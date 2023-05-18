@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.util.PropertyPlaceholderHelperTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-05-16T14:05:07" hostname="LMW-DESKTOP" time="4580.85">
-  <properties/>
-  <testcase name="unresolvedPlaceholderIsIgnored()" classname="org.springframework.util.PropertyPlaceholderHelperTests" time="4580.85"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
