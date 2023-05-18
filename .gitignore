@@ -47,3 +47,5 @@ atlassian-ide-plugin.xml
 ci/
 /.github/
 /ci/
+
+*.class
