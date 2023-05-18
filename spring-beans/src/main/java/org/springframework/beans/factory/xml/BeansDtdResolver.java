@@ -39,8 +39,8 @@ import org.springframework.lang.Nullable;
  *
  * @author Juergen Hoeller
  * @author Colin Sampaleanu
- * @since 04.06.2003
  * @see ResourceEntityResolver
+ * @since 04.06.2003
  */
 public class BeansDtdResolver implements EntityResolver {
 
@@ -59,33 +59,42 @@ public class BeansDtdResolver implements EntityResolver {
 					"] and system ID [" + systemId + "]");
 		}
 
-		if (systemId != null && systemId.endsWith(DTD_EXTENSION)) {
-			int lastPathSeparator = systemId.lastIndexOf('/');
-			int dtdNameStart = systemId.indexOf(DTD_NAME, lastPathSeparator);
-			if (dtdNameStart != -1) {
-				String dtdFile = DTD_NAME + DTD_EXTENSION;
-				if (logger.isTraceEnabled()) {
-					logger.trace("Trying to locate [" + dtdFile + "] in Spring jar on classpath");
-				}
-				try {
-					Resource resource = new ClassPathResource(dtdFile, getClass());
-					InputSource source = new InputSource(resource.getInputStream());
-					source.setPublicId(publicId);
-					source.setSystemId(systemId);
-					if (logger.isTraceEnabled()) {
-						logger.trace("Found beans DTD [" + systemId + "] in classpath: " + dtdFile);
-					}
-					return source;
-				}
-				catch (FileNotFoundException ex) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("Could not resolve beans DTD [" + systemId + "]: not found in classpath", ex);
-					}
-				}
+		if (systemId == null || !systemId.endsWith(DTD_EXTENSION)) {
+			//如果系统ID为空，或者不以DTD结尾，返回空
+			return null;
+		}
+		//最后的路径分割符位置
+		int lastPathSeparator = systemId.lastIndexOf('/');
+		int dtdNameStart = systemId.indexOf(DTD_NAME, lastPathSeparator);
+		if (dtdNameStart == -1) {
+			//如果从最后的路径分割符位置找字符串"spring-beans"，没有找到，则返回空
+			return null;
+		}
+		//spring-beans.dtd
+		String dtdFile = DTD_NAME + DTD_EXTENSION;
+		if (logger.isTraceEnabled()) {
+			logger.trace("Trying to locate [" + dtdFile + "] in Spring jar on classpath");
+		}
+		try {
+			//加载org/springframework/beans/factory/xml/spring-beans.dtd
+			Resource resource = new ClassPathResource(dtdFile, getClass());
+			//获取InputSource
+			InputSource source = new InputSource(resource.getInputStream());
+			//设置公共ID
+			source.setPublicId(publicId);
+			//设置系统ID
+			source.setSystemId(systemId);
+			if (logger.isTraceEnabled()) {
+				logger.trace("Found beans DTD [" + systemId + "] in classpath: " + dtdFile);
+			}
+			return source;
+		} catch (FileNotFoundException ex) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Could not resolve beans DTD [" + systemId + "]: not found in classpath", ex);
 			}
 		}
 
-		// Fall back to the parser's default behavior.
+		//回退到解析器的默认行为
 		return null;
 	}
 

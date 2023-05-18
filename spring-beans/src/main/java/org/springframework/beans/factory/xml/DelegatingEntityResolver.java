@@ -32,21 +32,29 @@ import org.springframework.util.Assert;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @author Rick Evans
- * @since 2.0
  * @see BeansDtdResolver
  * @see PluggableSchemaResolver
+ * @since 2.0
  */
 public class DelegatingEntityResolver implements EntityResolver {
 
-	/** Suffix for DTD files. */
+	/**
+	 * DTD文件的后缀。
+	 */
 	public static final String DTD_SUFFIX = ".dtd";
 
-	/** Suffix for schema definition files. */
+	/**
+	 * 模式定义文件的后缀。
+	 */
 	public static final String XSD_SUFFIX = ".xsd";
 
-
+	/**
+	 * DTD解析器
+	 */
 	private final EntityResolver dtdResolver;
-
+	/**
+	 * 模式解析器
+	 */
 	private final EntityResolver schemaResolver;
 
 
@@ -55,8 +63,9 @@ public class DelegatingEntityResolver implements EntityResolver {
 	 * a default {@link BeansDtdResolver} and a default {@link PluggableSchemaResolver}.
 	 * <p>Configures the {@link PluggableSchemaResolver} with the supplied
 	 * {@link ClassLoader}.
+	 *
 	 * @param classLoader the ClassLoader to use for loading
-	 * (can be {@code null}) to use the default ClassLoader)
+	 *                    (can be {@code null}) to use the default ClassLoader)
 	 */
 	public DelegatingEntityResolver(@Nullable ClassLoader classLoader) {
 		this.dtdResolver = new BeansDtdResolver();
@@ -66,7 +75,8 @@ public class DelegatingEntityResolver implements EntityResolver {
 	/**
 	 * Create a new DelegatingEntityResolver that delegates to
 	 * the given {@link EntityResolver EntityResolvers}.
-	 * @param dtdResolver the EntityResolver to resolve DTDs with
+	 *
+	 * @param dtdResolver    the EntityResolver to resolve DTDs with
 	 * @param schemaResolver the EntityResolver to resolve XML schemas with
 	 */
 	public DelegatingEntityResolver(EntityResolver dtdResolver, EntityResolver schemaResolver) {
@@ -82,16 +92,19 @@ public class DelegatingEntityResolver implements EntityResolver {
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId)
 			throws SAXException, IOException {
 
-		if (systemId != null) {
-			if (systemId.endsWith(DTD_SUFFIX)) {
-				return this.dtdResolver.resolveEntity(publicId, systemId);
-			}
-			else if (systemId.endsWith(XSD_SUFFIX)) {
-				return this.schemaResolver.resolveEntity(publicId, systemId);
-			}
+		if (systemId == null) {
+			//没有系统编号，返回null。
+			return null;
+		}
+		if (systemId.endsWith(DTD_SUFFIX)) {
+			//以DTO文件后缀结尾，使用DTD解析器解析
+			return this.dtdResolver.resolveEntity(publicId, systemId);
+		} else if (systemId.endsWith(XSD_SUFFIX)) {
+			//以XSD文件后缀结尾，使用XSD解析器解析
+			return this.schemaResolver.resolveEntity(publicId, systemId);
 		}
 
-		// Fall back to the parser's default behavior.
+		//回退到解析器的默认行为
 		return null;
 	}
 
