@@ -44,5 +44,6 @@ atlassian-ide-plugin.xml
 
 # VS Code
 .vscode/
-.github/
 ci/
+/.github/
+/ci/
