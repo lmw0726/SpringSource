@@ -48,12 +48,12 @@ import org.springframework.util.xml.XmlValidationModeDetector;
 public class DefaultDocumentLoader implements DocumentLoader {
 
 	/**
-	 * JAXP attribute used to configure the schema language for validation.
+	 * 用于配置模式语言以进行验证的JAXP属性。
 	 */
 	private static final String SCHEMA_LANGUAGE_ATTRIBUTE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
 
 	/**
-	 * JAXP attribute value indicating the XSD schema language.
+	 * 指示XSD模式语言的JAXP属性值。
 	 */
 	private static final String XSD_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
 
@@ -61,42 +61,48 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	private static final Log logger = LogFactory.getLog(DefaultDocumentLoader.class);
 
 
+
 	/**
-	 * Load the {@link Document} at the supplied {@link InputSource} using the standard JAXP-configured
-	 * XML parser.
+	 * 使用标准JAXP配置的XML解析器在提供的 {@link InputSource} 处加载 {@link Document}。
 	 */
 	@Override
 	public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
 			ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
-
+		//创建DocumentBuilderFactory
 		DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		//创建DocumentBuilder
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
+		//解析XML InputSource返回Document对象
 		return builder.parse(inputSource);
 	}
 
 	/**
-	 * Create the {@link DocumentBuilderFactory} instance.
-	 * @param validationMode the type of validation: {@link XmlValidationModeDetector#VALIDATION_DTD DTD}
-	 * or {@link XmlValidationModeDetector#VALIDATION_XSD XSD})
-	 * @param namespaceAware whether the returned factory is to provide support for XML namespaces
-	 * @return the JAXP DocumentBuilderFactory
-	 * @throws ParserConfigurationException if we failed to build a proper DocumentBuilderFactory
+	 * 创建{@link DocumentBuilderFactory}实例
+	 *
+	 * @param validationMode 验证模式： {@link XmlValidationModeDetector#VALIDATION_DTD DTD}
+	 *                       或者 {@link XmlValidationModeDetector#VALIDATION_XSD XSD})
+	 * @param namespaceAware 返回的工厂是否为XML命名空间提供支持
+	 * @return JAXP DocumentBuilderFactory实例
+	 * @throws ParserConfigurationException 如果我们未能建立一个合适的DocumentBuilderFactory
 	 */
 	protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
 			throws ParserConfigurationException {
-
+		//创建DocumentBuilderFactory实例
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		//设置命名空间支持
 		factory.setNamespaceAware(namespaceAware);
 
 		if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
+			//开启校验
 			factory.setValidating(true);
 			if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {
-				// Enforce namespace aware for XSD...
+				//如果是XSD验证模式，强制设置命名空间支持
 				factory.setNamespaceAware(true);
 				try {
+					// 设置 SCHEMA_LANGUAGE_ATTRIBUTE
 					factory.setAttribute(SCHEMA_LANGUAGE_ATTRIBUTE, XSD_SCHEMA_LANGUAGE);
 				}
 				catch (IllegalArgumentException ex) {
