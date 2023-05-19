@@ -1288,11 +1288,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Convert a comma delimited list (e.g., a row from a CSV file) into an
-	 * array of strings.
+	 * 将逗号分隔的列表 (例如，来自CSV文件的行) 转换为字符串数组。
 	 *
-	 * @param str the input {@code String} (potentially {@code null} or empty)
-	 * @return an array of strings, or the empty array in case of empty input
+	 * @param str 输入 {@code String} (可能是{@code null} 或空)
+	 * @return 字符串数组，或者在输入为空的情况下的空数组
 	 */
 	public static String[] commaDelimitedListToStringArray(@Nullable String str) {
 		return delimitedListToStringArray(str, ",");
