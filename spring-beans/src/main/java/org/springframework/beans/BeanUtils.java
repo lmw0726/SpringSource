@@ -727,19 +727,15 @@ public abstract class BeanUtils {
 
 
 	/**
-	 * Copy the property values of the given source bean into the target bean.
-	 * <p>Note: The source and target classes do not have to match or even be derived
-	 * from each other, as long as the properties match. Any bean properties that the
-	 * source bean exposes but the target bean does not will silently be ignored.
-	 * <p>This is just a convenience method. For more complex transfer needs,
-	 * consider using a full {@link BeanWrapper}.
-	 * <p>As of Spring Framework 5.3, this method honors generic type information
-	 * when matching properties in the source and target objects.
-	 * <p>The following table provides a non-exhaustive set of examples of source
-	 * and target property types that can be copied as well as source and target
-	 * property types that cannot be copied.
+	 * 将给定源bean的属性值复制到目标bean中。
+	 * <p> 注意: 源类和目标类不必匹配甚至彼此派生，只要属性匹配即可。
+	 * 源bean公开但目标bean不公开的任何bean属性都将被静默忽略。
+	 * <p> 这只是一种方便的方法。对于更复杂的传输需求，请考虑使用完整的 {@link BeanWrapper}。
+	 *
+	 * <p>从Spring Framework 5.3开始，当匹配源和目标对象中的属性时，此方法会遵循泛型类型信息。
+	 * <p>下表提供了可以复制的源和目标属性类型以及不能复制的源和目标属性类型的非详尽示例集。
 	 * <table border="1">
-	 * <tr><th>source property type</th><th>target property type</th><th>copy supported</th></tr>
+	 * <tr><th>源属性类型</th><th>目标属性类型</th><th>支持复制</th></tr>
 	 * <tr><td>{@code Integer}</td><td>{@code Integer}</td><td>yes</td></tr>
 	 * <tr><td>{@code Integer}</td><td>{@code Number}</td><td>yes</td></tr>
 	 * <tr><td>{@code List<Integer>}</td><td>{@code List<Integer>}</td><td>yes</td></tr>
@@ -752,9 +748,9 @@ public abstract class BeanUtils {
 	 * <tr><td>{@code List<Integer>}</td><td>{@code List<Number>}</td><td>no</td></tr>
 	 * </table>
 	 *
-	 * @param source the source bean
-	 * @param target the target bean
-	 * @throws BeansException if the copying failed
+	 * @param source 源 bean
+	 * @param target 目标 bean
+	 * @throws BeansException 如果复制失败
 	 * @see BeanWrapper
 	 */
 	public static void copyProperties(Object source, Object target) throws BeansException {
@@ -762,21 +758,18 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Copy the property values of the given source bean into the given target bean,
-	 * only setting properties defined in the given "editable" class (or interface).
-	 * <p>Note: The source and target classes do not have to match or even be derived
-	 * from each other, as long as the properties match. Any bean properties that the
-	 * source bean exposes but the target bean does not will silently be ignored.
-	 * <p>This is just a convenience method. For more complex transfer needs,
-	 * consider using a full {@link BeanWrapper}.
-	 * <p>As of Spring Framework 5.3, this method honors generic type information
-	 * when matching properties in the source and target objects. See the
-	 * documentation for {@link #copyProperties(Object, Object)} for details.
+	 * 将给定源bean的属性值复制到给定的目标bean中，仅设置在给定的 “可编辑” 类 (或接口) 中定义的属性。
+	 * <p>注意: 源类和目标类不必匹配甚至彼此派生，只要属性匹配即可。源bean公开但目标bean不公开的任何bean属性都将被静默忽略。
+	 * <p>这只是一种方便的方法。对于更复杂的传输需求，请考虑使用完整的 {@link BeanWrapper}。
 	 *
-	 * @param source   the source bean
-	 * @param target   the target bean
-	 * @param editable the class (or interface) to restrict property setting to
-	 * @throws BeansException if the copying failed
+	 *
+	 * <p>从Spring Framework 5.3开始，当匹配源和目标对象中的属性时，此方法会遵循泛型类型信息。
+	 * 有关详细信息，请参见 {@link #copyProperties(Object, Object)} 的文档。
+	 *
+	 * @param source   源 bean
+	 * @param target   目标 bean
+	 * @param editable 要限制属性设置的类 (或接口)
+	 * @throws BeansException 如果复制失败
 	 * @see BeanWrapper
 	 */
 	public static void copyProperties(Object source, Object target, Class<?> editable) throws BeansException {
@@ -784,21 +777,17 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Copy the property values of the given source bean into the given target bean,
-	 * ignoring the given "ignoreProperties".
-	 * <p>Note: The source and target classes do not have to match or even be derived
-	 * from each other, as long as the properties match. Any bean properties that the
-	 * source bean exposes but the target bean does not will silently be ignored.
-	 * <p>This is just a convenience method. For more complex transfer needs,
-	 * consider using a full {@link BeanWrapper}.
-	 * <p>As of Spring Framework 5.3, this method honors generic type information
-	 * when matching properties in the source and target objects. See the
-	 * documentation for {@link #copyProperties(Object, Object)} for details.
+	 * 将给定源bean的属性值复制到给定的目标bean中，忽略给定的 “ignoreProperties”。
+	 * <p>注意: 源类和目标类不必匹配，甚至不必彼此派生，只要属性匹配即可。
+	 * 源bean公开但目标bean不公开的任何bean属性都将被静默忽略。
+	 * <p>这只是一种方便的方法。对于更复杂的转移需求，请考虑使用完整的 {@link BeanWrapper}.
+	 * <p>从Spring Framework 5.3开始，当匹配源和目标对象中的属性时，此方法会遵循泛型类型信息。
+	 * 有关详细信息，请参见 {@link #copyProperties(Object, Object)} 的文档。
 	 *
-	 * @param source           the source bean
-	 * @param target           the target bean
-	 * @param ignoreProperties array of property names to ignore
-	 * @throws BeansException if the copying failed
+	 * @param source           源 bean
+	 * @param target           目标 bean
+	 * @param ignoreProperties 要忽略的属性名称数组
+	 * @throws BeansException 如果复制失败
 	 * @see BeanWrapper
 	 */
 	public static void copyProperties(Object source, Object target, String... ignoreProperties) throws BeansException {
@@ -806,19 +795,17 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Copy the property values of the given source bean into the given target bean.
-	 * <p>Note: The source and target classes do not have to match or even be derived
-	 * from each other, as long as the properties match. Any bean properties that the
-	 * source bean exposes but the target bean does not will silently be ignored.
-	 * <p>As of Spring Framework 5.3, this method honors generic type information
-	 * when matching properties in the source and target objects. See the
-	 * documentation for {@link #copyProperties(Object, Object)} for details.
+	 * 将给定源bean的属性值复制到给定的目标bean中。
+	 * <p> 注意: 源类和目标类不必匹配甚至彼此派生，只要属性匹配即可。
+	 * 源bean公开但目标bean不公开的任何bean属性都将被静默忽略。
+	 * <p> 从Spring Framework 5.3开始，此方法在匹配源和目标对象中的属性时会遵循泛型类型信息。
+	 * 有关详细信息，请参见 {@link #copyProperties(Object, Object)}  的文档。
 	 *
-	 * @param source           the source bean
-	 * @param target           the target bean
-	 * @param editable         the class (or interface) to restrict property setting to
-	 * @param ignoreProperties array of property names to ignore
-	 * @throws BeansException if the copying failed
+	 * @param source           源 bean
+	 * @param target           目标 bean
+	 * @param editable         要限制属性设置的类 (或接口)
+	 * @param ignoreProperties 要忽略的属性名称数组
+	 * @throws BeansException 如果复制失败
 	 * @see BeanWrapper
 	 */
 	private static void copyProperties(Object source, Object target, @Nullable Class<?> editable,
@@ -830,46 +817,66 @@ public abstract class BeanUtils {
 		Class<?> actualEditable = target.getClass();
 		if (editable != null) {
 			if (!editable.isInstance(target)) {
+				//如果目标类不是可编辑类的实例，抛出IllegalArgumentException
 				throw new IllegalArgumentException("Target class [" + target.getClass().getName() +
 						"] not assignable to Editable class [" + editable.getName() + "]");
 			}
 			actualEditable = editable;
 		}
+		//通过该类获取属性描述数组
 		PropertyDescriptor[] targetPds = getPropertyDescriptors(actualEditable);
-		List<String> ignoreList = (ignoreProperties != null ? Arrays.asList(ignoreProperties) : null);
+		//要忽略的属性名称列表
+		List<String> ignoreList = (ignoreProperties == null ? null : Arrays.asList(ignoreProperties));
 
 		for (PropertyDescriptor targetPd : targetPds) {
+			//获取可写方法
 			Method writeMethod = targetPd.getWriteMethod();
-			if (writeMethod != null && (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
-				PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
-				if (sourcePd != null) {
-					Method readMethod = sourcePd.getReadMethod();
-					if (readMethod != null) {
-						ResolvableType sourceResolvableType = ResolvableType.forMethodReturnType(readMethod);
-						ResolvableType targetResolvableType = ResolvableType.forMethodParameter(writeMethod, 0);
+			if (writeMethod == null || (ignoreList != null && ignoreList.contains(targetPd.getName()))) {
+				//如果该属性对应的方法，不是可写方法，或者忽略属性名列表不为空，且刚好这个属性是忽略属性时，跳过。
+				continue;
+			}
+			//根据源类和目标方法名获取源属性的属性描述
+			PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
+			if (sourcePd == null) {
+				//如果源字段属性描述为空，跳过
+				continue;
+			}
+			Method readMethod = sourcePd.getReadMethod();
+			if (readMethod == null) {
+				//如果源字段对应的方法不是可读方法，跳过
+				continue;
+			}
+			//获取源字段和目标字段对应的方法返回类型信息
+			ResolvableType sourceResolvableType = ResolvableType.forMethodReturnType(readMethod);
+			ResolvableType targetResolvableType = ResolvableType.forMethodParameter(writeMethod, 0);
 
-						// Ignore generic types in assignable check if either ResolvableType has unresolvable generics.
-						boolean isAssignable =
-								(sourceResolvableType.hasUnresolvableGenerics() || targetResolvableType.hasUnresolvableGenerics() ?
-										ClassUtils.isAssignable(writeMethod.getParameterTypes()[0], readMethod.getReturnType()) :
-										targetResolvableType.isAssignableFrom(sourceResolvableType));
+			// 如果任一可解析类型具有不可解析的泛型，请在可分配检查中忽略泛型。
+			boolean isAssignable;
+			if (sourceResolvableType.hasUnresolvableGenerics() || targetResolvableType.hasUnresolvableGenerics()) {
+				//如果源字段和目标字段的返回类型含有无法解析的泛型，通过ClassUtils检查可写方法的第一个参数是否可以赋值给可读方法的返回类型。
+				isAssignable = ClassUtils.isAssignable(writeMethod.getParameterTypes()[0], readMethod.getReturnType());
+			} else {
+				//否则通过目标字段返回信息检查是否可以将该属性赋值到目标对象中
+				isAssignable = targetResolvableType.isAssignableFrom(sourceResolvableType);
+			}
 
-						if (isAssignable) {
-							try {
-								if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
-									readMethod.setAccessible(true);
-								}
-								Object value = readMethod.invoke(source);
-								if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
-									writeMethod.setAccessible(true);
-								}
-								writeMethod.invoke(target, value);
-							} catch (Throwable ex) {
-								throw new FatalBeanException(
-										"Could not copy property '" + targetPd.getName() + "' from source to target", ex);
-							}
-						}
+			if (isAssignable) {
+				try {
+					if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
+						//如果可读方法的不是public权限，设置为可访问权限。
+						readMethod.setAccessible(true);
 					}
+					//通过反射调用可读方法，获取源对象值
+					Object value = readMethod.invoke(source);
+					if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
+						//如果可写方法不是public权限，设置为可访问权限。
+						writeMethod.setAccessible(true);
+					}
+					//通过反射方法，调用可写方法，值为源对象值，如setter方法
+					writeMethod.invoke(target, value);
+				} catch (Throwable ex) {
+					throw new FatalBeanException(
+							"Could not copy property '" + targetPd.getName() + "' from source to target", ex);
 				}
 			}
 		}
@@ -877,7 +884,7 @@ public abstract class BeanUtils {
 
 
 	/**
-	 * Inner class to avoid a hard dependency on Kotlin at runtime.
+	 * 内部类，以避免在运行时对Kotlin的硬依赖。
 	 */
 	private static class KotlinDelegate {
 
