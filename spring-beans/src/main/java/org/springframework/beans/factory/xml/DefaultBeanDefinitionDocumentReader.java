@@ -165,9 +165,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				}
 			}
 		}
-
+		//预处理文档根对象
 		preProcessXml(root);
 		parseBeanDefinitions(root, this.delegate);
+		//后置处理文档根对象
 		postProcessXml(root);
 
 		this.delegate = parent;
@@ -331,13 +332,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 
 	/**
-	 * Allow the XML to be extensible by processing any custom element types first,
-	 * before we start to process the bean definitions. This method is a natural
-	 * extension point for any other custom pre-processing of the XML.
-	 * <p>The default implementation is empty. Subclasses can override this method to
-	 * convert custom elements into standard Spring bean definitions, for example.
-	 * Implementors have access to the parser's bean definition reader and the
-	 * underlying XML resource, through the corresponding accessors.
+	 * 在开始处理bean定义之前，首先通过处理任何自定义元素类型来允许XML是可扩展的。
+	 * 此方法是XML的任何其他自定义预处理的自然扩展点。
+	 * <p> 默认实现为空。子类可以覆盖此方法以将自定义元素转换为标准Spring bean定义，
+	 * 例如：实现者可以通过相应的访问器访问解析器的bean定义读取器和底层XML资源。
 	 *
 	 * @see #getReaderContext()
 	 */
@@ -345,13 +343,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	/**
-	 * Allow the XML to be extensible by processing any custom element types last,
-	 * after we finished processing the bean definitions. This method is a natural
-	 * extension point for any other custom post-processing of the XML.
-	 * <p>The default implementation is empty. Subclasses can override this method to
-	 * convert custom elements into standard Spring bean definitions, for example.
-	 * Implementors have access to the parser's bean definition reader and the
-	 * underlying XML resource, through the corresponding accessors.
+	 * 在完成bean定义的处理后，通过最后处理任何自定义元素类型来允许XML可扩展。
+	 * 此方法是XML的任何其他自定义后处理的自然扩展点。
+	 * <p> 默认实现为空。子类可以覆盖此方法以将自定义元素转换为标准Spring bean定义，
+	 * 例如：实现者可以通过相应的访问器访问解析器的bean定义读取器和底层XML资源。
 	 *
 	 * @see #getReaderContext()
 	 */

@@ -531,9 +531,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Check if the right-hand side type may be assigned to the left-hand side
-	 * type, assuming setting by reflection. Considers primitive wrapper
-	 * classes as assignable to the corresponding primitive types.
+	 * 假设通过反射设置，请检查右侧类型是否可以分配给左侧类型。将原始包装器类视为可分配给相应的原始类型。
 	 *
 	 * @param lhsType the target type
 	 * @param rhsType the value type that should be assigned to the target type

@@ -34,7 +34,9 @@ import org.springframework.beans.factory.parsing.ReaderEventListener;
  * @author Juergen Hoeller
  */
 public class CollectingReaderEventListener implements ReaderEventListener {
-
+	/**
+	 * 默认定义列表
+	 */
 	private final List<DefaultsDefinition> defaults = new ArrayList<>();
 
 	private final Map<String, ComponentDefinition> componentDefinitions = new LinkedHashMap<>(8);

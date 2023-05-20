@@ -36,9 +36,9 @@ import org.springframework.lang.Nullable;
 public class PassThroughSourceExtractor implements SourceExtractor {
 
 	/**
-	 * Simply returns the supplied {@code sourceCandidate} as-is.
-	 * @param sourceCandidate the source metadata
-	 * @return the supplied {@code sourceCandidate}
+	 * 只需按状态返回提供的 {@code sourceCandidate}。
+	 * @param sourceCandidate 源元数据
+	 * @return 提供的 {@code sourceCandidate}
 	 */
 	@Override
 	public Object extractSource(Object sourceCandidate, @Nullable Resource definingResource) {

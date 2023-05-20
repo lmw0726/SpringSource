@@ -30,8 +30,8 @@ import java.util.EventListener;
 public interface ReaderEventListener extends EventListener {
 
 	/**
-	 * Notification that the given defaults has been registered.
-	 * @param defaultsDefinition a descriptor for the defaults
+	 * 已注册给定默认值的通知。
+	 * @param defaultsDefinition 默认值的描述符
 	 * @see org.springframework.beans.factory.xml.DocumentDefaultsDefinition
 	 */
 	void defaultsRegistered(DefaultsDefinition defaultsDefinition);

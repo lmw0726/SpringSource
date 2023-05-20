@@ -211,17 +211,29 @@ public class BeanDefinitionParserDelegate {
 	public static final String QUALIFIER_ELEMENT = "qualifier";
 
 	public static final String QUALIFIER_ATTRIBUTE_ELEMENT = "attribute";
-
+	/**
+	 * 默认的懒加载初始化配置
+	 */
 	public static final String DEFAULT_LAZY_INIT_ATTRIBUTE = "default-lazy-init";
-
+	/**
+	 * 默认合并属性
+	 */
 	public static final String DEFAULT_MERGE_ATTRIBUTE = "default-merge";
-
+	/**
+	 * 是否默认自动装配
+	 */
 	public static final String DEFAULT_AUTOWIRE_ATTRIBUTE = "default-autowire";
-
+	/**
+	 * 默认自动获取候选者
+	 */
 	public static final String DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE = "default-autowire-candidates";
-
+	/**
+	 * 默认初始化方法
+	 */
 	public static final String DEFAULT_INIT_METHOD_ATTRIBUTE = "default-init-method";
-
+	/**
+	 * 默认销毁方法
+	 */
 	public static final String DEFAULT_DESTROY_METHOD_ATTRIBUTE = "default-destroy-method";
 
 
@@ -312,52 +324,60 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Populate the given DocumentDefaultsDefinition instance with the default lazy-init,
-	 * autowire, dependency check settings, init-method, destroy-method and merge settings.
-	 * Support nested 'beans' element use cases by falling back to {@code parentDefaults}
-	 * in case the defaults are not explicitly set locally.
+	 * 使用默认的lazy-init，autowire，依赖项检查设置，init-方法，destroy-方法和合并设置填充给定的DocumentDefaultsDefinition实例。
+	 * 如果未在本地显式设置默认值，则通过回退 {@code parentDefaults} 来支持嵌套的 “beans” 元素用例。
 	 *
-	 * @param defaults       the defaults to populate
-	 * @param parentDefaults the parent BeanDefinitionParserDelegate (if any) defaults to fall back to
-	 * @param root           the root element of the current bean definition document (or nested beans element)
+	 * @param defaults       填充的默认值
+	 * @param parentDefaults (如果有) 默认回退到的父BeanDefinitionParserDelegate
+	 * @param root           当前bean定义文档的根元素 (或嵌套beans元素)
 	 */
 	protected void populateDefaults(DocumentDefaultsDefinition defaults, @Nullable DocumentDefaultsDefinition parentDefaults, Element root) {
 		String lazyInit = root.getAttribute(DEFAULT_LAZY_INIT_ATTRIBUTE);
 		if (isDefaultValue(lazyInit)) {
-			// Potentially inherited from outer <beans> sections, otherwise falling back to false.
-			lazyInit = (parentDefaults != null ? parentDefaults.getLazyInit() : FALSE_VALUE);
+			//如果是默认的懒加载初始化配置，查看父级文档默认定义是否存在，不存在将lazyInit设置为false。
+			//否则按照父级文档默认定义的lazyInit进行设置。
+			lazyInit = (parentDefaults == null ? FALSE_VALUE : parentDefaults.getLazyInit());
 		}
+		//设置默认的lazyInit
 		defaults.setLazyInit(lazyInit);
 
 		String merge = root.getAttribute(DEFAULT_MERGE_ATTRIBUTE);
 		if (isDefaultValue(merge)) {
-			// Potentially inherited from outer <beans> sections, otherwise falling back to false.
-			merge = (parentDefaults != null ? parentDefaults.getMerge() : FALSE_VALUE);
+			//如果default-merge的值是空值或者default，则从父级文档默认定义中获取。
+			//父级文档默认定义不存在，则将default-merge设置为false。存在则取父级文档默认定义的default-merge值。
+			merge = (parentDefaults == null ? FALSE_VALUE : parentDefaults.getMerge());
 		}
 		defaults.setMerge(merge);
 
 		String autowire = root.getAttribute(DEFAULT_AUTOWIRE_ATTRIBUTE);
 		if (isDefaultValue(autowire)) {
-			// Potentially inherited from outer <beans> sections, otherwise falling back to 'no'.
-			autowire = (parentDefaults != null ? parentDefaults.getAutowire() : AUTOWIRE_NO_VALUE);
+			//如果default-autowire的值是空值或者default，则从父级文档默认定义中获取。
+			//父级文档默认定义不存在，则将default-autowire设置为false。存在则取父级文档默认定义的default-autowire值。
+			autowire = (parentDefaults == null ? AUTOWIRE_NO_VALUE : parentDefaults.getAutowire());
 		}
 		defaults.setAutowire(autowire);
 
 		if (root.hasAttribute(DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE)) {
+			//如果根元素有default-autowire-candidates，设置default-autowire-candidates值
 			defaults.setAutowireCandidates(root.getAttribute(DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE));
 		} else if (parentDefaults != null) {
+			//如果父级文档默认定义存在，则从父级文档默认定义中获取。
 			defaults.setAutowireCandidates(parentDefaults.getAutowireCandidates());
 		}
 
 		if (root.hasAttribute(DEFAULT_INIT_METHOD_ATTRIBUTE)) {
+			//如果根元素有default-init-method，设置default-init-method值
 			defaults.setInitMethod(root.getAttribute(DEFAULT_INIT_METHOD_ATTRIBUTE));
 		} else if (parentDefaults != null) {
+			//如果父级文档默认定义存在，则从父级文档默认定义中获取。
 			defaults.setInitMethod(parentDefaults.getInitMethod());
 		}
 
 		if (root.hasAttribute(DEFAULT_DESTROY_METHOD_ATTRIBUTE)) {
+			//如果根元素有default-destroy-method，设置default-destroy-method值
 			defaults.setDestroyMethod(root.getAttribute(DEFAULT_DESTROY_METHOD_ATTRIBUTE));
 		} else if (parentDefaults != null) {
+			//如果父级文档默认定义存在，则从父级文档默认定义中获取。
 			defaults.setDestroyMethod(parentDefaults.getDestroyMethod());
 		}
 
@@ -1493,6 +1513,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	private boolean isDefaultValue(String value) {
+		//空值或者值是default，则为true，否则返回false
 		return !StringUtils.hasLength(value) || DEFAULT_VALUE.equals(value);
 	}
 

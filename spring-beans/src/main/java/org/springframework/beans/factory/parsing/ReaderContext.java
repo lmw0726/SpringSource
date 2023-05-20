@@ -28,13 +28,17 @@ import org.springframework.lang.Nullable;
  * @since 2.0
  */
 public class ReaderContext {
-
+	/**
+	 * 资源
+	 */
 	private final Resource resource;
 
 	private final ProblemReporter problemReporter;
 
 	private final ReaderEventListener eventListener;
-
+	/**
+	 * 源提取器
+	 */
 	private final SourceExtractor sourceExtractor;
 
 
@@ -153,7 +157,7 @@ public class ReaderContext {
 	// Explicit parse events
 
 	/**
-	 * Fire a defaults-registered event.
+	 * 触发默认注册的事件。
 	 */
 	public void fireDefaultsRegistered(DefaultsDefinition defaultsDefinition) {
 		this.eventListener.defaultsRegistered(defaultsDefinition);
@@ -198,10 +202,10 @@ public class ReaderContext {
 	}
 
 	/**
-	 * Call the source extractor for the given source object.
+	 * 调用给定源对象的源提取器。
 	 *
-	 * @param sourceCandidate the original source object
-	 * @return the source object to store, or {@code null} for none.
+	 * @param sourceCandidate 原始源对象
+	 * @return 要存储的源对象，可能为 {@code null} 或者无。
 	 * @see #getSourceExtractor()
 	 * @see SourceExtractor#extractSource
 	 */
