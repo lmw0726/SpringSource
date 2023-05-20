@@ -39,14 +39,15 @@ public class ReaderContext {
 
 
 	/**
-	 * Construct a new {@code ReaderContext}.
-	 * @param resource the XML bean definition resource
-	 * @param problemReporter the problem reporter in use
-	 * @param eventListener the event listener in use
-	 * @param sourceExtractor the source extractor in use
+	 * 构建一个新的 {@code ReaderContext}.
+	 *
+	 * @param resource        XML bean定义资源
+	 * @param problemReporter 使用中的问题报告者
+	 * @param eventListener   正在使用的事件侦听器
+	 * @param sourceExtractor 正在使用的源提取器
 	 */
 	public ReaderContext(Resource resource, ProblemReporter problemReporter,
-			ReaderEventListener eventListener, SourceExtractor sourceExtractor) {
+						 ReaderEventListener eventListener, SourceExtractor sourceExtractor) {
 
 		this.resource = resource;
 		this.problemReporter = problemReporter;
@@ -198,6 +199,7 @@ public class ReaderContext {
 
 	/**
 	 * Call the source extractor for the given source object.
+	 *
 	 * @param sourceCandidate the original source object
 	 * @return the source object to store, or {@code null} for none.
 	 * @see #getSourceExtractor()

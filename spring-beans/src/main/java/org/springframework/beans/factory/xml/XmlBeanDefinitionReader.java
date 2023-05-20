@@ -523,8 +523,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
 		//创建Bean定义文档阅读器
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
+		//获取已注册的Bean定义数量
 		int countBefore = getRegistry().getBeanDefinitionCount();
+		//创建XML阅读上下文，并注册Bean定义
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
+		//返回当前bean定义的数量
 		return getRegistry().getBeanDefinitionCount() - countBefore;
 	}
 
@@ -539,7 +542,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Create the {@link XmlReaderContext} to pass over to the document reader.
+	 * 创建 {@link XmlReaderContext} 以传递给文档阅读器。
 	 */
 	public XmlReaderContext createReaderContext(Resource resource) {
 		return new XmlReaderContext(resource, this.problemReporter, this.eventListener,
@@ -547,7 +550,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Lazily create a default NamespaceHandlerResolver, if not set before.
+	 * 懒加载地创建一个默认的命名空间处理解析器 (如果之前没有设置)。
 	 *
 	 * @see #createDefaultNamespaceHandlerResolver()
 	 */
@@ -559,13 +562,15 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Create the default implementation of {@link NamespaceHandlerResolver} used if none is specified.
-	 * <p>The default implementation returns an instance of {@link DefaultNamespaceHandlerResolver}.
+	 * 如果未指定，则创建 {@link NamespaceHandlerResolver} 的默认实现。
+	 * <p> 默认实现返回 {@link DefaultNamespaceHandlerResolver} 的实例。
 	 *
 	 * @see DefaultNamespaceHandlerResolver#DefaultNamespaceHandlerResolver(ClassLoader)
 	 */
 	protected NamespaceHandlerResolver createDefaultNamespaceHandlerResolver() {
-		ClassLoader cl = (getResourceLoader() != null ? getResourceLoader().getClassLoader() : getBeanClassLoader());
+		//获取类加载器
+		ClassLoader cl = (getResourceLoader() == null ? getBeanClassLoader() : getResourceLoader().getClassLoader());
+		//创建默认命名空间处理解析器
 		return new DefaultNamespaceHandlerResolver(cl);
 	}
 

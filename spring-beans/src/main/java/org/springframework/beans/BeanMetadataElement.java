@@ -28,8 +28,8 @@ import org.springframework.lang.Nullable;
 public interface BeanMetadataElement {
 
 	/**
-	 * Return the configuration source {@code Object} for this metadata element
-	 * (may be {@code null}).
+	 * 返回此元数据元素的配置源 {@code Object}
+	 * (可能为 {@code null}).
 	 */
 	@Nullable
 	default Object getSource() {

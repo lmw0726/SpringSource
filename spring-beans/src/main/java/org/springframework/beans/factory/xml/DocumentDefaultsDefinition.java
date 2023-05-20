@@ -28,38 +28,52 @@ import org.springframework.lang.Nullable;
  * @since 2.0.2
  */
 public class DocumentDefaultsDefinition implements DefaultsDefinition {
-
+	/**
+	 * 是否懒加载
+	 */
 	@Nullable
 	private String lazyInit;
-
+	/**
+	 * 是否合并设置
+	 */
 	@Nullable
 	private String merge;
-
+	/**
+	 * 自动装配
+	 */
 	@Nullable
 	private String autowire;
-
+	/**
+	 * 自动装配勾选者
+	 */
 	@Nullable
 	private String autowireCandidates;
-
+	/**
+	 * 初始化方法名称
+	 */
 	@Nullable
 	private String initMethod;
-
+	/**
+	 * 销毁方法名称
+	 */
 	@Nullable
 	private String destroyMethod;
-
+	/**
+	 * 元数据元素的配置源
+	 */
 	@Nullable
 	private Object source;
 
 
 	/**
-	 * Set the default lazy-init flag for the document that's currently parsed.
+	 * 为当前解析的文档设置默认的lazy-init标志。
 	 */
 	public void setLazyInit(@Nullable String lazyInit) {
 		this.lazyInit = lazyInit;
 	}
 
 	/**
-	 * Return the default lazy-init flag for the document that's currently parsed.
+	 * 返回当前解析的文档的默认lazy-init标志。
 	 */
 	@Nullable
 	public String getLazyInit() {
@@ -67,14 +81,14 @@ public class DocumentDefaultsDefinition implements DefaultsDefinition {
 	}
 
 	/**
-	 * Set the default merge setting for the document that's currently parsed.
+	 * 为当前解析的文档设置默认合并设置。
 	 */
 	public void setMerge(@Nullable String merge) {
 		this.merge = merge;
 	}
 
 	/**
-	 * Return the default merge setting for the document that's currently parsed.
+	 * 返回当前解析的文档的默认合并设置。
 	 */
 	@Nullable
 	public String getMerge() {
@@ -82,14 +96,14 @@ public class DocumentDefaultsDefinition implements DefaultsDefinition {
 	}
 
 	/**
-	 * Set the default autowire setting for the document that's currently parsed.
+	 * 为当前解析的文档设置默认的自动装配设置。
 	 */
 	public void setAutowire(@Nullable String autowire) {
 		this.autowire = autowire;
 	}
 
 	/**
-	 * Return the default autowire setting for the document that's currently parsed.
+	 * 返回当前解析的文档的默认自动装配设置。
 	 */
 	@Nullable
 	public String getAutowire() {
@@ -97,16 +111,14 @@ public class DocumentDefaultsDefinition implements DefaultsDefinition {
 	}
 
 	/**
-	 * Set the default autowire-candidate pattern for the document that's currently parsed.
-	 * Also accepts a comma-separated list of patterns.
+	 * 为当前解析的文档设置默认的自动装配候选模式。也接受以逗号分隔的模式列表。
 	 */
 	public void setAutowireCandidates(@Nullable String autowireCandidates) {
 		this.autowireCandidates = autowireCandidates;
 	}
 
 	/**
-	 * Return the default autowire-candidate pattern for the document that's currently parsed.
-	 * May also return a comma-separated list of patterns.
+	 * 返回当前解析的文档的默认自动装配候选模式。也可以返回逗号分隔的模式列表。
 	 */
 	@Nullable
 	public String getAutowireCandidates() {
@@ -114,14 +126,14 @@ public class DocumentDefaultsDefinition implements DefaultsDefinition {
 	}
 
 	/**
-	 * Set the default init-method setting for the document that's currently parsed.
+	 * 为当前解析的文档设置默认的init-method设置。
 	 */
 	public void setInitMethod(@Nullable String initMethod) {
 		this.initMethod = initMethod;
 	}
 
 	/**
-	 * Return the default init-method setting for the document that's currently parsed.
+	 * 返回当前解析的文档的默认init-method设置。
 	 */
 	@Nullable
 	public String getInitMethod() {
@@ -129,14 +141,14 @@ public class DocumentDefaultsDefinition implements DefaultsDefinition {
 	}
 
 	/**
-	 * Set the default destroy-method setting for the document that's currently parsed.
+	 * 为当前解析的文档设置默认的destroy-method设置。
 	 */
 	public void setDestroyMethod(@Nullable String destroyMethod) {
 		this.destroyMethod = destroyMethod;
 	}
 
 	/**
-	 * Return the default destroy-method setting for the document that's currently parsed.
+	 * 返回当前解析的文档的默认destroy-method设置。
 	 */
 	@Nullable
 	public String getDestroyMethod() {
@@ -144,8 +156,8 @@ public class DocumentDefaultsDefinition implements DefaultsDefinition {
 	}
 
 	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
+	 * 设置此元数据元素的配置源 {@code Object}。
+	 * <p> 对象的确切类型将取决于所使用的配置机制。
 	 */
 	public void setSource(@Nullable Object source) {
 		this.source = source;
