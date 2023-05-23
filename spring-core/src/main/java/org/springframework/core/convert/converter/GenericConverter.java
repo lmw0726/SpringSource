@@ -39,29 +39,29 @@ import org.springframework.util.Assert;
  *
  * @author Keith Donald
  * @author Juergen Hoeller
- * @since 3.0
  * @see TypeDescriptor
  * @see Converter
  * @see ConverterFactory
  * @see ConditionalConverter
+ * @since 3.0
  */
 public interface GenericConverter {
 
 	/**
-	 * Return the source and target types that this converter can convert between.
-	 * <p>Each entry is a convertible source-to-target type pair.
-	 * <p>For {@link ConditionalConverter conditional converters} this method may return
-	 * {@code null} to indicate all source-to-target pairs should be considered.
+	 * 返回此转换器可以在之间转换的源类型和目标类型。
+	 * <p> 每个条目都是可转换的源到目标类型对。
+	 * <p> 对于 {@link ConditionalConverter 条件转换器}，此方法可能返回 {@code null} 以指示应考虑所有源到目标对。
 	 */
 	@Nullable
 	Set<ConvertiblePair> getConvertibleTypes();
 
 	/**
-	 * Convert the source object to the targetType described by the {@code TypeDescriptor}.
-	 * @param source the source object to convert (may be {@code null})
-	 * @param sourceType the type descriptor of the field we are converting from
-	 * @param targetType the type descriptor of the field we are converting to
-	 * @return the converted object
+	 * 通过{@code TypeDescriptor}将源对象转为目标类型描述
+	 *
+	 * @param source     要转换的源对象 (可能是 {@code null})
+	 * @param sourceType 我们正在转换的字段的类型描述符
+	 * @param targetType 我们正在转换为的字段的类型描述符
+	 * @return 转换后的对象
 	 */
 	@Nullable
 	Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType);
@@ -78,6 +78,7 @@ public interface GenericConverter {
 
 		/**
 		 * Create a new source-to-target pair.
+		 *
 		 * @param sourceType the source type
 		 * @param targetType the target type
 		 */

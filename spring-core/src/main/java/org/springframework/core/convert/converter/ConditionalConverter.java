@@ -34,20 +34,20 @@ import org.springframework.core.convert.TypeDescriptor;
  *
  * @author Phillip Webb
  * @author Keith Donald
- * @since 3.2
  * @see Converter
  * @see GenericConverter
  * @see ConverterFactory
  * @see ConditionalGenericConverter
+ * @since 3.2
  */
 public interface ConditionalConverter {
 
 	/**
-	 * Should the conversion from {@code sourceType} to {@code targetType} currently under
-	 * consideration be selected?
-	 * @param sourceType the type descriptor of the field we are converting from
-	 * @param targetType the type descriptor of the field we are converting to
-	 * @return true if conversion should be performed, false otherwise
+	 * 是否应该选择当前正在考虑的从 {@code sourceType} 到 {@code targetType} 的转换？
+	 *
+	 * @param sourceType 我们正在转换的字段的类型描述符
+	 * @param targetType 我们正在转换为的字段的类型描述符
+	 * @return 如果应该进行转换，则为true，否则为false
 	 */
 	boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType);
 

@@ -112,7 +112,7 @@ public class XmlReaderContext extends ReaderContext {
 	}
 
 	/**
-	 * Return the environment to use.
+	 * 返回正在使用的环境
 	 *
 	 * @see XmlBeanDefinitionReader#setEnvironment
 	 */

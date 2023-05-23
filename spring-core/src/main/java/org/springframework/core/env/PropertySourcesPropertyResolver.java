@@ -24,19 +24,22 @@ import org.springframework.lang.Nullable;
  *
  * @author Chris Beams
  * @author Juergen Hoeller
- * @since 3.1
  * @see PropertySource
  * @see PropertySources
  * @see AbstractEnvironment
+ * @since 3.1
  */
 public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
-
+	/**
+	 * 属性资源
+	 */
 	@Nullable
 	private final PropertySources propertySources;
 
 
 	/**
 	 * Create a new resolver against the given property sources.
+	 *
 	 * @param propertySources the set of {@link PropertySource} objects to use
 	 */
 	public PropertySourcesPropertyResolver(@Nullable PropertySources propertySources) {
@@ -78,16 +81,21 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 	protected <T> T getProperty(String key, Class<T> targetValueType, boolean resolveNestedPlaceholders) {
 		if (this.propertySources != null) {
 			for (PropertySource<?> propertySource : this.propertySources) {
+				//遍历属性资源
 				if (logger.isTraceEnabled()) {
 					logger.trace("Searching for key '" + key + "' in PropertySource '" +
 							propertySource.getName() + "'");
 				}
+				//获取属性值
 				Object value = propertySource.getProperty(key);
 				if (value != null) {
 					if (resolveNestedPlaceholders && value instanceof String) {
+						//如果需要解析嵌套的占位符，且值是字符串类型
 						value = resolveNestedPlaceholders((String) value);
 					}
+					//记录日志
 					logKeyFound(key, propertySource, value);
+					//如果有必要，转换类型
 					return convertValueIfNecessary(value, targetValueType);
 				}
 			}
@@ -99,15 +107,14 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	/**
-	 * Log the given key as found in the given {@link PropertySource}, resulting in
-	 * the given value.
-	 * <p>The default implementation writes a debug log message with key and source.
-	 * As of 4.3.3, this does not log the value anymore in order to avoid accidental
-	 * logging of sensitive settings. Subclasses may override this method to change
-	 * the log level and/or log message, including the property's value if desired.
-	 * @param key the key found
-	 * @param propertySource the {@code PropertySource} that the key has been found in
-	 * @param value the corresponding value
+	 * 记录在给定的 {@link PropertySource} 中找到的给定键，从而得出给定值。
+	 * <p> 默认实现使用key和source写入调试日志消息。
+	 * 从4.3.3开始，这不再记录该值，以避免意外记录敏感设置。
+	 * 子类可以重写此方法来更改日志级别和或日志消息，如果需要，包括属性的值。
+	 *
+	 * @param key            找到的键
+	 * @param propertySource 已在其中找到键的 {@code PropertySource}
+	 * @param value          对应的值
 	 * @since 4.3.1
 	 */
 	protected void logKeyFound(String key, PropertySource<?> propertySource, Object value) {

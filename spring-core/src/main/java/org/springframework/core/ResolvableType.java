@@ -182,8 +182,8 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Private constructor used to create a new {@link ResolvableType} on a {@link Class} basis.
-	 * <p>Avoids all {@code instanceof} checks in order to create a straight {@link Class} wrapper.
+	 * 私有构造函数用于在 {@link Class} 的基础上创建新的 {@link ResolvableType}。
+	 * <p> 避免所有 {@code instanceof} 检查，以创建直接的 {@link Class} 包装器。
 	 *
 	 * @since 4.2
 	 */
@@ -233,8 +233,7 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return this type as a resolved {@code Class}, falling back to
-	 * {@link java.lang.Object} if no specific class can be resolved.
+	 * 将此类型作为已解析的 {@code Class} 返回，如果无法解析特定的类，则回退到 {@link java.lang.Object}。
 	 *
 	 * @return the resolved {@link Class} or the {@code Object} fallback
 	 * @see #getRawClass()
@@ -810,13 +809,12 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Resolve this type to a {@link java.lang.Class}, returning the specified
-	 * {@code fallback} if the type cannot be resolved. This method will consider bounds
-	 * of {@link TypeVariable TypeVariables} and {@link WildcardType WildcardTypes} if
-	 * direct resolution fails; however, bounds of {@code Object.class} will be ignored.
-	 *
-	 * @param fallback the fallback class to use if resolution fails
-	 * @return the resolved {@link Class} or the {@code fallback}
+	 * 将此类型解析为 {@link java.lang.Class}，如果无法解析该类型，则返回指定的 {@code fallback}。
+	 * 如果直接解析失败，此方法将考虑 {@link TypeVariable TypeVariables}  和 {@link WildcardType WildcardTypes}  的边界;
+	 * 但是，{@code Object.class} 的边界将被忽略。
+     *
+     * @param fallback 如果解析失败，要使用的回退类
+	 * @return 已解析的 {@link Class} 或 {@code fallback}
 	 * @see #resolve()
 	 * @see #resolveGeneric(int...)
 	 * @see #resolveGenerics()
@@ -1011,13 +1009,11 @@ public class ResolvableType implements Serializable {
 	// Factory methods
 
 	/**
-	 * Return a {@link ResolvableType} for the specified {@link Class},
-	 * using the full generic type information for assignability checks.
-	 * <p>For example: {@code ResolvableType.forClass(MyArrayList.class)}.
+	 * 使用完整的泛型类型信息进行可分配性检查，为指定的 {@link Class} 返回一个 {@link ResolvableType}。
+	 * <p> 例如: {@code ResolvableType.forClass(MyArrayList.class)}。
 	 *
-	 * @param clazz the class to introspect ({@code null} is semantically
-	 *              equivalent to {@code Object.class} for typical use cases here)
-	 * @return a {@link ResolvableType} for the specified class
+	 * @param clazz 内省类 ({@code null} 在语义上等同于 {@code Object.class} 这里的典型用例)
+	 * @return 指定类的 {@link ResolvableType}
 	 * @see #forClass(Class, Class)
 	 * @see #forClassWithGenerics(Class, Class...)
 	 */

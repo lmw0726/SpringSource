@@ -90,6 +90,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	/**
 	 * Set the prefix that placeholders replaced by this resolver must begin with.
 	 * <p>The default is "${".
+	 *
 	 * @see org.springframework.util.SystemPropertyUtils#PLACEHOLDER_PREFIX
 	 */
 	@Override
@@ -101,6 +102,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	/**
 	 * Set the suffix that placeholders replaced by this resolver must end with.
 	 * <p>The default is "}".
+	 *
 	 * @see org.springframework.util.SystemPropertyUtils#PLACEHOLDER_SUFFIX
 	 */
 	@Override
@@ -114,6 +116,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	 * resolver and their associated default value, or {@code null} if no such
 	 * special character should be processed as a value separator.
 	 * <p>The default is ":".
+	 *
 	 * @see org.springframework.util.SystemPropertyUtils#VALUE_SEPARATOR
 	 */
 	@Override
@@ -128,6 +131,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	 * that unresolvable nested placeholders should be passed through in their unresolved
 	 * ${...} form.
 	 * <p>The default is {@code false}.
+	 *
 	 * @since 3.2
 	 */
 	@Override
@@ -219,8 +223,9 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	 * {@link #resolveRequiredPlaceholders} do <i>not</i> delegate
 	 * to this method but rather perform their own handling of unresolvable
 	 * placeholders, as specified by each of those methods.
-	 * @since 3.2
+	 *
 	 * @see #setIgnoreUnresolvableNestedPlaceholders
+	 * @since 3.2
 	 */
 	protected String resolveNestedPlaceholders(String value) {
 		if (value.isEmpty()) {
@@ -240,24 +245,26 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	}
 
 	/**
-	 * Convert the given value to the specified target type, if necessary.
-	 * @param value the original property value
-	 * @param targetType the specified target type for property retrieval
-	 * @return the converted value, or the original value if no conversion
-	 * is necessary
+	 * 如有必要，将给定值转换为指定的目标类型。
+	 *
+	 * @param value      原始属性值
+	 * @param targetType 属性检索的指定目标类型
+	 * @return 转换后的值，如果不需要转换，则为原始值
 	 * @since 4.3.5
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
 	protected <T> T convertValueIfNecessary(Object value, @Nullable Class<T> targetType) {
 		if (targetType == null) {
+			//如果目标类型为空，则强转为返回类型
 			return (T) value;
 		}
+		//正在使用的类型转换服务
 		ConversionService conversionServiceToUse = this.conversionService;
 		if (conversionServiceToUse == null) {
-			// Avoid initialization of shared DefaultConversionService if
-			// no standard type conversion is needed in the first place...
+			// 避免初始化共享DefaultConversionService，如果首先不需要标准类型转换...
 			if (ClassUtils.isAssignableValue(targetType, value)) {
+				//如果value是目标类型的实例，强转
 				return (T) value;
 			}
 			conversionServiceToUse = DefaultConversionService.getSharedInstance();
@@ -269,6 +276,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	/**
 	 * Retrieve the specified property as a raw String,
 	 * i.e. without resolution of nested placeholders.
+	 *
 	 * @param key the property name to resolve
 	 * @return the property value or {@code null} if none found
 	 */

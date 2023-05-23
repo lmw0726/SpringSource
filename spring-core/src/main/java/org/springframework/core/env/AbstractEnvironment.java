@@ -64,12 +64,10 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	public static final String IGNORE_GETENV_PROPERTY_NAME = "spring.getenv.ignore";
 
 	/**
-	 * Name of property to set to specify active profiles: {@value}. Value may be comma
-	 * delimited.
-	 * <p>Note that certain shell environments such as Bash disallow the use of the period
-	 * character in variable names. Assuming that Spring's {@link SystemEnvironmentPropertySource}
-	 * is in use, this property may be specified as an environment variable as
-	 * {@code SPRING_PROFILES_ACTIVE}.
+	 * 要设置以指定活动配置文件的属性名称: {@value}。值可以用逗号分隔。
+	 * <p>
+	 * 请注意，某些shell环境 (例如Bash) 不允许在变量名称中使用句点字符。
+	 * 假设正在使用Spring的 {@link SystemEnvironmentPropertySource}，则此属性可以指定为 {@code SPRING_PROFILES_ACTIVE} 作为环境变量。
 	 *
 	 * @see ConfigurableEnvironment#setActiveProfiles
 	 */
@@ -103,8 +101,13 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 活动的环境配置，这里是有序的
+	 */
 	private final Set<String> activeProfiles = new LinkedHashSet<>();
-
+	/**
+	 * 默认的环境配置，这里是有序的
+	 */
 	private final Set<String> defaultProfiles = new LinkedHashSet<>(getReservedDefaultProfiles());
 
 	private final MutablePropertySources propertySources;
@@ -270,10 +273,8 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	}
 
 	/**
-	 * Return the set of active profiles as explicitly set through
-	 * {@link #setActiveProfiles} or if the current set of active profiles
-	 * is empty, check for the presence of {@link #doGetActiveProfilesProperty()}
-	 * and assign its value to the set of active profiles.
+	 * 返回通过{@link #setActiveProfiles} 显式设置的活动配置文件集，
+	 * 或者如果当前活动配置文件集为空，请检查是否存在 {@link #doGetActiveProfilesProperty()}，并将其值分配给活动配置文件集。
 	 *
 	 * @see #getActiveProfiles()
 	 * @see #doGetActiveProfilesProperty()
@@ -281,6 +282,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	protected Set<String> doGetActiveProfiles() {
 		synchronized (this.activeProfiles) {
 			if (this.activeProfiles.isEmpty()) {
+				//如果活动的环境配置为空，获取激活的环境配置属性
 				String profiles = doGetActiveProfilesProperty();
 				if (StringUtils.hasText(profiles)) {
 					setActiveProfiles(StringUtils.commaDelimitedListToStringArray(
@@ -292,7 +294,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	}
 
 	/**
-	 * Return the property value for the active profiles.
+	 * 返回活动配置文件的属性值。
 	 *
 	 * @see #ACTIVE_PROFILES_PROPERTY_NAME
 	 * @since 5.3.4
@@ -605,6 +607,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	@Override
 	@Nullable
 	public String getProperty(String key) {
+		//委托给属性解析器处理
 		return this.propertyResolver.getProperty(key);
 	}
 

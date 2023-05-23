@@ -54,18 +54,16 @@ public class DefaultConversionService extends GenericConversionService {
 
 
 	/**
-	 * Return a shared default {@code ConversionService} instance,
-	 * lazily building it once needed.
-	 * <p><b>NOTE:</b> We highly recommend constructing individual
-	 * {@code ConversionService} instances for customization purposes.
-	 * This accessor is only meant as a fallback for code paths which
-	 * need simple type coercion but cannot access a longer-lived
-	 * {@code ConversionService} instance any other way.
-	 * @return the shared {@code ConversionService} instance (never {@code null})
+	 * 返回一个共享的默认 {@code ConversionService} 实例，一旦需要就懒加载地构建它。
+	 * <p><b> 注意:</b> 我们强烈建议为定制目的构造单个 {@code ConversionService} 实例。
+	 * 此访问器仅表示需要简单类型强制但无法以其他任何方式访问寿命更长的 {@code ConversionService} 实例的代码路径的后备。
+	 *
+	 * @return 共享的{@code ConversionService} 实例 (从不为 {@code null})
 	 * @since 4.3.5
 	 */
 	public static ConversionService getSharedInstance() {
 		DefaultConversionService cs = sharedInstance;
+		//使用双重检测初始化共享实例
 		if (cs == null) {
 			synchronized (DefaultConversionService.class) {
 				cs = sharedInstance;
@@ -80,8 +78,9 @@ public class DefaultConversionService extends GenericConversionService {
 
 	/**
 	 * Add converters appropriate for most environments.
+	 *
 	 * @param converterRegistry the registry of converters to add to
-	 * (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
+	 *                          (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
 	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a ConversionService
 	 */
 	public static void addDefaultConverters(ConverterRegistry converterRegistry) {
@@ -101,8 +100,9 @@ public class DefaultConversionService extends GenericConversionService {
 
 	/**
 	 * Add common collection converters.
+	 *
 	 * @param converterRegistry the registry of converters to add to
-	 * (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
+	 *                          (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
 	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a ConversionService
 	 * @since 4.2.3
 	 */

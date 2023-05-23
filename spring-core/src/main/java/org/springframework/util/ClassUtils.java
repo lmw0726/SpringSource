@@ -86,14 +86,12 @@ public abstract class ClassUtils {
 
 
 	/**
-	 * Map with primitive wrapper type as key and corresponding primitive
-	 * type as value, for example: Integer.class -> int.class.
+	 * 以原始包装器类型为键，以对应的原始类型为值的映射，例如: Integer.class -> int.class。
 	 */
 	private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new IdentityHashMap<>(9);
 
 	/**
-	 * Map with primitive type as key and corresponding wrapper
-	 * type as value, for example: int.class -> Integer.class.
+	 * 以原始类型为键，以对应的包装类型为值的映射，例如: int.class -> Integer.class。
 	 */
 	private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new IdentityHashMap<>(9);
 
@@ -519,52 +517,56 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Resolve the given class if it is a primitive class,
-	 * returning the corresponding primitive wrapper type instead.
+	 * 解析给定的类，如果它是一个原始类，则返回相应的原始包装类型。
 	 *
-	 * @param clazz the class to check
-	 * @return the original class, or a primitive wrapper for the original primitive type
+	 * @param clazz 要检查的类
+	 * @return 原始类，或原始类型的包装器
 	 */
 	public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
+		//如果该类是原始类型，且该类不是void类型，通过primitiveTypeToWrapperMap获取对应的包装类型，返回该类型。
 		return (clazz.isPrimitive() && clazz != void.class ? primitiveTypeToWrapperMap.get(clazz) : clazz);
 	}
 
 	/**
 	 * 假设通过反射设置，请检查右侧类型是否可以分配给左侧类型。将原始包装器类视为可分配给相应的原始类型。
 	 *
-	 * @param lhsType the target type
-	 * @param rhsType the value type that should be assigned to the target type
-	 * @return if the target type is assignable from the value type
+	 * @param lhsType 目标类型
+	 * @param rhsType 应该分配给目标类型的值类型
+	 * @return 如果目标类型是可从值类型分配的
 	 * @see TypeUtils#isAssignable(java.lang.reflect.Type, java.lang.reflect.Type)
 	 */
 	public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
 		Assert.notNull(lhsType, "Left-hand side type must not be null");
 		Assert.notNull(rhsType, "Right-hand side type must not be null");
 		if (lhsType.isAssignableFrom(rhsType)) {
+			//如果右边的类型是左边类型的子类，返回true
 			return true;
 		}
 		if (lhsType.isPrimitive()) {
+			//如果左边类型是原始类型，获取右边类型对应的原始类型，并对他们进行比较。
 			Class<?> resolvedPrimitive = primitiveWrapperTypeMap.get(rhsType);
 			return (lhsType == resolvedPrimitive);
 		} else {
+			//获取右边类型的包装类型
 			Class<?> resolvedWrapper = primitiveTypeToWrapperMap.get(rhsType);
+			//如果包装类型不为空，且包装类型是左边类型的子类，返回true
 			return (resolvedWrapper != null && lhsType.isAssignableFrom(resolvedWrapper));
 		}
 	}
 
 	/**
-	 * Determine if the given type is assignable from the given value,
-	 * assuming setting by reflection. Considers primitive wrapper classes
-	 * as assignable to the corresponding primitive types.
+	 * 假设通过反射设置，确定给定类型是否可从给定值分配。将原始包装器类视为可分配给相应的原始类型。
 	 *
-	 * @param type  the target type
-	 * @param value the value that should be assigned to the type
-	 * @return if the type is assignable from the value
+	 * @param type  目标类型
+	 * @param value 应该分配给类型的值
+	 * @return 如果可以从值中分配类型
 	 */
 	public static boolean isAssignableValue(Class<?> type, @Nullable Object value) {
 		Assert.notNull(type, "Type must not be null");
-		return (value != null ? isAssignable(type, value.getClass()) : !type.isPrimitive());
+		//如果值为空，则判断目标类型不是原始类型
+		//否则调用isAssignable方法，判断两者的类型是否是派生出来的。
+		return (value == null ? !type.isPrimitive() : isAssignable(type, value.getClass()));
 	}
 
 	/**

@@ -66,8 +66,8 @@ import org.springframework.util.ReflectionUtils;
  * @author Keith Donald
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 3.0
  * @see FallbackObjectToStringConverter
+ * @since 3.0
  */
 final class ObjectToObjectConverter implements ConditionalGenericConverter {
 
@@ -104,21 +104,17 @@ final class ObjectToObjectConverter implements ConditionalGenericConverter {
 				ReflectionUtils.makeAccessible(method);
 				if (!Modifier.isStatic(method.getModifiers())) {
 					return method.invoke(source);
-				}
-				else {
+				} else {
 					return method.invoke(null, source);
 				}
-			}
-			else if (executable instanceof Constructor) {
+			} else if (executable instanceof Constructor) {
 				Constructor<?> ctor = (Constructor<?>) executable;
 				ReflectionUtils.makeAccessible(ctor);
 				return ctor.newInstance(source);
 			}
-		}
-		catch (InvocationTargetException ex) {
+		} catch (InvocationTargetException ex) {
 			throw new ConversionFailedException(sourceType, targetType, source, ex.getTargetException());
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
 			throw new ConversionFailedException(sourceType, targetType, source, ex);
 		}
 
@@ -126,7 +122,7 @@ final class ObjectToObjectConverter implements ConditionalGenericConverter {
 		// No toInteger() method exists on java.lang.Number, and no static valueOf/of/from(java.lang.Number)
 		// method or Integer(java.lang.Number) constructor exists on java.lang.Integer.
 		throw new IllegalStateException(String.format("No to%3$s() method exists on %1$s, " +
-				"and no static valueOf/of/from(%1$s) method or %3$s(%1$s) constructor exists on %2$s.",
+						"and no static valueOf/of/from(%1$s) method or %3$s(%1$s) constructor exists on %2$s.",
 				sourceClass.getName(), targetClass.getName(), targetClass.getSimpleName()));
 	}
 
@@ -163,12 +159,10 @@ final class ObjectToObjectConverter implements ConditionalGenericConverter {
 			return (!Modifier.isStatic(method.getModifiers()) ?
 					ClassUtils.isAssignable(method.getDeclaringClass(), sourceClass) :
 					method.getParameterTypes()[0] == sourceClass);
-		}
-		else if (executable instanceof Constructor) {
+		} else if (executable instanceof Constructor) {
 			Constructor<?> ctor = (Constructor<?>) executable;
 			return (ctor.getParameterTypes()[0] == sourceClass);
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -206,8 +200,9 @@ final class ObjectToObjectConverter implements ConditionalGenericConverter {
 	/**
 	 * Determine if the two types reside in the same type hierarchy (i.e., type 1
 	 * is assignable to type 2 or vice versa).
-	 * @since 5.3.21
+	 *
 	 * @see ClassUtils#isAssignable(Class, Class)
+	 * @since 5.3.21
 	 */
 	private static boolean areRelatedTypes(Class<?> type1, Class<?> type2) {
 		return (ClassUtils.isAssignable(type1, type2) || ClassUtils.isAssignable(type2, type1));
