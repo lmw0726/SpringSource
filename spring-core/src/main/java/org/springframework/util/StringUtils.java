@@ -147,14 +147,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Check whether the given {@code String} contains actual <em>text</em>.
-	 * <p>More specifically, this method returns {@code true} if the
-	 * {@code String} is not {@code null}, its length is greater than 0,
-	 * and it contains at least one non-whitespace character.
+	 * 检查给定的 {@code String} 是否包含实际的 <em> 文本 <em>。
+	 * <p> 更具体地说，如果 {@code String} 不是 {@code null}，其长度大于0，并且至少包含一个非空格字符，则此方法返回 {@code true}。
 	 *
-	 * @param str the {@code String} to check (may be {@code null})
-	 * @return {@code true} if the {@code String} is not {@code null}, its
-	 * length is greater than 0, and it does not contain whitespace only
+	 * @param str 要检查的 {@code String} (可能是 {@code null})
+	 * @return {@code true} 如果 {@code String} 不是 {@code null}，则其长度大于0，并且仅不包含空格
 	 * @see #hasText(CharSequence)
 	 * @see #hasLength(String)
 	 * @see Character#isWhitespace
@@ -933,15 +930,14 @@ public abstract class StringUtils {
 	//---------------------------------------------------------------------
 
 	/**
-	 * Copy the given {@link Collection} into a {@code String} array.
-	 * <p>The {@code Collection} must contain {@code String} elements only.
+	 * 将给定的 {@link Collection} 复制到 {@code String} 数组中。
+	 * <p> {@code Collection} 必须仅包含 {@code String} 元素。
 	 *
-	 * @param collection the {@code Collection} to copy
-	 *                   (potentially {@code null} or empty)
-	 * @return the resulting {@code String} array
+	 * @param collection 要复制的 {@code Collection} (可能为 {@code null} 或为空)
+	 * @return 生成的 {@code String} 数组
 	 */
 	public static String[] toStringArray(@Nullable Collection<String> collection) {
-		return (!CollectionUtils.isEmpty(collection) ? collection.toArray(EMPTY_STRING_ARRAY) : EMPTY_STRING_ARRAY);
+		return (CollectionUtils.isEmpty(collection) ? EMPTY_STRING_ARRAY : collection.toArray(EMPTY_STRING_ARRAY));
 	}
 
 	/**
@@ -1162,18 +1158,15 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Tokenize the given {@code String} into a {@code String} array via a
-	 * {@link StringTokenizer}.
-	 * <p>Trims tokens and omits empty tokens.
-	 * <p>The given {@code delimiters} string can consist of any number of
-	 * delimiter characters. Each of those characters can be used to separate
-	 * tokens. A delimiter is always a single character; for multi-character
-	 * delimiters, consider using {@link #delimitedListToStringArray}.
+	 * 通过 {@link StringTokenizer} 将给定的 {@code String} 标记为 {@code String} 数组。
+	 * <p>修剪令牌并省略空令牌。
+	 * <p>给定的 {@code delimiters} 字符串可以由任意数量的分隔符字符组成。这些字符中的每一个都可以用来分隔令牌。
+	 * 分隔符始终是单个字符;
+	 * 对于多字符分隔符，请考虑使用 {@link #delimitedListToStringArray}。
 	 *
-	 * @param str        the {@code String} to tokenize (potentially {@code null} or empty)
-	 * @param delimiters the delimiter characters, assembled as a {@code String}
-	 *                   (each of the characters is individually considered as a delimiter)
-	 * @return an array of the tokens
+	 * @param str        标记为令牌的 {@code String} (可能为 {@code null} 或空)
+	 * @param delimiters 分隔符字符，组装为 {@code String} (每个字符单独视为分隔符)
+	 * @return 令牌数组
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray
@@ -1183,21 +1176,16 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Tokenize the given {@code String} into a {@code String} array via a
-	 * {@link StringTokenizer}.
-	 * <p>The given {@code delimiters} string can consist of any number of
-	 * delimiter characters. Each of those characters can be used to separate
-	 * tokens. A delimiter is always a single character; for multi-character
-	 * delimiters, consider using {@link #delimitedListToStringArray}.
+	 * 通过 {@link StringTokenizer} 将给定的 {@code String} 标记为 {@code String} 数组。
+	 * <p>给定的 {@code delimiters} 字符串可以由任意数量的分隔符字符组成。
+	 * 这些字符中的每一个都可以用来分隔令牌。分隔符始终是单个字符;
+	 * 对于多字符分隔符，请考虑使用 {@link #delimitedListToStringArray}。
 	 *
-	 * @param str               the {@code String} to tokenize (potentially {@code null} or empty)
-	 * @param delimiters        the delimiter characters, assembled as a {@code String}
-	 *                          (each of the characters is individually considered as a delimiter)
-	 * @param trimTokens        trim the tokens via {@link String#trim()}
-	 * @param ignoreEmptyTokens omit empty tokens from the result array
-	 *                          (only applies to tokens that are empty after trimming; StringTokenizer
-	 *                          will not consider subsequent delimiters as token in the first place).
-	 * @return an array of the tokens
+	 * @param str               标记为令牌的 {@code String} (可能为 {@code null} 或空)
+	 * @param delimiters        分隔符字符，组装为 {@code String} (每个字符单独视为分隔符)
+	 * @param trimTokens        通过{@link String#trim()} 裁剪令牌
+	 * @param ignoreEmptyTokens 从结果数组中省略空令牌 (仅适用于修剪后为空的令牌; StringTokenizer首先不会将后续分隔符视为令牌)。
+	 * @return 令牌数组
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray
@@ -1217,9 +1205,11 @@ public abstract class StringUtils {
 				token = token.trim();
 			}
 			if (!ignoreEmptyTokens || token.length() > 0) {
+				//如果忽略了空令牌或者令牌不为空，添加令牌。
 				tokens.add(token);
 			}
 		}
+		//将List转为数组
 		return toStringArray(tokens);
 	}
 

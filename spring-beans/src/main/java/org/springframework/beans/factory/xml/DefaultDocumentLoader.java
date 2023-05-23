@@ -16,19 +16,18 @@
 
 package org.springframework.beans.factory.xml;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.lang.Nullable;
+import org.springframework.util.xml.XmlValidationModeDetector;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.xml.XmlValidationModeDetector;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Spring's default {@link DocumentLoader} implementation.
@@ -61,13 +60,12 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	private static final Log logger = LogFactory.getLog(DefaultDocumentLoader.class);
 
 
-
 	/**
 	 * 使用标准JAXP配置的XML解析器在提供的 {@link InputSource} 处加载 {@link Document}。
 	 */
 	@Override
 	public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
-			ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
+								 ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
 		//创建DocumentBuilderFactory
 		DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
 		if (logger.isTraceEnabled()) {
@@ -104,12 +102,11 @@ public class DefaultDocumentLoader implements DocumentLoader {
 				try {
 					// 设置 SCHEMA_LANGUAGE_ATTRIBUTE
 					factory.setAttribute(SCHEMA_LANGUAGE_ATTRIBUTE, XSD_SCHEMA_LANGUAGE);
-				}
-				catch (IllegalArgumentException ex) {
+				} catch (IllegalArgumentException ex) {
 					ParserConfigurationException pcex = new ParserConfigurationException(
 							"Unable to validate using XSD: Your JAXP provider [" + factory +
-							"] does not support XML Schema. Are you running on Java 1.4 with Apache Crimson? " +
-							"Upgrade to Apache Xerces (or Java 1.5) for full XSD support.");
+									"] does not support XML Schema. Are you running on Java 1.4 with Apache Crimson? " +
+									"Upgrade to Apache Xerces (or Java 1.5) for full XSD support.");
 					pcex.initCause(ex);
 					throw pcex;
 				}
@@ -123,15 +120,16 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	 * Create a JAXP DocumentBuilder that this bean definition reader
 	 * will use for parsing XML documents. Can be overridden in subclasses,
 	 * adding further initialization of the builder.
-	 * @param factory the JAXP DocumentBuilderFactory that the DocumentBuilder
-	 * should be created with
+	 *
+	 * @param factory        the JAXP DocumentBuilderFactory that the DocumentBuilder
+	 *                       should be created with
 	 * @param entityResolver the SAX EntityResolver to use
-	 * @param errorHandler the SAX ErrorHandler to use
+	 * @param errorHandler   the SAX ErrorHandler to use
 	 * @return the JAXP DocumentBuilder
 	 * @throws ParserConfigurationException if thrown by JAXP methods
 	 */
 	protected DocumentBuilder createDocumentBuilder(DocumentBuilderFactory factory,
-			@Nullable EntityResolver entityResolver, @Nullable ErrorHandler errorHandler)
+													@Nullable EntityResolver entityResolver, @Nullable ErrorHandler errorHandler)
 			throws ParserConfigurationException {
 
 		DocumentBuilder docBuilder = factory.newDocumentBuilder();
