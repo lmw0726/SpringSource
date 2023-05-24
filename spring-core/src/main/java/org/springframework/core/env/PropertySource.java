@@ -116,9 +116,8 @@ public abstract class PropertySource<T> {
 	}
 
 	/**
-	 * Return the value associated with the given name,
-	 * or {@code null} if not found.
-	 * @param name the property to find
+	 * 返回与给定名称关联的值，如果找不到，则返回 {@code null}。
+	 * @param name 找到的属性
 	 * @see PropertyResolver#getRequiredProperty(String)
 	 */
 	@Nullable

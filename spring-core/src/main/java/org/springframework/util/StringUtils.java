@@ -231,15 +231,15 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Trim <i>all</i> whitespace from the given {@code String}:
-	 * leading, trailing, and in between characters.
+	 * 从给定的 {@code String} 中修剪 <i> 所有 <i> 空格: 前置字符，后置字符和字符之间的字符。
 	 *
-	 * @param str the {@code String} to check
-	 * @return the trimmed {@code String}
+	 * @param str 要检查的 {@code String}
+	 * @return 裁剪后的 {@code String}
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimAllWhitespace(String str) {
 		if (!hasLength(str)) {
+			//如果没有长度，直接返回原字符串
 			return str;
 		}
 
@@ -248,6 +248,7 @@ public abstract class StringUtils {
 		for (int i = 0; i < len; i++) {
 			char c = str.charAt(i);
 			if (!Character.isWhitespace(c)) {
+				//如果字符不是空表字符，则添加到StringBuilder中
 				sb.append(c);
 			}
 		}
@@ -368,19 +369,20 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Test whether the given string matches the given substring
-	 * at the given index.
+	 * 测试给定字符串是否与给定索引处的给定子字符串匹配。
 	 *
-	 * @param str       the original string (or StringBuilder)
-	 * @param index     the index in the original string to start matching against
-	 * @param substring the substring to match at the given index
+	 * @param str       原始字符串 (或StringBuilder)
+	 * @param index     要开始匹配的原始字符串中的索引
+	 * @param substring 在给定索引处匹配的子字符串
 	 */
 	public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
 		if (index + substring.length() > str.length()) {
+			//如果遍历的位置+子字符串的长度大于原始字符串的长度,则返回false
 			return false;
 		}
 		for (int i = 0; i < substring.length(); i++) {
 			if (str.charAt(index + i) != substring.charAt(i)) {
+				//任意位置的字符不匹配，返回false
 				return false;
 			}
 		}
@@ -458,15 +460,15 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Delete any character in a given {@code String}.
+	 * 删除给定 {@code String} 中的任何字符。
 	 *
-	 * @param inString      the original {@code String}
-	 * @param charsToDelete a set of characters to delete.
-	 *                      E.g. "az\n" will delete 'a's, 'z's and new lines.
-	 * @return the resulting {@code String}
+	 * @param inString      原始 {@code String}
+	 * @param charsToDelete 要删除的一组字符。例如。“az\n” 将删除 “a” 、 “z” 和新行。
+	 * @return {@code String}结果
 	 */
 	public static String deleteAny(String inString, @Nullable String charsToDelete) {
 		if (!hasLength(inString) || !hasLength(charsToDelete)) {
+			//如果原始字符串为空，或者要删除的字符为空，返回原字符串
 			return inString;
 		}
 
@@ -475,12 +477,15 @@ public abstract class StringUtils {
 		for (int i = 0; i < inString.length(); i++) {
 			char c = inString.charAt(i);
 			if (charsToDelete.indexOf(c) == -1) {
+				//如果要删除的字符串没有当前位置的字符，将该字符添加到字符数组中
 				result[lastCharIndex++] = c;
 			}
 		}
 		if (lastCharIndex == inString.length()) {
+			//如果最后一个字符的位置与原始字符长度相同，则返回原始字符串
 			return inString;
 		}
+		//构建未删除的字符串
 		return new String(result, 0, lastCharIndex);
 	}
 
@@ -1214,17 +1219,13 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Take a {@code String} that is a delimited list and convert it into a
-	 * {@code String} array.
-	 * <p>A single {@code delimiter} may consist of more than one character,
-	 * but it will still be considered as a single delimiter string, rather
-	 * than as bunch of potential delimiter characters, in contrast to
-	 * {@link #tokenizeToStringArray}.
+	 * 取一个 {@code String}，它是一个分隔列表，并将其转换为 {@code String} 数组。
+	 * <p>单个 {@code String} 可能包含多个字符，但与 {@link #tokenizeToStringArray}
+	 * 相反，它仍将被视为单个分隔符字符串，而不是一堆潜在的分隔符字符。
 	 *
-	 * @param str       the input {@code String} (potentially {@code null} or empty)
-	 * @param delimiter the delimiter between elements (this is a single delimiter,
-	 *                  rather than a bunch individual delimiter characters)
-	 * @return an array of the tokens in the list
+	 * @param str       输入 {@code String} (可能为 {@code null} 或空)
+	 * @param delimiter 元素之间的分隔符 (这是单个分隔符，而不是一堆单独的分隔符字符)
+	 * @return 列表中的令牌数组
 	 * @see #tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(@Nullable String str, @Nullable String delimiter) {
@@ -1232,48 +1233,51 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Take a {@code String} that is a delimited list and convert it into
-	 * a {@code String} array.
-	 * <p>A single {@code delimiter} may consist of more than one character,
-	 * but it will still be considered as a single delimiter string, rather
-	 * than as bunch of potential delimiter characters, in contrast to
-	 * {@link #tokenizeToStringArray}.
+	 * 取一个 {@code String}，它是一个分隔列表，并将其转换为 {@code String} 数组。
+	 * <p>单个 {@code 分隔符} 可能包含多个字符，但与 {@link #tokenizeToStringArray} 相反，
+	 * 它仍将被视为单个分隔符字符串，而不是一堆潜在的分隔符字符。
 	 *
-	 * @param str           the input {@code String} (potentially {@code null} or empty)
-	 * @param delimiter     the delimiter between elements (this is a single delimiter,
-	 *                      rather than a bunch individual delimiter characters)
-	 * @param charsToDelete a set of characters to delete; useful for deleting unwanted
-	 *                      line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a {@code String}
-	 * @return an array of the tokens in the list
+	 * @param str           输入 {@code String} (可能为 {@code null} 或空)
+	 * @param delimiter     元素之间的分隔符 (这是单个分隔符，而不是一堆单独的分隔符字符)
+	 * @param charsToDelete 要删除的一组字符; 用于删除不需要的换行符: 例如 “\r \n \f” 将删除 {@code String} 中的所有新行和换行符
+	 * @return 列表中的令牌数组
 	 * @see #tokenizeToStringArray
 	 */
 	public static String[] delimitedListToStringArray(
 			@Nullable String str, @Nullable String delimiter, @Nullable String charsToDelete) {
 
 		if (str == null) {
+			//原字符串为空，返回空的字符串数组
 			return EMPTY_STRING_ARRAY;
 		}
 		if (delimiter == null) {
+			//分隔符为空，返回含有原字符串的字符串数组
 			return new String[]{str};
 		}
 
 		List<String> result = new ArrayList<>();
 		if (delimiter.isEmpty()) {
+			//如果分割符为空字符窜，
 			for (int i = 0; i < str.length(); i++) {
+				//删除指定的字符，并将删除后的字符串添加到结果
 				result.add(deleteAny(str.substring(i, i + 1), charsToDelete));
 			}
 		} else {
 			int pos = 0;
 			int delPos;
 			while ((delPos = str.indexOf(delimiter, pos)) != -1) {
+				//如果下一个分割符位置存在，将与前一个分割符的字符串删除掉指定字符后，添加到结果中
 				result.add(deleteAny(str.substring(pos, delPos), charsToDelete));
+				//将位置设置为删除位置+分隔符长度
 				pos = delPos + delimiter.length();
 			}
 			if (str.length() > 0 && pos <= str.length()) {
-				// Add rest of String, but not in case of empty input.
+				//如果原字符串有长度，且最后一个分割符的位置小于等于该长度，添加上最后一部分的字符串
+				// 添加字符串的其余部分，但在输入为空的情况下不添加。
 				result.add(deleteAny(str.substring(pos), charsToDelete));
 			}
 		}
+		//将List转为数组返回
 		return toStringArray(result);
 	}
 

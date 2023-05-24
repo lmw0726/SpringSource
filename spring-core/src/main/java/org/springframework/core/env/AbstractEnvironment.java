@@ -285,6 +285,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 				//如果活动的环境配置为空，获取激活的环境配置属性
 				String profiles = doGetActiveProfilesProperty();
 				if (StringUtils.hasText(profiles)) {
+					//以逗号分隔的字符串，并设置为活动的配置
 					setActiveProfiles(StringUtils.commaDelimitedListToStringArray(
 							StringUtils.trimAllWhitespace(profiles)));
 				}

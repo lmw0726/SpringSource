@@ -201,28 +201,29 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	@Override
 	public String resolvePlaceholders(String text) {
 		if (this.nonStrictHelper == null) {
+			//如果非严格模式助手不存在,则创建一个非严格模式的占位符占位符助手
 			this.nonStrictHelper = createPlaceholderHelper(true);
 		}
+		//使用非严格模式解析占位符
 		return doResolvePlaceholders(text, this.nonStrictHelper);
 	}
 
 	@Override
 	public String resolveRequiredPlaceholders(String text) throws IllegalArgumentException {
 		if (this.strictHelper == null) {
+			//如果严格模式助手不存在，创建一个非严格模式的占位符助手
 			this.strictHelper = createPlaceholderHelper(false);
 		}
+		//使用严格模式解析占位符
 		return doResolvePlaceholders(text, this.strictHelper);
 	}
 
 	/**
-	 * Resolve placeholders within the given string, deferring to the value of
-	 * {@link #setIgnoreUnresolvableNestedPlaceholders} to determine whether any
-	 * unresolvable placeholders should raise an exception or be ignored.
-	 * <p>Invoked from {@link #getProperty} and its variants, implicitly resolving
-	 * nested placeholders. In contrast, {@link #resolvePlaceholders} and
-	 * {@link #resolveRequiredPlaceholders} do <i>not</i> delegate
-	 * to this method but rather perform their own handling of unresolvable
-	 * placeholders, as specified by each of those methods.
+	 * 解析给定字符串中的占位符，推迟到 {@link #setIgnoreUnresolvableNestedPlaceholders} 的值，
+	 * 以确定任何不可解析的占位符应该引发异常还是被忽略。
+	 * <p>从 {@link #getProperty} 及其变体调用，隐式解析嵌套占位符。
+	 * 相反，{@link #resolvePlaceholders} 和 {@link #resolveRequiredPlaceholders} 不会委托给此方法，
+	 * 而是执行它们自己对不可解析的占位符的处理，如每个方法所指定的。
 	 *
 	 * @see #setIgnoreUnresolvableNestedPlaceholders
 	 * @since 3.2
@@ -232,6 +233,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 			return value;
 		}
 		return (this.ignoreUnresolvableNestedPlaceholders ?
+				//如果忽略或无法解析的嵌套占位符，则调用resolvePlaceholders方法，否则调用resolveRequiredPlaceholders方法
 				resolvePlaceholders(value) : resolveRequiredPlaceholders(value));
 	}
 
@@ -274,11 +276,10 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 
 
 	/**
-	 * Retrieve the specified property as a raw String,
-	 * i.e. without resolution of nested placeholders.
+	 * 以原始字符串的形式检索指定的属性，即没有嵌套占位符的解析。
 	 *
-	 * @param key the property name to resolve
-	 * @return the property value or {@code null} if none found
+	 * @param key 要解析的属性名称
+	 * @return 属性值，如果找不到则为{@code null}
 	 */
 	@Nullable
 	protected abstract String getPropertyAsRawString(String key);
