@@ -149,18 +149,16 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
 		if (this.delegate.isDefaultNamespace(root)) {
-			//获取环境属性
+			//如果是默认的命名空间，获取环境属性
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
 				//环境字符串按照,或;分割成一个字符串数组
-				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
-						profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
+				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 				//我们不能使用Profiles.of(...)，因为XML config中不支持profile表达式。有关详细信息，请参阅SPR-12458。
 				if (!getReaderContext().getEnvironment().acceptsProfiles(specifiedProfiles)) {
 					//如果当前环境不是指定的环境，记录日志后直接结束
 					if (logger.isDebugEnabled()) {
-						logger.debug("Skipped XML bean definition file due to specified profiles [" + profileSpec +
-								"] not matching: " + getReaderContext().getResource());
+						logger.debug("Skipped XML bean definition file due to specified profiles [" + profileSpec + "] not matching: " + getReaderContext().getResource());
 					}
 					return;
 				}
@@ -175,8 +173,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		this.delegate = parent;
 	}
 
-	protected BeanDefinitionParserDelegate createDelegate(
-			XmlReaderContext readerContext, Element root, @Nullable BeanDefinitionParserDelegate parentDelegate) {
+	protected BeanDefinitionParserDelegate createDelegate(XmlReaderContext readerContext, Element root, @Nullable BeanDefinitionParserDelegate parentDelegate) {
 		//创建Bean定义解析器代理实例
 		BeanDefinitionParserDelegate delegate = new BeanDefinitionParserDelegate(readerContext);
 		//初始化根元素和父级Bean定义解析器代理
@@ -191,53 +188,61 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
 		if (delegate.isDefaultNamespace(root)) {
+			//如果是默认的命名空间，获取根节点的子节点
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
 				if (node instanceof Element) {
+					//如果是元素，转为元素
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
+						//如果是默认的命名空间，解析默认元素
 						parseDefaultElement(ele, delegate);
 					} else {
+						//否则解析自定义元素
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
 		} else {
+			//非默认命名空间，解析自定义元素
 			delegate.parseCustomElement(root);
 		}
 	}
 
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
+			//如果是import元素，通过该元素导入Bean定义资源
 			importBeanDefinitionResource(ele);
 		} else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
+			//如果是别名元素标签，通过该元素处理别名注册
 			processAliasRegistration(ele);
 		} else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
+			//如果是Bean元素标签，通过该元素处理Bean定义
 			processBeanDefinition(ele, delegate);
 		} else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
-			// recurse
+			// 如果是嵌套Bean元素标签，递归处理嵌套Bean定义
 			doRegisterBeanDefinitions(ele);
 		}
 	}
 
 	/**
-	 * Parse an "import" element and load the bean definitions
-	 * from the given resource into the bean factory.
+	 * 解析 “import” 元素，并将bean定义从给定资源加载到bean工厂。
 	 */
 	protected void importBeanDefinitionResource(Element ele) {
+		//获取resource属性值
 		String location = ele.getAttribute(RESOURCE_ATTRIBUTE);
 		if (!StringUtils.hasText(location)) {
 			getReaderContext().error("Resource location must not be empty", ele);
 			return;
 		}
 
-		// Resolve system properties: e.g. "${user.dir}"
+		//解析系统属性: 例如  "${user.dir}"
 		location = getReaderContext().getEnvironment().resolveRequiredPlaceholders(location);
 
 		Set<Resource> actualResources = new LinkedHashSet<>(4);
 
-		// Discover whether the location is an absolute or relative URI
+		// 发现位置是绝对URI还是相对URI
 		boolean absoluteLocation = false;
 		try {
 			absoluteLocation = ResourcePatternUtils.isUrl(location) || ResourceUtils.toURI(location).isAbsolute();
@@ -254,8 +259,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 					logger.trace("Imported " + importCount + " bean definitions from URL location [" + location + "]");
 				}
 			} catch (BeanDefinitionStoreException ex) {
-				getReaderContext().error(
-						"Failed to import bean definitions from URL location [" + location + "]", ele, ex);
+				getReaderContext().error("Failed to import bean definitions from URL location [" + location + "]", ele, ex);
 			}
 		} else {
 			// No URL -> considering resource location as relative to the current file.
@@ -267,8 +271,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 					actualResources.add(relativeResource);
 				} else {
 					String baseLocation = getReaderContext().getResource().getURL().toString();
-					importCount = getReaderContext().getReader().loadBeanDefinitions(
-							StringUtils.applyRelativePath(baseLocation, location), actualResources);
+					importCount = getReaderContext().getReader().loadBeanDefinitions(StringUtils.applyRelativePath(baseLocation, location), actualResources);
 				}
 				if (logger.isTraceEnabled()) {
 					logger.trace("Imported " + importCount + " bean definitions from relative location [" + location + "]");
@@ -276,8 +279,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			} catch (IOException ex) {
 				getReaderContext().error("Failed to resolve current resource location", ele, ex);
 			} catch (BeanDefinitionStoreException ex) {
-				getReaderContext().error(
-						"Failed to import bean definitions from relative location [" + location + "]", ele, ex);
+				getReaderContext().error("Failed to import bean definitions from relative location [" + location + "]", ele, ex);
 			}
 		}
 		Resource[] actResArray = actualResources.toArray(new Resource[0]);
@@ -303,8 +305,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			try {
 				getReaderContext().getRegistry().registerAlias(name, alias);
 			} catch (Exception ex) {
-				getReaderContext().error("Failed to register alias '" + alias +
-						"' for bean with name '" + name + "'", ele, ex);
+				getReaderContext().error("Failed to register alias '" + alias + "' for bean with name '" + name + "'", ele, ex);
 			}
 			getReaderContext().fireAliasRegistered(name, alias, extractSource(ele));
 		}
@@ -322,8 +323,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				// Register the final decorated instance.
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 			} catch (BeanDefinitionStoreException ex) {
-				getReaderContext().error("Failed to register bean definition with name '" +
-						bdHolder.getBeanName() + "'", ele, ex);
+				getReaderContext().error("Failed to register bean definition with name '" + bdHolder.getBeanName() + "'", ele, ex);
 			}
 			// Send registration event.
 			getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));

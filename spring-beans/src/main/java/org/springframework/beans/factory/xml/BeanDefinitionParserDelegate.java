@@ -1439,28 +1439,25 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Get the local name for the supplied {@link Node}.
-	 * <p>The default implementation calls {@link Node#getLocalName}.
-	 * Subclasses may override the default implementation to provide a
-	 * different mechanism for getting the local name.
+	 * 获取提供的 {@link Node} 的本地名称。
+	 * <p> 默认实现调用 {@link Node#getLocalName}。子类可能会覆盖默认实现，以提供不同的机制来获取本地名称。
 	 *
-	 * @param node the {@code Node}
+	 * @param node {@code Node}节点
 	 */
 	public String getLocalName(Node node) {
 		return node.getLocalName();
 	}
 
 	/**
-	 * Determine whether the name of the supplied node is equal to the supplied name.
-	 * <p>The default implementation checks the supplied desired name against both
-	 * {@link Node#getNodeName()} and {@link Node#getLocalName()}.
-	 * <p>Subclasses may override the default implementation to provide a different
-	 * mechanism for comparing node names.
+	 * 确定所提供节点的名称是否等于所提供的名称。
+	 * <p> 默认实现将针对 {@link Node#getNodeName()} 和 {@link Node#getLocalName()} 检查提供的所需名称。
+	 * <p>子类可能会覆盖默认实现，以提供用于比较节点名称的不同机制。
 	 *
-	 * @param node        the node to compare
-	 * @param desiredName the name to check for
+	 * @param node        要比较的节点
+	 * @param desiredName 要检查的名称
 	 */
 	public boolean nodeNameEquals(Node node, String desiredName) {
+		//节点名称等于指定名称，或者是节点的本地名称等于指定的名称
 		return desiredName.equals(node.getNodeName()) || desiredName.equals(getLocalName(node));
 	}
 

@@ -96,7 +96,7 @@ public class ReaderContext {
 	}
 
 	/**
-	 * Raise a regular error.
+	 * 标注常规错误
 	 */
 	public void error(String message, @Nullable Object source) {
 		error(message, source, null, null);
@@ -117,10 +117,12 @@ public class ReaderContext {
 	}
 
 	/**
-	 * Raise a regular error.
+	 * 标注常规错误
 	 */
 	public void error(String message, @Nullable Object source, @Nullable ParseState parseState, @Nullable Throwable cause) {
+		//获取资源的位置
 		Location location = new Location(getResource(), source);
+		//问题报告者标注错误
 		this.problemReporter.error(new Problem(message, location, parseState, cause));
 	}
 
