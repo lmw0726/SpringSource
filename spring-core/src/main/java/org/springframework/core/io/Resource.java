@@ -212,13 +212,7 @@ public interface Resource extends InputStreamSource {
 	 */
 	long lastModified() throws IOException;
 
-	/**
-	 * Create a resource relative to this resource.
-	 *
-	 * @param relativePath the relative path (relative to this resource)
-	 * @return the resource handle for the relative resource
-	 * @throws IOException if the relative resource cannot be determined
-	 */
+
 	/**
 	 * 根据资源的相对路径创建相关资源
 	 *

@@ -649,23 +649,26 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Apply the given relative path to the given Java resource path,
-	 * assuming standard Java folder separation (i.e. "/" separators).
+	 * 将给定的相对路径应用于给定的Java资源路径，假设标准的Java文件夹分离 (即 “/” 分隔符)。
 	 *
-	 * @param path         the path to start from (usually a full file path)
-	 * @param relativePath the relative path to apply
-	 *                     (relative to the full file path above)
-	 * @return the full file path that results from applying the relative path
+	 * @param path         开始的路径 (通常是完整的文件路径)
+	 * @param relativePath 要应用的相对路径 (相对于上面的完整文件路径)
+	 * @return 应用相对路径产生的完整文件路径
 	 */
 	public static String applyRelativePath(String path, String relativePath) {
+		//获取最后一个 / 符号的位置
 		int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR_CHAR);
 		if (separatorIndex != -1) {
+			//获取 / 符号之前的路径
 			String newPath = path.substring(0, separatorIndex);
 			if (!relativePath.startsWith(FOLDER_SEPARATOR)) {
+				//如果相关路径不是以文件夹分隔符 / 开头，上面的新路径添加上文件夹分隔符 /
 				newPath += FOLDER_SEPARATOR_CHAR;
 			}
+			//再加上相关路径
 			return newPath + relativePath;
 		} else {
+			//如果该位置为空，则返回相关路径
 			return relativePath;
 		}
 	}

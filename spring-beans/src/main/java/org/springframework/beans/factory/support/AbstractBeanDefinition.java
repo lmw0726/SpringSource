@@ -1060,7 +1060,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return the role hint for this {@code BeanDefinition}.
+	 * 返回此 {@code BeanDefinition} 的角色提示。
 	 */
 	@Override
 	public int getRole() {

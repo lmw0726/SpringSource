@@ -49,7 +49,7 @@ public class ConstructorArgumentValues {
 
 
 	/**
-	 * Create a new empty ConstructorArgumentValues object.
+	 * 创建一个新的空ConstructorArgumentValues对象。
 	 */
 	public ConstructorArgumentValues() {
 	}
