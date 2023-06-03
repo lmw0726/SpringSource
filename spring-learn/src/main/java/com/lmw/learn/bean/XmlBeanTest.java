@@ -15,7 +15,9 @@ import java.nio.charset.StandardCharsets;
  * @date 2023/05/18 22:56
  */
 public class XmlBeanTest {
+
 	public static void main(String[] args) {
+
 		//获取资源
 		ClassPathResource resource = new ClassPathResource("bean.xml");
 

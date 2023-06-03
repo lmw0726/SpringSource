@@ -403,12 +403,11 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Create a URI instance for the given location String,
-	 * replacing spaces with "%20" URI encoding first.
+	 * 为给定的位置字符串创建一个URI实例，首先用 “%20” URI编码替换空格。
 	 *
-	 * @param location the location String to convert into a URI instance
-	 * @return the URI instance
-	 * @throws URISyntaxException if the location wasn't a valid URI
+	 * @param location 要转换为URI实例的位置字符串
+	 * @return URI 实例
+	 * @throws URISyntaxException 如果位置不是有效的URI
 	 */
 	public static URI toURI(String location) throws URISyntaxException {
 		return new URI(StringUtils.replace(location, " ", "%20"));

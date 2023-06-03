@@ -40,17 +40,17 @@ import java.util.*;
 public abstract class ClassUtils {
 
 	/**
-	 * Suffix for array class names: {@code "[]"}.
+	 * 数组类名称的后缀: {@code "[]"}。
 	 */
 	public static final String ARRAY_SUFFIX = "[]";
 
 	/**
-	 * Prefix for internal array class names: {@code "["}.
+	 * 内部数组类名称的前缀： {@code "["}.
 	 */
 	private static final String INTERNAL_ARRAY_PREFIX = "[";
 
 	/**
-	 * Prefix for internal non-primitive array class names: {@code "[L"}.
+	 * 内部非原始数组类名的前缀： {@code "[L"}.
 	 */
 	private static final String NON_PRIMITIVE_ARRAY_PREFIX = "[L";
 
@@ -60,7 +60,7 @@ public abstract class ClassUtils {
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
 
 	/**
-	 * The package separator character: {@code '.'}.
+	 * 包分隔符: {@code '.'}.
 	 */
 	private static final char PACKAGE_SEPARATOR = '.';
 
@@ -70,7 +70,7 @@ public abstract class ClassUtils {
 	private static final char PATH_SEPARATOR = '/';
 
 	/**
-	 * The nested class separator character: {@code '$'}.
+	 * 嵌套类分隔符: {@code '$'}.
 	 */
 	private static final char NESTED_CLASS_SEPARATOR = '$';
 
@@ -102,8 +102,7 @@ public abstract class ClassUtils {
 	private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
 
 	/**
-	 * Map with common Java language class name as key and corresponding Class as value.
-	 * Primarily for efficient deserialization of remote invocations.
+	 * 以通用Java语言类名为键，对应类为值的映射。主要用于远程调用的高效反序列化。
 	 */
 	private static final Map<String, Class<?>> commonClassCache = new HashMap<>(64);
 
@@ -228,68 +227,82 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Replacement for {@code Class.forName()} that also returns Class instances
-	 * for primitives (e.g. "int") and array class names (e.g. "String[]").
-	 * Furthermore, it is also capable of resolving nested class names in Java source
-	 * style (e.g. "java.lang.Thread.State" instead of "java.lang.Thread$State").
+	 * 替换 {@code Class.forName()}，它还返回基本类型 (例如 “int”) 和数组类名称 (例如 “String[]”) 的类实例。
+	 * 此外，它还能够以Java源码风格 (例如 “java.lang.Thread.State” 而不是 “java.lang.Thread#State”) 解析嵌套类名。
 	 *
-	 * @param name        the name of the Class
-	 * @param classLoader the class loader to use
-	 *                    (may be {@code null}, which indicates the default class loader)
-	 * @return a class instance for the supplied name
-	 * @throws ClassNotFoundException if the class was not found
-	 * @throws LinkageError           if the class file could not be loaded
+	 * @param name        类名
+	 * @param classLoader 要使用的类加载器 (可能是 {@code null}，表示默认的类加载器)
+	 * @return 提供名称的类实例
+	 * @throws ClassNotFoundException 如果找不到类
+	 * @throws LinkageError           如果无法加载类文件
 	 * @see Class#forName(String, boolean, ClassLoader)
 	 */
 	public static Class<?> forName(String name, @Nullable ClassLoader classLoader)
 			throws ClassNotFoundException, LinkageError {
 
 		Assert.notNull(name, "Name must not be null");
-
+		//解析基本类型的类名
 		Class<?> clazz = resolvePrimitiveClassName(name);
 		if (clazz == null) {
+			//如果类为空，从通用的类缓存获取该名称对应的类
 			clazz = commonClassCache.get(name);
 		}
 		if (clazz != null) {
+			//类不为空，返回该类
 			return clazz;
 		}
 
-		// "java.lang.String[]" style arrays
+		// "java.lang.String[]" 风格的数组
 		if (name.endsWith(ARRAY_SUFFIX)) {
+			//如果该名称以 [] 结尾（即数组类名称）
+			//获取 [] 之前的名称作为元素类名
 			String elementClassName = name.substring(0, name.length() - ARRAY_SUFFIX.length());
+			//递归调用，获取该元素类名的类型实例
 			Class<?> elementClass = forName(elementClassName, classLoader);
+			//构建成数组类型的类实例返回
 			return Array.newInstance(elementClass, 0).getClass();
 		}
 
-		// "[Ljava.lang.String;" style arrays
+		// "[Ljava.lang.String;" 风格的数组
 		if (name.startsWith(NON_PRIMITIVE_ARRAY_PREFIX) && name.endsWith(";")) {
+			//如果该类名以 [L 开头并且以 ; 结尾（即内部非原始数组类名），获取这两种字符中间的字符串作为元素类型名称
 			String elementName = name.substring(NON_PRIMITIVE_ARRAY_PREFIX.length(), name.length() - 1);
+			//递归调用，获取该元素类名的类型实例
 			Class<?> elementClass = forName(elementName, classLoader);
+			//构建成数组类型的类实例返回
 			return Array.newInstance(elementClass, 0).getClass();
 		}
 
-		// "[[I" or "[[Ljava.lang.String;" style arrays
+		// "[[I" or "[[Ljava.lang.String;" 风格的数组
 		if (name.startsWith(INTERNAL_ARRAY_PREFIX)) {
+			//如果类名以 [ 开头（即内部数组类），截取 [ 后的字符串作为元素类型名称
 			String elementName = name.substring(INTERNAL_ARRAY_PREFIX.length());
+			//递归调用，获取该元素类名的类型实例
 			Class<?> elementClass = forName(elementName, classLoader);
+			//构建成数组类型的类实例返回
 			return Array.newInstance(elementClass, 0).getClass();
 		}
-
+		//构建一个类加载器的局部变量，使后续赋值不影响原来的类加载器变量。
 		ClassLoader clToUse = classLoader;
 		if (clToUse == null) {
+			//如果类加载器为空，使用默认的类加载器
 			clToUse = getDefaultClassLoader();
 		}
 		try {
+			//反射调用该类名，获取该类的类实例
 			return Class.forName(name, false, clToUse);
 		} catch (ClassNotFoundException ex) {
+			//如果是以包分隔符 . 结尾
 			int lastDotIndex = name.lastIndexOf(PACKAGE_SEPARATOR);
 			if (lastDotIndex != -1) {
+				//在包分隔符后插入$符号
 				String nestedClassName =
 						name.substring(0, lastDotIndex) + NESTED_CLASS_SEPARATOR + name.substring(lastDotIndex + 1);
 				try {
+					//反射调用该类名，获取该类的类实例
 					return Class.forName(nestedClassName, false, clToUse);
 				} catch (ClassNotFoundException ex2) {
-					// Swallow - let original exception get through
+					// 吞掉异常 - 让原始异常通过
 				}
 			}
 			throw ex;
@@ -442,23 +455,19 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Resolve the given class name as primitive class, if appropriate,
-	 * according to the JVM's naming rules for primitive classes.
-	 * <p>Also supports the JVM's internal class names for primitive arrays.
-	 * Does <i>not</i> support the "[]" suffix notation for primitive arrays;
-	 * this is only supported by {@link #forName(String, ClassLoader)}.
+	 * 根据JVM对原始类的命名规则，如果合适的话，将给定的类名解析为原始类。
+	 * <p> 还支持JVM的原始数组的内部类名称。
+	 * <i> 不 <i> 支持原始数组的 “[]” 后缀表示法; 这仅由 {@link #forName(String, ClassLoader)} 支持。
 	 *
-	 * @param name the name of the potentially primitive class
-	 * @return the primitive class, or {@code null} if the name does not denote
-	 * a primitive class or primitive array class
+	 * @param name 潜在原始类的名称
+	 * @return 原始类，如果名称不表示原始类或原始数组类，则为 {@code null}
 	 */
 	@Nullable
 	public static Class<?> resolvePrimitiveClassName(@Nullable String name) {
 		Class<?> result = null;
-		// Most class names will be quite long, considering that they
-		// SHOULD sit in a package, so a length check is worthwhile.
+		//考虑到它们应该放在一个包中，大多数类名会很长，所以长度检查是值得的。
 		if (name != null && name.length() <= 7) {
-			// Could be a primitive - likely.
+			// 如果类名不为空，且类名长度小于7，从原始类型类型Map获取该类型
 			result = primitiveTypeNameMap.get(name);
 		}
 		return result;

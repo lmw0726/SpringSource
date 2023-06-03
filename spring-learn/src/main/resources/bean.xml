@@ -3,7 +3,7 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd" default-merge="default">
-	<bean id="person" class="com.lmw.learn.bean.Person">
+	<bean id="person" name="person;xiaowei" class="com.lmw.learn.bean.Person">
 		<property name="age" value="18"/>
 		<property name="name" value="黄小伟"/>
 	</bean>

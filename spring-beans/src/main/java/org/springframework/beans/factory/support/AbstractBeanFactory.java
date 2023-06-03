@@ -941,8 +941,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Return the internal cache of pre-filtered post-processors,
-	 * freshly (re-)building it if necessary.
+	 * 返回预先过滤后处理器的内部缓存，如有必要，重新 (重新) 构建它。
 	 *
 	 * @since 5.3
 	 */

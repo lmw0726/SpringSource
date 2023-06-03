@@ -383,9 +383,8 @@ public class BeanDefinitionParserDelegate {
 
 
 	/**
-	 * Parses the supplied {@code <bean>} element. May return {@code null}
-	 * if there were errors during parse. Errors are reported to the
-	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 * 解析提供的 {@code <bean>} 元素。如果解析过程中出现错误，可能会返回 {@code null}。
+	 * 错误将报告给 {@link org.springframework.beans.factory.parsing.ProblemReporter}.
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele) {
@@ -393,23 +392,26 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parses the supplied {@code <bean>} element. May return {@code null}
-	 * if there were errors during parse. Errors are reported to the
-	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 * 解析提供的 {@code <bean>} 元素。如果解析过程中出现错误，可能会返回 {@code null}。
+	 * 错误将报告给 {@link org.springframework.beans.factory.parsing.ProblemReporter}.
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		//获取id值
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		//获取bean名称
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
+			//将他们按照;或者,分割成字符串数组
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
-
+		//bean名称=id值
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
+			//如果bean名称为空，且别名不为空，bean名称为第一个别名
 			beanName = aliases.remove(0);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No XML 'id' specified - using '" + beanName +
@@ -418,61 +420,66 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		if (containingBean == null) {
+			//如果该bean标签内不包含bean定义，检查名称是否唯一
 			checkNameUniqueness(beanName, aliases, ele);
 		}
-
+		//解析bean标签内的bean名称解析成bean定义
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
-		if (beanDefinition != null) {
-			if (!StringUtils.hasText(beanName)) {
-				try {
-					if (containingBean != null) {
-						beanName = BeanDefinitionReaderUtils.generateBeanName(
-								beanDefinition, this.readerContext.getRegistry(), true);
-					} else {
-						beanName = this.readerContext.generateBeanName(beanDefinition);
-						// Register an alias for the plain bean class name, if still possible,
-						// if the generator returned the class name plus a suffix.
-						// This is expected for Spring 1.2/2.0 backwards compatibility.
-						String beanClassName = beanDefinition.getBeanClassName();
-						if (beanClassName != null &&
-								beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
-								!this.readerContext.getRegistry().isBeanNameInUse(beanClassName)) {
-							aliases.add(beanClassName);
-						}
-					}
-					if (logger.isTraceEnabled()) {
-						logger.trace("Neither XML 'id' nor 'name' specified - " +
-								"using generated bean name [" + beanName + "]");
-					}
-				} catch (Exception ex) {
-					error(ex.getMessage(), ele);
-					return null;
-				}
-			}
-			String[] aliasesArray = StringUtils.toStringArray(aliases);
-			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
+		if (beanDefinition == null) {
+			//如果bean定义为空，返回null
+			return null;
 		}
+		if (!StringUtils.hasText(beanName)) {
+			//如果bean名称为空
+			try {
+				if (containingBean != null) {
+					beanName = BeanDefinitionReaderUtils.generateBeanName(
+							beanDefinition, this.readerContext.getRegistry(), true);
+				} else {
+					beanName = this.readerContext.generateBeanName(beanDefinition);
+					// Register an alias for the plain bean class name, if still possible,
+					// if the generator returned the class name plus a suffix.
+					// This is expected for Spring 1.2/2.0 backwards compatibility.
+					String beanClassName = beanDefinition.getBeanClassName();
+					if (beanClassName != null &&
+							beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
+							!this.readerContext.getRegistry().isBeanNameInUse(beanClassName)) {
+						aliases.add(beanClassName);
+					}
+				}
+				if (logger.isTraceEnabled()) {
+					logger.trace("Neither XML 'id' nor 'name' specified - " +
+							"using generated bean name [" + beanName + "]");
+				}
+			} catch (Exception ex) {
+				error(ex.getMessage(), ele);
+				return null;
+			}
+		}
+		String[] aliasesArray = StringUtils.toStringArray(aliases);
+		return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 
-		return null;
 	}
 
 	/**
-	 * Validate that the specified bean name and aliases have not been used already
-	 * within the current level of beans element nesting.
+	 * 验证指定的bean名称和别名尚未在当前bean元素嵌套级别中使用。
 	 */
 	protected void checkNameUniqueness(String beanName, List<String> aliases, Element beanElement) {
 		String foundName = null;
 
 		if (StringUtils.hasText(beanName) && this.usedNames.contains(beanName)) {
+			//如果bean名称不为空，且该bean名称已经存在于已使用的Bean名称集合中，找到的名称则为该bean名称
 			foundName = beanName;
 		}
 		if (foundName == null) {
+			//如果找到的名称为空，在已使用的bean名称集合中，找到第一个名称为别名的bean名称。
 			foundName = CollectionUtils.findFirstMatch(this.usedNames, aliases);
 		}
 		if (foundName != null) {
+			//如果找到的名称仍为空，提示错误。
 			error("Bean name '" + foundName + "' is already used in this <beans> element", beanElement);
 		}
-
+		//将bean名称和别名列表添加到已使用的bean名称集合中。
 		this.usedNames.add(beanName);
 		this.usedNames.addAll(aliases);
 	}

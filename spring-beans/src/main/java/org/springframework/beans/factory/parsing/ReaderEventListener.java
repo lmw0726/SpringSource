@@ -37,21 +37,21 @@ public interface ReaderEventListener extends EventListener {
 	void defaultsRegistered(DefaultsDefinition defaultsDefinition);
 
 	/**
-	 * Notification that the given component has been registered.
-	 * @param componentDefinition a descriptor for the new component
+	 * 给定组件已注册的通知。
+	 * @param componentDefinition 新组件的描述符
 	 * @see BeanComponentDefinition
 	 */
 	void componentRegistered(ComponentDefinition componentDefinition);
 
 	/**
-	 * Notification that the given alias has been registered.
-	 * @param aliasDefinition a descriptor for the new alias
+	 * 给定别名已注册的通知。
+	 * @param aliasDefinition 新别名的描述符
 	 */
 	void aliasRegistered(AliasDefinition aliasDefinition);
 
 	/**
-	 * Notification that the given import has been processed.
-	 * @param importDefinition a descriptor for the import
+	 * 已处理给定导入的通知。
+	 * @param importDefinition 导入的描述符
 	 */
 	void importProcessed(ImportDefinition importDefinition);
 

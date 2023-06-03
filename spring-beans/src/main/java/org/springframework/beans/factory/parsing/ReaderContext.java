@@ -166,14 +166,14 @@ public class ReaderContext {
 	}
 
 	/**
-	 * Fire a component-registered event.
+	 * 触发组件注册的事件。
 	 */
 	public void fireComponentRegistered(ComponentDefinition componentDefinition) {
 		this.eventListener.componentRegistered(componentDefinition);
 	}
 
 	/**
-	 * Fire an alias-registered event.
+	 * 触发别名注册的事件。
 	 */
 	public void fireAliasRegistered(String beanName, String alias, @Nullable Object source) {
 		this.eventListener.aliasRegistered(new AliasDefinition(beanName, alias, source));
@@ -187,7 +187,7 @@ public class ReaderContext {
 	}
 
 	/**
-	 * Fire an import-processed event.
+	 * 触发导入处理的事件。
 	 */
 	public void fireImportProcessed(String importedResource, Resource[] actualResources, @Nullable Object source) {
 		this.eventListener.importProcessed(new ImportDefinition(importedResource, actualResources, source));
