@@ -50,7 +50,7 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	/**
 	 * 在此注册表中注册一个新的bean定义。必须支持RootBeanDefinition和ChildBeanDefinition。
 	 *
-	 * @param beanName      要注册的bean实例的名称
+	 * @param beanName       要注册的bean实例的名称
 	 * @param beanDefinition 要注册的bean实例的定义
 	 * @throws BeanDefinitionStoreException    如果BeanDefinition无效
 	 * @throws BeanDefinitionOverrideException 如果已经有指定bean名称的bean定义，并且我们不允许覆盖它
@@ -104,9 +104,10 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	/**
 	 * Determine whether the given bean name is already in use within this registry,
 	 * i.e. whether there is a local bean or alias registered under this name.
+	 * 确定给定的bean名称是否已在此注册表中使用，即是否存在本地bean或别名注册在此名称下。
 	 *
-	 * @param beanName the name to check
-	 * @return whether the given bean name is already in use
+	 * @param beanName 要检查的名称
+	 * @return 给定的bean名称是否已经在使用中
 	 */
 	boolean isBeanNameInUse(String beanName);
 

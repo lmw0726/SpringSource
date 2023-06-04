@@ -433,17 +433,22 @@ public class BeanDefinitionParserDelegate {
 			//如果bean名称为空
 			try {
 				if (containingBean != null) {
+					//如果该bean标签内包含bean定义，根据bean定义和bean定义注册器生成bean名称
 					beanName = BeanDefinitionReaderUtils.generateBeanName(
 							beanDefinition, this.readerContext.getRegistry(), true);
 				} else {
+					//否则根据bean定义生成bean名称
 					beanName = this.readerContext.generateBeanName(beanDefinition);
-					// Register an alias for the plain bean class name, if still possible,
-					// if the generator returned the class name plus a suffix.
-					// This is expected for Spring 1.2/2.0 backwards compatibility.
+					//如果生成器返回了类名加上后缀，则为普通bean类名注册别名 (如果仍然可能)。
+					// 这预计适用于Spring 1.2/2.0向后兼容性。
+					//获取bean的类名
 					String beanClassName = beanDefinition.getBeanClassName();
 					if (beanClassName != null &&
-							beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
+							beanName.startsWith(beanClassName) &&
+							beanName.length() > beanClassName.length() &&
 							!this.readerContext.getRegistry().isBeanNameInUse(beanClassName)) {
+						//如果bean类名不为空，且bean名称以bean类名开头，
+						// 且bean名称长度大于bean类名长度，且该bean类名没有被使用，则将bean类名添加为别名
 						aliases.add(beanClassName);
 					}
 				}
@@ -456,6 +461,7 @@ public class BeanDefinitionParserDelegate {
 				return null;
 			}
 		}
+		//将别名列表转为字符串数组，并构建BeanDefinitionHolder
 		String[] aliasesArray = StringUtils.toStringArray(aliases);
 		return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 
@@ -485,39 +491,50 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse the bean definition itself, without regard to name or aliases. May return
-	 * {@code null} if problems occurred during the parsing of the bean definition.
+	 * 解析bean定义本身，不考虑名称或别名。如果在解析bean定义期间出现问题，可能会返回 {@code null}。
 	 */
 	@Nullable
 	public AbstractBeanDefinition parseBeanDefinitionElement(
 			Element ele, String beanName, @Nullable BeanDefinition containingBean) {
-
+		//将bean名称设置为解析状态
 		this.parseState.push(new BeanEntry(beanName));
-
+		//解析class属性
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
+			//获取class属性值，并去除前后的空格
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
+		//解析parent属性
 		String parent = null;
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
+			//获取parent属性值
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
 
 		try {
+			//创建用于承载属性的AbstractBeanDefinition实例
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-
+			//解析默认bean的各种属性
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+			//提取description
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
-
+			//解析元数据<meta/>
 			parseMetaElements(ele, bd);
+			//解析lookup-method属性<look-method/>
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			//解析replaced-method属性<replaced-method/>
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
+			//解析构造函数参数<constructor-arg/>
 			parseConstructorArgElements(ele, bd);
+			//解析property子元素<property/>
 			parsePropertyElements(ele, bd);
+			//解析qualifier子元素<qualifier/>
 			parseQualifierElements(ele, bd);
 
+			//设置资源
 			bd.setResource(this.readerContext.getResource());
+			//设置源
 			bd.setSource(extractSource(ele));
 
 			return bd;
@@ -528,6 +545,7 @@ public class BeanDefinitionParserDelegate {
 		} catch (Throwable ex) {
 			error("Unexpected failure during bean definition parsing", ele, ex);
 		} finally {
+			//将该bean名称解析状态消除
 			this.parseState.pop();
 		}
 
