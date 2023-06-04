@@ -51,7 +51,7 @@ public abstract class BeanDefinitionReaderUtils {
 	 * @param className   bean类的名称 (如果有)
 	 * @param classLoader 用于加载bean类的类加载器 (可以是 {@code null}，仅按名称注册bean类)
 	 * @return bean定义
-	 * @throws ClassNotFoundException if the bean class could not be loaded
+	 * @throws ClassNotFoundException 如果无法加载bean类
 	 */
 	public static AbstractBeanDefinition createBeanDefinition(
 			@Nullable String parentName, @Nullable String className, @Nullable ClassLoader classLoader) throws ClassNotFoundException {

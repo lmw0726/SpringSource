@@ -56,8 +56,7 @@ public class BeanDefinitionParserDelegate {
 	public static final String MULTI_VALUE_ATTRIBUTE_DELIMITERS = ",; ";
 
 	/**
-	 * Value of a T/F attribute that represents true.
-	 * Anything else represents false.
+	 * 表示true的T/F属性的值。其他任何东西都代表错误。
 	 */
 	public static final String TRUE_VALUE = "true";
 
@@ -433,17 +432,22 @@ public class BeanDefinitionParserDelegate {
 			//如果bean名称为空
 			try {
 				if (containingBean != null) {
+					//如果该bean标签内包含bean定义，根据bean定义和bean定义注册器生成bean名称
 					beanName = BeanDefinitionReaderUtils.generateBeanName(
 							beanDefinition, this.readerContext.getRegistry(), true);
 				} else {
+					//否则根据bean定义生成bean名称
 					beanName = this.readerContext.generateBeanName(beanDefinition);
-					// Register an alias for the plain bean class name, if still possible,
-					// if the generator returned the class name plus a suffix.
-					// This is expected for Spring 1.2/2.0 backwards compatibility.
+					//如果生成器返回了类名加上后缀，则为普通bean类名注册别名 (如果仍然可能)。
+					// 这预计适用于Spring 1.2/2.0向后兼容性。
+					//获取bean的类名
 					String beanClassName = beanDefinition.getBeanClassName();
 					if (beanClassName != null &&
-							beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
+							beanName.startsWith(beanClassName) &&
+							beanName.length() > beanClassName.length() &&
 							!this.readerContext.getRegistry().isBeanNameInUse(beanClassName)) {
+						//如果bean类名不为空，且bean名称以bean类名开头，
+						// 且bean名称长度大于bean类名长度，且该bean类名没有被使用，则将bean类名添加为别名
 						aliases.add(beanClassName);
 					}
 				}
@@ -456,6 +460,7 @@ public class BeanDefinitionParserDelegate {
 				return null;
 			}
 		}
+		//将别名列表转为字符串数组，并构建BeanDefinitionHolder
 		String[] aliasesArray = StringUtils.toStringArray(aliases);
 		return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 
@@ -485,39 +490,50 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse the bean definition itself, without regard to name or aliases. May return
-	 * {@code null} if problems occurred during the parsing of the bean definition.
+	 * 解析bean定义本身，不考虑名称或别名。如果在解析bean定义期间出现问题，可能会返回 {@code null}。
 	 */
 	@Nullable
 	public AbstractBeanDefinition parseBeanDefinitionElement(
 			Element ele, String beanName, @Nullable BeanDefinition containingBean) {
-
+		//将bean名称设置为解析状态
 		this.parseState.push(new BeanEntry(beanName));
-
+		//解析class属性
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
+			//获取class属性值，并去除前后的空格
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
+		//解析parent属性
 		String parent = null;
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
+			//获取parent属性值
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
 
 		try {
+			//创建用于承载属性的AbstractBeanDefinition实例
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-
+			//解析默认bean的各种属性
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+			//提取description
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
-
+			//解析元数据<meta/>
 			parseMetaElements(ele, bd);
+			//解析lookup-method属性<look-method/>
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			//解析replaced-method属性<replaced-method/>
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
+			//解析构造函数参数<constructor-arg/>
 			parseConstructorArgElements(ele, bd);
+			//解析property子元素<property/>
 			parsePropertyElements(ele, bd);
+			//解析qualifier子元素<qualifier/>
 			parseQualifierElements(ele, bd);
 
+			//设置资源
 			bd.setResource(this.readerContext.getResource());
+			//设置源
 			bd.setSource(extractSource(ele));
 
 			return bd;
@@ -528,6 +544,7 @@ public class BeanDefinitionParserDelegate {
 		} catch (Throwable ex) {
 			error("Unexpected failure during bean definition parsing", ele, ex);
 		} finally {
+			//将该bean名称解析状态消除
 			this.parseState.pop();
 		}
 
@@ -535,51 +552,63 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Apply the attributes of the given bean element to the given bean * definition.
+	 * 将给定bean元素的属性应用于给定bean定义。
 	 *
-	 * @param ele            bean declaration element
-	 * @param beanName       bean name
-	 * @param containingBean containing bean definition
-	 * @return a bean definition initialized according to the bean element attributes
+	 * @param ele            bean声明元素
+	 * @param beanName       bean名称
+	 * @param containingBean 嵌套的bean定义
+	 * @return 根据bean元素属性初始化的bean定义
 	 */
 	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName,
 																@Nullable BeanDefinition containingBean, AbstractBeanDefinition bd) {
 
 		if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
+			//如果<bean/>标签有singleton属性，提示错误。
 			error("Old 1.x 'singleton' attribute in use - upgrade to 'scope' declaration", ele);
 		} else if (ele.hasAttribute(SCOPE_ATTRIBUTE)) {
+			//如果有scope属性，设置bean定义的作用域
 			bd.setScope(ele.getAttribute(SCOPE_ATTRIBUTE));
 		} else if (containingBean != null) {
-			// Take default from containing bean in case of an inner bean definition.
+			// 在内部bean定义的情况下，从嵌套的bean中取默认值。
 			bd.setScope(containingBean.getScope());
 		}
 
 		if (ele.hasAttribute(ABSTRACT_ATTRIBUTE)) {
+			//如果有abstract属性，设置bean定义的是否是抽象的
 			bd.setAbstract(TRUE_VALUE.equals(ele.getAttribute(ABSTRACT_ATTRIBUTE)));
 		}
-
+		//设置是否懒加载
 		String lazyInit = ele.getAttribute(LAZY_INIT_ATTRIBUTE);
 		if (isDefaultValue(lazyInit)) {
+			//如果是空值或者default，则设置为默认的懒加载属性值，默认是true
 			lazyInit = this.defaults.getLazyInit();
 		}
 		bd.setLazyInit(TRUE_VALUE.equals(lazyInit));
-
+		//设置是否自动装配
 		String autowire = ele.getAttribute(AUTOWIRE_ATTRIBUTE);
 		bd.setAutowireMode(getAutowireMode(autowire));
 
+		//如果有依赖于其他bean
 		if (ele.hasAttribute(DEPENDS_ON_ATTRIBUTE)) {
+			//获取依赖于其他bean名称
 			String dependsOn = ele.getAttribute(DEPENDS_ON_ATTRIBUTE);
+			//根据,或者;分割成字符串数组
 			bd.setDependsOn(StringUtils.tokenizeToStringArray(dependsOn, MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
+		//自动装配候选者
 		String autowireCandidate = ele.getAttribute(AUTOWIRE_CANDIDATE_ATTRIBUTE);
 		if (isDefaultValue(autowireCandidate)) {
+			//如果是空值或者是default，则设置为默认的自动装配候选者
 			String candidatePattern = this.defaults.getAutowireCandidates();
 			if (candidatePattern != null) {
+				//解析候选者，以,分割成字符串数组
 				String[] patterns = StringUtils.commaDelimitedListToStringArray(candidatePattern);
+				//如果bean名称匹配了pattern数组中的任何一个，则将该bean定义设置为自动装配候选者
 				bd.setAutowireCandidate(PatternMatchUtils.simpleMatch(patterns, beanName));
 			}
 		} else {
+			//否则根据该值是否为true，将该bean定义设置为自动装配候选者
 			bd.setAutowireCandidate(TRUE_VALUE.equals(autowireCandidate));
 		}
 
@@ -614,12 +643,12 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Create a bean definition for the given class name and parent name.
+	 * 为给定的类名和父名创建bean定义。
 	 *
-	 * @param className  the name of the bean class
-	 * @param parentName the name of the bean's parent bean
-	 * @return the newly created bean definition
-	 * @throws ClassNotFoundException if bean class resolution was attempted but failed
+	 * @param className  bean类的名称
+	 * @param parentName 父级bean的名称
+	 * @return 新创建的bean定义
+	 * @throws ClassNotFoundException 如果尝试了bean类解析，但失败了
 	 */
 	protected AbstractBeanDefinition createBeanDefinition(@Nullable String className, @Nullable String parentName)
 			throws ClassNotFoundException {
@@ -647,26 +676,31 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse the given autowire attribute value into
-	 * {@link AbstractBeanDefinition} autowire constants.
+	 * 将给定的autowire属性值解析为 {@link AbstractBeanDefinition} autowire常量。
 	 */
 	@SuppressWarnings("deprecation")
 	public int getAutowireMode(String attrValue) {
 		String attr = attrValue;
 		if (isDefaultValue(attr)) {
+			//如果是空值或者是default，则设置为默认的自动装配值
 			attr = this.defaults.getAutowire();
 		}
+		//默认为非自动装配
 		int autowire = AbstractBeanDefinition.AUTOWIRE_NO;
 		if (AUTOWIRE_BY_NAME_VALUE.equals(attr)) {
+			//根据名称自动装配
 			autowire = AbstractBeanDefinition.AUTOWIRE_BY_NAME;
 		} else if (AUTOWIRE_BY_TYPE_VALUE.equals(attr)) {
+			//根据类型自动装配
 			autowire = AbstractBeanDefinition.AUTOWIRE_BY_TYPE;
 		} else if (AUTOWIRE_CONSTRUCTOR_VALUE.equals(attr)) {
+			//根据构造函数自动装配
 			autowire = AbstractBeanDefinition.AUTOWIRE_CONSTRUCTOR;
 		} else if (AUTOWIRE_AUTODETECT_VALUE.equals(attr)) {
+			//自动检测模式
 			autowire = AbstractBeanDefinition.AUTOWIRE_AUTODETECT;
 		}
-		// Else leave default value.
+		// 否则保留默认值。
 		return autowire;
 	}
 

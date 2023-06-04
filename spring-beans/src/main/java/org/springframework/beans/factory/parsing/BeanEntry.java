@@ -28,8 +28,9 @@ public class BeanEntry implements ParseState.Entry {
 
 
 	/**
-	 * Create a new {@code BeanEntry} instance.
-	 * @param beanDefinitionName the name of the associated bean definition
+	 * 创建一个新的 {@code BeanEntry} 实例。
+	 *
+	 * @param beanDefinitionName 关联bean定义的名称
 	 */
 	public BeanEntry(String beanDefinitionName) {
 		this.beanDefinitionName = beanDefinitionName;

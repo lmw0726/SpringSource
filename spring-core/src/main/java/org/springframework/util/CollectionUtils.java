@@ -224,14 +224,13 @@ public abstract class CollectionUtils {
 	}
 
 	/**
-	 * Return the first element in '{@code candidates}' that is contained in
-	 * '{@code source}'. If no element in '{@code candidates}' is present in
-	 * '{@code source}' returns {@code null}. Iteration order is
-	 * {@link Collection} implementation specific.
+	 * 返回 “{@code candidates}” 中包含的 “{@code source}” 中的第一个元素。
+	 * 如果 “{@code candidates}” 中没有元素存在于 “{@code source}” 中，则返回 {@code null}。
+	 * 迭代顺序是特定的{@link Collection} 实现。
 	 *
-	 * @param source     the source Collection
-	 * @param candidates the candidates to search for
-	 * @return the first present object, or {@code null} if not found
+	 * @param source     源集合
+	 * @param candidates 要搜索的候选人
+	 * @return 第一个当前对象，如果找不到，则为 {@code null}
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
