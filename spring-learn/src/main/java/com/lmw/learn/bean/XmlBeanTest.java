@@ -1,5 +1,6 @@
 package com.lmw.learn.bean;
 
+import com.lmw.learn.bean.person.Boss;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
@@ -30,7 +31,8 @@ public class XmlBeanTest {
 		//装载资源
 		reader.loadBeanDefinitions(encodedResource);
 		//获取Bean对象
-		Person person = factory.getBean("person", Person.class);
+		Person person = factory.getBean("boss", Boss.class);
 		System.out.println(person);
+		System.out.println("下属为："+person.getSubordinate());
 	}
 }

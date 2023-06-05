@@ -11,6 +11,11 @@ public class Person {
 	private int age;
 	private String name;
 
+	/**
+	 * 下属
+	 */
+	private Person subordinate;
+
 	public int getAge() {
 		return age;
 	}
@@ -25,6 +30,14 @@ public class Person {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Person getSubordinate() {
+		return subordinate;
+	}
+
+	public void setSubordinate(Person subordinate) {
+		this.subordinate = subordinate;
 	}
 
 	@Override

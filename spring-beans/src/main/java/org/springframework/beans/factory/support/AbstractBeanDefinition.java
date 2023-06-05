@@ -907,7 +907,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return property values for this bean (never {@code null}).
+	 * 返回此bean的属性值 (从不为 {@code null})。
 	 */
 	@Override
 	public MutablePropertyValues getPropertyValues() {
@@ -935,9 +935,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return information about methods to be overridden by the IoC
-	 * container. This will be empty if there are no method overrides.
-	 * <p>Never returns {@code null}.
+	 * 返回由IoC容器覆盖的方法信息。如果没有方法覆盖，这将是空的。<p> 从不返回 {@code null}。
 	 */
 	public MethodOverrides getMethodOverrides() {
 		return this.methodOverrides;
