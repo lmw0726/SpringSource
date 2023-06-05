@@ -613,29 +613,36 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		if (ele.hasAttribute(PRIMARY_ATTRIBUTE)) {
+			//如果有primary属性，设置bean定义的primary属性值
 			bd.setPrimary(TRUE_VALUE.equals(ele.getAttribute(PRIMARY_ATTRIBUTE)));
 		}
 
 		if (ele.hasAttribute(INIT_METHOD_ATTRIBUTE)) {
+			//如果有初始化方法属性，获取初始化方法名称，并设置bean定义的初始化方法名称
 			String initMethodName = ele.getAttribute(INIT_METHOD_ATTRIBUTE);
 			bd.setInitMethodName(initMethodName);
 		} else if (this.defaults.getInitMethod() != null) {
+			//如果有默认的初始化方法名称，并设置bean定义的初始化方法名称，强制初始化方法为false
 			bd.setInitMethodName(this.defaults.getInitMethod());
 			bd.setEnforceInitMethod(false);
 		}
 
 		if (ele.hasAttribute(DESTROY_METHOD_ATTRIBUTE)) {
+			//如果有销毁方法属性，获取销毁方法名称，并设置bean定义的销毁方法名称
 			String destroyMethodName = ele.getAttribute(DESTROY_METHOD_ATTRIBUTE);
 			bd.setDestroyMethodName(destroyMethodName);
 		} else if (this.defaults.getDestroyMethod() != null) {
+			//如果有默认的销毁方法名称，并设置bean定义的销毁方法名称，强制销毁方法为false
 			bd.setDestroyMethodName(this.defaults.getDestroyMethod());
 			bd.setEnforceDestroyMethod(false);
 		}
 
 		if (ele.hasAttribute(FACTORY_METHOD_ATTRIBUTE)) {
+			//如果有工厂方法属性，获取工厂方法名称，并设置bean定义的工厂方法名称
 			bd.setFactoryMethodName(ele.getAttribute(FACTORY_METHOD_ATTRIBUTE));
 		}
 		if (ele.hasAttribute(FACTORY_BEAN_ATTRIBUTE)) {
+			//如果有工厂bean属性，获取并设置工厂bean值
 			bd.setFactoryBeanName(ele.getAttribute(FACTORY_BEAN_ATTRIBUTE));
 		}
 

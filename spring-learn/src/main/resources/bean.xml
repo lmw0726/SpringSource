@@ -3,8 +3,11 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd" default-merge="default">
+	<description>XML实体类</description>
 	<bean id="person" name="person;xiaowei" class="com.lmw.learn.bean.Person">
+		<description>人类实体类，他的名字叫黄小伟，年龄18岁</description>
 		<property name="age" value="18"/>
 		<property name="name" value="黄小伟"/>
+
 	</bean>
 </beans>
