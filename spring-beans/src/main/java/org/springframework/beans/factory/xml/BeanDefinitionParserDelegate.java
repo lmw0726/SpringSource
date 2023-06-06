@@ -746,13 +746,15 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse qualifier sub-elements of the given bean element.
+	 * 解析给定bean元素的 qualifier 子元素
 	 */
 	public void parseQualifierElements(Element beanEle, AbstractBeanDefinition bd) {
+		//获取子节点
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (isCandidateElement(node) && nodeNameEquals(node, QUALIFIER_ELEMENT)) {
+				//如果当前子节点是候选元素，且该元素节点名称为qualifier
 				parseQualifierElement((Element) node, bd);
 			}
 		}
@@ -840,20 +842,26 @@ public class BeanDefinitionParserDelegate {
 						this.parseState.push(new ConstructorArgumentEntry(index));
 						//解析构造参数的属性值
 						Object value = parsePropertyValue(ele, bd, null);
+						//构建值存储器
 						ConstructorArgumentValues.ValueHolder valueHolder = new ConstructorArgumentValues.ValueHolder(value);
 						if (StringUtils.hasLength(typeAttr)) {
+							//如果type属性值有值，设置type值
 							valueHolder.setType(typeAttr);
 						}
 						if (StringUtils.hasLength(nameAttr)) {
+							//如果name属性值有值，设置name值
 							valueHolder.setName(nameAttr);
 						}
 						valueHolder.setSource(extractSource(ele));
 						if (bd.getConstructorArgumentValues().hasIndexedArgumentValue(index)) {
+							//如果该索引已经注册了，提示错误
 							error("Ambiguous constructor-arg entries for index " + index, ele);
 						} else {
+							//否则添加上该索引和值存储器
 							bd.getConstructorArgumentValues().addIndexedArgumentValue(index, valueHolder);
 						}
 					} finally {
+						//退出解析状态
 						this.parseState.pop();
 					}
 				}
@@ -862,18 +870,25 @@ public class BeanDefinitionParserDelegate {
 			}
 		} else {
 			try {
+				//将解析构造参数设置为解析中的状态
 				this.parseState.push(new ConstructorArgumentEntry());
+				//解析构造参数的属性值
 				Object value = parsePropertyValue(ele, bd, null);
+				//构建值存储器
 				ConstructorArgumentValues.ValueHolder valueHolder = new ConstructorArgumentValues.ValueHolder(value);
 				if (StringUtils.hasLength(typeAttr)) {
+					//如果type属性值有值，设置type值
 					valueHolder.setType(typeAttr);
 				}
 				if (StringUtils.hasLength(nameAttr)) {
+					//如果name属性值有值，设置name值
 					valueHolder.setName(nameAttr);
 				}
 				valueHolder.setSource(extractSource(ele));
+				//将值存储器设置为通用的参数解析
 				bd.getConstructorArgumentValues().addGenericArgumentValue(valueHolder);
 			} finally {
+				//退出解析状态
 				this.parseState.pop();
 			}
 		}
@@ -914,30 +929,42 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse a qualifier element.
+	 * 解析一个 qualifier 元素
 	 */
 	public void parseQualifierElement(Element ele, AbstractBeanDefinition bd) {
+		//获取type属性名
 		String typeName = ele.getAttribute(TYPE_ATTRIBUTE);
 		if (!StringUtils.hasLength(typeName)) {
+			//如果type属性名为空，提示错误，直接结束
 			error("Tag 'qualifier' must have a 'type' attribute", ele);
 			return;
 		}
+		//将解析type属性名设置为解析状态
 		this.parseState.push(new QualifierEntry(typeName));
 		try {
+			//构建AutowireCandidateQualifier实例
 			AutowireCandidateQualifier qualifier = new AutowireCandidateQualifier(typeName);
+			//设置源
 			qualifier.setSource(extractSource(ele));
+			//获取type属性值
 			String value = ele.getAttribute(VALUE_ATTRIBUTE);
 			if (StringUtils.hasLength(value)) {
+				//如果有值，AutowireCandidateQualifier设置自动候选者注入该值
 				qualifier.setAttribute(AutowireCandidateQualifier.VALUE_KEY, value);
 			}
+			//获取子节点
 			NodeList nl = ele.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
 				if (isCandidateElement(node) && nodeNameEquals(node, QUALIFIER_ATTRIBUTE_ELEMENT)) {
+					//如果子节点是候选节点，且子节点是attribute元素
 					Element attributeEle = (Element) node;
+					//获取key属性
 					String attributeName = attributeEle.getAttribute(KEY_ATTRIBUTE);
+					//获取value属性
 					String attributeValue = attributeEle.getAttribute(VALUE_ATTRIBUTE);
 					if (StringUtils.hasLength(attributeName) && StringUtils.hasLength(attributeValue)) {
+						//key-value不为空，设置MetadataAttribute
 						BeanMetadataAttribute attribute = new BeanMetadataAttribute(attributeName, attributeValue);
 						attribute.setSource(extractSource(attributeEle));
 						qualifier.addMetadataAttribute(attribute);
@@ -949,6 +976,7 @@ public class BeanDefinitionParserDelegate {
 			}
 			bd.addQualifier(qualifier);
 		} finally {
+			//退出解析状态
 			this.parseState.pop();
 		}
 	}
@@ -1052,22 +1080,27 @@ public class BeanDefinitionParserDelegate {
 			}
 			return nestedBd;
 		} else if (nodeNameEquals(ele, REF_ELEMENT)) {
-			// A generic reference to any name of any bean.
+			// 对任何bean的任何名称的通用引用。
+			//如果节点是ref节点，获取关联bean名称
 			String refName = ele.getAttribute(BEAN_REF_ATTRIBUTE);
 			boolean toParent = false;
 			if (!StringUtils.hasLength(refName)) {
-				// A reference to the id of another bean in a parent context.
+				//如果关联bean名称为空，获取parent值，并作为关联bean名称
+				// 对父上下文中另一个bean的id的引用。
 				refName = ele.getAttribute(PARENT_REF_ATTRIBUTE);
 				toParent = true;
 				if (!StringUtils.hasLength(refName)) {
+					//如果关联bean名称仍为空，提示错误，返回null
 					error("'bean' or 'parent' is required for <ref> element", ele);
 					return null;
 				}
 			}
 			if (!StringUtils.hasText(refName)) {
+				//如果是空字符串，提示错误，返回null
 				error("<ref> element contains empty target attribute", ele);
 				return null;
 			}
+			//构建RuntimeBeanReference实例，设置源后，返回该实例
 			RuntimeBeanReference ref = new RuntimeBeanReference(refName, toParent);
 			ref.setSource(extractSource(ele));
 			return ref;
