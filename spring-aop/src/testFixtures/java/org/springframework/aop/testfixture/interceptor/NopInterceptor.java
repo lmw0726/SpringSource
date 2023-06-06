@@ -20,7 +20,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 /**
- * Trivial interceptor that can be introduced in a chain to display it.
+ * 可以在链中引入一个微不足道的拦截器来显示它
  *
  * @author Rod Johnson
  */

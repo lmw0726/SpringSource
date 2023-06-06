@@ -115,32 +115,41 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 
 
 	/**
-	 * Locate the {@link NamespaceHandler} for the supplied namespace URI
-	 * from the configured mappings.
+	 * 从配置的映射中找到提供的命名空间URI的 {@link NamespaceHandler}。
 	 *
-	 * @param namespaceUri the relevant namespace URI
-	 * @return the located {@link NamespaceHandler}, or {@code null} if none found
+	 * @param namespaceUri 相关的命名空间URI
+	 * @return 找到的 {@link NamespaceHandler}, 如果没有找到则为 {@code null}
 	 */
 	@Override
 	@Nullable
 	public NamespaceHandler resolve(String namespaceUri) {
+		//获取处理器映射
 		Map<String, Object> handlerMappings = getHandlerMappings();
+		//获取处理者或者类名
 		Object handlerOrClassName = handlerMappings.get(namespaceUri);
 		if (handlerOrClassName == null) {
+			//如果为空，则返回null
 			return null;
 		} else if (handlerOrClassName instanceof NamespaceHandler) {
+			//如果是NamespaceHandler类型，强转后直接返回
 			return (NamespaceHandler) handlerOrClassName;
 		} else {
+			//转为类名
 			String className = (String) handlerOrClassName;
 			try {
+				//根据类名进行反射，获取类型
 				Class<?> handlerClass = ClassUtils.forName(className, this.classLoader);
 				if (!NamespaceHandler.class.isAssignableFrom(handlerClass)) {
 					throw new FatalBeanException("Class [" + className + "] for namespace [" + namespaceUri +
 							"] does not implement the [" + NamespaceHandler.class.getName() + "] interface");
 				}
+				//创建NamespaceHandler实例对象
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
+				//初始化命名空间处理者
 				namespaceHandler.init();
+				//添加到handlerMappings 中
 				handlerMappings.put(namespaceUri, namespaceHandler);
+				//返回命名空间处理者
 				return namespaceHandler;
 			} catch (ClassNotFoundException ex) {
 				throw new FatalBeanException("Could not find NamespaceHandler class [" + className +
@@ -153,7 +162,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	}
 
 	/**
-	 * Load the specified NamespaceHandler mappings lazily.
+	 * 惰性加载指定命名空间处理者映射
 	 */
 	private Map<String, Object> getHandlerMappings() {
 		Map<String, Object> handlerMappings = this.handlerMappings;
@@ -161,17 +170,21 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 			synchronized (this) {
 				handlerMappings = this.handlerMappings;
 				if (handlerMappings == null) {
+					//采用双重检测初始化handlerMappings
 					if (logger.isTraceEnabled()) {
 						logger.trace("Loading NamespaceHandler mappings from [" + this.handlerMappingsLocation + "]");
 					}
 					try {
+						//加载命名空间处理者
 						Properties mappings =
 								PropertiesLoaderUtils.loadAllProperties(this.handlerMappingsLocation, this.classLoader);
 						if (logger.isTraceEnabled()) {
 							logger.trace("Loaded NamespaceHandler mappings: " + mappings);
 						}
 						handlerMappings = new ConcurrentHashMap<>(mappings.size());
+						//将mappings复制到handlerMappings中
 						CollectionUtils.mergePropertiesIntoMap(mappings, handlerMappings);
+						//替换全局的命名空间处理者映射
 						this.handlerMappings = handlerMappings;
 					} catch (IOException ex) {
 						throw new IllegalStateException(

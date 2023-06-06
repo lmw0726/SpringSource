@@ -817,20 +817,28 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse a constructor-arg element.
+	 * 解析一个constructor-arg元素
 	 */
 	public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+		//获取index属性值
 		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);
+		//获取type属性值
 		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);
+		//获取name属性值
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		if (StringUtils.hasLength(indexAttr)) {
+			//如果index属性值不为空
 			try {
+				//解析成整数
 				int index = Integer.parseInt(indexAttr);
 				if (index < 0) {
+					//如果index值小于0，提示错误
 					error("'index' cannot be lower than 0", ele);
 				} else {
 					try {
+						//将解析构造参数设置为解析中的状态
 						this.parseState.push(new ConstructorArgumentEntry(index));
+						//解析构造参数的属性值
 						Object value = parsePropertyValue(ele, bd, null);
 						ConstructorArgumentValues.ValueHolder valueHolder = new ConstructorArgumentValues.ValueHolder(value);
 						if (StringUtils.hasLength(typeAttr)) {
@@ -1403,23 +1411,27 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse a custom element (outside of the default namespace).
+	 * 解析自定义元素 (在默认名称空间之外)。
 	 *
-	 * @param ele          the element to parse
-	 * @param containingBd the containing bean definition (if any)
-	 * @return the resulting bean definition
+	 * @param ele          要解析的元素
+	 * @param containingBd 包含bean定义 (如果有)
+	 * @return 生成的bean定义
 	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		//获取命名空间URI
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
+			//如果URI为空，则返回null
 			return null;
 		}
+		//解析命名空间URI，获取命名空间处理器
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		//将该元素解析成bean定义
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 
@@ -1435,30 +1447,34 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Decorate the given bean definition through a namespace handler, if applicable.
+	 * 通过命名空间处理程序 (如果适用) 来装饰给定的bean定义。
 	 *
-	 * @param ele          the current element
-	 * @param originalDef  the current bean definition
-	 * @param containingBd the containing bean definition (if any)
-	 * @return the decorated bean definition
+	 * @param ele          当前元素
+	 * @param originalDef  当前bean定义
+	 * @param containingBd 包含bean定义 (如果有)
+	 * @return 装饰bean定义
 	 */
 	public BeanDefinitionHolder decorateBeanDefinitionIfRequired(
 			Element ele, BeanDefinitionHolder originalDef, @Nullable BeanDefinition containingBd) {
 
 		BeanDefinitionHolder finalDefinition = originalDef;
 
-		// Decorate based on custom attributes first.
+		// 首先基于自定义属性进行装饰。
+		//获取元素的属性
 		NamedNodeMap attributes = ele.getAttributes();
 		for (int i = 0; i < attributes.getLength(); i++) {
 			Node node = attributes.item(i);
+			//根据属性值如果需要则进行装饰
 			finalDefinition = decorateIfRequired(node, finalDefinition, containingBd);
 		}
 
-		// Decorate based on custom nested elements.
+		// 基于自定义嵌套元素进行装饰。
+		//获取元素的子节点
 		NodeList children = ele.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				//如果子节点的类型是元素节点，根据需要使用该子节点装饰bean定义
 				finalDefinition = decorateIfRequired(node, finalDefinition, containingBd);
 			}
 		}
@@ -1466,19 +1482,20 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Decorate the given bean definition through a namespace handler,
-	 * if applicable.
+	 * 通过命名空间处理程序 (如果适用) 来装饰给定的bean定义。
 	 *
-	 * @param node         the current child node
-	 * @param originalDef  the current bean definition
-	 * @param containingBd the containing bean definition (if any)
-	 * @return the decorated bean definition
+	 * @param node         当前子节点
+	 * @param originalDef  当前 bean 定义
+	 * @param containingBd 包含bean定义 (如果有)
+	 * @return 装饰的bean定义
 	 */
 	public BeanDefinitionHolder decorateIfRequired(
 			Node node, BeanDefinitionHolder originalDef, @Nullable BeanDefinition containingBd) {
-
+		//获取命名空间URI
 		String namespaceUri = getNamespaceURI(node);
 		if (namespaceUri != null && !isDefaultNamespace(namespaceUri)) {
+			//如果命名空间URI不为空且不是默认命名空间，则进行装饰
+			//获取命名空间的处理器
 			NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 			if (handler != null) {
 				BeanDefinitionHolder decorated =
@@ -1500,12 +1517,15 @@ public class BeanDefinitionParserDelegate {
 
 	@Nullable
 	private BeanDefinitionHolder parseNestedCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		//解析自定义元素标签
 		BeanDefinition innerDefinition = parseCustomElement(ele, containingBd);
 		if (innerDefinition == null) {
+			//如果内部的bean定义为空,则报错
 			error("Incorrect usage of element '" + ele.getNodeName() + "' in a nested manner. " +
 					"This tag cannot be used nested inside <property>.", ele);
 			return null;
 		}
+		//拼接bean定义id
 		String id = ele.getNodeName() + BeanDefinitionReaderUtils.GENERATED_BEAN_NAME_SEPARATOR +
 				ObjectUtils.getIdentityHexString(innerDefinition);
 		if (logger.isTraceEnabled()) {

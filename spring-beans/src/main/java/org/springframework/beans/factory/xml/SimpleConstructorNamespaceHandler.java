@@ -42,7 +42,7 @@ import org.springframework.util.StringUtils;
  * <pre class="code">
  * &lt;bean id=&quot;author&quot; class=&quot;..TestBean&quot; c:name=&quot;Enescu&quot; c:work-ref=&quot;compositions&quot;/&gt;
  * </pre>
- *
+ * <p>
  * Here the '{@code c:name}' corresponds directly to the '{@code name}
  * ' argument declared on the constructor of class '{@code TestBean}'. The
  * '{@code c:work-ref}' attributes corresponds to the '{@code work}'
@@ -54,8 +54,8 @@ import org.springframework.util.StringUtils;
  * the container which, by default, does type introspection.
  *
  * @author Costin Leau
- * @since 3.1
  * @see SimplePropertyNamespaceHandler
+ * @since 3.1
  */
 public class SimpleConstructorNamespaceHandler implements NamespaceHandler {
 
@@ -79,37 +79,41 @@ public class SimpleConstructorNamespaceHandler implements NamespaceHandler {
 	@Override
 	public BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
 		if (node instanceof Attr) {
+			//如果节点是Attr类型
 			Attr attr = (Attr) node;
+			//获取本地名称后，去除所有的空格
 			String argName = StringUtils.trimWhitespace(parserContext.getDelegate().getLocalName(attr));
+			//获取去除掉空格后的值
 			String argValue = StringUtils.trimWhitespace(attr.getValue());
-
+			//获取构造参数值对
 			ConstructorArgumentValues cvs = definition.getBeanDefinition().getConstructorArgumentValues();
 			boolean ref = false;
 
-			// handle -ref arguments
+			// 处理 -ref 参数
 			if (argName.endsWith(REF_SUFFIX)) {
+				//如果参数名称以 -ref 结尾，将参数名设置为-ref的字符串
 				ref = true;
 				argName = argName.substring(0, argName.length() - REF_SUFFIX.length());
 			}
-
+			//构建值存储器
 			ValueHolder valueHolder = new ValueHolder(ref ? new RuntimeBeanReference(argValue) : argValue);
+			//设置源
 			valueHolder.setSource(parserContext.getReaderContext().extractSource(attr));
-
-			// handle "escaped"/"_" arguments
+			// 处理 "escaped"/"_" 参数
 			if (argName.startsWith(DELIMITER_PREFIX)) {
+				//如果参数名称以 "_" 开头，将参数名设置为"_"后的字符串
 				String arg = argName.substring(1).trim();
 
-				// fast default check
+				// 快速默认检查
 				if (!StringUtils.hasText(arg)) {
+					//如果参数名没有值，添加到同样的参数
 					cvs.addGenericArgumentValue(valueHolder);
-				}
-				// assume an index otherwise
-				else {
+				} else {
+					//否则假设它是一个索引
 					int index = -1;
 					try {
 						index = Integer.parseInt(arg);
-					}
-					catch (NumberFormatException ex) {
+					} catch (NumberFormatException ex) {
 						parserContext.getReaderContext().error(
 								"Constructor argument '" + argName + "' specifies an invalid integer", attr);
 					}
@@ -117,24 +121,26 @@ public class SimpleConstructorNamespaceHandler implements NamespaceHandler {
 						parserContext.getReaderContext().error(
 								"Constructor argument '" + argName + "' specifies a negative index", attr);
 					}
-
 					if (cvs.hasIndexedArgumentValue(index)) {
+						//如果构造参数值对已经含有该索引了，报错
 						parserContext.getReaderContext().error(
-								"Constructor argument '" + argName + "' with index "+ index+" already defined using <constructor-arg>." +
-								" Only one approach may be used per argument.", attr);
+								"Constructor argument '" + argName + "' with index " + index + " already defined using <constructor-arg>." +
+										" Only one approach may be used per argument.", attr);
 					}
-
+					//添加到索引参数中
 					cvs.addIndexedArgumentValue(index, valueHolder);
 				}
-			}
-			// no escaping -> ctr name
-			else {
+			} else {
+				// no escaping -> ctr name
+				//将参数名转为驼峰模式的参数
 				String name = Conventions.attributeNameToPropertyName(argName);
 				if (containsArgWithName(name, cvs)) {
+					//如果通用参数或者索引参数已经有了这个参数名，报错
 					parserContext.getReaderContext().error(
 							"Constructor argument '" + argName + "' already defined using <constructor-arg>." +
-							" Only one approach may be used per argument.", attr);
+									" Only one approach may be used per argument.", attr);
 				}
+				//添加到通用参数中
 				valueHolder.setName(Conventions.attributeNameToPropertyName(argName));
 				cvs.addGenericArgumentValue(valueHolder);
 			}

@@ -552,12 +552,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Uncapitalize a {@code String}, changing the first letter to
-	 * lower case as per {@link Character#toLowerCase(char)}.
-	 * No other letters are changed.
+	 * 取消大写 {@code String}，根据 {@link Character#toLowerCase(char)} 将第一个字母更改为小写。没有其他字母更改。
 	 *
-	 * @param str the {@code String} to uncapitalize
-	 * @return the uncapitalized {@code String}
+	 * @param str 要取消大写的 {@code String}
+	 * @return 取消大写的{@code String}
 	 */
 	public static String uncapitalize(String str) {
 		return changeFirstCharacterCase(str, false);
@@ -567,7 +565,7 @@ public abstract class StringUtils {
 		if (!hasLength(str)) {
 			return str;
 		}
-
+		//第一个字符串
 		char baseChar = str.charAt(0);
 		char updatedChar;
 		if (capitalize) {

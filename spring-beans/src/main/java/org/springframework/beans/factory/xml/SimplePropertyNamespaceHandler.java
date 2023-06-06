@@ -37,7 +37,7 @@ import org.springframework.lang.Nullable;
  *
  * <pre class="code">
  * &lt;bean id=&quot;rob&quot; class=&quot;..TestBean&quot; p:name=&quot;Rob Harrop&quot; p:spouse-ref=&quot;sally&quot;/&gt;</pre>
- *
+ * <p>
  * Here the '{@code p:name}' corresponds directly to the '{@code name}'
  * property on class '{@code TestBean}'. The '{@code p:spouse-ref}'
  * attributes corresponds to the '{@code spouse}' property and, rather
@@ -68,19 +68,26 @@ public class SimplePropertyNamespaceHandler implements NamespaceHandler {
 	@Override
 	public BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext) {
 		if (node instanceof Attr) {
+			//如果节点是Attr类型
 			Attr attr = (Attr) node;
+			//获取属性节点的本地名称
 			String propertyName = parserContext.getDelegate().getLocalName(attr);
+			//获取属性节点的值
 			String propertyValue = attr.getValue();
+			//获取bean定义的可变属性值对
 			MutablePropertyValues pvs = definition.getBeanDefinition().getPropertyValues();
 			if (pvs.contains(propertyName)) {
+				//如果该属性已经在可变属性值对中了，提示该属性已被使用的错误
 				parserContext.getReaderContext().error("Property '" + propertyName + "' is already defined using " +
 						"both <property> and inline syntax. Only one approach may be used per property.", attr);
 			}
 			if (propertyName.endsWith(REF_SUFFIX)) {
+				//如果属性名以-ref结尾，获取-ref属性之前的字符串作为属性名
 				propertyName = propertyName.substring(0, propertyName.length() - REF_SUFFIX.length());
+				//将名称转为驼峰模式后，将属性值构建成RuntimeBeanReference实例，添加到可变属性值对中。
 				pvs.add(Conventions.attributeNameToPropertyName(propertyName), new RuntimeBeanReference(propertyValue));
-			}
-			else {
+			} else {
+				//将名称转为驼峰模式，并添加到可变属性值对中
 				pvs.add(Conventions.attributeNameToPropertyName(propertyName), propertyValue);
 			}
 		}

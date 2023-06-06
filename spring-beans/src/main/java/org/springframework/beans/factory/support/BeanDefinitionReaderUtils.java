@@ -38,8 +38,7 @@ import org.springframework.util.StringUtils;
 public abstract class BeanDefinitionReaderUtils {
 
 	/**
-	 * Separator for generated bean names. If a class name or parent name is not
-	 * unique, "#1", "#2" etc will be appended, until the name becomes unique.
+	 * 生成的bean名称的分隔符。如果类名或父名不是唯一的，则将附加 "#1"，"#2" 等，直到名称变得唯一。
 	 */
 	public static final String GENERATED_BEAN_NAME_SEPARATOR = BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR;
 

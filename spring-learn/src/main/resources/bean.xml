@@ -9,7 +9,6 @@
 		<meta key="special_key" value="special_value"/>
 		<property name="age" value="18"/>
 		<property name="name" value="黄小伟"/>
-
 	</bean>
 
 	<bean id="boss" name="boss" class="com.lmw.learn.bean.person.Boss">
@@ -19,7 +18,6 @@
 		<property name="asset" value="50000000.00"/>
 		<lookup-method name="getSubordinate" bean="employee2"/>
 		<replaced-method name="getName" replacer="com.lmw.learn.bean.person.Employee">
-			<arg-type ></arg-type>
 
 		</replaced-method>
 	</bean>

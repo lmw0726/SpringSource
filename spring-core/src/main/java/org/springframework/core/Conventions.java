@@ -58,6 +58,7 @@ public final class Conventions {
 	 * <p>For arrays the pluralized version of the array component type is used.
 	 * For {@code Collection}s an attempt is made to 'peek ahead' to determine
 	 * the component type and return its pluralized version.
+	 *
 	 * @param value the value to generate a variable name for
 	 * @return the generated variable name
 	 */
@@ -69,8 +70,7 @@ public final class Conventions {
 		if (value.getClass().isArray()) {
 			valueClass = value.getClass().getComponentType();
 			pluralize = true;
-		}
-		else if (value instanceof Collection) {
+		} else if (value instanceof Collection) {
 			Collection<?> collection = (Collection<?>) value;
 			if (collection.isEmpty()) {
 				throw new IllegalArgumentException(
@@ -79,8 +79,7 @@ public final class Conventions {
 			Object valueToCheck = peekAhead(collection);
 			valueClass = getClassForValue(valueToCheck);
 			pluralize = true;
-		}
-		else {
+		} else {
 			valueClass = getClassForValue(value);
 		}
 
@@ -95,6 +94,7 @@ public final class Conventions {
 	 * {@code Mono<com.myapp.Product>} becomes {@code "productMono"}<br>
 	 * {@code Flux<com.myapp.MyProduct>} becomes {@code "myProductFlux"}<br>
 	 * {@code Observable<com.myapp.MyProduct>} becomes {@code "myProductObservable"}<br>
+	 *
 	 * @param parameter the method or constructor parameter
 	 * @return the generated variable name
 	 */
@@ -107,16 +107,14 @@ public final class Conventions {
 		if (parameter.getParameterType().isArray()) {
 			valueClass = parameter.getParameterType().getComponentType();
 			pluralize = true;
-		}
-		else if (Collection.class.isAssignableFrom(parameter.getParameterType())) {
+		} else if (Collection.class.isAssignableFrom(parameter.getParameterType())) {
 			valueClass = ResolvableType.forMethodParameter(parameter).asCollection().resolveGeneric();
 			if (valueClass == null) {
 				throw new IllegalArgumentException(
 						"Cannot generate variable name for non-typed Collection parameter type");
 			}
 			pluralize = true;
-		}
-		else {
+		} else {
 			valueClass = parameter.getParameterType();
 			ReactiveAdapter adapter = ReactiveAdapterRegistry.getSharedInstance().getAdapter(valueClass);
 			if (adapter != null && !adapter.getDescriptor().isNoValue()) {
@@ -132,6 +130,7 @@ public final class Conventions {
 	/**
 	 * Determine the conventional variable name for the return type of the
 	 * given method, taking the generic collection type, if any, into account.
+	 *
 	 * @param method the method to generate a variable name for
 	 * @return the generated variable name
 	 */
@@ -144,8 +143,9 @@ public final class Conventions {
 	 * method, taking the generic collection type, if any, into account, falling
 	 * back on the given actual return value if the method declaration is not
 	 * specific enough, e.g. {@code Object} return type or untyped collection.
+	 *
 	 * @param method the method to generate a variable name for
-	 * @param value the return value (may be {@code null} if not available)
+	 * @param value  the return value (may be {@code null} if not available)
 	 * @return the generated variable name
 	 */
 	public static String getVariableNameForReturnType(Method method, @Nullable Object value) {
@@ -161,9 +161,10 @@ public final class Conventions {
 	 * {@code Mono<com.myapp.Product>} becomes {@code "productMono"}<br>
 	 * {@code Flux<com.myapp.MyProduct>} becomes {@code "myProductFlux"}<br>
 	 * {@code Observable<com.myapp.MyProduct>} becomes {@code "myProductObservable"}<br>
-	 * @param method the method to generate a variable name for
+	 *
+	 * @param method       the method to generate a variable name for
 	 * @param resolvedType the resolved return type of the method
-	 * @param value the return value (may be {@code null} if not available)
+	 * @param value        the return value (may be {@code null} if not available)
 	 * @return the generated variable name
 	 */
 	public static String getVariableNameForReturnType(Method method, Class<?> resolvedType, @Nullable Object value) {
@@ -184,8 +185,7 @@ public final class Conventions {
 		if (resolvedType.isArray()) {
 			valueClass = resolvedType.getComponentType();
 			pluralize = true;
-		}
-		else if (Collection.class.isAssignableFrom(resolvedType)) {
+		} else if (Collection.class.isAssignableFrom(resolvedType)) {
 			valueClass = ResolvableType.forMethodReturnType(method).asCollection().resolveGeneric();
 			if (valueClass == null) {
 				if (!(value instanceof Collection)) {
@@ -201,8 +201,7 @@ public final class Conventions {
 				valueClass = getClassForValue(valueToCheck);
 			}
 			pluralize = true;
-		}
-		else {
+		} else {
 			valueClass = resolvedType;
 			ReactiveAdapter adapter = ReactiveAdapterRegistry.getSharedInstance().getAdapter(valueClass);
 			if (adapter != null && !adapter.getDescriptor().isNoValue()) {
@@ -216,28 +215,27 @@ public final class Conventions {
 	}
 
 	/**
-	 * Convert {@code String}s in attribute name format (e.g. lowercase, hyphens
-	 * separating words) into property name format (camel-case). For example
-	 * {@code transaction-manager} becomes {@code "transactionManager"}.
+	 * 将属性名称格式的 {@code String} (例如小写，连字符分隔单词) 转换为属性名称格式 (camel-case)。例如 {@code transaction-manager} 变为 {@code “transactionManager”}。
 	 */
 	public static String attributeNameToPropertyName(String attributeName) {
 		Assert.notNull(attributeName, "'attributeName' must not be null");
 		if (!attributeName.contains("-")) {
 			return attributeName;
 		}
-		char[] result = new char[attributeName.length() -1]; // not completely accurate but good guess
+		char[] result = new char[attributeName.length() - 1]; // not completely accurate but good guess
 		int currPos = 0;
 		boolean upperCaseNext = false;
-		for (int i = 0; i < attributeName.length(); i++ ) {
+		for (int i = 0; i < attributeName.length(); i++) {
 			char c = attributeName.charAt(i);
 			if (c == '-') {
+				//碰到 - 符号，将下个字符设置为大写
 				upperCaseNext = true;
-			}
-			else if (upperCaseNext) {
+			} else if (upperCaseNext) {
+				//如果下个字符串是大写，将当前字符设置为大写
 				result[currPos++] = Character.toUpperCase(c);
+				//将下个字符设置为大写的标记设置为false
 				upperCaseNext = false;
-			}
-			else {
+			} else {
 				result[currPos++] = c;
 			}
 		}
@@ -261,6 +259,7 @@ public final class Conventions {
 	 * <p>Will return the class of the given value, except when encountering a
 	 * JDK proxy, in which case it will determine the 'primary' interface
 	 * implemented by that proxy.
+	 *
 	 * @param value the value to check
 	 * @return the class to use for naming a variable
 	 */
@@ -273,8 +272,7 @@ public final class Conventions {
 					return ifc;
 				}
 			}
-		}
-		else if (valueClass.getName().lastIndexOf('$') != -1 && valueClass.getDeclaringClass() == null) {
+		} else if (valueClass.getName().lastIndexOf('$') != -1 && valueClass.getDeclaringClass() == null) {
 			// '$' in the class name but no inner class -
 			// assuming it's a special subclass (e.g. by OpenJPA)
 			valueClass = valueClass.getSuperclass();

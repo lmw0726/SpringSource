@@ -757,9 +757,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Copy the qualifiers from the supplied AbstractBeanDefinition to this bean definition.
+	 * 将限定符从提供的AbstractBeanDefinition复制到此bean定义。
 	 *
-	 * @param source the AbstractBeanDefinition to copy from
+	 * @param source 要复制的抽象bean定义
 	 */
 	public void copyQualifiersFrom(AbstractBeanDefinition source) {
 		Assert.notNull(source, "Source must not be null");
