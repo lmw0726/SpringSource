@@ -48,13 +48,12 @@ import org.springframework.util.Assert;
 public abstract class DomUtils {
 
 	/**
-	 * Retrieves all child elements of the given DOM element that match any of the given element names.
-	 * Only looks at the direct child level of the given element; do not go into further depth
-	 * (in contrast to the DOM API's {@code getElementsByTagName} method).
+	 * 检索与给定元素名称匹配的给定DOM元素的所有子元素。
+	 * 只看给定元素的直接子级别; 不要深入 (与DOM API的 {@code getElementsByTagName}  方法相反)。
 	 *
-	 * @param ele           the DOM element to analyze
-	 * @param childEleNames the child element names to look for
-	 * @return a List of child {@code org.w3c.dom.Element} instances
+	 * @param ele           要分析的DOM元素
+	 * @param childEleNames 要查找的子元素名称
+	 * @return 一个{@code org.w3c.dom.Element}实例的子节点列表
 	 * @see org.w3c.dom.Element
 	 * @see org.w3c.dom.Element#getElementsByTagName
 	 */
@@ -65,8 +64,10 @@ public abstract class DomUtils {
 		NodeList nl = ele.getChildNodes();
 		List<Element> childEles = new ArrayList<>();
 		for (int i = 0; i < nl.getLength(); i++) {
+			//遍历子节点
 			Node node = nl.item(i);
 			if (node instanceof Element && nodeNameMatch(node, childEleNameList)) {
+				//如果子节点是Element类型，并且节点名称中含有当前子节点名称，添加到子元素列表。
 				childEles.add((Element) node);
 			}
 		}
@@ -74,13 +75,12 @@ public abstract class DomUtils {
 	}
 
 	/**
-	 * Retrieves all child elements of the given DOM element that match the given element name.
-	 * Only look at the direct child level of the given element; do not go into further depth
-	 * (in contrast to the DOM API's {@code getElementsByTagName} method).
+	 * 检索与给定元素名称匹配的给定DOM元素的所有子元素。
+	 * 只看给定元素的直接子级别; 不要深入 (与DOM API的 {@code getElementsByTagName}  方法相反)。
 	 *
-	 * @param ele          the DOM element to analyze
-	 * @param childEleName the child element name to look for
-	 * @return a List of child {@code org.w3c.dom.Element} instances
+	 * @param ele          要分析的DOM元素
+	 * @param childEleName 要查找的子元素名称
+	 * @return 一个{@code org.w3c.dom.Element}实例的子节点列表
 	 * @see org.w3c.dom.Element
 	 * @see org.w3c.dom.Element#getElementsByTagName
 	 */
@@ -146,10 +146,6 @@ public abstract class DomUtils {
 	}
 
 	/**
-	 * Extracts the text value from the given DOM element, ignoring XML comments.
-	 * <p>Appends all CharacterData nodes and EntityReference nodes into a single
-	 * String value, excluding Comment nodes. Only exposes actual user-specified
-	 * text, no default values of any kind.
 	 * 从给定的DOM元素中提取文本值，忽略XML注释。
 	 * <p> 将所有 CharacterData节点 和 EntityReference节点 附加到单个字符串值中，不包括注释节点。
 	 * 仅公开实际的用户指定文本，没有任何类型的默认值。
@@ -204,7 +200,7 @@ public abstract class DomUtils {
 	}
 
 	/**
-	 * Matches the given node's name and local name against the given desired names.
+	 * 将给定节点的名称和本地名称与给定的所需名称匹配。
 	 */
 	private static boolean nodeNameMatch(Node node, Collection<?> desiredNames) {
 		return (desiredNames.contains(node.getNodeName()) || desiredNames.contains(node.getLocalName()));

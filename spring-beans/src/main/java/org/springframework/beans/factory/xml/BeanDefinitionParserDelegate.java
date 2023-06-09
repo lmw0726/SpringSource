@@ -1105,132 +1105,172 @@ public class BeanDefinitionParserDelegate {
 			ref.setSource(extractSource(ele));
 			return ref;
 		} else if (nodeNameEquals(ele, IDREF_ELEMENT)) {
+			//如果节点是idref节点，获取关联bean名称
 			return parseIdRefElement(ele);
 		} else if (nodeNameEquals(ele, VALUE_ELEMENT)) {
+			//如果节点是value节点，解析value节点
 			return parseValueElement(ele, defaultValueType);
 		} else if (nodeNameEquals(ele, NULL_ELEMENT)) {
-			// It's a distinguished null value. Let's wrap it in a TypedStringValue
-			// object in order to preserve the source location.
+			//如果节点是null节点，解析null节点
+			// 这是一个显著的空值。让我们将其包装在TypedStringValue对象中，以便保留源位置。
 			TypedStringValue nullHolder = new TypedStringValue(null);
 			nullHolder.setSource(extractSource(ele));
 			return nullHolder;
 		} else if (nodeNameEquals(ele, ARRAY_ELEMENT)) {
+			//如果节点是array节点，解析array节点
 			return parseArrayElement(ele, bd);
 		} else if (nodeNameEquals(ele, LIST_ELEMENT)) {
+			//如果节点是list节点，解析list节点
 			return parseListElement(ele, bd);
 		} else if (nodeNameEquals(ele, SET_ELEMENT)) {
+			//如果节点是set节点，解析set节点
 			return parseSetElement(ele, bd);
 		} else if (nodeNameEquals(ele, MAP_ELEMENT)) {
+			//如果节点是map节点，解析map节点
 			return parseMapElement(ele, bd);
 		} else if (nodeNameEquals(ele, PROPS_ELEMENT)) {
+			//如果节点是props节点，解析props节点
 			return parsePropsElement(ele);
 		} else {
+			//提示错误消息，返回null
 			error("Unknown property sub-element: [" + ele.getNodeName() + "]", ele);
 			return null;
 		}
 	}
 
 	/**
-	 * Return a typed String value Object for the given 'idref' element.
+	 * 返回给定 'idref' 元素的类型化字符串值对象。
 	 */
 	@Nullable
 	public Object parseIdRefElement(Element ele) {
-		// A generic reference to any name of any bean.
+		// 对任何bean的任何名称的通用引用。
+		// 获取bean属性值
 		String refName = ele.getAttribute(BEAN_REF_ATTRIBUTE);
 		if (!StringUtils.hasLength(refName)) {
+			//如果引用名称为null，提示错误，返回null
 			error("'bean' is required for <idref> element", ele);
 			return null;
 		}
 		if (!StringUtils.hasText(refName)) {
+			//如果引用名称为空，提示错误，返回null
 			error("<idref> element contains empty target attribute", ele);
 			return null;
 		}
+		//构建运行时相关bean名称实例
 		RuntimeBeanNameReference ref = new RuntimeBeanNameReference(refName);
 		ref.setSource(extractSource(ele));
 		return ref;
 	}
 
 	/**
-	 * Return a typed String value Object for the given value element.
+	 * 返回给定的Value元素的类型化字符串值对象。
 	 */
 	public Object parseValueElement(Element ele, @Nullable String defaultTypeName) {
-		// It's a literal value.
+		// 这是字面上的值
 		String value = DomUtils.getTextValue(ele);
+		//获取type属性值
 		String specifiedTypeName = ele.getAttribute(TYPE_ATTRIBUTE);
 		String typeName = specifiedTypeName;
 		if (!StringUtils.hasText(typeName)) {
+			//如果没有指定类型，则类名名称为默认值类型名
 			typeName = defaultTypeName;
 		}
 		try {
+			//根据属性值和类型名称构建类型字符串值实例
 			TypedStringValue typedValue = buildTypedStringValue(value, typeName);
+			//设置源
 			typedValue.setSource(extractSource(ele));
+			//设置特殊的类型名称
 			typedValue.setSpecifiedTypeName(specifiedTypeName);
 			return typedValue;
 		} catch (ClassNotFoundException ex) {
+			//提示错误，直接返回值
 			error("Type class [" + typeName + "] not found for <value> element", ele, ex);
 			return value;
 		}
 	}
 
 	/**
-	 * Build a typed String value Object for the given raw value.
+	 * 为给定的原始值构建一个类型化的字符串值对象。
 	 *
 	 * @see org.springframework.beans.factory.config.TypedStringValue
 	 */
 	protected TypedStringValue buildTypedStringValue(String value, @Nullable String targetTypeName)
 			throws ClassNotFoundException {
-
+		//获取类加载器
 		ClassLoader classLoader = this.readerContext.getBeanClassLoader();
 		TypedStringValue typedValue;
 		if (!StringUtils.hasText(targetTypeName)) {
+			//如果类型名称没有值，使用value构建TypedStringValue实例
 			typedValue = new TypedStringValue(value);
 		} else if (classLoader != null) {
+			//如果类加载器存在，通过反射创建该类的实例
 			Class<?> targetType = ClassUtils.forName(targetTypeName, classLoader);
+			//根据类的实例构建TypedStringValue实例
 			typedValue = new TypedStringValue(value, targetType);
 		} else {
+			//根据类名和值构建TypedStringValue实例
 			typedValue = new TypedStringValue(value, targetTypeName);
 		}
 		return typedValue;
 	}
 
 	/**
-	 * Parse an array element.
+	 * 解析一个数组元素
 	 */
 	public Object parseArrayElement(Element arrayEle, @Nullable BeanDefinition bd) {
+		//获取value-type属性值
 		String elementType = arrayEle.getAttribute(VALUE_TYPE_ATTRIBUTE);
+		//获取子元素
 		NodeList nl = arrayEle.getChildNodes();
+		//创建管理数组实例
 		ManagedArray target = new ManagedArray(elementType, nl.getLength());
 		target.setSource(extractSource(arrayEle));
 		target.setElementTypeName(elementType);
+		//解析是否可以合并
 		target.setMergeEnabled(parseMergeAttribute(arrayEle));
+		//解析集合元素
 		parseCollectionElements(nl, target, bd, elementType);
 		return target;
 	}
 
 	/**
-	 * Parse a list element.
+	 * 解析一个list元素
 	 */
 	public List<Object> parseListElement(Element collectionEle, @Nullable BeanDefinition bd) {
+		//获取value-type属性值
 		String defaultElementType = collectionEle.getAttribute(VALUE_TYPE_ATTRIBUTE);
+		//获取子节点
 		NodeList nl = collectionEle.getChildNodes();
+		//创建管理集合实例
 		ManagedList<Object> target = new ManagedList<>(nl.getLength());
 		target.setSource(extractSource(collectionEle));
+		//设置默认元素类型
 		target.setElementTypeName(defaultElementType);
+		//设置是否可以合并元素
 		target.setMergeEnabled(parseMergeAttribute(collectionEle));
+		//解析集合类型元素
 		parseCollectionElements(nl, target, bd, defaultElementType);
 		return target;
 	}
 
 	/**
-	 * Parse a set element.
+	 * 解析一个 set 元素
 	 */
 	public Set<Object> parseSetElement(Element collectionEle, @Nullable BeanDefinition bd) {
+		//获取value-type属性值
 		String defaultElementType = collectionEle.getAttribute(VALUE_TYPE_ATTRIBUTE);
+		//获取子节点
 		NodeList nl = collectionEle.getChildNodes();
+		//创建管理Set实例
 		ManagedSet<Object> target = new ManagedSet<>(nl.getLength());
+		//设置源
 		target.setSource(extractSource(collectionEle));
+		//设置元素类型名称
 		target.setElementTypeName(defaultElementType);
+		//设置是否可以合并属性
 		target.setMergeEnabled(parseMergeAttribute(collectionEle));
+		//解析集合元素
 		parseCollectionElements(nl, target, bd, defaultElementType);
 		return target;
 	}
@@ -1239,118 +1279,157 @@ public class BeanDefinitionParserDelegate {
 			NodeList elementNodes, Collection<Object> target, @Nullable BeanDefinition bd, String defaultElementType) {
 
 		for (int i = 0; i < elementNodes.getLength(); i++) {
+			//遍历子元素节点
 			Node node = elementNodes.item(i);
 			if (node instanceof Element && !nodeNameEquals(node, DESCRIPTION_ELEMENT)) {
+				//如果该节点是Element元素，并且该节点不是description元素，添加解析好的子元素的节点值
 				target.add(parsePropertySubElement((Element) node, bd, defaultElementType));
 			}
 		}
 	}
 
 	/**
-	 * Parse a map element.
+	 * 解析一个 map 元素
 	 */
 	public Map<Object, Object> parseMapElement(Element mapEle, @Nullable BeanDefinition bd) {
+		//获取key-type属性值
 		String defaultKeyType = mapEle.getAttribute(KEY_TYPE_ATTRIBUTE);
+		//获取value-type属性值
 		String defaultValueType = mapEle.getAttribute(VALUE_TYPE_ATTRIBUTE);
-
+		//获取名称为entry的子节点
 		List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, ENTRY_ELEMENT);
+		//创建管理Map实例
 		ManagedMap<Object, Object> map = new ManagedMap<>(entryEles.size());
+		//设置源
 		map.setSource(extractSource(mapEle));
+		//设置keyType值
 		map.setKeyTypeName(defaultKeyType);
+		//设置ValueType值
 		map.setValueTypeName(defaultValueType);
+		//设置是否可以合并属性
 		map.setMergeEnabled(parseMergeAttribute(mapEle));
 
 		for (Element entryEle : entryEles) {
-			// Should only have one value child element: ref, value, list, etc.
-			// Optionally, there might be a key child element.
+			// 应该只有一个值子元素: ref、value、list等。可选地，可能有一个关键子元素。
+			//获取entry的子字节点列表
 			NodeList entrySubNodes = entryEle.getChildNodes();
 			Element keyEle = null;
 			Element valueEle = null;
 			for (int j = 0; j < entrySubNodes.getLength(); j++) {
+				//entry节点的子节点
 				Node node = entrySubNodes.item(j);
 				if (node instanceof Element) {
+					//如果该子节点是Element节点
 					Element candidateEle = (Element) node;
 					if (nodeNameEquals(candidateEle, KEY_ELEMENT)) {
+						//名称为key的子节点
 						if (keyEle != null) {
+							//key元素不为空，提示错误
 							error("<entry> element is only allowed to contain one <key> sub-element", entryEle);
 						} else {
+							//否则key元素为当前节点
 							keyEle = candidateEle;
 						}
 					} else {
-						// Child element is what we're looking for.
+						// 子元素是我们正在寻找的。
 						if (nodeNameEquals(candidateEle, DESCRIPTION_ELEMENT)) {
-							// the element is a <description> -> ignore it
+							//如果当前节点名为description元素，忽略
 						} else if (valueEle != null) {
+							//value节点也只能有一个
 							error("<entry> element must not contain more than one value sub-element", entryEle);
 						} else {
+							//否则value节点为当前节点
 							valueEle = candidateEle;
 						}
 					}
 				}
 			}
 
-			// Extract key from attribute or sub-element.
+			// 从属性或子元素中提取键。
 			Object key = null;
+			//entry是否有key属性
 			boolean hasKeyAttribute = entryEle.hasAttribute(KEY_ATTRIBUTE);
+			////entry是否有key-ref属性
 			boolean hasKeyRefAttribute = entryEle.hasAttribute(KEY_REF_ATTRIBUTE);
 			if ((hasKeyAttribute && hasKeyRefAttribute) ||
 					(hasKeyAttribute || hasKeyRefAttribute) && keyEle != null) {
+				//如果entry既有key也有key-ref，或者key子元素有，且key属性或者key-ref属性有值，则提示错误
 				error("<entry> element is only allowed to contain either " +
 						"a 'key' attribute OR a 'key-ref' attribute OR a <key> sub-element", entryEle);
 			}
 			if (hasKeyAttribute) {
+				//如果entry有key属性，获取key值，构建TypedStringValue 对象
 				key = buildTypedStringValueForMap(entryEle.getAttribute(KEY_ATTRIBUTE), defaultKeyType, entryEle);
 			} else if (hasKeyRefAttribute) {
+				//如果entry有key-ref属性，获取key-ref值
 				String refName = entryEle.getAttribute(KEY_REF_ATTRIBUTE);
 				if (!StringUtils.hasText(refName)) {
+					//如果关联key名为空，则提示错误
 					error("<entry> element contains empty 'key-ref' attribute", entryEle);
 				}
+				//构建RuntimeBeanReference实例
 				RuntimeBeanReference ref = new RuntimeBeanReference(refName);
+				//设置源
 				ref.setSource(extractSource(entryEle));
 				key = ref;
 			} else if (keyEle != null) {
+				//如果有key子元素，解析key元素
 				key = parseKeyElement(keyEle, bd, defaultKeyType);
 			} else {
 				error("<entry> element must specify a key", entryEle);
 			}
 
-			// Extract value from attribute or sub-element.
+			// 从属性或子元素中提取值。
 			Object value = null;
+			//entry节点是否有value属性
 			boolean hasValueAttribute = entryEle.hasAttribute(VALUE_ATTRIBUTE);
+			//entry节点是否有value-ref属性
 			boolean hasValueRefAttribute = entryEle.hasAttribute(VALUE_REF_ATTRIBUTE);
+			//entry节点是否有value-type属性
 			boolean hasValueTypeAttribute = entryEle.hasAttribute(VALUE_TYPE_ATTRIBUTE);
 			if ((hasValueAttribute && hasValueRefAttribute) ||
 					(hasValueAttribute || hasValueRefAttribute) && valueEle != null) {
+				//如果entry既有value也有value-ref，或者value子元素有，且value属性或者value-ref属性有值，则提示错误
 				error("<entry> element is only allowed to contain either " +
 						"'value' attribute OR 'value-ref' attribute OR <value> sub-element", entryEle);
 			}
 			if ((hasValueTypeAttribute && hasValueRefAttribute) ||
 					(hasValueTypeAttribute && !hasValueAttribute) ||
 					(hasValueTypeAttribute && valueEle != null)) {
+				//entry不能同时有value-type属性和value-ref属性
+				// 或者有value-type属性且没有value 属性
+				// 或者是有value-type属性且有value子元素
 				error("<entry> element is only allowed to contain a 'value-type' " +
 						"attribute when it has a 'value' attribute", entryEle);
 			}
 			if (hasValueAttribute) {
+				//如果entry有value属性，获取value值
 				String valueType = entryEle.getAttribute(VALUE_TYPE_ATTRIBUTE);
 				if (!StringUtils.hasText(valueType)) {
+					//如果valueType为哦那个，则设置为默认的valueType值
 					valueType = defaultValueType;
 				}
+				//获取value值构建TypedStringValue 对象
 				value = buildTypedStringValueForMap(entryEle.getAttribute(VALUE_ATTRIBUTE), valueType, entryEle);
 			} else if (hasValueRefAttribute) {
+				//如果entry有value-ref属性，获取value-ref值
 				String refName = entryEle.getAttribute(VALUE_REF_ATTRIBUTE);
 				if (!StringUtils.hasText(refName)) {
+					//如果关联名称为空，报错
 					error("<entry> element contains empty 'value-ref' attribute", entryEle);
 				}
+				//构建RuntimeBeanReference实例
 				RuntimeBeanReference ref = new RuntimeBeanReference(refName);
 				ref.setSource(extractSource(entryEle));
 				value = ref;
 			} else if (valueEle != null) {
+				//如果entry有value子元素，递归解析value子元素
 				value = parsePropertySubElement(valueEle, bd, defaultValueType);
 			} else {
 				error("<entry> element must specify a value", entryEle);
 			}
 
-			// Add final key and value to the Map.
+			// 向map中添加最终的key和value
 			map.put(key, value);
 		}
 
@@ -1358,33 +1437,38 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Build a typed String value Object for the given raw value.
+	 * 为给定的原始值构建一个类型化的字符串值对象。
 	 *
 	 * @see org.springframework.beans.factory.config.TypedStringValue
 	 */
 	protected final Object buildTypedStringValueForMap(String value, String defaultTypeName, Element entryEle) {
 		try {
+			//构建TypedStringValue实例，并设置源
 			TypedStringValue typedValue = buildTypedStringValue(value, defaultTypeName);
 			typedValue.setSource(extractSource(entryEle));
 			return typedValue;
 		} catch (ClassNotFoundException ex) {
+			//找不到类，提示错误，并返回原始值
 			error("Type class [" + defaultTypeName + "] not found for Map key/value type", entryEle, ex);
 			return value;
 		}
 	}
 
 	/**
-	 * Parse a key sub-element of a map element.
+	 * 解析map元素的 key 子元素。
 	 */
 	@Nullable
 	protected Object parseKeyElement(Element keyEle, @Nullable BeanDefinition bd, String defaultKeyTypeName) {
+		//获取子节点
 		NodeList nl = keyEle.getChildNodes();
 		Element subElement = null;
 		for (int i = 0; i < nl.getLength(); i++) {
+			//遍历字节点
 			Node node = nl.item(i);
 			if (node instanceof Element) {
-				// Child element is what we're looking for.
+				//如果子节点是Element类型，则设置子节点
 				if (subElement != null) {
+					//仅寻找一次，找到了，还能找到则提示错误。
 					error("<key> element must not contain more than one value sub-element", keyEle);
 				} else {
 					subElement = (Element) node;
@@ -1392,29 +1476,37 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 		if (subElement == null) {
+			//子节点为空，则返回null
 			return null;
 		}
+		//递归解析子节点
 		return parsePropertySubElement(subElement, bd, defaultKeyTypeName);
 	}
 
 	/**
-	 * Parse a props element.
+	 * 解析一个 props 元素
 	 */
 	public Properties parsePropsElement(Element propsEle) {
+		//构建管理Properties实例
 		ManagedProperties props = new ManagedProperties();
+		//设置源
 		props.setSource(extractSource(propsEle));
+		//设置是否可以合并属性
 		props.setMergeEnabled(parseMergeAttribute(propsEle));
-
+		//或者prop子元素
 		List<Element> propEles = DomUtils.getChildElementsByTagName(propsEle, PROP_ELEMENT);
 		for (Element propEle : propEles) {
+			//遍历Prop子元素，并获取key值
 			String key = propEle.getAttribute(KEY_ATTRIBUTE);
-			// Trim the text value to avoid unwanted whitespace
-			// caused by typical XML formatting.
+			// 修剪文本值，以避免由典型的XML格式引起的不必要的空格。
+			//获取节点的文本值
 			String value = DomUtils.getTextValue(propEle).trim();
+			//构建TypedStringValue 实例
 			TypedStringValue keyHolder = new TypedStringValue(key);
 			keyHolder.setSource(extractSource(propEle));
 			TypedStringValue valueHolder = new TypedStringValue(value);
 			valueHolder.setSource(extractSource(propEle));
+			//添加到ManagedProperties 实例中
 			props.put(keyHolder, valueHolder);
 		}
 
@@ -1422,13 +1514,16 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse the merge attribute of a collection element, if any.
+	 * 解析集合元素的合并属性 (如果有)。
 	 */
 	public boolean parseMergeAttribute(Element collectionElement) {
+		//获取merge属性值
 		String value = collectionElement.getAttribute(MERGE_ATTRIBUTE);
 		if (isDefaultValue(value)) {
+			//如果该值为空值或者default，设置为默认的合并属性
 			value = this.defaults.getMerge();
 		}
+		//测试该值是否为true字符串
 		return TRUE_VALUE.equals(value);
 	}
 
