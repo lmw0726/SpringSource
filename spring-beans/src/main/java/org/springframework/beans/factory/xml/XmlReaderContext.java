@@ -78,7 +78,7 @@ public class XmlReaderContext extends ReaderContext {
 	}
 
 	/**
-	 * Return the bean definition registry to use.
+	 * 返回要使用的bean定义注册表。
 	 *
 	 * @see XmlBeanDefinitionReader#XmlBeanDefinitionReader(BeanDefinitionRegistry)
 	 */
@@ -133,7 +133,7 @@ public class XmlReaderContext extends ReaderContext {
 	// Convenience methods to delegate to
 
 	/**
-	 * Call the bean name generator for the given bean definition.
+	 * 调用给定bean定义的bean名称生成器。
 	 *
 	 * @see XmlBeanDefinitionReader#getBeanNameGenerator()
 	 * @see org.springframework.beans.factory.support.BeanNameGenerator#generateBeanName

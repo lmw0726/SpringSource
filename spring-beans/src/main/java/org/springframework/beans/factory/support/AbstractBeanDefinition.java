@@ -415,22 +415,19 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return the specified class of the bean definition (assuming it is resolved already).
-	 * <p><b>NOTE:</b> This is an initial class reference as declared in the bean metadata
-	 * definition, potentially combined with a declared factory method or a
-	 * {@link org.springframework.beans.factory.FactoryBean} which may lead to a different
-	 * runtime type of the bean, or not being set at all in case of an instance-level
-	 * factory method (which is resolved via {@link #getFactoryBeanName()} instead).
-	 * <b>Do not use this for runtime type introspection of arbitrary bean definitions.</b>
-	 * The recommended way to find out about the actual runtime type of a particular bean
-	 * is a {@link org.springframework.beans.factory.BeanFactory#getType} call for the
-	 * specified bean name; this takes all of the above cases into account and returns the
-	 * type of object that a {@link org.springframework.beans.factory.BeanFactory#getBean}
-	 * call is going to return for the same bean name.
+	 * 返回bean定义的指定类 (假设已经解析)。
+	 * <p><b> 注意:<b> 这是bean元数据定义中声明的初始类引用，
+	 * 可能与声明的工厂方法或 {@link org.springframework.beans.factory.FactoryBean} 结合使用，
+	 * 这可能导致bean的不同运行时类型，或者在实例级工厂方法的情况下根本就不设置 (而是通过 {@link #getFactoryBeanName()} 解决)。
 	 *
-	 * @return the resolved bean class (never {@code null})
-	 * @throws IllegalStateException if the bean definition does not define a bean class,
-	 *                               or a specified bean class name has not been resolved into an actual Class yet
+	 * <b>不要将其用于任意bean定义的运行时类型内省。
+	 * <b> 查找特定bean的实际运行时类型的推荐方法是
+	 * 对指定bean名称的 {@link org.springframework.beans.factory.BeanFactory#getType} 调用；
+	 * 这将考虑上述所有情况，并返回 {@link org.springframework.beans.factory.BeanFactory#getBean}
+	 * 调用将返回相同bean名称的对象类型。
+	 *
+	 * @return 已解析的bean类 (从不为 {@code null})
+	 * @throws IllegalStateException 如果bean定义未定义bean类，或者尚未将指定的bean类名称解析为实际类
 	 * @see #getBeanClassName()
 	 * @see #hasBeanClass()
 	 * @see #setBeanClass(Class)
@@ -439,17 +436,20 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public Class<?> getBeanClass() throws IllegalStateException {
 		Object beanClassObject = this.beanClass;
 		if (beanClassObject == null) {
+			//如果bean类名为空，抛出异常
 			throw new IllegalStateException("No bean class specified on bean definition");
 		}
 		if (!(beanClassObject instanceof Class)) {
+			//如果bean类型不是Class类型，抛出异常
 			throw new IllegalStateException(
 					"Bean class name [" + beanClassObject + "] has not been resolved into an actual Class");
 		}
+		//返回Class对象
 		return (Class<?>) beanClassObject;
 	}
 
 	/**
-	 * Return whether this definition specifies a bean class.
+	 * 返回此定义是否指定bean类。
 	 *
 	 * @see #getBeanClass()
 	 * @see #setBeanClass(Class)
@@ -865,7 +865,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return a factory method, if any.
+	 * 返回工厂方法 (如果有)。
 	 */
 	@Override
 	@Nullable
@@ -942,7 +942,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return if there are method overrides defined for this bean.
+	 * 如果为此bean定义了方法覆盖，则返回。
 	 *
 	 * @since 5.0.2
 	 */
@@ -1137,54 +1137,53 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Validate this bean definition.
+	 * 验证此bean定义。
 	 *
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * @throws BeanDefinitionValidationException 在验证失败的情况下
 	 */
 	public void validate() throws BeanDefinitionValidationException {
-		//是否有方法被重载，并且有工厂方法
 		if (hasMethodOverrides() && getFactoryMethodName() != null) {
+			//如果有方法被重载，并且有工厂方法，抛出 BeanDefinitionValidationException
 			throw new BeanDefinitionValidationException(
 					"Cannot combine factory method with container-generated method overrides: " +
 							"the factory method must create the concrete bean instance.");
 		}
-		//有该Bean为Class对象
 		if (hasBeanClass()) {
+			//如果该bean类为Class对象
 			//准备方法覆盖
 			prepareMethodOverrides();
 		}
 	}
 
 	/**
-	 * Validate and prepare the method overrides defined for this bean.
-	 * Checks for existence of a method with the specified name.
+	 * 验证并准备为此bean定义的方法覆盖。检查是否存在具有指定名称的方法。
 	 *
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * @throws BeanDefinitionValidationException 在验证失败的情况下
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
-		// Check that lookup methods exist and determine their overloaded status.
+		// 检查查找方法是否存在，并确定其重载状态。
 		//如果有方法被重载，对每一个重载方法准备重载
 		if (hasMethodOverrides()) {
+			//如果有重载方法，检查重载方法的数量
 			getMethodOverrides().getOverrides().forEach(this::prepareMethodOverride);
 		}
 	}
 
 	/**
-	 * Validate and prepare the given method override.
-	 * Checks for existence of a method with the specified name,
-	 * marking it as not overloaded if none found.
+	 * 验证并准备给定的方法覆盖。检查是否存在具有指定名称的方法，如果找不到，则将其标记为未重载。
 	 *
-	 * @param mo the MethodOverride object to validate
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * @param mo 要验证的MethodOverride对象
+	 * @throws BeanDefinitionValidationException 在验证失败的情况下
 	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+		//根据类名和方法名反射查找指定方法的数量
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
+			//如果没有找到该方法，抛出异常
 			throw new BeanDefinitionValidationException(
 					"Invalid method override: no method with name '" + mo.getMethodName() +
 							"' on class [" + getBeanClassName() + "]");
 		} else if (count == 1) {
-			// Mark override as not overloaded, to avoid the overhead of arg type checking.
 			//标记为未被重载，避免参数类型检查的开销
 			mo.setOverloaded(false);
 		}

@@ -1244,28 +1244,32 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return the number of methods with a given name (with any argument types),
-	 * for the given class and/or its superclasses. Includes non-public methods.
+	 * 返回给定类及其超类的具有给定名称 (具有任何参数类型) 的方法数量。包括非公共方法。
 	 *
-	 * @param clazz      the clazz to check
-	 * @param methodName the name of the method
-	 * @return the number of methods with the given name
+	 * @param clazz      要检查的类
+	 * @param methodName 方法的名称
+	 * @return 具有给定名称的方法数量
 	 */
 	public static int getMethodCountForName(Class<?> clazz, String methodName) {
 		Assert.notNull(clazz, "Class must not be null");
 		Assert.notNull(methodName, "Method name must not be null");
 		int count = 0;
+		//获取该类的所有方法
 		Method[] declaredMethods = clazz.getDeclaredMethods();
 		for (Method method : declaredMethods) {
+			//如果方法名相同，则count+1
 			if (methodName.equals(method.getName())) {
 				count++;
 			}
 		}
+		//获取实现的所有接口
 		Class<?>[] ifcs = clazz.getInterfaces();
 		for (Class<?> ifc : ifcs) {
+			//递归调用，获取接口相同名称的方法数量，并添加到count中。
 			count += getMethodCountForName(ifc, methodName);
 		}
 		if (clazz.getSuperclass() != null) {
+			//如果父类不为空，递归调用，获取父类的相同名称的方法数量，并添加到count中。
 			count += getMethodCountForName(clazz.getSuperclass(), methodName);
 		}
 		return count;

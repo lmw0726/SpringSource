@@ -56,7 +56,7 @@ public abstract class MethodOverride implements BeanMetadataElement {
 
 
 	/**
-	 * Return the name of the method to be overridden.
+	 * 返回要重写的方法的名称。
 	 */
 	public String getMethodName() {
 		return this.methodName;

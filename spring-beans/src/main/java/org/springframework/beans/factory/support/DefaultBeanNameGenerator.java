@@ -28,8 +28,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 public class DefaultBeanNameGenerator implements BeanNameGenerator {
 
 	/**
-	 * A convenient constant for a default {@code DefaultBeanNameGenerator} instance,
-	 * as used for {@link AbstractBeanDefinitionReader} setup.
+	 * 默认 {@code DefaultBeanNameGenerator} 实例的方便常量，用于 {@link AbstractBeanDefinitionReader} 设置。
+	 *
 	 * @since 5.2
 	 */
 	public static final DefaultBeanNameGenerator INSTANCE = new DefaultBeanNameGenerator();

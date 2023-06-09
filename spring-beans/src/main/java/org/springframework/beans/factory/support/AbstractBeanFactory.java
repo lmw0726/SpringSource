@@ -131,12 +131,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final List<StringValueResolver> embeddedValueResolvers = new CopyOnWriteArrayList<>();
 
 	/**
-	 * BeanPostProcessors to apply.
+	 * 要应用的bean后置处理器
 	 */
 	private final List<BeanPostProcessor> beanPostProcessors = new BeanPostProcessorCacheAwareList();
 
 	/**
-	 * Cache of pre-filtered post-processors.
+	 * 预过滤后处理器的缓存。
 	 */
 	@Nullable
 	private volatile BeanPostProcessorCache beanPostProcessorCache;
@@ -158,7 +158,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final Map<String, RootBeanDefinition> mergedBeanDefinitions = new ConcurrentHashMap<>(256);
 
 	/**
-	 * Names of beans that have already been created at least once.
+	 * 已经创建至少一次的bean名称。
 	 */
 	private final Set<String> alreadyCreated = Collections.newSetFromMap(new ConcurrentHashMap<>(256));
 
@@ -946,23 +946,31 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @since 5.3
 	 */
 	BeanPostProcessorCache getBeanPostProcessorCache() {
+		//获取预先过滤后处理器的内部缓存
 		BeanPostProcessorCache bpCache = this.beanPostProcessorCache;
 		if (bpCache == null) {
+			//如果后置处理器缓存为空，构建个BeanPostProcessorCache 实例
 			bpCache = new BeanPostProcessorCache();
 			for (BeanPostProcessor bp : this.beanPostProcessors) {
+				//遍历bean后置处理器
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
+					//如果该后置处理器是InstantiationAwareBeanPostProcessor类型，添加到有关集合
 					bpCache.instantiationAware.add((InstantiationAwareBeanPostProcessor) bp);
 					if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
+						//如果它还是 SmartInstantiationAwareBeanPostProcessor 实例，添加到smartInstantiationAware集合中
 						bpCache.smartInstantiationAware.add((SmartInstantiationAwareBeanPostProcessor) bp);
 					}
 				}
 				if (bp instanceof DestructionAwareBeanPostProcessor) {
+					//如果该后置处理器是 DestructionAwareBeanPostProcessor 实例，添加到destructionAware集合
 					bpCache.destructionAware.add((DestructionAwareBeanPostProcessor) bp);
 				}
 				if (bp instanceof MergedBeanDefinitionPostProcessor) {
+					//如果该后置处理器是 MergedBeanDefinitionPostProcessor 实例，添加到mergedDefinition集合
 					bpCache.mergedDefinition.add((MergedBeanDefinitionPostProcessor) bp);
 				}
 			}
+			//设置缓存
 			this.beanPostProcessorCache = bpCache;
 		}
 		return bpCache;
@@ -1450,14 +1458,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Remove the merged bean definition for the specified bean,
-	 * recreating it on next access.
+	 * 删除指定bean的合并bean定义，在下次访问时重新创建它。
 	 *
-	 * @param beanName the bean name to clear the merged definition for
+	 * @param beanName 清除合并定义的bean名称
 	 */
 	protected void clearMergedBeanDefinition(String beanName) {
+		//根据bean名称获取根Bean定义
 		RootBeanDefinition bd = this.mergedBeanDefinitions.get(beanName);
 		if (bd != null) {
+			//如果根bean定义存在，合并bean定义
 			bd.stale = true;
 		}
 	}
@@ -1796,8 +1805,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Check whether this factory's bean creation phase already started,
-	 * i.e. whether any bean has been marked as created in the meantime.
+	 * 检查此工厂的bean创建阶段是否已经开始，即在此期间是否已将任何bean标记为创建。
 	 *
 	 * @see #markBeanAsCreated
 	 * @since 4.2.2
@@ -2078,18 +2086,26 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 
 	/**
-	 * Internal cache of pre-filtered post-processors.
+	 * 预过滤后处理器的内部缓存。
 	 *
 	 * @since 5.3
 	 */
 	static class BeanPostProcessorCache {
-
+		/**
+		 * 实例化感知Bean后处理器列表
+		 */
 		final List<InstantiationAwareBeanPostProcessor> instantiationAware = new ArrayList<>();
-
+		/**
+		 * 智能实例化感知Bean后置处理器列表
+		 */
 		final List<SmartInstantiationAwareBeanPostProcessor> smartInstantiationAware = new ArrayList<>();
-
+		/**
+		 * 销毁感知Bean后处理器列表
+		 */
 		final List<DestructionAwareBeanPostProcessor> destructionAware = new ArrayList<>();
-
+		/**
+		 * 合并的Bean定义后处理器
+		 */
 		final List<MergedBeanDefinitionPostProcessor> mergedDefinition = new ArrayList<>();
 	}
 

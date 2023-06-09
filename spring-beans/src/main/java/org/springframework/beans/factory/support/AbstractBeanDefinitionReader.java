@@ -249,8 +249,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 						"Could not resolve bean definition resource pattern [" + location + "]", ex);
 			}
 		} else {
-			// Can only load single resources by absolute URL.
+			// 只能通过绝对URL加载单个资源。
 			Resource resource = resourceLoader.getResource(location);
+			//根据资源加载bean定义
 			int count = loadBeanDefinitions(resource);
 			if (actualResources != null) {
 				actualResources.add(resource);
