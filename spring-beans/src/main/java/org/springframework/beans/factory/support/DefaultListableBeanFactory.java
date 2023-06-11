@@ -855,8 +855,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
+		//根据bean名称 获取bean定义
 		BeanDefinition bd = this.beanDefinitionMap.get(beanName);
 		if (bd == null) {
+			//如果bean定义为空，抛出异常
 			if (logger.isTraceEnabled()) {
 				logger.trace("No bean named '" + beanName + "' found in " + this);
 			}

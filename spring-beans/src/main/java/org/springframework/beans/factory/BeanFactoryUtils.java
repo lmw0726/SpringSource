@@ -54,17 +54,18 @@ public abstract class BeanFactoryUtils {
 
 	/**
 	 * Cache from name with factory bean prefix to stripped name without dereference.
-	 * @since 5.1
+	 *
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
+	 * @since 5.1
 	 */
 	private static final Map<String, String> transformedBeanNameCache = new ConcurrentHashMap<>();
 
 
 	/**
-	 * Return whether the given name is a factory dereference
-	 * (beginning with the factory dereference prefix).
-	 * @param name the name of the bean
-	 * @return whether the given name is a factory dereference
+	 * 返回给定的名称是否是工厂取消引用 (以工厂取消引用前缀开头)。
+	 *
+	 * @param name bean名称
+	 * @return 给定的名称是否是工厂取消引用
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
 	 */
 	public static boolean isFactoryDereference(@Nullable String name) {
@@ -72,22 +73,23 @@ public abstract class BeanFactoryUtils {
 	}
 
 	/**
-	 * Return the actual bean name, stripping out the factory dereference
-	 * prefix (if any, also stripping repeated factory prefixes if found).
-	 * @param name the name of the bean
-	 * @return the transformed name
+	 * 返回实际的bean名称，剥离工厂取消引用前缀 (如果有的话，如果找到，也去掉重复的工厂前缀)。
+	 *
+	 * @param name bean名称
+	 * @return 转换后的名称
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
 	 */
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
+			//如果该名称不是以$符号开头，则返回该名称
 			return name;
 		}
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
 			do {
+				//如果该名称以$符号开头，循环获取$符号后面的字符串作为bean名称
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
-			}
-			while (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
+			} while (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
 			return beanName;
 		});
 	}
@@ -95,6 +97,7 @@ public abstract class BeanFactoryUtils {
 	/**
 	 * Return whether the given name is a bean name which has been generated
 	 * by the default naming strategy (containing a "#..." part).
+	 *
 	 * @param name the name of the bean
 	 * @return whether the given name is a generated bean name
 	 * @see #GENERATED_BEAN_NAME_SEPARATOR
@@ -108,6 +111,7 @@ public abstract class BeanFactoryUtils {
 	/**
 	 * Extract the "raw" bean name from the given (potentially generated) bean name,
 	 * excluding any "#..." suffixes which might have been added for uniqueness.
+	 *
 	 * @param name the potentially generated bean name
 	 * @return the raw bean name
 	 * @see #GENERATED_BEAN_NAME_SEPARATOR
@@ -126,6 +130,7 @@ public abstract class BeanFactoryUtils {
 	 * Includes counts of ancestor bean factories.
 	 * <p>Beans that are "overridden" (specified in a descendant factory
 	 * with the same name) are only counted once.
+	 *
 	 * @param lbf the bean factory
 	 * @return count of beans including those defined in ancestor factories
 	 * @see #beanNamesIncludingAncestors
@@ -136,6 +141,7 @@ public abstract class BeanFactoryUtils {
 
 	/**
 	 * Return all bean names in the factory, including ancestor factories.
+	 *
 	 * @param lbf the bean factory
 	 * @return the array of matching bean names, or an empty array if none
 	 * @see #beanNamesForTypeIncludingAncestors
@@ -152,11 +158,12 @@ public abstract class BeanFactoryUtils {
 	 * the raw FactoryBean itself will be matched against the type.
 	 * <p>This version of {@code beanNamesForTypeIncludingAncestors} automatically
 	 * includes prototypes and FactoryBeans.
-	 * @param lbf the bean factory
+	 *
+	 * @param lbf  the bean factory
 	 * @param type the type that beans must match (as a {@code ResolvableType})
 	 * @return the array of matching bean names, or an empty array if none
-	 * @since 4.2
 	 * @see ListableBeanFactory#getBeanNamesForType(ResolvableType)
+	 * @since 4.2
 	 */
 	public static String[] beanNamesForTypeIncludingAncestors(ListableBeanFactory lbf, ResolvableType type) {
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
@@ -164,8 +171,7 @@ public abstract class BeanFactoryUtils {
 		if (lbf instanceof HierarchicalBeanFactory) {
 			HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
-				String[] parentResult = beanNamesForTypeIncludingAncestors(
-						(ListableBeanFactory) hbf.getParentBeanFactory(), type);
+				String[] parentResult = beanNamesForTypeIncludingAncestors((ListableBeanFactory) hbf.getParentBeanFactory(), type);
 				result = mergeNamesWithParent(result, parentResult, hbf);
 			}
 		}
@@ -181,29 +187,28 @@ public abstract class BeanFactoryUtils {
 	 * will be matched against the type. If "allowEagerInit" is not set,
 	 * only raw FactoryBeans will be checked (which doesn't require initialization
 	 * of each FactoryBean).
-	 * @param lbf the bean factory
-	 * @param type the type that beans must match (as a {@code ResolvableType})
+	 *
+	 * @param lbf                  the bean factory
+	 * @param type                 the type that beans must match (as a {@code ResolvableType})
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
-	 * or just singletons (also applies to FactoryBeans)
-	 * @param allowEagerInit whether to initialize <i>lazy-init singletons</i> and
-	 * <i>objects created by FactoryBeans</i> (or by factory methods with a
-	 * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
-	 * eagerly initialized to determine their type: So be aware that passing in "true"
-	 * for this flag will initialize FactoryBeans and "factory-bean" references.
+	 *                             or just singletons (also applies to FactoryBeans)
+	 * @param allowEagerInit       whether to initialize <i>lazy-init singletons</i> and
+	 *                             <i>objects created by FactoryBeans</i> (or by factory methods with a
+	 *                             "factory-bean" reference) for the type check. Note that FactoryBeans need to be
+	 *                             eagerly initialized to determine their type: So be aware that passing in "true"
+	 *                             for this flag will initialize FactoryBeans and "factory-bean" references.
 	 * @return the array of matching bean names, or an empty array if none
-	 * @since 5.2
 	 * @see ListableBeanFactory#getBeanNamesForType(ResolvableType, boolean, boolean)
+	 * @since 5.2
 	 */
-	public static String[] beanNamesForTypeIncludingAncestors(
-			ListableBeanFactory lbf, ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
+	public static String[] beanNamesForTypeIncludingAncestors(ListableBeanFactory lbf, ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		String[] result = lbf.getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 		if (lbf instanceof HierarchicalBeanFactory) {
 			HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
-				String[] parentResult = beanNamesForTypeIncludingAncestors(
-						(ListableBeanFactory) hbf.getParentBeanFactory(), type, includeNonSingletons, allowEagerInit);
+				String[] parentResult = beanNamesForTypeIncludingAncestors((ListableBeanFactory) hbf.getParentBeanFactory(), type, includeNonSingletons, allowEagerInit);
 				result = mergeNamesWithParent(result, parentResult, hbf);
 			}
 		}
@@ -218,7 +223,8 @@ public abstract class BeanFactoryUtils {
 	 * the raw FactoryBean itself will be matched against the type.
 	 * <p>This version of {@code beanNamesForTypeIncludingAncestors} automatically
 	 * includes prototypes and FactoryBeans.
-	 * @param lbf the bean factory
+	 *
+	 * @param lbf  the bean factory
 	 * @param type the type that beans must match (as a {@code Class})
 	 * @return the array of matching bean names, or an empty array if none
 	 * @see ListableBeanFactory#getBeanNamesForType(Class)
@@ -229,8 +235,7 @@ public abstract class BeanFactoryUtils {
 		if (lbf instanceof HierarchicalBeanFactory) {
 			HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
-				String[] parentResult = beanNamesForTypeIncludingAncestors(
-						(ListableBeanFactory) hbf.getParentBeanFactory(), type);
+				String[] parentResult = beanNamesForTypeIncludingAncestors((ListableBeanFactory) hbf.getParentBeanFactory(), type);
 				result = mergeNamesWithParent(result, parentResult, hbf);
 			}
 		}
@@ -246,28 +251,27 @@ public abstract class BeanFactoryUtils {
 	 * will be matched against the type. If "allowEagerInit" is not set,
 	 * only raw FactoryBeans will be checked (which doesn't require initialization
 	 * of each FactoryBean).
-	 * @param lbf the bean factory
+	 *
+	 * @param lbf                  the bean factory
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
-	 * or just singletons (also applies to FactoryBeans)
-	 * @param allowEagerInit whether to initialize <i>lazy-init singletons</i> and
-	 * <i>objects created by FactoryBeans</i> (or by factory methods with a
-	 * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
-	 * eagerly initialized to determine their type: So be aware that passing in "true"
-	 * for this flag will initialize FactoryBeans and "factory-bean" references.
-	 * @param type the type that beans must match
+	 *                             or just singletons (also applies to FactoryBeans)
+	 * @param allowEagerInit       whether to initialize <i>lazy-init singletons</i> and
+	 *                             <i>objects created by FactoryBeans</i> (or by factory methods with a
+	 *                             "factory-bean" reference) for the type check. Note that FactoryBeans need to be
+	 *                             eagerly initialized to determine their type: So be aware that passing in "true"
+	 *                             for this flag will initialize FactoryBeans and "factory-bean" references.
+	 * @param type                 the type that beans must match
 	 * @return the array of matching bean names, or an empty array if none
 	 * @see ListableBeanFactory#getBeanNamesForType(Class, boolean, boolean)
 	 */
-	public static String[] beanNamesForTypeIncludingAncestors(
-			ListableBeanFactory lbf, Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
+	public static String[] beanNamesForTypeIncludingAncestors(ListableBeanFactory lbf, Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		String[] result = lbf.getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 		if (lbf instanceof HierarchicalBeanFactory) {
 			HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
-				String[] parentResult = beanNamesForTypeIncludingAncestors(
-						(ListableBeanFactory) hbf.getParentBeanFactory(), type, includeNonSingletons, allowEagerInit);
+				String[] parentResult = beanNamesForTypeIncludingAncestors((ListableBeanFactory) hbf.getParentBeanFactory(), type, includeNonSingletons, allowEagerInit);
 				result = mergeNamesWithParent(result, parentResult, hbf);
 			}
 		}
@@ -278,22 +282,21 @@ public abstract class BeanFactoryUtils {
 	 * Get all bean names whose {@code Class} has the supplied {@link Annotation}
 	 * type, including those defined in ancestor factories, without creating any bean
 	 * instances yet. Will return unique names in case of overridden bean definitions.
-	 * @param lbf the bean factory
+	 *
+	 * @param lbf            the bean factory
 	 * @param annotationType the type of annotation to look for
 	 * @return the array of matching bean names, or an empty array if none
-	 * @since 5.0
 	 * @see ListableBeanFactory#getBeanNamesForAnnotation(Class)
+	 * @since 5.0
 	 */
-	public static String[] beanNamesForAnnotationIncludingAncestors(
-			ListableBeanFactory lbf, Class<? extends Annotation> annotationType) {
+	public static String[] beanNamesForAnnotationIncludingAncestors(ListableBeanFactory lbf, Class<? extends Annotation> annotationType) {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		String[] result = lbf.getBeanNamesForAnnotation(annotationType);
 		if (lbf instanceof HierarchicalBeanFactory) {
 			HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
-				String[] parentResult = beanNamesForAnnotationIncludingAncestors(
-						(ListableBeanFactory) hbf.getParentBeanFactory(), annotationType);
+				String[] parentResult = beanNamesForAnnotationIncludingAncestors((ListableBeanFactory) hbf.getParentBeanFactory(), annotationType);
 				result = mergeNamesWithParent(result, parentResult, hbf);
 			}
 		}
@@ -315,14 +318,14 @@ public abstract class BeanFactoryUtils {
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
-	 * @param lbf the bean factory
+	 *
+	 * @param lbf  the bean factory
 	 * @param type type of bean to match
 	 * @return the Map of matching bean instances, or an empty Map if none
 	 * @throws BeansException if a bean could not be created
 	 * @see ListableBeanFactory#getBeansOfType(Class)
 	 */
-	public static <T> Map<String, T> beansOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type)
-			throws BeansException {
+	public static <T> Map<String, T> beansOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type) throws BeansException {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		Map<String, T> result = new LinkedHashMap<>(4);
@@ -330,8 +333,7 @@ public abstract class BeanFactoryUtils {
 		if (lbf instanceof HierarchicalBeanFactory) {
 			HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
-				Map<String, T> parentResult = beansOfTypeIncludingAncestors(
-						(ListableBeanFactory) hbf.getParentBeanFactory(), type);
+				Map<String, T> parentResult = beansOfTypeIncludingAncestors((ListableBeanFactory) hbf.getParentBeanFactory(), type);
 				parentResult.forEach((beanName, beanInstance) -> {
 					if (!result.containsKey(beanName) && !hbf.containsLocalBean(beanName)) {
 						result.put(beanName, beanInstance);
@@ -356,22 +358,21 @@ public abstract class BeanFactoryUtils {
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
-	 * @param lbf the bean factory
-	 * @param type type of bean to match
+	 *
+	 * @param lbf                  the bean factory
+	 * @param type                 type of bean to match
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
-	 * or just singletons (also applies to FactoryBeans)
-	 * @param allowEagerInit whether to initialize <i>lazy-init singletons</i> and
-	 * <i>objects created by FactoryBeans</i> (or by factory methods with a
-	 * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
-	 * eagerly initialized to determine their type: So be aware that passing in "true"
-	 * for this flag will initialize FactoryBeans and "factory-bean" references.
+	 *                             or just singletons (also applies to FactoryBeans)
+	 * @param allowEagerInit       whether to initialize <i>lazy-init singletons</i> and
+	 *                             <i>objects created by FactoryBeans</i> (or by factory methods with a
+	 *                             "factory-bean" reference) for the type check. Note that FactoryBeans need to be
+	 *                             eagerly initialized to determine their type: So be aware that passing in "true"
+	 *                             for this flag will initialize FactoryBeans and "factory-bean" references.
 	 * @return the Map of matching bean instances, or an empty Map if none
 	 * @throws BeansException if a bean could not be created
 	 * @see ListableBeanFactory#getBeansOfType(Class, boolean, boolean)
 	 */
-	public static <T> Map<String, T> beansOfTypeIncludingAncestors(
-			ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
-			throws BeansException {
+	public static <T> Map<String, T> beansOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		Map<String, T> result = new LinkedHashMap<>(4);
@@ -379,8 +380,7 @@ public abstract class BeanFactoryUtils {
 		if (lbf instanceof HierarchicalBeanFactory) {
 			HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
-				Map<String, T> parentResult = beansOfTypeIncludingAncestors(
-						(ListableBeanFactory) hbf.getParentBeanFactory(), type, includeNonSingletons, allowEagerInit);
+				Map<String, T> parentResult = beansOfTypeIncludingAncestors((ListableBeanFactory) hbf.getParentBeanFactory(), type, includeNonSingletons, allowEagerInit);
 				parentResult.forEach((beanName, beanInstance) -> {
 					if (!result.containsKey(beanName) && !hbf.containsLocalBean(beanName)) {
 						result.put(beanName, beanInstance);
@@ -406,16 +406,16 @@ public abstract class BeanFactoryUtils {
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
-	 * @param lbf the bean factory
+	 *
+	 * @param lbf  the bean factory
 	 * @param type type of bean to match
 	 * @return the matching bean instance
-	 * @throws NoSuchBeanDefinitionException if no bean of the given type was found
+	 * @throws NoSuchBeanDefinitionException   if no bean of the given type was found
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
-	 * @throws BeansException if the bean could not be created
+	 * @throws BeansException                  if the bean could not be created
 	 * @see #beansOfTypeIncludingAncestors(ListableBeanFactory, Class)
 	 */
-	public static <T> T beanOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type)
-			throws BeansException {
+	public static <T> T beanOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type) throws BeansException {
 
 		Map<String, T> beansOfType = beansOfTypeIncludingAncestors(lbf, type);
 		return uniqueBean(type, beansOfType);
@@ -436,24 +436,23 @@ public abstract class BeanFactoryUtils {
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
-	 * @param lbf the bean factory
-	 * @param type type of bean to match
+	 *
+	 * @param lbf                  the bean factory
+	 * @param type                 type of bean to match
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
-	 * or just singletons (also applies to FactoryBeans)
-	 * @param allowEagerInit whether to initialize <i>lazy-init singletons</i> and
-	 * <i>objects created by FactoryBeans</i> (or by factory methods with a
-	 * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
-	 * eagerly initialized to determine their type: So be aware that passing in "true"
-	 * for this flag will initialize FactoryBeans and "factory-bean" references.
+	 *                             or just singletons (also applies to FactoryBeans)
+	 * @param allowEagerInit       whether to initialize <i>lazy-init singletons</i> and
+	 *                             <i>objects created by FactoryBeans</i> (or by factory methods with a
+	 *                             "factory-bean" reference) for the type check. Note that FactoryBeans need to be
+	 *                             eagerly initialized to determine their type: So be aware that passing in "true"
+	 *                             for this flag will initialize FactoryBeans and "factory-bean" references.
 	 * @return the matching bean instance
-	 * @throws NoSuchBeanDefinitionException if no bean of the given type was found
+	 * @throws NoSuchBeanDefinitionException   if no bean of the given type was found
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
-	 * @throws BeansException if the bean could not be created
+	 * @throws BeansException                  if the bean could not be created
 	 * @see #beansOfTypeIncludingAncestors(ListableBeanFactory, Class, boolean, boolean)
 	 */
-	public static <T> T beanOfTypeIncludingAncestors(
-			ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
-			throws BeansException {
+	public static <T> T beanOfTypeIncludingAncestors(ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
 
 		Map<String, T> beansOfType = beansOfTypeIncludingAncestors(lbf, type, includeNonSingletons, allowEagerInit);
 		return uniqueBean(type, beansOfType);
@@ -468,12 +467,13 @@ public abstract class BeanFactoryUtils {
 	 * the raw FactoryBean itself will be matched against the type.
 	 * <p>This version of {@code beanOfType} automatically includes
 	 * prototypes and FactoryBeans.
-	 * @param lbf the bean factory
+	 *
+	 * @param lbf  the bean factory
 	 * @param type type of bean to match
 	 * @return the matching bean instance
-	 * @throws NoSuchBeanDefinitionException if no bean of the given type was found
+	 * @throws NoSuchBeanDefinitionException   if no bean of the given type was found
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
-	 * @throws BeansException if the bean could not be created
+	 * @throws BeansException                  if the bean could not be created
 	 * @see ListableBeanFactory#getBeansOfType(Class)
 	 */
 	public static <T> T beanOfType(ListableBeanFactory lbf, Class<T> type) throws BeansException {
@@ -492,24 +492,23 @@ public abstract class BeanFactoryUtils {
 	 * will be matched against the type. If "allowEagerInit" is not set,
 	 * only raw FactoryBeans will be checked (which doesn't require initialization
 	 * of each FactoryBean).
-	 * @param lbf the bean factory
-	 * @param type type of bean to match
+	 *
+	 * @param lbf                  the bean factory
+	 * @param type                 type of bean to match
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
-	 * or just singletons (also applies to FactoryBeans)
-	 * @param allowEagerInit whether to initialize <i>lazy-init singletons</i> and
-	 * <i>objects created by FactoryBeans</i> (or by factory methods with a
-	 * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
-	 * eagerly initialized to determine their type: So be aware that passing in "true"
-	 * for this flag will initialize FactoryBeans and "factory-bean" references.
+	 *                             or just singletons (also applies to FactoryBeans)
+	 * @param allowEagerInit       whether to initialize <i>lazy-init singletons</i> and
+	 *                             <i>objects created by FactoryBeans</i> (or by factory methods with a
+	 *                             "factory-bean" reference) for the type check. Note that FactoryBeans need to be
+	 *                             eagerly initialized to determine their type: So be aware that passing in "true"
+	 *                             for this flag will initialize FactoryBeans and "factory-bean" references.
 	 * @return the matching bean instance
-	 * @throws NoSuchBeanDefinitionException if no bean of the given type was found
+	 * @throws NoSuchBeanDefinitionException   if no bean of the given type was found
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
-	 * @throws BeansException if the bean could not be created
+	 * @throws BeansException                  if the bean could not be created
 	 * @see ListableBeanFactory#getBeansOfType(Class, boolean, boolean)
 	 */
-	public static <T> T beanOfType(
-			ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit)
-			throws BeansException {
+	public static <T> T beanOfType(ListableBeanFactory lbf, Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		Map<String, T> beansOfType = lbf.getBeansOfType(type, includeNonSingletons, allowEagerInit);
@@ -519,9 +518,10 @@ public abstract class BeanFactoryUtils {
 
 	/**
 	 * Merge the given bean names result with the given parent result.
-	 * @param result the local bean name result
+	 *
+	 * @param result       the local bean name result
 	 * @param parentResult the parent bean name result (possibly empty)
-	 * @param hbf the local bean factory
+	 * @param hbf          the local bean factory
 	 * @return the merged result (possibly the local result as-is)
 	 * @since 4.3.15
 	 */
@@ -541,21 +541,20 @@ public abstract class BeanFactoryUtils {
 
 	/**
 	 * Extract a unique bean for the given type from the given Map of matching beans.
-	 * @param type type of bean to match
+	 *
+	 * @param type          type of bean to match
 	 * @param matchingBeans all matching beans found
 	 * @return the unique bean instance
-	 * @throws NoSuchBeanDefinitionException if no bean of the given type was found
+	 * @throws NoSuchBeanDefinitionException   if no bean of the given type was found
 	 * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
 	 */
 	private static <T> T uniqueBean(Class<T> type, Map<String, T> matchingBeans) {
 		int count = matchingBeans.size();
 		if (count == 1) {
 			return matchingBeans.values().iterator().next();
-		}
-		else if (count > 1) {
+		} else if (count > 1) {
 			throw new NoUniqueBeanDefinitionException(type, matchingBeans.keySet());
-		}
-		else {
+		} else {
 			throw new NoSuchBeanDefinitionException(type);
 		}
 	}

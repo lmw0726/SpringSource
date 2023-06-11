@@ -29,9 +29,9 @@
 		<property name="salary" value="5000.00"/>
 	</bean>
 
-	<bean id="employee2" name="employee2" class="com.lmw.learn.bean.person.Employee">
-		<property name="age" value="27"/>
-		<property name="name" value="颜美静"/>
+	<bean id="employee2" name="employee2" class="com.lmw.learn.bean.person.Employee" parent="person">
+<!--		<property name="age" value="27"/>-->
+<!--		<property name="name" value="颜美静"/>-->
 		<property name="skillName" value="财务"/>
 		<property name="salary" value="4000.00"/>
 	</bean>
