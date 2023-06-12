@@ -357,13 +357,11 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	void resolveAliases(StringValueResolver valueResolver);
 
 	/**
-	 * Return a merged BeanDefinition for the given bean name,
-	 * merging a child bean definition with its parent if necessary.
-	 * Considers bean definitions in ancestor factories as well.
+	 * 返回给定bean名称的合并BeanDefinition，并在必要时将子bean定义与其父项合并。也考虑祖先工厂中的bean定义。
 	 *
-	 * @param beanName the name of the bean to retrieve the merged definition for
-	 * @return a (potentially merged) BeanDefinition for the given bean
-	 * @throws NoSuchBeanDefinitionException if there is no bean definition with the given name
+	 * @param beanName 要检索的合并定义的bean的名称
+	 * @return 给定bean的 (可能合并的) bean 定义
+	 * @throws NoSuchBeanDefinitionException 如果没有给定名称的bean定义
 	 * @since 2.5
 	 */
 	BeanDefinition getMergedBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;

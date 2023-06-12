@@ -39,7 +39,9 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public abstract class AttributeAccessorSupport implements AttributeAccessor, Serializable {
 
-	/** Map with String keys and Object values. */
+	/**
+	 * 用字符串键和对象值构成的Map。
+	 */
 	private final Map<String, Object> attributes = new LinkedHashMap<>();
 
 
@@ -47,9 +49,10 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
 	public void setAttribute(String name, @Nullable Object value) {
 		Assert.notNull(name, "Name must not be null");
 		if (value != null) {
+			//如果值不为空，则设置该属性名和属性值
 			this.attributes.put(name, value);
-		}
-		else {
+		} else {
+			//值为空，移除该属性名
 			removeAttribute(name);
 		}
 	}
@@ -92,13 +95,16 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
 
 
 	/**
-	 * Copy the attributes from the supplied AttributeAccessor to this accessor.
-	 * @param source the AttributeAccessor to copy from
+	 * 将属性从提供的AttributeAccessor复制到此访问器。
+	 *
+	 * @param source 要从中复制的属性访问器
 	 */
 	protected void copyAttributesFrom(AttributeAccessor source) {
 		Assert.notNull(source, "Source must not be null");
+		//获取属性名称
 		String[] attributeNames = source.attributeNames();
 		for (String attributeName : attributeNames) {
+			//遍历属性名称，复制属性名和属性值
 			setAttribute(attributeName, source.getAttribute(attributeName));
 		}
 	}

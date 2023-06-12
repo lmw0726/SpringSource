@@ -63,20 +63,19 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 	}
 
 	/**
-	 * Deep copy constructor. Guarantees PropertyValue references
-	 * are independent, although it can't deep copy objects currently
-	 * referenced by individual PropertyValue objects.
+	 *深度复制构造函数。保证PropertyValue引用是独立的，尽管它不能深度复制当前由各个PropertyValue对象引用的对象。
 	 *
-	 * @param original the PropertyValues to copy
+	 * @param original 要复制的属性值
 	 * @see #addPropertyValues(PropertyValues)
 	 */
 	public MutablePropertyValues(@Nullable PropertyValues original) {
-		// We can optimize this because it's all new:
-		// There is no replacement of existing property values.
+		// 我们可以优化这一点，因为它是全新的: 没有现有属性值的替换。
 		if (original != null) {
+			//如果属性值不为空，获取它的属性值组
 			PropertyValue[] pvs = original.getPropertyValues();
 			this.propertyValueList = new ArrayList<>(pvs.length);
 			for (PropertyValue pv : pvs) {
+				//遍历后，添加到propertyValueList中
 				this.propertyValueList.add(new PropertyValue(pv));
 			}
 		} else {

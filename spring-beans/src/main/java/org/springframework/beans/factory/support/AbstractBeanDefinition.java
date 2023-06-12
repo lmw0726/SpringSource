@@ -226,139 +226,199 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Create a new AbstractBeanDefinition as a deep copy of the given
-	 * bean definition.
+	 * 创建一个新的AbstractBeanDefinition作为给定bean定义的深层副本。
 	 *
-	 * @param original the original bean definition to copy from
+	 * @param original 要复制的原始bean定义
 	 */
 	protected AbstractBeanDefinition(BeanDefinition original) {
+		//复制父bean定义名称
 		setParentName(original.getParentName());
+		//复制bean类名
 		setBeanClassName(original.getBeanClassName());
+		//复制范围
 		setScope(original.getScope());
+		//复制是否抽象
 		setAbstract(original.isAbstract());
+		//复制工厂bean名称
 		setFactoryBeanName(original.getFactoryBeanName());
+		//复制工厂方法名
 		setFactoryMethodName(original.getFactoryMethodName());
+		//设置角色
 		setRole(original.getRole());
+		//复制源
 		setSource(original.getSource());
+		//复制属性名和属性值
 		copyAttributesFrom(original);
 
 		if (original instanceof AbstractBeanDefinition) {
+			//如果该bean定义是AbstractBeanDefinition类型
 			AbstractBeanDefinition originalAbd = (AbstractBeanDefinition) original;
 			if (originalAbd.hasBeanClass()) {
+				//有bean类型，则设置bean类
 				setBeanClass(originalAbd.getBeanClass());
 			}
 			if (originalAbd.hasConstructorArgumentValues()) {
+				//有构造参数值，则只是构造参数值
 				setConstructorArgumentValues(new ConstructorArgumentValues(original.getConstructorArgumentValues()));
 			}
 			if (originalAbd.hasPropertyValues()) {
+				//如果有属性值，设置属性值
 				setPropertyValues(new MutablePropertyValues(original.getPropertyValues()));
 			}
 			if (originalAbd.hasMethodOverrides()) {
+				//复制覆盖方法
 				setMethodOverrides(new MethodOverrides(originalAbd.getMethodOverrides()));
 			}
 			Boolean lazyInit = originalAbd.getLazyInit();
 			if (lazyInit != null) {
+				//复制懒加载属性
 				setLazyInit(lazyInit);
 			}
+			//复制装配模式
 			setAutowireMode(originalAbd.getAutowireMode());
+			//复制依赖检查
 			setDependencyCheck(originalAbd.getDependencyCheck());
+			//复制依赖bean名称
 			setDependsOn(originalAbd.getDependsOn());
+			//复制自动装配候选者
 			setAutowireCandidate(originalAbd.isAutowireCandidate());
+			//复制是否主要
 			setPrimary(originalAbd.isPrimary());
+			//复制限定符
 			copyQualifiersFrom(originalAbd);
+			//复制实例提供者
 			setInstanceSupplier(originalAbd.getInstanceSupplier());
+			//复制允许非公共访问
 			setNonPublicAccessAllowed(originalAbd.isNonPublicAccessAllowed());
+			//复制宽松的构造函数解析
 			setLenientConstructorResolution(originalAbd.isLenientConstructorResolution());
+			//复制Init方法名称
 			setInitMethodName(originalAbd.getInitMethodName());
+			//复制强制的初始化方法
 			setEnforceInitMethod(originalAbd.isEnforceInitMethod());
+			//复制销毁方法名称
 			setDestroyMethodName(originalAbd.getDestroyMethodName());
+			//复制是否强制销毁方法
 			setEnforceDestroyMethod(originalAbd.isEnforceDestroyMethod());
+			//复制是否合成bean
 			setSynthetic(originalAbd.isSynthetic());
+			//复制源
 			setResource(originalAbd.getResource());
 		} else {
+			//复制构造参数对
 			setConstructorArgumentValues(new ConstructorArgumentValues(original.getConstructorArgumentValues()));
+			//复制属性值
 			setPropertyValues(new MutablePropertyValues(original.getPropertyValues()));
+			//复制是否懒加载
 			setLazyInit(original.isLazyInit());
+			//复制属性描述
 			setResourceDescription(original.getResourceDescription());
 		}
 	}
 
 
 	/**
-	 * Override settings in this bean definition (presumably a copied parent
-	 * from a parent-child inheritance relationship) from the given bean
-	 * definition (presumably the child).
+	 * 从给定的bean定义 (大概是子级) 中覆盖此bean定义中的设置 (大概是从父子继承关系中复制的父级)。
 	 * <ul>
-	 * <li>Will override beanClass if specified in the given bean definition.
-	 * <li>Will always take {@code abstract}, {@code scope},
-	 * {@code lazyInit}, {@code autowireMode}, {@code dependencyCheck},
-	 * and {@code dependsOn} from the given bean definition.
-	 * <li>Will add {@code constructorArgumentValues}, {@code propertyValues},
-	 * {@code methodOverrides} from the given bean definition to existing ones.
-	 * <li>Will override {@code factoryBeanName}, {@code factoryMethodName},
-	 * {@code initMethodName}, and {@code destroyMethodName} if specified
-	 * in the given bean definition.
+	 * <li>如果在给定的bean定义中指定，将覆盖beanClass。
+	 * <li>将始终从给定的bean定义中采用 {@code abstract}，{@code scope}，{@code lazyInit}，
+	 * {@code autowireMode}，{@code dependencyCheck} 和 {@code dependsOn}。
+	 * <li>将从给定的bean定义添加 {@code constructorArgumentValues} 、 {@code propertyValues} 、 {@code methodOverrides} 到现有的。
+	 * <li>如果在给定的bean定义中指定，将覆盖 {@code factoryBeanName} 、
+	 * {@code factoryMethodName} 、 {@code initMethodName} 和 {@code destroyMethodName}。
 	 * </ul>
 	 */
 	public void overrideFrom(BeanDefinition other) {
 		if (StringUtils.hasLength(other.getBeanClassName())) {
+			//如果其他bean定义的bean类型不为空，则设置bean类名
 			setBeanClassName(other.getBeanClassName());
 		}
 		if (StringUtils.hasLength(other.getScope())) {
+			//如果其他bean定义的scope不为空，则设置scope
 			setScope(other.getScope());
 		}
+		//设置是否是抽象的
 		setAbstract(other.isAbstract());
 		if (StringUtils.hasLength(other.getFactoryBeanName())) {
+			//如果其他bean定义的工厂Bean名称不为空，则设置当前bean定义的工厂Bean名称
 			setFactoryBeanName(other.getFactoryBeanName());
 		}
 		if (StringUtils.hasLength(other.getFactoryMethodName())) {
+			//如果其他bean定义的工厂方法名称不为空，则设置当前bean定义的工厂方法名称
 			setFactoryMethodName(other.getFactoryMethodName());
 		}
+		//复制角色属性
 		setRole(other.getRole());
+		//复制源
 		setSource(other.getSource());
+		//复制各个属性
 		copyAttributesFrom(other);
 
 		if (other instanceof AbstractBeanDefinition) {
+			//如果其他bean定义是AbstractBeanDefinition类型
 			AbstractBeanDefinition otherAbd = (AbstractBeanDefinition) other;
 			if (otherAbd.hasBeanClass()) {
+				//复制bean类型
 				setBeanClass(otherAbd.getBeanClass());
 			}
 			if (otherAbd.hasConstructorArgumentValues()) {
+				//有构造参数，添加构造参数
 				getConstructorArgumentValues().addArgumentValues(other.getConstructorArgumentValues());
 			}
 			if (otherAbd.hasPropertyValues()) {
+				//有属性值对，添加属性值对
 				getPropertyValues().addPropertyValues(other.getPropertyValues());
 			}
 			if (otherAbd.hasMethodOverrides()) {
+				//有覆盖方法，添加覆盖方法
 				getMethodOverrides().addOverrides(otherAbd.getMethodOverrides());
 			}
 			Boolean lazyInit = otherAbd.getLazyInit();
 			if (lazyInit != null) {
+				//复制是否懒加载
 				setLazyInit(lazyInit);
 			}
+			//复制自动装配模式
 			setAutowireMode(otherAbd.getAutowireMode());
+			//复制依赖检查
 			setDependencyCheck(otherAbd.getDependencyCheck());
+			//复制依赖bean名称
 			setDependsOn(otherAbd.getDependsOn());
+			//复制自动装配候选者
 			setAutowireCandidate(otherAbd.isAutowireCandidate());
 			setPrimary(otherAbd.isPrimary());
+			//复制限定符
 			copyQualifiersFrom(otherAbd);
+			//复制实例提供者
 			setInstanceSupplier(otherAbd.getInstanceSupplier());
+			//复制允许非公共访问
 			setNonPublicAccessAllowed(otherAbd.isNonPublicAccessAllowed());
+			//复制宽松的构造函数解析
 			setLenientConstructorResolution(otherAbd.isLenientConstructorResolution());
 			if (otherAbd.getInitMethodName() != null) {
+				//复制Init方法名称
 				setInitMethodName(otherAbd.getInitMethodName());
+				//复制强制的初始化方法
 				setEnforceInitMethod(otherAbd.isEnforceInitMethod());
 			}
 			if (otherAbd.getDestroyMethodName() != null) {
+				//复制是否强制销毁方法
 				setDestroyMethodName(otherAbd.getDestroyMethodName());
+				//复制是否强制销毁方法
 				setEnforceDestroyMethod(otherAbd.isEnforceDestroyMethod());
 			}
+			//复制是否合成bean
 			setSynthetic(otherAbd.isSynthetic());
+			//复制源
 			setResource(otherAbd.getResource());
 		} else {
+			//复制构造参数对
 			getConstructorArgumentValues().addArgumentValues(other.getConstructorArgumentValues());
+			//复制属性值
 			getPropertyValues().addPropertyValues(other.getPropertyValues());
+			//复制是否懒加载
 			setLazyInit(other.isLazyInit());
+			//复制属性描述
 			setResourceDescription(other.getResourceDescription());
 		}
 	}
@@ -384,7 +444,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 
 	/**
-	 * Specify the bean class name of this bean definition.
+	 * 指定此bean定义的bean类名。
 	 */
 	@Override
 	public void setBeanClassName(@Nullable String beanClassName) {
@@ -831,8 +891,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Specify the factory bean to use, if any.
-	 * This the name of the bean to call the specified factory method on.
+	 * 指定要使用的工厂bean (如果有)。这是要调用指定工厂方法的bean的名称。
 	 *
 	 * @see #setFactoryMethodName
 	 */
@@ -918,7 +977,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return if there are property values defined for this bean.
+	 * 如果为此bean定义了属性值，则返回。
 	 *
 	 * @since 5.0.2
 	 */
@@ -1033,9 +1092,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Set whether this bean definition is 'synthetic', that is, not defined
-	 * by the application itself (for example, an infrastructure bean such
-	 * as a helper for auto-proxying, created through {@code <aop:config>}).
+	 * 设置此bean定义是否为 “合成的”，即不是由应用程序本身定义的
+	 * (例如，通过 {@code <aop:config>} 创建的用于自动代理的助手之类的基础结构bean)。
 	 */
 	public void setSynthetic(boolean synthetic) {
 		this.synthetic = synthetic;

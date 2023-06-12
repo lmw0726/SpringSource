@@ -479,11 +479,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Determine whether the specified dependent bean has been registered as
-	 * dependent on the given bean or on any of its transitive dependencies.
+	 * 确定指定的从属bean是否已被注册为依赖于给定bean或其任何传递依赖性。
 	 *
-	 * @param beanName          the name of the bean to check
-	 * @param dependentBeanName the name of the dependent bean
+	 * @param beanName          要检查的bean名称
+	 * @param dependentBeanName 依赖bean的名称
 	 * @since 4.0
 	 */
 	protected boolean isDependent(String beanName, String dependentBeanName) {
@@ -494,14 +493,19 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	private boolean isDependent(String beanName, String dependentBeanName, @Nullable Set<String> alreadySeen) {
 		if (alreadySeen != null && alreadySeen.contains(beanName)) {
+			//如果存在已发现bean名称集合，且该集合中包含该bean名称。返回false
 			return false;
 		}
+		//返回规范bean名称
 		String canonicalName = canonicalName(beanName);
+		//获取依赖的bean名称
 		Set<String> dependentBeans = this.dependentBeanMap.get(canonicalName);
 		if (dependentBeans == null) {
+			//没有依赖bean名称，返回false
 			return false;
 		}
 		if (dependentBeans.contains(dependentBeanName)) {
+			//有该bean名称的依赖，返回true
 			return true;
 		}
 		for (String transitiveDependency : dependentBeans) {
@@ -510,6 +514,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			}
 			alreadySeen.add(beanName);
 			if (isDependent(transitiveDependency, dependentBeanName, alreadySeen)) {
+				//递归查找依赖的bean名称，有则返回true
 				return true;
 			}
 		}

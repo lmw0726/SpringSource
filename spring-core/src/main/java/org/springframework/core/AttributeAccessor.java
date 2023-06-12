@@ -37,16 +37,18 @@ public interface AttributeAccessor {
 	 * <p>In general, users should take care to prevent overlaps with other
 	 * metadata attributes by using fully-qualified names, perhaps using
 	 * class or package names as prefix.
-	 * @param name the unique attribute key
+	 *
+	 * @param name  the unique attribute key
 	 * @param value the attribute value to be attached
 	 */
 	void setAttribute(String name, @Nullable Object value);
 
 	/**
-	 * Get the value of the attribute identified by {@code name}.
-	 * <p>Return {@code null} if the attribute doesn't exist.
-	 * @param name the unique attribute key
-	 * @return the current value of the attribute, if any
+	 * 获取由 {@code name} 标识的属性的值。
+	 * <p> 如果属性不存在，则返回 {@code null}。
+	 *
+	 * @param name 唯一属性键
+	 * @return 属性的当前值 (如果有)
 	 */
 	@Nullable
 	Object getAttribute(String name);
@@ -60,14 +62,15 @@ public interface AttributeAccessor {
 	 * without applying the supplied compute function.
 	 * <p>The default implementation of this method is not thread safe but can
 	 * overridden by concrete implementations of this interface.
-	 * @param <T> the type of the attribute value
-	 * @param name the unique attribute key
+	 *
+	 * @param <T>             the type of the attribute value
+	 * @param name            the unique attribute key
 	 * @param computeFunction a function that computes a new value for the attribute
-	 * name; the function must not return a {@code null} value
+	 *                        name; the function must not return a {@code null} value
 	 * @return the existing value or newly computed value for the named attribute
-	 * @since 5.3.3
 	 * @see #getAttribute(String)
 	 * @see #setAttribute(String, Object)
+	 * @since 5.3.3
 	 */
 	@SuppressWarnings("unchecked")
 	default <T> T computeAttribute(String name, Function<String, T> computeFunction) {
@@ -86,6 +89,7 @@ public interface AttributeAccessor {
 	/**
 	 * Remove the attribute identified by {@code name} and return its value.
 	 * <p>Return {@code null} if no attribute under {@code name} is found.
+	 *
 	 * @param name the unique attribute key
 	 * @return the last value of the attribute, if any
 	 */
@@ -95,12 +99,13 @@ public interface AttributeAccessor {
 	/**
 	 * Return {@code true} if the attribute identified by {@code name} exists.
 	 * <p>Otherwise return {@code false}.
+	 *
 	 * @param name the unique attribute key
 	 */
 	boolean hasAttribute(String name);
 
 	/**
-	 * Return the names of all attributes.
+	 * 返回所有属性的名称。
 	 */
 	String[] attributeNames();
 

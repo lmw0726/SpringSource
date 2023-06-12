@@ -58,7 +58,7 @@ public class BeanMetadataAttribute implements BeanMetadataElement {
 	}
 
 	/**
-	 * Return the value of the attribute.
+	 * 属性的当前值 (如果有)
 	 */
 	@Nullable
 	public Object getValue() {
