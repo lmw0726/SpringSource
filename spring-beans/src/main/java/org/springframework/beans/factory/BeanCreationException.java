@@ -46,6 +46,7 @@ public class BeanCreationException extends FatalBeanException {
 
 	/**
 	 * Create a new BeanCreationException.
+	 *
 	 * @param msg the detail message
 	 */
 	public BeanCreationException(String msg) {
@@ -56,7 +57,8 @@ public class BeanCreationException extends FatalBeanException {
 
 	/**
 	 * Create a new BeanCreationException.
-	 * @param msg the detail message
+	 *
+	 * @param msg   the detail message
 	 * @param cause the root cause
 	 */
 	public BeanCreationException(String msg, Throwable cause) {
@@ -67,8 +69,9 @@ public class BeanCreationException extends FatalBeanException {
 
 	/**
 	 * Create a new BeanCreationException.
+	 *
 	 * @param beanName the name of the bean requested
-	 * @param msg the detail message
+	 * @param msg      the detail message
 	 */
 	public BeanCreationException(String beanName, String msg) {
 		super("Error creating bean with name '" + beanName + "': " + msg);
@@ -78,9 +81,10 @@ public class BeanCreationException extends FatalBeanException {
 
 	/**
 	 * Create a new BeanCreationException.
+	 *
 	 * @param beanName the name of the bean requested
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 * @param msg      the detail message
+	 * @param cause    the root cause
 	 */
 	public BeanCreationException(String beanName, String msg, Throwable cause) {
 		this(beanName, msg);
@@ -89,10 +93,11 @@ public class BeanCreationException extends FatalBeanException {
 
 	/**
 	 * Create a new BeanCreationException.
+	 *
 	 * @param resourceDescription description of the resource
-	 * that the bean definition came from
-	 * @param beanName the name of the bean requested
-	 * @param msg the detail message
+	 *                            that the bean definition came from
+	 * @param beanName            the name of the bean requested
+	 * @param msg                 the detail message
 	 */
 	public BeanCreationException(@Nullable String resourceDescription, @Nullable String beanName, String msg) {
 		super("Error creating bean with name '" + beanName + "'" +
@@ -104,11 +109,12 @@ public class BeanCreationException extends FatalBeanException {
 
 	/**
 	 * Create a new BeanCreationException.
+	 *
 	 * @param resourceDescription description of the resource
-	 * that the bean definition came from
-	 * @param beanName the name of the bean requested
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 *                            that the bean definition came from
+	 * @param beanName            the name of the bean requested
+	 * @param msg                 the detail message
+	 * @param cause               the root cause
 	 */
 	public BeanCreationException(@Nullable String resourceDescription, String beanName, String msg, Throwable cause) {
 		this(resourceDescription, beanName, msg);
@@ -134,10 +140,9 @@ public class BeanCreationException extends FatalBeanException {
 	}
 
 	/**
-	 * Add a related cause to this bean creation exception,
-	 * not being a direct cause of the failure but having occurred
-	 * earlier in the creation of the same bean instance.
-	 * @param ex the related cause to add
+	 * 在此bean创建异常中添加一个相关原因，该原因不是导致失败的直接原因，而是在创建同一bean实例时较早发生的原因。
+	 *
+	 * @param ex 要添加的相关原因
 	 */
 	public void addRelatedCause(Throwable ex) {
 		if (this.relatedCauses == null) {
@@ -148,6 +153,7 @@ public class BeanCreationException extends FatalBeanException {
 
 	/**
 	 * Return the related causes, if any.
+	 *
 	 * @return the array of related causes, or {@code null} if none
 	 */
 	@Nullable

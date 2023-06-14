@@ -34,13 +34,11 @@ import org.springframework.lang.Nullable;
 public interface BeanExpressionResolver {
 
 	/**
-	 * Evaluate the given value as an expression, if applicable;
-	 * return the value as-is otherwise.
-	 * @param value the value to evaluate as an expression
-	 * @param beanExpressionContext the bean expression context to use when
-	 * evaluating the expression
-	 * @return the resolved value (potentially the given value as-is)
-	 * @throws BeansException if evaluation failed
+	 * 将给定值计算为表达式 (如果适用); 否则按 “是” 返回值。
+	 * @param value 要作为表达式求值的值
+	 * @param beanExpressionContext 评估表达式时要使用的bean表达式上下文
+	 * @return 解析值 (可能是给定值)
+	 * @throws BeansException 如果评估失败
 	 */
 	@Nullable
 	Object evaluate(@Nullable String value, BeanExpressionContext beanExpressionContext) throws BeansException;

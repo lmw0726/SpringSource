@@ -98,7 +98,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private boolean cacheBeanMetadata = true;
 
 	/**
-	 * Resolution strategy for expressions in bean definition values.
+	 * bean定义值中表达式的解析策略
 	 */
 	@Nullable
 	private BeanExpressionResolver beanExpressionResolver;
@@ -142,12 +142,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private volatile BeanPostProcessorCache beanPostProcessorCache;
 
 	/**
-	 * Map from scope identifier String to corresponding Scope.
+	 * 从范围标识符字符串映射到相应的范围。
 	 */
 	private final Map<String, Scope> scopes = new LinkedHashMap<>(8);
 
 	/**
-	 * Security context used when running with a SecurityManager.
+	 * 使用SecurityManager运行时使用的安全上下文。
 	 */
 	@Nullable
 	private SecurityContextProvider securityContextProvider;
@@ -328,15 +328,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 				}
 
-				// Create bean instance.
+				// 创建bean实例
 				if (mbd.isSingleton()) {
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							return createBean(beanName, mbd, args);
 						} catch (BeansException ex) {
-							// Explicitly remove instance from singleton cache: It might have been put there
-							// eagerly by the creation process, to allow for circular reference resolution.
-							// Also remove any beans that received a temporary reference to the bean.
+							// 显式地从单例缓存中删除实例: 创建过程可能急切地将其放在那里，以允许循环引用解析。
+							// 还要删除任何收到对该bean的临时引用的bean
 							destroySingleton(beanName);
 							throw ex;
 						}
@@ -1067,12 +1066,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Delegate the creation of the access control context to the
-	 * {@link #setSecurityContextProvider SecurityContextProvider}.
+	 * 将访问控制上下文的创建委托给  {@link #setSecurityContextProvider SecurityContextProvider}.。
 	 */
 	@Override
 	public AccessControlContext getAccessControlContext() {
 		return (this.securityContextProvider != null ?
+				//如果安全上下文提供者不为空，则获取缓存的AccessControlContext，否则通过AccessController获取上下文
 				this.securityContextProvider.getAccessControlContext() :
 				AccessController.getContext());
 	}
@@ -1523,15 +1522,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Resolve the bean class for the specified bean definition,
-	 * resolving a bean class name into a Class reference (if necessary)
-	 * and storing the resolved Class in the bean definition for further use.
+	 * 解析指定bean定义的bean类，将bean类名解析为类引用 (如有必要)，并将解析的类存储在bean定义中以供进一步使用。
 	 *
-	 * @param mbd          the merged bean definition to determine the class for
-	 * @param beanName     the name of the bean (for error handling purposes)
-	 * @param typesToMatch the types to match in case of internal type matching purposes
-	 *                     (also signals that the returned {@code Class} will never be exposed to application code)
-	 * @return the resolved bean class (or {@code null} if none)
+	 * @param mbd          用于确定类的合并的bean定义
+	 * @param beanName     bean的名称 (用于错误处理)
+	 * @param typesToMatch 在内部类型匹配的情况下要匹配的类型 (也表示返回的 {@code Class} 永远不会暴露于应用程序代码)
+	 * @return 解析的bean类 (如果没有，则为 {@code null})
 	 * @throws CannotLoadBeanClassException if we failed to load the class
 	 */
 	@Nullable
@@ -1540,12 +1536,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		try {
 			if (mbd.hasBeanClass()) {
+				//如果根bean定义中有bean类，返回该根bean定义中的bean类
 				return mbd.getBeanClass();
 			}
 			if (System.getSecurityManager() != null) {
+				//如果系统安全接口存在，授予解析bean类方法的特权
 				return AccessController.doPrivileged((PrivilegedExceptionAction<Class<?>>)
 						() -> doResolveBeanClass(mbd, typesToMatch), getAccessControlContext());
 			} else {
+				//否则直接解析bean类
 				return doResolveBeanClass(mbd, typesToMatch);
 			}
 		} catch (PrivilegedActionException pae) {
@@ -1561,29 +1560,33 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Nullable
 	private Class<?> doResolveBeanClass(RootBeanDefinition mbd, Class<?>... typesToMatch)
 			throws ClassNotFoundException {
-
+		//获取bean类加载器
 		ClassLoader beanClassLoader = getBeanClassLoader();
+		//动态类加载器
 		ClassLoader dynamicLoader = beanClassLoader;
 		boolean freshResolve = false;
 
 		if (!ObjectUtils.isEmpty(typesToMatch)) {
-			// When just doing type checks (i.e. not creating an actual instance yet),
-			// use the specified temporary class loader (e.g. in a weaving scenario).
+			// 当只是进行类型检查 (即尚未创建实际实例) 时，请使用指定的临时类加载器 (例如在编织场景中)。
+			//如果匹配的类型不为空，获取临时的类加载器
 			ClassLoader tempClassLoader = getTempClassLoader();
 			if (tempClassLoader != null) {
+				//如果临时类加载器不为空，当前动态类加载器为临时类加载器
 				dynamicLoader = tempClassLoader;
 				freshResolve = true;
 				if (tempClassLoader instanceof DecoratingClassLoader) {
 					DecoratingClassLoader dcl = (DecoratingClassLoader) tempClassLoader;
 					for (Class<?> typeToMatch : typesToMatch) {
+						//排除匹配的类名
 						dcl.excludeClass(typeToMatch.getName());
 					}
 				}
 			}
 		}
-
+		//获取bean类名
 		String className = mbd.getBeanClassName();
 		if (className != null) {
+			//如果类名不为空
 			Object evaluated = evaluateBeanDefinitionString(className, mbd);
 			if (!className.equals(evaluated)) {
 				// A dynamically resolved expression, supported as of 4.2...
@@ -1617,27 +1620,30 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Evaluate the given String as contained in a bean definition,
-	 * potentially resolving it as an expression.
+	 * 评估bean定义中包含的给定字符串，有可能将其解析为表达式。
 	 *
-	 * @param value          the value to check
-	 * @param beanDefinition the bean definition that the value comes from
-	 * @return the resolved value
+	 * @param value          要检查的值
+	 * @param beanDefinition 值来自的bean定义
+	 * @return 已经解析的值
 	 * @see #setBeanExpressionResolver
 	 */
 	@Nullable
 	protected Object evaluateBeanDefinitionString(@Nullable String value, @Nullable BeanDefinition beanDefinition) {
 		if (this.beanExpressionResolver == null) {
+			//如果bean表达式解析器为空，直接返回原始值
 			return value;
 		}
 
 		Scope scope = null;
 		if (beanDefinition != null) {
+			//如果bean定义不为空，获取bean定义的范围
 			String scopeName = beanDefinition.getScope();
 			if (scopeName != null) {
+				//如果范围不为空，获取对应的Scope类
 				scope = getRegisteredScope(scopeName);
 			}
 		}
+		//使用bean表达式解析器解析
 		return this.beanExpressionResolver.evaluate(value, new BeanExpressionContext(this, scope));
 	}
 
@@ -2006,15 +2012,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected abstract BeanDefinition getBeanDefinition(String beanName) throws BeansException;
 
 	/**
-	 * Create a bean instance for the given merged bean definition (and arguments).
-	 * The bean definition will already have been merged with the parent definition
-	 * in case of a child definition.
-	 * <p>All bean retrieval methods delegate to this method for actual bean creation.
+	 * 为给定的合并bean定义 (和参数) 创建一个bean实例。
+	 * 如果是子定义，则bean定义将已经与父定义合并。
+	 * <p> 所有bean检索方法都委托给此方法，以进行实际的bean创建。
 	 *
-	 * @param beanName the name of the bean
-	 * @param mbd      the merged bean definition for the bean
-	 * @param args     explicit arguments to use for constructor or factory method invocation
-	 * @return a new instance of the bean
+	 * @param beanName bean名称
+	 * @param mbd      bean的合并bean定义
+	 * @param args     用于构造函数或工厂方法调用的显式参数
+	 * @return bean的新实例
 	 * @throws BeanCreationException if the bean could not be created
 	 */
 	protected abstract Object createBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)

@@ -27,8 +27,9 @@ import java.security.AccessControlContext;
 public interface SecurityContextProvider {
 
 	/**
-	 * Provides a security access control context relevant to a bean factory.
-	 * @return bean factory security control context
+	 * 提供与bean工厂相关的安全访问控制上下文。
+	 *
+	 * @return bean工厂安全控制上下文
 	 */
 	AccessControlContext getAccessControlContext();
 
