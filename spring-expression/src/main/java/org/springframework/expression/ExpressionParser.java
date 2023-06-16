@@ -27,29 +27,31 @@ package org.springframework.expression;
 public interface ExpressionParser {
 
 	/**
-	 * Parse the expression string and return an Expression object you can use for repeated evaluation.
-	 * <p>Some examples:
+	 * 解析表达式字符串并返回可用于重复求值的表达式对象。
+	 * <p>一些例子:
 	 * <pre class="code">
 	 *     3 + 4
 	 *     name.firstName
 	 * </pre>
-	 * @param expressionString the raw expression string to parse
-	 * @return an evaluator for the parsed expression
-	 * @throws ParseException an exception occurred during parsing
+	 *
+	 * @param expressionString 要解析的原始表达式字符串
+	 * @return 解析表达式的评估器
+	 * @throws ParseException 解析过程中出现异常
 	 */
 	Expression parseExpression(String expressionString) throws ParseException;
 
 	/**
-	 * Parse the expression string and return an Expression object you can use for repeated evaluation.
-	 * <p>Some examples:
+	 * 解析表达式字符串并返回可用于重复求值的表达式对象。
+	 * <p>一些例子:
 	 * <pre class="code">
 	 *     3 + 4
 	 *     name.firstName
 	 * </pre>
-	 * @param expressionString the raw expression string to parse
-	 * @param context a context for influencing this expression parsing routine (optional)
-	 * @return an evaluator for the parsed expression
-	 * @throws ParseException an exception occurred during parsing
+	 *
+	 * @param expressionString 要解析的原始表达式字符串
+	 * @param context          影响此表达式解析例程的上下文 (可选)
+	 * @return 解析表达式的评估器
+	 * @throws ParseException 解析过程中出现异常
 	 */
 	Expression parseExpression(String expressionString, ParserContext context) throws ParseException;
 
