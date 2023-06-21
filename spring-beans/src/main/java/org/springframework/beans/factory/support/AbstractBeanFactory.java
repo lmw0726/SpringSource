@@ -669,22 +669,28 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Override
 	@Nullable
 	public Class<?> getType(String name, boolean allowFactoryBeanInit) throws NoSuchBeanDefinitionException {
+		//获取规范的bean名称
 		String beanName = transformedBeanName(name);
 
-		// Check manually registered singletons.
+		// 检查手动注册的单例对象。
 		Object beanInstance = getSingleton(beanName, false);
 		if (beanInstance != null && beanInstance.getClass() != NullBean.class) {
+			//如果该单例对象不为空，且该单例对象的类型不是NullBean类
 			if (beanInstance instanceof FactoryBean && !BeanFactoryUtils.isFactoryDereference(name)) {
+				//如果该单例对象是FactoryBean的子类，且该bean名称不是bean工厂的取消引用，
+				// 调用getTypeForFactoryBean方法获取bean实例。
 				return getTypeForFactoryBean((FactoryBean<?>) beanInstance);
 			} else {
 				return beanInstance.getClass();
 			}
 		}
 
-		// No singleton instance found -> check bean definition.
+		//找不到单例实例-> 检查bean定义。
+		//获取父bean工厂
 		BeanFactory parentBeanFactory = getParentBeanFactory();
 		if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
-			// No bean definition found in this factory -> delegate to parent.
+			//如果父bean工厂不为空，且bean工厂中不包含此名称的bean定义
+			//在此工厂中找不到bean定义-> 委托给父级。
 			return parentBeanFactory.getType(originalBeanName(name));
 		}
 
@@ -993,8 +999,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Return whether this factory holds a InstantiationAwareBeanPostProcessor
-	 * that will get applied to singleton beans on creation.
+	 * 返回此工厂是否拥有将在创建时应用于单例bean的InstantiationAwareBeanPostProcessor。
 	 *
 	 * @see #addBeanPostProcessor
 	 * @see org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor

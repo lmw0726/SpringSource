@@ -16,19 +16,18 @@
 
 package org.springframework.beans.factory.xml;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.lang.Nullable;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.lang.Nullable;
 
 /**
  * {@code EntityResolver} implementation that tries to resolve entity references
@@ -89,7 +88,6 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 			String givenUrl = new URL(decodedSystemId).toString();
 			//获取系统根路径URL，如：file:/E:/backEnd/spring-framework-5.3.21/
 			String systemRootUrl = new File("").toURI().toURL().toString();
-			// Try relative to resource base if currently in system root.
 			//如果当前处于系统根目录，尝试相对于资源库。
 			if (givenUrl.startsWith(systemRootUrl)) {
 				resourcePath = givenUrl.substring(systemRootUrl.length());

@@ -36,15 +36,15 @@ public class SpelExpressionParser extends TemplateAwareExpressionParser {
 
 
 	/**
-	 * Create a parser with default settings.
+	 * 使用默认设置创建解析器。
 	 */
 	public SpelExpressionParser() {
 		this.configuration = new SpelParserConfiguration();
 	}
 
 	/**
-	 * Create a parser with the specified configuration.
-	 * @param configuration custom configuration options
+	 * 使用指定的配置创建解析器。
+	 * @param configuration 自定义配置选项
 	 */
 	public SpelExpressionParser(SpelParserConfiguration configuration) {
 		Assert.notNull(configuration, "SpelParserConfiguration must not be null");

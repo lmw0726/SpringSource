@@ -16,6 +16,15 @@
 
 package org.springframework.beans.factory.support;
 
+import org.apache.commons.logging.Log;
+import org.springframework.beans.*;
+import org.springframework.beans.factory.*;
+import org.springframework.beans.factory.config.*;
+import org.springframework.core.*;
+import org.springframework.lang.Nullable;
+import org.springframework.util.*;
+import org.springframework.util.ReflectionUtils.MethodCallback;
+
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -25,65 +34,10 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
-
-import org.apache.commons.logging.Log;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyAccessorUtils;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.PropertyValues;
-import org.springframework.beans.TypeConverter;
-import org.springframework.beans.factory.Aware;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.BeanCurrentlyInCreationException;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.InjectionPoint;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.AutowiredPropertyMarker;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
-import org.springframework.beans.factory.config.DependencyDescriptor;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
-import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
-import org.springframework.beans.factory.config.TypedStringValue;
-import org.springframework.core.DefaultParameterNameDiscoverer;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.NamedThreadLocal;
-import org.springframework.core.NativeDetector;
-import org.springframework.core.ParameterNameDiscoverer;
-import org.springframework.core.PriorityOrdered;
-import org.springframework.core.ResolvableType;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.ReflectionUtils.MethodCallback;
-import org.springframework.util.StringUtils;
 
 /**
  * Abstract bean factory superclass that implements default bean creation,
@@ -696,72 +650,81 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Determine the target type for the given bean definition.
+	 * 确定给定bean定义的目标类型。
 	 *
-	 * @param beanName     the name of the bean (for error handling purposes)
-	 * @param mbd          the merged bean definition for the bean
-	 * @param typesToMatch the types to match in case of internal type matching purposes
-	 *                     (also signals that the returned {@code Class} will never be exposed to application code)
-	 * @return the type for the bean if determinable, or {@code null} otherwise
+	 * @param beanName     bean的名称 (用于错误处理)
+	 * @param mbd          bean的合并bean定义
+	 * @param typesToMatch 在内部类型匹配的情况下要匹配的类型 (也表示返回的 {@code Class} 永远不会暴露于应用程序代码)
+	 * @return bean的类型 (如果可确定)，否则为 {@code null}
 	 */
 	@Nullable
 	protected Class<?> determineTargetType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+		//获取bean定义中的目标类型
 		Class<?> targetType = mbd.getTargetType();
-		if (targetType == null) {
-			targetType = (mbd.getFactoryMethodName() != null ?
-					getTypeForFactoryMethod(beanName, mbd, typesToMatch) :
-					resolveBeanClass(mbd, beanName, typesToMatch));
-			if (ObjectUtils.isEmpty(typesToMatch) || getTempClassLoader() == null) {
-				mbd.resolvedTargetType = targetType;
-			}
+		if (targetType != null) {
+			//目标类型不为空，返回改类型
+			return targetType;
+		}
+		if (mbd.getFactoryMethodName() == null) {
+			//如果没有指定工厂方法名，调用resolveBeanClass解析目标类型。
+			targetType = resolveBeanClass(mbd, beanName, typesToMatch);
+		} else {
+			//有工厂方法名，调用getTypeForFactoryMethod解析目标类型
+			targetType = getTypeForFactoryMethod(beanName, mbd, typesToMatch);
+		}
+		if (ObjectUtils.isEmpty(typesToMatch) || getTempClassLoader() == null) {
+			mbd.resolvedTargetType = targetType;
 		}
 		return targetType;
 	}
 
 	/**
-	 * Determine the target type for the given bean definition which is based on
-	 * a factory method. Only called if there is no singleton instance registered
-	 * for the target bean already.
-	 * <p>This implementation determines the type matching {@link #createBean}'s
-	 * different creation strategies. As far as possible, we'll perform static
-	 * type checking to avoid creation of the target bean.
+	 * 确定基于工厂方法的给定bean定义的目标类型。仅当没有为目标bean注册的单例实例时才调用。
+	 * <p>此实现决定匹配 {@link #createBean} 的不同创建策略的类型。尽可能地，我们将执行静态类型检查，以避免创建目标bean。
 	 *
-	 * @param beanName     the name of the bean (for error handling purposes)
-	 * @param mbd          the merged bean definition for the bean
-	 * @param typesToMatch the types to match in case of internal type matching purposes
-	 *                     (also signals that the returned {@code Class} will never be exposed to application code)
-	 * @return the type for the bean if determinable, or {@code null} otherwise
+	 * @param beanName     bean的名称 (用于错误处理)
+	 * @param mbd          bean的合并bean定义
+	 * @param typesToMatch 在内部类型匹配的情况下要匹配的类型 (也表示返回的 {@code Class} 永远不会暴露于应用程序代码)
+	 * @return bean的类型 (如果可确定)，否则为 {@code null}
 	 * @see #createBean
 	 */
 	@Nullable
 	protected Class<?> getTypeForFactoryMethod(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+		//获取已经缓存的工厂方法返回的类型
 		ResolvableType cachedReturnType = mbd.factoryMethodReturnType;
 		if (cachedReturnType != null) {
+			//如果该解析类型不为空，通过该解析类型解析返回类型
 			return cachedReturnType.resolve();
 		}
 
 		Class<?> commonType = null;
+		//获取用于内省的工厂方法
 		Method uniqueCandidate = mbd.factoryMethodToIntrospect;
 
 		if (uniqueCandidate == null) {
+			//如果该工厂方法为空
 			Class<?> factoryClass;
+			//是否为静态方法
 			boolean isStatic = true;
-
+			//获取工厂bean名称
 			String factoryBeanName = mbd.getFactoryBeanName();
-			if (factoryBeanName != null) {
+			if (factoryBeanName == null) {
+				//调用resolveBeanClass 解析该bean名称
+				factoryClass = resolveBeanClass(mbd, beanName, typesToMatch);
+			} else {
+				//如果该工厂bean名称存在
 				if (factoryBeanName.equals(beanName)) {
+					//工厂bean名称与当前bean名称相同，抛出异常
 					throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 							"factory-bean reference points back to the same bean definition");
 				}
-				// Check declared factory method return type on factory class.
+				// 检查工厂类上声明的工厂方法返回类型。
 				factoryClass = getType(factoryBeanName);
 				isStatic = false;
-			} else {
-				// Check declared factory method return type on bean class.
-				factoryClass = resolveBeanClass(mbd, beanName, typesToMatch);
 			}
 
 			if (factoryClass == null) {
+				//如果工厂类为空，返回null
 				return null;
 			}
 			factoryClass = ClassUtils.getUserClass(factoryClass);
@@ -1125,6 +1088,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 * Apply before-instantiation post-processors, resolving whether there is a
 	 * before-instantiation shortcut for the specified bean.
+	 * 应用前实例化后处理器，解决指定bean是否存在前实例化快捷方式。
 	 *
 	 * @param beanName the name of the bean
 	 * @param mbd      the bean definition for the bean
@@ -1133,19 +1097,22 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Nullable
 	protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition mbd) {
 		Object bean = null;
-		if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
-			// Make sure bean class is actually resolved at this point.
-			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
-				Class<?> targetType = determineTargetType(beanName, mbd);
-				if (targetType != null) {
-					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
-					if (bean != null) {
-						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
-					}
+		if (Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
+			//如果实例化后处理器未启动，直接返回null
+			return bean;
+		}
+		// 确保bean类实际上在这一点上得到解决。
+		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+			//如果bean定义不是合成的，并且有实例化感知bean后置处理器
+			Class<?> targetType = determineTargetType(beanName, mbd);
+			if (targetType != null) {
+				bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
+				if (bean != null) {
+					bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 				}
 			}
-			mbd.beforeInstantiationResolved = (bean != null);
 		}
+		mbd.beforeInstantiationResolved = (bean != null);
 		return bean;
 	}
 

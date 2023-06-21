@@ -1,7 +1,6 @@
 package com.lmw.learn.bean;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
 
 /**
  * Bean测试类
@@ -12,7 +11,9 @@ import org.springframework.context.annotation.Bean;
  */
 public class BeanTest {
 	public static void main(String[] args) {
+		// 获取注解配置应用上下文
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BeanConfig.class);
+		// 获取BeanService对象
 		BeanService bean = context.getBean(BeanService.class);
 		System.out.println(bean.getClass().getName());
 	}
