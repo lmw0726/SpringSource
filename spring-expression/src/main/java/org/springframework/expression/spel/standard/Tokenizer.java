@@ -34,7 +34,7 @@ import org.springframework.expression.spel.SpelParseException;
  */
 class Tokenizer {
 
-	// If this gets changed, it must remain sorted...
+	// 如果这被改变了，它必须保持排序...
 	private static final String[] ALTERNATIVE_OPERATOR_NAMES =
 			{"DIV", "EQ", "GE", "GT", "LE", "LT", "MOD", "NE", "NOT"};
 
@@ -88,147 +88,174 @@ class Tokenizer {
 		while (this.pos < this.max) {
 			char ch = this.charsToProcess[this.pos];
 			if (isAlphabetic(ch)) {
+				//如果是字母，添加到tokens中
 				lexIdentifier();
-			}
-			else {
+			} else {
 				switch (ch) {
 					case '+':
 						if (isTwoCharToken(TokenKind.INC)) {
+							//如果是++符号，添加到tokens中
 							pushPairToken(TokenKind.INC);
-						}
-						else {
+						} else {
+							//否则按照+符号，添加到tokens中
 							pushCharToken(TokenKind.PLUS);
 						}
 						break;
-					case '_': // the other way to start an identifier
+					case '_':
+						// 启动标识符的另一种方法
 						lexIdentifier();
 						break;
 					case '-':
 						if (isTwoCharToken(TokenKind.DEC)) {
+							//如果是--符号，添加到tokens中
 							pushPairToken(TokenKind.DEC);
-						}
-						else {
+						} else {
+							//否则作为-号，添加到tokens中
 							pushCharToken(TokenKind.MINUS);
 						}
 						break;
 					case ':':
+						//添加一个冒号令牌到tokens中
 						pushCharToken(TokenKind.COLON);
 						break;
 					case '.':
+						//添加一个点号令牌到tokens中
 						pushCharToken(TokenKind.DOT);
 						break;
 					case ',':
+						//添加一个逗号令牌到tokens中
 						pushCharToken(TokenKind.COMMA);
 						break;
 					case '*':
+						//添加一个星号令牌到tokens中
 						pushCharToken(TokenKind.STAR);
 						break;
 					case '/':
+						//添加一个除号令牌到tokens中
 						pushCharToken(TokenKind.DIV);
 						break;
 					case '%':
+						//添加一个模号令牌到tokens中
 						pushCharToken(TokenKind.MOD);
 						break;
 					case '(':
+						//添加左括号令牌
 						pushCharToken(TokenKind.LPAREN);
 						break;
 					case ')':
+						//添加右括号令牌
 						pushCharToken(TokenKind.RPAREN);
 						break;
 					case '[':
+						//添加左中括号令牌
 						pushCharToken(TokenKind.LSQUARE);
 						break;
 					case '#':
+						//添加hash令牌
 						pushCharToken(TokenKind.HASH);
 						break;
 					case ']':
+						//添加右中括号令牌
 						pushCharToken(TokenKind.RSQUARE);
 						break;
 					case '{':
+						//添加左大括号令牌
 						pushCharToken(TokenKind.LCURLY);
 						break;
 					case '}':
+						//添加右大括号令牌
 						pushCharToken(TokenKind.RCURLY);
 						break;
 					case '@':
+						//添加一个bean引用令牌
 						pushCharToken(TokenKind.BEAN_REF);
 						break;
 					case '^':
 						if (isTwoCharToken(TokenKind.SELECT_FIRST)) {
+							//如果是^[符号，添加到tokens中
 							pushPairToken(TokenKind.SELECT_FIRST);
-						}
-						else {
+						} else {
+							//作为乘法符号添加到tokens中
 							pushCharToken(TokenKind.POWER);
 						}
 						break;
 					case '!':
 						if (isTwoCharToken(TokenKind.NE)) {
+							//如果是!=符号，添加到tokens中
 							pushPairToken(TokenKind.NE);
-						}
-						else if (isTwoCharToken(TokenKind.PROJECT)) {
+						} else if (isTwoCharToken(TokenKind.PROJECT)) {
+							//如果是![符号，添加到tokens中
 							pushPairToken(TokenKind.PROJECT);
-						}
-						else {
+						} else {
+							//否则按照!符号，添加到tokens中
 							pushCharToken(TokenKind.NOT);
 						}
 						break;
 					case '=':
 						if (isTwoCharToken(TokenKind.EQ)) {
+							//如果是==符号，添加到tokens中
 							pushPairToken(TokenKind.EQ);
-						}
-						else {
+						} else {
+							//赋值符号，添加到tokens中
 							pushCharToken(TokenKind.ASSIGN);
 						}
 						break;
 					case '&':
 						if (isTwoCharToken(TokenKind.SYMBOLIC_AND)) {
+							//如果是&&符号，添加到tokens中
 							pushPairToken(TokenKind.SYMBOLIC_AND);
-						}
-						else {
+						} else {
+							//否则按照工厂bean引用，添加到tokens中
 							pushCharToken(TokenKind.FACTORY_BEAN_REF);
 						}
 						break;
 					case '|':
 						if (!isTwoCharToken(TokenKind.SYMBOLIC_OR)) {
+							//如果不是||符号，引发解析异常
 							raiseParseException(this.pos, SpelMessage.MISSING_CHARACTER, "|");
 						}
+						//作为||符号(逻辑或)，添加到tokens中
 						pushPairToken(TokenKind.SYMBOLIC_OR);
 						break;
 					case '?':
 						if (isTwoCharToken(TokenKind.SELECT)) {
+							//添加?[令牌，标识查询
 							pushPairToken(TokenKind.SELECT);
-						}
-						else if (isTwoCharToken(TokenKind.ELVIS)) {
+						} else if (isTwoCharToken(TokenKind.ELVIS)) {
+							//添加?:令牌
 							pushPairToken(TokenKind.ELVIS);
-						}
-						else if (isTwoCharToken(TokenKind.SAFE_NAVI)) {
+						} else if (isTwoCharToken(TokenKind.SAFE_NAVI)) {
+							//?.令牌
 							pushPairToken(TokenKind.SAFE_NAVI);
-						}
-						else {
+						} else {
+							//作为？符号添加到tokens中
 							pushCharToken(TokenKind.QMARK);
 						}
 						break;
 					case '$':
 						if (isTwoCharToken(TokenKind.SELECT_LAST)) {
+							//如果是$[符号，添加到tokens中
 							pushPairToken(TokenKind.SELECT_LAST);
-						}
-						else {
+						} else {
+							//作为标识符号添加到tokens中
 							lexIdentifier();
 						}
 						break;
 					case '>':
 						if (isTwoCharToken(TokenKind.GE)) {
+							//如果是>=符号，添加到tokens中
 							pushPairToken(TokenKind.GE);
-						}
-						else {
+						} else {
+							//否则按照>符号，添加到tokens中
 							pushCharToken(TokenKind.GT);
 						}
 						break;
 					case '<':
 						if (isTwoCharToken(TokenKind.LE)) {
+							//<=符号
 							pushPairToken(TokenKind.LE);
-						}
-						else {
+						} else {
+							//<符号
 							pushCharToken(TokenKind.LT);
 						}
 						break;
@@ -242,26 +269,30 @@ class Tokenizer {
 					case '7':
 					case '8':
 					case '9':
+						//添加数字令牌
 						lexNumericLiteral(ch == '0');
 						break;
 					case ' ':
 					case '\t':
 					case '\r':
 					case '\n':
-						// drift over white space
+						// 在白色空间上漂移
 						this.pos++;
 						break;
 					case '\'':
+						//作为字符串字面量，添加到tokens中
 						lexQuotedStringLiteral();
 						break;
 					case '"':
+						//双引号
 						lexDoubleQuotedStringLiteral();
 						break;
 					case 0:
-						// hit sentinel at end of value
-						this.pos++;  // will take us to the end
+						// 在值的末端点击哨兵会把我们带到终点
+						this.pos++;
 						break;
 					case '\\':
+						//引发异常
 						raiseParseException(this.pos, SpelMessage.UNEXPECTED_ESCAPE_CHAR);
 						break;
 					default:
@@ -273,7 +304,7 @@ class Tokenizer {
 	}
 
 
-	// STRING_LITERAL: '\''! (APOS|~'\'')* '\''!;
+	// 字符串字面量: '\''! (APOS|~'\'')* '\''!;
 	private void lexQuotedStringLiteral() {
 		int start = this.pos;
 		boolean terminated = false;
@@ -281,19 +312,23 @@ class Tokenizer {
 			this.pos++;
 			char ch = this.charsToProcess[this.pos];
 			if (ch == '\'') {
-				// may not be the end if the char after is also a '
+				//如果当前字符是\字符
+				// 如果后面的字符也是一个'
 				if (this.charsToProcess[this.pos + 1] == '\'') {
-					this.pos++;  // skip over that too, and continue
-				}
-				else {
+					// 跳过它，继续
+					this.pos++;
+				} else {
+					//否则，结束
 					terminated = true;
 				}
 			}
 			if (isExhausted()) {
+				//达到最后一个字符，抛出异常
 				raiseParseException(start, SpelMessage.NON_TERMINATING_QUOTED_STRING);
 			}
 		}
 		this.pos++;
+		//作为字面量令牌，添加到tokens中
 		this.tokens.add(new Token(TokenKind.LITERAL_STRING, subarray(start, this.pos), start, this.pos));
 	}
 
@@ -305,23 +340,26 @@ class Tokenizer {
 			this.pos++;
 			char ch = this.charsToProcess[this.pos];
 			if (ch == '"') {
-				// may not be the end if the char after is also a "
+				// 如果后面的字符也是一个“
 				if (this.charsToProcess[this.pos + 1] == '"') {
-					this.pos++;  // skip over that too, and continue
-				}
-				else {
+					// 跳过，继续
+					this.pos++;
+				} else {
+					//结束
 					terminated = true;
 				}
 			}
 			if (isExhausted()) {
+				//达到最后一个字符，抛出异常
 				raiseParseException(start, SpelMessage.NON_TERMINATING_DOUBLE_QUOTED_STRING);
 			}
 		}
 		this.pos++;
+		//作为字面量令牌，添加到tokens中
 		this.tokens.add(new Token(TokenKind.LITERAL_STRING, subarray(start, this.pos), start, this.pos));
 	}
 
-	// REAL_LITERAL :
+	// 真正的文字 :
 	// ('.' (DECIMAL_DIGIT)+ (EXPONENT_PART)? (REAL_TYPE_SUFFIX)?) |
 	// ((DECIMAL_DIGIT)+ '.' (DECIMAL_DIGIT)+ (EXPONENT_PART)? (REAL_TYPE_SUFFIX)?) |
 	// ((DECIMAL_DIGIT)+ (EXPONENT_PART) (REAL_TYPE_SUFFIX)?) |
@@ -343,45 +381,47 @@ class Tokenizer {
 		char ch = this.charsToProcess[this.pos + 1];
 		boolean isHex = ch == 'x' || ch == 'X';
 
-		// deal with hexadecimal
+		// 处理十六进制
 		if (firstCharIsZero && isHex) {
+			//第一个则字符串为0且第二个是x或者X
 			this.pos = this.pos + 1;
 			do {
 				this.pos++;
-			}
-			while (isHexadecimalDigit(this.charsToProcess[this.pos]));
+			} while (isHexadecimalDigit(this.charsToProcess[this.pos]));
+
 			if (isChar('L', 'l')) {
+				//如果当前位置的字符是L或者l，添加十六进制的令牌到tokens中
 				pushHexIntToken(subarray(start + 2, this.pos), true, start, this.pos);
 				this.pos++;
-			}
-			else {
+			} else {
+				//不是L和l,将令牌的isLong设置为false
 				pushHexIntToken(subarray(start + 2, this.pos), false, start, this.pos);
 			}
 			return;
 		}
 
-		// real numbers must have leading digits
+		// 实数必须有前导数字
 
-		// Consume first part of number
+		// 消耗数字的第一部分
 		do {
 			this.pos++;
-		}
-		while (isDigit(this.charsToProcess[this.pos]));
+		} while (isDigit(this.charsToProcess[this.pos]));
 
-		// a '.' indicates this number is a real
+		// 一个 '.' 表示此数字是实数
 		ch = this.charsToProcess[this.pos];
 		if (ch == '.') {
+			//如果数字后的第一个字符为 .
+			//表明此时是实数
 			isReal = true;
 			int dotpos = this.pos;
-			// carry on consuming digits
+			// 继续消费数字
 			do {
 				this.pos++;
-			}
-			while (isDigit(this.charsToProcess[this.pos]));
+			} while (isDigit(this.charsToProcess[this.pos]));
+
 			if (this.pos == dotpos + 1) {
-				// the number is something like '3.'. It is really an int but may be
-				// part of something like '3.toString()'. In this case process it as
-				// an int and leave the dot as a separate token.
+				//这个数字大约是 “3.”。它确实是一个int，但可能是 '3.toString()'之类的东西的一部分。
+				// 在这种情况下，将其处理为int，并将点保留为单独的令牌。
 				this.pos = dotpos;
 				pushIntToken(subarray(start, this.pos), false, start, this.pos);
 				return;
@@ -390,55 +430,58 @@ class Tokenizer {
 
 		int endOfNumber = this.pos;
 
-		// Now there may or may not be an exponent
+		// 现在可能有指数，也可能没有指数
 
-		// Is it a long ?
+		// 是不是long类型 ?
 		if (isChar('L', 'l')) {
-			if (isReal) {  // 3.4L - not allowed
+			if (isReal) {
+				// 3.4L - 不允许，抛出异常
 				raiseParseException(start, SpelMessage.REAL_CANNOT_BE_LONG);
 			}
 			pushIntToken(subarray(start, endOfNumber), true, start, endOfNumber);
 			this.pos++;
-		}
-		else if (isExponentChar(this.charsToProcess[this.pos])) {
-			isReal = true;  // if it wasn't before, it is now
+		} else if (isExponentChar(this.charsToProcess[this.pos])) {
+			//pos位置的字符是指数，即e或者E字符
+			isReal = true;
 			this.pos++;
 			char possibleSign = this.charsToProcess[this.pos];
 			if (isSign(possibleSign)) {
+				//如果当前位置的字符是+或者-
 				this.pos++;
 			}
 
-			// exponent digits
+			// 指数数字
 			do {
 				this.pos++;
-			}
-			while (isDigit(this.charsToProcess[this.pos]));
+			} while (isDigit(this.charsToProcess[this.pos]));
+
 			boolean isFloat = false;
 			if (isFloatSuffix(this.charsToProcess[this.pos])) {
+				//如果当前位置的字符是f或者F，则表明是浮点数
 				isFloat = true;
 				endOfNumber = ++this.pos;
-			}
-			else if (isDoubleSuffix(this.charsToProcess[this.pos])) {
+			} else if (isDoubleSuffix(this.charsToProcess[this.pos])) {
+				//如果当前位置的字符是d或者D，表明是浮点数
 				endOfNumber = ++this.pos;
 			}
+			//解析成实数类型或者FLOAT实数的令牌，并存入tokens中
 			pushRealToken(subarray(start, this.pos), isFloat, start, this.pos);
-		}
-		else {
+		} else {
 			ch = this.charsToProcess[this.pos];
 			boolean isFloat = false;
 			if (isFloatSuffix(ch)) {
+				//如果当前位置的字符是f或者F，则表明是浮点数
 				isReal = true;
 				isFloat = true;
 				endOfNumber = ++this.pos;
-			}
-			else if (isDoubleSuffix(ch)) {
+			} else if (isDoubleSuffix(ch)) {
+				//如果当前位置的字符是d或者D，表明是浮点数
 				isReal = true;
 				endOfNumber = ++this.pos;
 			}
 			if (isReal) {
 				pushRealToken(subarray(start, endOfNumber), isFloat, start, endOfNumber);
-			}
-			else {
+			} else {
 				pushIntToken(subarray(start, endOfNumber), false, start, endOfNumber);
 			}
 		}
@@ -447,46 +490,49 @@ class Tokenizer {
 	private void lexIdentifier() {
 		int start = this.pos;
 		do {
+			//如果是标识符，位置向后累加
 			this.pos++;
-		}
-		while (isIdentifier(this.charsToProcess[this.pos]));
+		} while (isIdentifier(this.charsToProcess[this.pos]));
+		//从开始位置到当前位置，复制出字符数组
 		char[] subarray = subarray(start, this.pos);
 
-		// Check if this is the alternative (textual) representation of an operator (see
-		// alternativeOperatorNames)
+		// 检查这是否是运算符的替代 (文本) 表示形式 (请参阅 alternativeOperatorNames)
 		if ((this.pos - start) == 2 || (this.pos - start) == 3) {
+			//如果当前位置距离开始位置2个字符或者3个字符，将上面的字符数组转为大写的字符串。
 			String asString = new String(subarray).toUpperCase();
+			// 二分查找逻辑符的位置
 			int idx = Arrays.binarySearch(ALTERNATIVE_OPERATOR_NAMES, asString);
 			if (idx >= 0) {
+				//如果逻辑符号存在，将逻辑符号转为Token，并添加到tokens中
 				pushOneCharOrTwoCharToken(TokenKind.valueOf(asString), start, subarray);
 				return;
 			}
 		}
+		//将其标识为一个标识符，并添加到tokens中
 		this.tokens.add(new Token(TokenKind.IDENTIFIER, subarray, start, this.pos));
 	}
 
 	private void pushIntToken(char[] data, boolean isLong, int start, int end) {
 		if (isLong) {
 			this.tokens.add(new Token(TokenKind.LITERAL_LONG, data, start, end));
-		}
-		else {
+		} else {
 			this.tokens.add(new Token(TokenKind.LITERAL_INT, data, start, end));
 		}
 	}
 
 	private void pushHexIntToken(char[] data, boolean isLong, int start, int end) {
 		if (data.length == 0) {
+			//如果字符数组不存在，抛出异常
 			if (isLong) {
 				raiseParseException(start, SpelMessage.NOT_A_LONG, this.expressionString.substring(start, end + 1));
-			}
-			else {
+			} else {
 				raiseParseException(start, SpelMessage.NOT_AN_INTEGER, this.expressionString.substring(start, end));
 			}
 		}
+		//添加成不同参数类型的Token到tokens中
 		if (isLong) {
 			this.tokens.add(new Token(TokenKind.LITERAL_HEXLONG, data, start, end));
-		}
-		else {
+		} else {
 			this.tokens.add(new Token(TokenKind.LITERAL_HEXINT, data, start, end));
 		}
 	}
@@ -494,8 +540,7 @@ class Tokenizer {
 	private void pushRealToken(char[] data, boolean isFloat, int start, int end) {
 		if (isFloat) {
 			this.tokens.add(new Token(TokenKind.LITERAL_REAL_FLOAT, data, start, end));
-		}
-		else {
+		} else {
 			this.tokens.add(new Token(TokenKind.LITERAL_REAL, data, start, end));
 		}
 	}
@@ -505,7 +550,7 @@ class Tokenizer {
 	}
 
 	/**
-	 * Check if this might be a two character token.
+	 * 检查这是否可能是两个字符的令牌。
 	 */
 	private boolean isTwoCharToken(TokenKind kind) {
 		return (kind.tokenChars.length == 2 &&
@@ -514,7 +559,7 @@ class Tokenizer {
 	}
 
 	/**
-	 * Push a token of just one character in length.
+	 * 推一个只有一个字符长度的标记。
 	 */
 	private void pushCharToken(TokenKind kind) {
 		this.tokens.add(new Token(kind, this.pos, this.pos + 1));
@@ -522,7 +567,7 @@ class Tokenizer {
 	}
 
 	/**
-	 * Push a token of two characters in length.
+	 * 按两个字符长度的标记。
 	 */
 	private void pushPairToken(TokenKind kind) {
 		this.tokens.add(new Token(kind, this.pos, this.pos + 2));
