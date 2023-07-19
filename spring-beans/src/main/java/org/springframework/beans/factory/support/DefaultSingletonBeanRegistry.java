@@ -16,26 +16,15 @@
 
 package org.springframework.beans.factory.support;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.BeanCreationNotAllowedException;
-import org.springframework.beans.factory.BeanCurrentlyInCreationException;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.SingletonBeanRegistry;
 import org.springframework.core.SimpleAliasRegistry;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Generic registry for shared bean instances, implementing the
@@ -71,7 +60,7 @@ import org.springframework.util.StringUtils;
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
 	/**
-	 * Maximum number of suppressed exceptions to preserve.
+	 * 要保留的被封锁异常的最大数量。
 	 */
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
@@ -319,13 +308,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Register an exception that happened to get suppressed during the creation of a
-	 * singleton bean instance, e.g. a temporary circular reference resolution problem.
-	 * <p>The default implementation preserves any given exception in this registry's
-	 * collection of suppressed exceptions, up to a limit of 100 exceptions, adding
-	 * them as related causes to an eventual top-level {@link BeanCreationException}.
+	 * 注册在创建 bean单例实例期间碰巧被封锁的异常，例如临时循环引用解决问题。
+	 * <p> 默认实现将保留此注册表的被封锁异常集合中的任何给定异常，最高限制为100异常，
+	 * 并将它们作为相关原因添加到最终的顶级 {@link BeanCreationException}。
 	 *
-	 * @param ex the Exception to register
+	 * @param ex 注册的异常
 	 * @see BeanCreationException#getRelatedCauses()
 	 */
 	protected void onSuppressedException(Exception ex) {

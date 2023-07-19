@@ -212,7 +212,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Return an instance, which may be shared or independent, of the specified bean.
 	 *
-	 * @param name         the name of the bean to retrieve
+	 * @param name         bean名称 to retrieve
 	 * @param requiredType the required type of the bean to retrieve
 	 * @param args         arguments to use when creating a bean instance using explicit arguments
 	 *                     (only applied when creating a new instance as opposed to retrieving an existing one)
@@ -509,7 +509,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * to check whether the bean with the given name matches the specified type. Allow
 	 * additional constraints to be applied to ensure that beans are not created early.
 	 *
-	 * @param name        the name of the bean to query
+	 * @param name        bean名称 to query
 	 * @param typeToMatch the type to match against (as a
 	 *                    {@code ResolvableType})
 	 * @return {@code true} if the bean type matches, {@code false} if it
@@ -701,25 +701,34 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// 获取装饰定义
 		BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
 		if (dbd != null && !BeanFactoryUtils.isFactoryDereference(name)) {
+			//如果装饰bean定义存在，且该名称不是bean工厂的取消引用
+			//获取该装饰bean定义的根合并bean定义
 			RootBeanDefinition tbd = getMergedBeanDefinition(dbd.getBeanName(), dbd.getBeanDefinition(), mbd);
+			//根据装饰bean定义的bean名称，预测bean类型
 			Class<?> targetClass = predictBeanType(dbd.getBeanName(), tbd);
 			if (targetClass != null && !FactoryBean.class.isAssignableFrom(targetClass)) {
+				//目标类型不为空，且该类型不是FactoryBean接口的子类，返回该目标类型
 				return targetClass;
 			}
 		}
-
+		//根据bean名称和本地bean定义预测bean类型
 		Class<?> beanClass = predictBeanType(beanName, mbd);
 
-		// Check bean class whether we're dealing with a FactoryBean.
+		// 检查bean类我们是否在处理工厂bean。
 		if (beanClass != null && FactoryBean.class.isAssignableFrom(beanClass)) {
-			if (!BeanFactoryUtils.isFactoryDereference(name)) {
-				// If it's a FactoryBean, we want to look at what it creates, not at the factory class.
-				return getTypeForFactoryBean(beanName, mbd, allowFactoryBeanInit).resolve();
-			} else {
+			if (BeanFactoryUtils.isFactoryDereference(name)) {
+				// 如果该名称是工厂取消引用返回该类型。
 				return beanClass;
+			} else {
+				//如果它是FactoryBean，我们想看看它创建了什么，而不是工厂类。
+				return getTypeForFactoryBean(beanName, mbd, allowFactoryBeanInit).resolve();
 			}
+		} else if (BeanFactoryUtils.isFactoryDereference(name)) {
+			// 如果该名称是工厂取消引用返回null
+			return null;
 		} else {
-			return (!BeanFactoryUtils.isFactoryDereference(name) ? beanClass : null);
+			//否则返回该类型
+			return beanClass;
 		}
 	}
 
@@ -1217,7 +1226,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Destroy the given bean instance (usually a prototype instance
 	 * obtained from this factory) according to the given bean definition.
 	 *
-	 * @param beanName the name of the bean definition
+	 * @param beanName bean名称 definition
 	 * @param bean     the bean instance to destroy
 	 * @param mbd      the merged bean definition
 	 */
@@ -1655,28 +1664,26 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 
 	/**
-	 * Predict the eventual bean type (of the processed bean instance) for the
-	 * specified bean. Called by {@link #getType} and {@link #isTypeMatch}.
-	 * Does not need to handle FactoryBeans specifically, since it is only
-	 * supposed to operate on the raw bean type.
-	 * <p>This implementation is simplistic in that it is not able to
-	 * handle factory methods and InstantiationAwareBeanPostProcessors.
-	 * It only predicts the bean type correctly for a standard bean.
-	 * To be overridden in subclasses, applying more sophisticated type detection.
+	 * 预测指定bean的最终bean类型 (已处理的bean实例的)。
+	 * 由 {@link #getType} 和 {@link #isTypeMatch} 调用。不需要专门处理FactoryBeans，因为它只应该对未加工的bean类型进行操作。
+	 * <p> 此实现过于简单，因为它无法处理工厂方法和InstantiationAwareBeanPostProcessors。
+	 * 它仅正确预测标准bean的bean类型。要在子类中覆盖，应用更复杂的类型检测。
 	 *
-	 * @param beanName     the name of the bean
-	 * @param mbd          the merged bean definition to determine the type for
-	 * @param typesToMatch the types to match in case of internal type matching purposes
-	 *                     (also signals that the returned {@code Class} will never be exposed to application code)
-	 * @return the type of the bean, or {@code null} if not predictable
+	 * @param beanName     bean名称
+	 * @param mbd          用来确定类型的合并bean定义
+	 * @param typesToMatch 在内部类型匹配的情况下要匹配的类型 (也表示返回的 {@code Class} 永远不会暴露于应用程序代码)
+	 * @return bean的类型，如果不可预测，则为 {@code null}
 	 */
 	@Nullable
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+		//如果目标类型
 		Class<?> targetType = mbd.getTargetType();
 		if (targetType != null) {
+			//如果目标类型不为空，则返回该类型
 			return targetType;
 		}
 		if (mbd.getFactoryMethodName() != null) {
+			//如果该工厂方法名称不为空，则返回null
 			return null;
 		}
 		return resolveBeanClass(mbd, beanName, typesToMatch);
@@ -1685,7 +1692,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Check whether the given bean is defined as a {@link FactoryBean}.
 	 *
-	 * @param beanName the name of the bean
+	 * @param beanName bean名称
 	 * @param mbd      the corresponding bean definition
 	 */
 	protected boolean isFactoryBean(String beanName, RootBeanDefinition mbd) {
@@ -1699,41 +1706,40 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Determine the bean type for the given FactoryBean definition, as far as possible.
-	 * Only called if there is no singleton instance registered for the target bean
-	 * already. The implementation is allowed to instantiate the target factory bean if
-	 * {@code allowInit} is {@code true} and the type cannot be determined another way;
-	 * otherwise it is restricted to introspecting signatures and related metadata.
-	 * <p>If no {@link FactoryBean#OBJECT_TYPE_ATTRIBUTE} if set on the bean definition
-	 * and {@code allowInit} is {@code true}, the default implementation will create
-	 * the FactoryBean via {@code getBean} to call its {@code getObjectType} method.
-	 * Subclasses are encouraged to optimize this, typically by inspecting the generic
-	 * signature of the factory bean class or the factory method that creates it.
-	 * If subclasses do instantiate the FactoryBean, they should consider trying the
-	 * {@code getObjectType} method without fully populating the bean. If this fails,
-	 * a full FactoryBean creation as performed by this implementation should be used
-	 * as fallback.
+	 * 尽可能确定给定FactoryBean定义的bean类型。仅当没有为目标bean注册的单例实例时才调用。
+	 * 如果 {@code allowInit} 为 {@code true}，并且无法以另一种方式确定类型，则允许实现实例化目标工厂bean;
+	 * 否则，它仅限于内省签名和相关元数据。
+	 * <p> 如果在bean定义上设置没有 {@link FactoryBean#OBJECT_TYPE_ATTRIBUTE}，并且 {@code allowInit} 为 {@code true}，
+	 * 则默认实现将通过 {@code getBean} 创建FactoryBean以调用其 {@code getObjectType} 方法。
+	 * 鼓励子类对此进行优化，通常是通过检查工厂bean类或创建它的工厂方法的通用签名。
+	 * 如果子类确实实例化了FactoryBean，他们应该考虑在不完全填充bean的情况下尝试 {@code getObjectType} 方法。
+	 * 如果失败，则应将此实现执行的完整FactoryBean创建用作后备。
 	 *
-	 * @param beanName  the name of the bean
-	 * @param mbd       the merged bean definition for the bean
-	 * @param allowInit if initialization of the FactoryBean is permitted if the type
-	 *                  cannot be determined another way
-	 * @return the type for the bean if determinable, otherwise {@code ResolvableType.NONE}
+	 * @param beanName  bean名称
+	 * @param mbd       bean的合并bean定义
+	 * @param allowInit 如果无法以另一种方式确定类型，则允许初始化FactoryBean
+	 * @return bean的类型 (如果可确定)，否则 {@code ResolvableType.NONE}
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 * @see #getBean(String)
 	 * @since 5.2
 	 */
 	protected ResolvableType getTypeForFactoryBean(String beanName, RootBeanDefinition mbd, boolean allowInit) {
+		//根据bean定义的属性值获取可解析的类型
 		ResolvableType result = getTypeForFactoryBeanFromAttributes(mbd);
 		if (result != ResolvableType.NONE) {
+			//如果是不是空置，则返回该解析类型
 			return result;
 		}
 
 		if (allowInit && mbd.isSingleton()) {
+			//如果允许初始化，且该bean定义是单例类型
 			try {
+				//获取工厂bean
 				FactoryBean<?> factoryBean = doGetBean(FACTORY_BEAN_PREFIX + beanName, FactoryBean.class, null, true);
+				//根据工厂bean获取对象类型
 				Class<?> objectType = getTypeForFactoryBean(factoryBean);
-				return (objectType != null ? ResolvableType.forClass(objectType) : ResolvableType.NONE);
+				//如果是对象类型为空，返回ResolvableType.NONE，否则，包装成可解析类型返回
+				return (objectType == null ? ResolvableType.NONE : ResolvableType.forClass(objectType));
 			} catch (BeanCreationException ex) {
 				if (ex.contains(BeanCurrentlyInCreationException.class)) {
 					logger.trace(LogMessage.format("Bean currently in creation on FactoryBean type check: %s", ex));
@@ -1742,6 +1748,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				} else {
 					logger.debug(LogMessage.format("Bean creation exception on eager FactoryBean type check: %s", ex));
 				}
+				//将其丢入异常栈中
 				onSuppressedException(ex);
 			}
 		}
@@ -1749,22 +1756,24 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Determine the bean type for a FactoryBean by inspecting its attributes for a
-	 * {@link FactoryBean#OBJECT_TYPE_ATTRIBUTE} value.
+	 * 通过检查FactoryBean的属性以获取 {@link FactoryBean#OBJECT_TYPE_ATTRIBUTE} 值来确定FactoryBean的bean类型。
 	 *
-	 * @param attributes the attributes to inspect
-	 * @return a {@link ResolvableType} extracted from the attributes or
-	 * {@code ResolvableType.NONE}
+	 * @param attributes 要检查的属性
+	 * @return 从属性提取出的一个{@code ResolvableType} 或 {@code ResolvableType.NONE}
 	 * @since 5.2
 	 */
 	ResolvableType getTypeForFactoryBeanFromAttributes(AttributeAccessor attributes) {
+		//获取FactoryBean的属性
 		Object attribute = attributes.getAttribute(FactoryBean.OBJECT_TYPE_ATTRIBUTE);
 		if (attribute instanceof ResolvableType) {
+			//如果是ResolvableType类型，返回该类型值
 			return (ResolvableType) attribute;
 		}
 		if (attribute instanceof Class) {
+			//如果是Class类型，包装成ResolvableType类型后返回。
 			return ResolvableType.forClass((Class<?>) attribute);
 		}
+		//否则返回NONE
 		return ResolvableType.NONE;
 	}
 
@@ -1778,8 +1787,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * If no type found, a full FactoryBean creation as performed by this implementation
 	 * should be used as fallback.
 	 *
-	 * @param beanName the name of the bean
-	 * @param mbd      the merged bean definition for the bean
+	 * @param beanName bean名称
+	 * @param mbd      bean的合并bean定义
 	 * @return the type for the bean if determinable, or {@code null} otherwise
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 * @see #getBean(String)
@@ -1795,7 +1804,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * 将指定的bean标记为已创建 (或即将创建)。
 	 * <p> 这允许bean工厂优化其缓存，以重复创建指定的bean。
 	 *
-	 * @param beanName the name of the bean
+	 * @param beanName bean名称
 	 */
 	protected void markBeanAsCreated(String beanName) {
 		if (!this.alreadyCreated.contains(beanName)) {
@@ -1815,7 +1824,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * bean创建失败后，对缓存的元数据执行适当的清理。
 	 *
-	 * @param beanName the name of the bean
+	 * @param beanName bean名称
 	 */
 	protected void cleanupAfterBeanCreationFailure(String beanName) {
 		synchronized (this.mergedBeanDefinitions) {
@@ -1828,7 +1837,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Determine whether the specified bean is eligible for having
 	 * its bean definition metadata cached.
 	 *
-	 * @param beanName the name of the bean
+	 * @param beanName bean名称
 	 * @return {@code true} if the bean's metadata may be cached
 	 * at this point already
 	 */
@@ -1840,7 +1849,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Remove the singleton instance (if any) for the given bean name,
 	 * but only if it hasn't been used for other purposes than type checking.
 	 *
-	 * @param beanName the name of the bean
+	 * @param beanName bean名称
 	 * @return {@code true} if actually removed, {@code false} otherwise
 	 */
 	protected boolean removeSingletonIfCreatedForTypeCheckOnly(String beanName) {
@@ -1952,7 +1961,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * registering its DisposableBean interface and/or the given destroy method
 	 * to be called on factory shutdown (if applicable). Only applies to singletons.
 	 *
-	 * @param beanName the name of the bean
+	 * @param beanName bean名称
 	 * @param bean     the bean instance
 	 * @param mbd      the bean definition for the bean
 	 * @see RootBeanDefinition#isSingleton

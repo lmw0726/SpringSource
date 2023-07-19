@@ -16,31 +16,15 @@
 
 package org.springframework.core;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.StringJoiner;
-
 import org.springframework.core.SerializableTypeWrapper.FieldTypeProvider;
 import org.springframework.core.SerializableTypeWrapper.MethodParameterTypeProvider;
 import org.springframework.core.SerializableTypeWrapper.TypeProvider;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ConcurrentReferenceHashMap;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.*;
+
+import java.io.Serializable;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * Encapsulates a Java {@link java.lang.reflect.Type}, providing access to
@@ -84,8 +68,7 @@ import org.springframework.util.StringUtils;
 public class ResolvableType implements Serializable {
 
 	/**
-	 * {@code ResolvableType} returned when no value is available. {@code NONE} is used
-	 * in preference to {@code null} so that multiple method calls can be safely chained.
+	 * 没有值时返回 {@code ResolvableType}。{@code NONE} 被优先使用，替换掉{@code null}，以便可以安全地链接多个方法调用。
 	 */
 	public static final ResolvableType NONE = new ResolvableType(EmptyType.INSTANCE, null, null, 0);
 
@@ -812,8 +795,8 @@ public class ResolvableType implements Serializable {
 	 * 将此类型解析为 {@link java.lang.Class}，如果无法解析该类型，则返回指定的 {@code fallback}。
 	 * 如果直接解析失败，此方法将考虑 {@link TypeVariable TypeVariables}  和 {@link WildcardType WildcardTypes}  的边界;
 	 * 但是，{@code Object.class} 的边界将被忽略。
-     *
-     * @param fallback 如果解析失败，要使用的回退类
+	 *
+	 * @param fallback 如果解析失败，要使用的回退类
 	 * @return 已解析的 {@link Class} 或 {@code fallback}
 	 * @see #resolve()
 	 * @see #resolveGeneric(int...)
