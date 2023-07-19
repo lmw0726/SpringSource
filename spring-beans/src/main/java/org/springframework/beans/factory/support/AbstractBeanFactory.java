@@ -694,10 +694,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return parentBeanFactory.getType(originalBeanName(name));
 		}
 
+		// 根据bean名称获取合并的本地bean定义
 		RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 
-		// Check decorated bean definition, if any: We assume it'll be easier
-		// to determine the decorated bean's type than the proxy's type.
+		// 检查装饰的bean定义 (如果有的话): 我们假设确定装饰的bean的类型比代理的类型更容易。
+		// 获取装饰定义
 		BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
 		if (dbd != null && !BeanFactoryUtils.isFactoryDereference(name)) {
 			RootBeanDefinition tbd = getMergedBeanDefinition(dbd.getBeanName(), dbd.getBeanDefinition(), mbd);
