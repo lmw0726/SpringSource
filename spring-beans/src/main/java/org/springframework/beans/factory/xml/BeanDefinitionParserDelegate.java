@@ -214,9 +214,8 @@ public class BeanDefinitionParserDelegate {
 	private final ParseState parseState = new ParseState();
 
 	/**
-	 * Stores all used bean names so we can enforce uniqueness on a per
-	 * beans-element basis. Duplicate bean ids/names may not exist within the
-	 * same level of beans element nesting, but may be duplicated across levels.
+	 * 存储所有使用的bean名称，因此我们可以在每个bean元素的基础上强制执行唯一性。
+	 * 重复的bean ids/names可能不存在于同一级别的bean元素嵌套中，但可能会跨级别重复。
 	 */
 	private final Set<String> usedNames = new HashSet<>();
 

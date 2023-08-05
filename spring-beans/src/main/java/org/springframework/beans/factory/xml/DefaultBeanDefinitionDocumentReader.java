@@ -93,6 +93,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * XML读取器上下文
+	 */
 	@Nullable
 	private XmlReaderContext readerContext;
 
@@ -112,6 +115,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	@Override
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
+		//解析文档元素执行注册bean定义
 		doRegisterBeanDefinitions(doc.getDocumentElement());
 	}
 
@@ -165,6 +169,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		//预处理文档根对象
 		preProcessXml(root);
+		//解析文档中根级别的元素: “import”，“alias”，“bean”。
 		parseBeanDefinitions(root, this.delegate);
 		//后置处理文档根对象
 		postProcessXml(root);
@@ -332,7 +337,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		//将元素解析成bean定义持有者
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
-			//如果该bean定义持有者为空，装饰bean定义，并产生bean定义持有者
+			//如果该bean定义持有者不为空，装饰bean定义，并产生bean定义持有者
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
 				// 注册最终装饰实例。

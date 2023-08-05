@@ -34,5 +34,8 @@ public class XmlBeanTest {
 		//获取Bean对象
 		Person person = factory.getBean("employee2", Employee.class);
 		System.out.println(person);
+
+		Boss boss = factory.getBean("boss", Boss.class);
+		System.out.println(boss);
 	}
 }
