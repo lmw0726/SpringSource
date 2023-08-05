@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+
+	<bean id="boss" name="boss" class="com.lmw.learn.bean.person.Boss">
+		<property name="age" value="48"/>
+		<property name="name" value="李梁"/>
+		<property name="companyName" value="宇宙牛牛贸易"/>
+		<property name="asset" value="50000000.00"/>
+		<lookup-method name="getSubordinate" bean="employee2"/>
+		<replaced-method name="getName" replacer="com.lmw.learn.bean.person.Employee">
+
+		</replaced-method>
+	</bean>
+</beans>

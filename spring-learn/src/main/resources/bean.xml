@@ -4,6 +4,8 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd" default-merge="default">
 	<description>XML实体类</description>
+
+
 	<bean id="person" name="person;xiaowei" class="com.lmw.learn.bean.Person">
 		<description>人类实体类，他的名字叫黄小伟，年龄18岁</description>
 		<meta key="special_key" value="special_value"/>
@@ -11,16 +13,6 @@
 		<property name="name" value="黄小伟"/>
 	</bean>
 
-	<bean id="boss" name="boss" class="com.lmw.learn.bean.person.Boss">
-		<property name="age" value="48"/>
-		<property name="name" value="李梁"/>
-		<property name="companyName" value="宇宙牛牛贸易"/>
-		<property name="asset" value="50000000.00"/>
-		<lookup-method name="getSubordinate" bean="employee2"/>
-		<replaced-method name="getName" replacer="com.lmw.learn.bean.person.Employee">
-
-		</replaced-method>
-	</bean>
 
 	<bean id="employee" name="employee" class="com.lmw.learn.bean.person.Employee">
 		<property name="age" value="26"/>
@@ -30,9 +22,11 @@
 	</bean>
 
 	<bean id="employee2" name="employee2" class="com.lmw.learn.bean.person.Employee" parent="person">
-<!--		<property name="age" value="27"/>-->
-<!--		<property name="name" value="颜美静"/>-->
+		<!--		<property name="age" value="27"/>-->
+		<!--		<property name="name" value="颜美静"/>-->
 		<property name="skillName" value="财务"/>
 		<property name="salary" value="4000.00"/>
 	</bean>
+
+	<import resource="boss.xml"></import>
 </beans>
