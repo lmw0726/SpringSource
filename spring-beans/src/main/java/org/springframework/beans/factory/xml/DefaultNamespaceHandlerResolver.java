@@ -16,14 +16,8 @@
 
 package org.springframework.beans.factory.xml;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -31,6 +25,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Default implementation of the {@link NamespaceHandlerResolver} interface.
@@ -61,18 +60,22 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * ClassLoader to use for NamespaceHandler classes.
+	 * 要用于命名空间处理程序类的类加载器。
 	 */
 	@Nullable
 	private final ClassLoader classLoader;
 
 	/**
-	 * Resource location to search for.
+	 * 要搜索的资源位置。
 	 */
 	private final String handlerMappingsLocation;
 
 	/**
-	 * Stores the mappings from namespace URI to NamespaceHandler class name / instance.
+	 * 存储从名称空间URI到名称空间处理程序类名/实例的映射。
+	 * key：命名空间
+	 * value：分成两种情况：
+	 * 1）未初始化时，对应的NamespaceHandler的类路径；
+	 * 2）已初始化时，对应的NamespaceHandler对象。
 	 */
 	@Nullable
 	private volatile Map<String, Object> handlerMappings;

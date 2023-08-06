@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+	<description>Qualifier测试类</description>
+	<bean id="student" name="student" class="com.lmw.learn.bean.qualifier.Student" autowire="byName">
+		<property name="name" value="张恒"/>
+		<property name="age" value="14"/>
+		<property name="grade" value="3"/>
+		<property name="subordinate">
+			<null/>
+		</property>
+		<qualifier value="teacher"/>
+	</bean>
+
+	<bean id="teacher" name="teacher" class="com.lmw.learn.bean.Person">
+		<property name="name" value="王雨薇"/>
+		<property name="age" value="36"/>
+	</bean>
+
+</beans>

@@ -1530,10 +1530,10 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse a custom element (outside of the default namespace).
+	 * 解析自定义元素 (在默认名称空间之外)。
 	 *
-	 * @param ele the element to parse
-	 * @return the resulting bean definition
+	 * @param ele 要解析的元素
+	 * @return 生成的bean定义
 	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele) {
