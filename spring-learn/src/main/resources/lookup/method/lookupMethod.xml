@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd" default-merge="default">
+	<description>LookupMethod测试类</description>
+	<bean id="display" class="com.lmw.learn.bean.lookup.method.Display">
+		<lookup-method name="getCar" bean="bmw"/>
+	</bean>
+	<!-- 注册bean -->
+	<bean id="bmw" class="com.lmw.learn.bean.lookup.method.Bmw"/>
+	<bean id="hongqi" class="com.lmw.learn.bean.lookup.method.HongQi"/>
+
+</beans>

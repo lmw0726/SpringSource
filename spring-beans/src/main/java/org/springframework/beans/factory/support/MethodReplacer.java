@@ -31,11 +31,11 @@ import java.lang.reflect.Method;
 public interface MethodReplacer {
 
 	/**
-	 * Reimplement the given method.
-	 * @param obj the instance we're reimplementing the method for
-	 * @param method the method to reimplement
-	 * @param args arguments to the method
-	 * @return return value for the method
+	 * 重新实现给定的方法。
+	 * @param obj 我们正在重新实现该方法的实例
+	 * @param method 重新实现的方法
+	 * @param args 方法的参数
+	 * @return 方法的返回值
 	 */
 	Object reimplement(Object obj, Method method, Object[] args) throws Throwable;
 

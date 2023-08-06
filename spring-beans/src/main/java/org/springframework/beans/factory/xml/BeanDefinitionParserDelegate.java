@@ -210,7 +210,9 @@ public class BeanDefinitionParserDelegate {
 	 * 文档默认定义
 	 */
 	private final DocumentDefaultsDefinition defaults = new DocumentDefaultsDefinition();
-
+	/**
+	 * 记录解析状态，这里是用ArrayDeque存储
+	 */
 	private final ParseState parseState = new ParseState();
 
 	/**
@@ -803,7 +805,7 @@ public class BeanDefinitionParserDelegate {
 				// 寻找arg-type的元素。
 				List<Element> argTypeEles = DomUtils.getChildElementsByTagName(replacedMethodEle, ARG_TYPE_ELEMENT);
 				for (Element argTypeEle : argTypeEles) {
-					//获取match属性值
+					//获取match属性值，这里是要替换的方法参数类型。
 					String match = argTypeEle.getAttribute(ARG_TYPE_MATCH_ATTRIBUTE);
 					//如果match属性值不为空，获取match值，否则从arg-type元素中获取文本值
 					match = (StringUtils.hasText(match) ? match : DomUtils.getTextValue(argTypeEle));

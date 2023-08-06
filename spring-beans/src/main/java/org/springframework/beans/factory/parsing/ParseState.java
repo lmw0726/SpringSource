@@ -16,9 +16,9 @@
 
 package org.springframework.beans.factory.parsing;
 
-import java.util.ArrayDeque;
-
 import org.springframework.lang.Nullable;
+
+import java.util.ArrayDeque;
 
 /**
  * Simple {@link ArrayDeque}-based structure for tracking the logical position during
@@ -35,21 +35,20 @@ import org.springframework.lang.Nullable;
 public final class ParseState {
 
 	/**
-	 * Internal {@link ArrayDeque} storage.
+	 * 内部 {@link ArrayDeque} 存储。
 	 */
 	private final ArrayDeque<Entry> state;
 
 
 	/**
-	 * Create a new {@code ParseState} with an empty {@link ArrayDeque}.
+	 * 用空的 {@link ArrayDeque} 创建一个新的 {@code ParseState}。
 	 */
 	public ParseState() {
 		this.state = new ArrayDeque<>();
 	}
 
 	/**
-	 * Create a new {@code ParseState} whose {@link ArrayDeque} is a clone
-	 * of the state in the passed-in {@code ParseState}.
+	 * 创建一个新的 {@code ParseState}，其 {@link ArrayDeque} 是传入 {@code ParseState} 中状态的克隆。
 	 */
 	private ParseState(ParseState other) {
 		this.state = other.state.clone();
@@ -57,22 +56,21 @@ public final class ParseState {
 
 
 	/**
-	 * Add a new {@link Entry} to the {@link ArrayDeque}.
+	 * 为 {@link ArrayDeque} 添加一个新的 {@link Entry}。
 	 */
 	public void push(Entry entry) {
 		this.state.push(entry);
 	}
 
 	/**
-	 * Remove an {@link Entry} from the {@link ArrayDeque}.
+	 * 从 {@link ArrayDeque} 中删除 {@link Entry}。
 	 */
 	public void pop() {
 		this.state.pop();
 	}
 
 	/**
-	 * Return the {@link Entry} currently at the top of the {@link ArrayDeque} or
-	 * {@code null} if the {@link ArrayDeque} is empty.
+	 * 如果 {@link ArrayDeque} 为空，则返回当前位于 {@link ArrayDeque} 顶部的 {@link Entry} 或 {@code null}。
 	 */
 	@Nullable
 	public Entry peek() {
@@ -80,8 +78,7 @@ public final class ParseState {
 	}
 
 	/**
-	 * Create a new instance of {@link ParseState} which is an independent snapshot
-	 * of this instance.
+	 * 创建一个 {@link ParseState} 的新实例，该实例是该实例的独立快照。
 	 */
 	public ParseState snapshot() {
 		return new ParseState(this);
@@ -89,7 +86,7 @@ public final class ParseState {
 
 
 	/**
-	 * Returns a tree-style representation of the current {@code ParseState}.
+	 * 返回当前 {@code ParseState} 的树状表示形式。
 	 */
 	@Override
 	public String toString() {
@@ -111,7 +108,7 @@ public final class ParseState {
 
 
 	/**
-	 * Marker interface for entries into the {@link ParseState}.
+	 * {@link ParseState} 条目的标记接口。
 	 */
 	public interface Entry {
 	}

@@ -3,7 +3,6 @@ package com.lmw.learn.bean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.AliasFor;
 
 /**
  * 配置类

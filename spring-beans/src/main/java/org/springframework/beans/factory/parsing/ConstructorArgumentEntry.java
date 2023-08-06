@@ -32,18 +32,16 @@ public class ConstructorArgumentEntry implements ParseState.Entry {
 
 
 	/**
-	 * Creates a new instance of the {@link ConstructorArgumentEntry} class
-	 * representing a constructor argument with a (currently) unknown index.
+	 * 创建一个 {@link ConstructorArgumentEntry} 类的新实例，该实例表示具有 (当前) 未知索引的构造函数参数。
 	 */
 	public ConstructorArgumentEntry() {
 		this.index = -1;
 	}
 
 	/**
-	 * Creates a new instance of the {@link ConstructorArgumentEntry} class
-	 * representing a constructor argument at the supplied {@code index}.
-	 * @param index the index of the constructor argument
-	 * @throws IllegalArgumentException if the supplied {@code index}
+	 * 在提供的 {@code index} 中创建一个表示构造函数参数的 {@link ConstructorArgumentEntry} 类的新实例。
+	 * @param index 构造函数参数的索引
+	 * @throws IllegalArgumentException 如果提供的 {@code index}
 	 * is less than zero
 	 */
 	public ConstructorArgumentEntry(int index) {
