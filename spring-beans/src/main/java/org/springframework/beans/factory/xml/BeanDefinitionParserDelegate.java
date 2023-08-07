@@ -351,7 +351,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Return the defaults definition object.
+	 * 返回默认的定义对象。
 	 */
 	public DocumentDefaultsDefinition getDefaults() {
 		return this.defaults;

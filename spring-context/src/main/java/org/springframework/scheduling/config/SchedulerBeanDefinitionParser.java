@@ -37,8 +37,10 @@ public class SchedulerBeanDefinitionParser extends AbstractSingleBeanDefinitionP
 
 	@Override
 	protected void doParse(Element element, BeanDefinitionBuilder builder) {
+		//获取poolSize属性值
 		String poolSize = element.getAttribute("pool-size");
 		if (StringUtils.hasText(poolSize)) {
+			//如果poolSize属性值不为空，设置poolSize属性
 			builder.addPropertyValue("poolSize", poolSize);
 		}
 	}

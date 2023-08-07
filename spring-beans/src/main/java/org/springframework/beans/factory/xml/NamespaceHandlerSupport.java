@@ -136,18 +136,14 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	}
 
 	/**
-	 * Subclasses can call this to register the supplied {@link BeanDefinitionDecorator} to
-	 * handle the specified element. The element name is the local (non-namespace qualified)
-	 * name.
+	 * 子类可以调用它来注册提供的 {@link BeanDefinitionDecorator} 来处理指定的元素。元素名称是本地 (非命名空间限定) 名称。
 	 */
 	protected final void registerBeanDefinitionDecorator(String elementName, BeanDefinitionDecorator dec) {
 		this.decorators.put(elementName, dec);
 	}
 
 	/**
-	 * Subclasses can call this to register the supplied {@link BeanDefinitionDecorator} to
-	 * handle the specified attribute. The attribute name is the local (non-namespace qualified)
-	 * name.
+	 * 子类可以调用它来注册提供的 {@link BeanDefinitionDecorator} 来处理指定的属性。属性名称是本地 (非命名空间限定) 名称。
 	 */
 	protected final void registerBeanDefinitionDecoratorForAttribute(String attrName, BeanDefinitionDecorator dec) {
 		this.attributeDecorators.put(attrName, dec);
