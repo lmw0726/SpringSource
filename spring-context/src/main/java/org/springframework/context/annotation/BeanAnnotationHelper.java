@@ -16,12 +16,12 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.ConcurrentReferenceHashMap;
+
+import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * Utilities for processing {@link Bean}-annotated methods.
@@ -44,14 +44,16 @@ abstract class BeanAnnotationHelper {
 	public static String determineBeanNameFor(Method beanMethod) {
 		String beanName = beanNameCache.get(beanMethod);
 		if (beanName == null) {
-			// By default, the bean name is the name of the @Bean-annotated method
+			// 默认情况下，bean名称是 @Bean注解方法的名称
 			beanName = beanMethod.getName();
-			// Check to see if the user has explicitly set a custom bean name...
+			// 检查用户是否明确设置了自定义bean名称...
 			AnnotationAttributes bean =
 					AnnotatedElementUtils.findMergedAnnotationAttributes(beanMethod, Bean.class, false, false);
 			if (bean != null) {
+				//获取name属性值数组
 				String[] names = bean.getStringArray("name");
 				if (names.length > 0) {
+					//将第一个name值设置为beanName
 					beanName = names[0];
 				}
 			}

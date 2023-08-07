@@ -393,7 +393,7 @@ class ConfigurationClassBeanDefinitionReader {
 		 */
 		private final AnnotationMetadata annotationMetadata;
 		/**
-		 * 方法元数据
+		 * 工厂方法元数据
 		 */
 		private final MethodMetadata factoryMethodMetadata;
 
@@ -404,11 +404,12 @@ class ConfigurationClassBeanDefinitionReader {
 
 		public ConfigurationClassBeanDefinition(
 				ConfigurationClass configClass, MethodMetadata beanMethodMetadata, String derivedBeanName) {
-
+			//通过配置类获取注解元数据，并赋值给annotationMetadata
 			this.annotationMetadata = configClass.getMetadata();
 			this.factoryMethodMetadata = beanMethodMetadata;
 			this.derivedBeanName = derivedBeanName;
 			setResource(configClass.getResource());
+			//设置宽松的构造函数解析
 			setLenientConstructorResolution(false);
 		}
 
@@ -440,6 +441,8 @@ class ConfigurationClassBeanDefinitionReader {
 
 		@Override
 		public boolean isFactoryMethod(Method candidate) {
+			//先判断候选方法是否是工厂方法，再判断候选方法是否有bean注解
+			//再判断bean名称是否是派生bean名称
 			return (super.isFactoryMethod(candidate) && BeanAnnotationHelper.isBeanAnnotated(candidate) &&
 					BeanAnnotationHelper.determineBeanNameFor(candidate).equals(this.derivedBeanName));
 		}

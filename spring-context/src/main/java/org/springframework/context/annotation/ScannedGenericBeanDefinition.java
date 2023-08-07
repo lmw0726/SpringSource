@@ -54,15 +54,17 @@ public class ScannedGenericBeanDefinition extends GenericBeanDefinition implemen
 
 
 	/**
-	 * Create a new ScannedGenericBeanDefinition for the class that the
-	 * given MetadataReader describes.
+	 * 为给定的MetadataReader描述的类创建一个新的ScannedGenericBeanDefinition。
 	 *
-	 * @param metadataReader the MetadataReader for the scanned target class
+	 * @param metadataReader 扫描目标类的MetadataReader
 	 */
 	public ScannedGenericBeanDefinition(MetadataReader metadataReader) {
 		Assert.notNull(metadataReader, "MetadataReader must not be null");
+		//通过MetadataReader读取类的注解元数据，并赋值给metadata
 		this.metadata = metadataReader.getAnnotationMetadata();
+		//设置bean类名
 		setBeanClassName(this.metadata.getClassName());
+		//设置源
 		setResource(metadataReader.getResource());
 	}
 
