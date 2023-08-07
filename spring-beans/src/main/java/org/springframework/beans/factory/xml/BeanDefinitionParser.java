@@ -16,10 +16,9 @@
 
 package org.springframework.beans.factory.xml;
 
-import org.w3c.dom.Element;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.lang.Nullable;
+import org.w3c.dom.Element;
 
 /**
  * Interface used by the {@link DefaultBeanDefinitionDocumentReader} to handle custom,
@@ -32,25 +31,23 @@ import org.springframework.lang.Nullable;
  * {@link NamespaceHandler} for the namespace in which the custom tag resides.
  *
  * @author Rob Harrop
- * @since 2.0
  * @see NamespaceHandler
  * @see AbstractBeanDefinitionParser
+ * @since 2.0
  */
 public interface BeanDefinitionParser {
 
 	/**
-	 * Parse the specified {@link Element} and register the resulting
-	 * {@link BeanDefinition BeanDefinition(s)} with the
-	 * {@link org.springframework.beans.factory.xml.ParserContext#getRegistry() BeanDefinitionRegistry}
-	 * embedded in the supplied {@link ParserContext}.
-	 * <p>Implementations must return the primary {@link BeanDefinition} that results
-	 * from the parse if they will ever be used in a nested fashion (for example as
-	 * an inner tag in a {@code <property/>} tag). Implementations may return
-	 * {@code null} if they will <strong>not</strong> be used in a nested fashion.
-	 * @param element the element that is to be parsed into one or more {@link BeanDefinition BeanDefinitions}
-	 * @param parserContext the object encapsulating the current state of the parsing process;
-	 * provides access to a {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
-	 * @return the primary {@link BeanDefinition}
+	 * 解析指定的 {@link Element}，并使用嵌入在提供的 {@link ParserContext} 中的
+	 * {@link org.springframework.beans.factory.xml.ParserContext#getRegistry() BeanDefinitionRegistry} 注册生成的
+	 * {@link BeanDefinition BeanDefinition(s)}。
+	 * <p> 如果实现将以嵌套方式使用 (例如，作为 {@code <property/>} tag) 标记中的内部标记，则必须返回从解析产生的主要 {@link BeanDefinition}。
+	 * 如果实现以嵌套方式使用 <strong> 而不是 <strong>，则它们可能会返回 {@code null}。
+	 *
+	 * @param element       要解析为一个或多个  {@link BeanDefinition BeanDefinitions} 的元素
+	 * @param parserContext 封装解析过程当前状态的对象; 提供对
+	 *                      {@link org.springframework.beans.factory.support.BeanDefinitionRegistry} 的访问
+	 * @return 主要的 {@link BeanDefinition}
 	 */
 	@Nullable
 	BeanDefinition parse(Element element, ParserContext parserContext);

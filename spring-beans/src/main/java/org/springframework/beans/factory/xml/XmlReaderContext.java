@@ -131,7 +131,7 @@ public class XmlReaderContext extends ReaderContext {
 	}
 
 
-	// Convenience methods to delegate to
+	// 委托给的便利方法
 
 	/**
 	 * 调用给定bean定义的bean名称生成器。

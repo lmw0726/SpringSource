@@ -16,8 +16,6 @@
 
 package org.springframework.beans.factory.xml;
 
-import org.w3c.dom.Element;
-
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -27,6 +25,7 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
+import org.w3c.dom.Element;
 
 /**
  * Abstract {@link BeanDefinitionParser} implementation providing
@@ -51,12 +50,12 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractBeanDefinitionParser implements BeanDefinitionParser {
 
 	/**
-	 * Constant for the "id" attribute.
+	 * “id” 属性的常量。
 	 */
 	public static final String ID_ATTRIBUTE = "id";
 
 	/**
-	 * Constant for the "name" attribute.
+	 * “名称” 属性的常量。
 	 */
 	public static final String NAME_ATTRIBUTE = "name";
 
@@ -110,46 +109,43 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 	}
 
 	/**
-	 * Resolve the ID for the supplied {@link BeanDefinition}.
-	 * <p>When using {@link #shouldGenerateId generation}, a name is generated automatically.
-	 * Otherwise, the ID is extracted from the "id" attribute, potentially with a
-	 * {@link #shouldGenerateIdAsFallback() fallback} to a generated id.
+	 * 解析提供的{@link BeanDefinition}的ID。
+	 * <p> 使用 {@link #shouldGenerateId } 生成时，名称会自动生成。
+	 * 否则，将从 “ID” 属性中提取id，并可能回退到使用 {@link #shouldGenerateIdAsFallback()} 生成id。
 	 *
-	 * @param element       the element that the bean definition has been built from
-	 * @param definition    the bean definition to be registered
-	 * @param parserContext the object encapsulating the current state of the parsing process;
-	 *                      provides access to a {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
-	 * @return the resolved id
-	 * @throws BeanDefinitionStoreException if no unique name could be generated
-	 *                                      for the given bean definition
+	 * @param element       bean定义已从中构建的元素
+	 * @param definition    要注册的bean定义
+	 * @param parserContext 封装解析进程当前状态的对象; 提供对 {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}的访问
+	 * @return 已解析的id
+	 * @throws BeanDefinitionStoreException 如果无法为给定的bean定义生成唯一名称
 	 */
 	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
 			throws BeanDefinitionStoreException {
 
 		if (shouldGenerateId()) {
+			//如果需要生成id，根据bean定义生成bean名称。
 			return parserContext.getReaderContext().generateBeanName(definition);
 		} else {
+			//如果不需要生成id，将从ID属性中提取id
 			String id = element.getAttribute(ID_ATTRIBUTE);
-			if (!StringUtils.hasText(id) && shouldGenerateIdAsFallback()) {
-				id = parserContext.getReaderContext().generateBeanName(definition);
+			if (StringUtils.hasText(id) || !shouldGenerateIdAsFallback()) {
+				//如果id值不为空，或者不回退到生成id，返回该id值
+				return id;
 			}
-			return id;
+			//根据bean定义生成名称
+			return parserContext.getReaderContext().generateBeanName(definition);
+
 		}
 	}
 
 	/**
-	 * Register the supplied {@link BeanDefinitionHolder bean} with the supplied
-	 * {@link BeanDefinitionRegistry registry}.
-	 * <p>Subclasses can override this method to control whether or not the supplied
-	 * {@link BeanDefinitionHolder bean} is actually even registered, or to
-	 * register even more beans.
-	 * <p>The default implementation registers the supplied {@link BeanDefinitionHolder bean}
-	 * with the supplied {@link BeanDefinitionRegistry registry} only if the {@code isNested}
-	 * parameter is {@code false}, because one typically does not want inner beans
-	 * to be registered as top level beans.
+	 * 使用提供的 {@link BeanDefinitionRegistry 注册表} 注册提供的 {@link BeanDefinitionHolder bean}。
+	 * <p> 子类可以覆盖此方法，以控制是否实际注册了所提供的 {@link BeanDefinitionHolder bean}，或者注册了更多的bean。
+	 * <p> 仅当 {@code isNested} 参数为 {@code false} 时，默认实现才会将提供的 {@link BeanDefinitionHolder bean}
+	 * 与提供的 {@link BeanDefinitionRegistry registry} 一起注册，因为通常不希望内部bean被注册为顶级bean。
 	 *
-	 * @param definition the bean definition to be registered
-	 * @param registry   the registry that the bean is to be registered with
+	 * @param definition 要注册的bean定义
+	 * @param registry   bean要注册的注册表
 	 * @see BeanDefinitionReaderUtils#registerBeanDefinition(BeanDefinitionHolder, BeanDefinitionRegistry)
 	 */
 	protected void registerBeanDefinition(BeanDefinitionHolder definition, BeanDefinitionRegistry registry) {
@@ -171,25 +167,23 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 	protected abstract AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext);
 
 	/**
-	 * Should an ID be generated instead of read from the passed in {@link Element}?
-	 * <p>Disabled by default; subclasses can override this to enable ID generation.
-	 * Note that this flag is about <i>always</i> generating an ID; the parser
-	 * won't even check for an "id" attribute in this case.
+	 * 是否应该生成一个ID，而不是从 {@link Element} 中传递的读取？
+	 * <p> 默认情况下禁用; 子类可以覆盖此功能以启用ID生成。
+	 * 请注意，此标志是关于 <i> 始终 <i> 生成ID;
+	 * 在这种情况下，解析器甚至不会检查 “id” 属性。
 	 *
-	 * @return whether the parser should always generate an id
+	 * @return 解析器是否应始终生成id
 	 */
 	protected boolean shouldGenerateId() {
 		return false;
 	}
 
 	/**
-	 * Should an ID be generated instead if the passed in {@link Element} does not
-	 * specify an "id" attribute explicitly?
-	 * <p>Disabled by default; subclasses can override this to enable ID generation
-	 * as fallback: The parser will first check for an "id" attribute in this case,
-	 * only falling back to a generated ID if no value was specified.
+	 * 如果 {@link Element} 中传递的没有显式指定 “ID” 属性，是否应该生成id？
+	 * <p>默认情况下禁用; 子类可以覆盖此功能以启用ID生成作为后备:
+	 * 在这种情况下，解析器将首先检查 “id” 属性，仅在未指定值的情况下才会回退到生成的ID。
 	 *
-	 * @return whether the parser should generate an id if no id was specified
+	 * @return 如果未指定id，解析器是否应生成id
 	 */
 	protected boolean shouldGenerateIdAsFallback() {
 		return false;
@@ -221,15 +215,13 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 	}
 
 	/**
-	 * Hook method called after the primary parsing of a
-	 * {@link BeanComponentDefinition} but before the
-	 * {@link BeanComponentDefinition} has been registered with a
-	 * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}.
-	 * <p>Derived classes can override this method to supply any custom logic that
-	 * is to be executed after all the parsing is finished.
-	 * <p>The default implementation is a no-op.
+	 * 在 {@link BeanComponentDefinition} 的主要解析之后
+	 * 但在 {@link BeanComponentDefinition} 已通过
+	 * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry} 注册之前调用的钩子方法。
+	 * <p> 派生类可以覆盖此方法，以提供所有解析完成后要执行的任何自定义逻辑。
+	 * <p> 默认实现是无操作。
 	 *
-	 * @param componentDefinition the {@link BeanComponentDefinition} that is to be processed
+	 * @param componentDefinition 要处理的 {@link BeanComponentDefinition}
 	 */
 	protected void postProcessComponentDefinition(BeanComponentDefinition componentDefinition) {
 	}
