@@ -80,6 +80,9 @@ import java.util.stream.Stream;
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
 		implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
 
+	/**
+	 * javax注册程序提供者类
+	 */
 	@Nullable
 	private static Class<?> javaxInjectProviderClass;
 
@@ -95,40 +98,40 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * Map from serialized id to factory instance.
+	 * 从序列化id映射到工厂实例。
 	 */
 	private static final Map<String, Reference<DefaultListableBeanFactory>> serializableFactories =
 			new ConcurrentHashMap<>(8);
 
 	/**
-	 * Optional id for this factory, for serialization purposes.
+	 * 此工厂的可选id，用于序列化目的。
 	 */
 	@Nullable
 	private String serializationId;
 
 	/**
-	 * Whether to allow re-registration of a different definition with the same name.
+	 * 是否允许重新注册具有相同名称的不同定义。
 	 */
 	private boolean allowBeanDefinitionOverriding = true;
 
 	/**
-	 * Whether to allow eager class loading even for lazy-init beans.
+	 * 是否允许早期的类加载，即使是懒惰的初始化 bean。
 	 */
 	private boolean allowEagerClassLoading = true;
 
 	/**
-	 * Optional OrderComparator for dependency Lists and arrays.
+	 * 依赖项列表和数组的可选排序比较器。
 	 */
 	@Nullable
 	private Comparator<Object> dependencyComparator;
 
 	/**
-	 * Resolver to use for checking if a bean definition is an autowire candidate.
+	 * 用于检查bean定义是否为自动装配候选的解析器。
 	 */
 	private AutowireCandidateResolver autowireCandidateResolver = SimpleAutowireCandidateResolver.INSTANCE;
 
 	/**
-	 * Map from dependency type to corresponding autowired value.
+	 * 从依赖类型映射到相应的自动装配值。
 	 */
 	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<>(16);
 
@@ -971,12 +974,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	//---------------------------------------------------------------------
-	// Implementation of BeanDefinitionRegistry interface
+	// BeanDefinitionRegistry接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
-	public void
-	registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
 
 		Assert.hasText(beanName, "Bean name must not be empty");
