@@ -32,21 +32,24 @@ import org.springframework.util.ObjectUtils;
  * {@code ChildBeanDefinition} where parent/child relationships happen to be pre-determined.
  *
  * @author Juergen Hoeller
- * @since 2.5
  * @see #setParentName
  * @see RootBeanDefinition
  * @see ChildBeanDefinition
+ * @since 2.5
  */
 @SuppressWarnings("serial")
 public class GenericBeanDefinition extends AbstractBeanDefinition {
 
+	/**
+	 * 父bean名称
+	 */
 	@Nullable
 	private String parentName;
 
 
 	/**
-	 * Create a new GenericBeanDefinition, to be configured through its bean
-	 * properties and configuration methods.
+	 * 创建一个新的GenericBeanDefinition，通过其bean属性和配置方法进行配置。
+	 *
 	 * @see #setBeanClass
 	 * @see #setScope
 	 * @see #setConstructorArgumentValues
@@ -57,9 +60,9 @@ public class GenericBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new GenericBeanDefinition as deep copy of the given
-	 * bean definition.
-	 * @param original the original bean definition to copy from
+	 * 创建一个新的GenericBeanDefinition作为给定bean定义的深度副本。
+	 *
+	 * @param original 要复制的原始bean定义
 	 */
 	public GenericBeanDefinition(BeanDefinition original) {
 		super(original);

@@ -45,15 +45,17 @@ import org.springframework.util.ObjectUtils;
  */
 @SuppressWarnings("serial")
 public class ChildBeanDefinition extends AbstractBeanDefinition {
-
+	/**
+	 * 父bean名称
+	 */
 	@Nullable
 	private String parentName;
 
 
 	/**
-	 * Create a new ChildBeanDefinition for the given parent, to be
-	 * configured through its bean properties and configuration methods.
-	 * @param parentName the name of the parent bean
+	 * 为给定的父级创建一个新的ChildBeanDefinition，通过其bean属性和配置方法进行配置。
+	 *
+	 * @param parentName 父bean的名称
 	 * @see #setBeanClass
 	 * @see #setScope
 	 * @see #setConstructorArgumentValues
@@ -65,9 +67,10 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new ChildBeanDefinition for the given parent.
-	 * @param parentName the name of the parent bean
-	 * @param pvs the additional property values of the child
+	 * 为给定的父级创建新的ChildBeanDefinition。
+	 *
+	 * @param parentName 父bean的名称
+	 * @param pvs        子级的附加属性值
 	 */
 	public ChildBeanDefinition(String parentName, MutablePropertyValues pvs) {
 		super(null, pvs);
@@ -75,10 +78,11 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new ChildBeanDefinition for the given parent.
-	 * @param parentName the name of the parent bean
-	 * @param cargs the constructor argument values to apply
-	 * @param pvs the additional property values of the child
+	 * 为给定的父级创建新的ChildBeanDefinition。
+	 *
+	 * @param parentName 父bean名称
+	 * @param cargs      要应用的构造函数参数值
+	 * @param pvs        子级的附加属性值
 	 */
 	public ChildBeanDefinition(
 			String parentName, ConstructorArgumentValues cargs, MutablePropertyValues pvs) {
@@ -88,12 +92,12 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new ChildBeanDefinition for the given parent,
-	 * providing constructor arguments and property values.
-	 * @param parentName the name of the parent bean
-	 * @param beanClass the class of the bean to instantiate
-	 * @param cargs the constructor argument values to apply
-	 * @param pvs the property values to apply
+	 * 为给定的父级创建一个新的ChildBeanDefinition，提供构造函数参数和属性值。
+	 *
+	 * @param parentName 父bean的名称
+	 * @param beanClass  要实例化的bean的类
+	 * @param cargs      要应用的构造函数参数值
+	 * @param pvs        要应用的属性值
 	 */
 	public ChildBeanDefinition(
 			String parentName, Class<?> beanClass, ConstructorArgumentValues cargs, MutablePropertyValues pvs) {
@@ -104,13 +108,13 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new ChildBeanDefinition for the given parent,
-	 * providing constructor arguments and property values.
-	 * Takes a bean class name to avoid eager loading of the bean class.
-	 * @param parentName the name of the parent bean
-	 * @param beanClassName the name of the class to instantiate
-	 * @param cargs the constructor argument values to apply
-	 * @param pvs the property values to apply
+	 * 为给定的父级创建一个新的ChildBeanDefinition，提供构造函数参数和属性值。
+	 * 采用bean类名称，以避免早期加载bean类。
+	 *
+	 * @param parentName    父bean的名称
+	 * @param beanClassName 要实例化的类的名称
+	 * @param cargs         要应用的构造函数参数值
+	 * @param pvs           要应用的属性值
 	 */
 	public ChildBeanDefinition(
 			String parentName, String beanClassName, ConstructorArgumentValues cargs, MutablePropertyValues pvs) {
@@ -121,9 +125,9 @@ public class ChildBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new ChildBeanDefinition as deep copy of the given
-	 * bean definition.
-	 * @param original the original bean definition to copy from
+	 * 创建一个新的ChildBeanDefinition作为给定bean定义的深度副本。
+	 *
+	 * @param original 要复制的原始bean定义
 	 */
 	public ChildBeanDefinition(ChildBeanDefinition original) {
 		super(original);

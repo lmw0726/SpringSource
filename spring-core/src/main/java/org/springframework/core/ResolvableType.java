@@ -1005,14 +1005,13 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return a {@link ResolvableType} for the specified {@link Class},
-	 * doing assignability checks against the raw class only (analogous to
-	 * {@link Class#isAssignableFrom}, which this serves as a wrapper for.
-	 * <p>For example: {@code ResolvableType.forRawClass(List.class)}.
+	 * 为指定的 {@link Class} 返回一个 {@link ResolvableType}，
+	 * 仅对原始类进行可分配性检查 (类似于 {@link  Class#isAssignableFrom}，它用作包装。
+	 * <p> 例如: {@code ResolvableType.forRawClass(List.Class)}。
 	 *
-	 * @param clazz the class to introspect ({@code null} is semantically
-	 *              equivalent to {@code Object.class} for typical use cases here)
-	 * @return a {@link ResolvableType} for the specified class
+	 * @param clazz 要内省的类，({@code null} 在语义上是
+	 *              相当于 {@code Object.class} 这里的典型用例)
+	 * @return 指定类的 {@link ResolvableType}
 	 * @see #forClass(Class)
 	 * @see #getRawClass()
 	 * @since 4.2
@@ -1026,6 +1025,7 @@ public class ResolvableType implements Serializable {
 
 			@Override
 			public boolean isAssignableFrom(Class<?> other) {
+				//clazz为空，返回true，clazz可以分配给other也返回true
 				return (clazz == null || ClassUtils.isAssignable(clazz, other));
 			}
 
@@ -1038,20 +1038,21 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return a {@link ResolvableType} for the specified base type
-	 * (interface or base class) with a given implementation class.
-	 * <p>For example: {@code ResolvableType.forClass(List.class, MyArrayList.class)}.
+	 * 返回具有给定实现类的指定基类型 (接口或基类) 的 {@link ResolvableType}。
+	 * <p> 例如: {@code ResolvableType.forClass(List.class，MyArrayList.class)}。
 	 *
-	 * @param baseType            the base type (must not be {@code null})
-	 * @param implementationClass the implementation class
-	 * @return a {@link ResolvableType} for the specified base type backed by the
-	 * given implementation class
+	 * @param baseType            基本类型 (不得为 {@code null})
+	 * @param implementationClass 实现类
+	 * @return 由给定实现类支持的指定基本类型的 {@link ResolvableType}
 	 * @see #forClass(Class)
 	 * @see #forClassWithGenerics(Class, Class...)
 	 */
 	public static ResolvableType forClass(Class<?> baseType, Class<?> implementationClass) {
 		Assert.notNull(baseType, "Base type must not be null");
+		//将实现类的转换为父类或父接口对应的ResolvableType
 		ResolvableType asType = forType(implementationClass).as(baseType);
+		//如果转换后的ResolvableType为NONE，则返回基本类型的ResolvableType，
+		// 否则返回父类或父接口对应的ResolvableType
 		return (asType == NONE ? forType(baseType) : asType);
 	}
 
@@ -1234,10 +1235,10 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return a {@link ResolvableType} for the specified {@link Method} return type.
+	 * 为指定的 {@link Method} 返回类型返回一个 {@link ResolvableType}。
 	 *
-	 * @param method the source for the method return type
-	 * @return a {@link ResolvableType} for the specified method return
+	 * @param method 方法返回类型的来源
+	 * @return 返回指定方法的 {@link ResolvableType}
 	 * @see #forMethodReturnType(Method, Class)
 	 */
 	public static ResolvableType forMethodReturnType(Method method) {

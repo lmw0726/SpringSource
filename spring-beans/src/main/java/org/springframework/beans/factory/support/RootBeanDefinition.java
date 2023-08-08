@@ -177,15 +177,14 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	/**
 	 * 外部管理销毁方法
-	 * DisposableBean 的 destroy 回调函数名 destroy 会在这里记录，以便进生命周期回调
+	 * DisposableBean 的 销毁方法 回调函数名 销毁方法 会在这里记录，以便进生命周期回调
 	 */
 	@Nullable
 	private Set<String> externallyManagedDestroyMethods;
 
 
 	/**
-	 * Create a new RootBeanDefinition, to be configured through its bean
-	 * properties and configuration methods.
+	 * 创建一个新的RootBeanDefinition，要通过其bean属性和配置方法进行配置。
 	 *
 	 * @see #setBeanClass
 	 * @see #setScope
@@ -197,9 +196,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new RootBeanDefinition for a singleton.
+	 * 为单例创建新的根bean定义。
 	 *
-	 * @param beanClass the class of the bean to instantiate
+	 * @param beanClass 要实例化的bean的类
 	 * @see #setBeanClass
 	 */
 	public RootBeanDefinition(@Nullable Class<?> beanClass) {
@@ -208,12 +207,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new RootBeanDefinition for a singleton bean, constructing each instance
-	 * through calling the given supplier (possibly a lambda or method reference).
+	 * 为单例bean创建一个新的RootBeanDefinition，
+	 * 通过调用给定的实例供应者 (可能是lambda或方法引用) 来构造每个实例。
 	 *
-	 * @param beanClass        the class of the bean to instantiate
-	 * @param instanceSupplier the supplier to construct a bean instance,
-	 *                         as an alternative to a declaratively specified factory method
+	 * @param beanClass        要实例化的bean的类
+	 * @param instanceSupplier 供应商构造bean实例，作为声明指定的工厂方法的替代
 	 * @see #setInstanceSupplier
 	 * @since 5.0
 	 */
@@ -224,13 +222,12 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new RootBeanDefinition for a scoped bean, constructing each instance
-	 * through calling the given supplier (possibly a lambda or method reference).
+	 * 为作用域bean创建一个新的RootBeanDefinition，
+	 * 通过调用给定的实例供应者 (可能是lambda或方法引用) 来构造每个实例。
 	 *
-	 * @param beanClass        the class of the bean to instantiate
-	 * @param scope            the name of the corresponding scope
-	 * @param instanceSupplier the supplier to construct a bean instance,
-	 *                         as an alternative to a declaratively specified factory method
+	 * @param beanClass        要实例化的bean的类
+	 * @param scope            对应范围的名称
+	 * @param instanceSupplier 供应商构造bean实例，作为声明指定的工厂方法的替代
 	 * @see #setInstanceSupplier
 	 * @since 5.0
 	 */
@@ -242,30 +239,29 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new RootBeanDefinition for a singleton,
-	 * using the given autowire mode.
+	 * 使用给定的自动装配模式为单例创建新的RootBeanDefinition。
 	 *
-	 * @param beanClass       the class of the bean to instantiate
-	 * @param autowireMode    by name or type, using the constants in this interface
-	 * @param dependencyCheck whether to perform a dependency check for objects
-	 *                        (not applicable to autowiring a constructor, thus ignored there)
+	 * @param beanClass       要实例化的bean的类
+	 * @param autowireMode    按名称或类型，使用此接口中的常量
+	 * @param dependencyCheck 是否对对象执行依赖检查 (不适用于自动生成构造函数，因此在那里忽略)
 	 */
 	public RootBeanDefinition(@Nullable Class<?> beanClass, int autowireMode, boolean dependencyCheck) {
 		super();
 		setBeanClass(beanClass);
 		setAutowireMode(autowireMode);
 		if (dependencyCheck && getResolvedAutowireMode() != AUTOWIRE_CONSTRUCTOR) {
+			//如果需要检查依赖，并且最后的自动装配模式不是构造函数的话
+			//仅检查依赖对象，不检查其属性。
 			setDependencyCheck(DEPENDENCY_CHECK_OBJECTS);
 		}
 	}
 
 	/**
-	 * Create a new RootBeanDefinition for a singleton,
-	 * providing constructor arguments and property values.
+	 * 为单例创建一个新的RootBeanDefinition，提供构造函数参数和属性值。
 	 *
-	 * @param beanClass the class of the bean to instantiate
-	 * @param cargs     the constructor argument values to apply
-	 * @param pvs       the property values to apply
+	 * @param beanClass 要实例化的bean的类
+	 * @param cargs     要应用的构造函数参数值
+	 * @param pvs       要应用的属性值
 	 */
 	public RootBeanDefinition(@Nullable Class<?> beanClass, @Nullable ConstructorArgumentValues cargs,
 							  @Nullable MutablePropertyValues pvs) {
@@ -275,24 +271,22 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new RootBeanDefinition for a singleton,
-	 * providing constructor arguments and property values.
-	 * <p>Takes a bean class name to avoid eager loading of the bean class.
+	 * 为单例创建一个新的RootBeanDefinition，提供构造函数参数和属性值。
+	 * <p> 采用bean类名称，以避免早期加载bean类。
 	 *
-	 * @param beanClassName the name of the class to instantiate
+	 * @param beanClassName 要实例化的类的名称
 	 */
 	public RootBeanDefinition(String beanClassName) {
 		setBeanClassName(beanClassName);
 	}
 
 	/**
-	 * Create a new RootBeanDefinition for a singleton,
-	 * providing constructor arguments and property values.
-	 * <p>Takes a bean class name to avoid eager loading of the bean class.
+	 * 为单例创建一个新的RootBeanDefinition，提供构造函数参数和属性值。
+	 * <p> 采用bean类名称，以避免早期加载bean类。
 	 *
-	 * @param beanClassName the name of the class to instantiate
-	 * @param cargs         the constructor argument values to apply
-	 * @param pvs           the property values to apply
+	 * @param beanClassName 要实例化的类的名称
+	 * @param cargs         要应用的构造函数参数值
+	 * @param pvs           要应用的属性值
 	 */
 	public RootBeanDefinition(String beanClassName, ConstructorArgumentValues cargs, MutablePropertyValues pvs) {
 		super(cargs, pvs);
@@ -300,10 +294,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Create a new RootBeanDefinition as deep copy of the given
-	 * bean definition.
+	 * 创建一个新的RootBeanDefinition作为给定bean定义的深度副本。
 	 *
-	 * @param original the original bean definition to copy from
+	 * @param original 要复制的原始bean定义
 	 */
 	public RootBeanDefinition(RootBeanDefinition original) {
 		super(original);
@@ -338,7 +331,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Register a target definition that is being decorated by this bean definition.
+	 * 注册由此bean定义修饰的目标定义。
 	 */
 	public void setDecoratedDefinition(@Nullable BeanDefinitionHolder decoratedDefinition) {
 		this.decoratedDefinition = decoratedDefinition;
@@ -353,8 +346,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Specify the {@link AnnotatedElement} defining qualifiers,
-	 * to be used instead of the target class or factory method.
+	 * 指定定义限定符的 {@link AnnotatedElement}，以代替目标类或工厂方法。
 	 *
 	 * @see #setTargetType(ResolvableType)
 	 * @see #getResolvedFactoryMethod()
@@ -365,8 +357,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Return the {@link AnnotatedElement} defining qualifiers, if any.
-	 * Otherwise, the factory method and target class will be checked.
+	 * 返回定义限定符 (如果有) 的 {@link AnnotatedElement}。否则，将检查工厂方法和目标类。
 	 *
 	 * @since 4.3.3
 	 */
@@ -376,7 +367,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Specify a generics-containing target type of this bean definition, if known in advance.
+	 * 如果事先知道，请指定此bean定义的包含泛型的目标类型。
 	 *
 	 * @since 4.3.3
 	 */
@@ -385,7 +376,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Specify the target type of this bean definition, if known in advance.
+	 * 指定此bean定义的目标类型 (如果事先知道)。
 	 *
 	 * @since 3.2.2
 	 */
@@ -394,8 +385,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Return the target type of this bean definition, if known
-	 * (either specified in advance or resolved on first instantiation).
+	 * 如果已知，则返回此bean定义的目标类型 (预先指定或在第一次实例化时解析)。
 	 *
 	 * @since 3.2.2
 	 */
@@ -409,10 +399,8 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Return a {@link ResolvableType} for this bean definition,
-	 * either from runtime-cached type information or from configuration-time
-	 * {@link #setTargetType(ResolvableType)} or {@link #setBeanClass(Class)},
-	 * also considering resolved factory method definitions.
+	 * 从运行时缓存的类型信息或从配置时 {@link #setTargetType(ResolvableType)} 或 {@link #setBeanClass(Class)}
+	 * 返回此bean定义的 {@link ResolvableType}，也考虑已解析的工厂方法定义。
 	 *
 	 * @see #setTargetType(ResolvableType)
 	 * @see #setBeanClass(Class)
@@ -437,11 +425,10 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Determine preferred constructors to use for default construction, if any.
-	 * Constructor arguments will be autowired if necessary.
+	 * 确定用于默认构造的首选构造函数 (如果有)。如有必要，构造函数参数将是自动的。
 	 *
-	 * @return one or more preferred constructors, or {@code null} if none
-	 * (in which case the regular no-arg default constructor will be called)
+	 * @return 一个或多个首选的构造函数，或者 {@code null}，
+	 * 如果没有 (在这种情况下，常规的无参默认构造函数将被调用)
 	 * @since 5.1
 	 */
 	@Nullable
@@ -450,7 +437,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Specify a factory method name that refers to a non-overloaded method.
+	 * 指定引用非重载方法的工厂方法名称。
 	 */
 	public void setUniqueFactoryMethodName(String name) {
 		Assert.hasText(name, "Factory method name must not be empty");
@@ -459,7 +446,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Specify a factory method name that refers to an overloaded method.
+	 * 指定引用重载方法的工厂方法名称。
 	 *
 	 * @since 5.2
 	 */
@@ -470,16 +457,16 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Check whether the given candidate qualifies as a factory method.
+	 * 检查给定的候选人是否符合工厂方法的条件。
 	 */
 	public boolean isFactoryMethod(Method candidate) {
 		return candidate.getName().equals(getFactoryMethodName());
 	}
 
 	/**
-	 * Set a resolved Java Method for the factory method on this bean definition.
+	 * 在此bean定义上设置工厂方法的已解析Java方法。
 	 *
-	 * @param method the resolved factory method, or {@code null} to reset it
+	 * @param method 已解析的工厂方法，或将它重置为 {@code null}
 	 * @since 5.2
 	 */
 	public void setResolvedFactoryMethod(@Nullable Method method) {
@@ -487,9 +474,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Return the resolved factory method as a Java Method object, if available.
+	 * 如果可用，则将已解析的工厂方法作为Java方法对象返回。
 	 *
-	 * @return the factory method, or {@code null} if not found or not resolved yet
+	 * @return 工厂方法，如果找不到或尚未解决，则为 {@code null}
 	 */
 	@Nullable
 	public Method getResolvedFactoryMethod() {
@@ -497,7 +484,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Register an externally managed configuration method or field.
+	 * 注册外部托管的配置方法或字段。
 	 */
 	public void registerExternallyManagedConfigMember(Member configMember) {
 		synchronized (this.postProcessingLock) {
@@ -509,7 +496,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Determine if the given method or field is an externally managed configuration member.
+	 * 确定给定的方法或字段是否是外部托管的配置成员。
 	 */
 	public boolean isExternallyManagedConfigMember(Member configMember) {
 		synchronized (this.postProcessingLock) {
@@ -519,7 +506,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Get all externally managed configuration methods and fields (as an immutable Set).
+	 * 获取所有外部托管的配置方法和字段 (作为不可变集)。
 	 *
 	 * @since 5.3.11
 	 */
@@ -532,15 +519,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Register an externally managed configuration initialization method &mdash;
-	 * for example, a method annotated with JSR-250's
-	 * {@link javax.annotation.PostConstruct} annotation.
-	 * <p>The supplied {@code initMethod} may be the
-	 * {@linkplain Method#getName() simple method name} for non-private methods or the
-	 * {@linkplain org.springframework.util.ClassUtils#getQualifiedMethodName(Method)
-	 * qualified method name} for {@code private} methods. A qualified name is
-	 * necessary for {@code private} methods in order to disambiguate between
-	 * multiple private methods with the same name within a class hierarchy.
+	 * 注册一个外部管理的配置初始化方法-例如，
+	 * 用JSR-250的 {@link javax.annotation.PostConstruct} 注解注释的方法。
+	 * <p> 提供的 {@code initMethod} 可以是非私有方法的 {@linkplain Method#getName() 简单方法名称}，
+	 * 也可以是 {@code private} 方法的 {@linkplain org.springframework.util.ClassUtils#getQualifiedMethodName(Method) 限定方法名称}。
+	 * 为了消除类层次结构中具有相同名称的多个私有方法之间的歧义，{@code private} 方法必须使用限定名称。
 	 */
 	public void registerExternallyManagedInitMethod(String initMethod) {
 		synchronized (this.postProcessingLock) {
@@ -552,10 +535,8 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Determine if the given method name indicates an externally managed
-	 * initialization method.
-	 * <p>See {@link #registerExternallyManagedInitMethod} for details
-	 * regarding the format for the supplied {@code initMethod}.
+	 * 确定给定的方法名称是否表示外部管理的初始化方法。
+	 * <p> 有关提供的 {@code initMethod} 格式的详细信息，请参见 {@link #registerExternallyManagedInitMethod}。
 	 */
 	public boolean isExternallyManagedInitMethod(String initMethod) {
 		synchronized (this.postProcessingLock) {
@@ -565,25 +546,26 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Determine if the given method name indicates an externally managed
-	 * initialization method, regardless of method visibility.
-	 * <p>In contrast to {@link #isExternallyManagedInitMethod(String)}, this
-	 * method also returns {@code true} if there is a {@code private} externally
-	 * managed initialization method that has been
-	 * {@linkplain #registerExternallyManagedInitMethod(String) registered}
-	 * using a qualified method name instead of a simple method name.
+	 * 确定给定的方法名称是否指示外部管理的初始化方法，而与方法可见性无关。
+	 * <p> 与 {@link #isExternallyManagedInitMethod(String)} 相反，如果存在 {@code private} 外部管理的初始化方法，
+	 * 该方法使用限定的方法名称，而不是简单的方法名称进行注册 {@linkplain #registerExternallyManagedInitMethod(String)}，
+	 * 则此方法还返回 {@code true}。
 	 *
 	 * @since 5.3.17
 	 */
 	boolean hasAnyExternallyManagedInitMethod(String initMethod) {
 		synchronized (this.postProcessingLock) {
 			if (isExternallyManagedInitMethod(initMethod)) {
+				//如果存在该名称的外部管理的初始化方法，返回true
 				return true;
 			}
 			if (this.externallyManagedInitMethods != null) {
+				//对外部管理的初始化方法名称进行遍历。
 				for (String candidate : this.externallyManagedInitMethods) {
+					//获取.的位置
 					int indexOfDot = candidate.lastIndexOf('.');
 					if (indexOfDot >= 0) {
+						//如果含有.字符，获取.字符后的方法名称
 						String methodName = candidate.substring(indexOfDot + 1);
 						if (methodName.equals(initMethod)) {
 							return true;
@@ -596,9 +578,8 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Return all externally managed initialization methods (as an immutable Set).
-	 * <p>See {@link #registerExternallyManagedInitMethod} for details
-	 * regarding the format for the initialization methods in the returned set.
+	 * 返回所有外部管理的初始化方法 (作为不可变集)。
+	 * <p> 有关返回的集合中初始化方法的格式的详细信息，请参见 {@link #registerExternallyManagedInitMethod}。
 	 *
 	 * @since 5.3.11
 	 */
@@ -611,15 +592,10 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Register an externally managed configuration destruction method &mdash;
-	 * for example, a method annotated with JSR-250's
-	 * {@link javax.annotation.PreDestroy} annotation.
-	 * <p>The supplied {@code destroyMethod} may be the
-	 * {@linkplain Method#getName() simple method name} for non-private methods or the
-	 * {@linkplain org.springframework.util.ClassUtils#getQualifiedMethodName(Method)
-	 * qualified method name} for {@code private} methods. A qualified name is
-	 * necessary for {@code private} methods in order to disambiguate between
-	 * multiple private methods with the same name within a class hierarchy.
+	 * 注册外部托管的配置销毁方法-——例如，用JSR-250的 {@link javax.annotation.PreDestroy} 注释注释的方法。
+	 * <p> 提供的 {@code destroyMethod} 可以是非私有方法的 {@linkplain Method#getName() 简单方法名称}，
+	 * 也可以是 {@code private} 方法的 {@linkplain org.springframework.util.ClassUtils#getQualifiedMethodName(Method) 限定方法名称}。
+	 * 为了消除类层次结构中具有相同名称的多个私有方法之间的歧义，{@code private} 方法必须使用限定名称。
 	 */
 	public void registerExternallyManagedDestroyMethod(String destroyMethod) {
 		synchronized (this.postProcessingLock) {
@@ -631,10 +607,8 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Determine if the given method name indicates an externally managed
-	 * destruction method.
-	 * <p>See {@link #registerExternallyManagedDestroyMethod} for details
-	 * regarding the format for the supplied {@code destroyMethod}.
+	 * 确定给定的方法名称是否表示外部托管的销毁方法。
+	 * <p> 有关提供的 {@code destroyMethod} 格式的详细信息，请参见 {@link #registerExternallyManagedDestroyMethod}。
 	 */
 	public boolean isExternallyManagedDestroyMethod(String destroyMethod) {
 		synchronized (this.postProcessingLock) {
@@ -644,25 +618,26 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Determine if the given method name indicates an externally managed
-	 * destruction method, regardless of method visibility.
-	 * <p>In contrast to {@link #isExternallyManagedDestroyMethod(String)}, this
-	 * method also returns {@code true} if there is a {@code private} externally
-	 * managed destruction method that has been
-	 * {@linkplain #registerExternallyManagedDestroyMethod(String) registered}
-	 * using a qualified method name instead of a simple method name.
+	 * 确定给定的方法名称是否指示外部管理的销毁方法，而不考虑方法可见性。
+	 * <p> 与 {@link #isExternallyManagedDestroyMethod(String)} 相反，
+	 * 如果存在 {@code private} 外部管理的销毁方法，该方法使用限定的方法名称，
+	 * 而不是简单的方法名称注册了 {@linkplain #registerExternallyManagedDestroyMethod(String)}，该方法还返回 {@code true}。
 	 *
 	 * @since 5.3.17
 	 */
 	boolean hasAnyExternallyManagedDestroyMethod(String destroyMethod) {
 		synchronized (this.postProcessingLock) {
 			if (isExternallyManagedDestroyMethod(destroyMethod)) {
+				//如果存在该名称的外部管理的销毁方法，返回true
 				return true;
 			}
 			if (this.externallyManagedDestroyMethods != null) {
+				//对外部管理的销毁方法名称进行遍历。
 				for (String candidate : this.externallyManagedDestroyMethods) {
+					//获取.的位置
 					int indexOfDot = candidate.lastIndexOf('.');
 					if (indexOfDot >= 0) {
+						//如果含有.字符，获取.字符后的方法名称
 						String methodName = candidate.substring(indexOfDot + 1);
 						if (methodName.equals(destroyMethod)) {
 							return true;
@@ -675,9 +650,8 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * Get all externally managed destruction methods (as an immutable Set).
-	 * <p>See {@link #registerExternallyManagedDestroyMethod} for details
-	 * regarding the format for the destruction methods in the returned set.
+	 * 获取所有外部管理的销毁方法 (作为不可变集)。
+	 * <p> 有关返回的集中销毁方法格式的详细信息，请参见 {@link #registerExternallyManagedDestroyMethod}。
 	 *
 	 * @since 5.3.11
 	 */
