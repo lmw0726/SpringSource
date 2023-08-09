@@ -133,12 +133,16 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
 		Assert.notNull(beanName, "Bean name must not be null");
 		Assert.notNull(singletonObject, "Singleton object must not be null");
+		//对单例Map添加锁，保证线程安全。
 		synchronized (this.singletonObjects) {
+			//获取单例对象对应的单例
 			Object oldObject = this.singletonObjects.get(beanName);
 			if (oldObject != null) {
+				//如果该单例对象不为空，抛出异常，提示该bean名称已注册。
 				throw new IllegalStateException("Could not register object [" + singletonObject +
 						"] under bean name '" + beanName + "': there is already object [" + oldObject + "] bound");
 			}
+			//添加名称和单例对象到缓存中。
 			addSingleton(beanName, singletonObject);
 		}
 	}
@@ -344,12 +348,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	@Override
 	public boolean containsSingleton(String beanName) {
+		//单例对象Map含有该bean名称
 		return this.singletonObjects.containsKey(beanName);
 	}
 
 	@Override
 	public String[] getSingletonNames() {
 		synchronized (this.singletonObjects) {
+			//返回已注册的单例bean名称数组
 			return StringUtils.toStringArray(this.registeredSingletons);
 		}
 	}
@@ -357,6 +363,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Override
 	public int getSingletonCount() {
 		synchronized (this.singletonObjects) {
+			//返回已注册的单例数量。
 			return this.registeredSingletons.size();
 		}
 	}
@@ -699,14 +706,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Exposes the singleton mutex to subclasses and external collaborators.
-	 * <p>Subclasses should synchronize on the given Object if they perform
-	 * any sort of extended singleton creation phase. In particular, subclasses
-	 * should <i>not</i> have their own mutexes involved in singleton creation,
-	 * to avoid the potential for deadlocks in lazy-init situations.
+	 * 向子类和外部合作者公开单例互斥体。
+	 * <p> 如果子类执行任何类型的扩展单例创建阶段，则它们应在给定对象上同步。
+	 * 特别是，子类应 <i> 不 </i> 在单例创建中涉及自己的互斥体，以避免在惰性初始化情况下可能出现死锁。
 	 */
 	@Override
 	public final Object getSingletonMutex() {
+		//返回单例Map
 		return this.singletonObjects;
 	}
 
