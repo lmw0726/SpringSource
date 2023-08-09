@@ -1195,7 +1195,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					//region 构建新的updatedSingletons，并通过updatedSingletons 删除beanName，最后重置manualSingletonNames，这确保在多线程环境下对manualSingletonNames 的安全操作
 					//如果manualSingletonNames含有bean名称
 					Set<String> updatedSingletons = new LinkedHashSet<>(this.manualSingletonNames);
-					//updatedSingletons将删除bean名称
+					//updatedSingletons消费bean名称
 					action.accept(updatedSingletons);
 					//重置manualSingletonNames 为更新的后的单例集合
 					this.manualSingletonNames = updatedSingletons;

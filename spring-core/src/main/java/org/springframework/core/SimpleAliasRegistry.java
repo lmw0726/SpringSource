@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SimpleAliasRegistry implements AliasRegistry {
 
 	/**
-	 * Logger available to subclasses.
+	 * 记录器可用于子类。
 	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -140,51 +140,59 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	}
 
 	/**
-	 * Transitively retrieve all aliases for the given name.
+	 * 传递检索给定名称的所有别名。
 	 *
-	 * @param name   the target name to find aliases for
-	 * @param result the resulting aliases list
+	 * @param name   查找别名的目标名称
+	 * @param result 生成的别名列表
 	 */
 	private void retrieveAliases(String name, List<String> result) {
 		this.aliasMap.forEach((alias, registeredName) -> {
 			if (registeredName.equals(name)) {
+				//如果别名Map中的bean名称与目标名称相同，添加进结果集
 				result.add(alias);
+				//更换为别名，递归检索别名的结果集
 				retrieveAliases(alias, result);
 			}
 		});
 	}
 
 	/**
-	 * Resolve all alias target names and aliases registered in this
-	 * registry, applying the given {@link StringValueResolver} to them.
-	 * <p>The value resolver may for example resolve placeholders
-	 * in target bean names and even in alias names.
+	 * 解析在此注册表中注册的所有别名目标名称和别名，并将给定的 {@link StringValueResolver} 应用于它们。
+	 * <p> 例如，值解析器可以解析目标bean名称甚至别名中的占位符。
 	 *
-	 * @param valueResolver the StringValueResolver to apply
+	 * @param valueResolver 要应用的StringValueResolver
 	 */
 	public void resolveAliases(StringValueResolver valueResolver) {
 		Assert.notNull(valueResolver, "StringValueResolver must not be null");
 		synchronized (this.aliasMap) {
+			//复制别名-规范名称Map
 			Map<String, String> aliasCopy = new HashMap<>(this.aliasMap);
 			aliasCopy.forEach((alias, registeredName) -> {
+				//解析别名中的占位符，将其解析为具体的别名
 				String resolvedAlias = valueResolver.resolveStringValue(alias);
+				//解析规范bean名称中的占位符，将其解析为具体的bean名称
 				String resolvedName = valueResolver.resolveStringValue(registeredName);
 				if (resolvedAlias == null || resolvedName == null || resolvedAlias.equals(resolvedName)) {
+					//如果解析出来的别名、bean名称为空，或者解析出来的别名和bean名称相同，移除掉该别名
 					this.aliasMap.remove(alias);
 				} else if (!resolvedAlias.equals(alias)) {
+					//如果解析出来的别名和原来的别名不同，先获取原来的规范bean名称
 					String existingName = this.aliasMap.get(resolvedAlias);
 					if (existingName != null) {
 						if (existingName.equals(resolvedName)) {
-							// Pointing to existing alias - just remove placeholder
+							//如果原来的规范bean名称和解析出来的bean名称相同，移除掉该别名
 							this.aliasMap.remove(alias);
 							return;
 						}
 						throw new IllegalStateException("Cannot register resolved alias '" + resolvedAlias + "' (original: '" + alias + "') for name '" + resolvedName + "': It is already registered for name '" + registeredName + "'.");
 					}
+					//检查解析出来的别名和解析出来是否存在循环有引用
 					checkForAliasCircle(resolvedName, resolvedAlias);
+					//移除原来的别名，再添加上解析好的别名和解析出来的bean名称
 					this.aliasMap.remove(alias);
 					this.aliasMap.put(resolvedAlias, resolvedName);
 				} else if (!registeredName.equals(resolvedName)) {
+					//如果解析出来的别名和原来的别名不同，替换掉原来的规范bean名称
 					this.aliasMap.put(alias, resolvedName);
 				}
 			});
