@@ -16,13 +16,8 @@
 
 package org.springframework.beans.factory.support;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.EnvironmentCapable;
@@ -33,6 +28,10 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Abstract base class for bean definition readers which implement
@@ -67,20 +66,15 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 
 	/**
-	 * Create a new AbstractBeanDefinitionReader for the given bean factory.
-	 * <p>If the passed-in bean factory does not only implement the BeanDefinitionRegistry
-	 * interface but also the ResourceLoader interface, it will be used as default
-	 * ResourceLoader as well. This will usually be the case for
-	 * {@link org.springframework.context.ApplicationContext} implementations.
-	 * <p>If given a plain BeanDefinitionRegistry, the default ResourceLoader will be a
-	 * {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}.
-	 * <p>If the passed-in bean factory also implements {@link EnvironmentCapable} its
-	 * environment will be used by this reader.  Otherwise, the reader will initialize and
-	 * use a {@link StandardEnvironment}. All ApplicationContext implementations are
-	 * EnvironmentCapable, while normal BeanFactory implementations are not.
+	 * 为给定的bean工厂创建一个新的AbstractBeanDefinitionReader。
+	 * <p> 如果传入的bean工厂不仅实现了BeanDefinitionRegistry接口，而且实现了ResourceLoader接口，它也将用作默认的ResourceLoader。
+	 * {@link org.springframework.context.ApplicationContext} 实现通常是这种情况。
+	 * <p> 如果给定一个普通的BeanDefinitionRegistry，则默认的ResourceLoader将是 {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}。
+	 * <p> 如果传入的bean工厂也实现了 {@link EnvironmentCapable}，则该阅读器将使用其环境。
+	 * 否则，阅读器将初始化并使用 {@link StandardEnvironment}。
+	 * 所有ApplicationContext实现都是环境保护的，而普通的BeanFactory实现不是。
 	 *
-	 * @param registry the BeanFactory to load bean definitions into,
-	 *                 in the form of a BeanDefinitionRegistry
+	 * @param registry 以BeanDefinitionRegistry的形式将bean定义加载到其中的BeanFactory
 	 * @see #setResourceLoader
 	 * @see #setEnvironment
 	 */
@@ -88,14 +82,14 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		this.registry = registry;
 
-		// Determine ResourceLoader to use.
+		// 确定要使用的资源。
 		if (this.registry instanceof ResourceLoader) {
 			this.resourceLoader = (ResourceLoader) this.registry;
 		} else {
 			this.resourceLoader = new PathMatchingResourcePatternResolver();
 		}
 
-		// Inherit Environment if possible
+		// 如果注册器是EnvironmentCapable子类，继承环境
 		if (this.registry instanceof EnvironmentCapable) {
 			this.environment = ((EnvironmentCapable) this.registry).getEnvironment();
 		} else {
