@@ -16,18 +16,13 @@
 
 package org.springframework.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.UndeclaredThrowableException;
+import org.springframework.lang.Nullable;
+
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Simple utility class for working with the reflection API and handling
@@ -519,20 +514,24 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Determine whether the given method is an "equals" method.
+	 * 确定给定的方法是否是 “equals” 方法。
 	 *
 	 * @see java.lang.Object#equals(Object)
 	 */
 	public static boolean isEqualsMethod(@Nullable Method method) {
 		if (method == null) {
+			//如果方法不存在，返回false
 			return false;
 		}
 		if (method.getParameterCount() != 1) {
+			//如果方法参数个数不为1，返回false
 			return false;
 		}
 		if (!method.getName().equals("equals")) {
+			//参数名不是equals，返回false
 			return false;
 		}
+		//参数类型必须是Object
 		return method.getParameterTypes()[0] == Object.class;
 	}
 
