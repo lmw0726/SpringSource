@@ -1075,11 +1075,10 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return the qualified name of the given class: usually simply
-	 * the class name, but component type class name + "[]" for arrays.
+	 * 返回给定类的限定名称: 通常只是类名，但对于数组，组件类型类名 “[]”。
 	 *
-	 * @param clazz the class
-	 * @return the qualified name of the class
+	 * @param clazz 类
+	 * @return class的合格名称
 	 */
 	public static String getQualifiedName(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");

@@ -113,8 +113,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<>();
 
 	/**
-	 * The name of the currently created bean, for implicit dependency registration
-	 * on getBean etc invocations triggered from a user-specified Supplier callback.
+	 * 当前创建的bean的名称，用于从用户指定的Supplier接口回调触发的getBean etc调用的隐式依赖注册。
 	 */
 	private final NamedThreadLocal<String> currentlyCreatedBean = new NamedThreadLocal<>("Currently created bean");
 
@@ -420,11 +419,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		Object result = existingBean;
+		//遍历已注册的BeanPostProcessor实现类
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
+			//进行后置处理
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {
+				//如果后置处理的实例为空，返回未处理前的对象。
 				return result;
 			}
+			//否则将bean实例重置为处理后的对象。
 			result = current;
 		}
 		return result;
@@ -1240,9 +1243,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Overridden in order to implicitly register the currently created bean as
-	 * dependent on further beans getting programmatically retrieved during a
-	 * {@link Supplier} callback.
+	 * 重写是为了将当前创建的bean隐式注册为依赖于在 {@link Supplier} 回调期间以编程方式检索的其他bean。
 	 *
 	 * @see #obtainFromSupplier
 	 * @since 5.0
@@ -1250,9 +1251,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Override
 	protected Object getObjectForBeanInstance(
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
-
+		//当前已创建的bean名称
 		String currentlyCreatedBean = this.currentlyCreatedBean.get();
 		if (currentlyCreatedBean != null) {
+			//为bean名称将当前已bean名称注册为依赖bean。
 			registerDependentBean(beanName, currentlyCreatedBean);
 		}
 
@@ -1908,14 +1910,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
-	 * Applies the {@code postProcessAfterInitialization} callback of all
-	 * registered BeanPostProcessors, giving them a chance to post-process the
-	 * object obtained from FactoryBeans (for example, to auto-proxy them).
+	 * 应用所有已注册BeanPostProcessors的 {@code postProcessAfterInitialization} 回调，
+	 * 使它们有机会对从FactoryBeans获得的对象进行后处理 (例如，自动代理它们)。
 	 *
 	 * @see #applyBeanPostProcessorsAfterInitialization
 	 */
 	@Override
 	protected Object postProcessObjectFromFactoryBean(Object object, String beanName) {
+		//初始化后应用Bean Post处理器
 		return applyBeanPostProcessorsAfterInitialization(object, beanName);
 	}
 

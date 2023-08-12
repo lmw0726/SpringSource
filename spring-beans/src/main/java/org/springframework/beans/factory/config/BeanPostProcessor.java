@@ -49,25 +49,25 @@ import org.springframework.lang.Nullable;
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 10.10.2003
  * @see InstantiationAwareBeanPostProcessor
  * @see DestructionAwareBeanPostProcessor
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
+ * @since 10.10.2003
  */
 public interface BeanPostProcessor {
 
 	/**
-	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>before</i> any bean
-	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
-	 * or a custom init-method). The bean will already be populated with property values.
-	 * The returned bean instance may be a wrapper around the original.
-	 * <p>The default implementation returns the given {@code bean} as-is.
-	 * @param bean the new bean instance
-	 * @param beanName the name of the bean
-	 * @return the bean instance to use, either the original or a wrapped one;
-	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
-	 * @throws org.springframework.beans.BeansException in case of errors
+	 * 将此 {@code BeanPostProcessor} 应用于给定的新bean实例 <i> 之前</i>的任何bean初始化回调
+	 * (例如InitializingBean的 {@code afterPropertiesSet} 或自定义init-方法)。
+	 * bean将已经用属性值填充。
+	 * 返回的bean实例可能是围绕原始的包装器。
+	 * <p> 默认实现按状态返回给定的 {@code bean}。
+	 *
+	 * @param bean     bean的新实例
+	 * @param beanName bean名称
+	 * @return 要使用的bean实例 (原始实例或包装实例); 如果 {@code null}，则不会调用后续的BeanPostProcessors
+	 * @throws org.springframework.beans.BeansException 在错误的情况下
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 */
 	@Nullable
@@ -76,23 +76,20 @@ public interface BeanPostProcessor {
 	}
 
 	/**
-	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>after</i> any bean
-	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
-	 * or a custom init-method). The bean will already be populated with property values.
-	 * The returned bean instance may be a wrapper around the original.
-	 * <p>In case of a FactoryBean, this callback will be invoked for both the FactoryBean
-	 * instance and the objects created by the FactoryBean (as of Spring 2.0). The
-	 * post-processor can decide whether to apply to either the FactoryBean or created
-	 * objects or both through corresponding {@code bean instanceof FactoryBean} checks.
-	 * <p>This callback will also be invoked after a short-circuiting triggered by a
-	 * {@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation} method,
-	 * in contrast to all other {@code BeanPostProcessor} callbacks.
-	 * <p>The default implementation returns the given {@code bean} as-is.
-	 * @param bean the new bean instance
-	 * @param beanName the name of the bean
-	 * @return the bean instance to use, either the original or a wrapped one;
-	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
-	 * @throws org.springframework.beans.BeansException in case of errors
+	 * 在任何bean初始化回调 (例如InitializingBean的 {@code afterPropertiesSet} 或自定义init方法) <i>之后</i>，
+	 * 将此 {@code BeanPostProcessor} 应用于给定的新bean实例 。
+	 * bean将已经用属性值填充。
+	 * 返回的bean实例可能是围绕原始的包装器。
+	 * <p> 如果是FactoryBean，则将为FactoryBean实例和FactoryBean创建的对象调用此回调 (从Spring 2.0开始)。
+	 * 后处理器可以通过相应的 {@code bean instanceof FactoryBean} 检查来决定是应用于FactoryBean还是创建的对象，还是同时应用于这两者。
+	 * <p> 与所有其他 {@code BeanPostProcessor} 回调相反，
+	 * 该回调也将在由 {@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation} 方法触发的短路后调用。
+	 * <p> 默认实现按状态返回给定的 {@code bean}。
+	 *
+	 * @param bean     bean的新实例
+	 * @param beanName bean名称
+	 * @return 要使用的bean实例 (原始实例或包装实例); 如果 {@code null}，则不会调用后续的BeanPostProcessors
+	 * @throws org.springframework.beans.BeansException 在错误的情况下
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
 	 */

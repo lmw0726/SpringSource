@@ -33,8 +33,8 @@ public class NamedThreadLocal<T> extends ThreadLocal<T> {
 
 
 	/**
-	 * Create a new NamedThreadLocal with the given name.
-	 * @param name a descriptive name for this ThreadLocal
+	 * 使用给定的名称创建一个新的NamedThreadLocal。
+	 * @param name ThreadLocal的描述性名称
 	 */
 	public NamedThreadLocal(String name) {
 		Assert.hasText(name, "Name must not be empty");

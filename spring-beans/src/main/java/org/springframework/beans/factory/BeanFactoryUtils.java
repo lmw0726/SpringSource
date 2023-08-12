@@ -16,19 +16,15 @@
 
 package org.springframework.beans.factory;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.BeansException;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.lang.annotation.Annotation;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Convenience methods operating on bean factories, in particular
@@ -53,7 +49,8 @@ public abstract class BeanFactoryUtils {
 	public static final String GENERATED_BEAN_NAME_SEPARATOR = "#";
 
 	/**
-	 * Cache from name with factory bean prefix to stripped name without dereference.
+	 * 从带有工厂bean前缀的名称缓存到已经转换好的名称。
+	 * 缓存 {@link #transformedBeanName(String)} 已经转换好的结果。
 	 *
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
 	 * @since 5.1
@@ -74,6 +71,9 @@ public abstract class BeanFactoryUtils {
 
 	/**
 	 * 返回实际的bean名称，剥离工厂取消引用前缀 (如果有的话，如果找到，也去掉重复的工厂前缀)。
+	 * 去除 FactoryBean 的修饰符 &
+	 * 如果 name 以 “&” 为前缀，那么会去掉该 "&" 。
+	 * 例如：name = "&&studentService" ，则会是 name = "studentService"。
 	 *
 	 * @param name bean名称
 	 * @return 转换后的名称

@@ -39,7 +39,7 @@ public class XmlBeanTest {
 		Object value = beanDefinition.getAttribute("special_key");
 		System.out.println("元数据为："+value);
 
-		Boss boss = factory.getBean("boss", Boss.class);
+		Boss boss = (Boss)factory.getBean("boss");
 		System.out.println(boss);
 	}
 }
