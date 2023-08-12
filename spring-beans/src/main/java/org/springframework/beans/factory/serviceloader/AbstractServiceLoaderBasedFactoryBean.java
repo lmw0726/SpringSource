@@ -16,13 +16,13 @@
 
 package org.springframework.beans.factory.serviceloader;
 
-import java.util.ServiceLoader;
-
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+
+import java.util.ServiceLoader;
 
 /**
  * Abstract base class for FactoryBeans operating on the
@@ -35,22 +35,28 @@ import org.springframework.util.ClassUtils;
 public abstract class AbstractServiceLoaderBasedFactoryBean extends AbstractFactoryBean<Object>
 		implements BeanClassLoaderAware {
 
+	/**
+	 * 服务类型
+	 */
 	@Nullable
 	private Class<?> serviceType;
 
+	/**
+	 * bean类加载器
+	 */
 	@Nullable
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
 
 	/**
-	 * Specify the desired service type (typically the service's public API).
+	 * 指定所需的服务类型 (通常是服务的公共API)。
 	 */
 	public void setServiceType(@Nullable Class<?> serviceType) {
 		this.serviceType = serviceType;
 	}
 
 	/**
-	 * Return the desired service type.
+	 * 返回所需的服务类型。
 	 */
 	@Nullable
 	public Class<?> getServiceType() {
@@ -64,8 +70,8 @@ public abstract class AbstractServiceLoaderBasedFactoryBean extends AbstractFact
 
 
 	/**
-	 * Delegates to {@link #getObjectToExpose(java.util.ServiceLoader)}.
-	 * @return the object to expose
+	 * 委托给 {@link #getObjectToExpose(java.util.ServiceLoader)}.
+	 * @return 要暴露的对象
 	 */
 	@Override
 	protected Object createInstance() {
@@ -74,10 +80,10 @@ public abstract class AbstractServiceLoaderBasedFactoryBean extends AbstractFact
 	}
 
 	/**
-	 * Determine the actual object to expose for the given ServiceLoader.
-	 * <p>Left to concrete subclasses.
-	 * @param serviceLoader the ServiceLoader for the configured service class
-	 * @return the object to expose
+	 * 为给定的ServiceLoader确定要公开的实际对象。
+	 * <p> 留给具体子类。
+	 * @param serviceLoader 配置的服务类的ServiceLoader
+	 * @return 要暴露的对象
 	 */
 	protected abstract Object getObjectToExpose(ServiceLoader<?> serviceLoader);
 
