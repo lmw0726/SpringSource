@@ -100,10 +100,11 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 					//实例不为空，返回该实例。
 					return object;
 				}
-				//从bean工厂中获取该bean名称的实例。
+				//从工厂bean中获取该bean名称的实例。
 				object = doGetObjectFromFactoryBean(factory, beanName);
 				//只有在getObject()调用期间(例如，由于自定义getBean调用触发的循环引用处理)尚未放置的情况下才进行后处理和存储。
 				//再次从工厂bean实例缓存中获取bean名称对应的实例
+				//这一步的目的是，避免重复的后处理和存储
 				Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
 				if (alreadyThere != null) {
 					//如果该实例存在，直接返回该实例。
@@ -140,7 +141,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 				return object;
 			}
 		} else {
-			//从bean工厂中获取该bean名称的实例。
+			//从工厂bean中获取该bean名称的实例。
 			Object object = doGetObjectFromFactoryBean(factory, beanName);
 			if (shouldPostProcess) {
 				//如果需要执行后置处理器

@@ -1457,6 +1457,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					//深拷贝覆盖值
 					mbd = new RootBeanDefinition(pbd);
 					//将bean定义的各个属性覆盖到根bean定义
+					//将子bean定义的各项属性合并到父bean定义中。
 					mbd.overrideFrom(bd);
 				}
 
@@ -1465,7 +1466,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					//如果没有配置返回，则设置为单例
 					mbd.setScope(SCOPE_SINGLETON);
 				}
-				//非单例bean中包含的豆本身不能是单例bean。
+				//非单例bean中包含的bean本身不能是单例bean。
 				// 让我们在这里进行纠正，因为这可能是外部bean的父子合并的结果，
 				// 在这种情况下，原始的内部bean定义将不会继承合并的外部bean的单例状态。
 				if (containingBd != null && !containingBd.isSingleton() && mbd.isSingleton()) {

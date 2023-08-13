@@ -35,8 +35,8 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 
 
 	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
+	 * 设置此元数据元素的配置源 {@code Object}。
+	 * <p> 对象的确切类型将取决于所使用的配置机制。
 	 */
 	public void setSource(@Nullable Object source) {
 		this.source = source;
@@ -51,6 +51,7 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 
 	/**
 	 * 将给定的BeanMetadataAttribute添加到此访问器的属性集。
+	 *
 	 * @param attribute 要注册的BeanMetadataAttribute对象
 	 */
 	public void addMetadataAttribute(BeanMetadataAttribute attribute) {
@@ -59,6 +60,7 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 
 	/**
 	 * Look up the given BeanMetadataAttribute in this accessor's set of attributes.
+	 *
 	 * @param name the name of the attribute
 	 * @return the corresponding BeanMetadataAttribute object,
 	 * or {@code null} if no such attribute defined

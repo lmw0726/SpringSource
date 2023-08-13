@@ -16,14 +16,14 @@
 
 package org.springframework.core;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Support class for {@link AttributeAccessor AttributeAccessors}, providing
@@ -48,12 +48,12 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
 	@Override
 	public void setAttribute(String name, @Nullable Object value) {
 		Assert.notNull(name, "Name must not be null");
-		if (value != null) {
-			//如果值不为空，则设置该属性名和属性值
-			this.attributes.put(name, value);
-		} else {
+		if (value == null) {
 			//值为空，移除该属性名
 			removeAttribute(name);
+		} else {
+			//如果值不为空，则设置该属性名和属性值
+			this.attributes.put(name, value);
 		}
 	}
 

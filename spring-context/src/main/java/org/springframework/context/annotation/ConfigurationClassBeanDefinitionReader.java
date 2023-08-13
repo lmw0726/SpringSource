@@ -421,8 +421,11 @@ class ConfigurationClassBeanDefinitionReader {
 
 		private ConfigurationClassBeanDefinition(ConfigurationClassBeanDefinition original) {
 			super(original);
+			//注解元数据
 			this.annotationMetadata = original.annotationMetadata;
+			//工厂方法元数据
 			this.factoryMethodMetadata = original.factoryMethodMetadata;
+			//派生bean名称
 			this.derivedBeanName = original.derivedBeanName;
 		}
 

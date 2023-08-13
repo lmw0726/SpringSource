@@ -300,11 +300,17 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	 */
 	public RootBeanDefinition(RootBeanDefinition original) {
 		super(original);
+		//装饰bean定义
 		this.decoratedDefinition = original.decoratedDefinition;
+		//注解元素
 		this.qualifiedElement = original.qualifiedElement;
+		//是否允许缓存
 		this.allowCaching = original.allowCaching;
+		//工厂方法是否唯一
 		this.isFactoryMethodUnique = original.isFactoryMethodUnique;
+		//目标类型
 		this.targetType = original.targetType;
+		//工厂方法实例
 		this.factoryMethodToIntrospect = original.factoryMethodToIntrospect;
 	}
 

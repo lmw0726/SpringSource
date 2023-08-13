@@ -423,7 +423,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void afterSingletonCreation(String beanName) {
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.remove(beanName)) {
-			//如果在创建检查中排除的bean名称中没有该bean名称，且当前创建的单例中没有该bean名称，抛出异常
+			//如果在创建检查中排除的bean名称中没有该bean名称，且当前创建的单例中移除该bean名称失败，抛出异常
 			throw new IllegalStateException("Singleton '" + beanName + "' isn't currently in creation");
 		}
 	}

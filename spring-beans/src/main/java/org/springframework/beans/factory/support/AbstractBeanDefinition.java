@@ -299,7 +299,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * 使用给定的构造函数参数值和属性值创建一个新的AbstractBeanDefinition。
 	 */
 	protected AbstractBeanDefinition(@Nullable ConstructorArgumentValues cargs, @Nullable MutablePropertyValues pvs) {
+		//构造参数的值
 		this.constructorArgumentValues = cargs;
+		//bean定义的属性值
 		this.propertyValues = pvs;
 	}
 
@@ -329,14 +331,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		copyAttributesFrom(original);
 
 		if (original instanceof AbstractBeanDefinition) {
-			//如果该bean定义是AbstractBeanDefinition类型
+			//如果该bean定义是AbstractBeanDefinition类型，对应的是以XML的合并bean定义
 			AbstractBeanDefinition originalAbd = (AbstractBeanDefinition) original;
 			if (originalAbd.hasBeanClass()) {
 				//有bean类型，则设置bean类
 				setBeanClass(originalAbd.getBeanClass());
 			}
 			if (originalAbd.hasConstructorArgumentValues()) {
-				//有构造参数值，则只是构造参数值
+				//有构造参数值，则复制构造参数值
 				setConstructorArgumentValues(new ConstructorArgumentValues(original.getConstructorArgumentValues()));
 			}
 			if (originalAbd.hasPropertyValues()) {
@@ -383,6 +385,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 			//复制源
 			setResource(originalAbd.getResource());
 		} else {
+			//AnnotatedBeanDefinition体系分支，对应以注解形式的合并bean定义。
 			//复制构造参数对
 			setConstructorArgumentValues(new ConstructorArgumentValues(original.getConstructorArgumentValues()));
 			//复制属性值

@@ -16,20 +16,14 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.Mergeable;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
+
+import java.util.*;
 
 /**
  * Holder for constructor argument values, typically as part of a bean definition.
@@ -43,8 +37,14 @@ import org.springframework.util.ObjectUtils;
  */
 public class ConstructorArgumentValues {
 
+	/**
+	 *存储索引下标的值对。
+	 */
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<>();
 
+	/**
+	 * 通用的参数值列表，用于存储构造参数的参数名称和参数值、参数类型等信息。
+	 */
 	private final List<ValueHolder> genericArgumentValues = new ArrayList<>();
 
 
@@ -71,6 +71,7 @@ public class ConstructorArgumentValues {
 	 */
 	public void addArgumentValues(@Nullable ConstructorArgumentValues other) {
 		if (other != null) {
+			//遍历索引下标的值对，一次添加到 indexedArgumentValues 中。
 			other.indexedArgumentValues.forEach(
 					(index, argValue) -> addOrMergeIndexedArgumentValue(index, argValue.copy()));
 			//如果其他构造参数值中的通用参数值不包含通用参数值中的值持有者，则将其合并到 genericArgumentValues 对象中。
