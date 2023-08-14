@@ -33,6 +33,8 @@ public interface Mergeable {
 
 	/**
 	 * 是否为此特定实例启用了合并？
+	 *
+	 * @return true表示可以进行属性合并
 	 */
 	boolean isMergeEnabled();
 

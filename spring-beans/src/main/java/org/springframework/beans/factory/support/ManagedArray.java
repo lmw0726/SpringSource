@@ -29,15 +29,15 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class ManagedArray extends ManagedList<Object> {
 
-	/** Resolved element type for runtime creation of the target array. */
+	/** 用于运行时创建目标数组的已解析元素类型。 */
 	@Nullable
 	volatile Class<?> resolvedElementType;
 
 
 	/**
-	 * Create a new managed array placeholder.
-	 * @param elementTypeName the target element type as a class name
-	 * @param size the size of the array
+	 * 创建一个新的管理数组占位符。
+	 * @param elementTypeName 作为类名的目标元素类型
+	 * @param size 数组的大小
 	 */
 	public ManagedArray(String elementTypeName, int size) {
 		super(size);
