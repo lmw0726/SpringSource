@@ -979,12 +979,13 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Check whether the given class matches the user-specified type name.
+	 * 检查给定的类是否与用户指定的类型名称匹配。
 	 *
-	 * @param clazz    the class to check
-	 * @param typeName the type name to match
+	 * @param clazz    要检查的class类
+	 * @param typeName 要匹配的类型名称
 	 */
 	public static boolean matchesTypeName(Class<?> clazz, @Nullable String typeName) {
+		//匹配类名或者简单类名是否相同
 		return (typeName != null &&
 				(typeName.equals(clazz.getTypeName()) || typeName.equals(clazz.getSimpleName())));
 	}
