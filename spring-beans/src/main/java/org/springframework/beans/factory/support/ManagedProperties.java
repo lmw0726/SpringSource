@@ -16,11 +16,11 @@
 
 package org.springframework.beans.factory.support;
 
-import java.util.Properties;
-
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.Mergeable;
 import org.springframework.lang.Nullable;
+
+import java.util.Properties;
 
 /**
  * Tag class which represents a Spring-managed {@link Properties} instance
@@ -40,8 +40,8 @@ public class ManagedProperties extends Properties implements Mergeable, BeanMeta
 
 
 	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
+	 * 设置此元数据元素的配置源 {@code Object}。
+	 * <p> 对象的确切类型将取决于所使用的配置机制。
 	 */
 	public void setSource(@Nullable Object source) {
 		this.source = source;
@@ -54,8 +54,7 @@ public class ManagedProperties extends Properties implements Mergeable, BeanMeta
 	}
 
 	/**
-	 * Set whether merging should be enabled for this collection,
-	 * in case of a 'parent' collection value being present.
+	 * 设置是否应为此集合启用合并 (如果存在 “父” 集合值)。
 	 */
 	public void setMergeEnabled(boolean mergeEnabled) {
 		this.mergeEnabled = mergeEnabled;
@@ -70,14 +69,18 @@ public class ManagedProperties extends Properties implements Mergeable, BeanMeta
 	@Override
 	public Object merge(@Nullable Object parent) {
 		if (!this.mergeEnabled) {
+			//如果不可合并，抛出异常
 			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
 		}
+		//如果父对象为空，返回原来的ManagedProperties对象
 		if (parent == null) {
 			return this;
 		}
 		if (!(parent instanceof Properties)) {
+			//如果父对象不是Properties类型，抛出异常
 			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
 		}
+		//构建一个新的ManagedProperties对象。先添加父对象的属性值，再添加本对象的属性值
 		Properties merged = new ManagedProperties();
 		merged.putAll((Properties) parent);
 		merged.putAll(this);

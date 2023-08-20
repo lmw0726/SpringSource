@@ -16,25 +16,25 @@
 
 package org.springframework.beans.factory.support;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.Mergeable;
 import org.springframework.lang.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Tag collection class used to hold managed List elements, which may
  * include runtime bean references (to be resolved into bean objects).
  *
+ * @param <E> the element type
  * @author Rod Johnson
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @author Stephane Nicoll
  * @author Sam Brannen
  * @since 27.05.2003
- * @param <E> the element type
  */
 @SuppressWarnings("serial")
 public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetadataElement {
@@ -42,9 +42,15 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	@Nullable
 	private Object source;
 
+	/**
+	 * 元素类型名称
+	 */
 	@Nullable
 	private String elementTypeName;
 
+	/**
+	 * 是否可以合并
+	 */
 	private boolean mergeEnabled;
 
 
@@ -57,10 +63,11 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 
 
 	/**
-	 * Create a new instance containing an arbitrary number of elements.
-	 * @param elements the elements to be contained in the list
-	 * @param <E> the {@code List}'s element type
-	 * @return a {@code ManagedList} containing the specified elements
+	 * 创建一个包含任意数量元素的新实例。
+	 *
+	 * @param elements 列表中要包含的元素
+	 * @param <E>      {@code List} 的元素类型
+	 * @return 包含指定元素的 {@code ManagedList}
 	 * @since 5.3.16
 	 */
 	@SafeVarargs
@@ -71,8 +78,8 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	}
 
 	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
+	 * 设置此元数据元素的配置源 {@code Object}。
+	 * <p> 对象的确切类型将取决于所使用的配置机制。
 	 */
 	public void setSource(@Nullable Object source) {
 		this.source = source;
@@ -85,14 +92,14 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	}
 
 	/**
-	 * Set the default element type name (class name) to be used for this list.
+	 * 设置要用于此列表的默认元素类型名称 (类名)。
 	 */
 	public void setElementTypeName(String elementTypeName) {
 		this.elementTypeName = elementTypeName;
 	}
 
 	/**
-	 * Return the default element type name (class name) to be used for this list.
+	 * 返回要用于此列表的默认元素类型名称 (类名)。
 	 */
 	@Nullable
 	public String getElementTypeName() {
@@ -100,8 +107,7 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	}
 
 	/**
-	 * Set whether merging should be enabled for this collection,
-	 * in case of a 'parent' collection value being present.
+	 * 设置是否应为此集合启用合并 (如果存在 “父” 集合值)。
 	 */
 	public void setMergeEnabled(boolean mergeEnabled) {
 		this.mergeEnabled = mergeEnabled;
@@ -116,14 +122,18 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	@SuppressWarnings("unchecked")
 	public List<E> merge(@Nullable Object parent) {
 		if (!this.mergeEnabled) {
+			//如果不可合并，抛出异常
 			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
 		}
 		if (parent == null) {
+			//如果父对象为空，返回原来的ManagedList对象
 			return this;
 		}
 		if (!(parent instanceof List)) {
+			//如果父对象不是List类型，抛出异常
 			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
 		}
+		//构建一个新的ManagedList对象，先添加父对象的元素，再添加原来的ManagedList的元素
 		List<E> merged = new ManagedList<>();
 		merged.addAll((List<E>) parent);
 		merged.addAll(this);

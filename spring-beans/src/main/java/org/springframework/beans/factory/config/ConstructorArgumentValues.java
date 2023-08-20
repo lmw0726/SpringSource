@@ -38,7 +38,7 @@ import java.util.*;
 public class ConstructorArgumentValues {
 
 	/**
-	 *存储索引下标的值对。
+	 * 存储索引下标的值对。
 	 */
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<>();
 
@@ -460,32 +460,49 @@ public class ConstructorArgumentValues {
 
 
 	/**
-	 * Holder for a constructor argument value, with an optional type
-	 * attribute indicating the target type of the actual constructor argument.
+	 * 构造函数参数值的持有者，带有一个可选的type属性，指示实际构造函数参数的目标类型。
 	 */
 	public static class ValueHolder implements BeanMetadataElement {
 
+		/**
+		 * 值
+		 */
 		@Nullable
 		private Object value;
 
+		/**
+		 * 类名
+		 */
 		@Nullable
 		private String type;
 
+		/**
+		 * 值的名称
+		 */
 		@Nullable
 		private String name;
 
+		/**
+		 * 源对象
+		 */
 		@Nullable
 		private Object source;
 
+		/**
+		 * 是否已经转换，默认为未转换。
+		 */
 		private boolean converted = false;
 
+		/**
+		 * 转换后的值
+		 */
 		@Nullable
 		private Object convertedValue;
 
 		/**
-		 * Create a new ValueHolder for the given value.
+		 * 为给定值创建一个新的ValueHolder。
 		 *
-		 * @param value the argument value
+		 * @param value 参数值
 		 */
 		public ValueHolder(@Nullable Object value) {
 			this.value = value;
