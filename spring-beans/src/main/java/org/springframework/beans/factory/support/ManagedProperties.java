@@ -33,9 +33,15 @@ import java.util.Properties;
 @SuppressWarnings("serial")
 public class ManagedProperties extends Properties implements Mergeable, BeanMetadataElement {
 
+	/**
+	 * 源对象
+	 */
 	@Nullable
 	private Object source;
 
+	/**
+	 * 是否可以合并
+	 */
 	private boolean mergeEnabled;
 
 

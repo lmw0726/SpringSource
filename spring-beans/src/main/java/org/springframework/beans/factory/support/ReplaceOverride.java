@@ -16,13 +16,13 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Extension of {@link MethodOverride} that represents an arbitrary
@@ -37,16 +37,22 @@ import org.springframework.util.ObjectUtils;
  */
 public class ReplaceOverride extends MethodOverride {
 
+	/**
+	 * 替换方法的bean名称
+	 */
 	private final String methodReplacerBeanName;
 
+	/**
+	 * 参数的类型标识列表
+	 */
 	private final List<String> typeIdentifiers = new ArrayList<>();
 
 
 	/**
-	 * Construct a new ReplaceOverride.
+	 * 构造一个新的ReplaceOverride。
 	 *
-	 * @param methodName             the name of the method to override
-	 * @param methodReplacerBeanName the bean name of the {@link MethodReplacer}
+	 * @param methodName             要覆盖的方法的名称
+	 * @param methodReplacerBeanName {@link MethodReplacer} 的bean名称
 	 */
 	public ReplaceOverride(String methodName, String methodReplacerBeanName) {
 		super(methodName);
@@ -56,7 +62,7 @@ public class ReplaceOverride extends MethodOverride {
 
 
 	/**
-	 * Return the name of the bean implementing MethodReplacer.
+	 * 返回实现MethodReplacer的bean的名称。
 	 */
 	public String getMethodReplacerBeanName() {
 		return this.methodReplacerBeanName;
@@ -75,20 +81,25 @@ public class ReplaceOverride extends MethodOverride {
 	@Override
 	public boolean matches(Method method) {
 		if (!method.getName().equals(getMethodName())) {
+			//如果方法名称和重载方法名称不同，返回false
 			return false;
 		}
 		if (!isOverloaded()) {
-			// Not overloaded: don't worry about arg type matching...
+			//如果不是重载方法，返回true
+			// 不是重载函数: 不用担心arg类型匹配...
 			return true;
 		}
-		// If we get here, we need to insist on precise argument matching...
+		// 如果我们到了这里，我们需要坚持精确的参数匹配...
 		if (this.typeIdentifiers.size() != method.getParameterCount()) {
+			//类型标识符列表的大小和方法参数个数不匹配，返回false
 			return false;
 		}
+		//获取方法参数的类型
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		for (int i = 0; i < this.typeIdentifiers.size(); i++) {
 			String identifier = this.typeIdentifiers.get(i);
 			if (!parameterTypes[i].getName().contains(identifier)) {
+				//如果参数类型名称和同一位置的类型标识符不匹配，返回false。
 				return false;
 			}
 		}

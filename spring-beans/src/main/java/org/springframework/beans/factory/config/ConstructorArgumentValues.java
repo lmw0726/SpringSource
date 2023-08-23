@@ -200,7 +200,7 @@ public class ConstructorArgumentValues {
 	 * 添加要按类型匹配的通用参数值。
 	 * <p> 注意: 单个通用参数值将仅使用一次，而不是多次匹配。
 	 *
-	 * @param value the argument value
+	 * @param value 参数值
 	 */
 	public void addGenericArgumentValue(Object value) {
 		this.genericArgumentValues.add(new ValueHolder(value));

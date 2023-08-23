@@ -16,12 +16,12 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Represents an override of a method that looks up an object in the same IoC context,
@@ -32,27 +32,33 @@ import org.springframework.util.ObjectUtils;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @since 1.1
  * @see org.springframework.beans.factory.BeanFactory#getBean(String)
  * @see org.springframework.beans.factory.BeanFactory#getBean(Class)
  * @see org.springframework.beans.factory.BeanFactory#getBean(String, Object...)
  * @see org.springframework.beans.factory.BeanFactory#getBean(Class, Object...)
  * @see org.springframework.beans.factory.BeanFactory#getBeanProvider(ResolvableType)
+ * @since 1.1
  */
 public class LookupOverride extends MethodOverride {
-
+	/**
+	 * bean名称
+	 */
 	@Nullable
 	private final String beanName;
 
+	/**
+	 * 要覆盖的方法
+	 */
 	@Nullable
 	private Method method;
 
 
 	/**
-	 * Construct a new LookupOverride.
-	 * @param methodName the name of the method to override
-	 * @param beanName the name of the bean in the current {@code BeanFactory} that the
-	 * overridden method should return (may be {@code null} for type-based bean retrieval)
+	 * 构建一个新的LookupOverride。
+	 *
+	 * @param methodName 要覆盖的方法名称
+	 * @param beanName   重写方法应该返回的当前 {@code BeanFactory} 中的bean的名称
+	 *                   (对于基于类型的bean检索可能是 {@code null})
 	 */
 	public LookupOverride(String methodName, @Nullable String beanName) {
 		super(methodName);
@@ -60,10 +66,11 @@ public class LookupOverride extends MethodOverride {
 	}
 
 	/**
-	 * Construct a new LookupOverride.
-	 * @param method the method declaration to override
-	 * @param beanName the name of the bean in the current {@code BeanFactory} that the
-	 * overridden method should return (may be {@code null} for type-based bean retrieval)
+	 * 构建一个新的LookupOverride。
+	 *
+	 * @param method   要覆盖的声明方法
+	 * @param beanName 重写方法应该返回的当前 {@code BeanFactory} 中的bean的名称
+	 *                 (对于基于类型的bean检索可能是 {@code null})
 	 */
 	public LookupOverride(Method method, @Nullable String beanName) {
 		super(method.getName());
@@ -73,7 +80,7 @@ public class LookupOverride extends MethodOverride {
 
 
 	/**
-	 * Return the name of the bean that should be returned by this method.
+	 * 返回该方法应返回的bean的名称。
 	 */
 	@Nullable
 	public String getBeanName() {
@@ -81,19 +88,19 @@ public class LookupOverride extends MethodOverride {
 	}
 
 	/**
-	 * Match the specified method by {@link Method} reference or method name.
-	 * <p>For backwards compatibility reasons, in a scenario with overloaded
-	 * non-abstract methods of the given name, only the no-arg variant of a
-	 * method will be turned into a container-driven lookup method.
-	 * <p>In case of a provided {@link Method}, only straight matches will
-	 * be considered, usually demarcated by the {@code @Lookup} annotation.
+	 * 通过 {@link Method} 引用或方法名称匹配指定的方法。
+	 * <p> 出于向后兼容性的原因，在具有给定名称的重载非抽象方法的场景中，只有方法的no-arg变体才会变成容器驱动的查找方法。
+	 * <p> 如果提供了 {@link Method}，则仅考虑直接匹配，通常由 {@code @Lookup} 注解划分。
 	 */
 	@Override
 	public boolean matches(Method method) {
 		if (this.method != null) {
 			return method.equals(this.method);
-		}
-		else {
+		} else {
+			//先比较方法名称是否相同。
+			//如果为非重写方法，返回true
+			//如果是抽象方法，返回true
+			//如果参数个数为0个，返回true。
 			return (method.getName().equals(getMethodName()) && (!isOverloaded() ||
 					Modifier.isAbstract(method.getModifiers()) || method.getParameterCount() == 0));
 		}
