@@ -30,10 +30,19 @@ import org.springframework.util.Assert;
  */
 public class PointcutComponentDefinition extends AbstractComponentDefinition {
 
+	/**
+	 * 切入点bean名称
+	 */
 	private final String pointcutBeanName;
 
+	/**
+	 * 切入点bean定义
+	 */
 	private final BeanDefinition pointcutDefinition;
 
+	/**
+	 * 描述
+	 */
 	private final String description;
 
 
@@ -59,7 +68,7 @@ public class PointcutComponentDefinition extends AbstractComponentDefinition {
 
 	@Override
 	public BeanDefinition[] getBeanDefinitions() {
-		return new BeanDefinition[] {this.pointcutDefinition};
+		return new BeanDefinition[]{this.pointcutDefinition};
 	}
 
 	@Override

@@ -38,7 +38,9 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetadataElement {
-
+	/**
+	 * 源对象
+	 */
 	@Nullable
 	private Object source;
 

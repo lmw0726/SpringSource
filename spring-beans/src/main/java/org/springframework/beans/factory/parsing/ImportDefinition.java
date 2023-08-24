@@ -25,41 +25,52 @@ import org.springframework.util.Assert;
  * Representation of an import that has been processed during the parsing process.
  *
  * @author Juergen Hoeller
- * @since 2.0
  * @see ReaderEventListener#importProcessed(ImportDefinition)
+ * @since 2.0
  */
 public class ImportDefinition implements BeanMetadataElement {
-
+	/**
+	 * 导入的资源地址
+	 */
 	private final String importedResource;
 
+	/**
+	 * 实际的资源
+	 */
 	@Nullable
 	private final Resource[] actualResources;
 
+	/**
+	 * 源对象
+	 */
 	@Nullable
 	private final Object source;
 
 
 	/**
-	 * Create a new ImportDefinition.
-	 * @param importedResource the location of the imported resource
+	 * 创建一个新的ImportDefinition。
+	 *
+	 * @param importedResource 导入资源的位置
 	 */
 	public ImportDefinition(String importedResource) {
 		this(importedResource, null, null);
 	}
 
 	/**
-	 * Create a new ImportDefinition.
-	 * @param importedResource the location of the imported resource
-	 * @param source the source object (may be {@code null})
+	 * 创建一个新的ImportDefinition。
+	 *
+	 * @param importedResource 导入资源的位置
+	 * @param source           源对象 (可能是 {@code null})
 	 */
 	public ImportDefinition(String importedResource, @Nullable Object source) {
 		this(importedResource, null, source);
 	}
 
 	/**
-	 * Create a new ImportDefinition.
-	 * @param importedResource the location of the imported resource
-	 * @param source the source object (may be {@code null})
+	 * 创建一个新的ImportDefinition。
+	 *
+	 * @param importedResource 导入资源的位置
+	 * @param source           源对象 (可能是 {@code null})
 	 */
 	public ImportDefinition(String importedResource, @Nullable Resource[] actualResources, @Nullable Object source) {
 		Assert.notNull(importedResource, "Imported resource must not be null");
@@ -70,7 +81,7 @@ public class ImportDefinition implements BeanMetadataElement {
 
 
 	/**
-	 * Return the location of the imported resource.
+	 * 返回导入资源的位置.
 	 */
 	public final String getImportedResource() {
 		return this.importedResource;
