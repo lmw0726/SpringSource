@@ -16,16 +16,16 @@
 
 package org.springframework.expression.spel.support;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.TypeLocator;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelMessage;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A simple implementation of {@link TypeLocator} that uses the context ClassLoader
@@ -58,7 +58,7 @@ public class StandardTypeLocator implements TypeLocator {
 	 */
 	public StandardTypeLocator(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
-		// Similar to when writing regular Java code, it only knows about java.lang by default
+		//类似于编写常规Java代码时，默认情况下只知道java.lang
 		registerImport("java.lang");
 	}
 
