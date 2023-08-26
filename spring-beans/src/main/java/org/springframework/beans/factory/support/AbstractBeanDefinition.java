@@ -493,6 +493,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 			//复制源
 			setResource(otherAbd.getResource());
 		} else {
+			//对应的是AnnotatedBeanDefinition体系分支，注解的属性复制。
 			//复制构造参数对
 			getConstructorArgumentValues().addArgumentValues(other.getConstructorArgumentValues());
 			//复制属性值

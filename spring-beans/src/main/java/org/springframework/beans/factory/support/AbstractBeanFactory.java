@@ -81,13 +81,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private BeanFactory parentBeanFactory;
 
 	/**
-	 * ClassLoader to resolve bean class names with, if necessary.
+	 * 类加载器来解析bean类名，如有必要。
 	 */
 	@Nullable
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
 	/**
-	 * ClassLoader to temporarily resolve bean class names with, if necessary.
+	 * 类加载器临时解析bean类名，如有必要。
 	 */
 	@Nullable
 	private ClassLoader tempClassLoader;
@@ -104,29 +104,34 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private BeanExpressionResolver beanExpressionResolver;
 
 	/**
-	 * Spring ConversionService to use instead of PropertyEditors.
+	 * 类型转换器
+	 * Spring 使用 ConversionService而不是PropertyEditors。
 	 */
 	@Nullable
 	private ConversionService conversionService;
 
 	/**
-	 * Custom PropertyEditorRegistrars to apply to the beans of this factory.
+	 * 属性编辑器
+	 * 自定义 PropertyEditorRegistrars ，应用于此工厂的bean。
 	 */
 	private final Set<PropertyEditorRegistrar> propertyEditorRegistrars = new LinkedHashSet<>(4);
 
 	/**
-	 * Custom PropertyEditors to apply to the beans of this factory.
+	 * 类的属性编辑器
+	 * 自定义属性编辑器PropertyEditors，应用于此工厂的bean。
 	 */
 	private final Map<Class<?>, Class<? extends PropertyEditor>> customEditors = new HashMap<>(4);
 
 	/**
-	 * A custom TypeConverter to use, overriding the default PropertyEditor mechanism.
+	 * 类型转换器
+	 * 要使用的自定义类型转换程序，覆盖默认的PropertyEditor机制。
 	 */
 	@Nullable
 	private TypeConverter typeConverter;
 
 	/**
-	 * String resolvers to apply e.g. to annotation attribute values.
+	 * 为嵌入的值(如注释属性)添加字符串解析器
+	 * 要应用于例如注释属性值的字符串解析器。
 	 */
 	private final List<StringValueResolver> embeddedValueResolvers = new CopyOnWriteArrayList<>();
 
@@ -174,15 +179,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
 	/**
-	 * Create a new AbstractBeanFactory.
+	 * 创建一个新的AbstractBeanFactory。
 	 */
 	public AbstractBeanFactory() {
 	}
 
 	/**
-	 * Create a new AbstractBeanFactory with the given parent.
+	 * 使用给定的父级创建一个新的AbstractBeanFactory。
 	 *
-	 * @param parentBeanFactory parent bean factory, or {@code null} if none
+	 * @param parentBeanFactory 父bean工厂，如果没有，则为 {@code null}
 	 * @see #getBean
 	 */
 	public AbstractBeanFactory(@Nullable BeanFactory parentBeanFactory) {
@@ -210,14 +215,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Return an instance, which may be shared or independent, of the specified bean.
+	 * 返回指定bean的实例，该实例可能是共享的或独立的。
 	 *
-	 * @param name         bean名称 to retrieve
-	 * @param requiredType the required type of the bean to retrieve
-	 * @param args         arguments to use when creating a bean instance using explicit arguments
-	 *                     (only applied when creating a new instance as opposed to retrieving an existing one)
-	 * @return an instance of the bean
-	 * @throws BeansException if the bean could not be created
+	 * @param name         要检索的bean名称
+	 * @param requiredType 要检索的bean的所需类型
+	 * @param args         使用显式参数创建bean实例时要使用的参数 (仅在创建新实例而不是检索现有实例时应用)
+	 * @return bean的实例
+	 * @throws BeansException 如果无法创建bean
 	 */
 	public <T> T getBean(String name, @Nullable Class<T> requiredType, @Nullable Object... args)
 			throws BeansException {
@@ -1497,10 +1501,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			ResolvableType targetType = mbd.targetType;
 			ResolvableType previousTargetType = previous.targetType;
 			if (targetType == null || targetType.equals(previousTargetType)) {
+				//复制目标类型
 				mbd.targetType = previousTargetType;
+				//复制是否是工厂bean
 				mbd.isFactoryBean = previous.isFactoryBean;
+				//复制解析好的目标类型
 				mbd.resolvedTargetType = previous.resolvedTargetType;
+				//复制工厂方法返回类型
 				mbd.factoryMethodReturnType = previous.factoryMethodReturnType;
+				//复制工厂方法实例
 				mbd.factoryMethodToIntrospect = previous.factoryMethodToIntrospect;
 			}
 		}
@@ -1608,9 +1617,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				dynamicLoader = tempClassLoader;
 				freshResolve = true;
 				if (tempClassLoader instanceof DecoratingClassLoader) {
+					//如果临时类加载器是DecoratingClassLoader类型
 					DecoratingClassLoader dcl = (DecoratingClassLoader) tempClassLoader;
 					for (Class<?> typeToMatch : typesToMatch) {
-						//排除匹配的类名
+						//装饰类加载器，排除匹配的类名
 						dcl.excludeClass(typeToMatch.getName());
 					}
 				}
@@ -1619,7 +1629,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		//获取bean类名
 		String className = mbd.getBeanClassName();
 		if (className != null) {
-			//如果类名不为空
+			//如果类名不为空，评估bean定义中包含的给定字符串，将其解析为表达式。
 			Object evaluated = evaluateBeanDefinitionString(className, mbd);
 			if (!className.equals(evaluated)) {
 				// A dynamically resolved expression, supported as of 4.2...
@@ -1648,7 +1658,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 		}
 
-		// Resolve regularly, caching the result in the BeanDefinition...
+		// 定期解析，将结果缓存在BeanDefinition中...
 		return mbd.resolveBeanClass(beanClassLoader);
 	}
 

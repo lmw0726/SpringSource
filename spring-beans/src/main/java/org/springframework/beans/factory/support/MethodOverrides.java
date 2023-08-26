@@ -16,11 +16,11 @@
 
 package org.springframework.beans.factory.support;
 
+import org.springframework.lang.Nullable;
+
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Set of method overrides, determining which, if any, methods on a
@@ -36,17 +36,20 @@ import org.springframework.lang.Nullable;
  */
 public class MethodOverrides {
 
+	/**
+	 * 属性覆盖获属性替换列表
+	 */
 	private final Set<MethodOverride> overrides = new CopyOnWriteArraySet<>();
 
 
 	/**
-	 * Create new MethodOverrides.
+	 * 创建新的方法。
 	 */
 	public MethodOverrides() {
 	}
 
 	/**
-	 * Deep copy constructor.
+	 * 深度复制构造函数。
 	 */
 	public MethodOverrides(MethodOverrides other) {
 		addOverrides(other);
@@ -54,7 +57,7 @@ public class MethodOverrides {
 
 
 	/**
-	 * Copy all given method overrides into this object.
+	 * 将所有给定的方法重写复制到此对象中。
 	 */
 	public void addOverrides(@Nullable MethodOverrides other) {
 		if (other != null) {
@@ -63,7 +66,7 @@ public class MethodOverrides {
 	}
 
 	/**
-	 * Add the given method override.
+	 * 添加给定的方法覆盖。
 	 */
 	public void addOverride(MethodOverride override) {
 		this.overrides.add(override);
@@ -80,22 +83,23 @@ public class MethodOverrides {
 	}
 
 	/**
-	 * Return whether the set of method overrides is empty.
+	 * 返回方法覆盖Set是否为空。
 	 */
 	public boolean isEmpty() {
 		return this.overrides.isEmpty();
 	}
 
 	/**
-	 * Return the override for the given method, if any.
+	 * 返回给定方法的覆盖 (如果有)。
 	 *
-	 * @param method method to check for overrides for
-	 * @return the method override, or {@code null} if none
+	 * @param method 检查是否为覆盖的方法
+	 * @return 方法覆盖，如果没有，则为 {@code null}
 	 */
 	@Nullable
 	public MethodOverride getOverride(Method method) {
 		MethodOverride match = null;
 		for (MethodOverride candidate : this.overrides) {
+			//遍历方法覆盖Set，如果匹配则返回该方法覆盖。
 			if (candidate.matches(method)) {
 				match = candidate;
 			}

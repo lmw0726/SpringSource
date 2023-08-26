@@ -16,23 +16,9 @@
 
 package org.springframework.web.servlet;
 
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.PropertyValues;
+import org.springframework.beans.*;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -46,6 +32,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.ServletContextResourceLoader;
 import org.springframework.web.context.support.StandardServletEnvironment;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Simple extension of {@link javax.servlet.http.HttpServlet} which treats
@@ -204,16 +197,15 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 
 
 	/**
-	 * PropertyValues implementation created from ServletConfig init parameters.
+	 * 从ServletConfig init参数创建的PropertyValues实现。
 	 */
 	private static class ServletConfigPropertyValues extends MutablePropertyValues {
 
 		/**
-		 * Create new ServletConfigPropertyValues.
-		 * @param config the ServletConfig we'll use to take PropertyValues from
-		 * @param requiredProperties set of property names we need, where
-		 * we can't accept default values
-		 * @throws ServletException if any required properties are missing
+		 * 创建新的ServletConfigPropertyValues
+		 * @param config 我们要从ServletConfig取PropertyValues
+		 * @param requiredProperties 我们需要的一组属性名称，我们不能接受默认值
+		 * @throws ServletException 如果缺少任何必需的属性
 		 */
 		public ServletConfigPropertyValues(ServletConfig config, Set<String> requiredProperties)
 				throws ServletException {

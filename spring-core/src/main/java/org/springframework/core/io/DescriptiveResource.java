@@ -34,6 +34,9 @@ import java.io.InputStream;
  */
 public class DescriptiveResource extends AbstractResource {
 
+	/**
+	 * 描述
+	 */
 	private final String description;
 
 
