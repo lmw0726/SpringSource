@@ -194,9 +194,9 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 				sec.setTypeLocator(new StandardTypeLocator(beanExpressionContext.getBeanFactory().getBeanClassLoader()));
 				//设置类型转换器
 				sec.setTypeConverter(new StandardTypeConverter(() -> {
-					//获取类型转换类
+					//获取类型转换器
 					ConversionService cs = beanExpressionContext.getBeanFactory().getConversionService();
-					//如果
+					//如果类型转换器为空，则使用默认的类型转换器
 					return (cs != null ? cs : DefaultConversionService.getSharedInstance());
 				}));
 				//自定义评估上下文
