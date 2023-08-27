@@ -144,7 +144,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 
 	/**
-	 * 存放bean的Class对象
+	 * 存放bean的Class对象，这里有两种情况，一种是字符串类型的类名，一种是Class对象
 	 */
 	@Nullable
 	private volatile Object beanClass;

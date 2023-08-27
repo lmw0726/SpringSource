@@ -1570,7 +1570,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param beanName     bean的名称 (用于错误处理)
 	 * @param typesToMatch 在内部类型匹配的情况下要匹配的类型 (也表示返回的 {@code Class} 永远不会暴露于应用程序代码)
 	 * @return 解析的bean类 (如果没有，则为 {@code null})
-	 * @throws CannotLoadBeanClassException if we failed to load the class
+	 * @throws CannotLoadBeanClassException 如果我们未能加载类
 	 */
 	@Nullable
 	protected Class<?> resolveBeanClass(RootBeanDefinition mbd, String beanName, Class<?>... typesToMatch)
@@ -1615,6 +1615,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			if (tempClassLoader != null) {
 				//如果临时类加载器不为空，当前动态类加载器为临时类加载器
 				dynamicLoader = tempClassLoader;
+				//新的解析设置为true
 				freshResolve = true;
 				if (tempClassLoader instanceof DecoratingClassLoader) {
 					//如果临时类加载器是DecoratingClassLoader类型
@@ -1632,20 +1633,26 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			//如果类名不为空，评估bean定义中包含的给定字符串，将其解析为表达式。
 			Object evaluated = evaluateBeanDefinitionString(className, mbd);
 			if (!className.equals(evaluated)) {
-				// A dynamically resolved expression, supported as of 4.2...
+				// 如果类名和评估值不同，按照类型进行特殊处理。
+				// 一个动态解析的表达式，从4.2开始支持...
 				if (evaluated instanceof Class) {
+					//如果评估值为Class类型，强转为Class后返回该评估值。
 					return (Class<?>) evaluated;
 				} else if (evaluated instanceof String) {
+					//如果评估值为字符串类型，将类名设置为评估值
 					className = (String) evaluated;
+					//新的解析标志设为true
 					freshResolve = true;
 				} else {
 					throw new IllegalStateException("Invalid class name expression result: " + evaluated);
 				}
 			}
 			if (freshResolve) {
-				// When resolving against a temporary class loader, exit early in order
-				// to avoid storing the resolved Class in the bean definition.
+				// 如果新解析标志为true
+				// 当针对临时类加载器进行解析时，请提前退出，以避免将解析的类存储在bean定义中。
+				// 该分支和 mbd.resolveBeanClass(beanClassLoader) 的区别是解析class后，没有设置bean定义的beanClass
 				if (dynamicLoader != null) {
+					//如果动态类加载器存在，使用动态类加载加载类名，并返回对应的类型。
 					try {
 						return dynamicLoader.loadClass(className);
 					} catch (ClassNotFoundException ex) {
@@ -1686,7 +1693,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				scope = getRegisteredScope(scopeName);
 			}
 		}
-		//使用bean表达式解析器解析
+		//使用bean表达式解析器解析，调用Spring EL表达式解析value值
 		return this.beanExpressionResolver.evaluate(value, new BeanExpressionContext(this, scope));
 	}
 

@@ -483,12 +483,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		//解析bean类
 		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
+			//如果解析出来了bean类，并且bean定义中的beanClass也是Class对象，且bean定义存在bean类名
+			//复制bean定义，并设置该bean类
 			mbdToUse = new RootBeanDefinition(mbd);
 			mbdToUse.setBeanClass(resolvedClass);
 		}
 
 		// 准备方法覆盖。
 		try {
+			//检查所有覆盖方法中，每个覆盖方法中，指定类中的覆盖方法是否存在
 			mbdToUse.prepareMethodOverrides();
 		} catch (BeanDefinitionValidationException ex) {
 			throw new BeanDefinitionStoreException(mbdToUse.getResourceDescription(),
@@ -1088,13 +1091,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Apply before-instantiation post-processors, resolving whether there is a
-	 * before-instantiation shortcut for the specified bean.
 	 * 应用前实例化后处理器，解决指定bean是否存在前实例化快捷方式。
 	 *
-	 * @param beanName the name of the bean
-	 * @param mbd      the bean definition for the bean
-	 * @return the shortcut-determined bean instance, or {@code null} if none
+	 * @param beanName bean名称
+	 * @param mbd      bean的bean定义
+	 * @return 快速确定的bean实例的方式，如果没有bean实例，则为 {@code null}
 	 */
 	@Nullable
 	protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition mbd) {
