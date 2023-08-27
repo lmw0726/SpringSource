@@ -123,7 +123,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private final ConcurrentMap<String, BeanWrapper> factoryBeanInstanceCache = new ConcurrentHashMap<>();
 
 	/**
-	 * Cache of candidate factory methods per factory class.
+	 * 工厂方法类-工厂方法候选者Map
+	 * 工厂类的候选工厂方法的缓存
 	 */
 	private final ConcurrentMap<Class<?>, Method[]> factoryMethodCandidateCache = new ConcurrentHashMap<>();
 
@@ -187,8 +188,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Return the ParameterNameDiscoverer to use for resolving method parameter
-	 * names if needed.
+	 * 如果需要，返回用于解析方法参数名称的ParameterNameDiscoverer。
 	 */
 	@Nullable
 	protected ParameterNameDiscoverer getParameterNameDiscoverer() {
@@ -714,7 +714,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			//获取工厂bean名称
 			String factoryBeanName = mbd.getFactoryBeanName();
 			if (factoryBeanName == null) {
-				//调用resolveBeanClass 解析该bean名称
+				//如果工厂bean名称为空，调用resolveBeanClass 解析出工厂方法类型
 				factoryClass = resolveBeanClass(mbd, beanName, typesToMatch);
 			} else {
 				//如果该工厂bean名称存在
@@ -734,47 +734,63 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			factoryClass = ClassUtils.getUserClass(factoryClass);
 
-			// If all factory methods have the same return type, return that type.
-			// Can't clearly figure out exact method due to type converting / autowiring!
+			//如果所有工厂方法都具有相同的返回类型，则返回该类型。由于类型转换自动转换，无法清楚地找到确切的方法!
+			//获取构造函数的参数个数
 			int minNrOfArgs =
 					(mbd.hasConstructorArgumentValues() ? mbd.getConstructorArgumentValues().getArgumentCount() : 0);
+			//获取工厂类的当前类的所有方法以及父类或父接口的所有方法。并添加进工厂方法候选者缓存中。
 			Method[] candidates = this.factoryMethodCandidateCache.computeIfAbsent(factoryClass,
 					clazz -> ReflectionUtils.getUniqueDeclaredMethods(clazz, ReflectionUtils.USER_DECLARED_METHODS));
 
 			for (Method candidate : candidates) {
+				//遍历候选方法
 				if (Modifier.isStatic(candidate.getModifiers()) == isStatic && mbd.isFactoryMethod(candidate) &&
 						candidate.getParameterCount() >= minNrOfArgs) {
-					// Declared type variables to inspect?
+					//如果当前方法的static修饰符与isStatic相同，且当前方法的方法名和工厂方法名相同，并且当前方法的参数个数>=构造函数的参数个数。
 					if (candidate.getTypeParameters().length > 0) {
+						//如果方法里有泛型参数
 						try {
-							// Fully resolve parameter names and argument values.
+							//获取所有的参数类型
 							Class<?>[] paramTypes = candidate.getParameterTypes();
 							String[] paramNames = null;
+							//获取参数名称发现者
 							ParameterNameDiscoverer pnd = getParameterNameDiscoverer();
 							if (pnd != null) {
+								//获取所有参数的参数名称
 								paramNames = pnd.getParameterNames(candidate);
 							}
+							//获取bean定义中的构造参数值
 							ConstructorArgumentValues cav = mbd.getConstructorArgumentValues();
 							Set<ConstructorArgumentValues.ValueHolder> usedValueHolders = new HashSet<>(paramTypes.length);
 							Object[] args = new Object[paramTypes.length];
 							for (int i = 0; i < args.length; i++) {
+								//遍历方法的每个参数位置，按照索引或者类型查找该参数的值持有者
 								ConstructorArgumentValues.ValueHolder valueHolder = cav.getArgumentValue(
 										i, paramTypes[i], (paramNames != null ? paramNames[i] : null), usedValueHolders);
 								if (valueHolder == null) {
+									//如果值持有者为空， 查找与给定类型匹配的下一个通用参数值
 									valueHolder = cav.getGenericArgumentValue(null, null, usedValueHolders);
 								}
 								if (valueHolder != null) {
+									//如果值持有者不为空，则获取参数值。
 									args[i] = valueHolder.getValue();
 									usedValueHolders.add(valueHolder);
 								}
 							}
+							//获取方法的返回类型
 							Class<?> returnType = AutowireUtils.resolveReturnTypeForFactoryMethod(
 									candidate, args, getBeanClassLoader());
-							uniqueCandidate = (commonType == null && returnType == candidate.getReturnType() ?
-									candidate : null);
+							//如果通用类型为空，且返回类型与当前的方法的类型相同，将当前方法设置为唯一候选方法
+							if (commonType == null && returnType == candidate.getReturnType()) {
+								uniqueCandidate = candidate;
+							} else {
+								uniqueCandidate = null;
+							}
+							//确认通用类型和当前方法返回类型的共同祖先
 							commonType = ClassUtils.determineCommonAncestor(returnType, commonType);
 							if (commonType == null) {
-								// Ambiguous return types found: return null to indicate "not determinable".
+								//如果共同祖先为空，返回null。
+								//发现不明确的返回类型: 返回null表示 “不可确定”。
 								return null;
 							}
 						} catch (Throwable ex) {
@@ -783,27 +799,39 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 							}
 						}
 					} else {
-						uniqueCandidate = (commonType == null ? candidate : null);
+						//如果通用类型为空，则将当前方法设置为唯一候选者
+						if (commonType == null) {
+							uniqueCandidate = candidate;
+						} else {
+							uniqueCandidate = null;
+						}
+						//确认通用类型和当前方法返回类型的共同祖先
 						commonType = ClassUtils.determineCommonAncestor(candidate.getReturnType(), commonType);
 						if (commonType == null) {
-							// Ambiguous return types found: return null to indicate "not determinable".
+							//如果共同祖先为空，返回null。
+							//发现不明确的返回类型: 返回null表示 “不可确定”。
 							return null;
 						}
 					}
 				}
 			}
-
+			//将唯一候选者方法缓存起来
 			mbd.factoryMethodToIntrospect = uniqueCandidate;
 			if (commonType == null) {
+				//如果共同类型为空，返回null
 				return null;
 			}
 		}
 
-		// Common return type found: all factory methods return same type. For a non-parameterized
-		// unique candidate, cache the full type declaration context of the target factory method.
+		// 找到常见的返回类型: 所有工厂方法都返回相同的类型。
+		// 对于非参数化的唯一候选者，缓存目标工厂方法的完整类型声明上下文。
+		//如果唯一候选方法不为空，通过ResolvableType.forMethodReturnType解析出返回类型。
+		//否则通过 共同类型 解析出返回类型
 		cachedReturnType = (uniqueCandidate != null ?
 				ResolvableType.forMethodReturnType(uniqueCandidate) : ResolvableType.forClass(commonType));
+		//缓存工厂方法的返回类型
 		mbd.factoryMethodReturnType = cachedReturnType;
+		//解析成Class对象返回。
 		return cachedReturnType.resolve();
 	}
 

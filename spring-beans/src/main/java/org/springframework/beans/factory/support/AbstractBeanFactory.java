@@ -738,6 +738,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// 检查bean类我们是否在处理工厂bean。
 		if (beanClass != null && FactoryBean.class.isAssignableFrom(beanClass)) {
+			//如果bean类不为空，且该bean类为FactoryBean的子类
 			if (BeanFactoryUtils.isFactoryDereference(name)) {
 				// 如果该名称是工厂取消引用返回该类型。
 				return beanClass;

@@ -75,7 +75,7 @@ public abstract class ClassUtils {
 	private static final char NESTED_CLASS_SEPARATOR = '$';
 
 	/**
-	 * The CGLIB class separator: {@code "$$"}.
+	 * CGLIB 类分隔符： {@code "$$"}.
 	 */
 	public static final String CGLIB_CLASS_SEPARATOR = "$$";
 
@@ -811,17 +811,17 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Determine the common ancestor of the given classes, if any.
+	 * 确定给定类的共同祖先 (如果有)。
 	 *
-	 * @param clazz1 the class to introspect
-	 * @param clazz2 the other class to introspect
-	 * @return the common ancestor (i.e. common superclass, one interface
-	 * extending the other), or {@code null} if none found. If any of the
-	 * given classes is {@code null}, the other class will be returned.
+	 * @param clazz1 要内省的类
+	 * @param clazz2 要内省的其他类
+	 * @return 公共祖先 (即公共超类，一个接口扩展另一个)，或者 {@code null}，如果没有找到。
+	 * 如果给定的任何一个类是 {@code null}，则将返回另一个类。
 	 * @since 3.2.6
 	 */
 	@Nullable
 	public static Class<?> determineCommonAncestor(@Nullable Class<?> clazz1, @Nullable Class<?> clazz2) {
+		//如果两者中的其中一个类为空，返回另外一个类
 		if (clazz1 == null) {
 			return clazz2;
 		}
@@ -829,19 +829,23 @@ public abstract class ClassUtils {
 			return clazz1;
 		}
 		if (clazz1.isAssignableFrom(clazz2)) {
+			//如果class2是class1的子类或者子接口，那么返回class1类型
 			return clazz1;
 		}
 		if (clazz2.isAssignableFrom(clazz1)) {
+			//如果class1是class2的子类或者子接口，那么返回class2类型
 			return clazz2;
 		}
 		Class<?> ancestor = clazz1;
 		do {
+			//获取父类
 			ancestor = ancestor.getSuperclass();
 			if (ancestor == null || Object.class == ancestor) {
+				//如果父类为空，或者父类为Object类，返回null。
 				return null;
 			}
-		}
-		while (!ancestor.isAssignableFrom(clazz2));
+			//如果class2不是父类的子类或者子接口，跳出循环
+		} while (!ancestor.isAssignableFrom(clazz2));
 		return ancestor;
 	}
 
@@ -936,16 +940,17 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return the user-defined class for the given class: usually simply the given
-	 * class, but the original class in case of a CGLIB-generated subclass.
+	 * 返回给定类的用户定义的类: 通常只是给定的类，但在CGLIB生成的子类的情况下是原始类。
 	 *
-	 * @param clazz the class to check
+	 * @param clazz 要检查的类
 	 * @return the user-defined class
 	 */
 	public static Class<?> getUserClass(Class<?> clazz) {
 		if (clazz.getName().contains(CGLIB_CLASS_SEPARATOR)) {
+			//如果类名含有CGLIB的类分隔符，获取该类的父类
 			Class<?> superclass = clazz.getSuperclass();
 			if (superclass != null && superclass != Object.class) {
+				//如果父类不为空，且该类不是Object类，则返回该父类
 				return superclass;
 			}
 		}
