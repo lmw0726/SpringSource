@@ -678,6 +678,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			targetType = getTypeForFactoryMethod(beanName, mbd, typesToMatch);
 		}
 		if (ObjectUtils.isEmpty(typesToMatch) || getTempClassLoader() == null) {
+			//如果要匹配的类型为空或者临时类加载器为空，缓存到当前的bean定义中的解析好的目标类型
 			mbd.resolvedTargetType = targetType;
 		}
 		return targetType;
@@ -1137,8 +1138,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			//如果bean定义不是合成的，并且有实例化感知bean后置处理器
 			Class<?> targetType = determineTargetType(beanName, mbd);
 			if (targetType != null) {
+				//如果目标类型不为空，实例化前应用bean后置处理
 				bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
 				if (bean != null) {
+					//如果bean不为空，实例化后，应用bean后置处理
 					bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 				}
 			}
@@ -1148,22 +1151,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Apply InstantiationAwareBeanPostProcessors to the specified bean definition
-	 * (by class and name), invoking their {@code postProcessBeforeInstantiation} methods.
-	 * <p>Any returned object will be used as the bean instead of actually instantiating
-	 * the target bean. A {@code null} return value from the post-processor will
-	 * result in the target bean being instantiated.
+	 * 将InstantiationAwareBeanPostProcessors应用于指定的bean定义 (按类和名称)，调用其 {@code postProcessBeforeInstantiation} 方法。
+	 * <p> 任何返回的对象都将用作bean，而不是实际实例化目标bean。后处理器的 {@code null} 返回值将导致目标bean被实例化。
 	 *
-	 * @param beanClass the class of the bean to be instantiated
-	 * @param beanName  the name of the bean
-	 * @return the bean object to use instead of a default instance of the target bean, or {@code null}
+	 * @param beanClass 要实例化的bean的类
+	 * @param beanName  bean名称
+	 * @return 要使用的bean对象而不是目标bean的默认实例，或 {@code null}
 	 * @see InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation
 	 */
 	@Nullable
 	protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
 		for (InstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().instantiationAware) {
+			//遍历实例化感知bean后置处理器，调用在实例化前后置处理
 			Object result = bp.postProcessBeforeInstantiation(beanClass, beanName);
 			if (result != null) {
+				//如果后置处理的返回值不为空，则停止后续实例化感知bean后置处理器的处理，并返回该对象。
 				return result;
 			}
 		}
