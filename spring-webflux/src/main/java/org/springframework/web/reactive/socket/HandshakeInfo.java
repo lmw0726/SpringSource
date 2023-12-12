@@ -16,104 +16,110 @@
 
 package org.springframework.web.reactive.socket;
 
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.Map;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
+import reactor.core.publisher.Mono;
+
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Simple container of information related to the handshake request that started
  * the {@link WebSocketSession} session.
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see WebSocketSession#getHandshakeInfo()
+ * @since 5.0
  */
 public class HandshakeInfo {
-
+	// 空的 Cookie Map，用于初始化
 	private static final MultiValueMap<String, HttpCookie> EMPTY_COOKIES =
 			CollectionUtils.toMultiValueMap(Collections.emptyMap());
 
-
+	// URI
 	private final URI uri;
 
+	// 主体 Mono
 	private final Mono<Principal> principalMono;
 
+	// 头部信息
 	private final HttpHeaders headers;
 
+	// Cookie Map
 	private final MultiValueMap<String, HttpCookie> cookies;
 
+	// 协议
 	@Nullable
 	private final String protocol;
 
+	// 远程地址
 	@Nullable
 	private final InetSocketAddress remoteAddress;
 
+	// 属性
 	private final Map<String, Object> attributes;
 
+	// 日志前缀
 	@Nullable
 	private final String logPrefix;
 
 
 	/**
-	 * Constructor with basic information about the handshake.
-	 * @param uri the endpoint URL
-	 * @param headers request headers for server or response headers or client
-	 * @param principal the principal for the session
-	 * @param protocol the negotiated sub-protocol (may be {@code null})
+	 * 构造函数，包含关于握手的基本信息。
+	 *
+	 * @param uri       终端点 URL
+	 * @param headers   服务器的请求头或响应头或客户端的请求头
+	 * @param principal 会话的主体
+	 * @param protocol  协商的子协议（可能为 null）
 	 */
 	public HandshakeInfo(URI uri, HttpHeaders headers, Mono<Principal> principal, @Nullable String protocol) {
 		this(uri, headers, EMPTY_COOKIES, principal, protocol, null, Collections.emptyMap(), null);
 	}
 
 	/**
-	 * Constructor targeting server-side use with extra information such as
-	 * the remote address, attributes, and a log prefix.
-	 * @param uri the endpoint URL
-	 * @param headers server request headers
-	 * @param principal the principal for the session
-	 * @param protocol the negotiated sub-protocol (may be {@code null})
-	 * @param remoteAddress the remote address of the client
-	 * @param attributes initial attributes for the WebSocket session
-	 * @param logPrefix the log prefix for the handshake request.
+	 * 针对服务器端使用的构造函数，包含远程地址、属性和日志前缀等额外信息。
+	 *
+	 * @param uri           终端点 URL
+	 * @param headers       服务器的请求头
+	 * @param principal     会话的主体
+	 * @param protocol      协商的子协议（可能为 null）
+	 * @param remoteAddress 客户端的远程地址
+	 * @param attributes    WebSocket 会话的初始属性
+	 * @param logPrefix     握手请求的日志前缀
 	 * @since 5.1
-	 * @deprecated as of 5.3.5 in favor of
-	 * {@link #HandshakeInfo(URI, HttpHeaders, MultiValueMap, Mono, String, InetSocketAddress, Map, String)}
+	 * @deprecated 自 5.3.5 起已弃用，推荐使用 {@link #HandshakeInfo(URI, HttpHeaders, MultiValueMap, Mono, String, InetSocketAddress, Map, String)}
 	 */
 	@Deprecated
 	public HandshakeInfo(URI uri, HttpHeaders headers, Mono<Principal> principal,
-				@Nullable String protocol, @Nullable InetSocketAddress remoteAddress,
-				Map<String, Object> attributes, @Nullable String logPrefix) {
+						 @Nullable String protocol, @Nullable InetSocketAddress remoteAddress,
+						 Map<String, Object> attributes, @Nullable String logPrefix) {
 
 		this(uri, headers, EMPTY_COOKIES, principal, protocol, remoteAddress, attributes, logPrefix);
 	}
 
 	/**
-	 * Constructor targeting server-side use with extra information such as the
-	 * cookies, remote address, attributes, and a log prefix.
-	 * @param uri the endpoint URL
-	 * @param headers server request headers
-	 * @param cookies server request cookies
-	 * @param principal the principal for the session
-	 * @param protocol the negotiated sub-protocol (may be {@code null})
-	 * @param remoteAddress the remote address of the client
-	 * @param attributes initial attributes for the WebSocket session
-	 * @param logPrefix the log prefix for the handshake request.
+	 * 针对服务器端使用的构造函数，包含 Cookies、远程地址、属性和日志前缀等额外信息。
+	 *
+	 * @param uri           终端点 URL
+	 * @param headers       服务器的请求头
+	 * @param cookies       服务器的请求 Cookies
+	 * @param principal     会话的主体
+	 * @param protocol      协商的子协议（可能为 null）
+	 * @param remoteAddress 客户端的远程地址
+	 * @param attributes    WebSocket 会话的初始属性
+	 * @param logPrefix     握手请求的日志前缀
 	 * @since 5.3.5
 	 */
 	public HandshakeInfo(URI uri, HttpHeaders headers, MultiValueMap<String, HttpCookie> cookies,
-				Mono<Principal> principal, @Nullable String protocol, @Nullable InetSocketAddress remoteAddress,
-				Map<String, Object> attributes, @Nullable String logPrefix) {
+						 Mono<Principal> principal, @Nullable String protocol, @Nullable InetSocketAddress remoteAddress,
+						 Map<String, Object> attributes, @Nullable String logPrefix) {
 
 		Assert.notNull(uri, "URI is required");
 		Assert.notNull(headers, "HttpHeaders are required");
@@ -133,24 +139,24 @@ public class HandshakeInfo {
 
 
 	/**
-	 * Return the URL for the WebSocket endpoint.
+	 * 返回 WebSocket 终端点的 URL。
 	 */
 	public URI getUri() {
 		return this.uri;
 	}
 
 	/**
-	 * Return the HTTP headers from the handshake request, either server request
-	 * headers for a server session or the client response headers for a client
-	 * session.
+	 * 返回 WebSocket 握手请求中的 HTTP 头部，对于服务器会话是服务器请求的头部，
+	 * 对于客户端会话是客户端响应的头部。
 	 */
 	public HttpHeaders getHeaders() {
 		return this.headers;
 	}
 
 	/**
-	 * For a server session this returns the server request cookies from the
-	 * handshake request. For a client session, it is an empty map.
+	 * 对于服务器会话，返回握手请求中的服务器请求 Cookie。
+	 * 对于客户端会话，返回一个空映射。
+	 *
 	 * @since 5.3.5
 	 */
 	public MultiValueMap<String, HttpCookie> getCookies() {
@@ -158,14 +164,15 @@ public class HandshakeInfo {
 	}
 
 	/**
-	 * Return the principal associated with the handshake request, if any.
+	 * 返回与握手请求关联的主体，如果有的话。
 	 */
 	public Mono<Principal> getPrincipal() {
 		return this.principalMono;
 	}
 
 	/**
-	 * The sub-protocol negotiated at handshake time, or {@code null} if none.
+	 * 握手时协商的子协议，如果没有则返回 null。
+	 *
 	 * @see <a href="https://tools.ietf.org/html/rfc6455#section-1.9">
 	 * https://tools.ietf.org/html/rfc6455#section-1.9</a>
 	 */
@@ -174,9 +181,11 @@ public class HandshakeInfo {
 		return this.protocol;
 	}
 
+
 	/**
-	 * For a server session this is the remote address where the handshake
-	 * request came from. For a client session, it is {@code null}.
+	 * 对于服务器会话，返回握手请求的远程地址。
+	 * 对于客户端会话，返回 null。
+	 *
 	 * @since 5.1
 	 */
 	@Nullable
@@ -185,7 +194,8 @@ public class HandshakeInfo {
 	}
 
 	/**
-	 * Attributes extracted from the handshake request to add to the session.
+	 * 从握手请求中提取的属性，用于添加到会话中。
+	 *
 	 * @since 5.1
 	 */
 	public Map<String, Object> getAttributes() {
@@ -193,8 +203,9 @@ public class HandshakeInfo {
 	}
 
 	/**
-	 * A log prefix used in the handshake to correlate log messages, if any.
-	 * @return a log prefix, or {@code null} if not specified
+	 * 握手中用于关联日志消息的日志前缀，如果未指定则返回 null。
+	 *
+	 * @return 日志前缀，如果未指定则返回 null
 	 * @since 5.1
 	 */
 	@Nullable
@@ -202,7 +213,9 @@ public class HandshakeInfo {
 		return this.logPrefix;
 	}
 
-
+	/**
+	 * 返回此对象的字符串表示形式，包括 URI 信息。
+	 */
 	@Override
 	public String toString() {
 		return "HandshakeInfo[uri=" + this.uri + "]";

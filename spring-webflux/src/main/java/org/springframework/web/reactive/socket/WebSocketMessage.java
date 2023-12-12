@@ -16,14 +16,14 @@
 
 package org.springframework.web.reactive.socket;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Representation of a WebSocket message.
@@ -45,21 +45,20 @@ public class WebSocketMessage {
 
 
 	/**
-	 * Constructor for a WebSocketMessage.
-	 * <p>See static factory methods in {@link WebSocketSession} or alternatively
-	 * use {@link WebSocketSession#bufferFactory()} to create the payload and
-	 * then invoke this constructor.
+	 * WebSocketMessage的构造函数。
+	 * <p>参见{@link WebSocketSession}中的静态工厂方法，或者可以使用{@link WebSocketSession#bufferFactory()}创建载荷，
+	 * 然后调用此构造函数。
 	 */
 	public WebSocketMessage(Type type, DataBuffer payload) {
 		this(type, payload, null);
 	}
 
 	/**
-	 * Constructor for an inbound message with access to the underlying message.
-	 * @param type the type of WebSocket message
-	 * @param payload the message content
-	 * @param nativeMessage the message from the API of the underlying WebSocket
-	 * library, if applicable.
+	 * 具有对底层消息的访问权限的入站消息的构造函数。
+	 *
+	 * @param type          WebSocket消息的类型
+	 * @param payload       消息内容
+	 * @param nativeMessage 应用于底层WebSocket库API的消息（如果适用）。
 	 * @since 5.3
 	 */
 	public WebSocketMessage(Type type, DataBuffer payload, @Nullable Object nativeMessage) {
@@ -71,26 +70,25 @@ public class WebSocketMessage {
 	}
 
 	/**
-	 * Return the message type (text, binary, etc).
+	 * 返回消息类型（文本、二进制等）。
 	 */
 	public Type getType() {
 		return this.type;
 	}
 
 	/**
-	 * Return the message payload.
+	 * 返回消息载荷。
 	 */
 	public DataBuffer getPayload() {
 		return this.payload;
 	}
 
 	/**
-	 * Return the message from the API of the underlying WebSocket library. This
-	 * is applicable for inbound messages only and when the underlying message
-	 * has additional fields other than the content. Currently this is the case
-	 * for Reactor Netty only.
-	 * @param <T> the type to cast the underlying message to
-	 * @return the underlying message, or {@code null}
+	 * 返回底层WebSocket库的消息。仅适用于入站消息以及底层消息除内容外具有其他字段的情况。
+	 * 目前仅适用于Reactor Netty。
+	 *
+	 * @param <T> 底层消息要转换的类型
+	 * @return 底层消息，或者{@code null}
 	 * @since 5.3
 	 */
 	@Nullable
@@ -100,18 +98,16 @@ public class WebSocketMessage {
 	}
 
 	/**
-	 * A variant of {@link #getPayloadAsText(Charset)} that uses {@code UTF-8}
-	 * for decoding the raw content to text.
+	 * {@link #getPayloadAsText(Charset)}的变体，使用{@code UTF-8}解码原始内容为文本。
 	 */
 	public String getPayloadAsText() {
 		return getPayloadAsText(StandardCharsets.UTF_8);
 	}
 
 	/**
-	 * A shortcut for decoding the raw content of the message to text with the
-	 * given character encoding. This is useful for text WebSocket messages, or
-	 * otherwise when the payload is expected to contain text.
-	 * @param charset the character encoding
+	 * 解码消息的原始内容为文本的快捷方式，使用给定的字符编码。对于文本WebSocket消息或者负载预计包含文本的情况，这很有用。
+	 *
+	 * @param charset 字符编码
 	 * @since 5.0.5
 	 */
 	public String getPayloadAsText(Charset charset) {
@@ -119,12 +115,12 @@ public class WebSocketMessage {
 	}
 
 	/**
-	 * Retain the data buffer for the message payload, which is useful on
-	 * runtimes (e.g. Netty) with pooled buffers. A shortcut for:
+	 * 保留消息负载的数据缓冲区，对于使用池化缓冲区的运行时（例如Netty）很有用。一个快捷方式：
 	 * <pre>
 	 * DataBuffer payload = message.getPayload();
 	 * DataBufferUtils.retain(payload);
 	 * </pre>
+	 *
 	 * @see DataBufferUtils#retain(DataBuffer)
 	 */
 	public WebSocketMessage retain() {
@@ -133,12 +129,12 @@ public class WebSocketMessage {
 	}
 
 	/**
-	 * Release the payload {@code DataBuffer} which is useful on runtimes
-	 * (e.g. Netty) with pooled buffers such as Netty. A shortcut for:
+	 * 释放负载{@code DataBuffer}，对于使用池化缓冲区的运行时（例如Netty）很有用。一个快捷方式：
 	 * <pre>
 	 * DataBuffer payload = message.getPayload();
 	 * DataBufferUtils.release(payload);
 	 * </pre>
+	 *
 	 * @see DataBufferUtils#release(DataBuffer)
 	 */
 	public void release() {
@@ -171,23 +167,23 @@ public class WebSocketMessage {
 
 
 	/**
-	 * WebSocket message types.
+	 * WebSocket消息类型枚举。
 	 */
 	public enum Type {
 		/**
-		 * Text WebSocket message.
+		 * 文本WebSocket消息。
 		 */
 		TEXT,
 		/**
-		 * Binary WebSocket message.
+		 * 二进制WebSocket消息。
 		 */
 		BINARY,
 		/**
-		 * WebSocket ping.
+		 * WebSocket ping。
 		 */
 		PING,
 		/**
-		 * WebSocket pong.
+		 * WebSocket pong。
 		 */
 		PONG
 	}

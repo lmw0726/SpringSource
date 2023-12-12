@@ -16,12 +16,11 @@
 
 package org.springframework.core;
 
-import java.util.function.Function;
-
 import org.reactivestreams.Publisher;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.function.Function;
 
 /**
  * Adapter for a Reactive Streams {@link Publisher} to and from an async/reactive
@@ -44,13 +43,14 @@ public class ReactiveAdapter {
 	/**
 	 * Constructor for an adapter with functions to convert the target reactive
 	 * or async type to and from a Reactive Streams Publisher.
-	 * @param descriptor the reactive type descriptor
-	 * @param toPublisherFunction adapter to a Publisher
+	 *
+	 * @param descriptor            the reactive type descriptor
+	 * @param toPublisherFunction   adapter to a Publisher
 	 * @param fromPublisherFunction adapter from a Publisher
 	 */
 	public ReactiveAdapter(ReactiveTypeDescriptor descriptor,
-			Function<Object, Publisher<?>> toPublisherFunction,
-			Function<Publisher<?>, Object> fromPublisherFunction) {
+						   Function<Object, Publisher<?>> toPublisherFunction,
+						   Function<Publisher<?>, Object> fromPublisherFunction) {
 
 		Assert.notNull(descriptor, "'descriptor' is required");
 		Assert.notNull(toPublisherFunction, "'toPublisherFunction' is required");
@@ -99,10 +99,10 @@ public class ReactiveAdapter {
 
 
 	/**
-	 * Adapt the given instance to a Reactive Streams {@code Publisher}.
-	 * @param source the source object to adapt from; if the given object is
-	 * {@code null}, {@link ReactiveTypeDescriptor#getEmptyValue()} is used.
-	 * @return the Publisher representing the adaptation
+	 * 使给定实例适应反应流 {@code Publisher}。
+	 *
+	 * @param source 要适应的源对象; 如果给定对象为 {@code null}，则使用 {@link ReactiveTypeDescriptor#getEmptyValue()}。
+	 * @return 代表适配了的Publisher
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> Publisher<T> toPublisher(@Nullable Object source) {
@@ -113,9 +113,10 @@ public class ReactiveAdapter {
 	}
 
 	/**
-	 * Adapt from the given Reactive Streams Publisher.
-	 * @param publisher the publisher to adapt from
-	 * @return the reactive type instance representing the adapted publisher
+	 * 适配给定的反应式流 Publisher
+	 *
+	 * @param publisher 要适配的publisher
+	 * @return 表示适配的发布者的响应类型实例
 	 */
 	public Object fromPublisher(Publisher<?> publisher) {
 		return this.fromPublisherFunction.apply(publisher);
