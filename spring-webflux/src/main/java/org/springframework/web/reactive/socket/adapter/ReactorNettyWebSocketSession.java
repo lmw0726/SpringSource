@@ -16,11 +16,14 @@
 
 package org.springframework.web.reactive.socket.adapter;
 
-import java.util.function.Consumer;
-
 import io.netty.channel.ChannelId;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.reactivestreams.Publisher;
+import org.springframework.core.io.buffer.NettyDataBufferFactory;
+import org.springframework.web.reactive.socket.CloseStatus;
+import org.springframework.web.reactive.socket.HandshakeInfo;
+import org.springframework.web.reactive.socket.WebSocketMessage;
+import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.Connection;
@@ -30,11 +33,7 @@ import reactor.netty.channel.ChannelOperations;
 import reactor.netty.http.websocket.WebsocketInbound;
 import reactor.netty.http.websocket.WebsocketOutbound;
 
-import org.springframework.core.io.buffer.NettyDataBufferFactory;
-import org.springframework.web.reactive.socket.CloseStatus;
-import org.springframework.web.reactive.socket.HandshakeInfo;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import org.springframework.web.reactive.socket.WebSocketSession;
+import java.util.function.Consumer;
 
 /**
  * {@link WebSocketSession} implementation for use with the Reactor Netty's
@@ -46,28 +45,45 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 public class ReactorNettyWebSocketSession
 		extends NettyWebSocketSessionSupport<ReactorNettyWebSocketSession.WebSocketConnection> {
 
+	/**
+	 * 最大帧有效负载长度
+	 */
 	private final int maxFramePayloadLength;
 
+	/**
+	 * 通道编号
+	 */
 	private final ChannelId channelId;
 
 
 	/**
-	 * Constructor for the session, using the {@link #DEFAULT_FRAME_MAX_SIZE} value.
+	 * 会话的构造方法，使用 {@link #DEFAULT_FRAME_MAX_SIZE} 的值。
+	 *
+	 * @param inbound       WebSocket 入站对象
+	 * @param outbound      WebSocket 出站对象
+	 * @param info          握手信息
+	 * @param bufferFactory NettyDataBufferFactory 实例
 	 */
 	public ReactorNettyWebSocketSession(WebsocketInbound inbound, WebsocketOutbound outbound,
-			HandshakeInfo info, NettyDataBufferFactory bufferFactory) {
+										HandshakeInfo info, NettyDataBufferFactory bufferFactory) {
 
 		this(inbound, outbound, info, bufferFactory, DEFAULT_FRAME_MAX_SIZE);
 	}
 
 	/**
-	 * Constructor with an additional maxFramePayloadLength argument.
+	 * 带有额外 maxFramePayloadLength 参数的构造方法。
+	 *
+	 * @param inbound               WebSocket 入站对象
+	 * @param outbound              WebSocket 出站对象
+	 * @param info                  握手信息
+	 * @param bufferFactory         NettyDataBufferFactory 实例
+	 * @param maxFramePayloadLength 最大帧负载长度
 	 * @since 5.1
 	 */
 	@SuppressWarnings("rawtypes")
 	public ReactorNettyWebSocketSession(WebsocketInbound inbound, WebsocketOutbound outbound,
-			HandshakeInfo info, NettyDataBufferFactory bufferFactory,
-			int maxFramePayloadLength) {
+										HandshakeInfo info, NettyDataBufferFactory bufferFactory,
+										int maxFramePayloadLength) {
 
 		super(new WebSocketConnection(inbound, outbound), info, bufferFactory);
 		this.maxFramePayloadLength = maxFramePayloadLength;
@@ -76,7 +92,9 @@ public class ReactorNettyWebSocketSession
 
 
 	/**
-	 * Return the id of the underlying Netty channel.
+	 * 返回底层 Netty 通道的 ID。
+	 *
+	 * @return 底层 Netty 通道的 ID
 	 * @since 5.3.4
 	 */
 	public ChannelId getChannelId() {
@@ -84,6 +102,11 @@ public class ReactorNettyWebSocketSession
 	}
 
 
+	/**
+	 * 接收 WebSocket 消息。
+	 *
+	 * @return WebSocket 消息的 Flux
+	 */
 	@Override
 	public Flux<WebSocketMessage> receive() {
 		return getDelegate().getInbound()
@@ -97,6 +120,12 @@ public class ReactorNettyWebSocketSession
 				});
 	}
 
+	/**
+	 * 发送 WebSocket 消息。
+	 *
+	 * @param messages WebSocket 消息的 Publisher
+	 * @return 发送操作的 Mono
+	 */
 	@Override
 	public Mono<Void> send(Publisher<WebSocketMessage> messages) {
 		Flux<WebSocketFrame> frames = Flux.from(messages)
@@ -111,6 +140,11 @@ public class ReactorNettyWebSocketSession
 				.then();
 	}
 
+	/**
+	 * 检查会话是否打开。
+	 *
+	 * @return 若会话未关闭，则为 true
+	 */
 	@Override
 	public boolean isOpen() {
 		DisposedCallback callback = new DisposedCallback();
@@ -118,25 +152,42 @@ public class ReactorNettyWebSocketSession
 		return !callback.isDisposed();
 	}
 
+	/**
+	 * 关闭会话。
+	 *
+	 * @param status 关闭状态
+	 * @return 关闭操作的 Mono
+	 */
 	@Override
 	public Mono<Void> close(CloseStatus status) {
-		// this will notify WebSocketInbound.receiveCloseStatus()
+		// 这将通知 WebSocketInbound.receiveCloseStatus()
 		return getDelegate().getOutbound().sendClose(status.getCode(), status.getReason());
 	}
 
+	/**
+	 * 获取关闭状态。
+	 *
+	 * @return 关闭状态的 Mono
+	 */
 	@Override
 	public Mono<CloseStatus> closeStatus() {
 		return getDelegate().getInbound().receiveCloseStatus()
 				.map(status -> CloseStatus.create(status.code(), status.reasonText()));
 	}
 
+
 	/**
-	 * Simple container for {@link NettyInbound} and {@link NettyOutbound}.
+	 * {@link NettyInbound} 和 {@link NettyOutbound} 的简单容器。
 	 */
 	public static class WebSocketConnection {
-
+		/**
+		 * WebSocket 入站对象
+		 */
 		private final WebsocketInbound inbound;
 
+		/**
+		 * WebSocket 出站对象
+		 */
 		private final WebsocketOutbound outbound;
 
 
@@ -154,9 +205,14 @@ public class ReactorNettyWebSocketSession
 		}
 	}
 
-
+	/**
+	 * 被释放的回调函数。
+	 */
 	private static class DisposedCallback implements Consumer<Connection> {
 
+		/**
+		 * 是否已被释放
+		 */
 		private boolean disposed;
 
 		public boolean isDisposed() {
