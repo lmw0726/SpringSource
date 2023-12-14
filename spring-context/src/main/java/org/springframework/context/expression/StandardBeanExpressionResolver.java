@@ -16,9 +16,6 @@
 
 package org.springframework.context.expression;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanExpressionException;
 import org.springframework.beans.factory.config.BeanExpressionContext;
@@ -36,6 +33,9 @@ import org.springframework.expression.spel.support.StandardTypeLocator;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Standard implementation of the
@@ -56,26 +56,44 @@ import org.springframework.util.StringUtils;
 public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 
 	/**
-	 * Default expression prefix: "#{".
+	 * 默认表达式前缀：“#{”。
 	 */
 	public static final String DEFAULT_EXPRESSION_PREFIX = "#{";
 
 	/**
-	 * Default expression suffix: "}".
+	 * 默认表达式后缀：“}”。
 	 */
 	public static final String DEFAULT_EXPRESSION_SUFFIX = "}";
 
 
+	/**
+	 * 表达式前缀
+	 */
 	private String expressionPrefix = DEFAULT_EXPRESSION_PREFIX;
 
+	/**
+	 * 表达式后缀
+	 */
 	private String expressionSuffix = DEFAULT_EXPRESSION_SUFFIX;
 
+	/**
+	 * 表达式解析器
+	 */
 	private ExpressionParser expressionParser;
 
+	/**
+	 * 表单时字符串与表达式类 Map缓存
+	 */
 	private final Map<String, Expression> expressionCache = new ConcurrentHashMap<>(256);
 
+	/**
+	 * bean表达式上下文 与 标准评估上下文 Map缓存
+	 */
 	private final Map<BeanExpressionContext, StandardEvaluationContext> evaluationCache = new ConcurrentHashMap<>(8);
 
+	/**
+	 * bean表达式解析器上下文
+	 */
 	private final ParserContext beanExpressionParserContext = new ParserContext() {
 		@Override
 		public boolean isTemplate() {
@@ -95,17 +113,16 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 
 
 	/**
-	 * Create a new {@code StandardBeanExpressionResolver} with default settings.
+	 * 使用默认设置创建新的 {@code StandardBeanExpressionResolver}。
 	 */
 	public StandardBeanExpressionResolver() {
 		this.expressionParser = new SpelExpressionParser();
 	}
 
 	/**
-	 * Create a new {@code StandardBeanExpressionResolver} with the given bean class loader,
-	 * using it as the basis for expression compilation.
+	 * 使用给定的bean类加载器创建一个新的 {@code StandardBeanExpressionResolver}，将其用作表达式编译的基础。
 	 *
-	 * @param beanClassLoader the factory's bean class loader
+	 * @param beanClassLoader 工厂的bean类加载器
 	 */
 	public StandardBeanExpressionResolver(@Nullable ClassLoader beanClassLoader) {
 		//SpringEL表达式解析器
@@ -114,8 +131,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 
 
 	/**
-	 * Set the prefix that an expression string starts with.
-	 * The default is "#{".
+	 * 设置表达式字符串开头的前缀。默认为 “#{”。
 	 *
 	 * @see #DEFAULT_EXPRESSION_PREFIX
 	 */
@@ -125,8 +141,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 	}
 
 	/**
-	 * Set the suffix that an expression string ends with.
-	 * The default is "}".
+	 * 设置表达式字符串结尾的后缀。默认为 “}”。
 	 *
 	 * @see #DEFAULT_EXPRESSION_SUFFIX
 	 */
@@ -136,9 +151,8 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 	}
 
 	/**
-	 * Specify the EL parser to use for expression parsing.
-	 * <p>Default is a {@link org.springframework.expression.spel.standard.SpelExpressionParser},
-	 * compatible with standard Unified EL style expression syntax.
+	 * 指定用于表达式解析的EL解析器。
+	 * <p> 默认为 {@link org.springframework.expression.spel.standard.SpelExpressionParser}，与标准统一EL样式表达式语法兼容。
 	 */
 	public void setExpressionParser(ExpressionParser expressionParser) {
 		Assert.notNull(expressionParser, "ExpressionParser must not be null");
@@ -164,17 +178,28 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 			}
 			StandardEvaluationContext sec = this.evaluationCache.get(beanExpressionContext);
 			if (sec == null) {
+				//如果标准评估上下文为空，使用bean表达式上下文创建新的标准评估上下文
 				sec = new StandardEvaluationContext(beanExpressionContext);
+				//添加bean表达式上下文访问器
 				sec.addPropertyAccessor(new BeanExpressionContextAccessor());
+				//添加bean工厂访问器
 				sec.addPropertyAccessor(new BeanFactoryAccessor());
+				//添加Map访问器
 				sec.addPropertyAccessor(new MapAccessor());
+				//添加环境访问器
 				sec.addPropertyAccessor(new EnvironmentAccessor());
+				//设置bean解析器
 				sec.setBeanResolver(new BeanFactoryResolver(beanExpressionContext.getBeanFactory()));
+				//设置类型定位器
 				sec.setTypeLocator(new StandardTypeLocator(beanExpressionContext.getBeanFactory().getBeanClassLoader()));
+				//设置类型转换器
 				sec.setTypeConverter(new StandardTypeConverter(() -> {
+					//获取类型转换器
 					ConversionService cs = beanExpressionContext.getBeanFactory().getConversionService();
+					//如果类型转换器为空，则使用默认的类型转换器
 					return (cs != null ? cs : DefaultConversionService.getSharedInstance());
 				}));
+				//自定义评估上下文
 				customizeEvaluationContext(sec);
 				this.evaluationCache.put(beanExpressionContext, sec);
 			}
@@ -185,8 +210,8 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 	}
 
 	/**
-	 * Template method for customizing the expression evaluation context.
-	 * <p>The default implementation is empty.
+	 * 用于自定义表达式求值上下文的模板方法。
+	 * <p> 默认实现为空。
 	 */
 	protected void customizeEvaluationContext(StandardEvaluationContext evalContext) {
 	}

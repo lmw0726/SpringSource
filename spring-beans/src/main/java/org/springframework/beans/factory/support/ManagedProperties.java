@@ -34,13 +34,13 @@ import java.util.Properties;
 public class ManagedProperties extends Properties implements Mergeable, BeanMetadataElement {
 
 	/**
-	 * 元数据元素的配置源
+	 * 源对象
 	 */
 	@Nullable
 	private Object source;
 
 	/**
-	 * 是否可以进行属性合并
+	 * 是否可以合并
 	 */
 	private boolean mergeEnabled;
 
@@ -75,18 +75,18 @@ public class ManagedProperties extends Properties implements Mergeable, BeanMeta
 	@Override
 	public Object merge(@Nullable Object parent) {
 		if (!this.mergeEnabled) {
-			//如果不允许属性合并，抛出异常
+			//如果不可合并，抛出异常
 			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
 		}
+		//如果父对象为空，返回原来的ManagedProperties对象
 		if (parent == null) {
-			//如果父元素为空，返回当前的ManagedProperties
 			return this;
 		}
 		if (!(parent instanceof Properties)) {
-			//如果父元素不是Properties集合，抛出异常
+			//如果父对象不是Properties类型，抛出异常
 			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
 		}
-		//构建一个新的ManagedProperties，先将父元素的各项名称和值添加进来，再将当前的各项名称和值添加进来。
+		//构建一个新的ManagedProperties对象。先添加父对象的属性值，再添加本对象的属性值
 		Properties merged = new ManagedProperties();
 		merged.putAll((Properties) parent);
 		merged.putAll(this);

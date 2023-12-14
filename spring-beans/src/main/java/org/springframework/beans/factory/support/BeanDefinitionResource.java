@@ -16,31 +16,35 @@
 
 package org.springframework.beans.factory.support;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Descriptive {@link org.springframework.core.io.Resource} wrapper for
  * a {@link org.springframework.beans.factory.config.BeanDefinition}.
  *
  * @author Juergen Hoeller
- * @since 2.5.2
  * @see org.springframework.core.io.DescriptiveResource
+ * @since 2.5.2
  */
 class BeanDefinitionResource extends AbstractResource {
 
+	/**
+	 * bean定义
+	 */
 	private final BeanDefinition beanDefinition;
 
 
 	/**
-	 * Create a new BeanDefinitionResource.
-	 * @param beanDefinition the BeanDefinition object to wrap
+	 * 创建一个新的BeanDefinitionResource。
+	 *
+	 * @param beanDefinition 要包装的BeanDefinition对象
 	 */
 	public BeanDefinitionResource(BeanDefinition beanDefinition) {
 		Assert.notNull(beanDefinition, "BeanDefinition must not be null");
@@ -48,7 +52,7 @@ class BeanDefinitionResource extends AbstractResource {
 	}
 
 	/**
-	 * Return the wrapped BeanDefinition object.
+	 * 返回包装的bean定义对象
 	 */
 	public final BeanDefinition getBeanDefinition() {
 		return this.beanDefinition;
@@ -78,7 +82,7 @@ class BeanDefinitionResource extends AbstractResource {
 
 
 	/**
-	 * This implementation compares the underlying BeanDefinition.
+	 * 此实现将基础BeanDefinition进行比较。
 	 */
 	@Override
 	public boolean equals(@Nullable Object other) {
@@ -87,7 +91,7 @@ class BeanDefinitionResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation returns the hash code of the underlying BeanDefinition.
+	 * 此实现返回底层BeanDefinition的哈希码。
 	 */
 	@Override
 	public int hashCode() {

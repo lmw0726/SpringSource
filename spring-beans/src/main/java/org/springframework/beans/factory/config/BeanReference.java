@@ -33,7 +33,7 @@ import org.springframework.beans.BeanMetadataElement;
 public interface BeanReference extends BeanMetadataElement {
 
 	/**
-	 * Return the target bean name that this reference points to (never {@code null}).
+	 * 返回此引用指向的目标bean名称 (从不 {@code null})。
 	 */
 	String getBeanName();
 

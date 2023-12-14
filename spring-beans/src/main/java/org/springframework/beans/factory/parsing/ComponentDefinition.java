@@ -68,55 +68,52 @@ import org.springframework.beans.factory.config.BeanReference;
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
- * @since 2.0
  * @see AbstractComponentDefinition
  * @see CompositeComponentDefinition
  * @see BeanComponentDefinition
  * @see ReaderEventListener#componentRegistered(ComponentDefinition)
+ * @since 2.0
  */
 public interface ComponentDefinition extends BeanMetadataElement {
 
 	/**
-	 * Get the user-visible name of this {@code ComponentDefinition}.
-	 * <p>This should link back directly to the corresponding configuration data
-	 * for this component in a given context.
+	 * 获取此 {@code ComponentDefinition} 的用户可见名称。
+	 * <p> 这应该直接链接回给定上下文中此组件的相应配置数据。
 	 */
 	String getName();
 
 	/**
-	 * Return a friendly description of the described component.
-	 * <p>Implementations are encouraged to return the same value from
-	 * {@code toString()}.
+	 * 返回描述组件的友好描述。
+	 * <p> 鼓励实现从 {@code toString()} 返回相同的值。
 	 */
 	String getDescription();
 
 	/**
-	 * Return the {@link BeanDefinition BeanDefinitions} that were registered
-	 * to form this {@code ComponentDefinition}.
-	 * <p>It should be noted that a {@code ComponentDefinition} may well be related with
-	 * other {@link BeanDefinition BeanDefinitions} via {@link BeanReference references},
-	 * however these are <strong>not</strong> included as they may be not available immediately.
-	 * Important {@link BeanReference BeanReferences} are available from {@link #getBeanReferences()}.
-	 * @return the array of BeanDefinitions, or an empty array if none
+	 * 返回注册形成此 {@code ComponentDefinition} 的 {@link BeanDefinition}。
+	 * <p> 应该注意的是，通过 {@link BeanReference 引用}，
+	 * {@code ComponentDefinition} 很可能与其他 {@link BeanDefinition BeanDefinition} 相关，
+	 * 但是这些 <strong> 不</strong>包括在内，因为它们可能无法立即使用。
+	 * 重要的 {@link BeanReference BeanReferences} 可从 {@link #getBeanReferences()} 获得。
+	 *
+	 * @return BeanDefinitions的数组，如果没有，则为空数组
 	 */
 	BeanDefinition[] getBeanDefinitions();
 
 	/**
-	 * Return the {@link BeanDefinition BeanDefinitions} that represent all relevant
-	 * inner beans within this component.
-	 * <p>Other inner beans may exist within the associated {@link BeanDefinition BeanDefinitions},
-	 * however these are not considered to be needed for validation or for user visualization.
-	 * @return the array of BeanDefinitions, or an empty array if none
+	 * 返回表示此组件中所有相关内部bean的 {@link BeanDefinition BeanDefinitions}。
+	 * <p> 关联的 {@link BeanDefinition BeanDefinitions} 中可能存在其他内部bean，
+	 * 但是，对于验证或用户可视化，不需要这些内部bean。
+	 *
+	 * @return BeanDefinitions的数组，如果没有，则为空数组
 	 */
 	BeanDefinition[] getInnerBeanDefinitions();
 
 	/**
-	 * Return the set of {@link BeanReference BeanReferences} that are considered
-	 * to be important to this {@code ComponentDefinition}.
-	 * <p>Other {@link BeanReference BeanReferences} may exist within the associated
-	 * {@link BeanDefinition BeanDefinitions}, however these are not considered
-	 * to be needed for validation or for user visualization.
-	 * @return the array of BeanReferences, or an empty array if none
+	 * 返回被认为对这个 {@code ComponentDefinition} 重要的 {@link BeanReference} 的集合。
+	 * <p> 其他 {@link BeanReference BeanReferences} 可能存在于关联的 {@link BeanDefinition BeanDefinitions} 中，
+	 * 但是对于验证或用户可视化而言，不需要这些。
+	 *
+	 * @return BeanReferences的数组，如果没有，则为空数组
 	 */
 	BeanReference[] getBeanReferences();
 

@@ -16,12 +16,12 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.Method;
-
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+
+import java.lang.reflect.Method;
 
 /**
  * Object representing the override of a method on a managed object by the IoC
@@ -37,17 +37,27 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class MethodOverride implements BeanMetadataElement {
 
+	/**
+	 * 方法名称
+	 */
 	private final String methodName;
 
+	/**
+	 * 是否为重载方法
+	 */
 	private boolean overloaded = true;
 
+	/**
+	 * 源对象
+	 */
 	@Nullable
 	private Object source;
 
 
 	/**
-	 * Construct a new override for the given method.
-	 * @param methodName the name of the method to override
+	 * 为给定的方法构造一个新的覆盖。
+	 *
+	 * @param methodName 要覆盖的方法的名称
 	 */
 	protected MethodOverride(String methodName) {
 		Assert.notNull(methodName, "Method name must not be null");
@@ -56,33 +66,29 @@ public abstract class MethodOverride implements BeanMetadataElement {
 
 
 	/**
-	 * 返回要重写的方法的名称。
+	 * 返回要重载的方法的名称。
 	 */
 	public String getMethodName() {
 		return this.methodName;
 	}
 
 	/**
-	 * Set whether the overridden method is <em>overloaded</em> (i.e., whether argument
-	 * type matching needs to occur to disambiguate methods of the same name).
-	 * <p>Default is {@code true}; can be switched to {@code false} to optimize
-	 * runtime performance.
+	 * 设置重载的方法是否为 <em>overloaded<em> (即是否需要发生参数类型匹配以消除同名方法的歧义)。
+	 * <p> 默认值为 {@code true}; 可以切换到 {@code false} 以优化运行时性能。
 	 */
 	protected void setOverloaded(boolean overloaded) {
 		this.overloaded = overloaded;
 	}
 
 	/**
-	 * Return whether the overridden method is <em>overloaded</em> (i.e., whether argument
-	 * type matching needs to occur to disambiguate methods of the same name).
+	 * 返回重载的方法是否为 <em>overloaded<em> (即是否需要发生参数类型匹配以消歧义同名方法)。
 	 */
 	protected boolean isOverloaded() {
 		return this.overloaded;
 	}
 
-	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
+	/**设置此元数据元素的配置源 {@code Object}。
+	 * <p> 对象的确切类型将取决于所使用的配置机制。
 	 */
 	public void setSource(@Nullable Object source) {
 		this.source = source;
@@ -95,11 +101,11 @@ public abstract class MethodOverride implements BeanMetadataElement {
 	}
 
 	/**
-	 * Subclasses must override this to indicate whether they <em>match</em> the
-	 * given method. This allows for argument list checking as well as method
-	 * name checking.
-	 * @param method the method to check
-	 * @return whether this override matches the given method
+	 * 子类必须覆盖此以指示它们是否 <em> 匹配 <em> 给定方法。
+	 * 这允许参数列表检查以及方法名称检查。
+	 *
+	 * @param method 要检查的方法
+	 * @return 此重载方法是否与给定方法匹配
 	 */
 	public abstract boolean matches(Method method);
 

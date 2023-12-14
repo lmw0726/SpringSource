@@ -29,15 +29,18 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class ManagedArray extends ManagedList<Object> {
 
-	/** 用于运行时创建目标数组的已解析元素类型。 */
+	/**
+	 * 用于创建目标数组的运行时的解析元素类型。
+	 */
 	@Nullable
 	volatile Class<?> resolvedElementType;
 
 
 	/**
-	 * 创建一个新的管理数组占位符。
+	 * 创建一个新的可管理的数组占位符。
+	 *
 	 * @param elementTypeName 作为类名的目标元素类型
-	 * @param size 数组的大小
+	 * @param size            数组的大小
 	 */
 	public ManagedArray(String elementTypeName, int size) {
 		super(size);

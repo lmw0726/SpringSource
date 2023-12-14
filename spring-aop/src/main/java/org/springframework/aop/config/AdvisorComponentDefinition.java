@@ -35,14 +35,29 @@ import org.springframework.util.Assert;
  */
 public class AdvisorComponentDefinition extends AbstractComponentDefinition {
 
+	/**
+	 * 通知者bean名称
+	 */
 	private final String advisorBeanName;
 
+	/**
+	 * 通知者bean定义
+	 */
 	private final BeanDefinition advisorDefinition;
 
+	/**
+	 * 描述
+	 */
 	private final String description;
 
+	/**
+	 * bean引用数组
+	 */
 	private final BeanReference[] beanReferences;
 
+	/**
+	 * bean定义数组
+	 */
 	private final BeanDefinition[] beanDefinitions;
 
 
@@ -59,19 +74,20 @@ public class AdvisorComponentDefinition extends AbstractComponentDefinition {
 		this.advisorDefinition = advisorDefinition;
 
 		MutablePropertyValues pvs = advisorDefinition.getPropertyValues();
+		//获取通知bean名称对应的bean引用
 		BeanReference adviceReference = (BeanReference) pvs.get("adviceBeanName");
 		Assert.state(adviceReference != null, "Missing 'adviceBeanName' property");
 
 		if (pointcutDefinition != null) {
-			this.beanReferences = new BeanReference[] {adviceReference};
-			this.beanDefinitions = new BeanDefinition[] {advisorDefinition, pointcutDefinition};
+			this.beanReferences = new BeanReference[]{adviceReference};
+			this.beanDefinitions = new BeanDefinition[]{advisorDefinition, pointcutDefinition};
 			this.description = buildDescription(adviceReference, pointcutDefinition);
-		}
-		else {
+		} else {
+			//获取切入点对应的bean引用
 			BeanReference pointcutReference = (BeanReference) pvs.get("pointcut");
 			Assert.state(pointcutReference != null, "Missing 'pointcut' property");
-			this.beanReferences = new BeanReference[] {adviceReference, pointcutReference};
-			this.beanDefinitions = new BeanDefinition[] {advisorDefinition};
+			this.beanReferences = new BeanReference[]{adviceReference, pointcutReference};
+			this.beanDefinitions = new BeanDefinition[]{advisorDefinition};
 			this.description = buildDescription(adviceReference, pointcutReference);
 		}
 	}

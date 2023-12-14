@@ -16,11 +16,11 @@
 
 package org.springframework.web.reactive.socket;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Handler for a WebSocket session.
@@ -45,16 +45,16 @@ import reactor.core.publisher.Mono;
  * 	public Mono&lt;Void&gt; handle(WebSocketSession session) {
  *
  * 		Flux&lt;WebSocketMessage&gt; output = session.receive()
- *			.doOnNext(message -&gt; {
+ * 			.doOnNext(message -&gt; {
  * 				// ...
- * 			})
+ *            })
  * 			.concatMap(message -&gt; {
  * 				// ...
- * 			})
+ *            })
  * 			.map(value -&gt; session.textMessage("Echo " + value));
  *
  * 		return session.send(output);
- * 	}
+ *    }
  * }
  * </pre>
  *
@@ -68,19 +68,19 @@ import reactor.core.publisher.Mono;
  * 	public Mono&lt;Void&gt; handle(WebSocketSession session) {
  *
  * 		Mono&lt;Void&gt; input = session.receive()
- *			.doOnNext(message -&gt; {
+ * 			.doOnNext(message -&gt; {
  * 				// ...
- * 			})
+ *            })
  * 			.concatMap(message -&gt; {
  * 				// ...
- * 			})
+ *            })
  * 			.then();
  *
- *		Flux&lt;String&gt; source = ... ;
+ * 		Flux&lt;String&gt; source = ... ;
  * 		Mono&lt;Void&gt; output = session.send(source.map(session::textMessage));
  *
  * 		return Mono.zip(input, output).then();
- * 	}
+ *    }
  * }
  * </pre>
  *
@@ -97,24 +97,22 @@ import reactor.core.publisher.Mono;
 public interface WebSocketHandler {
 
 	/**
-	 * Return the list of sub-protocols supported by this handler.
-	 * <p>By default an empty list is returned.
+	 * 获取此处理程序支持的子协议列表。
+	 * <p>默认情况下，返回一个空列表。
 	 */
 	default List<String> getSubProtocols() {
 		return Collections.emptyList();
 	}
 
 	/**
-	 * Invoked when a new WebSocket connection is established, and allows
-	 * handling of the session.
+	 * 当建立新的WebSocket连接时调用，允许处理会话。
 	 *
-	 * <p>See the class-level doc and the reference manual for more details and
-	 * examples of how to handle the session.
-	 * @param session the session to handle
-	 * @return indicates when application handling of the session is complete,
-	 * which should reflect the completion of the inbound message stream
-	 * (i.e. connection closing) and possibly the completion of the outbound
-	 * message stream and the writing of messages
+	 * <p>请参阅类级别的文档和参考手册，以获取有关如何处理会话的更多详细信息和示例。
+	 *
+	 * @param session 要处理的会话
+	 * @return 表示应用程序处理会话何时完成的指示，
+	 * 这应该反映入站消息流的完成（即连接关闭），
+	 * 可能还包括出站消息流的完成和消息的编写
 	 */
 	Mono<Void> handle(WebSocketSession session);
 

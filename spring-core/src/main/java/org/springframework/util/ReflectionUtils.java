@@ -41,8 +41,7 @@ import java.util.Map;
 public abstract class ReflectionUtils {
 
 	/**
-	 * Pre-built {@link MethodFilter} that matches all non-bridge non-synthetic methods
-	 * which are not declared on {@code java.lang.Object}.
+	 * 预构建的 {@link MethodFilter}，匹配所有未在 {@code java.lang.Object} 上声明的非桥非合成方法。
 	 *
 	 * @since 3.0.5
 	 */
@@ -57,7 +56,7 @@ public abstract class ReflectionUtils {
 
 
 	/**
-	 * Naming prefix for CGLIB-renamed methods.
+	 * CGLIB重命名方法的命名前缀。
 	 *
 	 * @see #isCglibRenamedMethod
 	 */
@@ -73,8 +72,7 @@ public abstract class ReflectionUtils {
 
 
 	/**
-	 * Cache for {@link Class#getDeclaredMethods()} plus equivalent default methods
-	 * from Java 8 based interfaces, allowing for fast iteration.
+	 * {@link Class#getDeclaredMethods()} 的缓存加上来自基于Java 8的接口的等效默认方法，允许快速迭代。
 	 */
 	private static final Map<Class<?>, Method[]> declaredMethodsCache = new ConcurrentReferenceHashMap<>(256);
 
@@ -353,36 +351,39 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Perform the given callback operation on all matching methods of the given
-	 * class and superclasses (or given interface and super-interfaces).
-	 * <p>The same named method occurring on subclass and superclass will appear
-	 * twice, unless excluded by the specified {@link MethodFilter}.
+	 * 对给定类和超类 (或给定接口和超接口) 的所有匹配方法执行给定的回调操作。
+	 * <p> 发生在子类和超类上的相同命名方法将出现两次，除非被指定的 {@link MethodFilter} 排除。
 	 *
-	 * @param clazz the class to introspect
-	 * @param mc    the callback to invoke for each method
-	 * @param mf    the filter that determines the methods to apply the callback to
-	 * @throws IllegalStateException if introspection fails
+	 * @param clazz 要内省的类
+	 * @param mc    每个方法要调用的回调
+	 * @param mf    确定要将回调应用于的方法的过滤器
+	 * @throws IllegalStateException 如果内省失败
 	 */
 	public static void doWithMethods(Class<?> clazz, MethodCallback mc, @Nullable MethodFilter mf) {
 		if (mf == USER_DECLARED_METHODS && clazz == Object.class) {
-			// nothing to introspect
+			// 如果方法过滤器为 用户声明方法过滤器，且当前的内省的类为Object类，直接结束。
 			return;
 		}
+		//获取声明方法
 		Method[] methods = getDeclaredMethods(clazz, false);
 		for (Method method : methods) {
 			if (mf != null && !mf.matches(method)) {
+				//如果方法过滤器不为空，且该方法匹配方法过滤器的条件。跳过该方法。
 				continue;
 			}
 			try {
+				//调用回调方法
 				mc.doWith(method);
 			} catch (IllegalAccessException ex) {
 				throw new IllegalStateException("Not allowed to access method '" + method.getName() + "': " + ex);
 			}
 		}
-		// Keep backing up the inheritance hierarchy.
+		// 继续备份继承层次结构。
 		if (clazz.getSuperclass() != null && (mf != USER_DECLARED_METHODS || clazz.getSuperclass() != Object.class)) {
+			//如果当前类有父类，且方法过滤器不是 用户声明方法过滤器 或者 当前类的父类不是Object类，递归调用doWithMethods处理父类
 			doWithMethods(clazz.getSuperclass(), mc, mf);
 		} else if (clazz.isInterface()) {
+			//如果当前类是接口，获取当前接口的父接口，递归调用doWithMethods处理父接口
 			for (Class<?> superIfc : clazz.getInterfaces()) {
 				doWithMethods(superIfc, mc, mf);
 			}
@@ -415,38 +416,43 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Get the unique set of declared methods on the leaf class and all superclasses.
-	 * Leaf class methods are included first and while traversing the superclass hierarchy
-	 * any methods found with signatures matching a method already included are filtered out.
+	 * 获取内省类和所有超类上唯一的一组声明的方法。
+	 * 首先包含内省类方法，并且在遍历超类层次结构时，将筛选出与已包含的方法相匹配的签名的任何方法。
 	 *
-	 * @param leafClass the class to introspect
-	 * @param mf        the filter that determines the methods to take into account
-	 * @throws IllegalStateException if introspection fails
+	 * @param leafClass 要内省的类
+	 * @param mf        确定要考虑方法的过滤器
+	 * @throws IllegalStateException 如果反射失败
 	 * @since 5.2
 	 */
 	public static Method[] getUniqueDeclaredMethods(Class<?> leafClass, @Nullable MethodFilter mf) {
 		final List<Method> methods = new ArrayList<>(20);
 		doWithMethods(leafClass, method -> {
+			//找到方法标志
 			boolean knownSignature = false;
+			//被协变返回类型覆盖的方法
 			Method methodBeingOverriddenWithCovariantReturnType = null;
 			for (Method existingMethod : methods) {
 				if (method.getName().equals(existingMethod.getName()) &&
 						method.getParameterCount() == existingMethod.getParameterCount() &&
 						Arrays.equals(method.getParameterTypes(), existingMethod.getParameterTypes())) {
-					// Is this a covariant return type situation?
+					//如果方法名称相同，方法参数相同，且方法的所有的参数类型相同
 					if (existingMethod.getReturnType() != method.getReturnType() &&
 							existingMethod.getReturnType().isAssignableFrom(method.getReturnType())) {
+						//如果他们的返回类型不同，且他们是父子类，则将当前编译到方法设置为 被协变返回类型覆盖的方法
 						methodBeingOverriddenWithCovariantReturnType = existingMethod;
 					} else {
+						//找到方法标志设置为true
 						knownSignature = true;
 					}
 					break;
 				}
 			}
 			if (methodBeingOverriddenWithCovariantReturnType != null) {
+				//如果被协变返回类型覆盖的方法不为空，则移除该协变返回类型覆盖方法。
 				methods.remove(methodBeingOverriddenWithCovariantReturnType);
 			}
 			if (!knownSignature && !isCglibRenamedMethod(method)) {
+				//如果未找到该方法，且该方法不是CGLIB重命名的方法。方法列表添加当前方法。
 				methods.add(method);
 			}
 		}, mf);
@@ -454,15 +460,12 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Variant of {@link Class#getDeclaredMethods()} that uses a local cache in
-	 * order to avoid the JVM's SecurityManager check and new Method instances.
-	 * In addition, it also includes Java 8 default methods from locally
-	 * implemented interfaces, since those are effectively to be treated just
-	 * like declared methods.
+	 * {@link Class#getDeclaredMethods()} 的变体，它使用本地缓存来避免JVM的SecurityManager检查和新方法实例。
+	 * 此外，它还包括来自本地实现的接口的Java 8默认方法，因为这些方法可以像声明的方法一样被有效地对待。
 	 *
-	 * @param clazz the class to introspect
-	 * @return the cached array of methods
-	 * @throws IllegalStateException if introspection fails
+	 * @param clazz the 要内省的类
+	 * @return 方法的缓存数组
+	 * @throws IllegalStateException 如果反省失败
 	 * @see Class#getDeclaredMethods()
 	 * @since 5.2
 	 */
@@ -472,22 +475,29 @@ public abstract class ReflectionUtils {
 
 	private static Method[] getDeclaredMethods(Class<?> clazz, boolean defensive) {
 		Assert.notNull(clazz, "Class must not be null");
+		//从缓存中获取该类的声明方法
 		Method[] result = declaredMethodsCache.get(clazz);
 		if (result == null) {
 			try {
+				//获取当前类的声明方法
 				Method[] declaredMethods = clazz.getDeclaredMethods();
+				//获取所有接口上继承的方法，作为默认方法
 				List<Method> defaultMethods = findConcreteMethodsOnInterfaces(clazz);
 				if (defaultMethods != null) {
 					result = new Method[declaredMethods.length + defaultMethods.size()];
+					//将当前类的声明方法数组复制到result中。
 					System.arraycopy(declaredMethods, 0, result, 0, declaredMethods.length);
 					int index = declaredMethods.length;
+					//添加接口继承的方法。
 					for (Method defaultMethod : defaultMethods) {
 						result[index] = defaultMethod;
 						index++;
 					}
 				} else {
+					//如果没有接口，则设置为当前类的声明方法
 					result = declaredMethods;
 				}
+				//添加进缓存
 				declaredMethodsCache.put(clazz, (result.length == 0 ? EMPTY_METHOD_ARRAY : result));
 			} catch (Throwable ex) {
 				throw new IllegalStateException("Failed to introspect Class [" + clazz.getName() +
@@ -501,8 +511,11 @@ public abstract class ReflectionUtils {
 	private static List<Method> findConcreteMethodsOnInterfaces(Class<?> clazz) {
 		List<Method> result = null;
 		for (Class<?> ifc : clazz.getInterfaces()) {
+			//遍历该类的接口
 			for (Method ifcMethod : ifc.getMethods()) {
+				//遍历该接口的方法
 				if (!Modifier.isAbstract(ifcMethod.getModifiers())) {
+					//如果接口方法的修饰符没有Abstract，添加该接口方法
 					if (result == null) {
 						result = new ArrayList<>();
 					}
@@ -562,16 +575,16 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Determine whether the given method is a CGLIB 'renamed' method,
-	 * following the pattern "CGLIB$methodName$0".
+	 * 确定给定的方法是否是CGLIB “重命名” 方法，遵循模式 “CGLIB$methodName$0”。
 	 *
-	 * @param renamedMethod the method to check
+	 * @param renamedMethod 要检查的方法
 	 */
 	public static boolean isCglibRenamedMethod(Method renamedMethod) {
 		String name = renamedMethod.getName();
 		if (name.startsWith(CGLIB_RENAMED_METHOD_PREFIX)) {
 			int i = name.length() - 1;
 			while (i >= 0 && Character.isDigit(name.charAt(i))) {
+				//如果当前位置是数字字符，索引-1
 				i--;
 			}
 			return (i > CGLIB_RENAMED_METHOD_PREFIX.length() && (i < name.length() - 1) && name.charAt(i) == '$');
@@ -831,40 +844,40 @@ public abstract class ReflectionUtils {
 
 
 	/**
-	 * Action to take on each method.
+	 * 对每种方法采取的行动。
 	 */
 	@FunctionalInterface
 	public interface MethodCallback {
 
 		/**
-		 * Perform an operation using the given method.
+		 * 使用给定的方法执行操作。
 		 *
-		 * @param method the method to operate on
+		 * @param method 操作的方法
 		 */
 		void doWith(Method method) throws IllegalArgumentException, IllegalAccessException;
 	}
 
 
 	/**
-	 * Callback optionally used to filter methods to be operated on by a method callback.
+	 * 回调可选地，用于筛选要由方法回调操作的方法。
 	 */
 	@FunctionalInterface
 	public interface MethodFilter {
 
 		/**
-		 * Determine whether the given method matches.
+		 * 确定给定的方法是否匹配。
 		 *
-		 * @param method the method to check
+		 * @param method 要检查的方法
 		 */
 		boolean matches(Method method);
 
 		/**
-		 * Create a composite filter based on this filter <em>and</em> the provided filter.
-		 * <p>If this filter does not match, the next filter will not be applied.
+		 * 基于此过滤器 <em> 和 <em> 提供的过滤器创建复合过滤器。
+		 * <p> 如果此过滤器不匹配，则不会应用下一个过滤器。
 		 *
-		 * @param next the next {@code MethodFilter}
-		 * @return a composite {@code MethodFilter}
-		 * @throws IllegalArgumentException if the MethodFilter argument is {@code null}
+		 * @param next 下一个 {@code MethodFilter}
+		 * @return 组合的 {@code MethodFilter}
+		 * @throws IllegalArgumentException 如果MethodFilter参数为 {@code null}
 		 * @since 5.3.2
 		 */
 		default MethodFilter and(MethodFilter next) {

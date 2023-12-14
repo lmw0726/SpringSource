@@ -33,7 +33,7 @@ import org.springframework.beans.factory.config.BeanReference;
 public abstract class AbstractComponentDefinition implements ComponentDefinition {
 
 	/**
-	 * Delegates to {@link #getName}.
+	 * 委托给 {@link #getName}.
 	 */
 	@Override
 	public String getDescription() {
@@ -41,7 +41,7 @@ public abstract class AbstractComponentDefinition implements ComponentDefinition
 	}
 
 	/**
-	 * Returns an empty array.
+	 * 返回一个空数组
 	 */
 	@Override
 	public BeanDefinition[] getBeanDefinitions() {
@@ -49,7 +49,7 @@ public abstract class AbstractComponentDefinition implements ComponentDefinition
 	}
 
 	/**
-	 * Returns an empty array.
+	 * 返回一个空数组。
 	 */
 	@Override
 	public BeanDefinition[] getInnerBeanDefinitions() {
@@ -57,7 +57,7 @@ public abstract class AbstractComponentDefinition implements ComponentDefinition
 	}
 
 	/**
-	 * Returns an empty array.
+	 * 返回一个空数组。
 	 */
 	@Override
 	public BeanReference[] getBeanReferences() {
@@ -65,7 +65,7 @@ public abstract class AbstractComponentDefinition implements ComponentDefinition
 	}
 
 	/**
-	 * Delegates to {@link #getDescription}.
+	 * 委托给 {@link #getDescription}.
 	 */
 	@Override
 	public String toString() {

@@ -773,15 +773,13 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Resolve this type to a {@link java.lang.Class}, returning {@code null}
-	 * if the type cannot be resolved. This method will consider bounds of
-	 * {@link TypeVariable TypeVariables} and {@link WildcardType WildcardTypes} if
-	 * direct resolution fails; however, bounds of {@code Object.class} will be ignored.
-	 * <p>If this method returns a non-null {@code Class} and {@link #hasGenerics()}
-	 * returns {@code false}, the given type effectively wraps a plain {@code Class},
-	 * allowing for plain {@code Class} processing if desirable.
+	 * 将此类型解析为 {@link java.lang.Class}，如果无法解析该类型，则返回 {@code null}。
+	 * 如果直接解析失败，此方法将考虑 {@link TypeVariable TypeVariables} 和 {@link WildcardType WildcardType} 的边界;
+	 * 但是，{@code Object.class} 的边界将被忽略。
+	 * <p> 如果此方法返回非空 {@code Class}，并且 {@link #hasGenerics()} 返回 {@code false}，
+	 * 则给定类型有效地包装了一个普通的 {@code Class}，如果需要，可以进行简单的 {@code Class} 处理。
 	 *
-	 * @return the resolved {@link Class}, or {@code null} if not resolvable
+	 * @return 已解析好的 {@link Class}，如果无法解析，则为 {@code null}
 	 * @see #resolve(Class)
 	 * @see #resolveGeneric(int...)
 	 * @see #resolveGenerics()

@@ -28,20 +28,29 @@ import org.springframework.util.ObjectUtils;
  * @since 2.5
  */
 public class BeanMetadataAttribute implements BeanMetadataElement {
-
+	/**
+	 * 名称
+	 */
 	private final String name;
 
+	/**
+	 * 属性值
+	 */
 	@Nullable
 	private final Object value;
 
+	/**
+	 * 数据源
+	 */
 	@Nullable
 	private Object source;
 
 
 	/**
-	 * Create a new AttributeValue instance.
-	 * @param name the name of the attribute (never {@code null})
-	 * @param value the value of the attribute (possibly before type conversion)
+	 * 创建一个新的AttributeValue实例。
+	 *
+	 * @param name  属性的名称 (从不 {@code null})
+	 * @param value 属性的值 (可能在类型转换之前)
 	 */
 	public BeanMetadataAttribute(String name, @Nullable Object value) {
 		Assert.notNull(name, "Name must not be null");
@@ -51,7 +60,7 @@ public class BeanMetadataAttribute implements BeanMetadataElement {
 
 
 	/**
-	 * Return the name of the attribute.
+	 * 返回属性的名称。
 	 */
 	public String getName() {
 		return this.name;
@@ -66,8 +75,8 @@ public class BeanMetadataAttribute implements BeanMetadataElement {
 	}
 
 	/**
-	 * Set the configuration source {@code Object} for this metadata element.
-	 * <p>The exact type of the object will depend on the configuration mechanism used.
+	 * 设置此元数据元素的配置源 {@code Object}。
+	 * <p> 对象的确切类型将取决于所使用的配置机制。
 	 */
 	public void setSource(@Nullable Object source) {
 		this.source = source;

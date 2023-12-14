@@ -38,25 +38,25 @@ import java.util.Map.Entry;
 public class ManagedMap<K, V> extends LinkedHashMap<K, V> implements Mergeable, BeanMetadataElement {
 
 	/**
-	 * 元数据配置的源
+	 * 数据源
 	 */
 	@Nullable
 	private Object source;
 
 	/**
-	 * key类型名称
+	 * key的类型名称
 	 */
 	@Nullable
 	private String keyTypeName;
 
 	/**
-	 * value类型名称
+	 * value的类型名称
 	 */
 	@Nullable
 	private String valueTypeName;
 
 	/**
-	 * 是否可以进行属性合并。
+	 * 是否可以合并
 	 */
 	private boolean mergeEnabled;
 
@@ -70,12 +70,12 @@ public class ManagedMap<K, V> extends LinkedHashMap<K, V> implements Mergeable, 
 
 
 	/**
-	 * 返回一个包含从给定条目中提取的键和值的新实例。条目本身不存储在Map中。
+	 * 返回一个包含从给定条目中提取的键和值的新实例。条目本身不存储在此Map中。
 	 *
-	 * @param entries {@code Map.Entry}包含填充Map的键和值
+	 * @param entries {@code Map.Entry} 包含填充Map的键和值
 	 * @param <K>     {@code Map}的 key 类型
-	 * @param <V>     {@code Map} 的 value 类型
-	 * @return 包含指定映射的 {@code Map}
+	 * @param <V>     {@code Map}的 value 类型
+	 * @return 包含特殊映射的 {@code Map}
 	 * @since 5.3.16
 	 */
 	@SafeVarargs
@@ -89,8 +89,7 @@ public class ManagedMap<K, V> extends LinkedHashMap<K, V> implements Mergeable, 
 	}
 
 	/**
-	 * 设置此元数据元素的配置源 {@code Object}。
-	 * <p> 对象的确切类型将取决于所使用的配置机制。
+	 * 设置此元数据元素的配置源 {@code Object}。<p> 对象的确切类型将取决于所使用的配置机制。
 	 */
 	public void setSource(@Nullable Object source) {
 		this.source = source;
@@ -103,14 +102,14 @@ public class ManagedMap<K, V> extends LinkedHashMap<K, V> implements Mergeable, 
 	}
 
 	/**
-	 * 设置要用于此映射的默认键类型名称 (类名)。
+	 * 设置要用于此Map的默认key类型名称 (类名)。
 	 */
 	public void setKeyTypeName(@Nullable String keyTypeName) {
 		this.keyTypeName = keyTypeName;
 	}
 
 	/**
-	 * 返回要用于此映射的默认键类型名称 (类名)。
+	 * 返回要用于此Map的默认key类型名称 (类名)。
 	 */
 	@Nullable
 	public String getKeyTypeName() {
@@ -118,14 +117,14 @@ public class ManagedMap<K, V> extends LinkedHashMap<K, V> implements Mergeable, 
 	}
 
 	/**
-	 * 设置要用于此映射的默认值类型名称 (类名)。
+	 * 设置要用于此映射的默认value类型名称 (类名)。
 	 */
 	public void setValueTypeName(@Nullable String valueTypeName) {
 		this.valueTypeName = valueTypeName;
 	}
 
 	/**
-	 * 返回要用于此映射的默认值类型名称 (类名)。
+	 * 返回要用于此Map的默认value类型名称 (类名)。
 	 */
 	@Nullable
 	public String getValueTypeName() {
@@ -148,18 +147,18 @@ public class ManagedMap<K, V> extends LinkedHashMap<K, V> implements Mergeable, 
 	@SuppressWarnings("unchecked")
 	public Object merge(@Nullable Object parent) {
 		if (!this.mergeEnabled) {
-			//如果不允许进行属性合并，抛出异常
+			//如果不可合并,抛出异常
 			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
 		}
 		if (parent == null) {
-			//如果父元素为空，返回当前的ManagedMap实例。
+			//如果父对象不存在，返回原来的ManagedMap对象
 			return this;
 		}
 		if (!(parent instanceof Map)) {
-			//如果父元素不是Map类型，抛出异常。
+			//如果父对象不是Map对象，抛出异常
 			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
 		}
-		//构建一个新的ManagedMap实例。先将父元素的key-value添加进来，再将当前实例的key-value添加进来。
+		//构建一个ManagedMap对象，先添加父对象所有的key-value，再添加原来ManagedMap对象的key-value值。
 		Map<K, V> merged = new ManagedMap<>();
 		merged.putAll((Map<K, V>) parent);
 		merged.putAll(this);

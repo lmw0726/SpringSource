@@ -38,9 +38,8 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetadataElement {
-
 	/**
-	 * 元数据元素配置的源
+	 * 源对象
 	 */
 	@Nullable
 	private Object source;
@@ -52,7 +51,7 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	private String elementTypeName;
 
 	/**
-	 * 是否可以进行属性合并
+	 * 是否可以合并
 	 */
 	private boolean mergeEnabled;
 
@@ -68,8 +67,8 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	/**
 	 * 创建一个包含任意数量元素的新实例。
 	 *
-	 * @param elements 要包含在列表中的元素
-	 * @param <E>      {@code List}的 元素类型
+	 * @param elements 列表中要包含的元素
+	 * @param <E>      {@code List} 的元素类型
 	 * @return 包含指定元素的 {@code ManagedList}
 	 * @since 5.3.16
 	 */
@@ -95,14 +94,14 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	}
 
 	/**
-	 * 设置用于此列表的默认元素类型名称(类名称)。
+	 * 设置要用于此列表的默认元素类型名称 (类名)。
 	 */
 	public void setElementTypeName(String elementTypeName) {
 		this.elementTypeName = elementTypeName;
 	}
 
 	/**
-	 * 返回用于此列表的默认元素类型名称(类名称)。
+	 * 返回要用于此列表的默认元素类型名称 (类名)。
 	 */
 	@Nullable
 	public String getElementTypeName() {
@@ -110,7 +109,7 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	}
 
 	/**
-	 * 设置如果存在“父”集合值，是否应该为该集合启用合并。
+	 * 设置是否应为此集合启用合并 (如果存在 “父” 集合值)。
 	 */
 	public void setMergeEnabled(boolean mergeEnabled) {
 		this.mergeEnabled = mergeEnabled;
@@ -125,18 +124,18 @@ public class ManagedList<E> extends ArrayList<E> implements Mergeable, BeanMetad
 	@SuppressWarnings("unchecked")
 	public List<E> merge(@Nullable Object parent) {
 		if (!this.mergeEnabled) {
-			//如果无法合并，抛出异常
+			//如果不可合并，抛出异常
 			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
 		}
 		if (parent == null) {
-			//如果要合并的父元素为空，返回当前的ManagedList
+			//如果父对象为空，返回原来的ManagedList对象
 			return this;
 		}
 		if (!(parent instanceof List)) {
-			//如果父元素不是List类型，抛出异常
+			//如果父对象不是List类型，抛出异常
 			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
 		}
-		//重新构建一个新的ManagedList，先将父元素添加进来，再将当前元素添加进来
+		//构建一个新的ManagedList对象，先添加父对象的元素，再添加原来的ManagedList的元素
 		List<E> merged = new ManagedList<>();
 		merged.addAll((List<E>) parent);
 		merged.addAll(this);

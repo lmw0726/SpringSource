@@ -26,35 +26,37 @@ import org.springframework.util.Assert;
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
- * @since 2.5
  * @see org.springframework.beans.factory.annotation.Qualifier
+ * @since 2.5
  */
 @SuppressWarnings("serial")
 public class AutowireCandidateQualifier extends BeanMetadataAttributeAccessor {
 
 	/**
-	 * The name of the key used to store the value.
+	 * 用于存储值的键的名称。
 	 */
 	public static final String VALUE_KEY = "value";
 
+	/**
+	 * 类型名称
+	 */
 	private final String typeName;
 
 
 	/**
-	 * Construct a qualifier to match against an annotation of the
-	 * given type.
-	 * @param type the annotation type
+	 * 构造一个限定符以与给定类型的注解匹配。
+	 *
+	 * @param type 注解类型
 	 */
 	public AutowireCandidateQualifier(Class<?> type) {
 		this(type.getName());
 	}
 
 	/**
-	 * Construct a qualifier to match against an annotation of the
-	 * given type name.
-	 * <p>The type name may match the fully-qualified class name of
-	 * the annotation or the short class name (without the package).
-	 * @param typeName the name of the annotation type
+	 * 构造一个限定符与给定类型名称的注解匹配。
+	 * <p> 类型名称可能与注解的完全限定的类名称或短类名称 (不带包) 匹配。
+	 *
+	 * @param typeName 注解类型的名称
 	 */
 	public AutowireCandidateQualifier(String typeName) {
 		Assert.notNull(typeName, "Type name must not be null");
@@ -62,24 +64,21 @@ public class AutowireCandidateQualifier extends BeanMetadataAttributeAccessor {
 	}
 
 	/**
-	 * Construct a qualifier to match against an annotation of the
-	 * given type whose {@code value} attribute also matches
-	 * the specified value.
-	 * @param type the annotation type
-	 * @param value the annotation value to match
+	 * 构造一个限定符与给定类型的注解匹配，该注释的 {@code value} 属性也与指定的值匹配。
+	 *
+	 * @param type  注解类型
+	 * @param value 要匹配的注解值
 	 */
 	public AutowireCandidateQualifier(Class<?> type, Object value) {
 		this(type.getName(), value);
 	}
 
 	/**
-	 * Construct a qualifier to match against an annotation of the
-	 * given type name whose {@code value} attribute also matches
-	 * the specified value.
-	 * <p>The type name may match the fully-qualified class name of
-	 * the annotation or the short class name (without the package).
-	 * @param typeName the name of the annotation type
-	 * @param value the annotation value to match
+	 * 构造一个限定符，与匹配给定类型名称的注解，该注解的 {@code value} 属性也与指定的值匹配。
+	 * <p> 类型名称可能与注解的完全限定的类名称或短类名称 (不带包) 匹配。
+	 *
+	 * @param typeName 注解类型名称
+	 * @param value    要匹配的注解值
 	 */
 	public AutowireCandidateQualifier(String typeName, Object value) {
 		Assert.notNull(typeName, "Type name must not be null");
@@ -89,9 +88,7 @@ public class AutowireCandidateQualifier extends BeanMetadataAttributeAccessor {
 
 
 	/**
-	 * Retrieve the type name. This value will be the same as the
-	 * type name provided to the constructor or the fully-qualified
-	 * class name if a Class instance was provided to the constructor.
+	 * 检索类型名称。如果将类实例提供给构造函数，则此值将与提供给构造函数的类型名称或完全限定的类名称相同。
 	 */
 	public String getTypeName() {
 		return this.typeName;

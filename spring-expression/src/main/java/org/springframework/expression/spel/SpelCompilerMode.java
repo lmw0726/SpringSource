@@ -26,21 +26,20 @@ package org.springframework.expression.spel;
 public enum SpelCompilerMode {
 
 	/**
-	 * The compiler is switched off; this is the default.
+	 * 关闭编译器; 这是默认的。
 	 */
 	OFF,
 
 	/**
-	 * In immediate mode, expressions are compiled as soon as possible (usually after 1 interpreted run).
-	 * If a compiled expression fails it will throw an exception to the caller.
+	 * 在立即模式下，表达式会尽快编译 (通常在1个解释运行之后)。
+	 * 如果编译的表达式失败，它将向调用者抛出异常。
 	 */
 	IMMEDIATE,
 
 	/**
-	 * In mixed mode, expression evaluation silently switches between interpreted and compiled over time.
-	 * After a number of runs the expression gets compiled. If it later fails (possibly due to inferred
-	 * type information changing) then that will be caught internally and the system switches back to
-	 * interpreted mode. It may subsequently compile it again later.
+	 * 在混合模式下，表达式求值随时间在解释和编译之间静默切换。经过多次运行后，表达式将被编译。
+	 * 如果以后失败 (可能是由于推断的类型信息更改)，则将在内部捕获，并且系统切换回解释模式。
+	 * 随后可能会再次编译它。
 	 */
 	MIXED
 

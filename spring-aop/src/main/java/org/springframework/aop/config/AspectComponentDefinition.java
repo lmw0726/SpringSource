@@ -33,8 +33,14 @@ import org.springframework.lang.Nullable;
  */
 public class AspectComponentDefinition extends CompositeComponentDefinition {
 
+	/**
+	 * bean定义数组
+	 */
 	private final BeanDefinition[] beanDefinitions;
 
+	/**
+	 * bean引用数组
+	 */
 	private final BeanReference[] beanReferences;
 
 

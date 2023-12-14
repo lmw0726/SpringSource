@@ -30,6 +30,9 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport implements BeanMetadataElement {
 
+	/**
+	 * 源对象
+	 */
 	@Nullable
 	private Object source;
 
@@ -59,11 +62,10 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 	}
 
 	/**
-	 * Look up the given BeanMetadataAttribute in this accessor's set of attributes.
+	 * 在此访问器的属性集中查找给定的BeanMetadataAttribute。
 	 *
-	 * @param name the name of the attribute
-	 * @return the corresponding BeanMetadataAttribute object,
-	 * or {@code null} if no such attribute defined
+	 * @param name 属性的名称
+	 * @return 相应的BeanMetadataAttribute对象，如果没有定义这样的属性，则为 {@code null}
 	 */
 	@Nullable
 	public BeanMetadataAttribute getMetadataAttribute(String name) {

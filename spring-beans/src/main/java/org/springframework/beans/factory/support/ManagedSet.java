@@ -39,7 +39,7 @@ import java.util.Set;
 public class ManagedSet<E> extends LinkedHashSet<E> implements Mergeable, BeanMetadataElement {
 
 	/**
-	 * 元数据配置的源
+	 * 源对象
 	 */
 	@Nullable
 	private Object source;
@@ -51,7 +51,7 @@ public class ManagedSet<E> extends LinkedHashSet<E> implements Mergeable, BeanMe
 	private String elementTypeName;
 
 	/**
-	 * 是否可以进行属性合并。
+	 * 是否可以合并
 	 */
 	private boolean mergeEnabled;
 
@@ -65,7 +65,7 @@ public class ManagedSet<E> extends LinkedHashSet<E> implements Mergeable, BeanMe
 
 
 	/**
-	 *创建一个包含任意数量元素的新实例。
+	 * 创建一个包含任意数量元素的新实例。
 	 *
 	 * @param elements 集合中要包含的元素
 	 * @param <E>      {@code Set} 的元素类型
@@ -94,14 +94,14 @@ public class ManagedSet<E> extends LinkedHashSet<E> implements Mergeable, BeanMe
 	}
 
 	/**
-	 * 设置用于此集合的默认元素类型名称(类名称)。
+	 * 设置要用于此集合的默认元素类型名称 (类名)。
 	 */
 	public void setElementTypeName(@Nullable String elementTypeName) {
 		this.elementTypeName = elementTypeName;
 	}
 
 	/**
-	 * 返回用于此集合的默认元素类型名称(类名称)。
+	 * 返回要用于此集合的默认元素类型名称 (类名)。
 	 */
 	@Nullable
 	public String getElementTypeName() {
@@ -124,18 +124,18 @@ public class ManagedSet<E> extends LinkedHashSet<E> implements Mergeable, BeanMe
 	@SuppressWarnings("unchecked")
 	public Set<E> merge(@Nullable Object parent) {
 		if (!this.mergeEnabled) {
-			//不允许合并，抛出异常
+			//如果不允许合并，抛出异常
 			throw new IllegalStateException("Not allowed to merge when the 'mergeEnabled' property is set to 'false'");
 		}
 		if (parent == null) {
-			//父集合为null，返回本集合
+			//如果父对象为空，返回原来的ManagedSet对象
 			return this;
 		}
 		if (!(parent instanceof Set)) {
-			//父集合不是集合，抛出异常
+			//如果父对象不是Set类型，抛出异常
 			throw new IllegalArgumentException("Cannot merge with object of type [" + parent.getClass() + "]");
 		}
-		//构建一个ManagedSet实例，先将父集合的元素添加进去，再将本集合的元素添加进去
+		//构建一个新的ManagedSet对象，先添加父对象的元素值，再添加原来的ManagedSet对象的元素值
 		Set<E> merged = new ManagedSet<>();
 		merged.addAll((Set<E>) parent);
 		merged.addAll(this);

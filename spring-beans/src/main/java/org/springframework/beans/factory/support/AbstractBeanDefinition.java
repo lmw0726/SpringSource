@@ -144,7 +144,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 
 	/**
-	 * 存放bean的Class对象
+	 * 存放bean的Class对象，这里有两种情况，一种是字符串类型的类名，一种是Class对象
 	 */
 	@Nullable
 	private volatile Object beanClass;
@@ -493,6 +493,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 			//复制源
 			setResource(otherAbd.getResource());
 		} else {
+			//对应的是AnnotatedBeanDefinition体系分支，注解的属性复制。
 			//复制构造参数对
 			getConstructorArgumentValues().addArgumentValues(other.getConstructorArgumentValues());
 			//复制属性值
