@@ -46,15 +46,32 @@ import org.springframework.web.reactive.socket.WebSocketSession;
  */
 public class StandardWebSocketSession extends AbstractListenerWebSocketSession<Session> {
 
+	/**
+	 * 构造方法
+	 *
+	 * @param session 会话
+	 * @param info    握手信息
+	 * @param factory 数据缓冲区工厂
+	 */
 	public StandardWebSocketSession(Session session, HandshakeInfo info, DataBufferFactory factory) {
 		this(session, info, factory, (Sinks.Empty<Void>) null);
 	}
 
+
+	/**
+	 * 构造方法
+	 *
+	 * @param session          会话
+	 * @param info             握手信息
+	 * @param factory          数据缓冲区工厂
+	 * @param completionSink   完成信号
+	 */
 	public StandardWebSocketSession(Session session, HandshakeInfo info, DataBufferFactory factory,
 			@Nullable Sinks.Empty<Void> completionSink) {
 
 		super(session, session.getId(), info, factory, completionSink);
 	}
+
 
 	@Deprecated
 	public StandardWebSocketSession(Session session, HandshakeInfo info, DataBufferFactory factory,
@@ -63,38 +80,67 @@ public class StandardWebSocketSession extends AbstractListenerWebSocketSession<S
 		super(session, session.getId(), info, factory, completionMono);
 	}
 
-
+	/**
+	 * 是否可以暂停接收
+	 *
+	 * @return boolean
+	 */
 	@Override
 	protected boolean canSuspendReceiving() {
 		return false;
 	}
 
+	/**
+	 * 暂停接收
+	 */
 	@Override
 	protected void suspendReceiving() {
 		// no-op
 	}
 
+	/**
+	 * 恢复接收
+	 */
 	@Override
 	protected void resumeReceiving() {
 		// no-op
 	}
 
+	/**
+	 * 发送消息
+	 *
+	 * @param message 消息
+	 * @return boolean
+	 * @throws IOException 异常
+	 */
 	@Override
 	protected boolean sendMessage(WebSocketMessage message) throws IOException {
+		//获取字节缓冲区
 		ByteBuffer buffer = message.getPayload().asByteBuffer();
+		//如果是文本消息
 		if (WebSocketMessage.Type.TEXT.equals(message.getType())) {
+			//将发送处理器发送标志设置为未准备
 			getSendProcessor().setReadyToSend(false);
+			//得到文本消息
 			String text = new String(buffer.array(), StandardCharsets.UTF_8);
+			//发送文本消息
 			getDelegate().getAsyncRemote().sendText(text, new SendProcessorCallback());
 		}
+		//如果是二进制消息
 		else if (WebSocketMessage.Type.BINARY.equals(message.getType())) {
+			//将发送处理器发送标志设置为未准备
 			getSendProcessor().setReadyToSend(false);
+			//发送二进制消息
 			getDelegate().getAsyncRemote().sendBinary(buffer, new SendProcessorCallback());
 		}
+		//如果是ping消息
 		else if (WebSocketMessage.Type.PING.equals(message.getType())) {
+			//发送ping消息
 			getDelegate().getAsyncRemote().sendPing(buffer);
 		}
+		//如果是pong消息
 		else if (WebSocketMessage.Type.PONG.equals(message.getType())) {
+			//发送pong消息
 			getDelegate().getAsyncRemote().sendPong(buffer);
 		}
 		else {
@@ -103,11 +149,22 @@ public class StandardWebSocketSession extends AbstractListenerWebSocketSession<S
 		return true;
 	}
 
+	/**
+	 * 会话是否打开
+	 *
+	 * @return boolean
+	 */
 	@Override
 	public boolean isOpen() {
 		return getDelegate().isOpen();
 	}
 
+	/**
+	 * 关闭会话
+	 *
+	 * @param status 状态
+	 * @return Mono<Void>
+	 */
 	@Override
 	public Mono<Void> close(CloseStatus status) {
 		try {
@@ -120,9 +177,16 @@ public class StandardWebSocketSession extends AbstractListenerWebSocketSession<S
 		return Mono.empty();
 	}
 
-
+	/**
+	 * 发送处理器回调
+	 */
 	private final class SendProcessorCallback implements SendHandler {
 
+		/**
+		 * 结果
+		 *
+		 * @param result 结果
+		 */
 		@Override
 		public void onResult(SendResult result) {
 			if (result.isOK()) {

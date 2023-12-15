@@ -64,20 +64,37 @@ public class UndertowWebSocketHandlerAdapter extends AbstractReceiveListener {
 		message.getData().free();
 	}
 
+	/**
+	 * 当接收到完整Pong消息时调用
+	 * @param channel WebSocket通道
+	 * @param message 缓冲二进制消息
+	 */
 	@Override
 	@SuppressWarnings("deprecation")
 	protected void onFullPongMessage(WebSocketChannel channel, BufferedBinaryMessage message) {
+		// 处理Pong消息，并转换为消息类型为PONG
 		this.session.handleMessage(Type.PONG, toMessage(Type.PONG, message.getData().getResource()));
+		// 释放消息数据资源
 		message.getData().free();
 	}
 
+
+	/**
+	 * 当接收到完整关闭消息时调用
+	 * @param channel WebSocket通道
+	 * @param message 缓冲二进制消息
+	 */
 	@Override
 	@SuppressWarnings("deprecation")
 	protected void onFullCloseMessage(WebSocketChannel channel, BufferedBinaryMessage message) {
+		// 从消息数据中获取关闭消息
 		CloseMessage closeMessage = new CloseMessage(message.getData().getResource());
+		// 处理会话关闭，并设置关闭状态
 		this.session.handleClose(CloseStatus.create(closeMessage.getCode(), closeMessage.getReason()));
+		// 释放消息数据资源
 		message.getData().free();
 	}
+
 
 	@Override
 	protected void onError(WebSocketChannel channel, Throwable error) {
