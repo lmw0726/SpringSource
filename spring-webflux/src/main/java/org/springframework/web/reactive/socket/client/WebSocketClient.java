@@ -16,15 +16,14 @@
 
 package org.springframework.web.reactive.socket.client;
 
-import java.net.URI;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.socket.WebSocketHandler;
+import reactor.core.publisher.Mono;
+
+import java.net.URI;
 
 /**
- * Contract for reactive-style handling of a WebSocket session.
+ * 用于以响应式风格处理WebSocket会话的契约。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -32,22 +31,21 @@ import org.springframework.web.reactive.socket.WebSocketHandler;
 public interface WebSocketClient {
 
 	/**
-	 * Execute a handshake request to the given url and handle the resulting
-	 * WebSocket session with the given handler.
-	 * @param url the handshake url
-	 * @param handler the handler of the WebSocket session
-	 * @return completion {@code Mono<Void>} to indicate the outcome of the
-	 * WebSocket session handling.
+	 * 执行握手请求到指定的URL，并使用给定的处理程序处理WebSocket会话。
+	 *
+	 * @param url     握手的URL
+	 * @param handler WebSocket会话的处理程序
+	 * @return 表示WebSocket会话处理结果的完成Mono<Void>
 	 */
 	Mono<Void> execute(URI url, WebSocketHandler handler);
 
 	/**
-	 * A variant of {@link #execute(URI, WebSocketHandler)} with custom headers.
-	 * @param url the handshake url
-	 * @param headers custom headers for the handshake request
-	 * @param handler the handler of the WebSocket session
-	 * @return completion {@code Mono<Void>} to indicate the outcome of the
-	 * WebSocket session handling.
+	 * 与{@link #execute(URI, WebSocketHandler)}的变体，带有自定义的头信息。
+	 *
+	 * @param url     握手的URL
+	 * @param headers 握手请求的自定义头信息
+	 * @param handler WebSocket会话的处理程序
+	 * @return 表示WebSocket会话处理结果的完成Mono<Void>
 	 */
 	Mono<Void> execute(URI url, HttpHeaders headers, WebSocketHandler handler);
 

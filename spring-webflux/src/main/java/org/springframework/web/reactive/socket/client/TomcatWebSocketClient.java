@@ -16,34 +16,47 @@
 
 package org.springframework.web.reactive.socket.client;
 
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-
 import org.apache.tomcat.websocket.WsWebSocketContainer;
-import reactor.core.publisher.Sinks;
-
 import org.springframework.web.reactive.socket.HandshakeInfo;
 import org.springframework.web.reactive.socket.adapter.StandardWebSocketSession;
 import org.springframework.web.reactive.socket.adapter.TomcatWebSocketSession;
+import reactor.core.publisher.Sinks;
+
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
 /**
- * {@link WebSocketClient} implementation for use with the Java WebSocket API.
+ * 用于Java WebSocket API的 {@link WebSocketClient} 实现。
  *
  * @author Violeta Georgieva
  * @since 5.0
  */
 public class TomcatWebSocketClient extends StandardWebSocketClient {
 
-
+	/**
+	 * 默认构造函数，使用默认的 WsWebSocketContainer。
+	 */
 	public TomcatWebSocketClient() {
 		this(new WsWebSocketContainer());
 	}
 
+	/**
+	 * 构造函数，接受一个 WebSocketContainer 实例。
+	 *
+	 * @param webSocketContainer WebSocketContainer 实例
+	 */
 	public TomcatWebSocketClient(WebSocketContainer webSocketContainer) {
 		super(webSocketContainer);
 	}
 
-
+	/**
+	 * 创建 Tomcat 特定的 WebSocket 会话。
+	 *
+	 * @param session        WebSocket 会话
+	 * @param info           握手信息
+	 * @param completionSink 完成信号 Sink
+	 * @return 创建的 TomcatWebSocketSession 实例
+	 */
 	@Override
 	protected StandardWebSocketSession createWebSocketSession(
 			Session session, HandshakeInfo info, Sinks.Empty<Void> completionSink) {

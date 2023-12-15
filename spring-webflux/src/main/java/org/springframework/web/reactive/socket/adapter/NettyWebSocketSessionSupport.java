@@ -45,9 +45,13 @@ public abstract class NettyWebSocketSessionSupport<T> extends AbstractWebSocketS
 	public static final int DEFAULT_FRAME_MAX_SIZE = 64 * 1024;
 
 
+	/**
+	 * 存储WebSocket消息类型的映射。
+	 */
 	private static final Map<Class<?>, WebSocketMessage.Type> messageTypes;
 
 	static {
+		// 初始化messageTypes映射，包含不同WebSocketFrame类对应的WebSocketMessage类型
 		messageTypes = new HashMap<>(8);
 		messageTypes.put(TextWebSocketFrame.class, WebSocketMessage.Type.TEXT);
 		messageTypes.put(BinaryWebSocketFrame.class, WebSocketMessage.Type.BINARY);
@@ -99,18 +103,24 @@ public abstract class NettyWebSocketSessionSupport<T> extends AbstractWebSocketS
 	 */
 	protected WebSocketFrame toFrame(WebSocketMessage message) {
 		if (message.getNativeMessage() != null) {
+			// 如果WebSocketMessage的底层原生消息不为null，则直接返回底层原生消息
 			return message.getNativeMessage();
 		}
 		ByteBuf byteBuf = NettyDataBufferFactory.toByteBuf(message.getPayload());
 		if (WebSocketMessage.Type.TEXT.equals(message.getType())) {
+			// 如果消息类型为TEXT，则创建TextWebSocketFrame
 			return new TextWebSocketFrame(byteBuf);
 		} else if (WebSocketMessage.Type.BINARY.equals(message.getType())) {
+			// 如果消息类型为BINARY，则创建BinaryWebSocketFrame
 			return new BinaryWebSocketFrame(byteBuf);
 		} else if (WebSocketMessage.Type.PING.equals(message.getType())) {
+			// 如果消息类型为PING，则创建PingWebSocketFrame
 			return new PingWebSocketFrame(byteBuf);
 		} else if (WebSocketMessage.Type.PONG.equals(message.getType())) {
+			// 如果消息类型为PONG，则创建PongWebSocketFrame
 			return new PongWebSocketFrame(byteBuf);
 		} else {
+			// 如果消息类型未知，则抛出IllegalArgumentException异常
 			throw new IllegalArgumentException("Unexpected message type: " + message.getType());
 		}
 	}

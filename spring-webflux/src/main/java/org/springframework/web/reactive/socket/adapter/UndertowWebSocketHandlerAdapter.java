@@ -16,16 +16,7 @@
 
 package org.springframework.web.reactive.socket.adapter;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
-import io.undertow.websockets.WebSocketConnectionCallback;
-import io.undertow.websockets.core.AbstractReceiveListener;
-import io.undertow.websockets.core.BufferedBinaryMessage;
-import io.undertow.websockets.core.BufferedTextMessage;
-import io.undertow.websockets.core.CloseMessage;
-import io.undertow.websockets.core.WebSocketChannel;
-
+import io.undertow.websockets.core.*;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.socket.CloseStatus;
@@ -33,9 +24,13 @@ import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketMessage.Type;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+
 /**
- * Undertow {@link WebSocketConnectionCallback} implementation that adapts and
- * delegates to a Spring {@link WebSocketHandler}.
+ * Undertow {@link io.undertow.websockets.WebSocketConnectionCallback} 实现，
+ * 它适应并委托给Spring {@link WebSocketHandler}。
+ * UndertowWebSocketHandlerAdapter类，继承自AbstractReceiveListener。
  *
  * @author Violeta Georgieva
  * @author Rossen Stoyanchev
@@ -43,29 +38,51 @@ import org.springframework.web.reactive.socket.WebSocketMessage.Type;
  */
 public class UndertowWebSocketHandlerAdapter extends AbstractReceiveListener {
 
+	/**
+	 * UndertowWebSocketSession对象，用于处理WebSocket会话。
+	 */
 	private final UndertowWebSocketSession session;
 
-
+	/**
+	 * 构造一个UndertowWebSocketHandlerAdapter对象。
+	 *
+	 * @param session UndertowWebSocketSession对象
+	 */
 	public UndertowWebSocketHandlerAdapter(UndertowWebSocketSession session) {
 		Assert.notNull(session, "UndertowWebSocketSession is required");
 		this.session = session;
 	}
 
-
+	/**
+	 * 处理完整的Text消息时调用。
+	 *
+	 * @param channel WebSocket通道
+	 * @param message 缓冲文本消息
+	 */
 	@Override
 	protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage message) {
+		// 处理Text消息，并转换为消息类型为TEXT
 		this.session.handleMessage(Type.TEXT, toMessage(Type.TEXT, message.getData()));
 	}
 
+	/**
+	 * 处理完整的Binary消息时调用。
+	 *
+	 * @param channel WebSocket通道
+	 * @param message 缓冲二进制消息
+	 */
 	@Override
 	@SuppressWarnings("deprecation")
 	protected void onFullBinaryMessage(WebSocketChannel channel, BufferedBinaryMessage message) {
+		// 处理Binary消息，并转换为消息类型为BINARY
 		this.session.handleMessage(Type.BINARY, toMessage(Type.BINARY, message.getData().getResource()));
+		// 释放消息数据资源
 		message.getData().free();
 	}
 
 	/**
-	 * 当接收到完整Pong消息时调用
+	 * 处理完整的Pong消息时调用。
+	 *
 	 * @param channel WebSocket通道
 	 * @param message 缓冲二进制消息
 	 */
@@ -80,7 +97,8 @@ public class UndertowWebSocketHandlerAdapter extends AbstractReceiveListener {
 
 
 	/**
-	 * 当接收到完整关闭消息时调用
+	 * 处理完整的Close消息时调用。
+	 *
 	 * @param channel WebSocket通道
 	 * @param message 缓冲二进制消息
 	 */
@@ -95,26 +113,40 @@ public class UndertowWebSocketHandlerAdapter extends AbstractReceiveListener {
 		message.getData().free();
 	}
 
-
+	/**
+	 * 处理WebSocket通道发生错误时调用。
+	 *
+	 * @param channel WebSocket通道
+	 * @param error   异常信息
+	 */
 	@Override
 	protected void onError(WebSocketChannel channel, Throwable error) {
+		// 处理WebSocket通道发生的错误
 		this.session.handleError(error);
 	}
 
+	/**
+	 * 将WebSocket消息转换为WebSocketMessage。
+	 *
+	 * @param type    消息类型
+	 * @param message 消息内容
+	 * @param <T>     消息类型泛型
+	 * @return WebSocketMessage对象
+	 */
 	private <T> WebSocketMessage toMessage(Type type, T message) {
 		if (Type.TEXT.equals(type)) {
+			// 如果消息类型为TEXT，将String类型的消息转换为字节数组，然后使用bufferFactory包装为DataBuffer
 			byte[] bytes = ((String) message).getBytes(StandardCharsets.UTF_8);
 			return new WebSocketMessage(Type.TEXT, this.session.bufferFactory().wrap(bytes));
-		}
-		else if (Type.BINARY.equals(type)) {
+		} else if (Type.BINARY.equals(type)) {
+			// 如果消息类型为BINARY，使用bufferFactory分配DataBuffer并将ByteBuffer数组写入其中
 			DataBuffer buffer = this.session.bufferFactory().allocateBuffer().write((ByteBuffer[]) message);
 			return new WebSocketMessage(Type.BINARY, buffer);
-		}
-		else if (Type.PONG.equals(type)) {
+		} else if (Type.PONG.equals(type)) {
+			// 如果消息类型为PONG，使用bufferFactory分配DataBuffer并将ByteBuffer数组写入其中
 			DataBuffer buffer = this.session.bufferFactory().allocateBuffer().write((ByteBuffer[]) message);
 			return new WebSocketMessage(Type.PONG, buffer);
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("Unexpected message type: " + message);
 		}
 	}

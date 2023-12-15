@@ -110,9 +110,13 @@ public class ReactorNettyWebSocketSession
 	@Override
 	public Flux<WebSocketMessage> receive() {
 		return getDelegate().getInbound()
+				// 聚合帧并设置最大帧负载长度
 				.aggregateFrames(this.maxFramePayloadLength)
+				// 接收帧
 				.receiveFrames()
+				// 将接收到的帧映射为WebSocketMessage
 				.map(super::toMessage)
+				// 在接收消息后进行日志记录
 				.doOnNext(message -> {
 					if (logger.isTraceEnabled()) {
 						logger.trace(getLogPrefix() + "Received " + message);

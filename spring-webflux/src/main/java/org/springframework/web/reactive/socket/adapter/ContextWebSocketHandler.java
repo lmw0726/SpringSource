@@ -31,9 +31,16 @@ import java.util.List;
  */
 public final class ContextWebSocketHandler implements WebSocketHandler {
 
+	/**
+	 * 代理 WebSocketHandler，用于处理WebSocket连接。
+	 */
 	private final WebSocketHandler delegate;
 
+	/**
+	 * 上下文视图，可能用于查看或管理当前的上下文信息。
+	 */
 	private final ContextView contextView;
+
 
 	// 使用给定的WebSocket处理程序和上下文视图创建ContextWebSocketHandler实例
 	private ContextWebSocketHandler(WebSocketHandler delegate, ContextView contextView) {

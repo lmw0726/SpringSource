@@ -201,9 +201,12 @@ public class UndertowWebSocketSession extends AbstractListenerWebSocketSession<W
 		 */
 		@Override
 		public void complete(WebSocketChannel channel, Void context) {
+			// 释放DataBuffer资源
 			DataBufferUtils.release(this.payload);
+			// 设置发送处理器为可发送状态，并触发可写入事件
 			getSendProcessor().setReadyToSend(true);
 			getSendProcessor().onWritePossible();
+
 		}
 
 		/**

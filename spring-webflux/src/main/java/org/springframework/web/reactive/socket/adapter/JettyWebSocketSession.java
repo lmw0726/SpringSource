@@ -45,32 +45,62 @@ import java.nio.charset.StandardCharsets;
 public class JettyWebSocketSession extends AbstractListenerWebSocketSession<Session> {
 
 	/**
-	 * 保存当前的suspendToken
+	 * 可空的易变暂停令牌。
 	 */
 	@Nullable
 	private volatile SuspendToken suspendToken;
 
 
+	/**
+	 * 构造一个JettyWebSocketSession对象。
+	 *
+	 * @param session Jetty的会话
+	 * @param info    握手信息
+	 * @param factory 数据缓冲工厂
+	 */
 	public JettyWebSocketSession(Session session, HandshakeInfo info, DataBufferFactory factory) {
+		// 调用另一个构造方法，并将completionSink参数设为null
 		this(session, info, factory, (Sinks.Empty<Void>) null);
 	}
 
+
+	/**
+	 * 构造一个JettyWebSocketSession对象。
+	 *
+	 * @param session        Jetty的会话
+	 * @param info           握手信息
+	 * @param factory        数据缓冲工厂
+	 * @param completionSink 完成时的Sinks.Empty处理器
+	 */
 	public JettyWebSocketSession(Session session, HandshakeInfo info, DataBufferFactory factory,
 								 @Nullable Sinks.Empty<Void> completionSink) {
 
 		super(session, ObjectUtils.getIdentityHexString(session), info, factory, completionSink);
-		// TODO: suspend causes failures if invoked at this stage
+		// TODO: 如果在这个阶段调用suspend会导致失败
 		// suspendReceiving();
 	}
 
+
+	/**
+	 * 构造一个JettyWebSocketSession对象，已被弃用。
+	 *
+	 * @param session        Jetty的会话
+	 * @param info           握手信息
+	 * @param factory        数据缓冲工厂
+	 * @param completionMono 完成时的Mono处理器
+	 */
 	@Deprecated
 	public JettyWebSocketSession(Session session, HandshakeInfo info, DataBufferFactory factory,
 								 @Nullable reactor.core.publisher.MonoProcessor<Void> completionMono) {
-
 		super(session, ObjectUtils.getIdentityHexString(session), info, factory, completionMono);
 	}
 
 
+	/**
+	 * 检查是否可以暂停接收操作。
+	 *
+	 * @return 总是返回true，表示可以暂停接收操作
+	 */
 	@Override
 	protected boolean canSuspendReceiving() {
 		return true;
@@ -96,8 +126,10 @@ public class JettyWebSocketSession extends AbstractListenerWebSocketSession<Sess
 	@Override
 	protected void resumeReceiving() {
 		SuspendToken tokenToUse = this.suspendToken;
+		// 清空暂停令牌
 		this.suspendToken = null;
 		if (tokenToUse != null) {
+			//如果暂停令牌不为空，则恢复接收
 			tokenToUse.resume();
 		}
 	}
@@ -140,22 +172,36 @@ public class JettyWebSocketSession extends AbstractListenerWebSocketSession<Sess
 		return true;
 	}
 
-
+	/**
+	 * 检查当前会话是否打开。
+	 *
+	 * @return 如果会话打开，则返回true；否则返回false
+	 */
 	@Override
 	public boolean isOpen() {
 		return getDelegate().isOpen();
 	}
 
+	/**
+	 * 关闭当前会话。
+	 *
+	 * @param status 关闭状态
+	 * @return 一个表示异步关闭操作的Mono
+	 */
 	@Override
 	public Mono<Void> close(CloseStatus status) {
 		getDelegate().close(status.getCode(), status.getReason());
 		return Mono.empty();
 	}
-	private final class SendProcessorCallback implements WriteCallback {
 
+	/**
+	 * 发送处理器回调类，实现了WriteCallback接口。
+	 */
+	private final class SendProcessorCallback implements WriteCallback {
 
 		/**
 		 * 写操作失败时的回调方法。
+		 *
 		 * @param x 失败时的异常信息
 		 */
 		@Override

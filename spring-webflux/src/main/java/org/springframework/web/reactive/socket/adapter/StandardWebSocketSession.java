@@ -16,25 +16,23 @@
 
 package org.springframework.web.reactive.socket.adapter;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
-import javax.websocket.Session;
-
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
-
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.HandshakeInfo;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.SendHandler;
+import javax.websocket.SendResult;
+import javax.websocket.Session;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Spring {@link WebSocketSession} adapter for a standard Java (JSR 356)
@@ -61,13 +59,13 @@ public class StandardWebSocketSession extends AbstractListenerWebSocketSession<S
 	/**
 	 * 构造方法
 	 *
-	 * @param session          会话
-	 * @param info             握手信息
-	 * @param factory          数据缓冲区工厂
-	 * @param completionSink   完成信号
+	 * @param session        会话
+	 * @param info           握手信息
+	 * @param factory        数据缓冲区工厂
+	 * @param completionSink 完成信号
 	 */
 	public StandardWebSocketSession(Session session, HandshakeInfo info, DataBufferFactory factory,
-			@Nullable Sinks.Empty<Void> completionSink) {
+									@Nullable Sinks.Empty<Void> completionSink) {
 
 		super(session, session.getId(), info, factory, completionSink);
 	}
@@ -75,7 +73,7 @@ public class StandardWebSocketSession extends AbstractListenerWebSocketSession<S
 
 	@Deprecated
 	public StandardWebSocketSession(Session session, HandshakeInfo info, DataBufferFactory factory,
-			@Nullable reactor.core.publisher.MonoProcessor<Void> completionMono) {
+									@Nullable reactor.core.publisher.MonoProcessor<Void> completionMono) {
 
 		super(session, session.getId(), info, factory, completionMono);
 	}
@@ -142,8 +140,7 @@ public class StandardWebSocketSession extends AbstractListenerWebSocketSession<S
 		else if (WebSocketMessage.Type.PONG.equals(message.getType())) {
 			//发送pong消息
 			getDelegate().getAsyncRemote().sendPong(buffer);
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("Unexpected message type: " + message.getType());
 		}
 		return true;
@@ -170,8 +167,7 @@ public class StandardWebSocketSession extends AbstractListenerWebSocketSession<S
 		try {
 			CloseReason.CloseCode code = CloseCodes.getCloseCode(status.getCode());
 			getDelegate().close(new CloseReason(code, status.getReason()));
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			return Mono.error(ex);
 		}
 		return Mono.empty();
@@ -190,13 +186,15 @@ public class StandardWebSocketSession extends AbstractListenerWebSocketSession<S
 		@Override
 		public void onResult(SendResult result) {
 			if (result.isOK()) {
+				// 如果结果为OK，则设置发送处理器为可发送状态，并触发可写入事件
 				getSendProcessor().setReadyToSend(true);
 				getSendProcessor().onWritePossible();
-			}
-			else {
+			} else {
+				// 如果结果不为OK，则取消发送处理器并触发错误处理
 				getSendProcessor().cancel();
 				getSendProcessor().onError(result.getException());
 			}
+
 		}
 
 	}
