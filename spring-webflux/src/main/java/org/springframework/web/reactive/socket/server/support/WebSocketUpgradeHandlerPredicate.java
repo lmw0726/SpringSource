@@ -16,16 +16,16 @@
 
 package org.springframework.web.reactive.socket.server.support;
 
-import java.util.function.BiPredicate;
-
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.function.BiPredicate;
+
 /**
- * A predicate for use with
+ * 用于与
  * {@link org.springframework.web.reactive.handler.AbstractUrlHandlerMapping#setHandlerPredicate}
- * to ensure only WebSocket handshake requests are matched to handlers of type
- * {@link WebSocketHandler}.
+ * 一起使用的断言，以确保只有 WebSocket 握手请求与类型为
+ * {@link WebSocketHandler} 的处理程序匹配。
  *
  * @author Rossen Stoyanchev
  * @since 5.3.5
@@ -35,11 +35,14 @@ public class WebSocketUpgradeHandlerPredicate implements BiPredicate<Object, Ser
 	@Override
 	public boolean test(Object handler, ServerWebExchange exchange) {
 		if (handler instanceof WebSocketHandler) {
+			// 获取请求方法和 Upgrade 头部信息
 			String method = exchange.getRequest().getMethodValue();
 			String header = exchange.getRequest().getHeaders().getUpgrade();
+			// 检查请求方法是否为 GET 且 Upgrade 头部信息为 websocket
 			return (method.equals("GET") && header != null && header.equalsIgnoreCase("websocket"));
 		}
+		// 如果处理程序不是 WebSocketHandler 类型，则始终返回 true
 		return true;
 	}
-
 }
+

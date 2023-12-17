@@ -16,25 +16,22 @@
 
 package org.springframework.web.reactive.socket.server;
 
-import java.util.function.Supplier;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.socket.HandshakeInfo;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Supplier;
 
 /**
- * A strategy for upgrading an HTTP request to a WebSocket session depending
- * on the underlying network runtime.
+ * 用于根据底层网络运行时将HTTP请求升级到WebSocket会话的策略。
  *
- * <p>Typically there is one such strategy for every {@link ServerHttpRequest}
- * and {@link ServerHttpResponse} type except in the case of Servlet containers
- * for which the standard Java WebSocket API JSR-356 does not define a way to
- * upgrade a request so a custom strategy is needed for every Servlet container.
+ * <p>通常，每个{@link ServerHttpRequest}和{@link ServerHttpResponse}类型都有一个这样的策略，
+ * 除了在Servlet容器的情况下，其中标准的Java WebSocket API JSR-356未定义升级请求的方式，
+ * 因此每个Servlet容器都需要一个自定义策略。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -42,34 +39,33 @@ import org.springframework.web.server.ServerWebExchange;
 public interface RequestUpgradeStrategy {
 
 	/**
-	 * Upgrade to a WebSocket session and handle it with the given handler.
-	 * @param exchange the current exchange
-	 * @param webSocketHandler handler for the WebSocket session
-	 * @param subProtocol the selected sub-protocol got the handler
-	 * @return completion {@code Mono<Void>} to indicate the outcome of the
-	 * WebSocket session handling.
-	 * @deprecated as of 5.1 in favor of
-	 * {@link #upgrade(ServerWebExchange, WebSocketHandler, String, Supplier)}
+	 * 将请求升级到WebSocket会话并使用给定的处理程序处理它。
+	 *
+	 * @param exchange         当前交换信息
+	 * @param webSocketHandler WebSocket会话的处理程序
+	 * @param subProtocol      处理程序选择的子协议
+	 * @return 完成的{@code Mono<Void>}，表示WebSocket会话处理的结果。
+	 * @deprecated 自5.1起弃用，建议使用{@link #upgrade(ServerWebExchange, WebSocketHandler, String, Supplier)}
 	 */
 	@Deprecated
 	default Mono<Void> upgrade(ServerWebExchange exchange, WebSocketHandler webSocketHandler,
-			@Nullable String subProtocol) {
+							   @Nullable String subProtocol) {
 
 		return Mono.error(new UnsupportedOperationException());
 	}
 
 	/**
-	 * Upgrade to a WebSocket session and handle it with the given handler.
-	 * @param exchange the current exchange
-	 * @param webSocketHandler handler for the WebSocket session
-	 * @param subProtocol the selected sub-protocol got the handler
-	 * @param handshakeInfoFactory factory to create HandshakeInfo for the WebSocket session
-	 * @return completion {@code Mono<Void>} to indicate the outcome of the
-	 * WebSocket session handling.
+	 * 将请求升级到WebSocket会话并使用给定的处理程序处理它。
+	 *
+	 * @param exchange             当前交换信息
+	 * @param webSocketHandler     WebSocket会话的处理程序
+	 * @param subProtocol          处理程序选择的子协议
+	 * @param handshakeInfoFactory 用于为WebSocket会话创建HandshakeInfo的工厂
+	 * @return 完成的{@code Mono<Void>}，表示WebSocket会话处理的结果。
 	 * @since 5.1
 	 */
 	default Mono<Void> upgrade(ServerWebExchange exchange, WebSocketHandler webSocketHandler,
-			@Nullable String subProtocol, Supplier<HandshakeInfo> handshakeInfoFactory) {
+							   @Nullable String subProtocol, Supplier<HandshakeInfo> handshakeInfoFactory) {
 
 		return upgrade(exchange, webSocketHandler, subProtocol);
 	}

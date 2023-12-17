@@ -27,52 +27,51 @@ import org.springframework.web.reactive.socket.server.WebSocketService;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * {@code HandlerAdapter} that allows
- * {@link org.springframework.web.reactive.DispatcherHandler} to support
- * handlers of type {@link WebSocketHandler} with such handlers mapped to
- * URL patterns via
- * {@link org.springframework.web.reactive.handler.SimpleUrlHandlerMapping}.
+ * {@code HandlerAdapter} 实现，允许
+ * {@link org.springframework.web.reactive.DispatcherHandler} 支持
+ * 类型为 {@link WebSocketHandler} 的处理程序，并通过
+ * {@link org.springframework.web.reactive.handler.SimpleUrlHandlerMapping}
+ * 将这些处理程序映射到 URL 模式。
  *
- * <p>Requests are handled by delegating to a
- * {@link WebSocketService}, by default {@link HandshakeWebSocketService},
- * which checks the WebSocket handshake request parameters, upgrades to a
- * WebSocket interaction, and uses the {@link WebSocketHandler} to handle it.
+ * <p>通过委托给 {@link WebSocketService} 处理请求，默认为 {@link HandshakeWebSocketService}，
+ * 该服务检查 WebSocket 握手请求参数，升级到 WebSocket 交互，并使用 {@link WebSocketHandler} 处理它。
  *
- * <p>As of 5.3 the WebFlux Java configuration, imported via
- * {@code @EnableWebFlux}, includes a declaration of this adapter and therefore
- * it no longer needs to be present in application configuration.
+ * <p>从 5.3 版本开始，WebFlux 的 Java 配置（通过 {@code @EnableWebFlux} 导入）包括对此适配器的声明，
+ * 因此它不再需要出现在应用程序配置中。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class WebSocketHandlerAdapter implements HandlerAdapter, Ordered {
-
+	/**
+	 * WebSocket服务
+	 */
 	private final WebSocketService webSocketService;
-
+	/**
+	 * 定义该Bean的排序值为2
+	 */
 	private int order = 2;
 
-
 	/**
-	 * Default constructor that creates and uses a
-	 * {@link HandshakeWebSocketService}.
+	 * 默认构造函数，创建并使用 {@link HandshakeWebSocketService}。
 	 */
 	public WebSocketHandlerAdapter() {
 		this(new HandshakeWebSocketService());
 	}
 
 	/**
-	 * Alternative constructor with the {@link WebSocketService} to use.
+	 * 另一种构造函数，使用指定的 {@link WebSocketService}。
 	 */
 	public WebSocketHandlerAdapter(WebSocketService webSocketService) {
 		Assert.notNull(webSocketService, "'webSocketService' is required");
 		this.webSocketService = webSocketService;
 	}
 
-
 	/**
-	 * Set the order value for this adapter.
-	 * <p>By default this is set to 2.
-	 * @param order the value to set to
+	 * 设置此适配器的排序值。
+	 * <p>默认为 2。
+	 *
+	 * @param order 要设置的值
 	 * @since 5.3
 	 */
 	public void setOrder(int order) {
@@ -80,7 +79,8 @@ public class WebSocketHandlerAdapter implements HandlerAdapter, Ordered {
 	}
 
 	/**
-	 * Return the {@link #setOrder(int) configured} order for this instance.
+	 * 返回此实例的配置顺序 {@link #setOrder(int)}。
+	 *
 	 * @since 5.3
 	 */
 	@Override
@@ -89,18 +89,33 @@ public class WebSocketHandlerAdapter implements HandlerAdapter, Ordered {
 	}
 
 	/**
-	 * Return the configured {@code WebSocketService} to handle requests.
+	 * 返回配置的 {@code WebSocketService} 以处理请求。
+	 *
+	 * @return WebSocket服务
 	 */
 	public WebSocketService getWebSocketService() {
 		return this.webSocketService;
 	}
 
-
+	/**
+	 * 检查处理程序是否为 WebSocketHandler 类型
+	 *
+	 * @param handler 要检查的处理程序对象
+	 * @return 如果处理程序是 WebSocketHandler 类型，则返回 true；否则返回 false
+	 */
 	@Override
 	public boolean supports(Object handler) {
+		//如果仅支持WebSocketHandler的实现类
 		return WebSocketHandler.class.isAssignableFrom(handler.getClass());
 	}
 
+	/**
+	 * 处理 WebSocket 请求
+	 *
+	 * @param exchange WebSocket 服务器交换对象
+	 * @param handler  处理程序对象
+	 * @return 返回一个 Mono，表示处理请求的结果
+	 */
 	@Override
 	public Mono<HandlerResult> handle(ServerWebExchange exchange, Object handler) {
 		WebSocketHandler webSocketHandler = (WebSocketHandler) handler;

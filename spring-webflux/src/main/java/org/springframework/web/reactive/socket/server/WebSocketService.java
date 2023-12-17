@@ -22,24 +22,23 @@ import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * A service to delegate WebSocket-related HTTP requests to.
+ * 用于委派WebSocket相关的HTTP请求的服务。
  *
- * <p>For a WebSocket endpoint this means handling the initial WebSocket HTTP
- * handshake request. For a SockJS endpoint it could mean handling all HTTP
- * requests defined in the SockJS protocol.
+ * <p>对于WebSocket端点，这意味着处理初始的WebSocket HTTP握手请求。
+ * 对于SockJS端点，它可以意味着处理SockJS协议中定义的所有HTTP请求。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see org.springframework.web.reactive.socket.server.support.HandshakeWebSocketService
+ * @since 5.0
  */
 public interface WebSocketService {
 
 	/**
-	 * Handle the request with the given {@link WebSocketHandler}.
-	 * @param exchange the current exchange
-	 * @param webSocketHandler handler for WebSocket session
-	 * @return a {@code Mono<Void>} that completes when application handling of
-	 * the WebSocket session completes.
+	 * 使用给定的{@link WebSocketHandler}处理请求。
+	 *
+	 * @param exchange         当前交换信息
+	 * @param webSocketHandler WebSocket会话的处理程序
+	 * @return 一个{@code Mono<Void>}，在WebSocket会话的应用程序处理完成时完成。
 	 */
 	Mono<Void> handleRequest(ServerWebExchange exchange, WebSocketHandler webSocketHandler);
 

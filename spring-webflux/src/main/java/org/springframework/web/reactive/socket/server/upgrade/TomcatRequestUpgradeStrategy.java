@@ -16,17 +16,7 @@
 
 package org.springframework.web.reactive.socket.server.upgrade;
 
-import java.util.Collections;
-import java.util.function.Supplier;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.websocket.Endpoint;
-import javax.websocket.server.ServerContainer;
-
 import org.apache.tomcat.websocket.server.WsServerContainer;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
@@ -41,9 +31,17 @@ import org.springframework.web.reactive.socket.adapter.StandardWebSocketHandlerA
 import org.springframework.web.reactive.socket.adapter.TomcatWebSocketSession;
 import org.springframework.web.reactive.socket.server.RequestUpgradeStrategy;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.websocket.Endpoint;
+import javax.websocket.server.ServerContainer;
+import java.util.Collections;
+import java.util.function.Supplier;
 
 /**
- * A {@link RequestUpgradeStrategy} for use with Tomcat.
+ * 用于Tomcat的{@link RequestUpgradeStrategy}
  *
  * @author Violeta Georgieva
  * @author Rossen Stoyanchev
@@ -71,26 +69,22 @@ public class TomcatRequestUpgradeStrategy implements RequestUpgradeStrategy {
 
 
 	/**
-	 * Exposes the underlying config option on
-	 * {@link javax.websocket.server.ServerContainer#setAsyncSendTimeout(long)}.
+	 * 暴露了底层配置选项在{@link javax.websocket.server.ServerContainer#setAsyncSendTimeout(long)}上的方法。
 	 */
 	public void setAsyncSendTimeout(Long timeoutInMillis) {
 		this.asyncSendTimeout = timeoutInMillis;
 	}
-
 	@Nullable
 	public Long getAsyncSendTimeout() {
 		return this.asyncSendTimeout;
 	}
 
 	/**
-	 * Exposes the underlying config option on
-	 * {@link javax.websocket.server.ServerContainer#setDefaultMaxSessionIdleTimeout(long)}.
+	 * 暴露了底层配置选项在{@link javax.websocket.server.ServerContainer#setDefaultMaxSessionIdleTimeout(long)}上的方法。
 	 */
 	public void setMaxSessionIdleTimeout(Long timeoutInMillis) {
 		this.maxSessionIdleTimeout = timeoutInMillis;
 	}
-
 	@Nullable
 	public Long getMaxSessionIdleTimeout() {
 		return this.maxSessionIdleTimeout;
@@ -126,7 +120,7 @@ public class TomcatRequestUpgradeStrategy implements RequestUpgradeStrategy {
 	@SuppressWarnings("deprecation")  // for old doUpgrade variant in Tomcat 9.0.55
 	@Override
 	public Mono<Void> upgrade(ServerWebExchange exchange, WebSocketHandler handler,
-			@Nullable String subProtocol, Supplier<HandshakeInfo> handshakeInfoFactory){
+							  @Nullable String subProtocol, Supplier<HandshakeInfo> handshakeInfoFactory) {
 
 		ServerHttpRequest request = exchange.getRequest();
 		ServerHttpResponse response = exchange.getResponse();
@@ -152,8 +146,7 @@ public class TomcatRequestUpgradeStrategy implements RequestUpgradeStrategy {
 					WsServerContainer container = getContainer(servletRequest);
 					try {
 						container.doUpgrade(servletRequest, servletResponse, config, Collections.emptyMap());
-					}
-					catch (Exception ex) {
+					} catch (Exception ex) {
 						return Mono.error(ex);
 					}
 					return Mono.empty();

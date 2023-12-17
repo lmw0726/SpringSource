@@ -16,15 +16,13 @@
 
 package org.springframework.web.reactive;
 
-import java.util.function.Function;
-
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import org.springframework.web.server.ServerWebExchange;
+import java.util.function.Function;
 
 /**
- * Contract that decouples the {@link DispatcherHandler} from the details of
- * invoking a handler and makes it possible to support any handler type.
+ * 将{@link DispatcherHandler}与调用处理程序的细节解耦，使支持任何处理程序类型成为可能的契约。
  *
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
@@ -33,27 +31,23 @@ import org.springframework.web.server.ServerWebExchange;
 public interface HandlerAdapter {
 
 	/**
-	 * Whether this {@code HandlerAdapter} supports the given {@code handler}.
-	 * @param handler the handler object to check
-	 * @return whether or not the handler is supported
+	 * 此{@code HandlerAdapter}是否支持给定的{@code handler}。
+	 *
+	 * @param handler 要检查的处理程序对象
+	 * @return 处理程序是否受支持
 	 */
 	boolean supports(Object handler);
 
 	/**
-	 * Handle the request with the given handler.
-	 * <p>Implementations are encouraged to handle exceptions resulting from the
-	 * invocation of a handler in order and if necessary to return an alternate
-	 * result that represents an error response.
-	 * <p>Furthermore since an async {@code HandlerResult} may produce an error
-	 * later during result handling implementations are also encouraged to
-	 * {@link HandlerResult#setExceptionHandler(Function) set an exception
-	 * handler} on the {@code HandlerResult} so that may also be applied later
-	 * after result handling.
-	 * @param exchange current server exchange
-	 * @param handler the selected handler which must have been previously
-	 * checked via {@link #supports(Object)}
-	 * @return {@link Mono} that emits a single {@code HandlerResult} or none if
-	 * the request has been fully handled and doesn't require further handling.
+	 * 使用给定处理程序处理请求。
+	 * <p>鼓励实现以顺序处理由处理程序调用引起的异常，并在必要时返回表示错误响应的备用结果。
+	 * <p>此外，由于异步{@code HandlerResult}可能在结果处理期间稍后产生错误，
+	 * 因此还鼓励实现在{@code HandlerResult}上{@link HandlerResult#setExceptionHandler(Function)设置异常处理程序}，
+	 * 以便在结果处理后稍后也可以应用它。
+	 *
+	 * @param exchange 当前服务器交换信息
+	 * @param handler  已经通过{@link #supports(Object)}事先检查过的选择的处理程序
+	 * @return {@link Mono}，发出单个{@code HandlerResult}或如果已完全处理请求并且不需要进一步处理则发出空值。
 	 */
 	Mono<HandlerResult> handle(ServerWebExchange exchange, Object handler);
 
