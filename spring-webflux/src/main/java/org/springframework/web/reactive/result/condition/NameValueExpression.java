@@ -17,22 +17,34 @@
 package org.springframework.web.reactive.result.condition;
 
 import org.springframework.lang.Nullable;
-
 /**
- * A contract for {@code "name!=value"} style expression used to specify request
- * parameters and request header conditions in {@code @RequestMapping}.
+ * 用于指定在 {@code @RequestMapping} 中的请求参数和请求头条件的 {@code "name!=value"} 样式表达式的约定。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
- * @param <T> the value type
+ * @param <T> 值的类型
  */
 public interface NameValueExpression<T> {
-
+	/**
+	 * 获取表达式中的名称。
+	 *
+	 * @return 表达式的名称
+	 */
 	String getName();
 
+	/**
+	 * 获取表达式中的值，如果没有值则返回 {@code null}。
+	 *
+	 * @return 表达式的值，可能为 {@code null}
+	 */
 	@Nullable
 	T getValue();
 
+	/**
+	 * 检查表达式是否是否定的。
+	 *
+	 * @return 如果表达式是否定，则为 true；否则为 false
+	 */
 	boolean isNegated();
 
 }
