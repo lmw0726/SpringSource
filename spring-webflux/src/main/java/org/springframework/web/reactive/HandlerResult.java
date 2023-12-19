@@ -16,56 +16,72 @@
 
 package org.springframework.web.reactive;
 
-import java.util.function.Function;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Function;
 
 /**
- * Represent the result of the invocation of a handler or a handler method.
+ * 表示调用处理程序或处理程序方法的结果。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class HandlerResult {
 
+	/**
+	 * 处理程序对象
+	 */
 	private final Object handler;
 
+	/**
+	 * 返回值对象，可为空
+	 */
 	@Nullable
 	private final Object returnValue;
 
+	/**
+	 * 可解析类型的返回类型
+	 */
 	private final ResolvableType returnType;
 
+	/**
+	 * 绑定上下文对象
+	 */
 	private final BindingContext bindingContext;
 
+	/**
+	 * 异常处理器函数，可为空
+	 */
 	@Nullable
 	private Function<Throwable, Mono<HandlerResult>> exceptionHandler;
 
 
 	/**
-	 * Create a new {@code HandlerResult}.
-	 * @param handler the handler that handled the request
-	 * @param returnValue the return value from the handler possibly {@code null}
-	 * @param returnType the return value type
+	 * 创建新的{@code HandlerResult}。
+	 *
+	 * @param handler     处理请求的处理程序
+	 * @param returnValue 处理程序的返回值，可能为{@code null}
+	 * @param returnType  返回值类型
 	 */
 	public HandlerResult(Object handler, @Nullable Object returnValue, MethodParameter returnType) {
 		this(handler, returnValue, returnType, null);
 	}
 
 	/**
-	 * Create a new {@code HandlerResult}.
-	 * @param handler the handler that handled the request
-	 * @param returnValue the return value from the handler possibly {@code null}
-	 * @param returnType the return value type
-	 * @param context the binding context used for request handling
+	 * 创建新的{@code HandlerResult}。
+	 *
+	 * @param handler     处理请求的处理程序
+	 * @param returnValue 处理程序的返回值，可能为{@code null}
+	 * @param returnType  返回值类型
+	 * @param context     用于请求处理的绑定上下文
 	 */
 	public HandlerResult(Object handler, @Nullable Object returnValue, MethodParameter returnType,
-			@Nullable BindingContext context) {
+						 @Nullable BindingContext context) {
 
 		Assert.notNull(handler, "'handler' is required");
 		Assert.notNull(returnType, "'returnType' is required");
@@ -77,14 +93,18 @@ public class HandlerResult {
 
 
 	/**
-	 * Return the handler that handled the request.
+	 * 返回处理请求的处理程序。
+	 *
+	 * @return 处理请求的处理程序
 	 */
 	public Object getHandler() {
 		return this.handler;
 	}
 
 	/**
-	 * Return the value returned from the handler, if any.
+	 * 返回从处理程序返回的值，如果有的话。
+	 *
+	 * @return 处理程序返回的值
 	 */
 	@Nullable
 	public Object getReturnValue() {
@@ -92,44 +112,48 @@ public class HandlerResult {
 	}
 
 	/**
-	 * Return the type of the value returned from the handler -- e.g. the return
-	 * type declared on a controller method's signature. Also see
-	 * {@link #getReturnTypeSource()} to obtain the underlying
-	 * {@link MethodParameter} for the return type.
+	 * 返回从处理程序返回的值的类型，例如控制器方法签名上声明的返回类型。
+	 * 还请参见{@link #getReturnTypeSource()}以获取返回类型的底层{@link MethodParameter}。
+	 *
+	 * @return 处理程序返回值的类型
 	 */
 	public ResolvableType getReturnType() {
 		return this.returnType;
 	}
 
 	/**
-	 * Return the {@link MethodParameter} from which {@link #getReturnType()
-	 * returnType} was created.
+	 * 返回创建{@link #getReturnType() returnType}的{@link MethodParameter}。
+	 *
+	 * @return 方法参数
 	 */
 	public MethodParameter getReturnTypeSource() {
 		return (MethodParameter) this.returnType.getSource();
 	}
 
 	/**
-	 * Return the BindingContext used for request handling.
+	 * 返回用于请求处理的BindingContext。
+	 *
+	 * @return 绑定上下文
 	 */
 	public BindingContext getBindingContext() {
 		return this.bindingContext;
 	}
 
 	/**
-	 * Return the model used for request handling. This is a shortcut for
-	 * {@code getBindingContext().getModel()}.
+	 * 返回用于请求处理的模型。这是{@code getBindingContext().getModel()}的快捷方式。
+	 *
+	 * @return 用于请求处理的模型
 	 */
 	public Model getModel() {
 		return this.bindingContext.getModel();
 	}
 
 	/**
-	 * Configure an exception handler that may be used to produce an alternative
-	 * result when result handling fails. Especially for an async return value
-	 * errors may occur after the invocation of the handler.
-	 * @param function the error handler
-	 * @return the current instance
+	 * 配置可能用于在处理结果失败时生成替代结果的异常处理程序。
+	 * 特别是对于异步返回值，在处理程序调用之后可能发生错误。
+	 *
+	 * @param function 错误处理程序
+	 * @return 当前实例
 	 */
 	public HandlerResult setExceptionHandler(Function<Throwable, Mono<HandlerResult>> function) {
 		this.exceptionHandler = function;
@@ -137,16 +161,19 @@ public class HandlerResult {
 	}
 
 	/**
-	 * Whether there is an exception handler.
+	 * 是否存在异常处理程序。
+	 *
+	 * @return 异常处理程序
 	 */
 	public boolean hasExceptionHandler() {
 		return (this.exceptionHandler != null);
 	}
 
 	/**
-	 * Apply the exception handler and return the alternative result.
-	 * @param failure the exception
-	 * @return the new result or the same error if there is no exception handler
+	 * 应用异常处理程序并返回替代结果。
+	 *
+	 * @param failure 异常
+	 * @return 新结果或如果没有异常处理程序则返回相同的错误
 	 */
 	public Mono<HandlerResult> applyExceptionHandler(Throwable failure) {
 		return (this.exceptionHandler != null ? this.exceptionHandler.apply(failure) : Mono.error(failure));

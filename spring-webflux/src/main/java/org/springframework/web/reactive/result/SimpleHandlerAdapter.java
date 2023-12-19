@@ -25,8 +25,8 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebHandler;
 
 /**
- * {@link HandlerAdapter} that allows using the plain {@link WebHandler} contract
- * with the generic {@link DispatcherHandler}.
+ * {@link HandlerAdapter}的实现，允许使用普通的 {@link WebHandler} 协议
+ * 与通用的 {@link DispatcherHandler} 进行交互。
  *
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
@@ -34,11 +34,24 @@ import org.springframework.web.server.WebHandler;
  */
 public class SimpleHandlerAdapter implements HandlerAdapter {
 
+	/**
+	 * 判断给定的处理器是否被支持。
+	 *
+	 * @param handler 要检查的处理器对象
+	 * @return 如果支持该处理器，则为 true；否则为 false
+	 */
 	@Override
 	public boolean supports(Object handler) {
 		return WebHandler.class.isAssignableFrom(handler.getClass());
 	}
 
+	/**
+	 * 处理请求并返回处理结果的 Mono。
+	 *
+	 * @param exchange 用于表示 HTTP 请求和响应的 ServerWebExchange 对象
+	 * @param handler 处理请求的对象
+	 * @return 包含处理结果的 Mono 对象
+	 */
 	@Override
 	public Mono<HandlerResult> handle(ServerWebExchange exchange, Object handler) {
 		WebHandler webHandler = (WebHandler) handler;
