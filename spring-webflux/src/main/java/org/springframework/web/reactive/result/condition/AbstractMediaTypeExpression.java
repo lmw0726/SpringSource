@@ -24,30 +24,46 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
 /**
- * Supports media type expressions as described in:
- * {@link RequestMapping#consumes()} and {@link RequestMapping#produces()}.
+ * 支持媒体类型表达式，如 {@link RequestMapping#consumes()} 和 {@link RequestMapping#produces()} 中描述的。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 abstract class AbstractMediaTypeExpression implements Comparable<AbstractMediaTypeExpression>, MediaTypeExpression {
-
+	/**
+	 * 媒体类型
+	 */
 	private final MediaType mediaType;
-
+	/**
+	 * 是否为否定表达式
+	 */
 	private final boolean isNegated;
 
-
+	/**
+	 * 构造函数，根据表达式初始化媒体类型和否定标志。
+	 *
+	 * @param expression 媒体类型表达式
+	 */
 	AbstractMediaTypeExpression(String expression) {
 		if (expression.startsWith("!")) {
+			//如果表达式以 ! 开头
 			this.isNegated = true;
+			//表达式为!后的字符串
 			expression = expression.substring(1);
-		}
-		else {
+		} else {
+			//不是否定表达式
 			this.isNegated = false;
 		}
+		//解析媒体类型
 		this.mediaType = MediaType.parseMediaType(expression);
 	}
 
+	/**
+	 * 构造函数，根据媒体类型和否定标志初始化对象。
+	 *
+	 * @param mediaType 媒体类型
+	 * @param negated   是否为否定表达式
+	 */
 	AbstractMediaTypeExpression(MediaType mediaType, boolean negated) {
 		this.mediaType = mediaType;
 		this.isNegated = negated;
@@ -65,16 +81,32 @@ abstract class AbstractMediaTypeExpression implements Comparable<AbstractMediaTy
 	}
 
 
+	/**
+	 * 判断是否匹配媒体类型。
+	 *
+	 * @param exchange 当前的服务器Web交换对象
+	 * @return 如果匹配，则返回 true；否则返回 false
+	 */
 	public final boolean match(ServerWebExchange exchange) {
 		try {
+			// 调用 matchMediaType 方法检查是否匹配媒体类型
 			boolean match = matchMediaType(exchange);
+			// 检查匹配结果是否与是否否定标志相符，并返回结果
 			return (!this.isNegated == match);
-		}
-		catch (NotAcceptableStatusException | UnsupportedMediaTypeStatusException ex) {
+		} catch (NotAcceptableStatusException | UnsupportedMediaTypeStatusException ex) {
+			// 如果发生 NotAcceptableStatusException 或 UnsupportedMediaTypeStatusException 异常，则返回 false
 			return false;
 		}
 	}
 
+	/**
+	 * 抽象方法，用于检查是否匹配媒体类型。
+	 *
+	 * @param exchange 当前的服务器Web交换对象
+	 * @return 如果匹配，则返回 true；否则返回 false
+	 * @throws NotAcceptableStatusException     如果不可接受，则抛出 NotAcceptableStatusException 异常
+	 * @throws UnsupportedMediaTypeStatusException 如果不支持的媒体类型，则抛出 UnsupportedMediaTypeStatusException 异常
+	 */
 	protected abstract boolean matchMediaType(ServerWebExchange exchange)
 			throws NotAcceptableStatusException, UnsupportedMediaTypeStatusException;
 

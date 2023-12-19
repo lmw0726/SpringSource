@@ -43,10 +43,14 @@ import java.util.TreeMap;
  * @since 5.0
  */
 public class BindingContext {
-
+	/**
+	 * Web绑定初始化器
+	 */
 	@Nullable
 	private final WebBindingInitializer initializer;
-
+	/**
+	 * 模型
+	 */
 	private final Model model = new BindingAwareConcurrentModel();
 
 
