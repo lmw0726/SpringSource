@@ -16,16 +16,6 @@
 
 package org.springframework.web.reactive.result.condition;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.springframework.http.server.PathContainer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
@@ -33,9 +23,10 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import java.util.*;
+
 /**
- * A logical disjunction (' || ') request condition that matches a request
- * against a set of URL path patterns.
+ * 逻辑或（' || '）请求条件，用于将请求与一组 URL 路径模式进行匹配。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
@@ -43,55 +34,92 @@ import org.springframework.web.util.pattern.PathPatternParser;
  */
 public final class PatternsRequestCondition extends AbstractRequestCondition<PatternsRequestCondition> {
 
+	/**
+	 * 表示空的路径模式集合
+	 */
 	private static final SortedSet<PathPattern> EMPTY_PATH_PATTERN =
 			new TreeSet<>(Collections.singleton(PathPatternParser.defaultInstance.parse("")));
 
+	/**
+	 * 表示空的路径集合
+	 */
 	private static final Set<String> EMPTY_PATH = Collections.singleton("");
 
-
+	/**
+	 * URL路径模式的有序集合
+	 */
 	private final SortedSet<PathPattern> patterns;
 
 
 	/**
-	 * Creates a new instance with the given URL patterns.
-	 * @param patterns 0 or more URL patterns; if 0 the condition will match to every request.
+	 * 使用给定的 URL 模式创建一个新实例。
+	 *
+	 * @param patterns 0 或更多个 URL 模式；如果为 0，则条件将与每个请求匹配。
 	 */
 	public PatternsRequestCondition(PathPattern... patterns) {
 		this(ObjectUtils.isEmpty(patterns) ? Collections.emptyList() : Arrays.asList(patterns));
 	}
 
 	/**
-	 * Creates a new instance with the given URL patterns.
+	 * 使用给定的 URL 模式创建一个新实例。
 	 */
 	public PatternsRequestCondition(List<PathPattern> patterns) {
 		this.patterns = (patterns.isEmpty() ? EMPTY_PATH_PATTERN : new TreeSet<>(patterns));
 	}
 
+	/**
+	 * 使用给定的路径模式集合创建 PatternsRequestCondition 的私有构造函数。
+	 *
+	 * @param patterns 路径模式集合
+	 */
 	private PatternsRequestCondition(SortedSet<PathPattern> patterns) {
 		this.patterns = patterns;
 	}
 
-
+	/**
+	 * 获取路径模式集合。
+	 *
+	 * @return 路径模式集合
+	 */
 	public Set<PathPattern> getPatterns() {
 		return this.patterns;
 	}
 
+	/**
+	 * 获取路径模式集合。
+	 *
+	 * @return 路径模式集合
+	 */
 	@Override
 	protected Collection<PathPattern> getContent() {
 		return this.patterns;
 	}
 
+
+	/**
+	 * 获取用于打印内容的离散项之间的符号。
+	 *
+	 * @return 用于打印的符号
+	 */
 	@Override
 	protected String getToStringInfix() {
 		return " || ";
 	}
 
+
+	/**
+	 * 检查路径模式集合是否为空。
+	 *
+	 * @return 如果为空则为 true
+	 */
 	private boolean isEmptyPathMapping() {
 		return this.patterns == EMPTY_PATH_PATTERN;
 	}
 
+
 	/**
-	 * Return the mapping paths that are not patterns.
+	 * 返回不是模式的映射路径。
+	 *
 	 * @since 5.3
 	 */
 	public Set<String> getDirectPaths() {
@@ -108,6 +136,7 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 		return result;
 	}
 
+
 	/**
 	 * Returns a new instance with URL patterns from the current instance ("this") and
 	 * the "other" instance as follows:
@@ -122,14 +151,11 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 	public PatternsRequestCondition combine(PatternsRequestCondition other) {
 		if (isEmptyPathMapping() && other.isEmptyPathMapping()) {
 			return this;
-		}
-		else if (other.isEmptyPathMapping()) {
+		} else if (other.isEmptyPathMapping()) {
 			return this;
-		}
-		else if (isEmptyPathMapping()) {
+		} else if (isEmptyPathMapping()) {
 			return other;
-		}
-		else {
+		} else {
 			SortedSet<PathPattern> combined = new TreeSet<>();
 			for (PathPattern pattern1 : this.patterns) {
 				for (PathPattern pattern2 : other.patterns) {
@@ -143,6 +169,7 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 	/**
 	 * Checks if any of the patterns match the given request and returns an instance
 	 * that is guaranteed to contain matching patterns, sorted.
+	 *
 	 * @param exchange the current exchange
 	 * @return the same instance if the condition contains no patterns;
 	 * or a new condition with sorted matching patterns;
@@ -190,11 +217,9 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 		}
 		if (iterator.hasNext()) {
 			return -1;
-		}
-		else if (iteratorOther.hasNext()) {
+		} else if (iteratorOther.hasNext()) {
 			return 1;
-		}
-		else {
+		} else {
 			return 0;
 		}
 	}

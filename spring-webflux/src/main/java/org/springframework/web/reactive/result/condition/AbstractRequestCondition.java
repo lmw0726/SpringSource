@@ -16,42 +16,40 @@
 
 package org.springframework.web.reactive.result.condition;
 
+import org.springframework.lang.Nullable;
+
 import java.util.Collection;
 import java.util.StringJoiner;
 
-import org.springframework.lang.Nullable;
-
 /**
- * A base class for {@link RequestCondition} types providing implementations of
- * {@link #equals(Object)}, {@link #hashCode()}, and {@link #toString()}.
+ * {@link RequestCondition} 类型的基类，提供了 {@link #equals(Object)}、{@link #hashCode()} 和 {@link #toString()} 的实现。
  *
+ * @param <T> 可以与此 RequestCondition 组合和比较的对象类型
  * @author Rossen Stoyanchev
  * @since 5.0
- * @param <T> the type of objects that this RequestCondition can be combined
- * with and compared to
  */
 public abstract class AbstractRequestCondition<T extends AbstractRequestCondition<T>> implements RequestCondition<T> {
 
 	/**
-	 * Indicates whether this condition is empty, i.e. whether or not it
-	 * contains any discrete items.
-	 * @return {@code true} if empty; {@code false} otherwise
+	 * 指示此条件是否为空，即是否包含任何离散项。
+	 *
+	 * @return 如果为空则为 {@code true}；否则为 {@code false}
 	 */
 	public boolean isEmpty() {
 		return getContent().isEmpty();
 	}
 
 	/**
-	 * Return the discrete items a request condition is composed of.
-	 * <p>For example URL patterns, HTTP request methods, param expressions, etc.
-	 * @return a collection of objects (never {@code null})
+	 * 返回请求条件由哪些离散项组成。
+	 * <p>例如 URL 模式、HTTP 请求方法、参数表达式等。
+	 *
+	 * @return 对象的集合（永远不会为 {@code null}）
 	 */
 	protected abstract Collection<?> getContent();
 
 	/**
-	 * The notation to use when printing discrete items of content.
-	 * <p>For example {@code " || "} for URL patterns or {@code " && "}
-	 * for param expressions.
+	 * 在打印内容的离散项时要使用的符号。
+	 * <p>例如，URL 模式使用 {@code " || "}，参数表达式使用 {@code " && "}。
 	 */
 	protected abstract String getToStringInfix();
 

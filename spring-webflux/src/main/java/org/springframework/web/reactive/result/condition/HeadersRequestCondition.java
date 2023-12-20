@@ -71,7 +71,7 @@ public final class HeadersRequestCondition extends AbstractRequestCondition<Head
 		// 创建一个空的结果集合
 		Set<HeaderExpression> result = null;
 
-// 如果头部不为空
+		// 如果头部不为空
 		if (!ObjectUtils.isEmpty(headers)) {
 			// 对于每个头部字符串
 			for (String header : headers) {
