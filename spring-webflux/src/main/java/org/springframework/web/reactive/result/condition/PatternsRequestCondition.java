@@ -123,28 +123,36 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 	 * @since 5.3
 	 */
 	public Set<String> getDirectPaths() {
+		// 如果是空的路径映射
 		if (isEmptyPathMapping()) {
+			// 返回空的路径集合
 			return EMPTY_PATH;
 		}
+
+		// 初始化结果集合为空集合
 		Set<String> result = Collections.emptySet();
+
+		// 对于每个路径模式
 		for (PathPattern pattern : this.patterns) {
+			// 如果模式不包含语法
 			if (!pattern.hasPatternSyntax()) {
+				// 如果结果集合为空，创建一个初始容量为1的 HashSet
 				result = (result.isEmpty() ? new HashSet<>(1) : result);
+				// 将模式字符串添加到结果集合中
 				result.add(pattern.getPatternString());
 			}
 		}
+		// 返回结果集合
 		return result;
 	}
 
 
 	/**
-	 * Returns a new instance with URL patterns from the current instance ("this") and
-	 * the "other" instance as follows:
+	 * 返回一个新实例，其中包含当前实例（“this”）和“other”实例的URL模式，规则如下：
 	 * <ul>
-	 * <li>If there are patterns in both instances, combine the patterns in "this" with
-	 * the patterns in "other" using {@link PathPattern#combine(PathPattern)}.
-	 * <li>If only one instance has patterns, use them.
-	 * <li>If neither instance has patterns, use an empty String (i.e. "").
+	 * <li>如果两个实例都有模式，则使用{@link PathPattern#combine(PathPattern)}将“this”中的模式与“other”中的模式组合起来。
+	 * <li>如果只有一个实例有模式，则使用该实例的模式。
+	 * <li>如果两个实例都没有模式，则使用空字符串（即""）。
 	 * </ul>
 	 */
 	@Override
@@ -156,60 +164,84 @@ public final class PatternsRequestCondition extends AbstractRequestCondition<Pat
 		} else if (isEmptyPathMapping()) {
 			return other;
 		} else {
+			// 创建一个排序的集合用于存储组合后的模式
 			SortedSet<PathPattern> combined = new TreeSet<>();
+
+			// 遍历当前实例中的模式
 			for (PathPattern pattern1 : this.patterns) {
+				// 遍历“other”实例中的模式
 				for (PathPattern pattern2 : other.patterns) {
+					// 将组合后的模式添加到集合中
 					combined.add(pattern1.combine(pattern2));
 				}
 			}
+
+			// 返回包含组合模式的新 PatternsRequestCondition 实例
 			return new PatternsRequestCondition(combined);
 		}
 	}
 
 	/**
-	 * Checks if any of the patterns match the given request and returns an instance
-	 * that is guaranteed to contain matching patterns, sorted.
+	 * 检查是否有任何模式与给定的请求匹配，并返回一个确保包含匹配模式且已排序的实例。
 	 *
-	 * @param exchange the current exchange
-	 * @return the same instance if the condition contains no patterns;
-	 * or a new condition with sorted matching patterns;
-	 * or {@code null} if no patterns match.
+	 * @param exchange 当前交换对象
+	 * @return 如果条件不包含模式，则返回相同实例；
+	 * 如果存在匹配的模式，则返回一个包含已排序匹配模式的新条件实例；
+	 * 如果没有模式匹配，则返回{@code null}。
 	 */
 	@Override
 	@Nullable
 	public PatternsRequestCondition getMatchingCondition(ServerWebExchange exchange) {
+		// 获取匹配的模式并进行排序
 		SortedSet<PathPattern> matches = getMatchingPatterns(exchange);
+
+		// 如果有匹配的模式，返回一个新的 PatternsRequestCondition 实例
 		return (matches != null ? new PatternsRequestCondition(matches) : null);
 	}
 
+	/**
+	 * 获取匹配的模式并进行排序。
+	 *
+	 * @param exchange 当前交换对象
+	 * @return 如果有匹配的模式，则返回已排序的 TreeSet；否则返回{@code null}
+	 */
 	@Nullable
 	private SortedSet<PathPattern> getMatchingPatterns(ServerWebExchange exchange) {
+		// 获取请求中相对于应用程序的路径
 		PathContainer lookupPath = exchange.getRequest().getPath().pathWithinApplication();
+
+		// 用于存储匹配模式的 TreeSet
 		TreeSet<PathPattern> result = null;
+
+		// 对于每个模式
 		for (PathPattern pattern : this.patterns) {
+			// 如果模式匹配请求路径
 			if (pattern.matches(lookupPath)) {
-				result = (result != null ? result : new TreeSet<>());
+				// 如果结果集合为空，创建一个 TreeSet
+				if (result == null) {
+					result = new TreeSet<>();
+				}
+				// 将匹配的模式添加到结果集合中
 				result.add(pattern);
 			}
 		}
+
+		// 返回存储匹配模式的 TreeSet
 		return result;
 	}
 
 	/**
-	 * Compare the two conditions based on the URL patterns they contain.
-	 * Patterns are compared one at a time, from top to bottom. If all compared
-	 * patterns match equally, but one instance has more patterns, it is
-	 * considered a closer match.
-	 * <p>It is assumed that both instances have been obtained via
-	 * {@link #getMatchingCondition(ServerWebExchange)} to ensure they
-	 * contain only patterns that match the request and are sorted with
-	 * the best matches on top.
+	 * 基于它们包含的 URL 模式比较两个条件。
+	 * 模式逐个比较，从顶部到底部。如果所有比较的模式都相等，但一个实例具有更多模式，则认为它是更接近的匹配。
+	 * <p>假设两个实例都是通过{@link #getMatchingCondition(ServerWebExchange)}获取的，
+	 * 确保它们仅包含与请求匹配并按最佳匹配排序的模式。
 	 */
 	@Override
 	public int compareTo(PatternsRequestCondition other, ServerWebExchange exchange) {
 		Iterator<PathPattern> iterator = this.patterns.iterator();
 		Iterator<PathPattern> iteratorOther = other.getPatterns().iterator();
 		while (iterator.hasNext() && iteratorOther.hasNext()) {
+			// 比较两个模式的特异性
 			int result = PathPattern.SPECIFICITY_COMPARATOR.compare(iterator.next(), iteratorOther.next());
 			if (result != 0) {
 				return result;

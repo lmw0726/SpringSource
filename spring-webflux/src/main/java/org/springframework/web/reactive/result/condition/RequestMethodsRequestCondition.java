@@ -16,13 +16,6 @@
 
 package org.springframework.web.reactive.result.condition;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.lang.Nullable;
@@ -32,34 +25,46 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.cors.reactive.CorsUtils;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.*;
+
 /**
- * A logical disjunction (' || ') request condition that matches a request
- * against a set of {@link RequestMethod RequestMethods}.
+ * 一个逻辑或 (' || ') 请求条件，用于匹配一个请求与一组 {@link RequestMethod RequestMethods}。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public final class RequestMethodsRequestCondition extends AbstractRequestCondition<RequestMethodsRequestCondition> {
 
-	/** Per HTTP method cache to return ready instances from getMatchingCondition. */
+	/**
+	 * 按照 HTTP 方法缓存，用于从 getMatchingCondition 方法中返回准备好的实例。
+	 */
 	private static final Map<HttpMethod, RequestMethodsRequestCondition> requestMethodConditionCache;
 
+
+	// 静态块，用于初始化请求方法条件缓存
 	static {
+		// 创建一个哈希映射来存储请求方法条件
 		requestMethodConditionCache = CollectionUtils.newHashMap(RequestMethod.values().length);
+
+		// 遍历所有的请求方法
 		for (RequestMethod method : RequestMethod.values()) {
+			// 将请求方法与对应的请求方法请求条件放入缓存中
 			requestMethodConditionCache.put(
 					HttpMethod.valueOf(method.name()), new RequestMethodsRequestCondition(method));
 		}
 	}
 
 
+	/**
+	 * 请求方法集合
+	 */
 	private final Set<RequestMethod> methods;
 
 
 	/**
-	 * Create a new instance with the given request methods.
-	 * @param requestMethods 0 or more HTTP request methods;
-	 * if, 0 the condition will match to every request
+	 * 使用给定的请求方法创建一个新实例。
+	 *
+	 * @param requestMethods 0个或更多个 HTTP 请求方法；如果为0，该条件将匹配所有请求
 	 */
 	public RequestMethodsRequestCondition(RequestMethod... requestMethods) {
 		this.methods = (ObjectUtils.isEmpty(requestMethods) ?
@@ -67,15 +72,14 @@ public final class RequestMethodsRequestCondition extends AbstractRequestConditi
 	}
 
 	/**
-	 * Private constructor for internal use when combining conditions.
+	 * 用于在合并条件时内部使用的私有构造函数。
 	 */
 	private RequestMethodsRequestCondition(Set<RequestMethod> requestMethods) {
 		this.methods = requestMethods;
 	}
 
-
 	/**
-	 * Returns all {@link RequestMethod RequestMethods} contained in this condition.
+	 * 返回此条件中包含的所有 {@link RequestMethod RequestMethods}。
 	 */
 	public Set<RequestMethod> getMethods() {
 		return this.methods;
@@ -92,102 +96,148 @@ public final class RequestMethodsRequestCondition extends AbstractRequestConditi
 	}
 
 	/**
-	 * Returns a new instance with a union of the HTTP request methods
-	 * from "this" and the "other" instance.
+	 * 返回一个新实例，其中包含从“this”和“other”实例中的 HTTP 请求方法的并集。
 	 */
 	@Override
 	public RequestMethodsRequestCondition combine(RequestMethodsRequestCondition other) {
+		// 如果“this”和“other”都为空
 		if (isEmpty() && other.isEmpty()) {
 			return this;
-		}
-		else if (other.isEmpty()) {
+		} else if (other.isEmpty()) {
 			return this;
-		}
-		else if (isEmpty()) {
+		} else if (isEmpty()) {
 			return other;
 		}
+
+		// 创建一个新的 LinkedHashSet，包含“this”实例中的方法
 		Set<RequestMethod> set = new LinkedHashSet<>(this.methods);
+		// 将“other”实例中的方法添加到新集合中
 		set.addAll(other.methods);
+
+		// 返回一个新的 RequestMethodsRequestCondition 实例，包含合并后的方法集合
 		return new RequestMethodsRequestCondition(set);
 	}
 
 	/**
-	 * Check if any of the HTTP request methods match the given request and
-	 * return an instance that contains the matching HTTP request method only.
-	 * @param exchange the current exchange
-	 * @return the same instance if the condition is empty (unless the request
-	 * method is HTTP OPTIONS), a new condition with the matched request method,
-	 * or {@code null} if there is no match or the condition is empty and the
-	 * request method is OPTIONS.
+	 * 检查任何 HTTP 请求方法是否与给定请求匹配，并返回仅包含匹配 HTTP 请求方法的实例。
+	 *
+	 * @param exchange 当前交换对象
+	 * @return 如果条件为空（除非请求方法是 HTTP OPTIONS），则返回相同实例；
+	 * 如果是匹配的请求方法，则返回包含匹配请求方法的新条件实例；
+	 * 如果没有匹配或条件为空且请求方法是 OPTIONS，则返回{@code null}
 	 */
 	@Override
 	@Nullable
 	public RequestMethodsRequestCondition getMatchingCondition(ServerWebExchange exchange) {
+		// 如果是预检请求
 		if (CorsUtils.isPreFlightRequest(exchange.getRequest())) {
+			// 匹配预检请求中的方法
 			return matchPreFlight(exchange.getRequest());
 		}
+
+		// 如果条件中的方法为空
 		if (getMethods().isEmpty()) {
+			// 如果请求方法是 OPTIONS，则返回null，否则返回当前实例
 			if (RequestMethod.OPTIONS.name().equals(exchange.getRequest().getMethodValue())) {
-				return null; // We handle OPTIONS transparently, so don't match if no explicit declarations
+				// 我们透明地处理 OPTIONS，如果没有明确声明，则不进行匹配
+				return null;
 			}
 			return this;
 		}
+
+		// 匹配请求中的方法
 		return matchRequestMethod(exchange.getRequest().getMethod());
 	}
 
+
 	/**
-	 * On a pre-flight request match to the would-be, actual request.
-	 * Hence empty conditions is a match, otherwise try to match to the HTTP
-	 * method in the "Access-Control-Request-Method" header.
+	 * 在预检请求（pre-flight request）中匹配即将发生的实际请求。
+	 * 因此，空条件是一个匹配，否则尝试匹配“Access-Control-Request-Method”头中的HTTP方法。
+	 *
+	 * @param request 服务器 HTTP 请求
+	 * @return 如果条件中的方法为空，则返回当前实例；
+	 * 否则尝试匹配“Access-Control-Request-Method”头中的HTTP方法，
+	 * 匹配成功返回对应的 RequestMethodsRequestCondition，否则返回{@code null}
 	 */
 	@Nullable
 	private RequestMethodsRequestCondition matchPreFlight(ServerHttpRequest request) {
+		// 如果条件中的方法为空
 		if (getMethods().isEmpty()) {
+			// 返回当前实例
 			return this;
 		}
+
+		// 获取预检请求中的期望 HTTP 方法
 		HttpMethod expectedMethod = request.getHeaders().getAccessControlRequestMethod();
-		return expectedMethod != null ? matchRequestMethod(expectedMethod) : null;
+
+		// 如果期望的方法不为null，尝试匹配对应的 RequestMethodsRequestCondition
+		if (expectedMethod == null) {
+			return null;
+		}
+		return matchRequestMethod(expectedMethod);
 	}
 
+	/**
+	 * 匹配 HTTP 请求方法。
+	 *
+	 * @param httpMethod HTTP 请求方法
+	 * @return 如果匹配成功，返回对应的 RequestMethodsRequestCondition；否则返回{@code null}
+	 */
 	@Nullable
 	private RequestMethodsRequestCondition matchRequestMethod(@Nullable HttpMethod httpMethod) {
+		// 如果 HTTP 请求方法为null，返回null
 		if (httpMethod == null) {
 			return null;
 		}
+
+		// 转换 HTTP 请求方法为 RequestMethod
 		RequestMethod requestMethod = RequestMethod.valueOf(httpMethod.name());
+
+		// 如果条件中包含该请求方法
 		if (getMethods().contains(requestMethod)) {
+			// 返回对应的 RequestMethodsRequestCondition
 			return requestMethodConditionCache.get(httpMethod);
 		}
+
+		// 如果请求方法为 HEAD 且条件中包含 GET 请求方法
 		if (requestMethod.equals(RequestMethod.HEAD) && getMethods().contains(RequestMethod.GET)) {
+			// 返回对应 GET 请求方法的 RequestMethodsRequestCondition
 			return requestMethodConditionCache.get(HttpMethod.GET);
 		}
+
+		// 匹配失败，返回null
 		return null;
 	}
 
 	/**
-	 * Returns:
+	 * 返回：
 	 * <ul>
-	 * <li>0 if the two conditions contain the same number of HTTP request methods
-	 * <li>Less than 0 if "this" instance has an HTTP request method but "other" doesn't
-	 * <li>Greater than 0 "other" has an HTTP request method but "this" doesn't
+	 * <li>如果两个条件包含相同数量的HTTP请求方法，则返回0
+	 * <li>如果“this”实例有一个HTTP请求方法而“other”没有，则返回小于0
+	 * <li>如果“other”有一个HTTP请求方法而“this”没有，则返回大于0
 	 * </ul>
-	 * <p>It is assumed that both instances have been obtained via
-	 * {@link #getMatchingCondition(ServerWebExchange)} and therefore each instance
-	 * contains the matching HTTP request method only or is otherwise empty.
+	 * <p>假设两个实例都是通过{@link #getMatchingCondition(ServerWebExchange)}获取的，
+	 * 因此每个实例仅包含匹配的HTTP请求方法或为空。
 	 */
 	@Override
 	public int compareTo(RequestMethodsRequestCondition other, ServerWebExchange exchange) {
+		// 如果两个实例包含的HTTP请求方法数量不同
 		if (other.methods.size() != this.methods.size()) {
 			return other.methods.size() - this.methods.size();
 		}
+		// 如果两个实例都包含一个HTTP请求方法
 		else if (this.methods.size() == 1) {
+			// 如果“this”实例包含HEAD而“other”实例包含GET
 			if (this.methods.contains(RequestMethod.HEAD) && other.methods.contains(RequestMethod.GET)) {
 				return -1;
 			}
+			// 如果“this”实例包含GET而“other”实例包含HEAD
 			else if (this.methods.contains(RequestMethod.GET) && other.methods.contains(RequestMethod.HEAD)) {
 				return 1;
 			}
 		}
+
+		// 默认情况返回0，表示相同数量的HTTP请求方法
 		return 0;
 	}
 

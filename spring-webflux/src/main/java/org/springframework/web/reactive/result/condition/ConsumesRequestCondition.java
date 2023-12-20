@@ -328,7 +328,9 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 				// 获取请求的 'Content-Type' 头的媒体类型
 				MediaType contentType = exchange.getRequest().getHeaders().getContentType();
 				// 如果 'Content-Type' 为空，则将其设置为 APPLICATION_OCTET_STREAM
-				contentType = (contentType != null ? contentType : MediaType.APPLICATION_OCTET_STREAM);
+				if (contentType == null) {
+					contentType = MediaType.APPLICATION_OCTET_STREAM;
+				}
 				// 检查当前媒体类型是否包含 'Content-Type' 头的媒体类型
 				return getMediaType().includes(contentType);
 			} catch (InvalidMediaTypeException ex) {

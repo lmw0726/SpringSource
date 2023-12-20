@@ -16,30 +16,23 @@
 
 package org.springframework.web.reactive.result.method;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
-import org.springframework.web.reactive.result.condition.ConsumesRequestCondition;
-import org.springframework.web.reactive.result.condition.HeadersRequestCondition;
-import org.springframework.web.reactive.result.condition.ParamsRequestCondition;
-import org.springframework.web.reactive.result.condition.PatternsRequestCondition;
-import org.springframework.web.reactive.result.condition.ProducesRequestCondition;
-import org.springframework.web.reactive.result.condition.RequestCondition;
-import org.springframework.web.reactive.result.condition.RequestConditionHolder;
-import org.springframework.web.reactive.result.condition.RequestMethodsRequestCondition;
+import org.springframework.web.reactive.result.condition.*;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 /**
- * Request mapping information. Encapsulates the following request mapping conditions:
+ * RequestMappingInfo 类用于封装请求映射的信息，包括多个请求映射条件：
  * <ol>
  * <li>{@link PatternsRequestCondition}
  * <li>{@link RequestMethodsRequestCondition}
@@ -47,7 +40,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
  * <li>{@link HeadersRequestCondition}
  * <li>{@link ConsumesRequestCondition}
  * <li>{@link ProducesRequestCondition}
- * <li>{@code RequestCondition} (optional, custom request condition)
+ * <li>{@code RequestCondition}（可选的自定义请求条件）
  * </ol>
  *
  * @author Rossen Stoyanchev
@@ -55,85 +48,173 @@ import org.springframework.web.util.pattern.PathPatternParser;
  */
 public final class RequestMappingInfo implements RequestCondition<RequestMappingInfo> {
 
+	/**
+	 * 表示空路径模式的静态常量
+	 */
 	private static final PatternsRequestCondition EMPTY_PATTERNS = new PatternsRequestCondition();
 
+	/**
+	 * 表示空请求方法的静态常量
+	 */
 	private static final RequestMethodsRequestCondition EMPTY_REQUEST_METHODS = new RequestMethodsRequestCondition();
 
+	/**
+	 * 表示空请求参数的静态常量
+	 */
 	private static final ParamsRequestCondition EMPTY_PARAMS = new ParamsRequestCondition();
 
+	/**
+	 * 表示空请求头部的静态常量
+	 */
 	private static final HeadersRequestCondition EMPTY_HEADERS = new HeadersRequestCondition();
 
+	/**
+	 * 表示空内容类型的静态常量
+	 */
 	private static final ConsumesRequestCondition EMPTY_CONSUMES = new ConsumesRequestCondition();
 
+	/**
+	 * 表示空生产类型的静态常量
+	 */
 	private static final ProducesRequestCondition EMPTY_PRODUCES = new ProducesRequestCondition();
 
+	/**
+	 * 表示空自定义请求条件的静态常量
+	 */
 	private static final RequestConditionHolder EMPTY_CUSTOM = new RequestConditionHolder(null);
 
 
+	/**
+	 * 映射名称，可以为 null
+	 */
 	@Nullable
 	private final String name;
 
+	/**
+	 * 匹配的路径模式条件
+	 */
 	private final PatternsRequestCondition patternsCondition;
 
+	/**
+	 * 匹配的请求方法条件
+	 */
 	private final RequestMethodsRequestCondition methodsCondition;
 
+	/**
+	 * 匹配的请求参数条件
+	 */
 	private final ParamsRequestCondition paramsCondition;
 
+	/**
+	 * 匹配的请求头部条件
+	 */
 	private final HeadersRequestCondition headersCondition;
 
+	/**
+	 * 匹配的内容类型条件
+	 */
 	private final ConsumesRequestCondition consumesCondition;
 
+	/**
+	 * 匹配的生产类型条件
+	 */
 	private final ProducesRequestCondition producesCondition;
 
+	/**
+	 * 自定义请求条件的持有者
+	 */
 	private final RequestConditionHolder customConditionHolder;
 
+	/**
+	 * 表示对象的哈希码
+	 */
 	private final int hashCode;
 
+	/**
+	 * 用于构建器配置的对象
+	 */
 	private final BuilderConfiguration options;
 
 
 	/**
-	 * Full constructor with a mapping name.
-	 * @deprecated as of 5.3.4 in favor using {@link RequestMappingInfo.Builder} via {@link #paths(String...)}.
+	 * 这是一个带有完整参数的构造函数，用于创建 RequestMappingInfo 实例，并接收映射名称以及多个请求映射条件作为参数。
+	 * 不过它已被标记为过时（deprecated）。
+	 *
+	 * @param name     映射名称
+	 * @param patterns 匹配的路径模式
+	 * @param methods  匹配的请求方法
+	 * @param params   匹配的请求参数
+	 * @param headers  匹配的请求头部
+	 * @param consumes 匹配的内容类型
+	 * @param produces 匹配的生产类型
+	 * @param custom   自定义的请求条件
+	 * @deprecated 自 5.3.4 版本起，建议使用 {@link RequestMappingInfo.Builder} 通过 {@link #paths(String...)} 方法来构建。
 	 */
 	@Deprecated
 	public RequestMappingInfo(@Nullable String name, @Nullable PatternsRequestCondition patterns,
-			@Nullable RequestMethodsRequestCondition methods, @Nullable ParamsRequestCondition params,
-			@Nullable HeadersRequestCondition headers, @Nullable ConsumesRequestCondition consumes,
-			@Nullable ProducesRequestCondition produces, @Nullable RequestCondition<?> custom) {
-
+							  @Nullable RequestMethodsRequestCondition methods, @Nullable ParamsRequestCondition params,
+							  @Nullable HeadersRequestCondition headers, @Nullable ConsumesRequestCondition consumes,
+							  @Nullable ProducesRequestCondition produces, @Nullable RequestCondition<?> custom) {
+		// 调用另一个构造函数，并使用默认的 BuilderConfiguration
 		this(name, patterns, methods, params, headers, consumes, produces, custom, new BuilderConfiguration());
 	}
 
+
 	/**
-	 * Create an instance with the given conditions.
-	 * @deprecated as of 5.3.4 in favor using {@link RequestMappingInfo.Builder} via {@link #paths(String...)}.
+	 * 这个构造函数被标记为过时（deprecated），用于创建 RequestMappingInfo 的实例，并接收多个请求映射条件作为参数。
+	 *
+	 * @param patterns 匹配的路径模式
+	 * @param methods  匹配的请求方法
+	 * @param params   匹配的请求参数
+	 * @param headers  匹配的请求头部
+	 * @param consumes 匹配的内容类型
+	 * @param produces 匹配的生产类型
+	 * @param custom   自定义的请求条件
+	 * @deprecated 自 5.3.4 版本起，建议使用 {@link RequestMappingInfo.Builder} 通过 {@link #paths(String...)} 方法来构建。
 	 */
 	@Deprecated
 	public RequestMappingInfo(@Nullable PatternsRequestCondition patterns,
-			@Nullable RequestMethodsRequestCondition methods, @Nullable ParamsRequestCondition params,
-			@Nullable HeadersRequestCondition headers, @Nullable ConsumesRequestCondition consumes,
-			@Nullable ProducesRequestCondition produces, @Nullable RequestCondition<?> custom) {
-
+							  @Nullable RequestMethodsRequestCondition methods, @Nullable ParamsRequestCondition params,
+							  @Nullable HeadersRequestCondition headers, @Nullable ConsumesRequestCondition consumes,
+							  @Nullable ProducesRequestCondition produces, @Nullable RequestCondition<?> custom) {
+		// 调用另一个构造函数，并将映射名称设置为 null
 		this(null, patterns, methods, params, headers, consumes, produces, custom);
 	}
 
+
 	/**
-	 * Re-create a RequestMappingInfo with the given custom request condition.
-	 * @deprecated since 5.3.4 in favor of using a {@link Builder} via {@link #mutate()}.
+	 * 这是一个已被标记为过时（deprecated）的构造函数，用于重新创建 RequestMappingInfo，指定自定义的请求条件。
+	 *
+	 * @param info                   原始的 RequestMappingInfo 实例
+	 * @param customRequestCondition 自定义的请求条件
+	 * @deprecated 自 5.3.4 版本起，建议使用  {@link Builder}  通过 {@link #mutate()} 方法来构建。
 	 */
 	@Deprecated
 	public RequestMappingInfo(RequestMappingInfo info, @Nullable RequestCondition<?> customRequestCondition) {
+		// 调用另一个构造函数，并传入原始 RequestMappingInfo 实例的信息以及自定义的请求条件
 		this(info.name, info.patternsCondition, info.methodsCondition, info.paramsCondition, info.headersCondition,
 				info.consumesCondition, info.producesCondition, customRequestCondition);
 	}
 
+	/**
+	 * 私有构造函数，用于创建 RequestMappingInfo 的实例。
+	 *
+	 * @param name     映射名称
+	 * @param patterns 匹配的路径模式
+	 * @param methods  匹配的请求方法
+	 * @param params   匹配的请求参数
+	 * @param headers  匹配的请求头部
+	 * @param consumes 匹配的内容类型
+	 * @param produces 匹配的生产类型
+	 * @param custom   自定义的请求条件
+	 * @param options  构建器配置
+	 */
 	private RequestMappingInfo(@Nullable String name, @Nullable PatternsRequestCondition patterns,
-			@Nullable RequestMethodsRequestCondition methods, @Nullable ParamsRequestCondition params,
-			@Nullable HeadersRequestCondition headers, @Nullable ConsumesRequestCondition consumes,
-			@Nullable ProducesRequestCondition produces, @Nullable RequestCondition<?> custom,
-			BuilderConfiguration options) {
-
+							   @Nullable RequestMethodsRequestCondition methods, @Nullable ParamsRequestCondition params,
+							   @Nullable HeadersRequestCondition headers, @Nullable ConsumesRequestCondition consumes,
+							   @Nullable ProducesRequestCondition produces, @Nullable RequestCondition<?> custom,
+							   BuilderConfiguration options) {
+		// 初始化成员变量
 		this.name = (StringUtils.hasText(name) ? name : null);
 		this.patternsCondition = (patterns != null ? patterns : EMPTY_PATTERNS);
 		this.methodsCondition = (methods != null ? methods : EMPTY_REQUEST_METHODS);
@@ -144,6 +225,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 		this.customConditionHolder = (custom != null ? new RequestConditionHolder(custom) : EMPTY_CUSTOM);
 		this.options = options;
 
+		// 计算哈希码
 		this.hashCode = calculateHashCode(
 				this.patternsCondition, this.methodsCondition, this.paramsCondition, this.headersCondition,
 				this.consumesCondition, this.producesCondition, this.customConditionHolder);
@@ -151,7 +233,9 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 
 
 	/**
-	 * Return the name for this mapping, or {@code null}.
+	 * 获取映射的名称，如果没有设置名称则返回 null。
+	 *
+	 * @return 映射的名称，或者为 null
 	 */
 	@Nullable
 	public String getName() {
@@ -168,6 +252,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 
 	/**
 	 * Return the mapping paths that are not patterns.
+	 *
 	 * @since 5.3
 	 */
 	public Set<String> getDirectPaths() {
@@ -226,6 +311,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	/**
 	 * Combines "this" request mapping info (i.e. the current instance) with another request mapping info instance.
 	 * <p>Example: combine type- and method-level request mappings.
+	 *
 	 * @return a new request mapping info instance; never {@code null}
 	 */
 	@Override
@@ -247,11 +333,9 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	private String combineNames(RequestMappingInfo other) {
 		if (this.name != null && other.name != null) {
 			return this.name + "#" + other.name;
-		}
-		else if (this.name != null) {
+		} else if (this.name != null) {
 			return this.name;
-		}
-		else {
+		} else {
 			return other.name;
 		}
 	}
@@ -261,6 +345,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	 * a potentially new request mapping info with conditions tailored to the current request.
 	 * <p>For example the returned instance may contain the subset of URL patterns that match to
 	 * the current request, sorted with best matching patterns on top.
+	 *
 	 * @return a new instance in case all conditions match; or {@code null} otherwise
 	 */
 	@Override
@@ -404,6 +489,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 
 	/**
 	 * Return a builder to create a new RequestMappingInfo by modifying this one.
+	 *
 	 * @return a builder to create a new, modified instance
 	 * @since 5.3.4
 	 */
@@ -413,6 +499,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 
 	/**
 	 * Create a new {@code RequestMappingInfo.Builder} with the given paths.
+	 *
 	 * @param paths the paths to use
 	 */
 	public static Builder paths(String... paths) {
@@ -735,6 +822,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	 * Container for configuration options used for request mapping purposes.
 	 * Such configuration is required to create RequestMappingInfo instances but
 	 * is typically used across all RequestMappingInfo instances.
+	 *
 	 * @see Builder#options
 	 */
 	public static class BuilderConfiguration {
