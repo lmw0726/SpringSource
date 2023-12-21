@@ -23,8 +23,7 @@ import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * Strategy to resolve the argument value for a method parameter in the context
- * of the current HTTP request.
+ * 用于在当前HTTP请求上下文中解析方法参数的策略。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -32,17 +31,19 @@ import org.springframework.web.server.ServerWebExchange;
 public interface HandlerMethodArgumentResolver {
 
 	/**
-	 * Whether this resolver supports the given method parameter.
-	 * @param parameter the method parameter
+	 * 此解析器是否支持给定的方法参数。
+	 *
+	 * @param parameter 方法参数
 	 */
 	boolean supportsParameter(MethodParameter parameter);
 
 	/**
-	 * Resolve the value for the method parameter.
-	 * @param parameter the method parameter
-	 * @param bindingContext the binding context to use
-	 * @param exchange the current exchange
-	 * @return {@code Mono} for the argument value, possibly empty
+	 * 解析方法参数的值。
+	 *
+	 * @param parameter      方法参数
+	 * @param bindingContext 要使用的绑定上下文
+	 * @param exchange       当前交换
+	 * @return 参数值的{@code Mono}，可能为空
 	 */
 	Mono<Object> resolveArgument(
 			MethodParameter parameter, BindingContext bindingContext, ServerWebExchange exchange);

@@ -16,11 +16,6 @@
 
 package org.springframework.web.reactive.result.method.annotation;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.config.BeanExpressionContext;
@@ -37,6 +32,10 @@ import org.springframework.web.reactive.result.method.HandlerMethodArgumentResol
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Mono;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Abstract base class for resolving method arguments from a named value.
@@ -89,15 +88,18 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	public Mono<Object> resolveArgument(
 			MethodParameter parameter, BindingContext bindingContext, ServerWebExchange exchange) {
 
+		// 获取命名值信息
 		NamedValueInfo namedValueInfo = getNamedValueInfo(parameter);
 		MethodParameter nestedParameter = parameter.nestedIfOptional();
 
+		// 解析嵌入的值和表达式
 		Object resolvedName = resolveEmbeddedValuesAndExpressions(namedValueInfo.name);
 		if (resolvedName == null) {
 			return Mono.error(new IllegalArgumentException(
 					"Specified name must not resolve to null: [" + namedValueInfo.name + "]"));
 		}
 
+		// 获取 BindingContext 中的 Model
 		Model model = bindingContext.getModel();
 
 		return resolveName(resolvedName.toString(), nestedParameter, exchange)
@@ -105,13 +107,17 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 					if ("".equals(arg) && namedValueInfo.defaultValue != null) {
 						arg = resolveEmbeddedValuesAndExpressions(namedValueInfo.defaultValue);
 					}
+					// 应用转换
 					arg = applyConversion(arg, namedValueInfo, parameter, bindingContext, exchange);
+					// 处理已解析的值
 					handleResolvedValue(arg, namedValueInfo.name, parameter, model, exchange);
 					return Mono.justOrEmpty(arg);
 				})
+				// 如果为空，则获取默认值
 				.switchIfEmpty(getDefaultValue(
 						namedValueInfo, parameter, bindingContext, model, exchange));
 	}
+
 
 	/**
 	 * Obtain the named value for the given method parameter.

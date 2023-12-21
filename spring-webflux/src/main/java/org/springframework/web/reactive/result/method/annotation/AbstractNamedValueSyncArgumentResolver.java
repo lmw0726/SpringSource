@@ -27,10 +27,8 @@ import org.springframework.web.reactive.result.method.SyncHandlerMethodArgumentR
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * An extension of {@link AbstractNamedValueArgumentResolver} for named value
- * resolvers that are synchronous and yet non-blocking. Sub-classes implement
- * the synchronous {@link #resolveNamedValue} to which the asynchronous
- * {@link #resolveName} delegates to by default.
+ * {@link AbstractNamedValueArgumentResolver} 的扩展，用于具有同步但非阻塞的命名值解析器。
+ * 子类实现同步的 {@link #resolveNamedValue} 方法，默认情况下由异步的 {@link #resolveName} 方法代理。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -39,11 +37,10 @@ public abstract class AbstractNamedValueSyncArgumentResolver extends AbstractNam
 		implements SyncHandlerMethodArgumentResolver {
 
 	/**
-	 * Create a new {@link AbstractNamedValueSyncArgumentResolver}.
-	 * @param factory a bean factory to use for resolving {@code ${...}}
-	 * placeholder and {@code #{...}} SpEL expressions in default values;
-	 * or {@code null} if default values are not expected to have expressions
-	 * @param registry for checking reactive type wrappers
+	 * 创建一个新的 {@link AbstractNamedValueSyncArgumentResolver}。
+	 * @param factory 用于解析默认值中的 {@code ${...}} 占位符和 {@code #{...}} SpEL 表达式的 bean 工厂；
+	 *                如果不希望默认值具有表达式，则为 {@code null}
+	 * @param registry 用于检查响应式类型包装器的注册表
 	 */
 	protected AbstractNamedValueSyncArgumentResolver(
 			@Nullable ConfigurableBeanFactory factory, ReactiveAdapterRegistry registry) {
@@ -56,10 +53,10 @@ public abstract class AbstractNamedValueSyncArgumentResolver extends AbstractNam
 	public Mono<Object> resolveArgument(
 			MethodParameter parameter, BindingContext bindingContext, ServerWebExchange exchange) {
 
-		// Flip the default implementation from SyncHandlerMethodArgumentResolver:
-		// instead of delegating to (sync) resolveArgumentValue,
-		// call (async) super.resolveArgument shared with non-blocking resolvers;
-		// actual resolution below still sync...
+		// 将默认实现从 SyncHandlerMethodArgumentResolver 中翻转：
+		// 不再委托给 (sync) resolveArgumentValue，
+		// 而是调用 (async) super.resolveArgument，与非阻塞解析器共享；
+		// 下面的实际解析仍然是同步的...
 
 		return super.resolveArgument(parameter, bindingContext, exchange);
 	}
@@ -68,7 +65,7 @@ public abstract class AbstractNamedValueSyncArgumentResolver extends AbstractNam
 	public Object resolveArgumentValue(
 			MethodParameter parameter, BindingContext context, ServerWebExchange exchange) {
 
-		// This won't block since resolveName below doesn't
+		// 这不会阻塞，因为下面的 resolveName 不会阻塞
 		return resolveArgument(parameter, context, exchange).block();
 	}
 
@@ -78,7 +75,7 @@ public abstract class AbstractNamedValueSyncArgumentResolver extends AbstractNam
 	}
 
 	/**
-	 * Actually resolve the value synchronously.
+	 * 实际同步解析值的方法。
 	 */
 	@Nullable
 	protected abstract Object resolveNamedValue(String name, MethodParameter param, ServerWebExchange exchange);

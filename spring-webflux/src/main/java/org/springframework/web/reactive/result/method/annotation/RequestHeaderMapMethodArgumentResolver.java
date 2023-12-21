@@ -16,8 +16,6 @@
 
 package org.springframework.web.reactive.result.method.annotation;
 
-import java.util.Map;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.http.HttpHeaders;
@@ -28,18 +26,18 @@ import org.springframework.web.reactive.result.method.HandlerMethodArgumentResol
 import org.springframework.web.reactive.result.method.SyncHandlerMethodArgumentResolver;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Map;
+
 /**
- * Resolves {@link Map} method arguments annotated with {@code @RequestHeader}.
- * For individual header values annotated with {@code @RequestHeader} see
- * {@link RequestHeaderMethodArgumentResolver} instead.
+ * 解析带有 {@code @RequestHeader} 注解的 {@link Map} 方法参数。
+ * 对于使用 {@code @RequestHeader} 注解的单个头部值，请参阅 {@link RequestHeaderMethodArgumentResolver}。
  *
- * <p>The created {@link Map} contains all request header name/value pairs.
- * The method parameter type may be a {@link MultiValueMap} to receive all
- * values for a header, not only the first one.
+ * <p>创建的 {@link Map} 包含所有请求头名称/值对。
+ * 方法参数类型可以是 {@link MultiValueMap}，以接收头部的所有值，而不仅仅是第一个值。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see RequestHeaderMethodArgumentResolver
+ * @since 5.0
  */
 public class RequestHeaderMapMethodArgumentResolver extends HandlerMethodArgumentResolverSupport
 		implements SyncHandlerMethodArgumentResolver {
@@ -51,20 +49,42 @@ public class RequestHeaderMapMethodArgumentResolver extends HandlerMethodArgumen
 
 	@Override
 	public boolean supportsParameter(MethodParameter param) {
+		//方法参数类型及其嵌套类型上是否含有@RequestHeader注解，并且
 		return checkAnnotatedParamNoReactiveWrapper(param, RequestHeader.class, this::allParams);
 	}
 
+	/**
+	 * 检查是否所有参数都符合请求头注解要求
+	 *
+	 * @param annotation 请求头注解
+	 * @param type       参数类型
+	 * @return true表示断言符合条件
+	 */
 	private boolean allParams(RequestHeader annotation, Class<?> type) {
+		// 检查参数类型是否为 Map 类型
 		return Map.class.isAssignableFrom(type);
 	}
 
-
+	/**
+	 * 解析方法参数的值。
+	 *
+	 * @param methodParameter 方法参数
+	 * @param context         要使用的绑定上下文
+	 * @param exchange        当前交换
+	 * @return 参数值
+	 */
 	@Override
 	public Object resolveArgumentValue(
 			MethodParameter methodParameter, BindingContext context, ServerWebExchange exchange) {
 
+		// 检查参数类型是否为 MultiValueMap
 		boolean isMultiValueMap = MultiValueMap.class.isAssignableFrom(methodParameter.getParameterType());
+
+		// 获取请求的头部信息
 		HttpHeaders headers = exchange.getRequest().getHeaders();
+
+		// 如果参数类型为 MultiValueMap，则直接返回头部信息
+		// 否则，将头部信息转换为单值 Map 返回
 		return (isMultiValueMap ? headers : headers.toSingleValueMap());
 	}
 

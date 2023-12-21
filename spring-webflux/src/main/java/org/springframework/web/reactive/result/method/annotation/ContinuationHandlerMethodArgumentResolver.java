@@ -24,7 +24,7 @@ import org.springframework.web.reactive.result.method.HandlerMethodArgumentResol
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * No-op resolver for method arguments of type {@link kotlin.coroutines.Continuation}.
+ * 用于类型为{@link kotlin.coroutines.Continuation}的方法参数的空操作解析器。
  *
  * @author Sebastien Deleuze
  * @since 5.2
@@ -33,11 +33,13 @@ public class ContinuationHandlerMethodArgumentResolver implements HandlerMethodA
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 检查参数类型是否为"kotlin.coroutines.Continuation"
 		return "kotlin.coroutines.Continuation".equals(parameter.getParameterType().getName());
 	}
 
 	@Override
 	public Mono<Object> resolveArgument(MethodParameter parameter, BindingContext bindingContext, ServerWebExchange exchange) {
+		// 返回空的Mono对象
 		return Mono.empty();
 	}
 }

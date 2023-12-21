@@ -16,26 +16,21 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 
+import java.lang.annotation.*;
+
 /**
- * Annotation which indicates that a method parameter should be bound to a URI template
- * variable. Supported for {@link RequestMapping} annotated handler methods.
+ * 注解指示方法参数应绑定到 URI 模板变量。支持 {@link RequestMapping} 注解的处理程序方法。
  *
- * <p>If the method parameter is {@link java.util.Map Map&lt;String, String&gt;}
- * then the map is populated with all path variable names and values.
+ * <p>如果方法参数是 {@link java.util.Map Map&lt;String, String&gt;}，
+ * 则该 Map 将包含所有路径变量名称和值。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
- * @since 3.0
  * @see RequestMapping
  * @see org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
+ * @since 3.0
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
@@ -43,24 +38,25 @@ import org.springframework.core.annotation.AliasFor;
 public @interface PathVariable {
 
 	/**
-	 * Alias for {@link #name}.
+	 * {@link #name} 的别名。
 	 */
 	@AliasFor("name")
 	String value() default "";
 
 	/**
-	 * The name of the path variable to bind to.
+	 * 要绑定的路径变量的名称。
+	 *
 	 * @since 4.3.3
 	 */
 	@AliasFor("value")
 	String name() default "";
 
 	/**
-	 * Whether the path variable is required.
-	 * <p>Defaults to {@code true}, leading to an exception being thrown if the path
-	 * variable is missing in the incoming request. Switch this to {@code false} if
-	 * you prefer a {@code null} or Java 8 {@code java.util.Optional} in this case.
-	 * e.g. on a {@code ModelAttribute} method which serves for different requests.
+	 * 路径变量是否为必需的。
+	 * <p>默认为 {@code true}，如果传入请求中缺少路径变量，则会引发异常。
+	 * 如果您希望在此情况下得到 {@code null} 或 Java 8 {@code java.util.Optional}，
+	 * 则将其切换为 {@code false}。例如，在为不同请求提供服务的 {@code ModelAttribute} 方法上。
+	 *
 	 * @since 4.3.3
 	 */
 	boolean required() default true;

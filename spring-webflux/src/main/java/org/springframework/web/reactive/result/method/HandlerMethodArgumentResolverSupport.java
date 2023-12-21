@@ -16,17 +16,16 @@
 
 package org.springframework.web.reactive.result.method;
 
-import java.lang.annotation.Annotation;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ReactiveAdapter;
 import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.util.Assert;
+
+import java.lang.annotation.Annotation;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * Base class for {@link HandlerMethodArgumentResolver} implementations with access to a
@@ -40,6 +39,9 @@ public abstract class HandlerMethodArgumentResolverSupport implements HandlerMet
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 响应式适配器注册器
+	 */
 	private final ReactiveAdapterRegistry adapterRegistry;
 
 
@@ -50,7 +52,7 @@ public abstract class HandlerMethodArgumentResolverSupport implements HandlerMet
 
 
 	/**
-	 * Return the configured {@link ReactiveAdapterRegistry}.
+	 * 返回配置的 ReactiveAdapterRegistry。
 	 */
 	public ReactiveAdapterRegistry getAdapterRegistry() {
 		return this.adapterRegistry;
@@ -58,80 +60,131 @@ public abstract class HandlerMethodArgumentResolverSupport implements HandlerMet
 
 
 	/**
-	 * Evaluate the {@code Predicate} on the method parameter type or on
-	 * the generic type within a reactive type wrapper.
+	 * 评估 Predicate 在方法参数类型上或反应式类型包装器内的泛型类型上的结果。
 	 */
 	protected boolean checkParameterType(MethodParameter parameter, Predicate<Class<?>> predicate) {
+		// 获取参数的类型
 		Class<?> type = parameter.getParameterType();
+
+		// 获取适配器
 		ReactiveAdapter adapter = getAdapterRegistry().getAdapter(type);
+
+		// 如果适配器不为空
 		if (adapter != null) {
+			// 确保适配器有值
 			assertHasValues(adapter, parameter);
+			// 获取嵌套参数的类型
 			type = parameter.nested().getNestedParameterType();
 		}
+
+		// 对类型应用断言条件并返回结果
 		return predicate.test(type);
 	}
 
+
+	/**
+	 * 确保适配器有值
+	 *
+	 * @param adapter 适配器
+	 * @param param   方法参数
+	 */
 	private void assertHasValues(ReactiveAdapter adapter, MethodParameter param) {
+		// 如果适配器没有值
 		if (adapter.isNoValue()) {
+			// 抛出非法参数异常，指明不支持没有值的反应式类型，并附带参数的泛型参数类型信息
 			throw new IllegalArgumentException(
 					"No value reactive types not supported: " + param.getGenericParameterType());
 		}
 	}
 
+
 	/**
-	 * Evaluate the {@code Predicate} on the method parameter type but raise an
-	 * {@code IllegalStateException} if the same matches the generic type
-	 * within a reactive type wrapper.
+	 * 在方法参数类型上评估 {@code Predicate}，如果类型匹配响应式类型包装器中的泛型类型，则引发 {@code IllegalStateException}。
+	 *
+	 * @param parameter 方法参数
+	 * @param predicate 类型断言函数
+	 * @return 是否满足条件的参数类型
 	 */
 	protected boolean checkParameterTypeNoReactiveWrapper(MethodParameter parameter, Predicate<Class<?>> predicate) {
+		// 获取参数的类型
 		Class<?> type = parameter.getParameterType();
+
+		// 获取适配器
 		ReactiveAdapter adapter = getAdapterRegistry().getAdapter(type);
+
+		// 如果适配器不为空
 		if (adapter != null) {
+			// 确保适配器有值
 			assertHasValues(adapter, parameter);
+			// 获取嵌套参数的类型
 			type = parameter.nested().getNestedParameterType();
 		}
+
+		// 测试嵌套参数是否满足给定的断言条件
 		if (predicate.test(type)) {
+			// 如果适配器为空，则返回 true
 			if (adapter == null) {
 				return true;
 			}
+			// 抛出反应式封装异常
 			throw buildReactiveWrapperException(parameter);
 		}
+
+		// 否则返回 false
 		return false;
 	}
 
+
+	/**
+	 * 构建响应式类型包装器异常。
+	 *
+	 * @param parameter 方法参数
+	 * @return 响应式类型包装器异常
+	 */
 	private IllegalStateException buildReactiveWrapperException(MethodParameter parameter) {
 		return new IllegalStateException(getClass().getSimpleName() +
 				" does not support reactive type wrapper: " + parameter.getGenericParameterType());
 	}
 
 	/**
-	 * Evaluate the {@code Predicate} on the method parameter type if it has the
-	 * given annotation, nesting within {@link java.util.Optional} if necessary,
-	 * but raise an {@code IllegalStateException} if the same matches the generic
-	 * type within a reactive type wrapper.
+	 * 在方法参数类型上评估 {@code Predicate}，如果具有给定的注解，则嵌套在 {@link java.util.Optional} 内，
+	 * 但如果相同的类型匹配响应式类型包装器中的泛型类型，则引发 {@code IllegalStateException}。
+	 *
+	 * @param parameter      方法参数
+	 * @param annotationType 注解类型
+	 * @param typePredicate  类型断言函数
+	 * @param <A>            注解类型参数
+	 * @return 是否满足条件的参数注解
 	 */
 	protected <A extends Annotation> boolean checkAnnotatedParamNoReactiveWrapper(
 			MethodParameter parameter, Class<A> annotationType, BiPredicate<A, Class<?>> typePredicate) {
 
+		// 获取方法参数上的注解
 		A annotation = parameter.getParameterAnnotation(annotationType);
 		if (annotation == null) {
 			return false;
 		}
 
+		// 如果参数是可选的，则进行嵌套处理
 		parameter = parameter.nestedIfOptional();
 		Class<?> type = parameter.getNestedParameterType();
 
+		// 获取响应式适配器
 		ReactiveAdapter adapter = getAdapterRegistry().getAdapter(type);
-		if (adapter != null) {
-			assertHasValues(adapter, parameter);
-			parameter = parameter.nested();
-			type = parameter.getNestedParameterType();
+		if (adapter == null) {
+			// 检查类型断言函数是否符合条件
+			return typePredicate.test(annotation, type);
 		}
 
+		// 确保适配器有值
+		assertHasValues(adapter, parameter);
+		// 继续嵌套处理
+		parameter = parameter.nested();
+		type = parameter.getNestedParameterType();
+
+		// 检查类型断言函数是否符合条件
 		if (typePredicate.test(annotation, type)) {
-			if (adapter == null) {
-				return true;
-			}
+			// 如果嵌套类型满足条件，抛出异常，提示不支持嵌套类
 			throw buildReactiveWrapperException(parameter);
 		}
 
