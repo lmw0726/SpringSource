@@ -30,34 +30,46 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 
 /**
- * Resolves method arguments annotated with an @{@link RequestAttribute}.
+ * 解析带有 @{@link RequestAttribute} 注解的方法参数。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see SessionAttributeMethodArgumentResolver
+ * @since 5.0
  */
 public class RequestAttributeMethodArgumentResolver extends AbstractNamedValueSyncArgumentResolver {
 
 	/**
-	 * Create a new {@link RequestAttributeMethodArgumentResolver} instance.
-	 * @param factory a bean factory to use for resolving {@code ${...}}
-	 * placeholder and {@code #{...}} SpEL expressions in default values;
-	 * or {@code null} if default values are not expected to have expressions
-	 * @param registry for checking reactive type wrappers
+	 * 创建一个新的 {@link RequestAttributeMethodArgumentResolver} 实例。
+	 *
+	 * @param factory  用于解析默认值中的 {@code ${...}} 占位符和 {@code #{...}} SpEL 表达式的 bean 工厂；
+	 *                 如果不期望默认值包含表达式，则为 {@code null}
+	 * @param registry 用于检查响应式类型包装器的注册表
 	 */
 	public RequestAttributeMethodArgumentResolver(@Nullable ConfigurableBeanFactory factory,
-			ReactiveAdapterRegistry registry) {
+												  ReactiveAdapterRegistry registry) {
 
 		super(factory, registry);
 	}
 
-
+	/**
+	 * 判断是否支持解析给定的方法参数。
+	 *
+	 * @param param 要检查的方法参数
+	 * @return 如果支持解析参数则为 true，否则为 false
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter param) {
 		return param.hasParameterAnnotation(RequestAttribute.class);
 	}
 
 
+	/**
+	 * 创建命名值信息。
+	 *
+	 * @param parameter 方法参数
+	 * @return 命名值信息
+	 * @throws IllegalStateException 如果不存在 RequestAttribute 注解，则抛出异常
+	 */
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
 		RequestAttribute ann = parameter.getParameterAnnotation(RequestAttribute.class);
@@ -65,29 +77,61 @@ public class RequestAttributeMethodArgumentResolver extends AbstractNamedValueSy
 		return new NamedValueInfo(ann.name(), ann.required(), ValueConstants.DEFAULT_NONE);
 	}
 
+	/**
+	 * 解析命名值。
+	 *
+	 * @param name      命名值的名称
+	 * @param parameter 方法参数
+	 * @param exchange  服务器Web交换对象
+	 * @return 解析后的值
+	 */
 	@Override
 	protected Object resolveNamedValue(String name, MethodParameter parameter, ServerWebExchange exchange) {
+		// 获取指定名称的请求属性值
 		Object value = exchange.getAttribute(name);
+
+		// 获取要适配的响应式适配器
 		ReactiveAdapter toAdapter = getAdapterRegistry().getAdapter(parameter.getParameterType());
-		if (toAdapter != null) {
-			if (value == null) {
-				Assert.isTrue(toAdapter.supportsEmpty(),
-						() -> "No request attribute '" + name + "' and target type " +
-								parameter.getGenericParameterType() + " doesn't support empty values.");
-				return toAdapter.fromPublisher(Mono.empty());
-			}
-			if (parameter.getParameterType().isAssignableFrom(value.getClass())) {
-				return value;
-			}
-			ReactiveAdapter fromAdapter = getAdapterRegistry().getAdapter(value.getClass());
-			Assert.isTrue(fromAdapter != null,
-					() -> getClass().getSimpleName() + " doesn't support " +
-							"reactive type wrapper: " + parameter.getGenericParameterType());
-			return toAdapter.fromPublisher(fromAdapter.toPublisher(value));
+
+		// 如果没有找到适配器，则直接返回属性值
+		if (toAdapter == null) {
+			return value;
 		}
-		return value;
+
+		// 如果值为空
+		if (value == null) {
+			// 检查目标类型是否支持空值，如果不支持则抛出异常
+			Assert.isTrue(toAdapter.supportsEmpty(),
+					() -> "No request attribute '" + name + "' and target type " +
+							parameter.getGenericParameterType() + " doesn't support empty values.");
+			// 返回一个空的 Mono
+			return toAdapter.fromPublisher(Mono.empty());
+		}
+
+		// 如果参数类型与值的类型兼容，则直接返回值
+		if (parameter.getParameterType().isAssignableFrom(value.getClass())) {
+			return value;
+		}
+
+		// 获取值类型的响应式适配器
+		ReactiveAdapter fromAdapter = getAdapterRegistry().getAdapter(value.getClass());
+
+		// 检查值类型的适配器是否存在，如果不存在则抛出异常
+		Assert.isTrue(fromAdapter != null,
+				() -> getClass().getSimpleName() + " doesn't support " +
+						"reactive type wrapper: " + parameter.getGenericParameterType());
+
+		// 将值从源适配器转换到目标适配器，然后从目标适配器获取结果
+		return toAdapter.fromPublisher(fromAdapter.toPublisher(value));
+
 	}
 
+	/**
+	 * 处理缺失的值。
+	 *
+	 * @param name      缺失值的名称
+	 * @param parameter 方法参数
+	 */
 	@Override
 	protected void handleMissingValue(String name, MethodParameter parameter) {
 		String type = parameter.getNestedParameterType().getSimpleName();

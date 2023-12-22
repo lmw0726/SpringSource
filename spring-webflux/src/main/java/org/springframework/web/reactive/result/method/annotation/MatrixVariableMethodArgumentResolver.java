@@ -16,10 +16,6 @@
 
 package org.springframework.web.reactive.result.method.annotation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ReactiveAdapterRegistry;
@@ -35,13 +31,15 @@ import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
- * Resolves arguments annotated with {@link MatrixVariable @MatrixVariable}.
+ * 解析带有 {@link MatrixVariable @MatrixVariable} 注解的参数。
  *
- * <p>If the method parameter is of type {@link Map} it will by resolved by
- * {@link MatrixVariableMapMethodArgumentResolver} instead unless the annotation
- * specifies a name in which case it is considered to be a single attribute of
- * type map (vs multiple attributes collected in a map).
+ * <p>如果方法参数的类型是 {@link Map}，则由 {@link MatrixVariableMapMethodArgumentResolver} 解析，
+ * 除非注解指定了名称，在这种情况下，它被视为映射类型的单个属性（而不是在映射中收集的多个属性）。
  *
  * @author Rossen Stoyanchev
  * @since 5.0.1
@@ -55,13 +53,11 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 		super(factory, registry);
 	}
 
-
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return checkAnnotatedParamNoReactiveWrapper(parameter, MatrixVariable.class,
 				(ann, type) -> !Map.class.isAssignableFrom(type) || StringUtils.hasText(ann.name()));
 	}
-
 
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
@@ -73,6 +69,7 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 	@Nullable
 	@Override
 	protected Object resolveNamedValue(String name, MethodParameter param, ServerWebExchange exchange) {
+		// 获取路径参数的矩阵变量
 		Map<String, MultiValueMap<String, String>> pathParameters =
 				exchange.getAttribute(HandlerMapping.MATRIX_VARIABLES_ATTRIBUTE);
 		if (CollectionUtils.isEmpty(pathParameters)) {
@@ -88,8 +85,7 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 			if (pathParameters.containsKey(pathVar)) {
 				paramValues = pathParameters.get(pathVar).get(name);
 			}
-		}
-		else {
+		} else {
 			boolean found = false;
 			paramValues = new ArrayList<>();
 			for (MultiValueMap<String, String> params : pathParameters.values()) {
@@ -98,7 +94,7 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 						String paramType = param.getNestedParameterType().getName();
 						throw new ServerErrorException(
 								"Found more than one match for URI path parameter '" + name +
-								"' for parameter type [" + paramType + "]. Use 'pathVar' attribute to disambiguate.",
+										"' for parameter type [" + paramType + "]. Use 'pathVar' attribute to disambiguate.",
 								param, null);
 					}
 					paramValues.addAll(params.get(name));
@@ -109,11 +105,9 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 
 		if (CollectionUtils.isEmpty(paramValues)) {
 			return null;
-		}
-		else if (paramValues.size() == 1) {
+		} else if (paramValues.size() == 1) {
 			return paramValues.get(0);
-		}
-		else {
+		} else {
 			return paramValues;
 		}
 	}
@@ -125,12 +119,10 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 				"for method parameter of type " + paramInfo, parameter);
 	}
 
-
 	private static final class MatrixVariableNamedValueInfo extends NamedValueInfo {
 
 		private MatrixVariableNamedValueInfo(MatrixVariable annotation) {
 			super(annotation.name(), annotation.required(), annotation.defaultValue());
 		}
 	}
-
 }

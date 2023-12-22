@@ -16,23 +16,19 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 
+import java.lang.annotation.*;
+
 /**
- * Annotation which indicates that a method parameter should be bound to a web request header.
+ * 该注解指示方法参数应绑定到 web 请求的头部。
  *
- * <p>Supported for annotated handler methods in Spring MVC and Spring WebFlux.
+ * <p>在 Spring MVC 和 Spring WebFlux 中支持带注解的处理器方法。
  *
- * <p>If the method parameter is {@link java.util.Map Map&lt;String, String&gt;},
- * {@link org.springframework.util.MultiValueMap MultiValueMap&lt;String, String&gt;},
- * or {@link org.springframework.http.HttpHeaders HttpHeaders} then the map is
- * populated with all header names and values.
+ * <p>如果方法参数是 {@link java.util.Map Map&lt;String, String&gt;}、
+ * {@link org.springframework.util.MultiValueMap MultiValueMap&lt;String, String&gt;} 或
+ * {@link org.springframework.http.HttpHeaders HttpHeaders}，
+ * 那么该映射将包含所有头部名称和值。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -47,33 +43,29 @@ import org.springframework.core.annotation.AliasFor;
 public @interface RequestHeader {
 
 	/**
-	 * Alias for {@link #name}.
+	 * {@link #name} 的别名。
 	 */
 	@AliasFor("name")
 	String value() default "";
 
 	/**
-	 * The name of the request header to bind to.
+	 * 要绑定到的请求头的名称。
 	 * @since 4.2
 	 */
 	@AliasFor("value")
 	String name() default "";
 
 	/**
-	 * Whether the header is required.
-	 * <p>Defaults to {@code true}, leading to an exception being thrown
-	 * if the header is missing in the request. Switch this to
-	 * {@code false} if you prefer a {@code null} value if the header is
-	 * not present in the request.
-	 * <p>Alternatively, provide a {@link #defaultValue}, which implicitly
-	 * sets this flag to {@code false}.
+	 * 头部是否为必需。
+	 * <p>默认为 {@code true}，如果请求中缺少头部，则会抛出异常。
+	 * 如果希望头部不存在时获得 {@code null} 值，请将其切换为 {@code false}。
+	 * <p>或者，提供一个 {@link #defaultValue}，它隐式地将此标志设置为 {@code false}。
 	 */
 	boolean required() default true;
 
 	/**
-	 * The default value to use as a fallback.
-	 * <p>Supplying a default value implicitly sets {@link #required} to
-	 * {@code false}.
+	 * 作为备用的默认值。
+	 * <p>提供默认值将隐式地将 {@link #required} 设置为 {@code false}。
 	 */
 	String defaultValue() default ValueConstants.DEFAULT_NONE;
 

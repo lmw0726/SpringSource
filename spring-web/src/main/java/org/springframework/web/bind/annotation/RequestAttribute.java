@@ -16,25 +16,19 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 
+import java.lang.annotation.*;
+
 /**
- * Annotation to bind a method parameter to a request attribute.
+ * 注解用于将方法参数绑定到请求属性。
  *
- * <p>The main motivation is to provide convenient access to request attributes
- * from a controller method with an optional/required check and a cast to the
- * target method parameter type.
+ * <p>主要目的是为了从控制器方法方便地访问请求属性，可以进行可选/必需检查，并将其转换为目标方法参数类型。
  *
  * @author Rossen Stoyanchev
- * @since 4.3
  * @see RequestMapping
  * @see SessionAttribute
+ * @since 4.3
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
@@ -42,24 +36,22 @@ import org.springframework.core.annotation.AliasFor;
 public @interface RequestAttribute {
 
 	/**
-	 * Alias for {@link #name}.
+	 * {@link #name} 的别名。
 	 */
 	@AliasFor("name")
 	String value() default "";
 
 	/**
-	 * The name of the request attribute to bind to.
-	 * <p>The default name is inferred from the method parameter name.
+	 * 要绑定的请求属性的名称。
+	 * <p>默认名称从方法参数名称推断出来。
 	 */
 	@AliasFor("value")
 	String name() default "";
 
 	/**
-	 * Whether the request attribute is required.
-	 * <p>Defaults to {@code true}, leading to an exception being thrown if
-	 * the attribute is missing. Switch this to {@code false} if you prefer
-	 * a {@code null} or Java 8 {@code java.util.Optional} if the attribute
-	 * doesn't exist.
+	 * 请求属性是否为必需。
+	 * <p>默认为 {@code true}，如果属性丢失，则会抛出异常。
+	 * 如果您希望 {@code null} 或 Java 8 的 {@code java.util.Optional} 来表示属性不存在，请将其切换为 {@code false}。
 	 */
 	boolean required() default true;
 

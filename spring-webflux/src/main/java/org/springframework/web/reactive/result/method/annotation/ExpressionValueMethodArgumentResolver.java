@@ -25,11 +25,9 @@ import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * Resolves method arguments annotated with {@code @Value}.
+ * 解析带有 {@code @Value} 注解的方法参数。
  *
- * <p>An {@code @Value} does not have a name but gets resolved from the default
- * value string, which may contain ${...} placeholder or Spring Expression
- * Language #{...} expressions.
+ * <p>{@code @Value} 没有名称，但可以从默认值字符串中解析出来，该字符串可能包含 ${...} 占位符或 Spring 表达式语言 #{...} 表达式。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -37,24 +35,37 @@ import org.springframework.web.server.ServerWebExchange;
 public class ExpressionValueMethodArgumentResolver extends AbstractNamedValueSyncArgumentResolver {
 
 	/**
-	 * Create a new {@link ExpressionValueMethodArgumentResolver} instance.
-	 * @param factory a bean factory to use for resolving {@code ${...}}
-	 * placeholder and {@code #{...}} SpEL expressions in default values;
-	 * or {@code null} if default values are not expected to contain expressions
-	 * @param registry for checking reactive type wrappers
+	 * 创建一个新的 {@link ExpressionValueMethodArgumentResolver} 实例。
+	 *
+	 * @param factory 用于解析默认值中的 {@code ${...}} 占位符和 {@code #{...}} SpEL 表达式的 bean 工厂；
+	 *                如果不期望默认值包含表达式，则为 {@code null}
+	 * @param registry 用于检查响应式类型包装器的注册表
 	 */
 	public ExpressionValueMethodArgumentResolver(@Nullable ConfigurableBeanFactory factory,
-			ReactiveAdapterRegistry registry) {
+												 ReactiveAdapterRegistry registry) {
 
 		super(factory, registry);
 	}
 
-
+	/**
+	 * 判断是否支持解析给定的方法参数。
+	 *
+	 * @param param 要检查的方法参数
+	 * @return 如果支持解析参数则为 true，否则为 false
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter param) {
+		//带有@Value注解，并且不是嵌套类型
 		return checkAnnotatedParamNoReactiveWrapper(param, Value.class, (ann, type) -> true);
 	}
 
+	/**
+	 * 创建命名值信息。
+	 *
+	 * @param parameter 方法参数
+	 * @return 命名值信息
+	 * @throws IllegalStateException 如果不存在 Value 注解，则抛出异常
+	 */
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
 		Value ann = parameter.getParameterAnnotation(Value.class);
@@ -62,20 +73,43 @@ public class ExpressionValueMethodArgumentResolver extends AbstractNamedValueSyn
 		return new ExpressionValueNamedValueInfo(ann);
 	}
 
+	/**
+	 * 解析命名值。
+	 *
+	 * @param name       命名值的名称
+	 * @param parameter  方法参数
+	 * @param exchange   服务器Web交换对象
+	 * @return 解析后的值
+	 */
 	@Override
 	protected Object resolveNamedValue(String name, MethodParameter parameter, ServerWebExchange exchange) {
-		// No name to resolve
+		// 没有需要解析的名称
 		return null;
 	}
 
+
+	/**
+	 * 处理缺失的值。
+	 *
+	 * @param name       缺失值的名称
+	 * @param parameter  方法参数
+	 */
 	@Override
 	protected void handleMissingValue(String name, MethodParameter parameter) {
 		throw new UnsupportedOperationException("@Value is never required: " + parameter.getMethod());
 	}
 
 
+	/**
+	 * 内部类，用于存储表达式值的命名值信息。
+	 */
 	private static final class ExpressionValueNamedValueInfo extends NamedValueInfo {
 
+		/**
+		 * 构造函数，根据注解创建命名值信息。
+		 *
+		 * @param annotation 表达式值的注解信息
+		 */
 		private ExpressionValueNamedValueInfo(Value annotation) {
 			super("@Value", false, annotation.value());
 		}
