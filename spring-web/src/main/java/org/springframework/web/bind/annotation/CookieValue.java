@@ -16,32 +16,26 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 
+import java.lang.annotation.*;
+
 /**
- * Annotation to indicate that a method parameter is bound to an HTTP cookie.
+ * 表示方法参数绑定到 HTTP cookie 的注解。
  *
- * <p>The method parameter may be declared as type {@link javax.servlet.http.Cookie}
- * or as cookie value type (String, int, etc.).
+ * <p>方法参数可以声明为 {@link javax.servlet.http.Cookie} 类型，
+ * 或者作为 cookie 值的类型（String、int 等）。
  *
- * <p>Note that with spring-webmvc 5.3.x and earlier, the cookie value is URL
- * decoded. This will be changed in 6.0 but in the meantime, applications can
- * also declare parameters of type {@link javax.servlet.http.Cookie} to access
- * the raw value.
+ * <p>请注意，在 spring-webmvc 5.3.x 及更早版本中，cookie 值会进行 URL 解码。
+ * 这将在 6.0 版本中更改，但在此期间，应用程序还可以声明类型为 {@link javax.servlet.http.Cookie} 的参数以访问原始值。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 3.0
  * @see RequestMapping
  * @see RequestParam
  * @see RequestHeader
  * @see org.springframework.web.bind.annotation.RequestMapping
+ * @since 3.0
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
@@ -49,33 +43,30 @@ import org.springframework.core.annotation.AliasFor;
 public @interface CookieValue {
 
 	/**
-	 * Alias for {@link #name}.
+	 * {@link #name} 的别名。
 	 */
 	@AliasFor("name")
 	String value() default "";
 
 	/**
-	 * The name of the cookie to bind to.
+	 * 绑定的 cookie 名称。
+	 *
 	 * @since 4.2
 	 */
 	@AliasFor("value")
 	String name() default "";
 
 	/**
-	 * Whether the cookie is required.
-	 * <p>Defaults to {@code true}, leading to an exception being thrown
-	 * if the cookie is missing in the request. Switch this to
-	 * {@code false} if you prefer a {@code null} value if the cookie is
-	 * not present in the request.
-	 * <p>Alternatively, provide a {@link #defaultValue}, which implicitly
-	 * sets this flag to {@code false}.
+	 * 是否需要 cookie。
+	 * <p>默认为 {@code true}，如果请求中缺少 cookie，则会抛出异常。
+	 * 将此值更改为 {@code false}，如果您希望在请求中缺少 cookie 时得到 {@code null} 值。
+	 * <p>或者，提供一个 {@link #defaultValue}，隐式将此标志设置为 {@code false}。
 	 */
 	boolean required() default true;
 
 	/**
-	 * The default value to use as a fallback.
-	 * <p>Supplying a default value implicitly sets {@link #required} to
-	 * {@code false}.
+	 * 作为回退的默认值。
+	 * <p>提供默认值会隐式地将 {@link #required} 设置为 {@code false}。
 	 */
 	String defaultValue() default ValueConstants.DEFAULT_NONE;
 

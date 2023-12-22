@@ -70,13 +70,14 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 
 	/**
 	 * Create a new {@link AbstractNamedValueArgumentResolver} instance.
-	 * @param factory a bean factory to use for resolving {@code ${...}} placeholder
-	 * and {@code #{...}} SpEL expressions in default values, or {@code null} if default
-	 * values are not expected to contain expressions
+	 *
+	 * @param factory  a bean factory to use for resolving {@code ${...}} placeholder
+	 *                 and {@code #{...}} SpEL expressions in default values, or {@code null} if default
+	 *                 values are not expected to contain expressions
 	 * @param registry for checking reactive type wrappers
 	 */
 	public AbstractNamedValueArgumentResolver(@Nullable ConfigurableBeanFactory factory,
-			ReactiveAdapterRegistry registry) {
+											  ReactiveAdapterRegistry registry) {
 
 		super(registry);
 		this.configurableBeanFactory = factory;
@@ -136,6 +137,7 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	 * Create the {@link NamedValueInfo} object for the given method parameter.
 	 * Implementations typically retrieve the method annotation by means of
 	 * {@link MethodParameter#getParameterAnnotation(Class)}.
+	 *
 	 * @param parameter the method parameter
 	 * @return the named value information
 	 */
@@ -152,7 +154,7 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 			if (name == null) {
 				throw new IllegalArgumentException(
 						"Name for argument of type [" + parameter.getNestedParameterType().getName() +
-						"] not specified, and parameter name information not found in class file either.");
+								"] not specified, and parameter name information not found in class file either.");
 			}
 		}
 		String defaultValue = (ValueConstants.DEFAULT_NONE.equals(info.defaultValue) ? null : info.defaultValue);
@@ -178,10 +180,11 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 
 	/**
 	 * Resolve the given parameter type and value name into an argument value.
-	 * @param name the name of the value being resolved
+	 *
+	 * @param name      the name of the value being resolved
 	 * @param parameter the method parameter to resolve to an argument value
-	 * (pre-nested in case of a {@link java.util.Optional} declaration)
-	 * @param exchange the current exchange
+	 *                  (pre-nested in case of a {@link java.util.Optional} declaration)
+	 * @param exchange  the current exchange
 	 * @return the resolved argument (may be empty {@link Mono})
 	 */
 	protected abstract Mono<Object> resolveName(String name, MethodParameter parameter, ServerWebExchange exchange);
@@ -191,16 +194,14 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	 */
 	@Nullable
 	private Object applyConversion(@Nullable Object value, NamedValueInfo namedValueInfo, MethodParameter parameter,
-			BindingContext bindingContext, ServerWebExchange exchange) {
+								   BindingContext bindingContext, ServerWebExchange exchange) {
 
 		WebDataBinder binder = bindingContext.createDataBinder(exchange, namedValueInfo.name);
 		try {
 			value = binder.convertIfNecessary(value, parameter.getParameterType(), parameter);
-		}
-		catch (ConversionNotSupportedException ex) {
+		} catch (ConversionNotSupportedException ex) {
 			throw new ServerErrorException("Conversion not supported.", parameter, ex);
-		}
-		catch (TypeMismatchException ex) {
+		} catch (TypeMismatchException ex) {
 			throw new ServerWebInputException("Type mismatch.", parameter, ex);
 		}
 		return value;
@@ -210,14 +211,13 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	 * Resolve the default value, if any.
 	 */
 	private Mono<Object> getDefaultValue(NamedValueInfo namedValueInfo, MethodParameter parameter,
-			BindingContext bindingContext, Model model, ServerWebExchange exchange) {
+										 BindingContext bindingContext, Model model, ServerWebExchange exchange) {
 
 		return Mono.fromSupplier(() -> {
 			Object value = null;
 			if (namedValueInfo.defaultValue != null) {
 				value = resolveEmbeddedValuesAndExpressions(namedValueInfo.defaultValue);
-			}
-			else if (namedValueInfo.required && !parameter.isOptional()) {
+			} else if (namedValueInfo.required && !parameter.isOptional()) {
 				handleMissingValue(namedValueInfo.name, parameter, exchange);
 			}
 			value = handleNullValue(namedValueInfo.name, value, parameter.getNestedParameterType());
@@ -232,9 +232,10 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	 * {@link #resolveName(String, MethodParameter, ServerWebExchange)} returned
 	 * {@code null} and there is no default value. Subclasses typically throw an
 	 * exception in this case.
-	 * @param name the name for the value
+	 *
+	 * @param name      the name for the value
 	 * @param parameter the method parameter
-	 * @param exchange the current exchange
+	 * @param exchange  the current exchange
 	 */
 	@SuppressWarnings("UnusedParameters")
 	protected void handleMissingValue(String name, MethodParameter parameter, ServerWebExchange exchange) {
@@ -246,7 +247,8 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 	 * {@link #resolveName(String, MethodParameter, ServerWebExchange)} returned
 	 * {@code null} and there is no default value. Subclasses typically throw an
 	 * exception in this case.
-	 * @param name the name for the value
+	 *
+	 * @param name      the name for the value
 	 * @param parameter the method parameter
 	 */
 	protected void handleMissingValue(String name, MethodParameter parameter) {
@@ -264,8 +266,7 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 		if (value == null) {
 			if (Boolean.TYPE.equals(paramType)) {
 				return Boolean.FALSE;
-			}
-			else if (paramType.isPrimitive()) {
+			} else if (paramType.isPrimitive()) {
 				throw new IllegalStateException("Optional " + paramType.getSimpleName() +
 						" parameter '" + name + "' is present but cannot be translated into a" +
 						" null value due to being declared as a primitive type. " +
@@ -277,28 +278,35 @@ public abstract class AbstractNamedValueArgumentResolver extends HandlerMethodAr
 
 	/**
 	 * Invoked after a value is resolved.
-	 * @param arg the resolved argument value
-	 * @param name the argument name
+	 *
+	 * @param arg       the resolved argument value
+	 * @param name      the argument name
 	 * @param parameter the argument parameter type
-	 * @param model the model
-	 * @param exchange the current exchange
+	 * @param model     the model
+	 * @param exchange  the current exchange
 	 */
 	@SuppressWarnings("UnusedParameters")
 	protected void handleResolvedValue(
 			@Nullable Object arg, String name, MethodParameter parameter, Model model, ServerWebExchange exchange) {
 	}
 
-
 	/**
-	 * Represents the information about a named value, including name, whether
-	 * it's required and a default value.
+	 * 表示有关命名值的信息，包括名称、是否必需以及默认值。
 	 */
 	protected static class NamedValueInfo {
-
+		/**
+		 * 名称
+		 */
 		private final String name;
 
+		/**
+		 * 是否必要
+		 */
 		private final boolean required;
 
+		/**
+		 * 默认值
+		 */
 		@Nullable
 		private final String defaultValue;
 
