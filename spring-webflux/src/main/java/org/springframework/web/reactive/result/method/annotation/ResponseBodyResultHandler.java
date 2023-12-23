@@ -16,10 +16,6 @@
 
 package org.springframework.web.reactive.result.method.annotation;
 
-import java.util.List;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -29,16 +25,14 @@ import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.HandlerResultHandler;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
- * {@code HandlerResultHandler} that handles return values from methods annotated
- * with {@code @ResponseBody} writing to the body of the request or response with
- * an {@link HttpMessageWriter}.
+ * {@code HandlerResultHandler} 处理带有 {@code @ResponseBody} 注解方法的返回值，使用 {@link HttpMessageWriter} 将内容写入请求或响应体中。
  *
- * <p>By default the order for this result handler is set to 100. As it detects
- * the presence of {@code @ResponseBody} it should be ordered after result
- * handlers that look for a specific return type. Note however that this handler
- * does recognize and explicitly ignores the {@code ResponseEntity} return type.
+ * <p>默认情况下，此结果处理程序的顺序设置为100。由于它检测到了 {@code @ResponseBody} 的存在，因此它应该排在寻找特定返回类型的结果处理程序之后。但请注意，此处理程序确实识别并明确忽略了 {@code ResponseEntity} 返回类型。
  *
  * @author Rossen Stoyanchev
  * @author Stephane Maldini
@@ -49,40 +43,60 @@ import org.springframework.web.server.ServerWebExchange;
 public class ResponseBodyResultHandler extends AbstractMessageWriterResultHandler implements HandlerResultHandler {
 
 	/**
-	 * Basic constructor with a default {@link ReactiveAdapterRegistry}.
-	 * @param writers the writers for serializing to the response body
-	 * @param resolver to determine the requested content type
+	 * 基本构造函数使用默认的 {@link ReactiveAdapterRegistry}。
+	 *
+	 * @param writers  用于将内容序列化到响应体中的写入器
+	 * @param resolver 用于确定请求的内容类型
 	 */
 	public ResponseBodyResultHandler(List<HttpMessageWriter<?>> writers, RequestedContentTypeResolver resolver) {
 		this(writers, resolver, ReactiveAdapterRegistry.getSharedInstance());
 	}
 
 	/**
-	 * Constructor with an {@link ReactiveAdapterRegistry} instance.
-	 * @param writers the writers for serializing to the response body
-	 * @param resolver to determine the requested content type
-	 * @param registry for adaptation to reactive types
+	 * 使用 {@link ReactiveAdapterRegistry} 实例的构造函数。
+	 *
+	 * @param writers  用于将内容序列化到响应体中的写入器
+	 * @param resolver 用于确定请求的内容类型
+	 * @param registry 用于适应反应式类型的注册表
 	 */
 	public ResponseBodyResultHandler(List<HttpMessageWriter<?>> writers,
-			RequestedContentTypeResolver resolver, ReactiveAdapterRegistry registry) {
-
+									 RequestedContentTypeResolver resolver, ReactiveAdapterRegistry registry) {
 		super(writers, resolver, registry);
 		setOrder(100);
 	}
 
-
+	/**
+	 * 确定此结果处理程序是否支持给定的处理结果。
+	 *
+	 * @param result 处理结果
+	 * @return 如果支持，则为 true；否则为 false
+	 */
 	@Override
 	public boolean supports(HandlerResult result) {
+		// 获取方法返回类型的参数
 		MethodParameter returnType = result.getReturnTypeSource();
+		// 获取包含该返回类型的类
 		Class<?> containingClass = returnType.getContainingClass();
+		// 判断包含类上是否有 @ResponseBody 注解，或者方法上是否有 @ResponseBody 注解
 		return (AnnotatedElementUtils.hasAnnotation(containingClass, ResponseBody.class) ||
 				returnType.hasMethodAnnotation(ResponseBody.class));
+
 	}
 
+	/**
+	 * 处理结果方法，将返回值写入到响应体中。
+	 *
+	 * @param exchange 当前的交换对象
+	 * @param result   处理结果
+	 * @return 表示完成或错误的 Mono
+	 */
 	@Override
 	public Mono<Void> handleResult(ServerWebExchange exchange, HandlerResult result) {
+		// 获取处理结果中的返回值
 		Object body = result.getReturnValue();
+		// 获取返回类型的方法参数信息
 		MethodParameter bodyTypeParameter = result.getReturnTypeSource();
+		// 将返回值写入响应体中
 		return writeBody(body, bodyTypeParameter, exchange);
 	}
 
