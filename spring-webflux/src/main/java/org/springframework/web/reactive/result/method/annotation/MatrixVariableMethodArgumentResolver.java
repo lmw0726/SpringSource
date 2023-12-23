@@ -42,8 +42,8 @@ import java.util.Map;
  * 除非注解指定了名称，在这种情况下，它被视为映射类型的单个属性（而不是在映射中收集的多个属性）。
  *
  * @author Rossen Stoyanchev
- * @since 5.0.1
  * @see MatrixVariableMapMethodArgumentResolver
+ * @since 5.0.1
  */
 public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSyncArgumentResolver {
 
@@ -53,12 +53,25 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 		super(factory, registry);
 	}
 
+	/**
+	 * 检查方法参数是否支持。
+	 *
+	 * @param parameter 方法参数
+	 * @return 是否支持该参数
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		//带有@MatrixVariable 注解，参数类型没有嵌套类，并且参数类型不是Map类型，或者@MatrixVariable有名称属性值。
 		return checkAnnotatedParamNoReactiveWrapper(parameter, MatrixVariable.class,
 				(ann, type) -> !Map.class.isAssignableFrom(type) || StringUtils.hasText(ann.name()));
 	}
 
+	/**
+	 * 创建命名值信息。
+	 *
+	 * @param parameter 方法参数
+	 * @return 命名值信息
+	 */
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
 		MatrixVariable ann = parameter.getParameterAnnotation(MatrixVariable.class);
@@ -66,30 +79,47 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 		return new MatrixVariableNamedValueInfo(ann);
 	}
 
+	/**
+	 * 解析命名值。
+	 *
+	 * @param name     名称
+	 * @param param    参数
+	 * @param exchange 服务器Web交换
+	 * @return 解析后的对象
+	 */
 	@Nullable
 	@Override
 	protected Object resolveNamedValue(String name, MethodParameter param, ServerWebExchange exchange) {
 		// 获取路径参数的矩阵变量
 		Map<String, MultiValueMap<String, String>> pathParameters =
 				exchange.getAttribute(HandlerMapping.MATRIX_VARIABLES_ATTRIBUTE);
+
+		// 如果路径参数为空，返回null
 		if (CollectionUtils.isEmpty(pathParameters)) {
 			return null;
 		}
 
+		// 获取方法参数上的MatrixVariable注解
 		MatrixVariable ann = param.getParameterAnnotation(MatrixVariable.class);
 		Assert.state(ann != null, "No MatrixVariable annotation");
+
+		// 获取MatrixVariable注解上的pathVar属性
 		String pathVar = ann.pathVar();
 		List<String> paramValues = null;
 
+		// 如果pathVar属性不等于ValueConstants.DEFAULT_NONE
 		if (!pathVar.equals(ValueConstants.DEFAULT_NONE)) {
+			// 如果路径参数包含pathVar属性，获取对应参数值
 			if (pathParameters.containsKey(pathVar)) {
 				paramValues = pathParameters.get(pathVar).get(name);
 			}
 		} else {
+			// 否则，遍历所有路径参数，查找匹配的参数值
 			boolean found = false;
 			paramValues = new ArrayList<>();
 			for (MultiValueMap<String, String> params : pathParameters.values()) {
 				if (params.containsKey(name)) {
+					// 如果找到多个匹配项，抛出ServerErrorException异常
 					if (found) {
 						String paramType = param.getNestedParameterType().getName();
 						throw new ServerErrorException(
@@ -104,14 +134,24 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 		}
 
 		if (CollectionUtils.isEmpty(paramValues)) {
+			// 如果解析后的参数值列表为空，返回null；
 			return null;
 		} else if (paramValues.size() == 1) {
+			// 如果只有一个参数值，返回该值；
 			return paramValues.get(0);
 		} else {
+			// 如果有多个参数值，返回参数值列表
 			return paramValues;
 		}
 	}
 
+	/**
+	 * 处理缺失值情况。
+	 *
+	 * @param name      参数名称
+	 * @param parameter 方法参数
+	 * @throws ServerWebInputException 服务器输入异常
+	 */
 	@Override
 	protected void handleMissingValue(String name, MethodParameter parameter) throws ServerWebInputException {
 		String paramInfo = parameter.getNestedParameterType().getSimpleName();
@@ -119,8 +159,16 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueSync
 				"for method parameter of type " + paramInfo, parameter);
 	}
 
+	/**
+	 * 矩阵变量命名值信息类。
+	 */
 	private static final class MatrixVariableNamedValueInfo extends NamedValueInfo {
 
+		/**
+		 * 构造方法，用于初始化矩阵变量命名值信息。
+		 *
+		 * @param annotation MatrixVariable注解
+		 */
 		private MatrixVariableNamedValueInfo(MatrixVariable annotation) {
 			super(annotation.name(), annotation.required(), annotation.defaultValue());
 		}
