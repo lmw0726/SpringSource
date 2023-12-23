@@ -28,8 +28,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
- * Base class for {@link HandlerMethodArgumentResolver} implementations with access to a
- * {@code ReactiveAdapterRegistry} and methods to check for method parameter support.
+ * {@code HandlerMethodArgumentResolver}的基类，具有对{@code ReactiveAdapterRegistry}的访问权限以及用于检查方法参数支持的方法。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller

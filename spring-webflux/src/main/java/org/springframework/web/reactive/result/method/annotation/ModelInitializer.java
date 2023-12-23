@@ -16,20 +16,7 @@
 
 package org.springframework.web.reactive.result.method.annotation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import reactor.core.publisher.Mono;
-
-import org.springframework.core.Conventions;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.ReactiveAdapter;
-import org.springframework.core.ReactiveAdapterRegistry;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.*;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -40,6 +27,10 @@ import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.result.method.InvocableHandlerMethod;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Package-private class to assist {@link RequestMappingHandlerAdapter} with
@@ -160,16 +151,18 @@ class ModelInitializer {
 	}
 
 	/**
-	 * Derive the model attribute name for the given method parameter based on
-	 * a {@code @ModelAttribute} parameter annotation (if present) or falling
-	 * back on parameter type based conventions.
-	 * @param parameter a descriptor for the method parameter
-	 * @return the derived name
+	 * 根据 {@code @ModelAttribute} 参数注解（如果存在）或者基于参数类型的约定，
+	 * 推断给定方法参数的模型属性名称。
+	 * @param parameter 方法参数的描述符
+	 * @return 推断出的名称
 	 * @see Conventions#getVariableNameForParameter(MethodParameter)
 	 */
 	public static String getNameForParameter(MethodParameter parameter) {
+		// 获取参数上的 ModelAttribute 注解
 		ModelAttribute ann = parameter.getParameterAnnotation(ModelAttribute.class);
+		// 获取注解中的值，如果注解为空则为 null
 		String name = (ann != null ? ann.value() : null);
+		// 如果注解中的值不为空，则返回注解中的值，否则使用参数的默认变量名
 		return (StringUtils.hasText(name) ? name : Conventions.getVariableNameForParameter(parameter));
 	}
 

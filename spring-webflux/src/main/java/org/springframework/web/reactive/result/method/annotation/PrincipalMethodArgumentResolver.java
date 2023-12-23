@@ -16,23 +16,22 @@
 
 package org.springframework.web.reactive.result.method.annotation;
 
-import java.security.Principal;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ReactiveAdapter;
 import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolverSupport;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.security.Principal;
 
 /**
- * Resolves method argument value of type {@link java.security.Principal}.
+ * 解析类型为 {@link java.security.Principal} 的方法参数值。
  *
  * @author Rossen Stoyanchev
- * @since 5.2
  * @see ServerWebExchangeMethodArgumentResolver
+ * @since 5.2
  */
 public class PrincipalMethodArgumentResolver extends HandlerMethodArgumentResolverSupport {
 
@@ -41,17 +40,37 @@ public class PrincipalMethodArgumentResolver extends HandlerMethodArgumentResolv
 	}
 
 
+	/**
+	 * 判断是否支持解析指定类型的方法参数。
+	 *
+	 * @param parameter 要判断的方法参数
+	 * @return 如果是 {@link Principal} 类型的参数则返回 true，否则返回 false
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 如果类型是 Principal，则返回 true
 		return checkParameterType(parameter, Principal.class::isAssignableFrom);
 	}
 
+	/**
+	 * 解析参数并返回处理后的结果。
+	 *
+	 * @param parameter        方法参数
+	 * @param context          绑定上下文
+	 * @param exchange         当前的服务器Web交换
+	 * @return 解析后的参数结果
+	 */
 	@Override
 	public Mono<Object> resolveArgument(
 			MethodParameter parameter, BindingContext context, ServerWebExchange exchange) {
 
+		// 获取当前的 Principal
 		Mono<Principal> principal = exchange.getPrincipal();
+
+		// 获取参数类型对应的适配器
 		ReactiveAdapter adapter = getAdapterRegistry().getAdapter(parameter.getParameterType());
+
+		// 如果存在适配器，则使用适配器将 Publisher 转换为对应类型的 Mono；否则直接返回当前的 Principal
 		return (adapter != null ? Mono.just(adapter.fromPublisher(principal)) : Mono.from(principal));
 	}
 
