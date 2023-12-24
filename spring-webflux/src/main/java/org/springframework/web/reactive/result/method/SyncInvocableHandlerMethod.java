@@ -16,12 +16,6 @@
 
 package org.springframework.web.reactive.result.method;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.lang.Nullable;
@@ -31,10 +25,15 @@ import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
 /**
- * Extension of {@link HandlerMethod} that invokes the underlying method via
- * {@link InvocableHandlerMethod} but uses sync argument resolvers only and
- * thus can return directly a {@link HandlerResult} with no async wrappers.
+ * {@link HandlerMethod}的扩展，通过{@link InvocableHandlerMethod}调用基础方法，但仅使用同步参数解析器，
+ * 因此可以直接返回带有{@link HandlerResult}的结果，而无需使用异步包装器。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
