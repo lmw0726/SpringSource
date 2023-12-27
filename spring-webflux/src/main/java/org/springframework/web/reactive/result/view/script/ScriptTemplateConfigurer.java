@@ -16,20 +16,18 @@
 
 package org.springframework.web.reactive.result.view.script;
 
-import java.nio.charset.Charset;
-import java.util.function.Supplier;
+import org.springframework.lang.Nullable;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
-
-import org.springframework.lang.Nullable;
+import java.nio.charset.Charset;
+import java.util.function.Supplier;
 
 /**
- * An implementation of the Spring WebFlux {@link ScriptTemplateConfig} for
- * creating a {@code ScriptEngine} for use in a web application.
+ * 用于在 Web 应用程序中创建 {@code ScriptEngine} 以供使用的 Spring WebFlux {@link ScriptTemplateConfig} 的实现。
  *
  * <pre class="code">
- * // Add the following to an &#64;Configuration class
+ * // 将以下内容添加到 @Configuration 类中
  * &#64;Bean
  * public ScriptTemplateConfigurer mustacheConfigurer() {
  *    ScriptTemplateConfigurer configurer = new ScriptTemplateConfigurer();
@@ -41,66 +39,86 @@ import org.springframework.lang.Nullable;
  * }
  * </pre>
  *
- * <p><b>NOTE:</b> It is possible to use non thread-safe script engines with
- * templating libraries not designed for concurrency, like Handlebars or React running on
- * Nashorn, by setting the {@link #setSharedEngine sharedEngine} property to {@code false}.
+ * <p><b>注意:</b> 可以通过将 {@link #setSharedEngine sharedEngine} 属性设置为 {@code false}，在不设计为并发的模板库中使用非线程安全的脚本引擎，如运行在 Nashorn 上的 Handlebars 或 React。
  *
  * @author Sebastien Deleuze
- * @since 5.0
  * @see ScriptTemplateView
+ * @since 5.0
  */
 public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
-
+	/**
+	 * 脚本引擎
+	 */
 	@Nullable
 	private ScriptEngine engine;
 
+	/**
+	 * 脚本引擎供应商
+	 */
 	@Nullable
 	private Supplier<ScriptEngine> engineSupplier;
 
+	/**
+	 * 脚本引擎名称
+	 */
 	@Nullable
 	private String engineName;
 
+	/**
+	 * 是否共享引擎
+	 */
 	@Nullable
 	private Boolean sharedEngine;
 
+	/**
+	 * 脚本数组
+	 */
 	@Nullable
 	private String[] scripts;
 
+	/**
+	 * 渲染对象
+	 */
 	@Nullable
 	private String renderObject;
 
+	/**
+	 * 渲染函数
+	 */
 	@Nullable
 	private String renderFunction;
 
+	/**
+	 * 字符集
+	 */
 	@Nullable
 	private Charset charset;
 
+	/**
+	 * 资源加载路径
+	 */
 	@Nullable
 	private String resourceLoaderPath;
 
-
 	/**
-	 * Default constructor.
+	 * 默认构造函数。
 	 */
 	public ScriptTemplateConfigurer() {
 	}
 
 	/**
-	 * Create a new ScriptTemplateConfigurer using the given engine name.
+	 * 使用给定的引擎名称创建一个新的 ScriptTemplateConfigurer。
 	 */
 	public ScriptTemplateConfigurer(String engineName) {
 		this.engineName = engineName;
 	}
 
-
 	/**
-	 * Set the {@link ScriptEngine} to use by the view.
-	 * If {@code renderFunction} is specified, the script engine must implement {@code Invocable}.
-	 * You must define {@code engine} or {@code engineName}, not both.
-	 * <p>When the {@code sharedEngine} flag is set to {@code false}, you should not specify
-	 * the script engine with this setter, but with the {@link #setEngineName(String)}
-	 * or {@link #setEngineSupplier(Supplier)} (since it implies multiple lazy
-	 * instantiations of the script engine).
+	 * 设置用于视图的 {@link ScriptEngine}。
+	 * 如果指定了 {@code renderFunction}，则脚本引擎必须实现 {@code Invocable}。
+	 * 您必须定义 {@code engine} 或 {@code engineName}，但不能同时定义两者。
+	 * <p>当 {@code sharedEngine} 标志设置为 {@code false} 时，不应使用此 setter 指定脚本引擎，而应使用 {@link #setEngineName(String)} 或 {@link #setEngineSupplier(Supplier)}（因为这意味着多次延迟实例化脚本引擎）。
+	 *
 	 * @see #setEngineName(String)
 	 * @see #setEngineSupplier(Supplier)
 	 */
@@ -115,13 +133,13 @@ public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
 	}
 
 	/**
-	 * Set the {@link ScriptEngine} supplier to use by the view, usually used with
-	 * {@link #setSharedEngine(Boolean)} set to {@code false}.
-	 * If {@code renderFunction} is specified, the script engine must implement {@code Invocable}.
-	 * You must either define {@code engineSupplier}, {@code engine} or {@code engineName}.
-	 * @since 5.2
+	 * 设置视图使用的 {@link ScriptEngine} 供应商，通常与 {@link #setSharedEngine(Boolean)} 设置为 {@code false} 一起使用。
+	 * 如果指定了 {@code renderFunction}，则脚本引擎必须实现 {@code Invocable}。
+	 * 您必须定义 {@code engineSupplier}、{@code engine} 或 {@code engineName}。
+	 *
 	 * @see #setEngine(ScriptEngine)
 	 * @see #setEngineName(String)
+	 * @since 5.2
 	 */
 	public void setEngineSupplier(@Nullable Supplier<ScriptEngine> engineSupplier) {
 		this.engineSupplier = engineSupplier;
@@ -134,9 +152,10 @@ public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
 	}
 
 	/**
-	 * Set the engine name that will be used to instantiate the {@link ScriptEngine}.
-	 * If {@code renderFunction} is specified, the script engine must implement {@code Invocable}.
-	 * You must define {@code engine} or {@code engineName}, not both.
+	 * 设置将用于实例化 {@link ScriptEngine} 的引擎名称。
+	 * 如果指定了 {@code renderFunction}，则脚本引擎必须实现 {@code Invocable}。
+	 * 您必须定义 {@code engine} 或 {@code engineName}，但不能同时定义两者。
+	 *
 	 * @see #setEngine(ScriptEngine)
 	 * @see #setEngineSupplier(Supplier)
 	 */
@@ -151,15 +170,10 @@ public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
 	}
 
 	/**
-	 * When set to {@code false}, a new  {@link ScriptEngine} instance will be created
-	 * for each request, else the same instance will be reused.
-	 * This flag should be set to {@code false} for those using non thread-safe script
-	 * engines with templating libraries not designed for
-	 * concurrency, like Handlebars or React running on Nashorn for example.
-	 * <p>When this flag is set to {@code false}, the script engine must be specified using
-	 * {@link #setEngineName(String)}. Using {@link #setEngine(ScriptEngine)} is not
-	 * possible because multiple instances of the script engine need to be created for
-	 * each request.
+	 * 当设置为 {@code false} 时，每个请求将创建一个新的 {@link ScriptEngine} 实例，否则将重用相同的实例。
+	 * 对于使用非线程安全脚本引擎与不适用于并发的模板库（例如运行在 Nashorn 上的 Handlebars 或 React）的情况，应将此标志设置为 {@code false}。
+	 * <p>当此标志设置为 {@code false} 时，脚本引擎必须使用 {@link #setEngineName(String)} 指定。不能使用 {@link #setEngine(ScriptEngine)}，因为需要为每个请求创建多个脚本引擎实例。
+	 *
 	 * @see <a href="https://docs.oracle.com/javase/8/docs/api/javax/script/ScriptEngineFactory.html#getParameter-java.lang.String-">THREADING ScriptEngine parameter</a>
 	 */
 	public void setSharedEngine(@Nullable Boolean sharedEngine) {
@@ -173,13 +187,10 @@ public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
 	}
 
 	/**
-	 * Set the scripts to be loaded by the script engine (library or user provided).
-	 * Since {@code resourceLoaderPath} default value is "classpath:", you can load easily
-	 * any script available on the classpath.
-	 * <p>For example, in order to use a JavaScript library available as a WebJars dependency
-	 * and a custom "render.js" file, you should call
-	 * {@code configurer.setScripts("/META-INF/resources/webjars/library/version/library.js",
-	 * "com/myproject/script/render.js");}.
+	 * 设置要由脚本引擎加载的脚本（库或用户提供的）。
+	 * 由于 {@code resourceLoaderPath} 的默认值是 "classpath:"，因此您可以轻松加载类路径上可用的任何脚本。
+	 * <p>例如，要使用作为 WebJars 依赖项可用的 JavaScript 库和自定义的 "render.js" 文件，您应该调用 {@code configurer.setScripts("/META-INF/resources/webjars/library/version/library.js", "com/myproject/script/render.js");}。
+	 *
 	 * @see #setResourceLoaderPath
 	 * @see <a href="https://www.webjars.org">WebJars</a>
 	 */
@@ -194,9 +205,8 @@ public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
 	}
 
 	/**
-	 * Set the object where the render function belongs (optional).
-	 * For example, in order to call {@code Mustache.render()}, {@code renderObject}
-	 * should be set to {@code "Mustache"} and {@code renderFunction} to {@code "render"}.
+	 * 设置包含渲染函数的对象（可选）。
+	 * 例如，为了调用 {@code Mustache.render()}，应将 {@code renderObject} 设置为 {@code "Mustache"}，将 {@code renderFunction} 设置为 {@code "render"}。
 	 */
 	public void setRenderObject(@Nullable String renderObject) {
 		this.renderObject = renderObject;
@@ -209,14 +219,14 @@ public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
 	}
 
 	/**
-	 * Set the render function name (optional). If not specified, the script templates
-	 * will be evaluated with {@link ScriptEngine#eval(String, Bindings)}.
-	 * <p>This function will be called with the following parameters:
+	 * 设置渲染函数的名称（可选）。如果未指定，脚本模板将使用 {@link ScriptEngine#eval(String, Bindings)} 进行评估。
+	 * <p>此函数将使用以下参数进行调用：
 	 * <ol>
-	 * <li>{@code String template}: the template content</li>
-	 * <li>{@code Map model}: the view model</li>
-	 * <li>{@code RenderingContext context}: the rendering context</li>
+	 * <li>{@code String template}：模板内容</li>
+	 * <li>{@code Map model}：视图模型</li>
+	 * <li>{@code RenderingContext context}：渲染上下文</li>
 	 * </ol>
+	 *
 	 * @see RenderingContext
 	 */
 	public void setRenderFunction(@Nullable String renderFunction) {
@@ -230,8 +240,7 @@ public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
 	}
 
 	/**
-	 * Set the charset used to read script and template files.
-	 * ({@code UTF-8} by default).
+	 * 设置用于读取脚本和模板文件的字符集（默认为 {@code UTF-8}）。
 	 */
 	public void setCharset(@Nullable Charset charset) {
 		this.charset = charset;
@@ -244,12 +253,11 @@ public class ScriptTemplateConfigurer implements ScriptTemplateConfig {
 	}
 
 	/**
-	 * Set the resource loader path(s) via a Spring resource location.
-	 * Accepts multiple locations as a comma-separated list of paths.
-	 * Standard URLs like "file:" and "classpath:" and pseudo URLs are supported
-	 * as understood by Spring's {@link org.springframework.core.io.ResourceLoader}.
-	 * Relative paths are allowed when running in an ApplicationContext.
-	 * <p>Default is "classpath:".
+	 * 通过 Spring 资源位置设置资源加载器路径（可选）。
+	 * 接受多个位置，以逗号分隔的路径列表。
+	 * 支持类似 "file:"、"classpath:" 和伪 URL 的标准 URL，如 Spring 的 {@link org.springframework.core.io.ResourceLoader} 所理解的那样。
+	 * 在 ApplicationContext 运行时允许相对路径。
+	 * <p>默认值为 "classpath:"。
 	 */
 	public void setResourceLoaderPath(@Nullable String resourceLoaderPath) {
 		this.resourceLoaderPath = resourceLoaderPath;
