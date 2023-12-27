@@ -16,9 +16,6 @@
 
 package org.springframework.web.reactive.result.view;
 
-import java.util.Arrays;
-import java.util.Map;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
@@ -26,22 +23,37 @@ import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 
+import java.util.Arrays;
+import java.util.Map;
+
 /**
- * Default implementation of {@link Rendering.RedirectBuilder}.
+ * {@link Rendering.RedirectBuilder} 的默认实现。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 class DefaultRenderingBuilder implements Rendering.RedirectBuilder {
 
+	/**
+	 * 视图对象。
+	 */
 	private final Object view;
 
+	/**
+	 * 模型对象
+	 */
 	@Nullable
 	private Model model;
 
+	/**
+	 * HTTP 状态
+	 */
 	@Nullable
 	private HttpStatus status;
 
+	/**
+	 * HTTP 头部
+	 */
 	@Nullable
 	private HttpHeaders headers;
 
@@ -49,7 +61,6 @@ class DefaultRenderingBuilder implements Rendering.RedirectBuilder {
 	DefaultRenderingBuilder(Object view) {
 		this.view = view;
 	}
-
 
 	@Override
 	public DefaultRenderingBuilder modelAttribute(String name, Object value) {
@@ -107,6 +118,12 @@ class DefaultRenderingBuilder implements Rendering.RedirectBuilder {
 		return this.headers;
 	}
 
+	/**
+	 * 设置是否相对于上下文的相对路径。
+	 *
+	 * @param contextRelative 是否相对于上下文的相对路径
+	 * @return 当前 {@link Rendering.RedirectBuilder} 实例
+	 */
 	@Override
 	public Rendering.RedirectBuilder contextRelative(boolean contextRelative) {
 		getRedirectView().setContextRelative(contextRelative);
@@ -123,7 +140,6 @@ class DefaultRenderingBuilder implements Rendering.RedirectBuilder {
 		Assert.isInstanceOf(RedirectView.class, this.view);
 		return (RedirectView) this.view;
 	}
-
 
 	@Override
 	public Rendering build() {
