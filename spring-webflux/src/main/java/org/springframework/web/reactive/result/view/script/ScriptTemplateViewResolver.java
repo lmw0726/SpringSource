@@ -20,15 +20,12 @@ import org.springframework.web.reactive.result.view.AbstractUrlBasedView;
 import org.springframework.web.reactive.result.view.UrlBasedViewResolver;
 
 /**
- * Convenience subclass of {@link UrlBasedViewResolver} that supports
- * {@link ScriptTemplateView} and custom subclasses of it.
+ * {@link UrlBasedViewResolver} 的便利子类，支持 {@link ScriptTemplateView} 及其自定义子类。
  *
- * <p>The view class for all views created by this resolver can be specified
- * via the {@link #setViewClass(Class)} property.
+ * <p>通过 {@link #setViewClass} 属性可以指定此解析器创建的所有视图的视图类。
  *
- * <p><b>Note:</b> When chaining ViewResolvers this resolver will check for the
- * existence of the specified template resources and only return a non-null
- * View object if a template is actually found.
+ * <p><b>注意：</b>在链接 ViewResolvers 时，此解析器将检查指定的模板资源的存在，
+ * 只有在实际找到模板时才会返回非空的 View 对象。
  *
  * @author Sebastien Deleuze
  * @since 5.0
@@ -37,25 +34,24 @@ import org.springframework.web.reactive.result.view.UrlBasedViewResolver;
 public class ScriptTemplateViewResolver extends UrlBasedViewResolver {
 
 	/**
-	 * Sets the default {@link #setViewClass view class} to {@link #requiredViewClass}:
-	 * by default {@link ScriptTemplateView}.
+	 * 将默认 {@link #setViewClass 视图类} 设置为 {@link #requiredViewClass}：
+	 * 默认为 {@link ScriptTemplateView}。
 	 */
 	public ScriptTemplateViewResolver() {
 		setViewClass(requiredViewClass());
 	}
 
 	/**
-	 * A convenience constructor that allows for specifying {@link #setPrefix prefix}
-	 * and {@link #setSuffix suffix} as constructor arguments.
-	 * @param prefix the prefix that gets prepended to view names when building a URL
-	 * @param suffix the suffix that gets appended to view names when building a URL
+	 * 一个便利的构造函数，允许指定 {@link #setPrefix 前缀} 和 {@link #setSuffix 后缀} 作为构造函数参数。
+	 *
+	 * @param prefix 构建 URL 时附加到视图名称前面的前缀
+	 * @param suffix 构建 URL 时附加到视图名称后面的后缀
 	 */
 	public ScriptTemplateViewResolver(String prefix, String suffix) {
 		this();
 		setPrefix(prefix);
 		setSuffix(suffix);
 	}
-
 
 	@Override
 	protected Class<?> requiredViewClass() {
