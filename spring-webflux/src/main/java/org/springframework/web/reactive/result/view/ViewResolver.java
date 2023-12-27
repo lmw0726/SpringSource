@@ -16,30 +16,27 @@
 
 package org.springframework.web.reactive.result.view;
 
-import java.util.Locale;
-
 import reactor.core.publisher.Mono;
 
+import java.util.Locale;
+
 /**
- * Contract to resolve a view name to a {@link View} instance. The view name may
- * correspond to an HTML template or be generated dynamically.
- *
- * <p>The process of view resolution is driven through a ViewResolver-based
- * {@code HandlerResultHandler} implementation called
- * {@link ViewResolutionResultHandler
- * ViewResolutionResultHandler}.
+ * 用于将视图名称解析为{@link View}实例的契约。视图名称可能对应于HTML模板或动态生成的内容。
+ * <p>
+ * 视图解析的过程是通过基于ViewResolver的HandlerResultHandler实现驱动的，称为ViewResolutionResultHandler。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see ViewResolutionResultHandler
+ * @since 5.0
  */
 public interface ViewResolver {
 
 	/**
-	 * Resolve the view name to a View instance.
-	 * @param viewName the name of the view to resolve
-	 * @param locale the locale for the request
-	 * @return the resolved view or an empty stream
+	 * 将视图名称解析为View实例。
+	 *
+	 * @param viewName 视图的名称
+	 * @param locale   请求的语言环境
+	 * @return 解析后的视图或空的流
 	 */
 	Mono<View> resolveViewName(String viewName, Locale locale);
 

@@ -16,27 +16,20 @@
 
 package org.springframework.web.reactive.result.view;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.ui.Model;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
- * Public API for HTML rendering. Supported as a return value in Spring WebFlux
- * controllers. Comparable to the use of {@code ModelAndView} as a return value
- * in Spring MVC controllers.
+ * HTML渲染的公共API。在Spring WebFlux控制器中支持作为返回值。类似于在Spring MVC控制器中使用{@code ModelAndView}作为返回值。
  *
- * <p>Controllers typically return a {@link String} view name and rely on the
- * "implicit" model which can also be injected into the controller method.
- * Or controllers may return model attribute(s) and rely on a default view name
- * being selected based on the request path.
+ * <p>控制器通常返回一个{@link String}视图名称，并依赖于“隐式”模型，该模型也可以注入到控制器方法中。或者控制器可以返回模型属性并依赖于基于请求路径选择默认视图名称。
  *
- * <p>{@code Rendering} can be used to combine a view name with model attributes,
- * set the HTTP status or headers, and for other more advanced options around
- * redirect scenarios.
+ * <p>{@code Rendering}可用于将视图名称与模型属性组合，设置HTTP状态码或头部信息，以及其他更高级的重定向场景选项。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -44,119 +37,156 @@ import org.springframework.ui.Model;
 public interface Rendering {
 
 	/**
-	 * Return the selected {@link String} view name or {@link View} object.
+	 * 返回所选的{@link String}视图名称或{@link View}对象。
+	 *
+	 * @return 所选的视图名称或View对象。
 	 */
 	@Nullable
 	Object view();
 
 	/**
-	 * Return attributes to add to the model.
+	 * 返回要添加到模型中的属性。
+	 *
+	 * @return 要添加到模型中的属性
 	 */
 	Map<String, Object> modelAttributes();
 
 	/**
-	 * Return the HTTP status to set the response to.
+	 * 返回要设置到响应的HTTP状态码。
+	 *
+	 * @return 要设置到响应的HTTP状态码
 	 */
 	@Nullable
 	HttpStatus status();
 
 	/**
-	 * Return headers to add to the response.
+	 * 返回要添加到响应的头部信息。
+	 *
+	 * @return 要添加到响应的头部信息
 	 */
 	HttpHeaders headers();
 
-
 	/**
-	 * Create a new builder for response rendering based on the given view name.
-	 * @param name the view name to be resolved to a {@link View}
-	 * @return the builder
+	 * 基于给定的视图名称创建一个新的响应渲染构建器。
+	 *
+	 * @param name 要解析为{@link View}的视图名称
+	 * @return 构建器
 	 */
 	static Builder<?> view(String name) {
 		return new DefaultRenderingBuilder(name);
 	}
 
 	/**
-	 * Create a new builder for a redirect through a {@link RedirectView}.
-	 * @param url the redirect URL
-	 * @return the builder
+	 * 创建一个新的重定向{@link RedirectView}的构建器。
+	 *
+	 * @param url 重定向的URL
+	 * @return 构建器
 	 */
 	static RedirectBuilder redirectTo(String url) {
 		return new DefaultRenderingBuilder(new RedirectView(url));
 	}
 
-
 	/**
-	 * Defines a builder for {@link Rendering}.
+	 * 定义{@link Rendering}的构建器。
 	 *
-	 * @param <B> a self reference to the builder type
+	 * @param <B> 构建器类型的自引用
 	 */
 	interface Builder<B extends Builder<B>> {
 
 		/**
-		 * Add the given model attribute with the supplied name.
+		 * 使用提供的名称添加给定的模型属性。
+		 *
+		 * @param name  属性名称
+		 * @param value 属性值
+		 * @return 当前构建器类型
 		 * @see Model#addAttribute(String, Object)
 		 */
+
 		B modelAttribute(String name, Object value);
 
 		/**
-		 * Add an attribute to the model using a
-		 * {@link org.springframework.core.Conventions#getVariableName generated name}.
+		 * 使用{@link org.springframework.core.Conventions#getVariableName 生成的名称}向模型添加属性。
+		 *
+		 * @param value 属性值
+		 * @return 当前构建器
 		 * @see Model#addAttribute(Object)
 		 */
 		B modelAttribute(Object value);
 
 		/**
-		 * Add all given attributes to the model using
-		 * {@link org.springframework.core.Conventions#getVariableName generated names}.
+		 * 使用{@link org.springframework.core.Conventions#getVariableName 生成的名称}向模型添加所有给定的属性。
+		 *
+		 * @param values 给定的属性值
+		 * @return 当前构建器
 		 * @see Model#addAllAttributes(Collection)
 		 */
 		B modelAttributes(Object... values);
 
 		/**
-		 * Add the given attributes to the model.
+		 * 将给定的属性添加到模型中。
+		 *
+		 * @param map 属性值对
+		 * @return 当前构建器
 		 * @see Model#addAllAttributes(Map)
 		 */
 		B model(Map<String, ?> map);
 
 		/**
-		 * Specify the status to use for the response.
+		 * 指定响应的状态。
+		 *
+		 * @param status HTTP状态
+		 * @return 当前构建器
 		 */
 		B status(HttpStatus status);
 
 		/**
-		 * Specify a header to add to the response.
+		 * 指定要添加到响应的头部信息。
+		 *
+		 * @param headerName   请求头
+		 * @param headerValues 请求头值
+		 * @return 当前构建器
 		 */
 		B header(String headerName, String... headerValues);
 
 		/**
-		 * Specify headers to add to the response.
+		 * 指定要添加到响应的头部信息。
+		 *
+		 * @param headers 请求头
+		 * @return 当前构建器
 		 */
 		B headers(HttpHeaders headers);
 
 		/**
-		 * Builder the {@link Rendering} instance.
+		 * 构建{@link Rendering}实例。
+		 *
+		 * @return 渲染对象
 		 */
+
 		Rendering build();
 	}
 
 
 	/**
-	 * Extends {@link Builder} with extra options for redirect scenarios.
+	 * 扩展{@link Builder}，用于重定向场景的额外选项。
 	 */
 	interface RedirectBuilder extends Builder<RedirectBuilder> {
 
 		/**
-		 * Whether to the provided redirect URL should be prepended with the
-		 * application context path (if any).
-		 * <p>By default this is set to {@code true}.
+		 * 是否应将提供的重定向URL前缀与应用程序上下文路径（如果有）结合起来。
+		 * <p>默认情况下，此项设置为{@code true}。
+		 *
+		 * @param contextRelative 是否是相关上下文
+		 * @return 重定向构建器
 		 * @see RedirectView#setContextRelative(boolean)
 		 */
 		RedirectBuilder contextRelative(boolean contextRelative);
 
 		/**
-		 * Whether to append the query string of the current URL to the target
-		 * redirect URL or not.
-		 * <p>By default this is set to {@code false}.
+		 * 是否将当前URL的查询字符串追加到目标重定向URL中。
+		 * <p>默认情况下，此项设置为{@code false}。
+		 *
+		 * @param propagate 是否是传播属性
+		 * @return 重定向构建器
 		 * @see RedirectView#setPropagateQuery(boolean)
 		 */
 		RedirectBuilder propagateQuery(boolean propagate);
