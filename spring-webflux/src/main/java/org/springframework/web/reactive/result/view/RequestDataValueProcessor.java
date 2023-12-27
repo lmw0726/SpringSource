@@ -16,23 +16,17 @@
 
 package org.springframework.web.reactive.result.view;
 
-import java.util.Map;
-
 import org.springframework.lang.Nullable;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Map;
+
 /**
- * A contract for inspecting and potentially modifying request data values such
- * as URL query parameters or form field values before they are rendered by a
- * view or before a redirect.
- *
- * <p>Implementations may use this contract for example as part of a solution
- * to provide data integrity, confidentiality, protection against cross-site
- * request forgery (CSRF), and others or for other tasks such as automatically
- * adding a hidden field to all forms and URLs.
- *
- * <p>View technologies that support this contract can obtain an instance to
- * delegate to via {@link RequestContext#getRequestDataValueProcessor()}.
+ * 用于检查和可能修改请求数据值的合约，例如URL查询参数或表单字段值，在它们被视图呈现之前或重定向之前。
+ * <p>
+ * 实现可能会使用此合约作为解决方案的一部分，用于提供数据完整性、机密性、跨站请求伪造（CSRF）保护等，或者用于其他任务，例如自动向所有表单和URL添加隐藏字段。
+ * <p>
+ * 支持此合约的视图技术可以通过{@link RequestContext#getRequestDataValueProcessor()}获得一个实例来委托执行。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -40,37 +34,41 @@ import org.springframework.web.server.ServerWebExchange;
 public interface RequestDataValueProcessor {
 
 	/**
-	 * Invoked when a new form action is rendered.
-	 * @param exchange the current exchange
-	 * @param action the form action
-	 * @param httpMethod the form HTTP method
-	 * @return the action to use, possibly modified
+	 * 渲染新表单操作时调用。
+	 *
+	 * @param exchange   当前交换
+	 * @param action     表单操作
+	 * @param httpMethod 表单HTTP方法
+	 * @return 要使用的操作，可能已修改
 	 */
 	String processAction(ServerWebExchange exchange, String action, String httpMethod);
 
 	/**
-	 * Invoked when a form field value is rendered.
-	 * @param exchange the current exchange
-	 * @param name the form field name
-	 * @param value the form field value
-	 * @param type the form field type ("text", "hidden", etc.)
-	 * @return the form field value to use, possibly modified
+	 * 渲染表单字段值时调用。
+	 *
+	 * @param exchange 当前交换
+	 * @param name     表单字段名称
+	 * @param value    表单字段值
+	 * @param type     表单字段类型（"text"、"hidden"等）
+	 * @return 要使用的表单字段值，可能已修改
 	 */
 	String processFormFieldValue(ServerWebExchange exchange, String name, String value, String type);
 
 	/**
-	 * Invoked after all form fields have been rendered.
-	 * @param exchange the current exchange
-	 * @return additional hidden form fields to be added, or {@code null}
+	 * 在所有表单字段都呈现后调用。
+	 *
+	 * @param exchange 当前交换
+	 * @return 要添加的额外隐藏表单字段，或{@code null}
 	 */
 	@Nullable
 	Map<String, String> getExtraHiddenFields(ServerWebExchange exchange);
 
 	/**
-	 * Invoked when a URL is about to be rendered or redirected to.
-	 * @param exchange the current exchange
-	 * @param url the URL value
-	 * @return the URL to use, possibly modified
+	 * 渲染或重定向到URL时调用。
+	 *
+	 * @param exchange 当前交换
+	 * @param url      URL值
+	 * @return 要使用的URL，可能已修改
 	 */
 	String processUrl(ServerWebExchange exchange, String url);
 

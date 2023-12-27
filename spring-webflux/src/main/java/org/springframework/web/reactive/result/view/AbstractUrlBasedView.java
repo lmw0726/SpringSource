@@ -16,14 +16,13 @@
 
 package org.springframework.web.reactive.result.view;
 
-import java.util.Locale;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 
+import java.util.Locale;
+
 /**
- * Abstract base class for URL-based views. Provides a consistent way of
- * holding the URL that a View wraps, in the form of a "url" bean property.
+ * 基于 URL 的视图的抽象基类。提供了一种持有视图包装的 URL 的一致方式，以“url” bean 属性的形式。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -33,37 +32,33 @@ public abstract class AbstractUrlBasedView extends AbstractView implements Initi
 	@Nullable
 	private String url;
 
-
 	/**
-	 * Constructor for use as a bean.
+	 * 作为 bean 使用的构造方法。
 	 */
 	protected AbstractUrlBasedView() {
 	}
 
 	/**
-	 * Create a new AbstractUrlBasedView with the given URL.
+	 * 使用给定的 URL 创建新的 AbstractUrlBasedView。
 	 */
 	protected AbstractUrlBasedView(String url) {
 		this.url = url;
 	}
 
-
 	/**
-	 * Set the URL of the resource that this view wraps.
-	 * The URL must be appropriate for the concrete View implementation.
+	 * 设置此视图包装的资源的 URL。URL 必须适用于具体的 View 实现。
 	 */
 	public void setUrl(@Nullable String url) {
 		this.url = url;
 	}
 
 	/**
-	 * Return the URL of the resource that this view wraps.
+	 * 返回此视图包装的资源的 URL。
 	 */
 	@Nullable
 	public String getUrl() {
 		return this.url;
 	}
-
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -73,11 +68,11 @@ public abstract class AbstractUrlBasedView extends AbstractView implements Initi
 	}
 
 	/**
-	 * Check whether the resource for the configured URL actually exists.
-	 * @param locale the desired Locale that we're looking for
-	 * @return {@code false} if the resource exists
-	 * {@code false} if we know that it does not exist
-	 * @throws Exception if the resource exists but is invalid (e.g. could not be parsed)
+	 * 检查配置的 URL 的资源是否实际存在。
+	 *
+	 * @param locale 我们正在查找的期望 Locale
+	 * @return 如果资源存在，则为 {@code false}，如果我们知道它不存在，则为 {@code false}
+	 * @throws Exception 如果资源存在但无效（例如，无法解析）
 	 */
 	public abstract boolean checkResourceExists(Locale locale) throws Exception;
 
