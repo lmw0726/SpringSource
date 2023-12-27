@@ -16,7 +16,6 @@
 
 package org.springframework.web.reactive.result.method;
 
-import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
@@ -55,15 +54,18 @@ public class SyncInvocableHandlerMethod extends HandlerMethod {
 
 
 	/**
-	 * Configure the argument resolvers to use to use for resolving method
-	 * argument values against a {@code ServerWebExchange}.
+	 * 配置用于根据ServerWebExchange解析方法参数值的参数解析器。
+	 *
+	 * @param resolvers 用于解析方法参数值的参数解析器列表
 	 */
 	public void setArgumentResolvers(List<SyncHandlerMethodArgumentResolver> resolvers) {
 		this.delegate.setArgumentResolvers(resolvers);
 	}
 
 	/**
-	 * Return the configured argument resolvers.
+	 * 返回已配置的参数解析器。
+	 *
+	 * @return 已配置的参数解析器列表
 	 */
 	public List<SyncHandlerMethodArgumentResolver> getResolvers() {
 		return this.delegate.getResolvers().stream()
@@ -72,16 +74,19 @@ public class SyncInvocableHandlerMethod extends HandlerMethod {
 	}
 
 	/**
-	 * Set the ParameterNameDiscoverer for resolving parameter names when needed
-	 * (e.g. default request attribute name).
-	 * <p>Default is a {@link DefaultParameterNameDiscoverer}.
+	 * 设置ParameterNameDiscoverer，用于在需要时解析参数名称（例如默认请求属性名称）。
+	 * <p>默认为DefaultParameterNameDiscoverer。
+	 *
+	 * @param nameDiscoverer 要设置的ParameterNameDiscoverer
 	 */
 	public void setParameterNameDiscoverer(ParameterNameDiscoverer nameDiscoverer) {
 		this.delegate.setParameterNameDiscoverer(nameDiscoverer);
 	}
 
 	/**
-	 * Return the configured parameter name discoverer.
+	 * 返回配置的参数名称发现器。
+	 *
+	 * @return 参数名称发现器
 	 */
 	public ParameterNameDiscoverer getParameterNameDiscoverer() {
 		return this.delegate.getParameterNameDiscoverer();
@@ -89,20 +94,22 @@ public class SyncInvocableHandlerMethod extends HandlerMethod {
 
 
 	/**
-	 * Invoke the method for the given exchange.
-	 * @param exchange the current exchange
-	 * @param bindingContext the binding context to use
-	 * @param providedArgs optional list of argument values to match by type
-	 * @return a Mono with a {@link HandlerResult}.
-	 * @throws ServerErrorException if method argument resolution or method invocation fails
+	 * 调用给定的交换方法。
+	 *
+	 * @param exchange       当前的交换
+	 * @param bindingContext 要使用的绑定上下文
+	 * @param providedArgs   可选的参数值列表，按类型匹配
+	 * @return 包含{@link HandlerResult}的Mono
+	 * @throws ServerErrorException 如果方法参数解析或方法调用失败
 	 */
 	@Nullable
 	public HandlerResult invokeForHandlerResult(ServerWebExchange exchange,
-			BindingContext bindingContext, Object... providedArgs) {
+												BindingContext bindingContext, Object... providedArgs) {
 
-		CompletableFuture<HandlerResult> future =
-				this.delegate.invoke(exchange, bindingContext, providedArgs).toFuture();
+		// 使用委托的 invoke 方法调用处理器方法并转换为 CompletableFuture
+		CompletableFuture<HandlerResult> future = this.delegate.invoke(exchange, bindingContext, providedArgs).toFuture();
 
+		// 如果 CompletableFuture 没有完成，则抛出异常，因为 SyncInvocableHandlerMethod 应该同步完成
 		if (!future.isDone()) {
 			throw new IllegalStateException(
 					"SyncInvocableHandlerMethod should have completed synchronously.");
@@ -110,14 +117,14 @@ public class SyncInvocableHandlerMethod extends HandlerMethod {
 
 		Throwable failure;
 		try {
+			// 尝试获取 CompletableFuture 的结果，捕获可能的异常
 			return future.get();
-		}
-		catch (ExecutionException ex) {
+		} catch (ExecutionException ex) {
 			failure = ex.getCause();
-		}
-		catch (InterruptedException ex) {
+		} catch (InterruptedException ex) {
 			failure = ex;
 		}
+		// 抛出服务器错误异常，指示调用失败
 		throw (new ServerErrorException(
 				"Failed to invoke: " + getShortLogMessage(), getMethod(), failure));
 	}
