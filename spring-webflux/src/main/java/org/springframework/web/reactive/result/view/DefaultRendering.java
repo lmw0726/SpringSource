@@ -16,32 +16,44 @@
 
 package org.springframework.web.reactive.result.view;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.ui.Model;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
- * Default implementation of {@link Rendering}.
+ * {@link Rendering} 的默认实现。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 class DefaultRendering implements Rendering {
-
+	/**
+	 * 空的 HttpHeaders
+	 */
 	private static final HttpHeaders EMPTY_HEADERS = HttpHeaders.EMPTY;
 
-
+	/**
+	 * 视图对象
+	 */
 	private final Object view;
-
+	/**
+	 * 模型数据
+	 */
 	private final Map<String, Object> model;
 
+	/**
+	 * HTTP 状态码
+	 */
 	@Nullable
 	private final HttpStatus status;
 
+	/**
+	 * HTTP 头部信息
+	 */
 	private final HttpHeaders headers;
 
 
