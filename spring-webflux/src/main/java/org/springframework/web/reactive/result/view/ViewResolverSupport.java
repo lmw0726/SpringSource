@@ -16,17 +16,17 @@
 
 package org.springframework.web.reactive.result.view;
 
+import org.springframework.core.Ordered;
+import org.springframework.http.MediaType;
+import org.springframework.util.Assert;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.core.Ordered;
-import org.springframework.http.MediaType;
-import org.springframework.util.Assert;
-
 /**
- * Base class for {@code ViewResolver} implementations with shared properties.
+ * {@code ViewResolver} 实现的基类，具有共享属性。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -35,26 +35,27 @@ import org.springframework.util.Assert;
 public abstract class ViewResolverSupport implements Ordered {
 
 	/**
-	 * The default {@link MediaType content-type} for views.
+	 * 视图的默认 {@link MediaType content-type}。
 	 */
 	public static final MediaType DEFAULT_CONTENT_TYPE = MediaType.parseMediaType("text/html;charset=UTF-8");
 
-
+	/**
+	 * 媒体类型列表
+	 */
 	private List<MediaType> mediaTypes = new ArrayList<>(4);
-
+	/**
+	 * 默认字符集
+	 */
 	private Charset defaultCharset = StandardCharsets.UTF_8;
-
 	private int order = Ordered.LOWEST_PRECEDENCE;
-
 
 	public ViewResolverSupport() {
 		this.mediaTypes.add(DEFAULT_CONTENT_TYPE);
 	}
 
-
 	/**
-	 * Set the supported media types for this view.
-	 * Default is "text/html;charset=UTF-8".
+	 * 设置此视图支持的媒体类型。
+	 * 默认为 "text/html;charset=UTF-8"。
 	 */
 	public void setSupportedMediaTypes(List<MediaType> supportedMediaTypes) {
 		Assert.notEmpty(supportedMediaTypes, "MediaType List must not be empty");
@@ -63,16 +64,15 @@ public abstract class ViewResolverSupport implements Ordered {
 	}
 
 	/**
-	 * Return the configured media types supported by this view.
+	 * 返回此视图支持的配置媒体类型。
 	 */
 	public List<MediaType> getSupportedMediaTypes() {
 		return this.mediaTypes;
 	}
 
 	/**
-	 * Set the default charset for this view, used when the
-	 * {@linkplain #setSupportedMediaTypes(List) content type} does not contain one.
-	 * Default is {@linkplain StandardCharsets#UTF_8 UTF 8}.
+	 * 设置此视图的默认字符集，在 {@linkplain #setSupportedMediaTypes(List) content type} 不包含字符集时使用。
+	 * 默认为 {@linkplain StandardCharsets#UTF_8 UTF 8}。
 	 */
 	public void setDefaultCharset(Charset defaultCharset) {
 		Assert.notNull(defaultCharset, "Default Charset must not be null");
@@ -80,16 +80,16 @@ public abstract class ViewResolverSupport implements Ordered {
 	}
 
 	/**
-	 * Return the default charset, used when the
-	 * {@linkplain #setSupportedMediaTypes(List) content type} does not contain one.
+	 * 返回默认字符集，在 {@linkplain #setSupportedMediaTypes(List) content type} 不包含字符集时使用。
 	 */
 	public Charset getDefaultCharset() {
 		return this.defaultCharset;
 	}
 
 	/**
-	 * Specify the order value for this ViewResolver bean.
-	 * <p>The default value is {@code Ordered.LOWEST_PRECEDENCE}, meaning non-ordered.
+	 * 为此 ViewResolver bean 指定顺序值。
+	 * <p>默认值为 {@code Ordered.LOWEST_PRECEDENCE}，表示无序。
+	 *
 	 * @see org.springframework.core.Ordered#getOrder()
 	 */
 	public void setOrder(int order) {
