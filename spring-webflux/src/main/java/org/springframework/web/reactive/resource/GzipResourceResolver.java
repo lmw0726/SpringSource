@@ -16,20 +16,19 @@
 
 package org.springframework.web.reactive.resource;
 
+import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.lang.Nullable;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-
-import reactor.core.publisher.Mono;
-
-import org.springframework.core.io.AbstractResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.lang.Nullable;
-import org.springframework.web.server.ServerWebExchange;
 
 /**
  * A {@code ResourceResolver} that delegates to the chain to locate a resource
@@ -81,12 +80,17 @@ public class GzipResourceResolver extends AbstractResourceResolver {
 
 
 	/**
-	 * A gzipped {@link HttpResource}.
+	 * 一种gzip压缩后的 {@link HttpResource}.
 	 */
 	static final class GzippedResource extends AbstractResource implements HttpResource {
-
+		/**
+		 * 原始资源
+		 */
 		private final Resource original;
 
+		/**
+		 * 经过gzip压缩后的资源
+		 */
 		private final Resource gzipped;
 
 		public GzippedResource(Resource original) throws IOException {
@@ -163,7 +167,9 @@ public class GzipResourceResolver extends AbstractResourceResolver {
 		@Override
 		public HttpHeaders getResponseHeaders() {
 			HttpHeaders headers = (this.original instanceof HttpResource ?
+					// 如果原始对象是 HttpResource，则获取响应头，否则创建一个新的 HttpHeaders 对象
 					((HttpResource) this.original).getResponseHeaders() : new HttpHeaders());
+			// 添加内容编码和可变头信息
 			headers.add(HttpHeaders.CONTENT_ENCODING, "gzip");
 			headers.add(HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING);
 			return headers;
