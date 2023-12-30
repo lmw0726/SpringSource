@@ -53,9 +53,10 @@ public class ResponseStatusExceptionHandler implements WebExceptionHandler {
 	 * Set the log category for warn logging.
 	 * <p>Default is no warn logging. Specify this setting to activate warn
 	 * logging into a specific category.
-	 * @since 5.1
+	 *
 	 * @see org.apache.commons.logging.LogFactory#getLog(String)
 	 * @see java.util.logging.Logger#getLogger(String)
+	 * @since 5.1
 	 */
 	public void setWarnLogCategory(String loggerName) {
 		this.warnLogger = LogFactory.getLog(loggerName);
@@ -72,8 +73,7 @@ public class ResponseStatusExceptionHandler implements WebExceptionHandler {
 		String logPrefix = exchange.getLogPrefix();
 		if (this.warnLogger != null && this.warnLogger.isWarnEnabled()) {
 			this.warnLogger.warn(logPrefix + formatError(ex, exchange.getRequest()));
-		}
-		else if (logger.isDebugEnabled()) {
+		} else if (logger.isDebugEnabled()) {
 			logger.debug(logPrefix + formatError(ex, exchange.getRequest()));
 		}
 
@@ -101,8 +101,7 @@ public class ResponseStatusExceptionHandler implements WebExceptionHandler {
 				}
 				result = true;
 			}
-		}
-		else {
+		} else {
 			Throwable cause = ex.getCause();
 			if (cause != null) {
 				result = updateResponse(response, cause);
@@ -115,6 +114,7 @@ public class ResponseStatusExceptionHandler implements WebExceptionHandler {
 	 * Determine the HTTP status for the given exception.
 	 * <p>As of 5.3 this method always returns {@code null} in which case
 	 * {@link #determineRawStatusCode(Throwable)} is used instead.
+	 *
 	 * @param ex the exception to check
 	 * @return the associated HTTP status, if any
 	 * @deprecated as of 5.3 in favor of {@link #determineRawStatusCode(Throwable)}.
@@ -126,16 +126,20 @@ public class ResponseStatusExceptionHandler implements WebExceptionHandler {
 	}
 
 	/**
-	 * Determine the raw status code for the given exception.
-	 * @param ex the exception to check
-	 * @return the associated HTTP status code, or -1 if it can't be derived.
+	 * 这个方法确定给定异常的原始状态码。
+	 *
+	 * @param ex 要检查的异常
+	 * @return 相关联的 HTTP 状态码，如果无法推断则返回 -1。
 	 * @since 5.3
 	 */
 	protected int determineRawStatusCode(Throwable ex) {
 		if (ex instanceof ResponseStatusException) {
+			// 如果是 ResponseStatusException 类型的异常，获取其原始状态码
 			return ((ResponseStatusException) ex).getRawStatusCode();
 		}
+		// 否则返回 -1，表示无法推断状态码
 		return -1;
 	}
+
 
 }

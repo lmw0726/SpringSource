@@ -21,14 +21,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 
 /**
- * Common WebFlux exception handler that detects instances of
- * {@link org.springframework.web.server.ResponseStatusException}
- * (inherited from the base class) as well as exceptions annotated with
- * {@link ResponseStatus @ResponseStatus} by determining the HTTP status
- * for them and updating the status of the response accordingly.
+ * 这是一个常见的 WebFlux 异常处理器，用于检测继承自基类的 {@link org.springframework.web.server.ResponseStatusException}
+ * 实例以及通过确定它们的 HTTP 状态码并相应地更新响应状态来处理带有 {@link ResponseStatus @ResponseStatus} 注解的异常。
  *
- * <p>If the response is already committed, the error remains unresolved
- * and is propagated.
+ * <p>如果响应已经提交，则错误将保持未解决状态并被传播。
  *
  * @author Juergen Hoeller
  * @author Rossen Stoyanchev
@@ -40,12 +36,16 @@ public class WebFluxResponseStatusExceptionHandler extends ResponseStatusExcepti
 	protected int determineRawStatusCode(Throwable ex) {
 		int status = super.determineRawStatusCode(ex);
 		if (status == -1) {
+			// 查找异常类上的合并注解 @ResponseStatus注解
 			ResponseStatus ann = AnnotatedElementUtils.findMergedAnnotation(ex.getClass(), ResponseStatus.class);
 			if (ann != null) {
+				// 如果找到注解，使用注解中的状态码
 				status = ann.code().value();
 			}
 		}
+		// 返回最终确定的状态码
 		return status;
 	}
 
 }
+
