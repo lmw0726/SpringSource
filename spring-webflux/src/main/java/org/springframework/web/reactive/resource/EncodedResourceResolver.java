@@ -33,17 +33,11 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Resolver that delegates to the chain, and if a resource is found, it then
- * attempts to find an encoded (e.g. gzip, brotli) variant that is acceptable
- * based on the "Accept-Encoding" request header.
+ * 该解析器委托给链，在找到资源后，尝试找到一个经过编码（例如gzip、brotli）的变体，根据请求的“Accept-Encoding”头部确定是否接受。
  *
- * <p>The list of supported {@link #setContentCodings(List) contentCodings} can
- * be configured, in order of preference, and each coding must be associated
- * with {@link #setExtensions(Map) extensions}.
+ * <p>可以配置支持的{@link #setContentCodings(List) contentCodings}列表，按优先级排列，并且每种编码必须与{@link #setExtensions(Map) extensions}关联。
  *
- * <p>Note that this resolver must be ordered ahead of a
- * {@link VersionResourceResolver} with a content-based, version strategy to
- * ensure the version calculation is not impacted by the encoding.
+ * <p>请注意，为了确保版本计算不受编码影响，此解析器必须在具有基于内容的版本策略的{@link VersionResourceResolver}之前排序。
  *
  * @author Rossen Stoyanchev
  * @since 5.1
@@ -51,13 +45,18 @@ import java.util.*;
 public class EncodedResourceResolver extends AbstractResourceResolver {
 
 	/**
-	 * The default content codings.
+	 * 默认的内容编码列表。
 	 */
 	public static final List<String> DEFAULT_CODINGS = Arrays.asList("br", "gzip");
 
-
+	/**
+	 * 默认编码列表
+	 */
 	private final List<String> contentCodings = new ArrayList<>(DEFAULT_CODINGS);
 
+	/**
+	 * 扩展名映射
+	 */
 	private final Map<String, String> extensions = new LinkedHashMap<>();
 
 
@@ -68,18 +67,14 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 
 
 	/**
-	 * Configure the supported content codings in order of preference. The first
-	 * coding that is present in the {@literal "Accept-Encoding"} header for a
-	 * given request, and that has a file present with the associated extension,
-	 * is used.
-	 * <p><strong>Note:</strong> Each coding must be associated with a file
-	 * extension via {@link #registerExtension} or {@link #setExtensions}. Also
-	 * customizations to the list of codings here should be matched by
-	 * customizations to the same list in {@link CachingResourceResolver} to
-	 * ensure encoded variants of a resource are cached under separate keys.
-	 * <p>By default this property is set to {@literal ["br", "gzip"]}.
+	 * 配置支持的内容编码列表，按优先级排列。对于给定请求的“Accept-Encoding”头部中存在的第一个编码，且具有与其关联的文件扩展名的情况下，将使用此编码。
 	 *
-	 * @param codings one or more supported content codings
+	 * <p><strong>注意：</strong> 每种编码都必须通过 {@link #registerExtension} 或 {@link #setExtensions} 关联到文件扩展名。
+	 * 此处对编码列表的自定义应与 {@link CachingResourceResolver} 中的相同列表的自定义相匹配，以确保资源的编码变体被缓存在单独的键下。
+	 *
+	 * <p>默认情况下，此属性设置为 {@literal ["br", "gzip"]}。
+	 *
+	 * @param codings 一个或多个支持的内容编码
 	 */
 	public void setContentCodings(List<String> codings) {
 		Assert.notEmpty(codings, "At least one content coding expected");
@@ -88,19 +83,18 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 	}
 
 	/**
-	 * Return a read-only list with the supported content codings.
+	 * 返回只读的支持的内容编码列表。
 	 */
 	public List<String> getContentCodings() {
 		return Collections.unmodifiableList(this.contentCodings);
 	}
 
 	/**
-	 * Configure mappings from content codings to file extensions. A dot "."
-	 * will be prepended in front of the extension value if not present.
-	 * <p>By default this is configured with {@literal ["br" -> ".br"]} and
-	 * {@literal ["gzip" -> ".gz"]}.
+	 * 配置内容编码到文件扩展名的映射。如果未指定扩展名，则点“.”将会在扩展名值之前添加。
 	 *
-	 * @param extensions the extensions to use.
+	 * <p>默认情况下，配置为 {@literal ["br" -> ".br"]} 和 {@literal ["gzip" -> ".gz"]}。
+	 *
+	 * @param extensions 要使用的扩展名
 	 * @see #registerExtension(String, String)
 	 */
 	public void setExtensions(Map<String, String> extensions) {
@@ -108,57 +102,84 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 	}
 
 	/**
-	 * Return a read-only map with coding-to-extension mappings.
+	 * 返回只读的编码到扩展名的映射。
 	 */
 	public Map<String, String> getExtensions() {
 		return Collections.unmodifiableMap(this.extensions);
 	}
 
 	/**
-	 * Java config friendly alternative to {@link #setExtensions(Map)}.
+	 * 与 {@link #setExtensions(Map)} 相似，适用于 Java 配置。
 	 *
-	 * @param coding    the content coding
-	 * @param extension the associated file extension
+	 * @param coding    内容编码
+	 * @param extension 关联的文件扩展名
 	 */
 	public void registerExtension(String coding, String extension) {
 		this.extensions.put(coding, (extension.startsWith(".") ? extension : "." + extension));
 	}
 
-
+	/**
+	 * 解析资源路径。
+	 *
+	 * @param exchange    可能的服务器网络交换
+	 * @param requestPath 请求的路径
+	 * @param locations   资源的位置列表
+	 * @param chain       资源解析链
+	 * @return 包含解析的资源的{@link Mono}
+	 */
 	@Override
 	protected Mono<Resource> resolveResourceInternal(@Nullable ServerWebExchange exchange,
 													 String requestPath, List<? extends Resource> locations, ResourceResolverChain chain) {
 
 		return chain.resolveResource(exchange, requestPath, locations).map(resource -> {
 
+			// 如果exchange为null，则直接返回原始资源
 			if (exchange == null) {
 				return resource;
 			}
 
+			// 获取Accept-Encoding头信息
 			String acceptEncoding = getAcceptEncoding(exchange);
+
+			// 如果Accept-Encoding为null，则直接返回原始资源
 			if (acceptEncoding == null) {
 				return resource;
 			}
 
+			// 遍历支持的编码类型
 			for (String coding : this.contentCodings) {
+				// 如果Accept-Encoding包含当前编码类型
 				if (acceptEncoding.contains(coding)) {
 					try {
+						// 获取编码类型对应的文件扩展名
 						String extension = getExtension(coding);
+
+						// 将资源编码为指定的编码类型
 						Resource encoded = new EncodedResource(resource, coding, extension);
+
+						// 如果编码后的资源存在，则返回编码后的资源
 						if (encoded.exists()) {
 							return encoded;
 						}
 					} catch (IOException ex) {
+						// 记录异常信息，但不影响程序继续执行
 						logger.trace(exchange.getLogPrefix() +
 								"No " + coding + " resource for [" + resource.getFilename() + "]", ex);
 					}
 				}
 			}
 
+			// 如果没有找到合适的编码资源，则返回原始资源
 			return resource;
 		});
 	}
 
+	/**
+	 * 获取“Accept-Encoding”头部的编码。
+	 *
+	 * @param exchange 服务器网络交换
+	 * @return 编码字符串或 null
+	 */
 	@Nullable
 	private String getAcceptEncoding(ServerWebExchange exchange) {
 		ServerHttpRequest request = exchange.getRequest();
@@ -166,6 +187,12 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 		return (header != null ? header.toLowerCase() : null);
 	}
 
+	/**
+	 * 获取编码对应的文件扩展名。
+	 *
+	 * @param coding 编码名称
+	 * @return 对应的文件扩展名
+	 */
 	private String getExtension(String coding) {
 		String extension = this.extensions.get(coding);
 		if (extension == null) {
@@ -174,6 +201,14 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 		return extension;
 	}
 
+	/**
+	 * 解析URL路径。
+	 *
+	 * @param resourceUrlPath 资源URL路径
+	 * @param locations       资源位置列表
+	 * @param chain           资源解析链
+	 * @return 解析的URL路径
+	 */
 	@Override
 	protected Mono<String> resolveUrlPathInternal(String resourceUrlPath,
 												  List<? extends Resource> locations, ResourceResolverChain chain) {

@@ -22,8 +22,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * A contract for invoking a chain of {@link ResourceTransformer ResourceTransformers} where each resolver
- * is given a reference to the chain allowing it to delegate when necessary.
+ * 一个用于调用一系列 {@link ResourceTransformer 资源转换器} 的契约，其中每个转换器都可以访问到链中的下一个转换器，
+ * 从而在必要时进行委托处理。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -31,17 +31,19 @@ import org.springframework.web.server.ServerWebExchange;
 public interface ResourceTransformerChain {
 
 	/**
-	 * Return the {@code ResourceResolverChain} that was used to resolve the
-	 * {@code Resource} being transformed. This may be needed for resolving
-	 * related resources, e.g. links to other resources.
+	 * 返回用于解析正在被转换的 {@code Resource} 的 {@code ResourceResolverChain}。
+	 * 这可能在解析相关资源（例如链接到其他资源）时需要使用。
+	 *
+	 * @return 使用过的 {@code ResourceResolverChain}
 	 */
 	ResourceResolverChain getResolverChain();
 
 	/**
-	 * Transform the given resource.
-	 * @param exchange the current exchange
-	 * @param resource the candidate resource to transform
-	 * @return the transformed or the same resource, never empty
+	 * 对给定的资源进行转换。
+	 *
+	 * @param exchange 当前的交换对象
+	 * @param resource 待转换的资源
+	 * @return 转换后的资源，不会为空
 	 */
 	Mono<Resource> transform(ServerWebExchange exchange, Resource resource);
 

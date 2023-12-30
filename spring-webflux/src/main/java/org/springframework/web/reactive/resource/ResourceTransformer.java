@@ -22,7 +22,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * An abstraction for transforming the content of a resource.
+ * {@code ResourceTransformer} 是用于转换资源内容的抽象。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -31,13 +31,14 @@ import org.springframework.web.server.ServerWebExchange;
 public interface ResourceTransformer {
 
 	/**
-	 * Transform the given resource.
-	 * @param exchange the current exchange
-	 * @param resource the resource to transform
-	 * @param transformerChain the chain of remaining transformers to delegate to
-	 * @return the transformed resource (never empty)
+	 * 转换给定的资源。
+	 *
+	 * @param exchange         当前的交换对象
+	 * @param resource         要转换的资源
+	 * @param transformerChain 剩余转换器链，用于委托转换
+	 * @return 转换后的资源（不会为空）
 	 */
 	Mono<Resource> transform(ServerWebExchange exchange, Resource resource,
-			ResourceTransformerChain transformerChain);
+							 ResourceTransformerChain transformerChain);
 
 }

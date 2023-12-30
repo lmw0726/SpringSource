@@ -22,8 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
 /**
- * Abstract base class for {@link VersionStrategy} implementations that insert
- * a prefix into the URL path, e.g. "version/static/myresource.js".
+ * {@code AbstractPrefixVersionStrategy} 是一个抽象基类，用于插入前缀到 URL 路径中的 {@link VersionStrategy} 实现，
+ * 例如 "version/static/myresource.js"。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
@@ -33,35 +33,58 @@ public abstract class AbstractPrefixVersionStrategy implements VersionStrategy {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-
+	/**
+	 * 版本前缀
+	 */
 	private final String prefix;
 
-
+	/**
+	 * 构造一个 AbstractPrefixVersionStrategy 实例。
+	 *
+	 * @param version 版本信息，不能为空
+	 */
 	protected AbstractPrefixVersionStrategy(String version) {
 		Assert.hasText(version, "Version must not be empty");
 		this.prefix = version;
 	}
 
-
+	/**
+	 * 从请求路径中提取版本信息。
+	 *
+	 * @param requestPath 请求路径
+	 * @return 如果请求路径以此前缀开头，则返回前缀；否则返回 null
+	 */
 	@Override
 	public String extractVersion(String requestPath) {
 		return (requestPath.startsWith(this.prefix) ? this.prefix : null);
 	}
 
+	/**
+	 * 移除路径中的版本信息。
+	 *
+	 * @param requestPath 请求路径
+	 * @param version     要移除的版本信息
+	 * @return 移除版本信息后的路径
+	 */
 	@Override
 	public String removeVersion(String requestPath, String version) {
 		return requestPath.substring(this.prefix.length());
 	}
 
+	/**
+	 * 向路径中添加版本信息。
+	 *
+	 * @param path    要添加版本信息的路径
+	 * @param version 要添加的版本信息
+	 * @return 添加了版本信息后的路径
+	 */
 	@Override
 	public String addVersion(String path, String version) {
 		if (path.startsWith(".")) {
 			return path;
-		}
-		else if (this.prefix.endsWith("/") || path.startsWith("/")) {
+		} else if (this.prefix.endsWith("/") || path.startsWith("/")) {
 			return this.prefix + path;
-		}
-		else {
+		} else {
 			return this.prefix + '/' + path;
 		}
 	}

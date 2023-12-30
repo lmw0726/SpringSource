@@ -22,45 +22,47 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
- * A strategy to determine the version of a static resource and to apply and/or
- * extract it from the URL path.
+ * 用于确定静态资源版本并在 URL 路径中应用和/或提取版本的策略。
  *
- * @author Rossen Stoyanchev
- * @author Brian Clozel
  * @since 5.0
  * @see VersionResourceResolver
-*/
+ * @author Rossen Stoyanchev
+ * @author Brian Clozel
+ */
 public interface VersionStrategy {
 
 	/**
-	 * Extract the resource version from the request path.
-	 * @param requestPath the request path to check
-	 * @return the version string or {@code null} if none was found
+	 * 从请求路径中提取资源版本。
+	 *
+	 * @param requestPath 要检查的请求路径
+	 * @return 版本字符串，如果未找到则为 {@code null}
 	 */
 	@Nullable
 	String extractVersion(String requestPath);
 
 	/**
-	 * Remove the version from the request path. It is assumed that the given
-	 * version was extracted via {@link #extractVersion(String)}.
-	 * @param requestPath the request path of the resource being resolved
-	 * @param version the version obtained from {@link #extractVersion(String)}
-	 * @return the request path with the version removed
+	 * 从请求路径中删除版本。假设给定的版本是通过 {@link #extractVersion(String)} 提取的。
+	 *
+	 * @param requestPath 要解析的资源的请求路径
+	 * @param version     {@link #extractVersion(String)} 获取的版本
+	 * @return 删除版本后的请求路径
 	 */
 	String removeVersion(String requestPath, String version);
 
 	/**
-	 * Add a version to the given request path.
-	 * @param requestPath the requestPath
-	 * @param version the version
-	 * @return the requestPath updated with a version string
+	 * 为给定的请求路径添加版本。
+	 *
+	 * @param requestPath 请求路径
+	 * @param version     版本
+	 * @return 带有版本字符串更新的请求路径
 	 */
 	String addVersion(String requestPath, String version);
 
 	/**
-	 * Determine the version for the given resource.
-	 * @param resource the resource to check
-	 * @return the resource version
+	 * 确定给定资源的版本。
+	 *
+	 * @param resource 要检查的资源
+	 * @return 资源版本
 	 */
 	Mono<String> getResourceVersion(Resource resource);
 

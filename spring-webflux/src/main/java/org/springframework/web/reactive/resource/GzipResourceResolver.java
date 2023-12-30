@@ -31,49 +31,75 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * A {@code ResourceResolver} that delegates to the chain to locate a resource
- * and then attempts to find a variation with the ".gz" extension.
+ * 一个 {@code ResourceResolver}，它委托给链路定位资源，然后尝试查找带有“.gz”扩展名的变体。
  *
- * <p>The resolver gets involved only if the "Accept-Encoding" request header
- * contains the value "gzip" indicating the client accepts gzipped responses.
+ * <p>仅当“Accept-Encoding”请求头包含值“gzip”时，客户端接受gzip响应时，解析器才会介入。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
- * @deprecated as of 5.1, in favor of using {@link EncodedResourceResolver}
+ * @deprecated 自 5.1 起，建议使用 {@link EncodedResourceResolver}
  */
 @Deprecated
 public class GzipResourceResolver extends AbstractResourceResolver {
 
+	/**
+	 * 解析资源内部方法。
+	 *
+	 * @param exchange     服务器网络交换，可以为 null
+	 * @param requestPath  请求路径
+	 * @param locations    资源位置列表
+	 * @param chain        资源解析链
+	 * @return 解析的资源
+	 */
 	@Override
 	protected Mono<Resource> resolveResourceInternal(@Nullable ServerWebExchange exchange,
-			String requestPath, List<? extends Resource> locations, ResourceResolverChain chain) {
+													 String requestPath, List<? extends Resource> locations, ResourceResolverChain chain) {
 
+		// 返回解析后的资源（可能是链式解析的结果）
 		return chain.resolveResource(exchange, requestPath, locations)
 				.map(resource -> {
+					// 如果 exchange 为空或者接受 Gzip 压缩
 					if (exchange == null || isGzipAccepted(exchange)) {
 						try {
+							// 尝试使用 GzippedResource 对象包装资源
 							Resource gzipped = new GzippedResource(resource);
+							// 如果存在 Gzip 版本的资源，则使用它替换原始资源
 							if (gzipped.exists()) {
 								resource = gzipped;
 							}
-						}
-						catch (IOException ex) {
+						} catch (IOException ex) {
+							// 捕获可能的 IOException，并记录日志
 							String logPrefix = exchange != null ? exchange.getLogPrefix() : "";
 							logger.trace(logPrefix + "No gzip resource for [" + resource.getFilename() + "]", ex);
 						}
 					}
+					// 返回经过处理的资源（可能是原始资源或者 Gzip 资源）
 					return resource;
 				});
 	}
 
+	/**
+	 * 检查是否接受Gzip编码。
+	 *
+	 * @param exchange 服务器网络交换
+	 * @return 是否接受Gzip编码
+	 */
 	private boolean isGzipAccepted(ServerWebExchange exchange) {
 		String value = exchange.getRequest().getHeaders().getFirst("Accept-Encoding");
 		return (value != null && value.toLowerCase().contains("gzip"));
 	}
 
+	/**
+	 * 解析URL路径。
+	 *
+	 * @param resourceUrlPath 资源URL路径
+	 * @param locations       资源位置列表
+	 * @param chain           资源解析链
+	 * @return 解析的URL路径
+	 */
 	@Override
 	protected Mono<String> resolveUrlPathInternal(String resourceUrlPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+												  List<? extends Resource> locations, ResourceResolverChain chain) {
 
 		return chain.resolveUrlPath(resourceUrlPath, locations);
 	}

@@ -16,21 +16,19 @@
 
 package org.springframework.web.reactive.resource;
 
-import java.util.List;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.Resource;
 import org.springframework.http.server.RequestPath;
 import org.springframework.lang.Nullable;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
- * A strategy for resolving a request to a server-side resource.
+ * 用于解析服务器端资源请求的策略。
  *
- * <p>Provides mechanisms for resolving an incoming request to an actual
- * {@link Resource} and for obtaining the
- * public URL path that clients should use when requesting the resource.
+ * <p>提供了解析传入请求到实际 {@link Resource} 的机制，
+ * 以及获取客户端在请求资源时应使用的公共 URL 路径。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -38,30 +36,26 @@ import org.springframework.web.server.ServerWebExchange;
 public interface ResourceResolver {
 
 	/**
-	 * Resolve the supplied request and request path to a {@link Resource} that
-	 * exists under one of the given resource locations.
-	 * @param exchange the current exchange
-	 * @param requestPath the portion of the request path to use. This is
-	 * expected to be the encoded path, i.e. {@link RequestPath#value()}.
-	 * @param locations the locations to search in when looking up resources
-	 * @param chain the chain of remaining resolvers to delegate to
-	 * @return the resolved resource or an empty {@code Mono} if unresolved
+	 * 将提供的请求和请求路径解析为位于给定资源位置下存在的 {@link Resource}。
+	 *
+	 * @param exchange    当前的 exchange
+	 * @param requestPath 要使用的请求路径部分。预计这是编码后的路径，即 {@link RequestPath#value()}。
+	 * @param locations   查找资源时要搜索的位置
+	 * @param chain       剩余解析器的链，用于委托
+	 * @return 已解析的资源，如果未解析则为空的 {@code Mono}
 	 */
 	Mono<Resource> resolveResource(@Nullable ServerWebExchange exchange, String requestPath,
-			List<? extends Resource> locations, ResourceResolverChain chain);
+								   List<? extends Resource> locations, ResourceResolverChain chain);
 
 	/**
-	 * Resolve the externally facing <em>public</em> URL path for clients to use
-	 * to access the resource that is located at the given <em>internal</em>
-	 * resource path.
-	 * <p>This is useful when rendering URL links to clients.
-	 * @param resourcePath the "internal" resource path to resolve a path for
-	 * public use. This is expected to be the encoded path.
-	 * @param locations the locations to search in when looking up resources
-	 * @param chain the chain of resolvers to delegate to
-	 * @return the resolved public URL path or an empty {@code Mono} if unresolved
+	 * 解析外部面向客户端的 <em>公共</em> URL 路径，以便访问位于给定 <em>内部</em> 资源路径的资源。
+	 * <p>在为客户端渲染 URL 链接时非常有用。
+	 *
+	 * @param resourcePath 要解析用于公共使用的 "内部" 资源路径。预计这是编码后的路径。
+	 * @param locations    查找资源时要搜索的位置
+	 * @param chain        要委托给的解析器链
+	 * @return 已解析的公共 URL 路径，如果未解析则为空的 {@code Mono}
 	 */
 	Mono<String> resolveUrlPath(String resourcePath, List<? extends Resource> locations,
-			ResourceResolverChain chain);
-
+								ResourceResolverChain chain);
 }

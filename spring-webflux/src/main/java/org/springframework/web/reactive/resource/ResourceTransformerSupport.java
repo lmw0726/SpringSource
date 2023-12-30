@@ -16,86 +16,88 @@
 
 package org.springframework.web.reactive.resource;
 
-import java.util.Collections;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.util.Collections;
 
 /**
- * A base class for a {@code ResourceTransformer} with an optional helper method
- * for resolving public links within a transformed resource.
+ * {@code ResourceTransformerSupport} 是一个 {@code ResourceTransformer} 的基类，包含一个可选的辅助方法，
+ * 用于在转换的资源中解析公共链接。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
  * @since 5.0
  */
 public abstract class ResourceTransformerSupport implements ResourceTransformer {
-
+	/**
+	 * 资源 URL 提供者
+	 */
 	@Nullable
 	private ResourceUrlProvider resourceUrlProvider;
 
 
 	/**
-	 * Configure a {@link ResourceUrlProvider} to use when resolving the public
-	 * URL of links in a transformed resource (e.g. import links in a CSS file).
-	 * This is required only for links expressed as full paths and not for
-	 * relative links.
-	 * @param resourceUrlProvider the URL provider to use
+	 * 配置一个 {@link ResourceUrlProvider}，用于解析转换后资源中公共链接的公共 URL（例如 CSS 文件中的导入链接）。
+	 * 仅当链接以完整路径表示时需要配置此项，而对于相对链接则不需要。
+	 *
+	 * @param resourceUrlProvider 要使用的 URL 提供者
 	 */
 	public void setResourceUrlProvider(@Nullable ResourceUrlProvider resourceUrlProvider) {
 		this.resourceUrlProvider = resourceUrlProvider;
 	}
 
 	/**
-	 * Return the configured {@code ResourceUrlProvider}.
+	 * 返回配置的 {@code ResourceUrlProvider}。
 	 */
 	@Nullable
 	public ResourceUrlProvider getResourceUrlProvider() {
 		return this.resourceUrlProvider;
 	}
 
-
 	/**
-	 * A transformer can use this method when a resource being transformed
-	 * contains links to other resources. Such links need to be replaced with the
-	 * public facing link as determined by the resource resolver chain (e.g. the
-	 * public URL may have a version inserted).
-	 * @param resourcePath the path to a resource that needs to be re-written
-	 * @param exchange the current exchange
-	 * @param resource the resource being transformed
-	 * @param transformerChain the transformer chain
-	 * @return the resolved URL or an empty {@link Mono}
+	 * 当转换的资源包含指向其他资源的链接时，转换器可以使用此方法。
+	 * 此类链接需要根据资源解析器链（例如公共 URL 可能包含版本信息）替换为公共面向的链接。
+	 *
+	 * @param resourcePath     需要重写的资源路径
+	 * @param exchange         当前的交换对象
+	 * @param resource         正在转换的资源
+	 * @param transformerChain 转换器链
+	 * @return 解析后的 URL 或空的 {@link Mono}
 	 */
 	protected Mono<String> resolveUrlPath(String resourcePath, ServerWebExchange exchange,
-			Resource resource, ResourceTransformerChain transformerChain) {
+										  Resource resource, ResourceTransformerChain transformerChain) {
 
 		if (resourcePath.startsWith("/")) {
-			// full resource path
+			// 完整资源路径
 			ResourceUrlProvider urlProvider = getResourceUrlProvider();
 			return (urlProvider != null ? urlProvider.getForUriString(resourcePath, exchange) : Mono.empty());
-		}
-		else {
-			// try resolving as relative path
+		} else {
+			// 尝试解析为相对路径
 			return transformerChain.getResolverChain()
 					.resolveUrlPath(resourcePath, Collections.singletonList(resource));
 		}
 	}
 
 	/**
-	 * Transform the given relative request path to an absolute path,
-	 * taking the path of the given request as a point of reference.
-	 * The resulting path is also cleaned from sequences like "path/..".
-	 * @param path the relative path to transform
-	 * @param exchange the current exchange
-	 * @return the absolute request path for the given resource path
+	 * 将给定的相对请求路径转换为绝对路径，以给定请求路径为参考点。
+	 * 结果路径也会清理类似于 "path/.." 的序列。
+	 *
+	 * @param path     要转换的相对路径
+	 * @param exchange 当前的交换对象
+	 * @return 给定资源路径的绝对请求路径
 	 */
 	protected String toAbsolutePath(String path, ServerWebExchange exchange) {
+		// 获取请求的路径
 		String requestPath = exchange.getRequest().getURI().getPath();
+
+		// 如果给定的路径以斜杠开头，则使用该路径；否则将相对路径应用于请求路径，得到绝对路径
 		String absolutePath = (path.startsWith("/") ? path : StringUtils.applyRelativePath(requestPath, path));
+
+		// 对绝对路径进行清理，返回规范化后的路径
 		return StringUtils.cleanPath(absolutePath);
 	}
 

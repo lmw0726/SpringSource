@@ -27,28 +27,38 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.StreamUtils;
 
 /**
- * A {@code VersionStrategy} that calculates an Hex MD5 hashes from the content
- * of the resource and appends it to the file name, e.g.
- * {@code "styles/main-e36d2e05253c6c7085a91522ce43a0b4.css"}.
+ * {@code ContentVersionStrategy} 是一个版本策略，它从资源内容计算出 Hex MD5 哈希，并将其附加到文件名中，例如
+ * {@code "styles/main-e36d2e05253c6c7085a91522ce43a0b4.css"}。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
- * @since 5.0
  * @see VersionResourceResolver
+ * @since 5.0
  */
 public class ContentVersionStrategy extends AbstractFileNameVersionStrategy {
 
-
+	/**
+	 * 从给定资源获取版本信息。
+	 *
+	 * @param resource 要获取版本信息的资源
+	 * @return 代表资源版本的 Mono（异步结果）
+	 */
 	@Override
 	public Mono<String> getResourceVersion(Resource resource) {
+		// 从资源中读取数据并创建一个数据流 Flux
 		Flux<DataBuffer> flux = DataBufferUtils.read(
 				resource, DefaultDataBufferFactory.sharedInstance, StreamUtils.BUFFER_SIZE);
 
+		// 将数据流中的数据缓冲区合并为一个单独的 DataBuffer
 		return DataBufferUtils.join(flux)
 				.map(buffer -> {
+					// 创建一个字节数组，大小为可读字节数
 					byte[] result = new byte[buffer.readableByteCount()];
+					// 将数据从缓冲区读取到结果字节数组中
 					buffer.read(result);
+					// 释放当前缓冲区资源
 					DataBufferUtils.release(buffer);
+					// 返回结果字节数组的 MD5 散列值作为字符串
 					return DigestUtils.md5DigestAsHex(result);
 				});
 	}
