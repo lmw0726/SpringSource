@@ -16,17 +16,15 @@
 
 package org.springframework.web.reactive.accept;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Resolver that always resolves to a fixed list of media types. This can be
- * used as the "last in line" strategy providing a fallback for when the client
- * has not requested any media types.
+ * 始终解析为固定媒体类型列表的解析器。可以作为“最后一个”策略使用，为当客户端未请求任何媒体类型时提供后备方案。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -35,19 +33,16 @@ public class FixedContentTypeResolver implements RequestedContentTypeResolver {
 
 	private final List<MediaType> contentTypes;
 
-
 	/**
-	 * Constructor with a single default {@code MediaType}.
+	 * 使用单个默认的 {@code MediaType} 构造函数。
 	 */
 	public FixedContentTypeResolver(MediaType mediaType) {
 		this(Collections.singletonList(mediaType));
 	}
 
 	/**
-	 * Constructor with an ordered List of default {@code MediaType}'s to return
-	 * for use in applications that support a variety of content types.
-	 * <p>Consider appending {@link MediaType#ALL} at the end if destinations
-	 * are present which do not support any of the other default media types.
+	 * 使用有序的默认 {@code MediaType} 列表的构造函数，用于返回在支持各种内容类型的应用程序中使用的默认 {@code MediaType}。
+	 * <p>如果存在不支持其他默认媒体类型的目标，请考虑在最后追加 {@link MediaType#ALL}。
 	 */
 	public FixedContentTypeResolver(List<MediaType> contentTypes) {
 		Assert.notNull(contentTypes, "'contentTypes' must not be null");
@@ -56,7 +51,7 @@ public class FixedContentTypeResolver implements RequestedContentTypeResolver {
 
 
 	/**
-	 * Return the configured list of media types.
+	 * 返回配置的媒体类型列表。
 	 */
 	public List<MediaType> getContentTypes() {
 		return this.contentTypes;

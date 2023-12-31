@@ -16,18 +16,17 @@
 
 package org.springframework.web.reactive.accept;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.server.NotAcceptableStatusException;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Strategy to resolve the requested media types for a {@code ServerWebExchange}.
+ * 解析 {@code ServerWebExchange} 请求的媒体类型的策略。
  *
- * <p>See {@link RequestedContentTypeResolverBuilder} to create a sequence of
- * strategies.
+ * <p>参见 {@link RequestedContentTypeResolverBuilder} 创建一系列策略。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -35,20 +34,18 @@ import org.springframework.web.server.ServerWebExchange;
 public interface RequestedContentTypeResolver {
 
 	/**
-	 * A singleton list with {@link MediaType#ALL} that is returned from
-	 * {@link #resolveMediaTypes} when no specific media types are requested.
+	 * 当没有请求特定媒体类型时，从 {@link #resolveMediaTypes} 返回的单例列表，包含 {@link MediaType#ALL}。
+	 *
 	 * @since 5.0.5
 	 */
 	List<MediaType> MEDIA_TYPE_ALL_LIST = Collections.singletonList(MediaType.ALL);
 
-
 	/**
-	 * Resolve the given request to a list of requested media types. The returned
-	 * list is ordered by specificity first and by quality parameter second.
-	 * @param exchange the current exchange
-	 * @return the requested media types, or {@link #MEDIA_TYPE_ALL_LIST} if none
-	 * were requested.
-	 * @throws NotAcceptableStatusException if the requested media type is invalid
+	 * 解析给定请求的媒体类型列表。返回的列表首先按特定性排序，然后按质量参数排序。
+	 *
+	 * @param exchange 当前的交换对象
+	 * @return 请求的媒体类型列表；如果没有请求，则返回 {@link #MEDIA_TYPE_ALL_LIST}。
+	 * @throws NotAcceptableStatusException 如果请求的媒体类型无效
 	 */
 	List<MediaType> resolveMediaTypes(ServerWebExchange exchange);
 
