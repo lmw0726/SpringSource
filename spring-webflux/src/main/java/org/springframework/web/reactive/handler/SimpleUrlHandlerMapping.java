@@ -16,36 +16,32 @@
 
 package org.springframework.web.reactive.handler;
 
+import org.springframework.beans.BeansException;
+import org.springframework.util.CollectionUtils;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.beans.BeansException;
-import org.springframework.util.CollectionUtils;
-
 /**
- * Implementation of the {@link org.springframework.web.reactive.HandlerMapping}
- * interface to map from URLs to request handler beans. Supports both mapping
- * to bean instances and mapping to bean names; the latter is required for
- * non-singleton handlers.
+ * 实现了 {@link org.springframework.web.reactive.HandlerMapping} 接口，
+ * 用于将 URL 映射到请求处理程序 bean。支持映射到 bean 实例和映射到 bean 名称；
+ * 对于非单例处理程序，后者是必需的。
  *
- * <p>The "urlMap" property is suitable for populating the handler map with
- * bean instances. Mappings to bean names can be set via the "mappings"
- * property, in a form accepted by the {@code java.util.Properties} class,
- * as follows:
+ * <p>"urlMap" 属性适用于使用 bean 实例填充处理程序映射。
+ * 可以通过 "mappings" 属性设置到 bean 名称的映射，形式可以是 {@code java.util.Properties} 类接受的形式，
+ * 如下所示：
  *
  * <pre class="code">
  * /welcome.html=ticketController
  * /show.html=ticketController</pre>
  *
- * <p>The syntax is {@code PATH=HANDLER_BEAN_NAME}. If the path doesn't begin
- * with a slash, one is prepended.
+ * <p>语法是 {@code PATH=HANDLER_BEAN_NAME}。如果路径不以斜杠开头，则会添加斜杠。
  *
- * <p>Supports direct matches, e.g. a registered "/test" matches "/test", and
- * various Ant-style pattern matches, e.g. a registered "/t*" pattern matches
- * both "/test" and "/team", "/test/*" matches all paths under "/test",
- * "/test/**" matches all paths below "/test". For details, see the
- * {@link org.springframework.web.util.pattern.PathPattern} javadoc.
+ * <p>支持直接匹配，例如注册的 "/test" 匹配 "/test"，
+ * 以及各种 Ant 风格的模式匹配，例如注册的 "/t*" 模式匹配 "/test" 和 "/team"，
+ * "/test/*" 匹配 "/test" 下的所有路径，"/test/**" 匹配 "/test" 下的所有路径及其子路径。
+ * 有关详细信息，请参阅 {@link org.springframework.web.util.pattern.PathPattern} javadoc。
  *
  * @author Rossen Stoyanchev
  * @author Sam Brannen
@@ -53,34 +49,37 @@ import org.springframework.util.CollectionUtils;
  */
 public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 
+	/**
+	 * URL-处理程序映射
+	 */
 	private final Map<String, Object> urlMap = new LinkedHashMap<>();
 
 
 	/**
-	 * Create a {@code SimpleUrlHandlerMapping} with default settings.
+	 * 使用默认设置创建 {@code SimpleUrlHandlerMapping}。
 	 */
 	public SimpleUrlHandlerMapping() {
 	}
 
 	/**
-	 * Create a {@code SimpleUrlHandlerMapping} using the supplied URL map.
-	 * @param urlMap map with URL paths as keys and handler beans (or handler
-	 * bean names) as values
-	 * @since 5.2
+	 * 使用提供的 URL 映射创建 {@code SimpleUrlHandlerMapping}。
+	 *
+	 * @param urlMap URL路径作为键，处理程序bean（或处理程序bean名称）作为值的映射
 	 * @see #setUrlMap(Map)
+	 * @since 5.2
 	 */
 	public SimpleUrlHandlerMapping(Map<String, ?> urlMap) {
 		setUrlMap(urlMap);
 	}
 
 	/**
-	 * Create a {@code SimpleUrlHandlerMapping} using the supplied URL map and order.
-	 * @param urlMap map with URL paths as keys and handler beans (or handler
-	 * bean names) as values
-	 * @param order the order value for this {@code SimpleUrlHandlerMapping}
-	 * @since 5.2
+	 * 使用提供的 URL 映射和顺序创建 {@code SimpleUrlHandlerMapping}。
+	 *
+	 * @param urlMap URL路径作为键，处理程序bean（或处理程序bean名称）作为值的映射
+	 * @param order  {@code SimpleUrlHandlerMapping} 的顺序值
 	 * @see #setUrlMap(Map)
 	 * @see #setOrder(int)
+	 * @since 5.2
 	 */
 	public SimpleUrlHandlerMapping(Map<String, ?> urlMap, int order) {
 		setUrlMap(urlMap);
@@ -89,11 +88,13 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 
 
 	/**
-	 * Map URL paths to handler bean names.
-	 * This is the typical way of configuring this HandlerMapping.
-	 * <p>Supports direct URL matches and Ant-style pattern matches. For syntax details,
-	 * see the {@link org.springframework.web.util.pattern.PathPattern} javadoc.
-	 * @param mappings properties with URLs as keys and bean names as values
+	 * 将 URL 路径映射到处理程序 bean 名称。
+	 * 这是配置此 HandlerMapping 的典型方式。
+	 *
+	 * <p>支持直接 URL 匹配和 Ant 风格的模式匹配。有关语法详细信息，
+	 * 请参阅 {@link org.springframework.web.util.pattern.PathPattern} javadoc。
+	 *
+	 * @param mappings URL作为键，bean名称作为值的属性
 	 * @see #setUrlMap
 	 */
 	public void setMappings(Properties mappings) {
@@ -101,11 +102,13 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 	}
 
 	/**
-	 * Set a Map with URL paths as keys and handler beans (or handler bean names)
-	 * as values. Convenient for population with bean references.
-	 * <p>Supports direct URL matches and Ant-style pattern matches. For syntax details,
-	 * see the {@link org.springframework.web.util.pattern.PathPattern} javadoc.
-	 * @param urlMap map with URLs as keys and beans as values
+	 * 设置 URL 路径作为键，处理程序 bean（或处理程序 bean 名称）作为值的映射。
+	 * 便于使用 bean 引用进行填充。
+	 *
+	 * <p>支持直接 URL 匹配和 Ant 风格的模式匹配。有关语法详细信息，
+	 * 请参阅 {@link org.springframework.web.util.pattern.PathPattern} javadoc。
+	 *
+	 * @param urlMap URL作为键，bean作为值的映射
 	 * @see #setMappings
 	 */
 	public void setUrlMap(Map<String, ?> urlMap) {
@@ -113,11 +116,10 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 	}
 
 	/**
-	 * Allow Map access to the URL path mappings, with the option to add or
-	 * override specific entries.
-	 * <p>Useful for specifying entries directly, for example via "urlMap[myKey]".
-	 * This is particularly useful for adding or overriding entries in child
-	 * bean definitions.
+	 * 允许使用 URL 路径映射的 Map 访问，可以添加或覆盖特定条目。
+	 *
+	 * <p>对于直接指定条目特别有用，例如通过 "urlMap[myKey]" 进行指定。
+	 * 这对于添加或覆盖子 bean 定义中的条目特别有用。
 	 */
 	public Map<String, ?> getUrlMap() {
 		return this.urlMap;
@@ -125,8 +127,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 
 
 	/**
-	 * Calls the {@link #registerHandlers} method in addition to the
-	 * superclass's initialization.
+	 * 调用 {@link #registerHandlers} 方法以及父类的初始化。
 	 */
 	@Override
 	public void initApplicationContext() throws BeansException {
@@ -135,24 +136,24 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 	}
 
 	/**
-	 * Register all handlers specified in the URL map for the corresponding paths.
-	 * @param urlMap a Map with URL paths as keys and handler beans or bean names as values
-	 * @throws BeansException if a handler couldn't be registered
-	 * @throws IllegalStateException if there is a conflicting handler registered
+	 * 注册 URL 映射中指定的所有处理程序。
+	 *
+	 * @param urlMap URL路径作为键，处理程序 bean 或 bean 名称作为值的映射
+	 * @throws BeansException        如果无法注册处理程序
+	 * @throws IllegalStateException 如果已注册冲突的处理程序
 	 */
 	protected void registerHandlers(Map<String, Object> urlMap) throws BeansException {
 		if (urlMap.isEmpty()) {
 			logger.trace("No patterns in " + formatMappingName());
-		}
-		else {
+		} else {
 			for (Map.Entry<String, Object> entry : urlMap.entrySet()) {
 				String url = entry.getKey();
 				Object handler = entry.getValue();
-				// Prepend with slash if not already present.
+				// 如果路径不以斜杠开头，则添加斜杠。
 				if (!url.startsWith("/")) {
 					url = "/" + url;
 				}
-				// Remove whitespace from handler bean name.
+				// 从处理程序 bean 名称中删除空格。
 				if (handler instanceof String) {
 					handler = ((String) handler).trim();
 				}
@@ -165,8 +166,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 	private void logMappings() {
 		if (mappingsLogger.isDebugEnabled()) {
 			mappingsLogger.debug(formatMappingName() + " " + getHandlerMap());
-		}
-		else if (logger.isDebugEnabled()) {
+		} else if (logger.isDebugEnabled()) {
 			logger.debug("Patterns " + getHandlerMap().keySet() + " in " + formatMappingName());
 		}
 	}
