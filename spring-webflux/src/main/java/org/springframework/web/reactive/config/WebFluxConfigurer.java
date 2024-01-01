@@ -29,39 +29,31 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 import org.springframework.web.reactive.socket.server.WebSocketService;
 
 /**
- * Defines callback methods to customize the configuration for WebFlux
- * applications enabled via {@link EnableWebFlux @EnableWebFlux}.
+ * 定义回调方法，用于自定义通过 {@link EnableWebFlux @EnableWebFlux} 启用的 WebFlux 应用程序的配置。
  *
- * <p>{@code @EnableWebFlux}-annotated configuration classes may implement
- * this interface to be called back and given a chance to customize the
- * default configuration. Consider implementing this interface and
- * overriding the relevant methods for your needs.
+ * <p>{@code @EnableWebFlux} 注解的配置类可以实现此接口以被回调，并有机会定制默认配置。考虑实现此接口并重写相关方法以满足您的需求。
  *
  * @author Brian Clozel
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see WebFluxConfigurationSupport
  * @see DelegatingWebFluxConfiguration
+ * @since 5.0
  */
 public interface WebFluxConfigurer {
 
 	/**
-	 * Configure how the content type requested for the response is resolved
-	 * when handling requests with annotated controllers.
-	 * @param builder for configuring the resolvers to use
+	 * 配置处理带有注解控制器的请求时用于解析响应的内容类型。
+	 *
+	 * @param builder 用于配置要使用的解析器
 	 */
 	default void configureContentTypeResolver(RequestedContentTypeResolverBuilder builder) {
 	}
 
 	/**
-	 * Configure "global" cross origin request processing. The configured CORS
-	 * mappings apply to annotated controllers, functional endpoints, and static
-	 * resources.
-	 * <p>Annotated controllers can further declare more fine-grained config via
-	 * {@link org.springframework.web.bind.annotation.CrossOrigin @CrossOrigin}.
-	 * In such cases "global" CORS configuration declared here is
-	 * {@link org.springframework.web.cors.CorsConfiguration#combine(CorsConfiguration) combined}
-	 * with local CORS configuration defined on a controller method.
+	 * 配置“全局”跨源请求处理。配置的 CORS 映射适用于注解控制器、函数式端点和静态资源。
+	 * <p>注解控制器可以通过 {@link org.springframework.web.bind.annotation.CrossOrigin @CrossOrigin} 进一步声明更精细的配置。
+	 * 在这种情况下，此处声明的“全局”CORS 配置将与在控制器方法上定义的本地 CORS 配置进行 {@link org.springframework.web.cors.CorsConfiguration#combine(CorsConfiguration) 组合}。
+	 *
 	 * @see CorsRegistry
 	 * @see CorsConfiguration#combine(CorsConfiguration)
 	 */
@@ -69,54 +61,49 @@ public interface WebFluxConfigurer {
 	}
 
 	/**
-	 * Configure path matching options.
-	 * <p>The configured path matching options will be used for mapping to
-	 * annotated controllers and also
-	 * {@link #addResourceHandlers(ResourceHandlerRegistry) static resources}.
-	 * @param configurer the {@link PathMatchConfigurer} instance
+	 * 配置路径匹配选项。
+	 * <p>配置的路径匹配选项将用于映射到注解控制器，还包括 {@link #addResourceHandlers(ResourceHandlerRegistry) 静态资源}。
+	 *
+	 * @param configurer {@link PathMatchConfigurer} 实例
 	 */
 	default void configurePathMatching(PathMatchConfigurer configurer) {
 	}
 
 	/**
-	 * Add resource handlers for serving static resources.
+	 * 添加用于提供静态资源的资源处理程序。
+	 *
 	 * @see ResourceHandlerRegistry
 	 */
 	default void addResourceHandlers(ResourceHandlerRegistry registry) {
 	}
 
 	/**
-	 * Configure resolvers for custom {@code @RequestMapping} method arguments.
-	 * @param configurer to configurer to use
+	 * 配置用于自定义 {@code @RequestMapping} 方法参数解析器。
+	 *
+	 * @param configurer 要使用的配置器
 	 */
 	default void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
 	}
 
 	/**
-	 * Configure the HTTP message readers and writers for reading from the
-	 * request body and for writing to the response body in annotated controllers
-	 * and functional endpoints.
-	 * <p>By default, all built-in readers and writers are configured as long as
-	 * the corresponding 3rd party libraries such Jackson JSON, JAXB2, and others
-	 * are present on the classpath.
-	 * @param configurer the configurer to customize readers and writers
+	 * 配置用于从请求主体读取和向响应主体写入的 HTTP 消息读取器和写入器（用于注解控制器和函数式端点）。
+	 * <p>默认情况下，只要类路径上存在相应的第三方库（例如 Jackson JSON、JAXB2 等），所有内置的读取器和写入器都会被配置。
+	 *
+	 * @param configurer 用于自定义读取器和写入器的配置器
 	 */
 	default void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
 	}
 
 	/**
-	 * Add custom {@link Converter Converters} and {@link Formatter Formatters} for
-	 * performing type conversion and formatting of annotated controller method arguments.
+	 * 为执行注解控制器方法参数的类型转换和格式化添加自定义 {@link Converter Converters} 和 {@link Formatter Formatters}。
 	 */
 	default void addFormatters(FormatterRegistry registry) {
 	}
 
 	/**
-	 * Provide a custom {@link Validator}.
-	 * <p>By default a validator for standard bean validation is created if
-	 * bean validation API is present on the classpath.
-	 * <p>The configured validator is used for validating annotated controller
-	 * method arguments.
+	 * 提供自定义的 {@link Validator}。
+	 * <p>默认情况下，如果类路径上存在 bean 验证 API，则会创建用于标准 bean 验证的验证器。
+	 * <p>配置的验证器用于验证注解控制器方法参数。
 	 */
 	@Nullable
 	default Validator getValidator() {
@@ -124,9 +111,7 @@ public interface WebFluxConfigurer {
 	}
 
 	/**
-	 * Provide a custom {@link MessageCodesResolver} to use for data binding in
-	 * annotated controller method arguments instead of the one created by
-	 * default in {@link org.springframework.validation.DataBinder}.
+	 * 提供自定义的 {@link MessageCodesResolver}，用于在注解控制器方法参数中进行数据绑定，而不是在 {@link org.springframework.validation.DataBinder} 中默认创建的解析器。
 	 */
 	@Nullable
 	default MessageCodesResolver getMessageCodesResolver() {
@@ -134,10 +119,9 @@ public interface WebFluxConfigurer {
 	}
 
 	/**
-	 * Provide the {@link WebSocketService} to create
-	 * {@link org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter}
-	 * with. This can be used to configure server-specific properties through the
-	 * {@link org.springframework.web.reactive.socket.server.RequestUpgradeStrategy}.
+	 * 提供用于创建 {@link org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter} 的 {@link WebSocketService}。
+	 * 这可用于通过 {@link org.springframework.web.reactive.socket.server.RequestUpgradeStrategy} 配置服务器特定属性。
+	 *
 	 * @since 5.3
 	 */
 	@Nullable
@@ -146,11 +130,8 @@ public interface WebFluxConfigurer {
 	}
 
 	/**
-	 * Configure view resolution for rendering responses with a view and a model,
-	 * where the view is typically an HTML template but could also be based on
-	 * an HTTP message writer (e.g. JSON, XML).
-	 * <p>The configured view resolvers will be used for both annotated
-	 * controllers and functional endpoints.
+	 * 配置视图解析，用于呈现带有视图和模型的响应，其中视图通常是 HTML 模板，但也可以基于 HTTP 消息写入器（例如 JSON、XML）。
+	 * <p>配置的视图解析器将用于注解控制器和函数式端点。
 	 */
 	default void configureViewResolvers(ViewResolverRegistry registry) {
 	}

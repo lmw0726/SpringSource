@@ -16,10 +16,6 @@
 
 package org.springframework.web.reactive.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.ApplicationContext;
@@ -35,13 +31,14 @@ import org.springframework.web.reactive.result.view.freemarker.FreeMarkerViewRes
 import org.springframework.web.reactive.result.view.script.ScriptTemplateConfigurer;
 import org.springframework.web.reactive.result.view.script.ScriptTemplateViewResolver;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Assist with the configuration of a chain of {@link ViewResolver}'s supporting
- * different template mechanisms.
+ * 辅助配置支持不同模板机制的 {@link ViewResolver} 链的属性。
  *
- * <p>In addition, you can also configure {@link #defaultViews(View...)
- * defaultViews} for rendering according to the requested content type, e.g.
- * JSON, XML, etc.
+ * 此外，还可以通过 {@link #defaultViews(View...)} 配置默认视图，根据请求的内容类型进行选择，例如 JSON、XML 等。
  *
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
@@ -49,13 +46,25 @@ import org.springframework.web.reactive.result.view.script.ScriptTemplateViewRes
  */
 public class ViewResolverRegistry {
 
+	/**
+	 * 应用程序上下文
+	 */
 	@Nullable
 	private final ApplicationContext applicationContext;
 
+	/**
+	 * 视图解析器列表
+	 */
 	private final List<ViewResolver> viewResolvers = new ArrayList<>(4);
 
+	/**
+	 * 默认视图列表
+	 */
 	private final List<View> defaultViews = new ArrayList<>(4);
 
+	/**
+	 * 顺序
+	 */
 	@Nullable
 	private Integer order;
 
@@ -66,88 +75,107 @@ public class ViewResolverRegistry {
 
 
 	/**
-	 * Register a {@code FreeMarkerViewResolver} with a ".ftl" suffix.
-	 * <p><strong>Note</strong> that you must also configure FreeMarker by
-	 * adding a {@link FreeMarkerConfigurer} bean.
+	 * 注册一个带有“.ftl”后缀的 {@code FreeMarkerViewResolver}。
+	 * <p><strong>注意</strong>，您还必须通过添加 {@link FreeMarkerConfigurer} bean 配置 FreeMarker。
 	 */
 	public UrlBasedViewResolverRegistration freeMarker() {
+		// 检查是否存在 FreeMarkerConfigurer 类型的 Bean
 		if (!checkBeanOfType(FreeMarkerConfigurer.class)) {
 			throw new BeanInitializationException("In addition to a FreeMarker view resolver " +
 					"there must also be a single FreeMarkerConfig bean in this web application context " +
 					"(or its parent): FreeMarkerConfigurer is the usual implementation. " +
 					"This bean may be given any name.");
 		}
+
+		// 创建 FreeMarker 视图的注册信息
 		FreeMarkerRegistration registration = new FreeMarkerRegistration();
+
+		// 获取视图解析器
 		UrlBasedViewResolver resolver = registration.getViewResolver();
+
+		// 如果应用程序上下文不为空，则设置到视图解析器中
 		if (this.applicationContext != null) {
 			resolver.setApplicationContext(this.applicationContext);
 		}
+
+		// 将视图解析器添加到视图解析器列表中
 		this.viewResolvers.add(resolver);
+
+		// 返回 FreeMarker 视图的注册信息
 		return registration;
 	}
 
 	/**
-	 * Register a script template view resolver with an empty default view name prefix and suffix.
-	 * <p><strong>Note</strong> that you must also configure script templating by
-	 * adding a {@link ScriptTemplateConfigurer} bean.
+	 * 使用空的默认视图名称前缀和后缀注册脚本模板视图解析器。
+	 * <p><strong>注意</strong>，您还必须通过添加 {@link ScriptTemplateConfigurer} bean 配置脚本模板。
 	 * @since 5.0.4
 	 */
 	public UrlBasedViewResolverRegistration scriptTemplate() {
+		// 检查是否存在 ScriptTemplateConfigurer 类型的 Bean
 		if (!checkBeanOfType(ScriptTemplateConfigurer.class)) {
 			throw new BeanInitializationException("In addition to a script template view resolver " +
 					"there must also be a single ScriptTemplateConfig bean in this web application context " +
 					"(or its parent): ScriptTemplateConfigurer is the usual implementation. " +
 					"This bean may be given any name.");
 		}
+
+		// 创建 Script 模板视图的注册信息
 		ScriptRegistration registration = new ScriptRegistration();
+
+		// 获取视图解析器
 		UrlBasedViewResolver resolver = registration.getViewResolver();
+
+		// 如果应用程序上下文不为空，则设置到视图解析器中
 		if (this.applicationContext != null) {
 			resolver.setApplicationContext(this.applicationContext);
 		}
+
+		// 将视图解析器添加到视图解析器列表中
 		this.viewResolvers.add(resolver);
+
+		// 返回 Script 模板视图的注册信息
 		return registration;
 	}
 
 	/**
-	 * Register a {@link ViewResolver} bean instance. This may be useful to
-	 * configure a 3rd party resolver implementation or as an alternative to
-	 * other registration methods in this class when they don't expose some
-	 * more advanced property that needs to be set.
+	 * 注册一个 {@link ViewResolver} bean 实例。当其他注册方法不能暴露需要设置的更高级属性时，
+	 * 这可能对配置第三方解析器实现或作为该类中的替代注册方法的替代方法很有用。
 	 */
 	public void viewResolver(ViewResolver viewResolver) {
 		this.viewResolvers.add(viewResolver);
 	}
 
 	/**
-	 * Set default views associated with any view name and selected based on the
-	 * best match for the requested content type.
-	 * <p>Use {@link HttpMessageWriterView
-	 * HttpMessageWriterView} to adapt and use any existing
-	 * {@code HttpMessageWriter} (e.g. JSON, XML) as a {@code View}.
+	 * 设置与任何视图名称关联的默认视图，并根据请求的内容类型选择最佳匹配的视图。
+	 * <p>使用 {@link HttpMessageWriterView HttpMessageWriterView} 将任何现有的
+	 * {@code HttpMessageWriter}（例如 JSON、XML）适配并用作 {@code View}。
 	 */
 	public void defaultViews(View... defaultViews) {
 		this.defaultViews.addAll(Arrays.asList(defaultViews));
 	}
 
 	/**
-	 * Whether any view resolvers have been registered.
+	 * 是否已注册任何视图解析器。
 	 */
 	public boolean hasRegistrations() {
 		return (!this.viewResolvers.isEmpty());
 	}
 
 	/**
-	 * Set the order for the
-	 * {@link org.springframework.web.reactive.result.view.ViewResolutionResultHandler
-	 * ViewResolutionResultHandler}.
-	 * <p>By default this property is not set, which means the result handler is
-	 * ordered at {@link Ordered#LOWEST_PRECEDENCE}.
+	 * 设置 {@link org.springframework.web.reactive.result.view.ViewResolutionResultHandler ViewResolutionResultHandler} 的顺序。
+	 * <p>默认情况下，此属性未设置，这意味着结果处理器位于 {@link Ordered#LOWEST_PRECEDENCE} 处。
 	 */
 	public void order(int order) {
 		this.order = order;
 	}
 
 
+	/**
+	 * 检查给定类型的 bean 是否存在于应用程序上下文中。
+	 *
+	 * @param beanType 要检查的 bean 类型
+	 * @return 如果应用程序上下文为 null 或给定类型的 bean 存在，则返回 true；否则返回 false
+	 */
 	private boolean checkBeanOfType(Class<?> beanType) {
 		return (this.applicationContext == null ||
 				!ObjectUtils.isEmpty(BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
@@ -167,16 +195,28 @@ public class ViewResolverRegistry {
 	}
 
 
+	/**
+	 * 内部类，用于注册带有“.ftl”后缀的 {@code FreeMarkerViewResolver}。
+	 */
 	private static class FreeMarkerRegistration extends UrlBasedViewResolverRegistration {
 
+		/**
+		 * 构造函数，初始化 {@code FreeMarkerRegistration} 实例。
+		 */
 		public FreeMarkerRegistration() {
 			super(new FreeMarkerViewResolver());
 			getViewResolver().setSuffix(".ftl");
 		}
 	}
 
+	/**
+	 * 内部类，用于注册脚本模板视图解析器。
+	 */
 	private static class ScriptRegistration extends UrlBasedViewResolverRegistration {
 
+		/**
+		 * 构造函数，初始化 {@code ScriptRegistration} 实例。
+		 */
 		public ScriptRegistration() {
 			super(new ScriptTemplateViewResolver());
 			getViewResolver();

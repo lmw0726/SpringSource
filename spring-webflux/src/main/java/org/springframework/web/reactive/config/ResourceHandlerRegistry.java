@@ -16,12 +16,6 @@
 
 package org.springframework.web.reactive.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.ResourceLoader;
@@ -34,22 +28,14 @@ import org.springframework.web.reactive.resource.ResourceUrlProvider;
 import org.springframework.web.reactive.resource.ResourceWebHandler;
 import org.springframework.web.server.WebHandler;
 
+import java.util.*;
+
 /**
- * Stores registrations of resource handlers for serving static resources such
- * as images, css files and others through Spring WebFlux including setting cache
- * headers optimized for efficient loading in a web browser. Resources can be
- * served out of locations under web application root, from the classpath, and
- * others.
+ * 存储资源处理程序的注册信息，用于通过 Spring WebFlux 提供静态资源（如图像、CSS 文件等），包括设置针对在 Web 浏览器中高效加载的缓存头。资源可以从 Web 应用程序根目录、类路径和其他位置提供。
  *
- * <p>To create a resource handler, use {@link #addResourceHandler(String...)}
- * providing the URL path patterns for which the handler should be invoked to
- * serve static resources (e.g. {@code "/resources/**"}).
+ * <p>要创建资源处理程序，请使用 {@link #addResourceHandler(String...)}，提供要调用处理程序以提供静态资源的 URL 路径模式（例如 {@code "/resources/**"}）。
  *
- * <p>Then use additional methods on the returned
- * {@link ResourceHandlerRegistration} to add one or more locations from which
- * to serve static content from (e.g. {{@code "/"},
- * {@code "classpath:/META-INF/public-web-resources/"}}) or to specify a cache
- * period for served resources.
+ * <p>然后，使用返回的 {@link ResourceHandlerRegistration} 上的其他方法，添加一个或多个位置，从这些位置提供静态内容（例如 {@code "/"}、{@code "classpath:/META-INF/public-web-resources/"}），或者指定所提供资源的缓存期限。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
@@ -57,29 +43,41 @@ import org.springframework.web.server.WebHandler;
  */
 public class ResourceHandlerRegistry {
 
+	/**
+	 * 资源加载器
+	 */
 	private final ResourceLoader resourceLoader;
 
+	/**
+	 * 注册资源处理程序的列表
+	 */
 	private final List<ResourceHandlerRegistration> registrations = new ArrayList<>();
 
+	/**
+	 * 处理程序顺序，默认为 LOWEST_PRECEDENCE - 1
+	 */
 	private int order = Ordered.LOWEST_PRECEDENCE - 1;
 
+	/**
+	 * 资源 URL 提供程序
+	 */
 	@Nullable
 	private ResourceUrlProvider resourceUrlProvider;
 
 
 	/**
-	 * Create a new resource handler registry for the given resource loader
-	 * (typically an application context).
-	 * @param resourceLoader the resource loader to use
+	 * 为给定的资源加载器（通常是应用程序上下文）创建一个新的资源处理程序注册表。
+	 *
+	 * @param resourceLoader 要使用的资源加载器
 	 */
 	public ResourceHandlerRegistry(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
 
 	/**
-	 * Configure the {@link ResourceUrlProvider} that can be used by
-	 * {@link org.springframework.web.reactive.resource.ResourceTransformer} instances.
-	 * @param resourceUrlProvider the resource URL provider to use
+	 * 配置可被 {@link org.springframework.web.reactive.resource.ResourceTransformer} 实例使用的 {@link ResourceUrlProvider}。
+	 *
+	 * @param resourceUrlProvider 要使用的资源 URL 提供程序
 	 * @since 5.0.11
 	 */
 	public void setResourceUrlProvider(@Nullable ResourceUrlProvider resourceUrlProvider) {
@@ -89,14 +87,13 @@ public class ResourceHandlerRegistry {
 
 
 	/**
-	 * Add a resource handler for serving static resources based on the specified
-	 * URL path patterns. The handler will be invoked for every incoming request
-	 * that matches to one of the specified path patterns.
-	 * <p>Patterns like {@code "/static/**"} or {@code "/css/{filename:\\w+\\.css}"}
-	 * are allowed. See {@link org.springframework.web.util.pattern.PathPattern}
-	 * for more details on the syntax.
-	 * @return a {@link ResourceHandlerRegistration} to use to further configure
-	 * the registered resource handler
+	 * 添加一个资源处理程序，用于基于指定的 URL 路径模式提供静态资源服务。
+	 * 对于匹配指定路径模式之一的每个传入请求，都会调用处理程序。
+	 * <p>允许类似 {@code "/static/**"} 或 {@code "/css/{filename:\\w+\\.css}"} 的模式。
+	 * 有关语法的更多详细信息，请参阅 {@link org.springframework.web.util.pattern.PathPattern}。
+	 *
+	 * @param patterns 要匹配的 URL 路径模式数组
+	 * @return {@link ResourceHandlerRegistration} 实例，用于进一步配置注册的资源处理程序
 	 */
 	public ResourceHandlerRegistration addResourceHandler(String... patterns) {
 		ResourceHandlerRegistration registration = new ResourceHandlerRegistration(this.resourceLoader, patterns);
@@ -105,21 +102,30 @@ public class ResourceHandlerRegistry {
 	}
 
 	/**
-	 * Whether a resource handler has already been registered for the given path pattern.
+	 * 检查给定路径模式是否已经注册了资源处理程序。
+	 *
+	 * @param pathPattern 要检查的路径模式
+	 * @return 如果已注册资源处理程序返回 true，否则返回 false
 	 */
 	public boolean hasMappingForPattern(String pathPattern) {
+		// 遍历所有注册信息
 		for (ResourceHandlerRegistration registration : this.registrations) {
+			// 如果某个注册的路径模式列表包含指定的路径模式
 			if (Arrays.asList(registration.getPathPatterns()).contains(pathPattern)) {
 				return true;
 			}
 		}
+
+		// 如果没有匹配的路径模式，则返回false
 		return false;
 	}
 
 	/**
-	 * Specify the order to use for resource handling relative to other
-	 * {@code HandlerMapping}s configured in the Spring configuration.
-	 * <p>The default value used is {@code Integer.MAX_VALUE-1}.
+	 * 设置资源处理的顺序，相对于 Spring 配置中配置的其他 {@code HandlerMapping}。
+	 * 默认值为 {@code Integer.MAX_VALUE-1}。
+	 *
+	 * @param order 要设置的顺序值
+	 * @return {@link ResourceHandlerRegistry} 实例
 	 */
 	public ResourceHandlerRegistry setOrder(int order) {
 		this.order = order;
@@ -127,37 +133,65 @@ public class ResourceHandlerRegistry {
 	}
 
 	/**
-	 * Return a handler mapping with the mapped resource handlers; or {@code null} in case
-	 * of no registrations.
+	 * 返回具有映射资源处理程序的处理程序映射；如果没有注册，则返回 {@code null}。
+	 *
+	 * @return {@code AbstractUrlHandlerMapping} 实例，或者在没有注册的情况下返回 {@code null}
 	 */
 	@Nullable
 	protected AbstractUrlHandlerMapping getHandlerMapping() {
+		// 如果没有注册信息，则返回null
 		if (this.registrations.isEmpty()) {
 			return null;
 		}
+
+		// 创建 URL 映射的 Map
 		Map<String, WebHandler> urlMap = new LinkedHashMap<>();
+
+		// 遍历所有注册信息
 		for (ResourceHandlerRegistration registration : this.registrations) {
+			// 获取请求处理程序
 			ResourceWebHandler handler = getRequestHandler(registration);
+
+			// 针对每个注册的路径模式
 			for (String pathPattern : registration.getPathPatterns()) {
+				// 将路径模式和处理程序放入 URL 映射中
 				urlMap.put(pathPattern, handler);
 			}
 		}
+
+		// 返回基于路径模式的简单 URL 处理程序映射
 		return new SimpleUrlHandlerMapping(urlMap, this.order);
 	}
 
+
+	/**
+	 * 获取 {@link ResourceWebHandler} 实例。
+	 *
+	 * @param registration 资源处理程序注册
+	 * @return {@link ResourceWebHandler} 实例
+	 */
 	private ResourceWebHandler getRequestHandler(ResourceHandlerRegistration registration) {
+		// 获取注册的请求处理程序
 		ResourceWebHandler handler = registration.getRequestHandler();
+
+		// 遍历处理程序的资源转换器
 		for (ResourceTransformer transformer : handler.getResourceTransformers()) {
+			// 如果转换器是 ResourceTransformerSupport 类型
 			if (transformer instanceof ResourceTransformerSupport) {
+				// 设置资源 URL 提供程序给转换器
 				((ResourceTransformerSupport) transformer).setResourceUrlProvider(this.resourceUrlProvider);
 			}
 		}
+
 		try {
+			// 初始化资源请求处理程序
 			handler.afterPropertiesSet();
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
+			// 抛出 Bean 初始化异常，指示初始化资源请求处理程序失败
 			throw new BeanInitializationException("Failed to init ResourceHttpRequestHandler", ex);
 		}
+
+		// 返回已配置完成的处理程序
 		return handler;
 	}
 

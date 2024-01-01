@@ -16,12 +16,6 @@
 
 package org.springframework.web.reactive.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.cache.Cache;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -32,40 +26,67 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.resource.ResourceWebHandler;
 
+import java.util.*;
+
 /**
- * Assist with creating and configuring a static resources handler.
+ * 辅助创建和配置静态资源处理器。
+ *
+ * <p>通过此类可以创建和配置静态资源处理器。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class ResourceHandlerRegistration {
-
+	/**
+	 * 资源加载器
+	 */
 	private final ResourceLoader resourceLoader;
 
+	/**
+	 * 路径模式数组
+	 */
 	private final String[] pathPatterns;
 
+	/**
+	 * 位置值列表
+	 */
 	private final List<String> locationValues = new ArrayList<>();
 
+	/**
+	 * 缓存控制
+	 */
 	@Nullable
 	private CacheControl cacheControl;
 
+	/**
+	 * 资源链注册
+	 */
 	@Nullable
 	private ResourceChainRegistration resourceChainRegistration;
 
+	/**
+	 * 是否使用最后修改时间，默认为 true
+	 */
 	private boolean useLastModified = true;
 
+	/**
+	 * 是否优化位置，默认为 false
+	 */
 	private boolean optimizeLocations = false;
 
+	/**
+	 * 媒体类型映射
+	 */
 	@Nullable
 	private Map<String, MediaType> mediaTypes;
 
 
 
 	/**
-	 * Create a {@link ResourceHandlerRegistration} instance.
-	 * @param resourceLoader a resource loader for turning a String location
-	 * into a {@link Resource}
-	 * @param pathPatterns one or more resource URL path patterns
+	 * 创建一个{@link ResourceHandlerRegistration}实例。
+	 *
+	 * @param resourceLoader 用于将字符串位置转换为{@link Resource}的资源加载器
+	 * @param pathPatterns   一个或多个资源URL路径模式
 	 */
 	public ResourceHandlerRegistration(ResourceLoader resourceLoader, String... pathPatterns) {
 		Assert.notNull(resourceLoader, "ResourceLoader is required");
@@ -76,16 +97,14 @@ public class ResourceHandlerRegistration {
 
 
 	/**
-	 * Add one or more resource locations from which to serve static content.
-	 * <p>Each location must point to a valid directory. Multiple locations may
-	 * be specified as a comma-separated list, and the locations will be checked
-	 * for a given resource in the order specified.
-	 * <p>For example, {@code "/", "classpath:/META-INF/public-web-resources/"}
-	 * allows resources to be served both from the web application root and from
-	 * any JAR on the classpath that contains a {@code /META-INF/public-web-resources/}
-	 * directory, with resources in the web application root taking precedence.
-	 * @return the same {@link ResourceHandlerRegistration} instance, for
-	 * chained method invocation
+	 * 添加一个或多个资源位置，用于提供静态内容。
+	 *
+	 * <p>每个位置必须指向有效目录。多个位置可以指定为逗号分隔的列表，并且将按照指定的顺序检查资源。
+	 *
+	 * <p>例如，{@code "/", "classpath:/META-INF/public-web-resources/"} 允许从Web应用程序根目录和类路径中包含
+	 * {@code /META-INF/public-web-resources/} 目录的任何JAR中提供资源，Web应用程序根目录中的资源优先。
+	 *
+	 * @return 相同的 {@link ResourceHandlerRegistration} 实例，用于链接方法调用
 	 */
 	public ResourceHandlerRegistration addResourceLocations(String... resourceLocations) {
 		this.locationValues.addAll(Arrays.asList(resourceLocations));
@@ -93,11 +112,10 @@ public class ResourceHandlerRegistration {
 	}
 
 	/**
-	 * Specify the {@link CacheControl} which should be used
-	 * by the resource handler.
-	 * @param cacheControl the CacheControl configuration to use
-	 * @return the same {@link ResourceHandlerRegistration} instance, for
-	 * chained method invocation
+	 * 指定资源处理器应使用的 {@link CacheControl}。
+	 *
+	 * @param cacheControl 要使用的CacheControl配置
+	 * @return 相同的 {@link ResourceHandlerRegistration} 实例，用于链接方法调用
 	 */
 	public ResourceHandlerRegistration setCacheControl(CacheControl cacheControl) {
 		this.cacheControl = cacheControl;
@@ -105,12 +123,14 @@ public class ResourceHandlerRegistration {
 	}
 
 	/**
-	 * Set whether the {@link Resource#lastModified()} information should be used to drive HTTP responses.
-	 * <p>This configuration is set to {@code true} by default.
-	 * @param useLastModified whether the "last modified" resource information should be used
-	 * @return the same {@link ResourceHandlerRegistration} instance, for chained method invocation
-	 * @since 5.3
+	 * 设置是否使用 {@link Resource#lastModified()} 信息来驱动HTTP响应。
+	 *
+	 * <p>此配置默认设置为 {@code true}。
+	 *
+	 * @param useLastModified 是否应使用“最后修改”资源信息
+	 * @return 相同的 {@link ResourceHandlerRegistration} 实例，用于链接方法调用
 	 * @see ResourceWebHandler#setUseLastModified
+	 * @since 5.3
 	 */
 	public ResourceHandlerRegistration setUseLastModified(boolean useLastModified) {
 		this.useLastModified = useLastModified;
@@ -118,16 +138,16 @@ public class ResourceHandlerRegistration {
 	}
 
 	/**
-	 * Set whether to optimize the specified locations through an existence check on startup,
-	 * filtering non-existing directories upfront so that they do not have to be checked
-	 * on every resource access.
-	 * <p>The default is {@code false}, for defensiveness against zip files without directory
-	 * entries which are unable to expose the existence of a directory upfront. Switch this flag to
-	 * {@code true} for optimized access in case of a consistent jar layout with directory entries.
-	 * @param optimizeLocations whether to optimize the locations through an existence check on startup
-	 * @return the same {@link ResourceHandlerRegistration} instance, for chained method invocation
-	 * @since 5.3.13
+	 * 设置是否通过启动时的存在性检查来优化指定的位置，
+	 * 通过在启动时过滤不存在的目录，从而不必在每次资源访问时进行检查。
+	 *
+	 * <p>默认值为 {@code false}，用于防御没有目录条目的zip文件，无法提前暴露目录的存在性。
+	 * 将此标志切换为 {@code true} 可以在具有目录条目的一致jar布局情况下获得优化的访问。
+	 *
+	 * @param optimizeLocations 是否通过启动时的存在性检查来优化位置
+	 * @return 相同的 {@link ResourceHandlerRegistration} 实例，用于链接方法调用
 	 * @see ResourceWebHandler#setOptimizeLocations
+	 * @since 5.3.13
 	 */
 	public ResourceHandlerRegistration setOptimizeLocations(boolean optimizeLocations) {
 		this.optimizeLocations = optimizeLocations;
@@ -135,16 +155,14 @@ public class ResourceHandlerRegistration {
 	}
 
 	/**
-	 * Configure a chain of resource resolvers and transformers to use. This
-	 * can be useful, for example, to apply a version strategy to resource URLs.
-	 * <p>If this method is not invoked, by default only a simple
-	 * {@code PathResourceResolver} is used in order to match URL paths to
-	 * resources under the configured locations.
-	 * @param cacheResources whether to cache the result of resource resolution;
-	 * setting this to "true" is recommended for production (and "false" for
-	 * development, especially when applying a version strategy)
-	 * @return the same {@link ResourceHandlerRegistration} instance, for
-	 * chained method invocation
+	 * 配置要使用的资源解析器和转换器链。例如，可以将版本策略应用于资源URL。
+	 *
+	 * <p>如果没有调用此方法，默认情况下仅使用简单的 {@code PathResourceResolver}，
+	 * 以便将URL路径匹配到配置位置下的资源。
+	 *
+	 * @param cacheResources 是否缓存资源解析的结果；建议在生产环境中设置为“true”（在开发环境中设置为“false”，
+	 *                       特别是应用版本策略时）
+	 * @return 相同的 {@link ResourceHandlerRegistration} 实例，用于链接方法调用
 	 */
 	public ResourceChainRegistration resourceChain(boolean cacheResources) {
 		this.resourceChainRegistration = new ResourceChainRegistration(cacheResources);
@@ -152,20 +170,17 @@ public class ResourceHandlerRegistration {
 	}
 
 	/**
-	 * Configure a chain of resource resolvers and transformers to use. This
-	 * can be useful, for example, to apply a version strategy to resource URLs.
-	 * <p>If this method is not invoked, by default only a simple
-	 * {@code PathResourceResolver} is used in order to match URL paths to
-	 * resources under the configured locations.
-	 * @param cacheResources whether to cache the result of resource resolution;
-	 * setting this to "true" is recommended for production (and "false" for
-	 * development, especially when applying a version strategy
-	 * @param cache the cache to use for storing resolved and transformed resources;
-	 * by default a {@link org.springframework.cache.concurrent.ConcurrentMapCache}
-	 * is used. Since Resources aren't serializable and can be dependent on the
-	 * application host, one should not use a distributed cache but rather an
-	 * in-memory cache.
-	 * @return the same {@link ResourceHandlerRegistration} instance, for chained method invocation
+	 * 配置要使用的资源解析器和转换器链。例如，可以将版本策略应用于资源URL。
+	 *
+	 * <p>如果未调用此方法，则默认情况下只使用简单的 {@code PathResourceResolver}，
+	 * 以便将URL路径匹配到配置位置下的资源。
+	 *
+	 * @param cacheResources 是否缓存资源解析的结果；
+	 *                       建议在生产环境中设置为“true”（在开发环境中设置为“false”，特别是应用版本策略时）
+	 * @param cache          用于存储已解析和转换的资源的缓存；
+	 *                       默认情况下，使用 {@link org.springframework.cache.concurrent.ConcurrentMapCache}。
+	 *                       由于资源不可序列化并且可能依赖于应用程序主机，因此不应使用分布式缓存，而应使用内存缓存。
+	 * @return 相同的 {@link ResourceHandlerRegistration} 实例，用于链接方法调用
 	 */
 	public ResourceChainRegistration resourceChain(boolean cacheResources, Cache cache) {
 		this.resourceChainRegistration = new ResourceChainRegistration(cacheResources, cache);
@@ -173,11 +188,11 @@ public class ResourceHandlerRegistration {
 	}
 
 	/**
-	 * Add mappings between file extensions extracted from the filename of static
-	 * {@link Resource}s and the media types to use for the response.
-	 * <p>Use of this method is typically not necessary since mappings can be
-	 * also determined via {@link MediaTypeFactory#getMediaType(Resource)}.
-	 * @param mediaTypes media type mappings
+	 * 向静态 {@link Resource} 的文件扩展名和用于响应的媒体类型之间添加映射。
+	 *
+	 * <p>通常不需要使用此方法，因为还可以通过 {@link MediaTypeFactory#getMediaType(Resource)} 确定映射。
+	 *
+	 * @param mediaTypes 媒体类型映射
 	 * @since 5.3.2
 	 */
 	public void setMediaTypes(Map<String, MediaType> mediaTypes) {
@@ -190,31 +205,47 @@ public class ResourceHandlerRegistration {
 
 
 	/**
-	 * Returns the URL path patterns for the resource handler.
+	 * 返回资源处理程序的URL路径模式。
 	 */
 	protected String[] getPathPatterns() {
 		return this.pathPatterns;
 	}
 
 	/**
-	 * Returns a {@link ResourceWebHandler} instance.
+	 * 返回一个 {@link ResourceWebHandler} 实例。
 	 */
 	protected ResourceWebHandler getRequestHandler() {
+		// 创建 ResourceWebHandler 实例
 		ResourceWebHandler handler = new ResourceWebHandler();
+
+		// 设置资源加载器和位置值
 		handler.setResourceLoader(this.resourceLoader);
 		handler.setLocationValues(this.locationValues);
+
+		// 如果存在资源链注册
 		if (this.resourceChainRegistration != null) {
+			// 设置资源解析器和资源转换器
 			handler.setResourceResolvers(this.resourceChainRegistration.getResourceResolvers());
 			handler.setResourceTransformers(this.resourceChainRegistration.getResourceTransformers());
 		}
+
+		// 如果存在缓存控制
 		if (this.cacheControl != null) {
+			// 设置缓存控制
 			handler.setCacheControl(this.cacheControl);
 		}
+
+		// 设置是否使用最后修改时间、是否优化位置
 		handler.setUseLastModified(this.useLastModified);
 		handler.setOptimizeLocations(this.optimizeLocations);
+
+		// 如果存在媒体类型映射
 		if (this.mediaTypes != null) {
+			// 设置媒体类型映射
 			handler.setMediaTypes(this.mediaTypes);
 		}
+
+		// 返回配置完成的 ResourceWebHandler 实例
 		return handler;
 	}
 

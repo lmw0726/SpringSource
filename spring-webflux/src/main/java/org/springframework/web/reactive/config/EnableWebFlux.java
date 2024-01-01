@@ -16,20 +16,14 @@
 
 package org.springframework.web.reactive.config;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.Import;
 
+import java.lang.annotation.*;
+
 /**
- * Adding this annotation to an {@code @Configuration} class imports the Spring
- * WebFlux configuration from {@link WebFluxConfigurationSupport} that enables
- * use of annotated controllers and functional endpoints.
+ * 将此注解添加到 {@code @Configuration} 类中，可以从 {@link WebFluxConfigurationSupport} 导入 Spring WebFlux 配置，以启用带注解的控制器和函数式端点的使用。
  *
- * <p>For example:
+ * 例如：
  *
  * <pre class="code">
  * &#064;Configuration
@@ -39,8 +33,7 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * <p>To customize the imported configuration, implement
- * {@link WebFluxConfigurer} and one or more of its methods:
+ * 要自定义导入的配置，请实现 {@link WebFluxConfigurer} 及其一个或多个方法：
  *
  * <pre class="code">
  * &#064;Configuration
@@ -65,17 +58,9 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * <p>Only one {@code @Configuration} class should have the {@code @EnableWebFlux}
- * annotation in order to import the Spring WebFlux configuration. There can
- * however be multiple {@code @Configuration} classes that implement
- * {@code WebFluxConfigurer} that customize the provided configuration.
+ * 只有一个 {@code @Configuration} 类应该具有 {@code @EnableWebFlux} 注解，以导入 Spring WebFlux 配置。然而，可以有多个实现 {@code WebFluxConfigurer} 的 {@code @Configuration} 类来定制提供的配置。
  *
- * <p>If {@code WebFluxConfigurer} does not expose some setting that needs to be
- * configured, consider switching to an advanced mode by removing the
- * {@code @EnableWebFlux} annotation and extending directly from
- * {@link WebFluxConfigurationSupport} or {@link DelegatingWebFluxConfiguration} --
- * the latter allows detecting and delegating to one or more
- * {@code WebFluxConfigurer} configuration classes.
+ * 如果 {@code WebFluxConfigurer} 没有公开需要配置的某些设置，则考虑通过删除 {@code @EnableWebFlux} 注解并直接扩展 {@link WebFluxConfigurationSupport} 或 {@link DelegatingWebFluxConfiguration} 来切换到高级模式——后者允许检测和委派给一个或多个 {@code WebFluxConfigurer} 配置类。
  *
  * @author Brian Clozel
  * @author Rossen Stoyanchev
