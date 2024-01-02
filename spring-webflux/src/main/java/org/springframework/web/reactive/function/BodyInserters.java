@@ -224,9 +224,16 @@ public abstract class BodyInserters {
 	public static <T extends Resource> BodyInserter<T, ReactiveHttpOutputMessage> fromResource(T resource) {
 		Assert.notNull(resource, "'resource' must not be null");
 		return (outputMessage, context) -> {
+			// 使用 RESOURCE_TYPE 构建 ResolvableType 对象
 			ResolvableType elementType = RESOURCE_TYPE;
+
+			// 根据给定的 context 和 elementType 查找合适的写入器
 			HttpMessageWriter<Resource> writer = findWriter(context, elementType, null);
+
+			// 获取输出消息的内容类型
 			MediaType contentType = outputMessage.getHeaders().getContentType();
+
+			// 将资源包装为 Mono，并调用 write 方法进行写入
 			return write(Mono.just(resource), elementType, contentType, outputMessage, context, writer);
 		};
 	}
@@ -247,9 +254,16 @@ public abstract class BodyInserters {
 
 		Assert.notNull(eventsPublisher, "'eventsPublisher' must not be null");
 		return (serverResponse, context) -> {
+			// 使用 SSE_TYPE 构建 ResolvableType 对象
 			ResolvableType elementType = SSE_TYPE;
+
+			// 设置媒体类型为 TEXT_EVENT_STREAM
 			MediaType mediaType = MediaType.TEXT_EVENT_STREAM;
+
+			// 根据给定的 context、elementType 和 mediaType 查找合适的写入器
 			HttpMessageWriter<ServerSentEvent<T>> writer = findWriter(context, elementType, mediaType);
+
+			// 调用 write 方法将事件发布器（eventsPublisher）写入到 serverResponse 中
 			return write(eventsPublisher, elementType, mediaType, serverResponse, context, writer);
 		};
 	}
@@ -369,14 +383,22 @@ public abstract class BodyInserters {
 			M outputMessage, BodyInserter.Context context, Object body, ResolvableType bodyType, @Nullable ReactiveAdapter adapter) {
 
 		Publisher<?> publisher;
+
+		// 如果 body 是 Publisher 类型，则直接使用
 		if (body instanceof Publisher) {
 			publisher = (Publisher<?>) body;
 		} else if (adapter != null) {
+			// 如果存在适配器，则使用适配器将 body 转换为 Publisher
 			publisher = adapter.toPublisher(body);
 		} else {
+			// 否则，将 body 封装为 Mono
 			publisher = Mono.just(body);
 		}
+
+		// 获取输出消息的 MediaType
 		MediaType mediaType = outputMessage.getHeaders().getContentType();
+
+		// 寻找可以写入指定类型和 MediaType 的消息写入器
 		return context.messageWriters().stream()
 				.filter(messageWriter -> messageWriter.canWrite(bodyType, mediaType))
 				.findFirst()
@@ -396,10 +418,12 @@ public abstract class BodyInserters {
 	private static UnsupportedMediaTypeException unsupportedError(
 			ResolvableType bodyType, BodyInserter.Context context, @Nullable MediaType mediaType) {
 
+		// 获取支持的可写入的媒体类型列表
 		List<MediaType> supportedMediaTypes = context.messageWriters().stream()
 				.flatMap(reader -> reader.getWritableMediaTypes(bodyType).stream())
 				.collect(Collectors.toList());
 
+		// 抛出不支持的媒体类型异常，提供当前媒体类型、支持的媒体类型列表和body类型
 		return new UnsupportedMediaTypeException(mediaType, supportedMediaTypes, bodyType);
 	}
 
@@ -419,12 +443,17 @@ public abstract class BodyInserters {
 			Publisher<? extends T> input, ResolvableType type, @Nullable MediaType mediaType,
 			ReactiveHttpOutputMessage message, BodyInserter.Context context, HttpMessageWriter<T> writer) {
 
+		// 使用上下文的 ServerRequest 获取消息
 		return context.serverRequest()
 				.map(request -> {
 					ServerHttpResponse response = (ServerHttpResponse) message;
+					// 如果存在请求，则使用请求和响应进行写入
 					return writer.write(input, type, type, mediaType, request, response, context.hints());
 				})
-				.orElseGet(() -> writer.write(input, type, mediaType, message, context.hints()));
+				.orElseGet(() -> {
+					// 如果不存在请求，则直接使用消息进行写入
+					return writer.write(input, type, mediaType, message, context.hints());
+				});
 	}
 
 	/**
