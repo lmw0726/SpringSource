@@ -16,13 +16,6 @@
 
 package org.springframework.web.reactive.function.client;
 
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
@@ -36,15 +29,24 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import reactor.core.publisher.Flux;
+
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
- * Default implementation of {@link ClientResponse.Builder}.
+ * {@link ClientResponse.Builder} 的默认实现。
  *
  * @author Arjen Poutsma
  * @since 5.0.5
  */
 final class DefaultClientResponseBuilder implements ClientResponse.Builder {
 
+	/**
+	 * 空的Http请求
+	 */
 	private static final HttpRequest EMPTY_REQUEST = new HttpRequest() {
 
 		private final URI empty = URI.create("");
@@ -66,21 +68,42 @@ final class DefaultClientResponseBuilder implements ClientResponse.Builder {
 	};
 
 
+	/**
+	 * 用于交换的策略。
+	 */
 	private ExchangeStrategies strategies;
 
+	/**
+	 * 状态码，默认为 200。
+	 */
 	private int statusCode = 200;
 
+	/**
+	 * HTTP响应的头信息。
+	 */
 	@Nullable
 	private HttpHeaders headers;
 
+	/**
+	 * HTTP响应的Cookie信息。
+	 */
 	@Nullable
 	private MultiValueMap<String, ResponseCookie> cookies;
 
+	/**
+	 * HTTP响应的数据体，默认为空的 Flux。
+	 */
 	private Flux<DataBuffer> body = Flux.empty();
 
+	/**
+	 * 原始的客户端响应。
+	 */
 	@Nullable
 	private ClientResponse originalResponse;
 
+	/**
+	 * HTTP请求。
+	 */
 	private HttpRequest request;
 
 
@@ -92,18 +115,35 @@ final class DefaultClientResponseBuilder implements ClientResponse.Builder {
 		this.request = EMPTY_REQUEST;
 	}
 
+	/**
+	 * 根据给定的 ClientResponse 和布尔值构造 DefaultClientResponseBuilder 对象。
+	 *
+	 * @param other  给定的 ClientResponse 对象
+	 * @param mutate 布尔值，用于决定是否进行改变
+	 */
 	DefaultClientResponseBuilder(ClientResponse other, boolean mutate) {
+		// 确保给定的 ClientResponse 不为空
 		Assert.notNull(other, "ClientResponse must not be null");
+
+		// 获取 ClientResponse 的策略并设置到当前对象
 		this.strategies = other.strategies();
+
+		// 获取 ClientResponse 的状态码并设置到当前对象
 		this.statusCode = other.rawStatusCode();
+
 		if (mutate) {
+			// 如果需要改变，则将 ClientResponse 的 body 转换为 Flux<DataBuffer> 并设置到当前对象
 			this.body = other.bodyToFlux(DataBuffer.class);
-		}
-		else {
+		} else {
+			// 如果不需要改变，则创建新的 HttpHeaders 对象，并将原始 ClientResponse 的 headers 添加到其中
 			this.headers = new HttpHeaders();
 			this.headers.addAll(other.headers().asHttpHeaders());
 		}
+
+		// 设置原始的 ClientResponse 到当前对象
 		this.originalResponse = other;
+
+		// 获取原始 ClientResponse 的请求或设置空请求到当前对象
 		this.request = (other instanceof DefaultClientResponse ?
 				((DefaultClientResponse) other).request() : EMPTY_REQUEST);
 	}
@@ -174,24 +214,42 @@ final class DefaultClientResponseBuilder implements ClientResponse.Builder {
 	@Override
 	public ClientResponse.Builder body(Flux<DataBuffer> body) {
 		Assert.notNull(body, "Body must not be null");
+		// 释放当前请求体内容占用的资源。
 		releaseBody();
 		this.body = body;
 		return this;
 	}
 
+	/**
+	 * 设置请求体内容并返回 Builder 对象。
+	 *
+	 * @param body 请求体内容
+	 * @return 返回设置了请求体内容的 Builder 对象
+	 */
 	@Override
 	public ClientResponse.Builder body(String body) {
+		// 确保请求体内容不为空
 		Assert.notNull(body, "Body must not be null");
+		// 释放现有的请求体内容
 		releaseBody();
-		this.body = Flux.just(body).
-				map(s -> {
+		// 使用给定的字符串创建 Flux<DataBuffer>
+		this.body = Flux.just(body)
+				.map(s -> {
+					// 将字符串转换为 UTF-8 编码的字节数组
 					byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+					// 使用 DefaultDataBufferFactory 创建一个 DataBuffer 包装字节数组
 					return DefaultDataBufferFactory.sharedInstance.wrap(bytes);
 				});
+		// 返回更新后的 Builder 对象
 		return this;
 	}
 
+	/**
+	 * 释放当前请求体内容占用的资源。
+	 * 注意：此方法为私有方法，用于释放请求体内容所占用的资源。
+	 */
 	private void releaseBody() {
+		// 订阅当前请求体内容，并使用 DataBufferUtils.releaseConsumer() 方法释放资源
 		this.body.subscribe(DataBufferUtils.releaseConsumer());
 	}
 
@@ -202,38 +260,72 @@ final class DefaultClientResponseBuilder implements ClientResponse.Builder {
 		return this;
 	}
 
+	/**
+	 * 构建并返回一个 ClientResponse 对象。
+	 *
+	 * @return 构建的 ClientResponse 对象
+	 */
 	@Override
 	public ClientResponse build() {
 
+		// 创建一个 ClientHttpResponse 对象
 		ClientHttpResponse httpResponse = new BuiltClientHttpResponse(
 				this.statusCode, this.headers, this.cookies, this.body, this.originalResponse);
 
-		return new DefaultClientResponse(httpResponse, this.strategies,
+		// 返回一个新的 DefaultClientResponse 对象
+		return new DefaultClientResponse(
+				httpResponse, this.strategies,
 				this.originalResponse != null ? this.originalResponse.logPrefix() : "",
 				this.request.getMethodValue() + " " + this.request.getURI(),
 				() -> this.request);
 	}
 
 
+	/**
+	 * 内部类实现了 {@link ClientHttpResponse} 接口。
+	 */
 	private static class BuiltClientHttpResponse implements ClientHttpResponse {
 
+		/**
+		 * HTTP响应的状态码。
+		 */
 		private final int statusCode;
 
+		/**
+		 * HTTP响应的头信息。
+		 */
 		@Nullable
 		private final HttpHeaders headers;
 
+		/**
+		 * HTTP响应的Cookie信息。
+		 */
 		@Nullable
 		private final MultiValueMap<String, ResponseCookie> cookies;
 
+		/**
+		 * HTTP响应的数据体。
+		 */
 		private final Flux<DataBuffer> body;
 
+		/**
+		 * 原始的客户端响应。
+		 */
 		@Nullable
 		private final ClientResponse originalResponse;
 
-
+		/**
+		 * 构造函数，初始化 HTTP 响应的各项属性。
+		 *
+		 * @param statusCode       HTTP响应的状态码
+		 * @param headers          HTTP响应的头信息
+		 * @param cookies          HTTP响应的Cookie信息
+		 * @param body             HTTP响应的数据体
+		 * @param originalResponse 原始的客户端响应
+		 */
 		BuiltClientHttpResponse(int statusCode, @Nullable HttpHeaders headers,
-				@Nullable MultiValueMap<String, ResponseCookie> cookies, Flux<DataBuffer> body,
-				@Nullable ClientResponse originalResponse) {
+								@Nullable MultiValueMap<String, ResponseCookie> cookies, Flux<DataBuffer> body,
+								@Nullable ClientResponse originalResponse) {
 
 			Assert.isTrue(headers != null || originalResponse != null,
 					"Expected either headers or an original response with headers.");

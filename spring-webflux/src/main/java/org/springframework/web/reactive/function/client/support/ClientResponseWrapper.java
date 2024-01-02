@@ -16,19 +16,8 @@
 
 package org.springframework.web.reactive.function.client.support;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalLong;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.reactive.ClientHttpResponse;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
@@ -36,12 +25,17 @@ import org.springframework.web.reactive.function.BodyExtractor;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
- * Implementation of the {@link ClientResponse} interface that can be subclassed
- * to adapt the request in a
- * {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction exchange filter function}.
- * All methods default to calling through to the wrapped request.
+ * {@link ClientResponse} 接口的实现，可被子类化以适应
+ * {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction exchange filter function} 中的请求。
+ * 所有方法默认调用包装的请求。
  *
  * @author Arjen Poutsma
  * @since 5.0.5
@@ -52,8 +46,8 @@ public class ClientResponseWrapper implements ClientResponse {
 
 
 	/**
-	 * Create a new {@code ClientResponseWrapper} that wraps the given response.
-	 * @param delegate the response to wrap
+	 * 创建一个包装给定响应的新的 {@code ClientResponseWrapper}。
+	 * @param delegate 要包装的响应
 	 */
 	public ClientResponseWrapper(ClientResponse delegate) {
 		Assert.notNull(delegate, "Delegate is required");
@@ -62,7 +56,7 @@ public class ClientResponseWrapper implements ClientResponse {
 
 
 	/**
-	 * Return the wrapped request.
+	 * 返回包装的请求。
 	 */
 	public ClientResponse response() {
 		return this.delegate;
@@ -159,24 +153,21 @@ public class ClientResponseWrapper implements ClientResponse {
 	}
 
 	/**
-	 * Implementation of the {@code Headers} interface that can be subclassed
-	  * to adapt the headers in a
-	  * {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction exchange filter function}.
-	  * All methods default to calling through to the wrapped request.
+	 * 实现了 {@code Headers} 接口的类，可被子类化以在
+	 * {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction exchange filter function} 中适应头信息。
+	 * 所有方法默认调用包装的请求。
 	 */
 	public static class HeadersWrapper implements ClientResponse.Headers {
 
 		private final Headers headers;
 
-
 		/**
-		 * Create a new {@code HeadersWrapper} that wraps the given request.
-		 * @param headers the headers to wrap
+		 * 创建一个新的 {@code HeadersWrapper}，用于包装给定的请求头信息。
+		 * @param headers 要包装的头信息
 		 */
 		public HeadersWrapper(Headers headers) {
 			this.headers = headers;
 		}
-
 
 		@Override
 		public OptionalLong contentLength() {

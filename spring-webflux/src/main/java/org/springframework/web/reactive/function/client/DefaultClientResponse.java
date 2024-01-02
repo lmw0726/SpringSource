@@ -16,27 +16,11 @@
 
 package org.springframework.web.reactive.function.client;
 
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalLong;
-import java.util.function.Supplier;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.codec.Hints;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.reactive.ClientHttpResponse;
 import org.springframework.http.codec.HttpMessageReader;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -44,9 +28,15 @@ import org.springframework.util.MimeType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyExtractor;
 import org.springframework.web.reactive.function.BodyExtractors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.function.Supplier;
 
 /**
- * Default implementation of {@link ClientResponse}.
+ * {@link ClientResponse} 的默认实现。
  *
  * @author Arjen Poutsma
  * @author Brian Clozel
@@ -54,26 +44,47 @@ import org.springframework.web.reactive.function.BodyExtractors;
  */
 class DefaultClientResponse implements ClientResponse {
 
+	/**
+	 * 空字节数组
+	 */
 	private static final byte[] EMPTY = new byte[0];
 
-
+	/**
+	 * 客户端响应
+	 */
 	private final ClientHttpResponse response;
 
+	/**
+	 * 响应头
+	 */
 	private final Headers headers;
 
+	/**
+	 * 交换策略
+	 */
 	private final ExchangeStrategies strategies;
 
+	/**
+	 * 日志前缀
+	 */
 	private final String logPrefix;
-
+	/**
+	 * 请求描述
+	 */
 	private final String requestDescription;
 
+	/**
+	 * 请求提供程序
+	 */
 	private final Supplier<HttpRequest> requestSupplier;
-
+	/**
+	 * 请求体提取器上下文
+	 */
 	private final BodyExtractor.Context bodyExtractorContext;
 
 
 	public DefaultClientResponse(ClientHttpResponse response, ExchangeStrategies strategies,
-			String logPrefix, String requestDescription, Supplier<HttpRequest> requestSupplier) {
+								 String logPrefix, String requestDescription, Supplier<HttpRequest> requestSupplier) {
 
 		this.response = response;
 		this.strategies = strategies;
@@ -128,15 +139,18 @@ class DefaultClientResponse implements ClientResponse {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T body(BodyExtractor<T, ? super ClientHttpResponse> extractor) {
+		// 提取结果
 		T result = extractor.extract(this.response, this.bodyExtractorContext);
+
+		// 构建描述字符串
 		String description = "Body from " + this.requestDescription + " [DefaultClientResponse]";
+
+		// 根据结果类型应用 checkpoint
 		if (result instanceof Mono) {
 			return (T) ((Mono<?>) result).checkpoint(description);
-		}
-		else if (result instanceof Flux) {
+		} else if (result instanceof Flux) {
 			return (T) ((Flux<?>) result).checkpoint(description);
-		}
-		else {
+		} else {
 			return result;
 		}
 	}
@@ -199,10 +213,17 @@ class DefaultClientResponse implements ClientResponse {
 				.defaultIfEmpty(EMPTY)
 				.onErrorReturn(ex -> !(ex instanceof Error), EMPTY)
 				.map(bodyBytes -> {
+					// 获取请求
 					HttpRequest request = this.requestSupplier.get();
+
+					// 获取字符集
 					Charset charset = headers().contentType().map(MimeType::getCharset).orElse(null);
+
+					// 获取原始状态码和对应的 HTTP 状态码
 					int statusCode = rawStatusCode();
 					HttpStatus httpStatus = HttpStatus.resolve(statusCode);
+
+					// 根据 HTTP 状态码创建 WebClientResponseException 或 UnknownHttpStatusCodeException
 					if (httpStatus != null) {
 						return WebClientResponseException.create(
 								statusCode,
@@ -211,8 +232,7 @@ class DefaultClientResponse implements ClientResponse {
 								bodyBytes,
 								charset,
 								request);
-					}
-					else {
+					} else {
 						return new UnknownHttpStatusCodeException(
 								statusCode,
 								headers().asHttpHeaders(),
@@ -228,13 +248,19 @@ class DefaultClientResponse implements ClientResponse {
 		return this.logPrefix;
 	}
 
-	// Used by DefaultClientResponseBuilder
+	/**
+	 * 由DefaultClientResponseBuilder使用
+	 *
+	 * @return Http请求
+	 */
 	HttpRequest request() {
 		return this.requestSupplier.get();
 	}
 
 	private class DefaultHeaders implements Headers {
-
+		/**
+		 * HTTP请求头
+		 */
 		private final HttpHeaders httpHeaders =
 				HttpHeaders.readOnlyHttpHeaders(response.getHeaders());
 
@@ -250,6 +276,7 @@ class DefaultClientResponse implements ClientResponse {
 
 		@Override
 		public List<String> header(String headerName) {
+			// 获取请求头值列表
 			List<String> headerValues = this.httpHeaders.get(headerName);
 			return (headerValues != null ? headerValues : Collections.emptyList());
 		}

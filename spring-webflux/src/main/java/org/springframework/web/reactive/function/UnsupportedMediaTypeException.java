@@ -16,16 +16,16 @@
 
 package org.springframework.web.reactive.function;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.core.ResolvableType;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Exception thrown to indicate that a {@code Content-Type} is not supported.
+ * 表示 {@code Content-Type} 不受支持的异常。
  *
  * @author Arjen Poutsma
  * @since 5.0
@@ -33,17 +33,26 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class UnsupportedMediaTypeException extends NestedRuntimeException {
 
+	/**
+	 * 内容类型
+	 */
 	@Nullable
 	private final MediaType contentType;
 
+	/**
+	 * 支持的媒体类型列表
+	 */
 	private final List<MediaType> supportedMediaTypes;
 
+	/**
+	 * body类型
+	 */
 	@Nullable
 	private final ResolvableType bodyType;
 
 
 	/**
-	 * Constructor for when the specified Content-Type is invalid.
+	 * 当指定的 Content-Type 无效时使用的构造函数。
 	 */
 	public UnsupportedMediaTypeException(String reason) {
 		super(reason);
@@ -53,18 +62,18 @@ public class UnsupportedMediaTypeException extends NestedRuntimeException {
 	}
 
 	/**
-	 * Constructor for when the Content-Type can be parsed but is not supported.
+	 * 当 Content-Type 可以解析但不受支持时使用的构造函数。
 	 */
 	public UnsupportedMediaTypeException(@Nullable MediaType contentType, List<MediaType> supportedTypes) {
 		this(contentType, supportedTypes, null);
 	}
 
 	/**
-	 * Constructor for when trying to encode from or decode to a specific Java type.
+	 * 当尝试从特定 Java 类型编码或解码时使用的构造函数。
 	 * @since 5.1
 	 */
 	public UnsupportedMediaTypeException(@Nullable MediaType contentType, List<MediaType> supportedTypes,
-			@Nullable ResolvableType bodyType) {
+										 @Nullable ResolvableType bodyType) {
 
 		super(initReason(contentType, bodyType));
 		this.contentType = contentType;
@@ -79,8 +88,7 @@ public class UnsupportedMediaTypeException extends NestedRuntimeException {
 
 
 	/**
-	 * Return the request Content-Type header if it was parsed successfully,
-	 * or {@code null} otherwise.
+	 * 如果成功解析了请求的 Content-Type 头部，则返回其值，否则返回 {@code null}。
 	 */
 	@Nullable
 	public MediaType getContentType() {
@@ -88,18 +96,15 @@ public class UnsupportedMediaTypeException extends NestedRuntimeException {
 	}
 
 	/**
-	 * Return the list of supported content types in cases when the Content-Type
-	 * header is parsed but not supported, or an empty list otherwise.
+	 * 在 Content-Type 头部已解析但不受支持的情况下返回受支持的内容类型列表，否则返回空列表。
 	 */
 	public List<MediaType> getSupportedMediaTypes() {
 		return this.supportedMediaTypes;
 	}
 
 	/**
-	 * Return the body type in the context of which this exception was generated.
-	 * This is applicable when the exception was raised as a result trying to
-	 * encode from or decode to a specific Java type.
-	 * @return the body type, or {@code null} if not available
+	 * 返回生成此异常的上下文中的主体类型。当异常由于尝试从特定 Java 类型编码或解码而引发时适用。
+	 * @return 主体类型，如果不可用则返回 {@code null}
 	 * @since 5.1
 	 */
 	@Nullable
