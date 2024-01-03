@@ -34,7 +34,7 @@ import java.util.Optional;
  * @see BodyInserters
  * @since 5.0
  */
-@FunctionalInterface
+   @FunctionalInterface
 public interface BodyInserter<T, M extends ReactiveHttpOutputMessage> {
 
 	/**

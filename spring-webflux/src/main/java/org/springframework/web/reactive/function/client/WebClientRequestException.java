@@ -16,13 +16,13 @@
 
 package org.springframework.web.reactive.function.client;
 
-import java.net.URI;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
+import java.net.URI;
+
 /**
- * Exceptions that contain actual HTTP request data.
+ * 包含实际 HTTP 请求数据的异常。
  *
  * @author Arjen Poutsma
  * @since 5.3
@@ -31,16 +31,29 @@ public class WebClientRequestException extends WebClientException {
 
 	private static final long serialVersionUID = -5139991985321385005L;
 
-
+	/**
+	 * HTTP请求的方法。
+	 */
 	private final HttpMethod method;
 
+	/**
+	 * HTTP请求的URI。
+	 */
 	private final URI uri;
 
+	/**
+	 * HTTP请求的头信息。
+	 */
 	private final HttpHeaders headers;
 
 
 	/**
-	 * Constructor for throwable.
+	 * 使用异常、HTTP方法、URI和HTTP头构造一个新的 {@code WebClientRequestException} 实例。
+	 *
+	 * @param ex      异常
+	 * @param method  HTTP方法
+	 * @param uri     请求URI
+	 * @param headers HTTP头信息
 	 */
 	public WebClientRequestException(Throwable ex, HttpMethod method, URI uri, HttpHeaders headers) {
 		super(ex.getMessage(), ex);
@@ -51,21 +64,27 @@ public class WebClientRequestException extends WebClientException {
 	}
 
 	/**
-	 * Return the HTTP request method.
+	 * 返回HTTP请求方法。
+	 *
+	 * @return HTTP请求方法
 	 */
 	public HttpMethod getMethod() {
 		return this.method;
 	}
 
 	/**
-	 * Return the request URI.
+	 * 返回请求URI。
+	 *
+	 * @return 请求URI
 	 */
 	public URI getUri() {
 		return this.uri;
 	}
 
 	/**
-	 * Return the HTTP request headers.
+	 * 返回HTTP请求头。
+	 *
+	 * @return HTTP请求头
 	 */
 	public HttpHeaders getHeaders() {
 		return this.headers;

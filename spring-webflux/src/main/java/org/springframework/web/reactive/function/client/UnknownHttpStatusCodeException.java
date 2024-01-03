@@ -16,14 +16,14 @@
 
 package org.springframework.web.reactive.function.client;
 
-import java.nio.charset.Charset;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.lang.Nullable;
 
+import java.nio.charset.Charset;
+
 /**
- * Exception thrown when an unknown (or custom) HTTP status code is received.
+ * 当接收到未知（或自定义）HTTP状态码时抛出的异常。
  *
  * @author Brian Clozel
  * @since 5.1
@@ -34,8 +34,12 @@ public class UnknownHttpStatusCodeException extends WebClientResponseException {
 
 
 	/**
-	 * Create a new instance of the {@code UnknownHttpStatusCodeException} with the given
-	 * parameters.
+	 * 使用给定的参数创建 {@code UnknownHttpStatusCodeException} 的新实例。
+	 *
+	 * @param statusCode      HTTP状态码
+	 * @param headers         HTTP响应头
+	 * @param responseBody    响应体字节数组
+	 * @param responseCharset 响应字符集编码
 	 */
 	public UnknownHttpStatusCodeException(
 			int statusCode, HttpHeaders headers, byte[] responseBody, Charset responseCharset) {
@@ -45,8 +49,13 @@ public class UnknownHttpStatusCodeException extends WebClientResponseException {
 	}
 
 	/**
-	 * Create a new instance of the {@code UnknownHttpStatusCodeException} with the given
-	 * parameters.
+	 * 使用给定的参数创建 {@code UnknownHttpStatusCodeException} 的新实例。
+	 *
+	 * @param statusCode      HTTP状态码
+	 * @param headers         HTTP响应头
+	 * @param responseBody    响应体字节数组
+	 * @param responseCharset 响应字符集编码
+	 * @param request         HTTP请求
 	 * @since 5.1.4
 	 */
 	public UnknownHttpStatusCodeException(
