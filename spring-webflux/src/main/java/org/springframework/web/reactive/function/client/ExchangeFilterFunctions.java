@@ -16,23 +16,21 @@
 
 package org.springframework.web.reactive.function.client;
 
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import reactor.core.publisher.Mono;
+
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import reactor.core.publisher.Mono;
-
-import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Static factory methods providing access to built-in implementations of
- * {@link ExchangeFilterFunction} for basic authentication, error handling, etc.
+ * 提供用于基本身份验证、错误处理等 {@link ExchangeFilterFunction} 内置实现的静态工厂方法。
  *
  * @author Rob Winch
  * @author Arjen Poutsma
@@ -42,9 +40,9 @@ import org.springframework.util.Assert;
 public abstract class ExchangeFilterFunctions {
 
 	/**
-	 * Name of the request attribute with {@link Credentials} for {@link #basicAuthentication()}.
-	 * @deprecated as of Spring 5.1 in favor of using
-	 * {@link HttpHeaders#setBasicAuth(String, String)} while building the request.
+	 * {@link #basicAuthentication()} 使用的 {@link Credentials} 的请求属性的名称。
+	 *
+	 * @deprecated 自 Spring 5.1 起，推荐在构建请求时使用 {@link HttpHeaders#setBasicAuth(String, String)}。
 	 */
 	@Deprecated
 	public static final String BASIC_AUTHENTICATION_CREDENTIALS_ATTRIBUTE =
@@ -52,31 +50,33 @@ public abstract class ExchangeFilterFunctions {
 
 
 	/**
-	 * Consume up to the specified number of bytes from the response body and
-	 * cancel if any more data arrives.
-	 * <p>Internally delegates to {@link DataBufferUtils#takeUntilByteCount}.
-	 * @param maxByteCount the limit as number of bytes
-	 * @return the filter to limit the response size with
+	 * 从响应体中消耗指定字节数，并在到达更多数据时取消。
+	 * <p>内部委托给 {@link DataBufferUtils#takeUntilByteCount}。
+	 *
+	 * @param maxByteCount 作为字节数的限制
+	 * @return 用于限制响应大小的过滤器
 	 * @since 5.1
 	 */
 	public static ExchangeFilterFunction limitResponseSize(long maxByteCount) {
 		return (request, next) ->
-				next.exchange(request).map(response ->
-						response.mutate()
-								.body(body -> DataBufferUtils.takeUntilByteCount(body, maxByteCount))
-								.build());
+				// 对下一个处理器的请求进行处理，映射为一个新的响应
+				next.exchange(request)
+						.map(response ->
+								// 对响应进行变换，截取 body 数据直到达到最大字节数
+								response.mutate()
+										.body(body -> DataBufferUtils.takeUntilByteCount(body, maxByteCount))
+										.build());
 	}
 
 	/**
-	 * Return a filter that generates an error signal when the given
-	 * {@link HttpStatus} predicate matches.
-	 * @param statusPredicate the predicate to check the HTTP status with
-	 * @param exceptionFunction the function to create the exception
-	 * @return the filter to generate an error signal
+	 * 返回一个过滤器，在给定的 {@link HttpStatus} 谓词匹配时生成错误信号。
+	 *
+	 * @param statusPredicate   用于检查 HTTP 状态的谓词
+	 * @param exceptionFunction 用于创建异常的函数
+	 * @return 生成错误信号的过滤器
 	 */
 	public static ExchangeFilterFunction statusError(Predicate<HttpStatus> statusPredicate,
-			Function<ClientResponse, ? extends Throwable> exceptionFunction) {
-
+													 Function<ClientResponse, ? extends Throwable> exceptionFunction) {
 		Assert.notNull(statusPredicate, "Predicate must not be null");
 		Assert.notNull(exceptionFunction, "Function must not be null");
 
@@ -86,43 +86,47 @@ public abstract class ExchangeFilterFunctions {
 	}
 
 	/**
-	 * Return a filter that applies HTTP Basic Authentication to the request
-	 * headers via {@link HttpHeaders#setBasicAuth(String)} and
-	 * {@link HttpHeaders#encodeBasicAuth(String, String, Charset)}.
-	 * @param username the username
-	 * @param password the password
-	 * @return the filter to add authentication headers with
+	 * 返回一个过滤器，通过 {@link HttpHeaders#setBasicAuth(String)} 和
+	 * {@link HttpHeaders#encodeBasicAuth(String, String, Charset)} 向请求头添加 HTTP 基本身份验证。
+	 *
+	 * @param username 用户名
+	 * @param password 密码
+	 * @return 添加身份验证头的过滤器
 	 * @see HttpHeaders#encodeBasicAuth(String, String, Charset)
 	 * @see HttpHeaders#setBasicAuth(String)
 	 */
 	public static ExchangeFilterFunction basicAuthentication(String username, String password) {
 		String encodedCredentials = HttpHeaders.encodeBasicAuth(username, password, null);
+
 		return (request, next) ->
+				// 使用下一个处理器处理请求，但在构建请求时设置基本身份验证头部信息
 				next.exchange(ClientRequest.from(request)
 						.headers(headers -> headers.setBasicAuth(encodedCredentials))
 						.build());
 	}
 
 	/**
-	 * Variant of {@link #basicAuthentication(String, String)} that looks up
-	 * the {@link Credentials Credentials} in a
-	 * {@link #BASIC_AUTHENTICATION_CREDENTIALS_ATTRIBUTE request attribute}.
-	 * @return the filter to use
+	 * {@link #basicAuthentication(String, String)} 的变体，从
+	 * {@link #BASIC_AUTHENTICATION_CREDENTIALS_ATTRIBUTE 请求属性} 中查找
+	 * {@link Credentials Credentials}。
+	 *
+	 * @return 要使用的过滤器
 	 * @see Credentials
-	 * @deprecated as of Spring 5.1 in favor of using
-	 * {@link HttpHeaders#setBasicAuth(String, String)} while building the request.
+	 * @deprecated 自 Spring 5.1 起，推荐在构建请求时使用 {@link HttpHeaders#setBasicAuth(String, String)}。
 	 */
 	@Deprecated
 	public static ExchangeFilterFunction basicAuthentication() {
 		return (request, next) -> {
+			// 检查请求属性中是否存在基本身份验证凭据
 			Object attr = request.attributes().get(BASIC_AUTHENTICATION_CREDENTIALS_ATTRIBUTE);
 			if (attr instanceof Credentials) {
+				// 如果存在，提取凭据并使用它构建带有基本身份验证头部的新请求
 				Credentials cred = (Credentials) attr;
 				return next.exchange(ClientRequest.from(request)
 						.headers(headers -> headers.setBasicAuth(cred.username, cred.password))
 						.build());
-			}
-			else {
+			} else {
+				// 如果不存在，直接使用原始请求
 				return next.exchange(request);
 			}
 		};
@@ -130,9 +134,9 @@ public abstract class ExchangeFilterFunctions {
 
 
 	/**
-	 * Stores username and password for HTTP basic authentication.
-	 * @deprecated as of Spring 5.1 in favor of using
-	 * {@link HttpHeaders#setBasicAuth(String, String)} while building the request.
+	 * 存储用于 HTTP 基本身份验证的用户名和密码。
+	 *
+	 * @deprecated 自 Spring 5.1 起，推荐在构建请求时使用 {@link HttpHeaders#setBasicAuth(String, String)}。
 	 */
 	@Deprecated
 	public static final class Credentials {
@@ -142,9 +146,10 @@ public abstract class ExchangeFilterFunctions {
 		private final String password;
 
 		/**
-		 * Create a new {@code Credentials} instance with the given username and password.
-		 * @param username the username
-		 * @param password the password
+		 * 使用给定的用户名和密码创建一个新的 {@code Credentials} 实例。
+		 *
+		 * @param username 用户名
+		 * @param password 密码
 		 */
 		public Credentials(String username, String password) {
 			Assert.notNull(username, "'username' must not be null");
@@ -154,13 +159,12 @@ public abstract class ExchangeFilterFunctions {
 		}
 
 		/**
-		 * Return a {@literal Consumer} that stores the given username and password
-		 * as a request attribute of type {@code Credentials} that is in turn
-		 * used by {@link ExchangeFilterFunctions#basicAuthentication()}.
-		 * @param username the username
-		 * @param password the password
-		 * @return a consumer that can be passed into
-		 * {@linkplain ClientRequest.Builder#attributes(java.util.function.Consumer)}
+		 * 返回一个 {@literal Consumer}，将给定的用户名和密码作为 {@code Credentials} 类型的请求属性存储，
+		 * 然后由 {@link ExchangeFilterFunctions#basicAuthentication()} 使用。
+		 *
+		 * @param username 用户名
+		 * @param password 密码
+		 * @return 一个可传递给 {@linkplain ClientRequest.Builder#attributes(java.util.function.Consumer)} 的消费者
 		 * @see ClientRequest.Builder#attributes(java.util.function.Consumer)
 		 * @see #BASIC_AUTHENTICATION_CREDENTIALS_ATTRIBUTE
 		 */
