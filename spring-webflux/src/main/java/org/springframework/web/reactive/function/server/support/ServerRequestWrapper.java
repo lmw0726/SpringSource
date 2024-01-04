@@ -16,25 +16,8 @@
 
 package org.springframework.web.reactive.function.server.support;
 
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.security.Principal;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalLong;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpRange;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.http.codec.HttpMessageReader;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.http.server.PathContainer;
@@ -47,24 +30,35 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import org.springframework.web.util.UriBuilder;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.security.Principal;
+import java.util.*;
 
 /**
- * Implementation of the {@link ServerRequest} interface that can be subclassed
- * to adapt the request in a
- * {@link org.springframework.web.reactive.function.server.HandlerFilterFunction handler filter function}.
- * All methods default to calling through to the wrapped request.
+ * {@link ServerRequest} 接口的实现，可以被子类化以适应
+ * {@link org.springframework.web.reactive.function.server.HandlerFilterFunction 处理器过滤函数} 中的请求。
+ * 所有方法默认调用委托请求。
  *
  * @author Arjen Poutsma
  * @since 5.0
  */
 public class ServerRequestWrapper implements ServerRequest {
 
+	/**
+	 * 服务端请求
+	 */
 	private final ServerRequest delegate;
 
 
 	/**
-	 * Create a new {@code ServerRequestWrapper} that wraps the given request.
-	 * @param delegate the request to wrap
+	 * 创建一个包装给定请求的新 {@code ServerRequestWrapper}。
+	 *
+	 * @param delegate 要包装的请求
 	 */
 	public ServerRequestWrapper(ServerRequest delegate) {
 		Assert.notNull(delegate, "Delegate must not be null");
@@ -73,7 +67,7 @@ public class ServerRequestWrapper implements ServerRequest {
 
 
 	/**
-	 * Return the wrapped request.
+	 * 返回被包装的请求。
 	 */
 	public ServerRequest request() {
 		return this.delegate;
@@ -226,18 +220,21 @@ public class ServerRequestWrapper implements ServerRequest {
 	}
 
 	/**
-	 * Implementation of the {@code Headers} interface that can be subclassed
-	 * to adapt the headers in a
-	 * {@link org.springframework.web.reactive.function.server.HandlerFilterFunction handler filter function}.
-	 * All methods default to calling through to the wrapped headers.
+	 * {@code Headers} 接口的实现，可以被子类化以适应
+	 * {@link org.springframework.web.reactive.function.server.HandlerFilterFunction 处理器过滤函数} 中的请求头。
+	 * 所有方法默认调用委托请求头。
 	 */
 	public static class HeadersWrapper implements ServerRequest.Headers {
 
+		/**
+		 * 请求头
+		 */
 		private final Headers headers;
 
 		/**
-		 * Create a new {@code HeadersWrapper} that wraps the given request.
-		 * @param headers the headers to wrap
+		 * 创建一个包装给定请求头的新 {@code HeadersWrapper}。
+		 *
+		 * @param headers 要包装的请求头
 		 */
 		public HeadersWrapper(Headers headers) {
 			Assert.notNull(headers, "Headers must not be null");
