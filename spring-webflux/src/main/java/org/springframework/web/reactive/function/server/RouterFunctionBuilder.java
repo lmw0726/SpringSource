@@ -16,22 +16,17 @@
 
 package org.springframework.web.reactive.function.server;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.*;
+import java.util.stream.Stream;
 
 /**
  * Default implementation of {@link RouterFunctions.Builder}.
@@ -382,17 +377,29 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 
 	/**
-	 * Router function returned by {@link #build()} that simply iterates over the registered routes.
+	 * {@link #build()} 返回的路由函数，简单地迭代注册的路由。
 	 */
 	private static class BuiltRouterFunction extends RouterFunctions.AbstractRouterFunction<ServerResponse> {
 
+		/**
+		 * 声明一个 RouterFunction<ServerResponse> 类型的列表字段
+		 */
 		private final List<RouterFunction<ServerResponse>> routerFunctions;
 
+		/**
+		 * 构造函数，接收一个路由函数列表。
+		 * @param routerFunctions 路由函数列表
+		 */
 		public BuiltRouterFunction(List<RouterFunction<ServerResponse>> routerFunctions) {
 			Assert.notEmpty(routerFunctions, "RouterFunctions must not be empty");
 			this.routerFunctions = new ArrayList<>(routerFunctions);
 		}
 
+		/**
+		 * 路由请求的方法，将注册的路由函数按顺序迭代，并返回匹配的第一个结果。
+		 * @param request 请求
+		 * @return 处理函数
+		 */
 		@Override
 		public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
 			return Flux.fromIterable(this.routerFunctions)
@@ -400,6 +407,10 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 					.next();
 		}
 
+		/**
+		 * 接受访问者的方法，遍历注册的路由函数并通知访问者。
+		 * @param visitor 访问者
+		 */
 		@Override
 		public void accept(RouterFunctions.Visitor visitor) {
 			this.routerFunctions.forEach(routerFunction -> routerFunction.accept(visitor));

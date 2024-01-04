@@ -16,43 +16,41 @@
 
 package org.springframework.web.reactive.function.server;
 
-import java.util.function.Function;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.support.ServerRequestWrapper;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Function;
 
 /**
- * Represents a function that filters a {@linkplain HandlerFunction handler function}.
+ * 表示过滤{@linkplain HandlerFunction 处理函数}的函数。
  *
+ * @param <T> 要过滤的{@linkplain HandlerFunction 处理函数}类型
+ * @param <R> 函数的响应类型
  * @author Arjen Poutsma
- * @since 5.0
- * @param <T> the type of the {@linkplain HandlerFunction handler function} to filter
- * @param <R> the type of the response of the function
  * @see RouterFunction#filter(HandlerFilterFunction)
+ * @since 5.0
  */
 @FunctionalInterface
 public interface HandlerFilterFunction<T extends ServerResponse, R extends ServerResponse> {
 
 	/**
-	 * Apply this filter to the given handler function. The given
-	 * {@linkplain HandlerFunction handler function} represents the next entity in the chain,
-	 * and can be {@linkplain HandlerFunction#handle(ServerRequest) invoked} in order to
-	 * proceed to this entity, or not invoked to block the chain.
-	 * @param request the request
-	 * @param next the next handler or filter function in the chain
-	 * @return the filtered response
+	 * 将此过滤器应用于给定的处理函数。给定的{@linkplain HandlerFunction 处理函数}表示链中的下一个实体，
+	 * 可以{@linkplain HandlerFunction#handle(ServerRequest) 调用}以继续到此实体，
+	 * 或者不调用以阻止链。
+	 *
+	 * @param request 请求
+	 * @param next    链中的下一个处理函数或过滤器函数
+	 * @return 过滤后的响应
 	 * @see ServerRequestWrapper
 	 */
 	Mono<R> filter(ServerRequest request, HandlerFunction<T> next);
 
 	/**
-	 * Return a composed filter function that first applies this filter, and then applies the
-	 * {@code after} filter.
-	 * @param after the filter to apply after this filter is applied
-	 * @return a composed filter that first applies this function and then applies the
-	 * {@code after} function
+	 * 返回一个组合过滤器函数，首先应用此过滤器，然后应用{@code after}过滤器。
+	 *
+	 * @param after 此过滤器之后要应用的过滤器
+	 * @return 首先应用此函数然后应用{@code after}函数的组合过滤器
 	 */
 	default HandlerFilterFunction<T, R> andThen(HandlerFilterFunction<T, T> after) {
 		Assert.notNull(after, "HandlerFilterFunction must not be null");
@@ -63,9 +61,10 @@ public interface HandlerFilterFunction<T extends ServerResponse, R extends Serve
 	}
 
 	/**
-	 * Apply this filter to the given handler function, resulting in a filtered handler function.
-	 * @param handler the handler function to filter
-	 * @return the filtered handler function
+	 * 将此过滤器应用于给定的处理函数，生成一个过滤后的处理函数。
+	 *
+	 * @param handler 要过滤的处理函数
+	 * @return 过滤后的处理函数
 	 */
 	default HandlerFunction<R> apply(HandlerFunction<T> handler) {
 		Assert.notNull(handler, "HandlerFunction must not be null");
@@ -73,10 +72,10 @@ public interface HandlerFilterFunction<T extends ServerResponse, R extends Serve
 	}
 
 	/**
-	 * Adapt the given request processor function to a filter function that only operates
-	 * on the {@code ServerRequest}.
-	 * @param requestProcessor the request processor
-	 * @return the filter adaptation of the request processor
+	 * 将给定的请求处理函数适配为仅对{@code ServerRequest}操作的过滤器函数。
+	 *
+	 * @param requestProcessor 请求处理函数
+	 * @return 请求处理函数的过滤器适配
 	 */
 	static HandlerFilterFunction<?, ?> ofRequestProcessor(
 			Function<ServerRequest, Mono<ServerRequest>> requestProcessor) {
@@ -86,10 +85,10 @@ public interface HandlerFilterFunction<T extends ServerResponse, R extends Serve
 	}
 
 	/**
-	 * Adapt the given response processor function to a filter function that only operates
-	 * on the {@code ServerResponse}.
-	 * @param responseProcessor the response processor
-	 * @return the filter adaptation of the request processor
+	 * 将给定的响应处理函数适配为仅对{@code ServerResponse}操作的过滤器函数。
+	 *
+	 * @param responseProcessor 响应处理函数
+	 * @return 响应处理函数的过滤器适配
 	 */
 	static <T extends ServerResponse, R extends ServerResponse> HandlerFilterFunction<T, R> ofResponseProcessor(
 			Function<T, Mono<R>> responseProcessor) {
