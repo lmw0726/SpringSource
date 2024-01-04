@@ -16,28 +16,31 @@
 
 package org.springframework.web.reactive.function.server;
 
-import java.util.Map;
-import java.util.function.Function;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.web.util.pattern.PathPatternParser;
+import reactor.core.publisher.Mono;
+
+import java.util.Map;
+import java.util.function.Function;
 
 /**
- * Implementation of {@link RouterFunctions.Visitor} that changes the
- * {@link PathPatternParser} on path-related request predicates
- * (i.e. {@link RequestPredicates.PathPatternPredicate}).
+ * {@link RouterFunctions.Visitor}的实现，在路径相关的请求谓词（例如{@link RequestPredicates.PathPatternPredicate}）上更改{@link PathPatternParser}。
  *
  * @author Arjen Poutsma
  * @since 5.3
  */
 class ChangePathPatternParserVisitor implements RouterFunctions.Visitor {
-
+	/**
+	 * 路径模式解析器
+	 */
 	private final PathPatternParser parser;
 
-
+	/**
+	 * 构造函数，设置要使用的解析器。
+	 *
+	 * @param parser 要使用的解析器，不能为空
+	 */
 	public ChangePathPatternParserVisitor(PathPatternParser parser) {
 		Assert.notNull(parser, "Parser must not be null");
 		this.parser = parser;
@@ -69,19 +72,33 @@ class ChangePathPatternParserVisitor implements RouterFunctions.Visitor {
 	public void unknown(RouterFunction<?> routerFunction) {
 	}
 
+	/**
+	 * 修改路由断言使用的解析器。
+	 *
+	 * @param predicate 要修改解析器的谓词
+	 */
 	private void changeParser(RequestPredicate predicate) {
+		// 检查 predicate 是否是 Target 类的实例
 		if (predicate instanceof Target) {
 			Target target = (Target) predicate;
+
+			// 更改解析器
 			target.changeParser(this.parser);
 		}
+
 	}
 
 
 	/**
-	 * Interface implemented by predicates that can change the parser.
+	 * 由能够更改解析器的断言实现的接口。
 	 */
 	public interface Target {
 
+		/**
+		 * 更改解析器。
+		 *
+		 * @param parser 要使用的解析器
+		 */
 		void changeParser(PathPatternParser parser);
 	}
 }
