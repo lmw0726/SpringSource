@@ -622,6 +622,26 @@ public abstract class RouterFunctions {
 		Builder nest(RequestPredicate predicate, Supplier<RouterFunction<ServerResponse>> routerFunctionSupplier);
 
 		/**
+		 * 如果给定的请求断言成立，则路由到构建的路由函数。
+		 * 此方法可用于创建<strong>嵌套路由</strong>，其中一组路由共享公共路径（前缀）、标题或其他请求断言。
+		 * <p>例如，以下示例创建一个具有“/user”路径断言的嵌套路由，因此“/user”的 GET 请求将列出用户，“/user”的 POST 请求将创建新用户。
+		 * <pre class="code">
+		 * RouterFunction&lt;ServerResponse&gt; nestedRoute =
+		 *   RouterFunctions.route()
+		 *     .nest(RequestPredicates.path("/user"), builder -&gt;
+		 *       builder.GET(this::listUsers)
+		 *              .POST(this::createUser))
+		 *     .build();
+		 * </pre>
+		 *
+		 * @param predicate       要测试的断言
+		 * @param builderConsumer 提供嵌套路由函数的 {@code Builder} 的消费者
+		 * @return 此构建器
+		 * @see RequestPredicates
+		 */
+		Builder nest(RequestPredicate predicate, Consumer<Builder> builderConsumer);
+
+		/**
 		 * 如果给定的请求路径前缀模式适用，则将请求路由到生成的路由函数。此方法可用于创建<strong>嵌套路由</strong>，
 		 * 其中一组路由共享公共路径前缀。
 		 *
@@ -630,6 +650,25 @@ public abstract class RouterFunctions {
 		 * @return 此构建器
 		 */
 		Builder path(String pattern, Supplier<RouterFunction<ServerResponse>> routerFunctionSupplier);
+
+		/**
+		 * 如果给定的路径前缀模式匹配，则路由到构建的路由函数。
+		 * 此方法可用于创建<strong>嵌套路由</strong>，其中一组路由共享公共路径前缀。
+		 * <p>例如，以下示例创建一个具有“/user”路径前缀的嵌套路由，因此“/user”的 GET 请求将列出用户，“/user”的 POST 请求将创建新用户。
+		 * <pre class="code">
+		 * RouterFunction&lt;ServerResponse&gt; nestedRoute =
+		 *   RouterFunctions.route()
+		 *     .path("/user", builder -&gt;
+		 *       builder.GET(this::listUsers)
+		 *              .POST(this::createUser))
+		 *     .build();
+		 * </pre>
+		 *
+		 * @param pattern         要匹配的模式
+		 * @param builderConsumer 提供嵌套路由函数的 {@code Builder} 的消费者
+		 * @return 此构建器
+		 */
+		Builder path(String pattern, Consumer<Builder> builderConsumer);
 
 		/**
 		 * 将请求构建器的所有路由函数过滤器为给定的过滤器函数。过滤器函数通常用于解决交叉关注点，如日志记录、安全性等。
