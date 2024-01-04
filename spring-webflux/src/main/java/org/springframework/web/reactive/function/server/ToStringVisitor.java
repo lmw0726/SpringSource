@@ -16,18 +16,16 @@
 
 package org.springframework.web.reactive.function.server;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import reactor.core.publisher.Mono;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import reactor.core.publisher.Mono;
-
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpMethod;
-
 /**
- * Implementation of {@link RouterFunctions.Visitor} that creates a formatted
- * string representation of router functions.
+ * {@link RouterFunctions.Visitor}的实现，用于创建路由函数的格式化字符串表示形式。
  *
  * @author Arjen Poutsma
  * @since 5.0
@@ -36,6 +34,9 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 
 	private final StringBuilder builder = new StringBuilder();
 
+	/**
+	 * 缩进字符个数
+	 */
 	private int indent = 0;
 
 
@@ -43,6 +44,7 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 
 	@Override
 	public void startNested(RequestPredicate predicate) {
+		//缩进若干个数字符
 		indent();
 		predicate.accept(this);
 		this.builder.append(" => {\n");
@@ -80,6 +82,9 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 		this.builder.append(routerFunction);
 	}
 
+	/**
+	 * 缩进当前字符串生成器的输出，用于格式化输出路由函数的可读性。
+	 */
 	private void indent() {
 		for (int i = 0; i < this.indent; i++) {
 			this.builder.append(' ');
@@ -93,8 +98,7 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 	public void method(Set<HttpMethod> methods) {
 		if (methods.size() == 1) {
 			this.builder.append(methods.iterator().next());
-		}
-		else {
+		} else {
 			this.builder.append(methods);
 		}
 	}
