@@ -19,20 +19,21 @@ package org.springframework.web.reactive.function.server;
 import reactor.core.publisher.Mono;
 
 /**
- * Represents a function that handles a {@linkplain ServerRequest request}.
+ * 表示处理 {@linkplain ServerRequest request} 的函数。
  *
+ * @param <T> 函数的响应类型
  * @author Arjen Poutsma
- * @since 5.0
- * @param <T> the type of the response of the function
  * @see RouterFunction
+ * @since 5.0
  */
 @FunctionalInterface
 public interface HandlerFunction<T extends ServerResponse> {
 
 	/**
-	 * Handle the given request.
-	 * @param request the request to handle
-	 * @return the response
+	 * 处理给定的请求。
+	 *
+	 * @param request 要处理的请求
+	 * @return 响应
 	 */
 	Mono<T> handle(ServerRequest request);
 
