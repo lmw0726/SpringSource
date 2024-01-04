@@ -16,9 +16,6 @@
 
 package org.springframework.web.reactive.function.server;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import org.springframework.http.codec.HttpMessageReader;
 import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
@@ -27,71 +24,82 @@ import org.springframework.web.server.WebExceptionHandler;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
- * Defines the strategies to be used for processing {@link HandlerFunction HandlerFunctions}.
+ * 定义用于处理 {@link HandlerFunction HandlerFunctions} 的策略。
  *
- * <p>An instance of this class is immutable. Instances are typically created through the
- * mutable {@link Builder}: either through {@link #builder()} to set up default strategies,
- * or {@link #empty()} to start from scratch.
+ * <p>此类的实例是不可变的。通常通过可变的 {@link Builder} 创建实例：
+ * 可以通过 {@link #builder()} 来设置默认策略，
+ * 或者通过 {@link #empty()} 从头开始。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @author Sebastien Deleuze
- * @since 5.0
  * @see RouterFunctions#toHttpHandler(RouterFunction, HandlerStrategies)
+ * @since 5.0
  */
 public interface HandlerStrategies {
 
 	/**
-	 * Return the {@link HttpMessageReader HttpMessageReaders} to be used for request body conversion.
-	 * @return the message readers
+	 * 返回用于请求体转换的 {@link HttpMessageReader HttpMessageReaders}。
+	 *
+	 * @return 消息读取器
 	 */
 	List<HttpMessageReader<?>> messageReaders();
 
 	/**
-	 * Return the {@link HttpMessageWriter HttpMessageWriters} to be used for response body conversion.
-	 * @return the message writers
+	 * 返回用于响应体转换的 {@link HttpMessageWriter HttpMessageWriters}。
+	 *
+	 * @return 消息写入器
 	 */
 	List<HttpMessageWriter<?>> messageWriters();
 
 	/**
-	 * Return the {@link ViewResolver ViewResolvers} to be used for view name resolution.
-	 * @return the view resolvers
+	 * 返回用于视图名称解析的 {@link ViewResolver ViewResolvers}。
+	 *
+	 * @return 视图解析器
 	 */
 	List<ViewResolver> viewResolvers();
 
 	/**
-	 * Return the {@link WebFilter WebFilters} to be used for filtering the request and response.
-	 * @return the web filters
+	 * 返回用于过滤请求和响应的 {@link WebFilter WebFilters}。
+	 *
+	 * @return web过滤器
 	 */
 	List<WebFilter> webFilters();
 
 	/**
-	 * Return the {@link WebExceptionHandler WebExceptionHandlers} to be used for handling exceptions.
-	 * @return the exception handlers
+	 * 返回用于处理异常的 {@link WebExceptionHandler WebExceptionHandlers}。
+	 *
+	 * @return 异常处理器
 	 */
 	List<WebExceptionHandler> exceptionHandlers();
 
 	/**
-	 * Return the {@link LocaleContextResolver} to be used for resolving locale context.
-	 * @return the locale context resolver
+	 * 返回用于解析语言环境上下文的 {@link LocaleContextResolver}。
+	 *
+	 * @return 语言环境上下文解析器
 	 */
 	LocaleContextResolver localeContextResolver();
 
 
-	// Static builder methods
+	// 静态生成器方法
 
 	/**
-	 * Return a new {@code HandlerStrategies} with default initialization.
-	 * @return the new {@code HandlerStrategies}
+	 * 使用默认初始化返回一个新的 {@code HandlerStrategies}。
+	 *
+	 * @return 新的 {@code HandlerStrategies}
 	 */
 	static HandlerStrategies withDefaults() {
 		return builder().build();
 	}
 
 	/**
-	 * Return a mutable builder for a {@code HandlerStrategies} with default initialization.
-	 * @return the builder
+	 * 返回一个可变的 {@code HandlerStrategies} 构建器，使用默认初始化。
+	 *
+	 * @return 构建器
 	 */
 	static Builder builder() {
 		DefaultHandlerStrategiesBuilder builder = new DefaultHandlerStrategiesBuilder();
@@ -100,8 +108,9 @@ public interface HandlerStrategies {
 	}
 
 	/**
-	 * Return a mutable, empty builder for a {@code HandlerStrategies}.
-	 * @return the builder
+	 * 返回一个可变的空 {@code HandlerStrategies} 构建器。
+	 *
+	 * @return 构建器
 	 */
 	static Builder empty() {
 		return new DefaultHandlerStrategiesBuilder();
@@ -109,48 +118,54 @@ public interface HandlerStrategies {
 
 
 	/**
-	 * A mutable builder for a {@link HandlerStrategies}.
+	 * 用于构建 {@link HandlerStrategies} 的可变构建器。
 	 */
 	interface Builder {
 
 		/**
-		 * Customize the list of server-side HTTP message readers and writers.
-		 * @param consumer the consumer to customize the codecs
-		 * @return this builder
+		 * 自定义服务器端HTTP消息读取器和写入器的列表。
+		 *
+		 * @param consumer 用于自定义编解码器的消费者
+		 * @return 当前构建器实例
 		 */
 		Builder codecs(Consumer<ServerCodecConfigurer> consumer);
 
 		/**
-		 * Add the given view resolver to this builder.
-		 * @param viewResolver the view resolver to add
-		 * @return this builder
+		 * 将给定的视图解析器添加到此构建器。
+		 *
+		 * @param viewResolver 要添加的视图解析器
+		 * @return 当前构建器实例
 		 */
 		Builder viewResolver(ViewResolver viewResolver);
 
 		/**
-		 * Add the given web filter to this builder.
-		 * @param filter the filter to add
-		 * @return this builder
+		 * 将给定的Web过滤器添加到此构建器。
+		 *
+		 * @param filter 要添加的过滤器
+		 * @return 当前构建器实例
 		 */
 		Builder webFilter(WebFilter filter);
 
 		/**
-		 * Add the given exception handler to this builder.
-		 * @param exceptionHandler the exception handler to add
-		 * @return this builder
+		 * 将给定的异常处理器添加到此构建器。
+		 *
+		 * @param exceptionHandler 要添加的异常处理器
+		 * @return 当前构建器实例
 		 */
 		Builder exceptionHandler(WebExceptionHandler exceptionHandler);
 
 		/**
-		 * Add the given locale context resolver to this builder.
-		 * @param localeContextResolver the locale context resolver to add
-		 * @return this builder
+		 * 将给定的语言环境上下文解析器添加到此构建器。
+		 *
+		 * @param localeContextResolver 要添加的语言环境上下文解析器
+		 * @return 当前构建器实例
 		 */
 		Builder localeContextResolver(LocaleContextResolver localeContextResolver);
 
 		/**
-		 * Builds the {@link HandlerStrategies}.
-		 * @return the built strategies
+		 * 构建 {@link HandlerStrategies}。
+		 *
+		 * @return 构建的策略
 		 */
 		HandlerStrategies build();
 	}

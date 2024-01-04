@@ -16,11 +16,6 @@
 
 package org.springframework.web.reactive.function.server;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
-
 import org.springframework.http.codec.HttpMessageReader;
 import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
@@ -32,30 +27,54 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.i18n.AcceptHeaderLocaleContextResolver;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
- * Default implementation of {@link HandlerStrategies.Builder}.
+ * {@link HandlerStrategies.Builder} 接口的默认实现。
  *
  * @author Arjen Poutsma
  * @since 5.0
  */
 class DefaultHandlerStrategiesBuilder implements HandlerStrategies.Builder {
 
+	/**
+	 * 用于配置服务器编解码器的实例
+	 */
 	private final ServerCodecConfigurer codecConfigurer = ServerCodecConfigurer.create();
 
+	/**
+	 * 视图解析器列表
+	 */
 	private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
+	/**
+	 * Web过滤器列表
+	 */
 	private final List<WebFilter> webFilters = new ArrayList<>();
 
+	/**
+	 * 异常处理器列表
+	 */
 	private final List<WebExceptionHandler> exceptionHandlers = new ArrayList<>();
 
+	/**
+	 * 语言环境上下文解析器，默认为 AcceptHeaderLocaleContextResolver
+	 */
 	private LocaleContextResolver localeContextResolver = new AcceptHeaderLocaleContextResolver();
 
-
+	/**
+	 * 构造函数，初始化DefaultHandlerStrategiesBuilder对象。
+	 */
 	public DefaultHandlerStrategiesBuilder() {
 		this.codecConfigurer.registerDefaults(false);
 	}
 
-
+	/**
+	 * 配置默认值。
+	 */
 	public void defaultConfiguration() {
 		this.codecConfigurer.registerDefaults(true);
 		this.exceptionHandlers.add(new WebFluxResponseStatusExceptionHandler());
@@ -104,20 +123,51 @@ class DefaultHandlerStrategiesBuilder implements HandlerStrategies.Builder {
 	}
 
 
+	/**
+	 * 默认的 HandlerStrategies 实现类。
+	 */
 	private static class DefaultHandlerStrategies implements HandlerStrategies {
 
+		/**
+		 * 用于存储 HTTP 消息读取器的列表。
+		 */
 		private final List<HttpMessageReader<?>> messageReaders;
 
+		/**
+		 * 用于存储 HTTP 消息写入器的列表。
+		 */
 		private final List<HttpMessageWriter<?>> messageWriters;
 
+		/**
+		 * 用于存储视图解析器的列表。
+		 */
 		private final List<ViewResolver> viewResolvers;
 
+		/**
+		 * 用于存储 Web 过滤器的列表。
+		 */
 		private final List<WebFilter> webFilters;
 
+		/**
+		 * 用于存储 Web 异常处理器的列表。
+		 */
 		private final List<WebExceptionHandler> exceptionHandlers;
 
+		/**
+		 * 用于存储语言环境上下文解析器的实例。
+		 */
 		private final LocaleContextResolver localeContextResolver;
 
+		/**
+		 * 构造方法，初始化 DefaultHandlerStrategies 对象。
+		 *
+		 * @param messageReaders        消息读取器列表
+		 * @param messageWriters        消息写入器列表
+		 * @param viewResolvers         视图解析器列表
+		 * @param webFilters            web过滤器列表
+		 * @param exceptionHandlers     异常处理器列表
+		 * @param localeContextResolver 语言环境上下文解析器
+		 */
 		public DefaultHandlerStrategies(
 				List<HttpMessageReader<?>> messageReaders,
 				List<HttpMessageWriter<?>> messageWriters,
@@ -134,6 +184,9 @@ class DefaultHandlerStrategiesBuilder implements HandlerStrategies.Builder {
 			this.localeContextResolver = localeContextResolver;
 		}
 
+		/**
+		 * 返回一个不可修改的列表副本。
+		 */
 		private static <T> List<T> unmodifiableCopy(List<? extends T> list) {
 			return Collections.unmodifiableList(new ArrayList<>(list));
 		}
