@@ -16,27 +16,8 @@
 
 package org.springframework.web.reactive.function.server;
 
-import java.net.URI;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.codec.Hints;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.*;
 import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -45,27 +26,51 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.net.URI;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
- * Default {@link EntityResponse.Builder} implementation.
+ * 默认的 {@link EntityResponse.Builder} 实现。
  *
+ * @param <T> 构建器类型的自引用
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @since 5.0
- * @param <T> a self reference to the builder type
  */
 class DefaultEntityResponseBuilder<T> implements EntityResponse.Builder<T> {
-
+	/**
+	 * 实体对象
+	 */
 	private final T entity;
 
+	/**
+	 * 用于插入实体的BodyInserter对象
+	 */
 	private final BodyInserter<T, ? super ServerHttpResponse> inserter;
 
+	/**
+	 * 状态码，默认为OK（200）
+	 */
 	private int status = HttpStatus.OK.value();
 
+	/**
+	 * HTTP响应头
+	 */
 	private final HttpHeaders headers = new HttpHeaders();
 
+	/**
+	 * 响应的Cookie列表
+	 */
 	private final MultiValueMap<String, ResponseCookie> cookies = new LinkedMultiValueMap<>();
 
+	/**
+	 * 提示信息映射
+	 */
 	private final Map<String, Object> hints = new HashMap<>();
 
 
@@ -139,6 +144,12 @@ class DefaultEntityResponseBuilder<T> implements EntityResponse.Builder<T> {
 		return this;
 	}
 
+	/**
+	 * 设置实体标签（ETag）。
+	 *
+	 * @param etag 要设置的实体标签
+	 * @return EntityResponse.Builder对象，用于链式调用
+	 */
 	@Override
 	public EntityResponse.Builder<T> eTag(String etag) {
 		if (!etag.startsWith("\"") && !etag.startsWith("W/\"")) {
@@ -204,43 +215,84 @@ class DefaultEntityResponseBuilder<T> implements EntityResponse.Builder<T> {
 			extends DefaultServerResponseBuilder.AbstractServerResponse
 			implements EntityResponse<T> {
 
+		/**
+		 * 实体对象。
+		 */
 		private final T entity;
 
+		/**
+		 * 实体对象的插入器，用于将实体写入到服务器HTTP响应中。
+		 */
 		private final BodyInserter<T, ? super ServerHttpResponse> inserter;
 
 
 		public DefaultEntityResponse(int statusCode, HttpHeaders headers,
-				MultiValueMap<String, ResponseCookie> cookies, T entity,
-				BodyInserter<T, ? super ServerHttpResponse> inserter, Map<String, Object> hints) {
+									 MultiValueMap<String, ResponseCookie> cookies, T entity,
+									 BodyInserter<T, ? super ServerHttpResponse> inserter, Map<String, Object> hints) {
 
 			super(statusCode, headers, cookies, hints);
 			this.entity = entity;
 			this.inserter = inserter;
 		}
 
+		/**
+		 * 获取实体对象。
+		 *
+		 * @return 实体对象
+		 */
 		@Override
 		public T entity() {
 			return this.entity;
 		}
 
+		/**
+		 * 获取用于插入实体的BodyInserter对象。
+		 *
+		 * @return BodyInserter对象，用于将实体插入ServerHttpResponse
+		 */
 		@Override
 		public BodyInserter<T, ? super ServerHttpResponse> inserter() {
 			return this.inserter;
 		}
 
+		/**
+		 * 覆盖父类方法，用于在内部执行写入操作。
+		 *
+		 * @param exchange 服务器Web交换对象
+		 * @param context  上下文对象
+		 * @return Mono<Void>对象，表示写入操作完成的信号
+		 */
 		@Override
 		protected Mono<Void> writeToInternal(ServerWebExchange exchange, Context context) {
 			return inserter().insert(exchange.getResponse(), new BodyInserter.Context() {
+				/**
+				 * 获取消息写入器列表。
+				 *
+				 * @return HttpMessageWriter列表
+				 */
 				@Override
 				public List<HttpMessageWriter<?>> messageWriters() {
 					return context.messageWriters();
 				}
+
+				/**
+				 * 获取服务器HTTP请求对象的可选项。
+				 *
+				 * @return 可选的ServerHttpRequest对象
+				 */
 				@Override
 				public Optional<ServerHttpRequest> serverRequest() {
 					return Optional.of(exchange.getRequest());
 				}
+
+				/**
+				 * 获取提示信息的映射。
+				 *
+				 * @return 提示信息映射
+				 */
 				@Override
 				public Map<String, Object> hints() {
+					Map<String, Object> hints = new HashMap<>();
 					hints.put(Hints.LOG_PREFIX_HINT, exchange.getLogPrefix());
 					return hints;
 				}
