@@ -29,11 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Base class for Netty-based {@link WebSocketSession} adapters that provides
- * convenience methods to convert Netty {@link WebSocketFrame WebSocketFrames} to and from
- * {@link WebSocketMessage WebSocketMessages}.
+ * 基于 Netty 的 {@link WebSocketSession} 适配器的基类，提供将 Netty {@link WebSocketFrame WebSocketFrames}
+ * 转换为 {@link WebSocketMessage WebSocketMessages} 以及从中转换的便利方法。
  *
- * @param <T> the native delegate type
+ * @param <T> 本机委托类型
  * @author Rossen Stoyanchev
  * @since 5.0
  */

@@ -36,8 +36,7 @@ import reactor.netty.http.websocket.WebsocketOutbound;
 import java.util.function.Consumer;
 
 /**
- * {@link WebSocketSession} implementation for use with the Reactor Netty's
- * {@link NettyInbound} and {@link NettyOutbound}.
+ * 用于Reactor Netty的 {@link NettyInbound} 和 {@link NettyOutbound} 的 {@link WebSocketSession} 实现。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
