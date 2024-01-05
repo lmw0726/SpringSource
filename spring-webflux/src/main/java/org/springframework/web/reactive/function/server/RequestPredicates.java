@@ -52,8 +52,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Implementations of {@link RequestPredicate} that implement various useful
- * request matching operations, such as matching based on path, HTTP method, etc.
+ * 实现了{@link RequestPredicate}接口，实现了各种有用的请求匹配操作，比如基于路径、HTTP方法等的匹配。
  *
  * @author Arjen Poutsma
  * @since 5.0
@@ -63,31 +62,29 @@ public abstract class RequestPredicates {
 	private static final Log logger = LogFactory.getLog(RequestPredicates.class);
 
 	/**
-	 * Return a {@code RequestPredicate} that always matches.
+	 * 返回一个总是匹配的{@code RequestPredicate}。
 	 *
-	 * @return a predicate that always matches
+	 * @return 总是匹配的谓词
 	 */
 	public static RequestPredicate all() {
 		return request -> true;
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if the request's
-	 * HTTP method is equal to the given method.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法等于给定的方法，则匹配成功。
 	 *
-	 * @param httpMethod the HTTP method to match against
-	 * @return a predicate that tests against the given HTTP method
+	 * @param httpMethod 要匹配的HTTP方法
+	 * @return 一个测试给定HTTP方法的谓词
 	 */
 	public static RequestPredicate method(HttpMethod httpMethod) {
 		return new HttpMethodPredicate(httpMethod);
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if the request's
-	 * HTTP method is equal to one the of the given methods.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法等于给定方法之一，则匹配成功。
 	 *
-	 * @param httpMethods the HTTP methods to match against
-	 * @return a predicate that tests against the given HTTP methods
+	 * @param httpMethods 要匹配的HTTP方法
+	 * @return 一个测试给定HTTP方法的谓词
 	 * @since 5.1
 	 */
 	public static RequestPredicate methods(HttpMethod... httpMethods) {
@@ -95,11 +92,10 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that tests the request path
-	 * against the given path pattern.
+	 * 返回一个{@code RequestPredicate}，测试请求路径与给定的路径模式匹配。
 	 *
-	 * @param pattern the pattern to match to
-	 * @return a predicate that tests against the given path pattern
+	 * @param pattern 要匹配的路径模式
+	 * @return 一个测试给定路径模式的谓词
 	 */
 	public static RequestPredicate path(String pattern) {
 		Assert.notNull(pattern, "'pattern' must not be null");
@@ -110,14 +106,11 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * Return a function that creates new path-matching {@code RequestPredicates}
-	 * from pattern Strings using the given {@link PathPatternParser}.
-	 * <p>This method can be used to specify a non-default, customized
-	 * {@code PathPatternParser} when resolving path patterns.
+	 * 返回一个函数，使用给定的{@link PathPatternParser}从模式字符串创建新的路径匹配{@code RequestPredicates}。
+	 * <p>当解析路径模式时，此方法可用于指定非默认的自定义{@code PathPatternParser}。
 	 *
-	 * @param patternParser the parser used to parse patterns given to the returned function
-	 * @return a function that resolves a pattern String into a path-matching
-	 * {@code RequestPredicates} instance
+	 * @param patternParser 用于解析模式的解析器
+	 * @return 一个将模式字符串解析为路径匹配{@code RequestPredicates}实例的函数
 	 */
 	public static Function<String, RequestPredicate> pathPredicates(PathPatternParser patternParser) {
 		Assert.notNull(patternParser, "PathPatternParser must not be null");
@@ -125,23 +118,21 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that tests the request's headers
-	 * against the given headers predicate.
+	 * 返回一个{@code RequestPredicate}，用于测试请求的头部信息是否符合给定的头部信息谓词。
 	 *
-	 * @param headersPredicate a predicate that tests against the request headers
-	 * @return a predicate that tests against the given header predicate
+	 * @param headersPredicate 测试请求头部信息的谓词
+	 * @return 一个测试给定头部信息谓词的谓词
 	 */
 	public static RequestPredicate headers(Predicate<ServerRequest.Headers> headersPredicate) {
 		return new HeadersPredicate(headersPredicate);
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that tests if the request's
-	 * {@linkplain ServerRequest.Headers#contentType() content type} is
-	 * {@linkplain MediaType#includes(MediaType) included} by any of the given media types.
+	 * 返回一个{@code RequestPredicate}，用于检查请求的{@linkplain ServerRequest.Headers#contentType() 内容类型}
+	 * 是否被给定的媒体类型之一所包含。
 	 *
-	 * @param mediaTypes the media types to match the request's content type against
-	 * @return a predicate that tests the request's content type against the given media types
+	 * @param mediaTypes 用于匹配请求内容类型的媒体类型
+	 * @return 一个测试请求内容类型是否匹配给定媒体类型的谓词
 	 */
 	public static RequestPredicate contentType(MediaType... mediaTypes) {
 		Assert.notEmpty(mediaTypes, "'mediaTypes' must not be empty");
@@ -149,12 +140,10 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that tests if the request's
-	 * {@linkplain ServerRequest.Headers#accept() accept} header is
-	 * {@linkplain MediaType#isCompatibleWith(MediaType) compatible} with any of the given media types.
+	 * 返回一个{@code RequestPredicate}，用于测试请求的{@linkplain ServerRequest.Headers#accept() accept}头部信息是否与给定的媒体类型之一{@linkplain MediaType#isCompatibleWith(MediaType)兼容}。
 	 *
-	 * @param mediaTypes the media types to match the request's accept header against
-	 * @return a predicate that tests the request's accept header against the given media types
+	 * @param mediaTypes 用于匹配请求的accept头部信息的媒体类型
+	 * @return 一个测试请求的accept头部信息是否与给定媒体类型兼容的谓词
 	 */
 	public static RequestPredicate accept(MediaType... mediaTypes) {
 		Assert.notEmpty(mediaTypes, "'mediaTypes' must not be empty");
@@ -162,94 +151,80 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if request's HTTP method is {@code GET}
-	 * and the given {@code pattern} matches against the request path.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法为{@code GET}且给定的{@code pattern}与请求路径匹配，则匹配。
 	 *
-	 * @param pattern the path pattern to match against
-	 * @return a predicate that matches if the request method is GET and if the given pattern
-	 * matches against the request path
+	 * @param pattern 要与之匹配的路径模式
+	 * @return 如果请求方法为GET并且给定模式与请求路径匹配，则匹配的谓词
 	 */
 	public static RequestPredicate GET(String pattern) {
 		return method(HttpMethod.GET).and(path(pattern));
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if request's HTTP method is {@code HEAD}
-	 * and the given {@code pattern} matches against the request path.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法为{@code HEAD}且给定的{@code pattern}与请求路径匹配，则匹配。
 	 *
-	 * @param pattern the path pattern to match against
-	 * @return a predicate that matches if the request method is HEAD and if the given pattern
-	 * matches against the request path
+	 * @param pattern 要与之匹配的路径模式
+	 * @return 如果请求方法为HEAD并且给定模式与请求路径匹配，则匹配的谓词
 	 */
 	public static RequestPredicate HEAD(String pattern) {
 		return method(HttpMethod.HEAD).and(path(pattern));
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if request's HTTP method is {@code POST}
-	 * and the given {@code pattern} matches against the request path.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法为{@code POST}且给定的{@code pattern}与请求路径匹配，则匹配。
 	 *
-	 * @param pattern the path pattern to match against
-	 * @return a predicate that matches if the request method is POST and if the given pattern
-	 * matches against the request path
+	 * @param pattern 要与之匹配的路径模式
+	 * @return 如果请求方法为POST并且给定模式与请求路径匹配，则匹配的谓词
 	 */
 	public static RequestPredicate POST(String pattern) {
 		return method(HttpMethod.POST).and(path(pattern));
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if request's HTTP method is {@code PUT}
-	 * and the given {@code pattern} matches against the request path.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法为{@code PUT}且给定的{@code pattern}与请求路径匹配，则匹配。
 	 *
-	 * @param pattern the path pattern to match against
-	 * @return a predicate that matches if the request method is PUT and if the given pattern
-	 * matches against the request path
+	 * @param pattern 要与之匹配的路径模式
+	 * @return 如果请求方法为PUT并且给定模式与请求路径匹配，则匹配的谓词
 	 */
 	public static RequestPredicate PUT(String pattern) {
 		return method(HttpMethod.PUT).and(path(pattern));
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if request's HTTP method is {@code PATCH}
-	 * and the given {@code pattern} matches against the request path.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法为{@code PATCH}且给定的{@code pattern}与请求路径匹配，则匹配。
 	 *
-	 * @param pattern the path pattern to match against
-	 * @return a predicate that matches if the request method is PATCH and if the given pattern
-	 * matches against the request path
+	 * @param pattern 要与之匹配的路径模式
+	 * @return 如果请求方法为PATCH并且给定模式与请求路径匹配，则匹配的谓词
 	 */
 	public static RequestPredicate PATCH(String pattern) {
 		return method(HttpMethod.PATCH).and(path(pattern));
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if request's HTTP method is {@code DELETE}
-	 * and the given {@code pattern} matches against the request path.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法为{@code DELETE}且给定的{@code pattern}与请求路径匹配，则匹配。
 	 *
-	 * @param pattern the path pattern to match against
-	 * @return a predicate that matches if the request method is DELETE and if the given pattern
-	 * matches against the request path
+	 * @param pattern 要与之匹配的路径模式
+	 * @return 如果请求方法为DELETE并且给定模式与请求路径匹配，则匹配的谓词
 	 */
 	public static RequestPredicate DELETE(String pattern) {
 		return method(HttpMethod.DELETE).and(path(pattern));
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if request's HTTP method is {@code OPTIONS}
-	 * and the given {@code pattern} matches against the request path.
+	 * 返回一个{@code RequestPredicate}，如果请求的HTTP方法为{@code OPTIONS}且给定的{@code pattern}与请求路径匹配，则匹配。
 	 *
-	 * @param pattern the path pattern to match against
-	 * @return a predicate that matches if the request method is OPTIONS and if the given pattern
-	 * matches against the request path
+	 * @param pattern 要与之匹配的路径模式
+	 * @return 如果请求方法为OPTIONS并且给定模式与请求路径匹配，则匹配的谓词
 	 */
 	public static RequestPredicate OPTIONS(String pattern) {
 		return method(HttpMethod.OPTIONS).and(path(pattern));
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if the request's path has the given extension.
+	 * 返回一个{@code RequestPredicate}，如果请求的路径具有给定的扩展名，则匹配。
 	 *
-	 * @param extension the path extension to match against, ignoring case
-	 * @return a predicate that matches if the request's path has the given file extension
+	 * @param extension 要与之匹配的路径扩展名（忽略大小写）
+	 * @return 如果请求的路径具有给定的文件扩展名，则匹配的谓词
 	 */
 	public static RequestPredicate pathExtension(String extension) {
 		Assert.notNull(extension, "'extension' must not be null");
@@ -257,24 +232,21 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if the request's path matches the given
-	 * predicate.
+	 * 返回一个{@code RequestPredicate}，如果请求的路径与给定的谓词匹配，则匹配。
 	 *
-	 * @param extensionPredicate the predicate to test against the request path extension
-	 * @return a predicate that matches if the given predicate matches against the request's path
-	 * file extension
+	 * @param extensionPredicate 要针对请求路径扩展名测试的谓词
+	 * @return 如果给定的谓词与请求的路径文件扩展名匹配，则匹配的谓词
 	 */
 	public static RequestPredicate pathExtension(Predicate<String> extensionPredicate) {
 		return new PathExtensionPredicate(extensionPredicate);
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that matches if the request's query parameter of the given name
-	 * has the given value.
+	 * 返回一个{@code RequestPredicate}，如果请求的给定名称的查询参数具有给定值，则匹配。
 	 *
-	 * @param name  the name of the query parameter to test against
-	 * @param value the value of the query parameter to test against
-	 * @return a predicate that matches if the query parameter has the given value
+	 * @param name  要与之匹配的查询参数的名称
+	 * @param value 要与查询参数匹配的值
+	 * @return 如果查询参数具有给定值，则匹配的谓词
 	 * @see ServerRequest#queryParam(String)
 	 * @since 5.0.7
 	 */
@@ -283,12 +255,11 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * Return a {@code RequestPredicate} that tests the request's query parameter of the given name
-	 * against the given predicate.
+	 * 返回一个{@code RequestPredicate}，用于测试请求的给定名称的查询参数是否与给定的谓词匹配。
 	 *
-	 * @param name      the name of the query parameter to test against
-	 * @param predicate the predicate to test against the query parameter value
-	 * @return a predicate that matches the given predicate against the query parameter of the given name
+	 * @param name      要测试的查询参数的名称
+	 * @param predicate 要针对查询参数值进行测试的谓词
+	 * @return 匹配给定谓词与给定名称的查询参数的谓词
 	 * @see ServerRequest#queryParam(String)
 	 */
 	public static RequestPredicate queryParam(String name, Predicate<String> predicate) {
@@ -296,6 +267,14 @@ public abstract class RequestPredicates {
 	}
 
 
+	/**
+	 * 跟踪匹配结果的辅助方法。
+	 *
+	 * @param prefix  前缀字符串，用于标识是哪种类型的匹配
+	 * @param desired 期望的值
+	 * @param actual  实际值
+	 * @param match   匹配结果，是否匹配
+	 */
 	private static void traceMatch(String prefix, Object desired, @Nullable Object actual, boolean match) {
 		if (logger.isTraceEnabled()) {
 			logger.trace(String.format("%s \"%s\" %s against value \"%s\"",
@@ -303,27 +282,56 @@ public abstract class RequestPredicates {
 		}
 	}
 
+	/**
+	 * 恢复 ServerRequest 的属性。
+	 *
+	 * @param request    ServerRequest 请求对象
+	 * @param attributes 要恢复的属性映射
+	 */
 	private static void restoreAttributes(ServerRequest request, Map<String, Object> attributes) {
+		// 清空请求的属性
 		request.attributes().clear();
+		// 将给定的属性映射放入请求的属性中
 		request.attributes().putAll(attributes);
 	}
 
+	/**
+	 * 合并两个路径变量的映射。
+	 *
+	 * @param oldVariables 原始的路径变量映射
+	 * @param newVariables 新的路径变量映射
+	 * @return 合并后的路径变量映射
+	 */
 	private static Map<String, String> mergePathVariables(Map<String, String> oldVariables,
 														  Map<String, String> newVariables) {
-
+		// 如果新的路径变量映射不为空
 		if (!newVariables.isEmpty()) {
+			// 创建一个新的 LinkedHashMap，将原始路径变量映射放入其中
 			Map<String, String> mergedVariables = new LinkedHashMap<>(oldVariables);
+			// 将新的路径变量映射放入合并后的映射中
 			mergedVariables.putAll(newVariables);
+			// 返回合并后的路径变量映射
 			return mergedVariables;
 		} else {
+			// 如果新的路径变量映射为空，则直接返回原始路径变量映射
 			return oldVariables;
 		}
 	}
 
+	/**
+	 * 合并路径模式。
+	 *
+	 * @param oldPattern 原始路径模式（可为空）
+	 * @param newPattern 新的路径模式
+	 * @return 合并后的路径模式
+	 */
 	private static PathPattern mergePatterns(@Nullable PathPattern oldPattern, PathPattern newPattern) {
+		// 如果原始路径模式不为空
 		if (oldPattern != null) {
+			// 将新的路径模式合并到原始路径模式中，并返回合并后的路径模式
 			return oldPattern.combine(newPattern);
 		} else {
+			// 如果原始路径模式为空，则直接返回新的路径模式
 			return newPattern;
 		}
 
@@ -331,39 +339,39 @@ public abstract class RequestPredicates {
 
 
 	/**
-	 * Receives notifications from the logical structure of request predicates.
+	 * 接收来自请求谓词逻辑结构的通知。
 	 */
 	public interface Visitor {
 
 		/**
-		 * Receive notification of an HTTP method predicate.
+		 * 接收 HTTP 方法谓词的通知。
 		 *
-		 * @param methods the HTTP methods that make up the predicate
+		 * @param methods 组成谓词的 HTTP 方法集合
 		 * @see RequestPredicates#method(HttpMethod)
 		 */
 		void method(Set<HttpMethod> methods);
 
 		/**
-		 * Receive notification of an path predicate.
+		 * 接收路径谓词的通知。
 		 *
-		 * @param pattern the path pattern that makes up the predicate
+		 * @param pattern 组成谓词的路径模式
 		 * @see RequestPredicates#path(String)
 		 */
 		void path(String pattern);
 
 		/**
-		 * Receive notification of an path extension predicate.
+		 * 接收路径扩展谓词的通知。
 		 *
-		 * @param extension the path extension that makes up the predicate
+		 * @param extension 组成谓词的路径扩展
 		 * @see RequestPredicates#pathExtension(String)
 		 */
 		void pathExtension(String extension);
 
 		/**
-		 * Receive notification of an HTTP header predicate.
+		 * 接收 HTTP 头部谓词的通知。
 		 *
-		 * @param name  the name of the HTTP header to check
-		 * @param value the desired value of the HTTP header
+		 * @param name  要检查的 HTTP 头部名称
+		 * @param value HTTP 头部的期望值
 		 * @see RequestPredicates#headers(Predicate)
 		 * @see RequestPredicates#contentType(MediaType...)
 		 * @see RequestPredicates#accept(MediaType...)
@@ -371,80 +379,79 @@ public abstract class RequestPredicates {
 		void header(String name, String value);
 
 		/**
-		 * Receive notification of a query parameter predicate.
+		 * 接收查询参数谓词的通知。
 		 *
-		 * @param name  the name of the query parameter
-		 * @param value the desired value of the parameter
+		 * @param name  查询参数的名称
+		 * @param value 参数的期望值
 		 * @see RequestPredicates#queryParam(String, String)
 		 */
 		void queryParam(String name, String value);
 
 		/**
-		 * Receive first notification of a logical AND predicate.
-		 * The first subsequent notification will contain the left-hand side of the AND-predicate;
-		 * followed by {@link #and()}, followed by the right-hand side, followed by {@link #endAnd()}.
+		 * 接收逻辑 AND 谓词的首次通知。
+		 * 下一个通知将包含 AND 谓词的左侧；
+		 * 接着是 {@link #and()}，然后是右侧，最后是 {@link #endAnd()}。
 		 *
 		 * @see RequestPredicate#and(RequestPredicate)
 		 */
 		void startAnd();
 
 		/**
-		 * Receive "middle" notification of a logical AND predicate.
-		 * The following notification contains the right-hand side, followed by {@link #endAnd()}.
+		 * 接收逻辑 AND 谓词的“中间”通知。
+		 * 下一个通知将包含右侧，然后是 {@link #endAnd()}。
 		 *
 		 * @see RequestPredicate#and(RequestPredicate)
 		 */
 		void and();
 
 		/**
-		 * Receive last notification of a logical AND predicate.
+		 * 接收逻辑 AND 谓词的最后通知。
 		 *
 		 * @see RequestPredicate#and(RequestPredicate)
 		 */
 		void endAnd();
 
 		/**
-		 * Receive first notification of a logical OR predicate.
-		 * The first subsequent notification will contain the left-hand side of the OR-predicate;
-		 * the second notification contains the right-hand side, followed by {@link #endOr()}.
+		 * 接收逻辑 OR 谓词的首次通知。
+		 * 下一个通知将包含 OR 谓词的左侧；
+		 * 第二个通知包含右侧，然后是 {@link #endOr()}。
 		 *
 		 * @see RequestPredicate#or(RequestPredicate)
 		 */
 		void startOr();
 
 		/**
-		 * Receive "middle" notification of a logical OR predicate.
-		 * The following notification contains the right-hand side, followed by {@link #endOr()}.
+		 * 接收逻辑 OR 谓词的“中间”通知。
+		 * 下一个通知将包含右侧，然后是 {@link #endOr()}。
 		 *
 		 * @see RequestPredicate#or(RequestPredicate)
 		 */
 		void or();
 
 		/**
-		 * Receive last notification of a logical OR predicate.
+		 * 接收逻辑 OR 谓词的最后通知。
 		 *
 		 * @see RequestPredicate#or(RequestPredicate)
 		 */
 		void endOr();
 
 		/**
-		 * Receive first notification of a negated predicate.
-		 * The first subsequent notification will contain the negated predicated, followed
-		 * by {@link #endNegate()}.
+		 * 接收否定谓词的首次通知。
+		 * 下一个通知将包含被否定的谓词，然后是 {@link #endNegate()}。
 		 *
 		 * @see RequestPredicate#negate()
 		 */
 		void startNegate();
 
 		/**
-		 * Receive last notification of a negated predicate.
+		 * 接收否定谓词的最后通知。
 		 *
 		 * @see RequestPredicate#negate()
 		 */
 		void endNegate();
 
 		/**
-		 * Receive first notification of an unknown predicate.
+		 * 接收未知谓词的首次通知。
 		 */
 		void unknown(RequestPredicate predicate);
 	}
@@ -452,6 +459,9 @@ public abstract class RequestPredicates {
 
 	private static class HttpMethodPredicate implements RequestPredicate {
 
+		/**
+		 * HTTP方法集合
+		 */
 		private final Set<HttpMethod> httpMethods;
 
 		public HttpMethodPredicate(HttpMethod httpMethod) {
@@ -464,21 +474,46 @@ public abstract class RequestPredicates {
 			this.httpMethods = EnumSet.copyOf(Arrays.asList(httpMethods));
 		}
 
+		/**
+		 * 测试请求的 HTTP 方法是否匹配给定的 HTTP 方法。
+		 *
+		 * @param request 请求对象
+		 * @return 如果请求的方法匹配谓词中定义的方法，则为 true；否则为 false
+		 */
 		@Override
 		public boolean test(ServerRequest request) {
+			// 获取请求的 HTTP 方法
 			HttpMethod method = method(request);
+
+			// 检查请求的方法是否包含在预期的方法集合中
 			boolean match = this.httpMethods.contains(method);
+
+			// 输出匹配信息，用于追踪调试
 			traceMatch("Method", this.httpMethods, method, match);
+
+			// 返回是否匹配的结果
 			return match;
 		}
 
+		/**
+		 * 从 ServerRequest 对象中获取 HTTP 方法。
+		 *
+		 * @param request ServerRequest 对象
+		 * @return 如果是预检请求（preflight request），则返回预检请求的控制方法（Access-Control-Request-Method）对应的 HTTP 方法；
+		 * 否则返回实际请求的 HTTP 方法
+		 */
 		@Nullable
 		private static HttpMethod method(ServerRequest request) {
+			// 检查当前请求是否是预检请求（Preflight Request）
 			if (CorsUtils.isPreFlightRequest(request.exchange().getRequest())) {
+				// 获取 Access-Control-Request-Method 请求头的值
 				String accessControlRequestMethod =
 						request.headers().firstHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD);
+
+				// 解析 Access-Control-Request-Method 为对应的 HttpMethod
 				return HttpMethod.resolve(accessControlRequestMethod);
 			} else {
+				// 如果不是预检请求，则直接返回当前请求的 HttpMethod
 				return request.method();
 			}
 		}
@@ -499,8 +534,14 @@ public abstract class RequestPredicates {
 	}
 
 
+	/**
+	 * 路径模式断言
+	 */
 	private static class PathPatternPredicate implements RequestPredicate, ChangePathPatternParserVisitor.Target {
 
+		/**
+		 * 路径模式
+		 */
 		private PathPattern pattern;
 
 		public PathPatternPredicate(PathPattern pattern) {
@@ -508,31 +549,59 @@ public abstract class RequestPredicates {
 			this.pattern = pattern;
 		}
 
+		/**
+		 * 测试给定的 ServerRequest 是否符合特定的路径模式。
+		 *
+		 * @param request ServerRequest 对象
+		 * @return 如果路径匹配成功，则返回 true；否则返回 false
+		 */
 		@Override
 		public boolean test(ServerRequest request) {
+			// 从 ServerRequest 中获取请求路径容器
 			PathContainer pathContainer = request.requestPath().pathWithinApplication();
+
+			// 使用路径模式匹配并提取信息
 			PathPattern.PathMatchInfo info = this.pattern.matchAndExtract(pathContainer);
+
+			// 记录匹配日志
 			traceMatch("Pattern", this.pattern.getPatternString(), request.path(), info != null);
+
 			if (info != null) {
+				// 如果匹配成功，则合并请求属性
 				mergeAttributes(request, info.getUriVariables(), this.pattern);
 				return true;
 			} else {
+				// 如果匹配失败，则返回 false
 				return false;
 			}
 		}
 
-		private static void mergeAttributes(ServerRequest request, Map<String, String> variables,
-											PathPattern pattern) {
+		/**
+		 * 合并请求中的属性信息，包括路径变量和匹配模式。
+		 *
+		 * @param request   ServerRequest 对象
+		 * @param variables 路径变量的键值对
+		 * @param pattern   匹配模式
+		 */
+		private static void mergeAttributes(ServerRequest request, Map<String, String> variables, PathPattern pattern) {
+			// 合并路径变量
 			Map<String, String> pathVariables = mergePathVariables(request.pathVariables(), variables);
 			request.attributes().put(RouterFunctions.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
 					Collections.unmodifiableMap(pathVariables));
 
+			// 合并匹配模式
 			pattern = mergePatterns(
 					(PathPattern) request.attributes().get(RouterFunctions.MATCHING_PATTERN_ATTRIBUTE),
 					pattern);
 			request.attributes().put(RouterFunctions.MATCHING_PATTERN_ATTRIBUTE, pattern);
 		}
 
+		/**
+		 * 将当前的请求谓词嵌套到新的服务器请求中，主要是匹配路径的起始部分。
+		 *
+		 * @param request ServerRequest 对象
+		 * @return 包含匹配信息的新 ServerRequest，如果没有匹配则返回 Optional.empty()
+		 */
 		@Override
 		public Optional<ServerRequest> nest(ServerRequest request) {
 			return Optional.ofNullable(this.pattern.matchStartOfPath(request.requestPath().pathWithinApplication()))
@@ -544,6 +613,11 @@ public abstract class RequestPredicates {
 			visitor.path(this.pattern.getPatternString());
 		}
 
+		/**
+		 * 更改当前的路径模式解析器，并重新解析已保存的模式字符串。
+		 *
+		 * @param parser 要设置的新 PathPatternParser
+		 */
 		@Override
 		public void changeParser(PathPatternParser parser) {
 			String patternString = this.pattern.getPatternString();
@@ -558,8 +632,14 @@ public abstract class RequestPredicates {
 	}
 
 
+	/**
+	 * 请求头断言
+	 */
 	private static class HeadersPredicate implements RequestPredicate {
 
+		/**
+		 * 请求头断言
+		 */
 		private final Predicate<ServerRequest.Headers> headersPredicate;
 
 		public HeadersPredicate(Predicate<ServerRequest.Headers> headersPredicate) {
@@ -567,11 +647,19 @@ public abstract class RequestPredicates {
 			this.headersPredicate = headersPredicate;
 		}
 
+		/**
+		 * 检查服务器请求是否符合条件。
+		 *
+		 * @param request 服务器请求对象
+		 * @return 如果请求符合条件返回 true，否则返回 false
+		 */
 		@Override
 		public boolean test(ServerRequest request) {
+			// 检查是否为预检请求
 			if (CorsUtils.isPreFlightRequest(request.exchange().getRequest())) {
 				return true;
 			} else {
+				// 使用头部断言检查请求的头部信息
 				return this.headersPredicate.test(request.headers());
 			}
 		}
@@ -582,29 +670,53 @@ public abstract class RequestPredicates {
 		}
 	}
 
+	/**
+	 * 内容类型断言
+	 */
 	private static class ContentTypePredicate extends HeadersPredicate {
 
+		/**
+		 * 媒体类型集合
+		 */
 		private final Set<MediaType> mediaTypes;
 
 		public ContentTypePredicate(MediaType... mediaTypes) {
 			this(new HashSet<>(Arrays.asList(mediaTypes)));
 		}
 
+		/**
+		 * 私有构造函数，用于创建 ContentTypePredicate 对象。
+		 *
+		 * @param mediaTypes 包含的媒体类型的集合
+		 */
 		private ContentTypePredicate(Set<MediaType> mediaTypes) {
 			super(headers -> {
+				// 获取请求头中的 Content-Type，默认为 APPLICATION_OCTET_STREAM 类型
 				MediaType contentType =
 						headers.contentType().orElse(MediaType.APPLICATION_OCTET_STREAM);
+
+				// 检查请求头中的 Content-Type 是否匹配给定的媒体类型集合中的任何一种类型
 				boolean match = mediaTypes.stream()
 						.anyMatch(mediaType -> mediaType.includes(contentType));
+
+				// 跟踪匹配结果
 				traceMatch("Content-Type", mediaTypes, contentType, match);
+
 				return match;
 			});
 			this.mediaTypes = mediaTypes;
 		}
 
+		/**
+		 * 接受一个访问者，并将内容类型信息传递给访问者。
+		 *
+		 * @param visitor 访问者对象
+		 */
 		@Override
 		public void accept(Visitor visitor) {
+			// 将内容类型信息传递给访问者
 			visitor.header(HttpHeaders.CONTENT_TYPE,
+					// 如果媒体类型集合大小为1，则将该类型作为内容类型；否则，将整个媒体类型集合作为内容类型
 					(this.mediaTypes.size() == 1) ?
 							this.mediaTypes.iterator().next().toString() :
 							this.mediaTypes.toString());
@@ -619,40 +731,74 @@ public abstract class RequestPredicates {
 		}
 	}
 
+	/**
+	 * 接受类型断言
+	 */
 	private static class AcceptPredicate extends HeadersPredicate {
 
+		/**
+		 * 媒体类型
+		 */
 		private final Set<MediaType> mediaTypes;
 
 		public AcceptPredicate(MediaType... mediaTypes) {
 			this(new HashSet<>(Arrays.asList(mediaTypes)));
 		}
 
+		/**
+		 * 私有构造函数，创建 AcceptPredicate 对象。
+		 *
+		 * @param mediaTypes 接受的媒体类型集合
+		 */
 		private AcceptPredicate(Set<MediaType> mediaTypes) {
 			super(headers -> {
+				// 获取请求中可接受的媒体类型列表
 				List<MediaType> acceptedMediaTypes = acceptedMediaTypes(headers);
+
+				// 检查可接受的媒体类型是否与给定的媒体类型集合中的任何一种兼容
 				boolean match = acceptedMediaTypes.stream()
 						.anyMatch(acceptedMediaType -> mediaTypes.stream()
 								.anyMatch(acceptedMediaType::isCompatibleWith));
+
+				// 跟踪匹配结果
 				traceMatch("Accept", mediaTypes, acceptedMediaTypes, match);
+
 				return match;
 			});
 			this.mediaTypes = mediaTypes;
 		}
 
+		/**
+		 * 获取请求头中可接受的媒体类型列表。
+		 *
+		 * @param headers 服务器请求的头部信息
+		 * @return 可接受的媒体类型列表
+		 */
 		@NonNull
 		private static List<MediaType> acceptedMediaTypes(ServerRequest.Headers headers) {
+			// 获取请求头中可接受的媒体类型列表
 			List<MediaType> acceptedMediaTypes = headers.accept();
+
+			// 如果可接受的媒体类型列表为空，则默认为接受所有媒体类型
 			if (acceptedMediaTypes.isEmpty()) {
 				acceptedMediaTypes = Collections.singletonList(MediaType.ALL);
 			} else {
+				// 按照特异性和质量对媒体类型列表进行排序
 				MediaType.sortBySpecificityAndQuality(acceptedMediaTypes);
 			}
 			return acceptedMediaTypes;
 		}
 
+		/**
+		 * 接受一个访问者，并将可接受的内容类型信息传递给访问者。
+		 *
+		 * @param visitor 访问者对象
+		 */
 		@Override
 		public void accept(Visitor visitor) {
+			// 将可接受的内容类型信息传递给访问者
 			visitor.header(HttpHeaders.ACCEPT,
+					// 如果媒体类型集合大小为1，则将该类型作为接受的内容类型；否则，将整个媒体类型集合作为接受的内容类型
 					(this.mediaTypes.size() == 1) ?
 							this.mediaTypes.iterator().next().toString() :
 							this.mediaTypes.toString());
@@ -667,11 +813,19 @@ public abstract class RequestPredicates {
 		}
 	}
 
-
+	/**
+	 * 路径扩展后缀断言
+	 */
 	private static class PathExtensionPredicate implements RequestPredicate {
 
+		/**
+		 * 扩展名断言
+		 */
 		private final Predicate<String> extensionPredicate;
 
+		/**
+		 * 扩展名
+		 */
 		@Nullable
 		private final String extension;
 
@@ -692,15 +846,31 @@ public abstract class RequestPredicates {
 			this.extension = extension;
 		}
 
+		/**
+		 * 检查服务器请求的路径是否符合条件。
+		 *
+		 * @param request 服务器请求对象
+		 * @return 如果路径符合条件返回 true，否则返回 false
+		 */
 		@Override
 		public boolean test(ServerRequest request) {
+			// 提取请求路径的文件扩展名
 			String pathExtension = UriUtils.extractFileExtension(request.path());
+
+			// 使用扩展名断言检查路径的扩展名是否符合条件
 			return this.extensionPredicate.test(pathExtension);
 		}
 
+		/**
+		 * 接受一个访问者，并将路径扩展信息传递给访问者。
+		 *
+		 * @param visitor 访问者对象
+		 */
 		@Override
 		public void accept(Visitor visitor) {
+			// 将路径扩展信息传递给访问者
 			visitor.pathExtension(
+					// 如果扩展名不为空，则将该扩展名作为路径扩展信息；否则，将扩展名断言的字符串表示作为路径扩展信息
 					(this.extension != null) ?
 							this.extension :
 							this.extensionPredicate.toString());
@@ -716,13 +886,23 @@ public abstract class RequestPredicates {
 
 	}
 
-
+	/**
+	 * 查询参数断言
+	 */
 	private static class QueryParamPredicate implements RequestPredicate {
-
+		/**
+		 * 参数名称
+		 */
 		private final String name;
 
+		/**
+		 * 值断言
+		 */
 		private final Predicate<String> valuePredicate;
 
+		/**
+		 * 参数值
+		 */
 		@Nullable
 		private final String value;
 
@@ -742,15 +922,32 @@ public abstract class RequestPredicates {
 			this.value = value;
 		}
 
+		/**
+		 * 检查服务器请求中指定名称的查询参数是否符合条件。
+		 *
+		 * @param request 服务器请求对象
+		 * @return 如果查询参数符合条件返回 true，否则返回 false
+		 */
 		@Override
 		public boolean test(ServerRequest request) {
+			// 获取指定名称的查询参数值
 			Optional<String> s = request.queryParam(this.name);
+
+			// 使用值断言检查查询参数值是否符合条件
 			return s.filter(this.valuePredicate).isPresent();
 		}
 
+		/**
+		 * 接受一个访问者，并将查询参数信息传递给访问者。
+		 *
+		 * @param visitor 访问者对象
+		 */
 		@Override
 		public void accept(Visitor visitor) {
-			visitor.queryParam(this.name,
+			// 将查询参数信息传递给访问者
+			visitor.queryParam(
+					// 如果值不为空，则将该值作为查询参数值；否则，将值断言的字符串表示作为查询参数值
+					this.name,
 					(this.value != null) ?
 							this.value :
 							this.valuePredicate.toString());
@@ -767,13 +964,18 @@ public abstract class RequestPredicates {
 
 
 	/**
-	 * {@link RequestPredicate} for where both {@code left} and {@code right} predicates
-	 * must match.
+	 * {@link RequestPredicate}，要求同时满足 {@code left} 和 {@code right} 断言。
 	 */
 	static class AndRequestPredicate implements RequestPredicate, ChangePathPatternParserVisitor.Target {
 
+		/**
+		 * 左侧断言
+		 */
 		private final RequestPredicate left;
 
+		/**
+		 * 右侧断言
+		 */
 		private final RequestPredicate right;
 
 		public AndRequestPredicate(RequestPredicate left, RequestPredicate right) {
@@ -783,36 +985,75 @@ public abstract class RequestPredicates {
 			this.right = right;
 		}
 
+		/**
+		 * 检查服务器请求是否符合左侧和右侧断言的条件。
+		 *
+		 * @param request 服务器请求对象
+		 * @return 如果请求同时符合左侧和右侧断言的条件返回 true，否则返回 false
+		 */
 		@Override
 		public boolean test(ServerRequest request) {
+			// 保存旧的属性值
 			Map<String, Object> oldAttributes = new HashMap<>(request.attributes());
 
+			// 如果左侧和右侧断言都满足条件，则返回 true
 			if (this.left.test(request) && this.right.test(request)) {
 				return true;
 			}
+
+			// 恢复属性值
 			restoreAttributes(request, oldAttributes);
 			return false;
 		}
 
+		/**
+		 * 对服务器请求进行嵌套，根据左侧和右侧断言进行嵌套处理。
+		 *
+		 * @param request 服务器请求对象
+		 * @return 包含左侧和右侧断言嵌套处理后的可选服务器请求
+		 */
 		@Override
 		public Optional<ServerRequest> nest(ServerRequest request) {
+			// 对左侧断言进行嵌套处理，然后根据右侧断言进行进一步的嵌套处理
 			return this.left.nest(request).flatMap(this.right::nest);
 		}
 
+		/**
+		 * 接受一个访问者，并按照特定的顺序将左侧和右侧断言传递给访问者。
+		 *
+		 * @param visitor 访问者对象
+		 */
 		@Override
 		public void accept(Visitor visitor) {
+			// 开始 AND 条件组合
 			visitor.startAnd();
+
+			// 接受并传递左侧断言给访问者
 			this.left.accept(visitor);
+
+			// 添加 AND 操作符
 			visitor.and();
+
+			// 接受并传递右侧断言给访问者
 			this.right.accept(visitor);
+
+			// 结束 AND 条件组合
 			visitor.endAnd();
 		}
 
+		/**
+		 * 更改解析器，根据左侧和右侧断言进行解析器的更改操作。
+		 *
+		 * @param parser 要应用的路径模式解析器
+		 */
 		@Override
 		public void changeParser(PathPatternParser parser) {
+			// 如果左侧实现了 ChangePathPatternParserVisitor.Target 接口，则对左侧进行解析器更改操作
 			if (this.left instanceof ChangePathPatternParserVisitor.Target) {
 				((ChangePathPatternParserVisitor.Target) this.left).changeParser(parser);
 			}
+
+			// 如果右侧实现了 ChangePathPatternParserVisitor.Target 接口，则对右侧进行解析器更改操作
 			if (this.right instanceof ChangePathPatternParserVisitor.Target) {
 				((ChangePathPatternParserVisitor.Target) this.right).changeParser(parser);
 			}
@@ -825,27 +1066,51 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * {@link RequestPredicate} that negates a delegate predicate.
+	 * {@link RequestPredicate}，用于对委托的断言进行取反。
 	 */
 	static class NegateRequestPredicate implements RequestPredicate, ChangePathPatternParserVisitor.Target {
 
+		/**
+		 * 要取反的委托断言
+		 */
 		private final RequestPredicate delegate;
 
+		/**
+		 * 构造函数，传入要取反的委托断言。
+		 *
+		 * @param delegate 要取反的委托断言
+		 */
 		public NegateRequestPredicate(RequestPredicate delegate) {
 			Assert.notNull(delegate, "Delegate must not be null");
 			this.delegate = delegate;
 		}
 
+		/**
+		 * 检查服务器请求是否不符合委托断言的条件。
+		 *
+		 * @param request 服务器请求对象
+		 * @return 如果请求不符合委托断言的条件返回 true，否则返回 false
+		 */
 		@Override
 		public boolean test(ServerRequest request) {
+			// 保存旧的属性值
 			Map<String, Object> oldAttributes = new HashMap<>(request.attributes());
+
+			// 对委托断言取反
 			boolean result = !this.delegate.test(request);
+
+			// 如果取反结果为 false，则恢复属性值
 			if (!result) {
 				restoreAttributes(request, oldAttributes);
 			}
 			return result;
 		}
 
+		/**
+		 * 接受一个访问者，并在委托断言上开始取反操作。
+		 *
+		 * @param visitor 访问者对象
+		 */
 		@Override
 		public void accept(Visitor visitor) {
 			visitor.startNegate();
@@ -853,6 +1118,11 @@ public abstract class RequestPredicates {
 			visitor.endNegate();
 		}
 
+		/**
+		 * 更改解析器，根据委托断言进行解析器的更改操作。
+		 *
+		 * @param parser 要应用的路径模式解析器
+		 */
 		@Override
 		public void changeParser(PathPatternParser parser) {
 			if (this.delegate instanceof ChangePathPatternParserVisitor.Target) {
@@ -860,6 +1130,11 @@ public abstract class RequestPredicates {
 			}
 		}
 
+		/**
+		 * 返回取反字符串表示形式。
+		 *
+		 * @return 取反字符串表示形式
+		 */
 		@Override
 		public String toString() {
 			return "!" + this.delegate.toString();
@@ -867,15 +1142,26 @@ public abstract class RequestPredicates {
 	}
 
 	/**
-	 * {@link RequestPredicate} where either {@code left} or {@code right} predicates
-	 * may match.
+	 * {@link RequestPredicate}，允许 {@code left} 或 {@code right} 断言匹配。
 	 */
 	static class OrRequestPredicate implements RequestPredicate, ChangePathPatternParserVisitor.Target {
 
+		/**
+		 * 左侧断言
+		 */
 		private final RequestPredicate left;
 
+		/**
+		 * 右侧断言
+		 */
 		private final RequestPredicate right;
 
+		/**
+		 * 构造函数，传入左侧和右侧断言。
+		 *
+		 * @param left  左侧断言
+		 * @param right 右侧断言
+		 */
 		public OrRequestPredicate(RequestPredicate left, RequestPredicate right) {
 			Assert.notNull(left, "Left RequestPredicate must not be null");
 			Assert.notNull(right, "Right RequestPredicate must not be null");
@@ -883,22 +1169,41 @@ public abstract class RequestPredicates {
 			this.right = right;
 		}
 
+		/**
+		 * 检查服务器请求是否左侧或右侧断言匹配。
+		 *
+		 * @param request 服务器请求对象
+		 * @return 如果左侧或右侧断言匹配返回 true，否则返回 false
+		 */
 		@Override
 		public boolean test(ServerRequest request) {
+			// 保存旧的属性值
 			Map<String, Object> oldAttributes = new HashMap<>(request.attributes());
 
+			// 如果左侧断言匹配，则返回 true
 			if (this.left.test(request)) {
 				return true;
 			} else {
+				// 恢复属性值
 				restoreAttributes(request, oldAttributes);
+
+				// 如果右侧断言匹配，则返回 true
 				if (this.right.test(request)) {
 					return true;
 				}
 			}
+
+			// 恢复属性值
 			restoreAttributes(request, oldAttributes);
 			return false;
 		}
 
+		/**
+		 * 对服务器请求进行嵌套，根据左侧和右侧断言进行嵌套处理。
+		 *
+		 * @param request 服务器请求对象
+		 * @return 包含左侧和右侧断言嵌套处理后的可选服务器请求
+		 */
 		@Override
 		public Optional<ServerRequest> nest(ServerRequest request) {
 			Optional<ServerRequest> leftResult = this.left.nest(request);
@@ -909,6 +1214,11 @@ public abstract class RequestPredicates {
 			}
 		}
 
+		/**
+		 * 接受一个访问者，并按照特定的顺序将左侧和右侧断言传递给访问者。
+		 *
+		 * @param visitor 访问者对象
+		 */
 		@Override
 		public void accept(Visitor visitor) {
 			visitor.startOr();
@@ -918,6 +1228,11 @@ public abstract class RequestPredicates {
 			visitor.endOr();
 		}
 
+		/**
+		 * 更改解析器，根据左侧和右侧断言进行解析器的更改操作。
+		 *
+		 * @param parser 要应用的路径模式解析器
+		 */
 		@Override
 		public void changeParser(PathPatternParser parser) {
 			if (this.left instanceof ChangePathPatternParserVisitor.Target) {
@@ -928,6 +1243,11 @@ public abstract class RequestPredicates {
 			}
 		}
 
+		/**
+		 * 返回逻辑或的字符串表示形式。
+		 *
+		 * @return 逻辑或的字符串表示形式
+		 */
 		@Override
 		public String toString() {
 			return String.format("(%s || %s)", this.left, this.right);
