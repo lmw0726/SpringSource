@@ -26,10 +26,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Representation of a WebSocket message.
+ * WebSocket 消息的表示。
  *
- * <p>See static factory methods in {@link WebSocketSession} for creating messages with
- * the {@link org.springframework.core.io.buffer.DataBufferFactory} for the session.
+ * <p>查看 {@link WebSocketSession} 中基于 {@link org.springframework.core.io.buffer.DataBufferFactory}
+ * 创建会话消息的静态工厂方法。
  *
  * @author Rossen Stoyanchev
  * @since 5.0

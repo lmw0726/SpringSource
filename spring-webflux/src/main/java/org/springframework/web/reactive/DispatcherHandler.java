@@ -98,7 +98,7 @@ public class DispatcherHandler implements WebHandler, PreFlightRequestHandler, A
 
 	/**
 	 * 返回通过类型检测在{@link #setApplicationContext 注入的上下文}中检测到的所有{@link HandlerMapping} bean，
-	 * 并进行{@link AnnotationAwareOrderComparator#sort(List)排序}。
+	 * 并进行{@link AnnotationAwareOrderComparator#sort(List) 排序}。
 	 * <p><strong>注意：</strong>如果在{@link #setApplicationContext(ApplicationContext)}之前调用，此方法可能返回{@code null}。
 	 *
 	 * @return 不可变列表，其中包含配置的映射，可能为{@code null}

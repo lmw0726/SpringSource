@@ -380,7 +380,7 @@ public abstract class AbstractView implements View, BeanNameAware, ApplicationCo
 	 * 子类必须实现此方法来实际渲染视图。
 	 *
 	 * @param renderAttributes 组合输出映射（永不为{@code null}），其中动态值优先于静态属性
-	 * @param contentType      选择用于渲染的内容类型，应与{@linkplain #getSupportedMediaTypes()支持的媒体类型}之一匹配
+	 * @param contentType      选择用于渲染的内容类型，应与{@linkplain #getSupportedMediaTypes() 支持的媒体类型}之一匹配
 	 * @param exchange         当前交换对象
 	 * @return 代表渲染成功与否的{@code Mono}
 	 */

@@ -23,20 +23,19 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Handler for a WebSocket session.
+ * WebSocket 会话的处理程序。
  *
- * <p>A server {@code WebSocketHandler} is mapped to requests with
+ * <p>服务器端的 {@code WebSocketHandler} 通过
  * {@link org.springframework.web.reactive.handler.SimpleUrlHandlerMapping
- * SimpleUrlHandlerMapping} and
+ * SimpleUrlHandlerMapping} 和
  * {@link org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter
- * WebSocketHandlerAdapter}. A client {@code WebSocketHandler} is passed to the
+ * WebSocketHandlerAdapter} 映射到请求。客户端的 {@code WebSocketHandler} 被传递给
  * {@link org.springframework.web.reactive.socket.client.WebSocketClient
- * WebSocketClient} execute method.
+ * WebSocketClient} 的 execute 方法。
  *
- * <p>Use {@link WebSocketSession#receive() session.receive()} to compose on
- * the inbound message stream, and {@link WebSocketSession#send(Publisher)
- * session.send(publisher)} for the outbound message stream. Below is an
- * example, combined flow to process inbound and to send outbound messages:
+ * <p>使用 {@link WebSocketSession#receive() session.receive()} 来组合入站消息流，
+ * 并使用 {@link WebSocketSession#send(Publisher) session.send(publisher)} 来处理出站消息流。
+ * 下面是一个处理入站并发送出站消息的示例组合流程：
  *
  * <pre class="code">
  * class ExampleHandler implements WebSocketHandler {
@@ -58,8 +57,7 @@ import java.util.List;
  * }
  * </pre>
  *
- * <p>If processing inbound and sending outbound messages are independent
- * streams, they can be joined together with the "zip" operator:
+ * <p>如果处理入站和发送出站消息是独立的流程，可以使用 "zip" 操作符将它们合并在一起：
  *
  * <pre class="code">
  * class ExampleHandler implements WebSocketHandler {
@@ -84,12 +82,9 @@ import java.util.List;
  * }
  * </pre>
  *
- * <p>A {@code WebSocketHandler} must compose the inbound and outbound streams
- * into a unified flow and return a {@code Mono<Void>} that reflects the
- * completion of that flow. That means there is no need to check if the
- * connection is open, since Reactive Streams signals will terminate activity.
- * The inbound stream receives a completion/error signal, and the outbound
- * stream receives a cancellation signal.
+ * <p>{@code WebSocketHandler} 必须将入站和出站流组合成一个统一的流，并返回反映该流程完成的 {@code Mono<Void>}。
+ * 这意味着无需检查连接是否打开，因为反应式流信号将终止活动。
+ * 入站流接收到完成/错误信号，而出站流接收到取消信号。
  *
  * @author Rossen Stoyanchev
  * @since 5.0

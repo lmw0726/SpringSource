@@ -22,12 +22,11 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Representation of WebSocket "close" status codes and reasons. Status codes
- * in the 1xxx range are pre-defined by the protocol.
+ * WebSocket “close” 状态码和原因的表示。协议预定义了 1xxx 范围内的状态码。
  *
  * @author Rossen Stoyanchev
  * @see <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">
- * RFC 6455, Section 7.4.1 "Defined Status Codes"</a>
+ *      RFC 6455, Section 7.4.1 "Defined Status Codes"</a>
  * @since 5.0
  */
 public final class CloseStatus {

@@ -44,7 +44,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * {@code WebSocketService}的实现，通过委派给一个{@link RequestUpgradeStrategy}来处理WebSocket HTTP握手请求，
+ * {@code WebSocketService}的实现，通过委派给一个{@link org.springframework.web.reactive.socket.server.RequestUpgradeStrategy}来处理WebSocket HTTP握手请求，
  * 该策略可以自动从类路径中检测（无参构造函数）但也可以显式配置。
  *
  * @author Rossen Stoyanchev

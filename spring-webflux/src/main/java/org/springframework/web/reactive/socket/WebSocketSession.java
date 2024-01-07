@@ -26,11 +26,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Represents a WebSocket session.
+ * 表示一个 WebSocket 会话。
  *
- * <p>Use {@link WebSocketSession#receive() session.receive()} to compose on
- * the inbound message stream, and {@link WebSocketSession#send(Publisher)
- * session.send(publisher)} to provide the outbound message stream.
+ * <p>使用 {@link WebSocketSession#receive() session.receive()} 来组合入站消息流，
+ * 并使用 {@link WebSocketSession#send(Publisher) session.send(publisher)} 来提供出站消息流。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
