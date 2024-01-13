@@ -1196,43 +1196,56 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Callback before prototype creation.
-	 * <p>The default implementation register the prototype as currently in creation.
+	 * 在原型创建之前的回调方法。
+	 * <p>默认实现将原型注册为当前正在创建的状态。
 	 *
-	 * @param beanName the name of the prototype about to be created
+	 * @param beanName 即将创建的原型的名称
 	 * @see #isPrototypeCurrentlyInCreation
 	 */
 	@SuppressWarnings("unchecked")
 	protected void beforePrototypeCreation(String beanName) {
+		// 获取当前正在创建中的原型 Bean 的集合
 		Object curVal = this.prototypesCurrentlyInCreation.get();
+
+		// 如果当前集合为空，直接将当前 Bean 名称设置为正在创建中的原型 Bean
 		if (curVal == null) {
 			this.prototypesCurrentlyInCreation.set(beanName);
 		} else if (curVal instanceof String) {
+			// 如果当前集合为单个 Bean 名称，创建一个包含两个 Bean 名称的集合
 			Set<String> beanNameSet = new HashSet<>(2);
 			beanNameSet.add((String) curVal);
 			beanNameSet.add(beanName);
 			this.prototypesCurrentlyInCreation.set(beanNameSet);
 		} else {
+			// 如果当前集合为多个 Bean 名称的集合，直接将当前 Bean 名称添加到集合中
 			Set<String> beanNameSet = (Set<String>) curVal;
 			beanNameSet.add(beanName);
 		}
 	}
 
 	/**
-	 * Callback after prototype creation.
-	 * <p>The default implementation marks the prototype as not in creation anymore.
+	 * 在原型创建之后的回调方法。
+	 * <p>默认实现标记原型为不再处于创建状态。
 	 *
-	 * @param beanName the name of the prototype that has been created
+	 * @param beanName 已创建的原型的名称
 	 * @see #isPrototypeCurrentlyInCreation
 	 */
 	@SuppressWarnings("unchecked")
 	protected void afterPrototypeCreation(String beanName) {
+		// 获取当前正在创建中的原型 Bean 的集合
 		Object curVal = this.prototypesCurrentlyInCreation.get();
+
+		// 如果当前集合为单个 Bean 名称，直接移除
 		if (curVal instanceof String) {
 			this.prototypesCurrentlyInCreation.remove();
 		} else if (curVal instanceof Set) {
+			// 如果当前集合为多个 Bean 名称的集合
 			Set<String> beanNameSet = (Set<String>) curVal;
+
+			// 移除当前 Bean 名称
 			beanNameSet.remove(beanName);
+
+			// 如果集合为空，移除整个集合
 			if (beanNameSet.isEmpty()) {
 				this.prototypesCurrentlyInCreation.remove();
 			}

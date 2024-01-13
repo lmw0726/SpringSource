@@ -16,45 +16,46 @@
 
 package org.springframework.context.support;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.lang.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * A simple thread-backed {@link Scope} implementation.
+ * 一个简单的基于线程的{@link Scope}实现。
  *
- * <p><b>NOTE:</b> This thread scope is not registered by default in common contexts.
- * Instead, you need to explicitly assign it to a scope key in your setup, either through
+ * <p><b>注意：</b>这个线程作用域在常见上下文中不是默认注册的。
+ * 相反，您需要通过在设置中将其显式分配给作用域键，可以通过
  * {@link org.springframework.beans.factory.config.ConfigurableBeanFactory#registerScope}
- * or through a {@link org.springframework.beans.factory.config.CustomScopeConfigurer} bean.
+ * 或通过{@link org.springframework.beans.factory.config.CustomScopeConfigurer} bean。
  *
- * <p>{@code SimpleThreadScope} <em>does not clean up any objects</em> associated with it.
- * It is therefore typically preferable to use a request-bound scope implementation such
- * as {@code org.springframework.web.context.request.RequestScope} in web environments,
- * implementing the full lifecycle for scoped attributes (including reliable destruction).
+ * <p>{@code SimpleThreadScope} <em>不清理</em> 与之关联的任何对象。
+ * 因此，在Web环境中，通常最好使用一个请求绑定的作用域实现，比如{@code org.springframework.web.context.request.RequestScope}，
+ * 它实现了作用域属性的完整生命周期（包括可靠的销毁）。
  *
- * <p>For an implementation of a thread-based {@code Scope} with support for destruction
- * callbacks, refer to
- * <a href="https://www.springbyexample.org/examples/custom-thread-scope-module.html">Spring by Example</a>.
+ * <p>有关支持销毁回调的基于线程的{@code Scope}的实现，请参阅
+ * <a href="https://www.springbyexample.org/examples/custom-thread-scope-module.html">Spring by Example</a>。
  *
- * <p>Thanks to Eugene Kuleshov for submitting the original prototype for a thread scope!
+ * <p>感谢Eugene Kuleshov提交了线程作用域的原型！
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
- * @since 3.0
  * @see org.springframework.web.context.request.RequestScope
+ * @since 3.0
  */
 public class SimpleThreadScope implements Scope {
 
 	private static final Log logger = LogFactory.getLog(SimpleThreadScope.class);
 
+	/**
+	 * 线程范围的{@code ThreadLocal}，用于存储作用域对象。
+	 * 使用{@code NamedThreadLocal}，初始化为一个空的{@code HashMap}。
+	 */
 	private final ThreadLocal<Map<String, Object>> threadScope =
 			new NamedThreadLocal<Map<String, Object>>("SimpleThreadScope") {
 				@Override
@@ -66,14 +67,21 @@ public class SimpleThreadScope implements Scope {
 
 	@Override
 	public Object get(String name, ObjectFactory<?> objectFactory) {
+		// 获取当前线程的对象集合
 		Map<String, Object> scope = this.threadScope.get();
-		// NOTE: Do NOT modify the following to use Map::computeIfAbsent. For details,
-		// see https://github.com/spring-projects/spring-framework/issues/25801.
+
+		// 注意: 请勿使用Map::computeIfAbsent修改以下内容。有关详细信息，
+		// 见 https://github.com/spring-projects/spring-framework/issues/25801.
+		// 从对象集合中获取特定名称的对象
 		Object scopedObject = scope.get(name);
+
+		// 如果对象不存在，则通过 objectFactory 创建对象，并放入线程范围的集合中
 		if (scopedObject == null) {
 			scopedObject = objectFactory.getObject();
 			scope.put(name, scopedObject);
 		}
+
+		// 返回线程范围内的对象
 		return scopedObject;
 	}
 

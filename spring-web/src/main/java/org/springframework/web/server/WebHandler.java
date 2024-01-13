@@ -22,12 +22,12 @@ import org.springframework.web.server.adapter.HttpWebHandlerAdapter;
 import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 
 /**
- * Contract to handle a web request.
+ * 用于处理Web请求的合同。
  *
- * <p>Use {@link HttpWebHandlerAdapter} to adapt a {@code WebHandler} to an
- * {@link org.springframework.http.server.reactive.HttpHandler HttpHandler}.
- * The {@link WebHttpHandlerBuilder} provides a convenient way to do that while
- * also optionally configuring one or more filters and/or exception handlers.
+ * <p>使用 {@link HttpWebHandlerAdapter} 来适应 {@code WebHandler} 到
+ * {@link org.springframework.http.server.reactive.HttpHandler HttpHandler}。
+ * {@link WebHttpHandlerBuilder} 提供了一种方便的方式来实现适应，
+ * 同时也可以选择配置一个或多个过滤器和/或异常处理器。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -35,9 +35,10 @@ import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 public interface WebHandler {
 
 	/**
-	 * Handle the web server exchange.
-	 * @param exchange the current server exchange
-	 * @return {@code Mono<Void>} to indicate when request handling is complete
+	 * 处理Web服务器交换。
+	 *
+	 * @param exchange 当前服务器交换
+	 * @return {@code Mono<Void>} 以指示请求处理何时完成
 	 */
 	Mono<Void> handle(ServerWebExchange exchange);
 
