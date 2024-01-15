@@ -1895,17 +1895,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Remove the singleton instance (if any) for the given bean name,
-	 * but only if it hasn't been used for other purposes than type checking.
+	 * 如果单例实例尚未用于除类型检查之外的其他目的，则删除给定 bean 名称的单例实例。
 	 *
-	 * @param beanName bean名称
-	 * @return {@code true} if actually removed, {@code false} otherwise
+	 * @param beanName 要删除单例的 bean 名称
+	 * @return 如果实际移除了，则返回 {@code true}，否则返回 {@code false}
 	 */
 	protected boolean removeSingletonIfCreatedForTypeCheckOnly(String beanName) {
 		if (!this.alreadyCreated.contains(beanName)) {
+			// 如果 beanName 不在已创建的集合中
 			removeSingleton(beanName);
+			// 从单例缓存中移除 bean
 			return true;
 		} else {
+			// 如果 beanName 已经创建过
 			return false;
 		}
 	}
@@ -2010,13 +2012,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Add the given bean to the list of disposable beans in this factory,
-	 * registering its DisposableBean interface and/or the given destroy method
-	 * to be called on factory shutdown (if applicable). Only applies to singletons.
+	 * 将给定的 bean 添加到此工厂中的可销毁 bean 列表中，注册其 DisposableBean 接口和/或给定的销毁方法，
+	 * 以便在工厂关闭时调用（如果适用）。仅适用于单例。
 	 *
-	 * @param beanName bean名称
-	 * @param bean     the bean instance
-	 * @param mbd      the bean definition for the bean
+	 * @param beanName bean 的名称
+	 * @param bean     bean 实例
+	 * @param mbd      bean 的定义
 	 * @see RootBeanDefinition#isSingleton
 	 * @see RootBeanDefinition#getDependsOn
 	 * @see #registerDisposableBean
@@ -2025,22 +2026,25 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected void registerDisposableBeanIfNecessary(String beanName, Object bean, RootBeanDefinition mbd) {
 		AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
 		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
+			// 如果不是 prototype 且需要销毁
 			if (mbd.isSingleton()) {
-				// Register a DisposableBean implementation that performs all destruction
-				// work for the given bean: DestructionAwareBeanPostProcessors,
-				// DisposableBean interface, custom destroy method.
+				// 如果是 单例，则注册 DisposableBean 适配器，执行销毁工作
+				// 包括 DestructionAwareBeanPostProcessors，DisposableBean 接口，自定义销毁方法
 				registerDisposableBean(beanName, new DisposableBeanAdapter(
 						bean, beanName, mbd, getBeanPostProcessorCache().destructionAware, acc));
 			} else {
-				// A bean with a custom scope...
+				// 如果具有自定义范围的 bean...
 				Scope scope = this.scopes.get(mbd.getScope());
 				if (scope == null) {
+					// 如果范围未注册，则抛出异常
 					throw new IllegalStateException("No Scope registered for scope name '" + mbd.getScope() + "'");
 				}
+				// 在自定义范围中注册销毁回调
 				scope.registerDestructionCallback(beanName, new DisposableBeanAdapter(
 						bean, beanName, mbd, getBeanPostProcessorCache().destructionAware, acc));
 			}
 		}
+
 	}
 
 
