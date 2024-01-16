@@ -129,7 +129,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	Executable resolvedConstructorOrFactoryMethod;
 
 	/**
-	 * 包可见字段，将构造函数参数标记为已解决。
+	 * 包可见字段，将构造函数参数标记为已解析好。
 	 */
 	boolean constructorArgumentsResolved = false;
 

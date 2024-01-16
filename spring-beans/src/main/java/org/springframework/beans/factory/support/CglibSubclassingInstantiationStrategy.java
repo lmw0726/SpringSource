@@ -16,35 +16,27 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.cglib.core.ClassLoaderAwareGeneratorStrategy;
 import org.springframework.cglib.core.SpringNamingPolicy;
-import org.springframework.cglib.proxy.Callback;
-import org.springframework.cglib.proxy.CallbackFilter;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.Factory;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
-import org.springframework.cglib.proxy.NoOp;
+import org.springframework.cglib.proxy.*;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 /**
- * Default object instantiation strategy for use in BeanFactories.
+ * 用于在BeanFactories中使用的默认对象实例化策略。
  *
- * <p>Uses CGLIB to generate subclasses dynamically if methods need to be
- * overridden by the container to implement <em>Method Injection</em>.
+ * <p>如果容器需要通过动态生成子类覆盖方法来实现<em>方法注入</em>，则使用CGLIB。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -54,20 +46,17 @@ import org.springframework.util.StringUtils;
 public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationStrategy {
 
 	/**
-	 * Index in the CGLIB callback array for passthrough behavior,
-	 * in which case the subclass won't override the original class.
+	 * CGLIB回调数组中的索引，用于透传行为，在这种情况下子类不会覆盖原始类。
 	 */
 	private static final int PASSTHROUGH = 0;
 
 	/**
-	 * Index in the CGLIB callback array for a method that should
-	 * be overridden to provide <em>method lookup</em>.
+	 * CGLIB回调数组中的索引，用于应该被覆盖以提供<em>方法查找</em>的方法。
 	 */
 	private static final int LOOKUP_OVERRIDE = 1;
 
 	/**
-	 * Index in the CGLIB callback array for a method that should
-	 * be overridden using generic <em>method replacer</em> functionality.
+	 * CGLIB回调数组中的索引，用于应该使用通用的<em>方法替换</em>功能进行覆盖的方法。
 	 */
 	private static final int METHOD_REPLACER = 2;
 
@@ -81,7 +70,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
 			@Nullable Constructor<?> ctor, Object... args) {
 
-		// Must generate CGLIB subclass...
+		// 必须生成CGLIB子类...
 		return new CglibSubclassCreator(bd, owner).instantiate(ctor, args);
 	}
 

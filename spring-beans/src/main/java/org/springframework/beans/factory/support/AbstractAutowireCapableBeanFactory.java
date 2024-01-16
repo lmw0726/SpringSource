@@ -1241,7 +1241,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// 自动装配的候选构造函数？
+		// 确定解析的构造函数
+		// 主要是检查已经注册的SmartInstantiationAwareBeanPostProcessor
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
@@ -1250,7 +1251,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
-		// 默认构造的首选构造函数？
+		// 选择构造方法，创建bean
 		ctors = mbd.getPreferredConstructors();
 		if (ctors != null) {
 			// 如果存在首选构造函数，则执行自动装配构造函数
