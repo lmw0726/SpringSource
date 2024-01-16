@@ -1263,22 +1263,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Obtain a bean instance from the given supplier.
+	 * 从给定的供应商获取一个 bean 实例。
 	 *
-	 * @param instanceSupplier the configured supplier
-	 * @param beanName         the corresponding bean name
-	 * @return a BeanWrapper for the new instance
+	 * @param instanceSupplier 已配置的供应商
+	 * @param beanName         相应的 bean 名称
+	 * @return 新实例的 BeanWrapper
 	 * @see #getObjectForBeanInstance
 	 * @since 5.0
 	 */
 	protected BeanWrapper obtainFromSupplier(Supplier<?> instanceSupplier, String beanName) {
 		Object instance;
 
+		// 获取当前正在创建的外部 bean
 		String outerBean = this.currentlyCreatedBean.get();
+		// 将当前正在创建的 bean 设置为当前 beanName
 		this.currentlyCreatedBean.set(beanName);
 		try {
+			// 尝试获取实例
 			instance = instanceSupplier.get();
 		} finally {
+			// 恢复当前正在创建的 bean 为外部 bean
 			if (outerBean != null) {
 				this.currentlyCreatedBean.set(outerBean);
 			} else {
@@ -1286,11 +1290,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// 如果实例为 null，则使用 NullBean
 		if (instance == null) {
 			instance = new NullBean();
 		}
+		// 使用 BeanWrapperImpl 封装实例
 		BeanWrapper bw = new BeanWrapperImpl(instance);
+		// 初始化 BeanWrapper
 		initBeanWrapper(bw);
+		// 返回封装的 BeanWrapper
 		return bw;
 	}
 
@@ -1365,15 +1373,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Instantiate the bean using a named factory method. The method may be static, if the
-	 * mbd parameter specifies a class, rather than a factoryBean, or an instance variable
-	 * on a factory object itself configured using Dependency Injection.
+	 * 使用命名的工厂方法实例化 bean。如果 mbd 参数指定的是类而不是 factoryBean，则该方法可能是静态的，
+	 * 或者是通过依赖注入配置的工厂对象本身上的实例变量。
 	 *
-	 * @param beanName     the name of the bean
-	 * @param mbd          the bean definition for the bean
-	 * @param explicitArgs argument values passed in programmatically via the getBean method,
-	 *                     or {@code null} if none (implying the use of constructor argument values from bean definition)
-	 * @return a BeanWrapper for the new instance
+	 * @param beanName     bean 的名称
+	 * @param mbd          bean 的定义
+	 * @param explicitArgs 通过程序传递的参数值，通过 getBean 方法传递，如果没有则为 {@code null}
+	 *                     （暗示使用 bean 定义中的构造函数参数值）
+	 * @return 新实例的 BeanWrapper
 	 * @see #getBean(String, Object[])
 	 */
 	protected BeanWrapper instantiateUsingFactoryMethod(

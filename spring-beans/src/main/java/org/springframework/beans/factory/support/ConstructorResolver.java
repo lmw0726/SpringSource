@@ -375,21 +375,19 @@ class ConstructorResolver {
 					ReflectionUtils.getAllDeclaredMethods(factoryClass) : factoryClass.getMethods());
 		}
 	}
-
 	/**
-	 * Instantiate the bean using a named factory method. The method may be static, if the
-	 * bean definition parameter specifies a class, rather than a "factory-bean", or
-	 * an instance variable on a factory object itself configured using Dependency Injection.
-	 * <p>Implementation requires iterating over the static or instance methods with the
-	 * name specified in the RootBeanDefinition (the method may be overloaded) and trying
-	 * to match with the parameters. We don't have the types attached to constructor args,
-	 * so trial and error is the only way to go here. The explicitArgs array may contain
-	 * argument values passed in programmatically via the corresponding getBean method.
-	 * @param beanName the name of the bean
-	 * @param mbd the merged bean definition for the bean
-	 * @param explicitArgs argument values passed in programmatically via the getBean
-	 * method, or {@code null} if none (-> use constructor argument values from bean definition)
-	 * @return a BeanWrapper for the new instance
+	 * 使用命名的工厂方法实例化 bean。如果 bean 定义参数指定的是类，而不是 "factory-bean"，
+	 * 或者是通过依赖注入配置的工厂对象本身上的实例变量。
+	 * <p>实现要求遍历具有在 RootBeanDefinition 中指定的名称的静态或实例方法
+	 * （方法可能是重载的），并尝试与参数匹配。我们没有将类型附加到构造函数参数，
+	 * 因此在这里尝试和错误是唯一的方法。explicitArgs 数组可能包含通过相应的 getBean 方法
+	 * 在程序中传递的参数值。
+	 *
+	 * @param beanName     bean 的名称
+	 * @param mbd          bean 的合并定义
+	 * @param explicitArgs 通过程序通过 getBean 方法传递的参数值，如果没有则为 {@code null}
+	 *                     （-> 使用来自 bean 定义的构造函数参数值）
+	 * @return 新实例的 BeanWrapper
 	 */
 	public BeanWrapper instantiateUsingFactoryMethod(
 			String beanName, RootBeanDefinition mbd, @Nullable Object[] explicitArgs) {
