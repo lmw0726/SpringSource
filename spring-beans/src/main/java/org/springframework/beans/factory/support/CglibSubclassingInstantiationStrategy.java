@@ -126,7 +126,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 			factory.setCallbacks(new Callback[] {NoOp.INSTANCE,
 					new LookupOverrideMethodInterceptor(this.beanDefinition, this.owner),
 					new ReplaceOverrideMethodInterceptor(this.beanDefinition, this.owner)});
-		// 返回实例
+			// 返回实例
 			return instance;
 
 		}
