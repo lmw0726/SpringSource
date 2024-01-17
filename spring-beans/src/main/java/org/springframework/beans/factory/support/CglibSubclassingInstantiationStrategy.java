@@ -94,37 +94,41 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		}
 
 		/**
-		 * Create a new instance of a dynamically generated subclass implementing the
-		 * required lookups.
-		 * @param ctor constructor to use. If this is {@code null}, use the
-		 * no-arg constructor (no parameterization, or Setter Injection)
-		 * @param args arguments to use for the constructor.
-		 * Ignored if the {@code ctor} parameter is {@code null}.
-		 * @return new instance of the dynamically generated subclass
+		 * 创建一个实现所需查找的动态生成子类的新实例。
+		 *
+		 * @param ctor 构造函数。如果为 {@code null}，则使用无参构造函数（无参数化，或Setter注入）。
+		 * @param args 用于构造函数的参数。如果 {@code ctor} 参数为 {@code null}，则忽略。
+		 * @return 动态生成子类的新实例
 		 */
 		public Object instantiate(@Nullable Constructor<?> ctor, Object... args) {
+			// 创建增强的子类
 			Class<?> subclass = createEnhancedSubclass(this.beanDefinition);
+			// 创建实例
 			Object instance;
 			if (ctor == null) {
+				// 如果构造函数为空，则直接实例化子类
 				instance = BeanUtils.instantiateClass(subclass);
-			}
-			else {
+			} else {
 				try {
+					// 获取增强子类的构造函数，并使用传入的参数实例化
 					Constructor<?> enhancedSubclassConstructor = subclass.getConstructor(ctor.getParameterTypes());
 					instance = enhancedSubclassConstructor.newInstance(args);
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
+					// 构造函数实例化失败，抛出异常
 					throw new BeanInstantiationException(this.beanDefinition.getBeanClass(),
 							"Failed to invoke constructor for CGLIB enhanced subclass [" + subclass.getName() + "]", ex);
 				}
 			}
-			// SPR-10785: set callbacks directly on the instance instead of in the
-			// enhanced class (via the Enhancer) in order to avoid memory leaks.
+
+			// SPR-10785: 直接在实例上设置回调，而不是在增强类（通过Enhancer）上设置回调，以避免内存泄漏。
+			// 将回调设置到实例上
 			Factory factory = (Factory) instance;
 			factory.setCallbacks(new Callback[] {NoOp.INSTANCE,
 					new LookupOverrideMethodInterceptor(this.beanDefinition, this.owner),
 					new ReplaceOverrideMethodInterceptor(this.beanDefinition, this.owner)});
+		// 返回实例
 			return instance;
+
 		}
 
 		/**
