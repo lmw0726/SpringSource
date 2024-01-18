@@ -16,9 +16,9 @@
 
 package org.springframework.beans.factory.config;
 
-import java.io.Serializable;
-
 import org.springframework.lang.Nullable;
+
+import java.io.Serializable;
 
 /**
  * Simple marker class for an individually autowired property value, to be added
@@ -29,16 +29,16 @@ import org.springframework.lang.Nullable;
  * through a {@link AutowireCapableBeanFactory#resolveDependency} step.
  *
  * @author Juergen Hoeller
- * @since 5.2
  * @see AutowireCapableBeanFactory#resolveDependency
  * @see BeanDefinition#getPropertyValues()
  * @see org.springframework.beans.factory.support.BeanDefinitionBuilder#addAutowiredProperty
+ * @since 5.2
  */
 @SuppressWarnings("serial")
 public final class AutowiredPropertyMarker implements Serializable {
 
 	/**
-	 * The canonical instance for the autowired marker value.
+	 * 自动装配标记值的规范实例。
 	 */
 	public static final Object INSTANCE = new AutowiredPropertyMarker();
 

@@ -73,41 +73,43 @@ abstract class AutowireUtils {
 	}
 
 	/**
-	 * Determine whether the given bean property is excluded from dependency checks.
-	 * <p>This implementation excludes properties defined by CGLIB.
+	 * 确定给定的bean属性是否被排除在依赖性检查之外。
+	 * <p>此实现排除由CGLIB定义的属性。
 	 *
-	 * @param pd the PropertyDescriptor of the bean property
-	 * @return whether the bean property is excluded
+	 * @param pd bean属性的PropertyDescriptor
+	 * @return bean属性是否被排除
 	 */
 	public static boolean isExcludedFromDependencyCheck(PropertyDescriptor pd) {
 		Method wm = pd.getWriteMethod();
 		if (wm == null) {
+			//如果没有set方法，返回false
 			return false;
 		}
 		if (!wm.getDeclaringClass().getName().contains("$$")) {
-			// Not a CGLIB method so it's OK.
+			// 不是CGLIB方法，所以是可以的。
 			return false;
 		}
-		// It was declared by CGLIB, but we might still want to autowire it
-		// if it was actually declared by the superclass.
+		// 它是由CGLIB声明的，但如果它实际上是由超类声明的，我们仍然可能想要进行自动装配。
 		Class<?> superclass = wm.getDeclaringClass().getSuperclass();
+		// 如果超类中没有该set方法，返回true
 		return !ClassUtils.hasMethod(superclass, wm);
 	}
 
 	/**
-	 * Return whether the setter method of the given bean property is defined
-	 * in any of the given interfaces.
+	 * 返回给定bean属性的setter方法是否在给定接口中的任何一个中定义。
 	 *
-	 * @param pd         the PropertyDescriptor of the bean property
-	 * @param interfaces the Set of interfaces (Class objects)
-	 * @return whether the setter method is defined by an interface
+	 * @param pd         bean属性的PropertyDescriptor
+	 * @param interfaces 接口的Set（Class对象）
+	 * @return setter方法是否由接口定义
 	 */
 	public static boolean isSetterDefinedInInterface(PropertyDescriptor pd, Set<Class<?>> interfaces) {
 		Method setter = pd.getWriteMethod();
 		if (setter != null) {
+			// 如果存在set方法，获取set方法的类
 			Class<?> targetClass = setter.getDeclaringClass();
 			for (Class<?> ifc : interfaces) {
 				if (ifc.isAssignableFrom(targetClass) && ClassUtils.hasMethod(ifc, setter)) {
+					//如果set方法的类是接口的实现类并且该接口方法有该名称的set方法，返回true
 					return true;
 				}
 			}
