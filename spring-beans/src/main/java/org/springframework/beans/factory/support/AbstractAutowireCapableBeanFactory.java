@@ -574,14 +574,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// 急切地缓存单例，以便能够解析循环引用，即使被 BeanFactoryAware 等生命周期接口触发。
-		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
-				isSingletonCurrentlyInCreation(beanName));
+		boolean earlySingletonExposure = (mbd.isSingleton()  //单例模式
+				&& this.allowCircularReferences //运行循环依赖
+				&& isSingletonCurrentlyInCreation(beanName)); //当前单例bean是否正在创建
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
 			// 添加单例工厂，用于获取早期 bean 引用
+			// 提前将创建的 bean 实例加入到 singletonFactories 中
+			// 这里是为了后期避免循环依赖
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -985,21 +988,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Obtain a reference for early access to the specified bean,
-	 * typically for the purpose of resolving a circular reference.
+	 * 获取对指定bean的早期访问引用，通常用于解析循环引用。
 	 *
-	 * @param beanName the name of the bean (for error handling purposes)
-	 * @param mbd      the merged bean definition for the bean
-	 * @param bean     the raw bean instance
-	 * @return the object to expose as bean reference
+	 * @param beanName bean的名称（出错处理时使用）
+	 * @param mbd      bean的合并定义
+	 * @param bean     原始bean实例
+	 * @return 作为bean引用公开的对象
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
+		// 将bean赋给暴露对象
 		Object exposedObject = bean;
+		// 如果不是合成对象并且存在实例化感知的Bean后置处理器
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+			// 遍历实例化感知的Bean后置处理器集合
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
+				// 调用后置处理器的getEarlyBeanReference方法，获取提前暴露的Bean引用
 				exposedObject = bp.getEarlyBeanReference(exposedObject, beanName);
 			}
 		}
+		// 返回暴露对象
 		return exposedObject;
 	}
 
