@@ -17,35 +17,30 @@
 package org.springframework.beans.factory;
 
 /**
- * Interface to be implemented by beans that want to be aware of their
- * bean name in a bean factory. Note that it is not usually recommended
- * that an object depends on its bean name, as this represents a potentially
- * brittle dependence on external configuration, as well as a possibly
- * unnecessary dependence on a Spring API.
+ * 由希望了解其在bean工厂中的bean名称的bean实现的接口。请注意，通常不建议对象依赖于其bean名称，
+ * 因为这表示对外部配置的潜在脆弱依赖，以及对Spring API可能不必要的依赖。
  *
- * <p>For a list of all bean lifecycle methods, see the
- * {@link BeanFactory BeanFactory javadocs}.
+ * <p>有关所有bean生命周期方法的列表，请参见
+ * {@link BeanFactory BeanFactory javadocs}。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
- * @since 01.11.2003
  * @see BeanClassLoaderAware
  * @see BeanFactoryAware
  * @see InitializingBean
+ * @since 01.11.2003
  */
 public interface BeanNameAware extends Aware {
 
 	/**
-	 * Set the name of the bean in the bean factory that created this bean.
-	 * <p>Invoked after population of normal bean properties but before an
-	 * init callback such as {@link InitializingBean#afterPropertiesSet()}
-	 * or a custom init-method.
-	 * @param name the name of the bean in the factory.
-	 * Note that this name is the actual bean name used in the factory, which may
-	 * differ from the originally specified name: in particular for inner bean
-	 * names, the actual bean name might have been made unique through appending
-	 * "#..." suffixes. Use the {@link BeanFactoryUtils#originalBeanName(String)}
-	 * method to extract the original bean name (without suffix), if desired.
+	 * 设置创建此bean的bean工厂中的bean的名称。
+	 * <p>在正常bean属性填充之后但在初始化回调（例如 {@link InitializingBean#afterPropertiesSet()}）
+	 * 或自定义init方法之前调用。
+	 *
+	 * @param name 工厂中bean的名称。
+	 *             注意，此名称是工厂中使用的实际bean名称，可能与最初指定的名称不同：
+	 *             特别是对于内部bean名称，实际bean名称可能已通过附加“#...”后缀而变得唯一。
+	 *             如果需要，使用 {@link BeanFactoryUtils#originalBeanName(String)} 方法提取原始bean名称（不带后缀）。
 	 */
 	void setBeanName(String name);
 

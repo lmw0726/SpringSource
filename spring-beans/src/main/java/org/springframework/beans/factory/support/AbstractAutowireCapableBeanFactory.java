@@ -398,21 +398,42 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return initializeBean(beanName, existingBean, null);
 	}
 
+	/**
+	 * 在初始化之前应用Bean后置处理器。
+	 *
+	 * @param existingBean 要初始化的现有Bean实例
+	 * @param beanName     Bean的名称
+	 * @return 经过处理后的Bean实例
+	 * @throws BeansException 如果在处理期间发生错误
+	 */
 	@Override
 	public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
 			throws BeansException {
 
+		// 对于已存在的bean，遍历所有的BeanPostProcessor，调用postProcessBeforeInitialization方法
 		Object result = existingBean;
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
+			// 调用postProcessBeforeInitialization方法，并获取处理后的对象
 			Object current = processor.postProcessBeforeInitialization(result, beanName);
+			// 如果处理后的对象为null，则返回原始结果
 			if (current == null) {
 				return result;
 			}
+			// 将处理后的对象赋值给result，继续下一个BeanPostProcessor的处理
 			result = current;
 		}
+		// 返回最终处理后的结果
 		return result;
 	}
 
+	/**
+	 * 在初始化之后应用Bean后置处理器。
+	 *
+	 * @param existingBean 要初始化的现有Bean实例
+	 * @param beanName     Bean的名称
+	 * @return 经过处理后的Bean实例
+	 * @throws BeansException 如果在处理期间发生错误
+	 */
 	@Override
 	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
 			throws BeansException {
@@ -1859,16 +1880,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
-	 * Initialize the given bean instance, applying factory callbacks
-	 * as well as init methods and bean post processors.
-	 * <p>Called from {@link #createBean} for traditionally defined beans,
-	 * and from {@link #initializeBean} for existing bean instances.
+	 * 初始化给定的bean实例，应用工厂回调、初始化方法和bean后处理器。
+	 * <p>对于传统定义的bean，从{@link #createBean}调用，对于现有bean实例，从{@link #initializeBean}调用。
 	 *
-	 * @param beanName the bean name in the factory (for debugging purposes)
-	 * @param bean     the new bean instance we may need to initialize
-	 * @param mbd      the bean definition that the bean was created with
-	 *                 (can also be {@code null}, if given an existing bean instance)
-	 * @return the initialized bean instance (potentially wrapped)
+	 * @param beanName 工厂中的bean名称（用于调试目的）
+	 * @param bean     可能需要初始化的新bean实例
+	 * @param mbd      bean创建时使用的bean定义（如果给定现有bean实例，也可以为{@code null}）
+	 * @return 初始化的bean实例（可能被包装）
 	 * @see BeanNameAware
 	 * @see BeanClassLoaderAware
 	 * @see BeanFactoryAware
@@ -1877,75 +1895,107 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #applyBeanPostProcessorsAfterInitialization
 	 */
 	protected Object initializeBean(String beanName, Object bean, @Nullable RootBeanDefinition mbd) {
+		// 如果安全管理器不为空
 		if (System.getSecurityManager() != null) {
+			// 通过特权访问执行invokeAwareMethods方法
 			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 				invokeAwareMethods(beanName, bean);
 				return null;
 			}, getAccessControlContext());
 		} else {
+			// 否则直接调用invokeAwareMethods方法
 			invokeAwareMethods(beanName, bean);
 		}
 
+		// 将wrappedBean初始化为原始的bean
 		Object wrappedBean = bean;
+		// 如果不存在根bean定义 或 根bean定义不是合成对象
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 调用Bean后置处理器的applyBeanPostProcessorsBeforeInitialization方法
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+			// 调用invokeInitMethods方法，执行初始化方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		} catch (Throwable ex) {
+			// 捕获初始化方法抛出的异常，封装为BeanCreationException并抛出
 			throw new BeanCreationException(
 					(mbd != null ? mbd.getResourceDescription() : null),
 					beanName, "Invocation of init method failed", ex);
 		}
+
+		// 如果不存在根bean定义 或 根bean定义不是合成对象
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 调用Bean后置处理器的applyBeanPostProcessorsAfterInitialization方法
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
+		// 返回处理后的bean包装对象
 		return wrappedBean;
 	}
 
+	/**
+	 * 调用bean的感知方法（Aware methods）。
+	 * 如果bean实现了Aware接口，会调用相应的方法。
+	 *
+	 * @param beanName bean的名称（用于调试目的）
+	 * @param bean     bean实例
+	 */
 	private void invokeAwareMethods(String beanName, Object bean) {
+		// 如果bean实现了Aware接口
 		if (bean instanceof Aware) {
+			// 如果bean同时实现了BeanNameAware接口
 			if (bean instanceof BeanNameAware) {
+				// 调用setBeanName方法设置bean的名称
 				((BeanNameAware) bean).setBeanName(beanName);
 			}
+			// 如果bean同时实现了BeanClassLoaderAware接口
 			if (bean instanceof BeanClassLoaderAware) {
+				// 获取Bean类加载器
 				ClassLoader bcl = getBeanClassLoader();
+				// 如果Bean类加载器不为空，则调用setBeanClassLoader方法设置Bean类加载器
 				if (bcl != null) {
 					((BeanClassLoaderAware) bean).setBeanClassLoader(bcl);
 				}
 			}
+			// 如果bean同时实现了BeanFactoryAware接口
 			if (bean instanceof BeanFactoryAware) {
+				// 调用setBeanFactory方法设置BeanFactory为当前AbstractAutowireCapableBeanFactory
 				((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.this);
 			}
 		}
 	}
 
 	/**
-	 * Give a bean a chance to react now all its properties are set,
-	 * and a chance to know about its owning bean factory (this object).
-	 * This means checking whether the bean implements InitializingBean or defines
-	 * a custom init method, and invoking the necessary callback(s) if it does.
+	 * 给予bean在所有属性设置完成后作出反应的机会，并了解其所属的Bean工厂（即这个对象）。
+	 * 这意味着检查bean是否实现了InitializingBean接口或定义了自定义的初始化方法，
+	 * 如果是，则调用必要的回调方法。
 	 *
-	 * @param beanName the bean name in the factory (for debugging purposes)
-	 * @param bean     the new bean instance we may need to initialize
-	 * @param mbd      the merged bean definition that the bean was created with
-	 *                 (can also be {@code null}, if given an existing bean instance)
-	 * @throws Throwable if thrown by init methods or by the invocation process
+	 * @param beanName 在工厂中的bean名称（用于调试目的）
+	 * @param bean     可能需要初始化的新bean实例
+	 * @param mbd      bean创建时使用的合并的bean定义
+	 *                 （如果给定了现有bean实例，则可能为null）
+	 * @throws Throwable 如果由init方法或调用过程引发
 	 * @see #invokeCustomInitMethod
 	 */
 	protected void invokeInitMethods(String beanName, Object bean, @Nullable RootBeanDefinition mbd)
 			throws Throwable {
 
+		// 检查bean是否实现了InitializingBean接口
 		boolean isInitializingBean = (bean instanceof InitializingBean);
+
+		// 如果是InitializingBean，并且bean没有外部管理的afterPropertiesSet方法，则调用其afterPropertiesSet方法
 		if (isInitializingBean && (mbd == null || !mbd.hasAnyExternallyManagedInitMethod("afterPropertiesSet"))) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Invoking afterPropertiesSet() on bean with name '" + beanName + "'");
 			}
+
+			// 使用特权访问方式调用afterPropertiesSet方法
 			if (System.getSecurityManager() != null) {
 				try {
 					AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () -> {
+						//调用 afterPropertiesSet 方法
 						((InitializingBean) bean).afterPropertiesSet();
 						return null;
 					}, getAccessControlContext());
@@ -1953,15 +2003,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					throw pae.getException();
 				}
 			} else {
+				// 直接调用afterPropertiesSet方法
 				((InitializingBean) bean).afterPropertiesSet();
 			}
 		}
 
+		// 如果存在BeanDefinition，并且bean的类不是NullBean，则检查initMethodName，并调用自定义的初始化方法
 		if (mbd != null && bean.getClass() != NullBean.class) {
+			// 获取初始化方法名称
 			String initMethodName = mbd.getInitMethodName();
 			if (StringUtils.hasLength(initMethodName) &&
 					!(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
 					!mbd.hasAnyExternallyManagedInitMethod(initMethodName)) {
+				// 并且bean没有外部管理的初始化方法名称的方法
+				// 调用自定义的初始化方法
 				invokeCustomInitMethod(beanName, bean, mbd);
 			}
 		}
