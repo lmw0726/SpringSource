@@ -433,8 +433,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param beanName     Bean的名称
 	 * @return 经过处理后的Bean实例
 	 * @throws BeansException 如果在处理期间发生错误
-	 */
-	@Override
+	 */	@Override
 	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
 			throws BeansException {
 

@@ -18,8 +18,8 @@ public class BeanPostProcessorTest {
 		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
 		reader.loadBeanDefinitions(resource);
 
-//		MyBeanPostProcessor myBeanPostProcessor = new MyBeanPostProcessor();
-//		factory.addBeanPostProcessor(myBeanPostProcessor);
+		MyBeanPostProcessor myBeanPostProcessor = new MyBeanPostProcessor();
+		factory.addBeanPostProcessor(myBeanPostProcessor);
 
 		MyBeanPostProcessor test = (MyBeanPostProcessor) factory.getBean("myBeanPostProcessor");
 		test.display();
