@@ -516,7 +516,6 @@ class DefaultWebClient implements WebClient {
 		 *
 		 * @param contextModifier 上下文修改器函数，用于修改请求的上下文信息
 		 * @return 返回当前的 RequestBodySpec 对象
-		 * @deprecated 该方法已被弃用
 		 */
 		@Override
 		@SuppressWarnings("deprecation")
