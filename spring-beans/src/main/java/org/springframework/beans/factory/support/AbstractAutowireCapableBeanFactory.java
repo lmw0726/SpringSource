@@ -433,7 +433,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param beanName     Bean的名称
 	 * @return 经过处理后的Bean实例
 	 * @throws BeansException 如果在处理期间发生错误
-	 */	@Override
+	 */
+	@Override
 	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
 			throws BeansException {
 
@@ -2022,22 +2023,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Invoke the specified custom init method on the given bean.
-	 * Called by invokeInitMethods.
-	 * <p>Can be overridden in subclasses for custom resolution of init
-	 * methods with arguments.
+	 * 在给定的bean上调用指定的自定义初始化方法。
+	 * 由invokeInitMethods调用。
+	 * <p>可以在子类中覆盖，以自定义解析带有参数的init方法。
 	 *
 	 * @see #invokeInitMethods
 	 */
 	protected void invokeCustomInitMethod(String beanName, Object bean, RootBeanDefinition mbd)
 			throws Throwable {
 
+		// 获取初始化方法的名称
 		String initMethodName = mbd.getInitMethodName();
+		// 检查是否设置了初始化方法，如果没有，则抛出异常
 		Assert.state(initMethodName != null, "No init method set");
+		// 根据是否允许访问非公共方法选择查找方法的方式
 		Method initMethod = (mbd.isNonPublicAccessAllowed() ?
 				BeanUtils.findMethod(bean.getClass(), initMethodName) :
 				ClassUtils.getMethodIfAvailable(bean.getClass(), initMethodName));
 
+		// 如果找不到初始化方法，根据是否强制执行抛出异常或记录日志
 		if (initMethod == null) {
 			if (mbd.isEnforceInitMethod()) {
 				throw new BeanDefinitionValidationException("Could not find an init method named '" +
@@ -2047,33 +2051,42 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					logger.trace("No default init method named '" + initMethodName +
 							"' found on bean with name '" + beanName + "'");
 				}
-				// Ignore non-existent default lifecycle methods.
+				// 忽略不存在的默认生命周期方法
 				return;
 			}
 		}
 
+		// 如果日志启用，记录将要调用的初始化方法
 		if (logger.isTraceEnabled()) {
 			logger.trace("Invoking init method  '" + initMethodName + "' on bean with name '" + beanName + "'");
 		}
+
+		// 获取要调用的方法，考虑接口中的方法
 		Method methodToInvoke = ClassUtils.getInterfaceMethodIfPossible(initMethod, bean.getClass());
 
+		// 如果启用了安全管理器，使用特权块进行访问控制和调用
 		if (System.getSecurityManager() != null) {
+			// 使用特权块使方法可访问
 			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 				ReflectionUtils.makeAccessible(methodToInvoke);
 				return null;
 			});
 			try {
+				// 使用特权块调用初始化方法
 				AccessController.doPrivileged((PrivilegedExceptionAction<Object>)
 						() -> methodToInvoke.invoke(bean), getAccessControlContext());
 			} catch (PrivilegedActionException pae) {
+				// 处理特权块中的异常
 				InvocationTargetException ex = (InvocationTargetException) pae.getException();
 				throw ex.getTargetException();
 			}
 		} else {
 			try {
+				// 否则，直接使方法可访问并调用初始化方法
 				ReflectionUtils.makeAccessible(methodToInvoke);
 				methodToInvoke.invoke(bean);
 			} catch (InvocationTargetException ex) {
+				// 处理调用初始化方法时的异常
 				throw ex.getTargetException();
 			}
 		}
