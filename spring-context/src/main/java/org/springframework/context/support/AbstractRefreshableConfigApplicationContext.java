@@ -24,17 +24,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link AbstractRefreshableApplicationContext} subclass that adds common handling
- * of specified config locations. Serves as base class for XML-based application
- * context implementations such as {@link ClassPathXmlApplicationContext} and
- * {@link FileSystemXmlApplicationContext}, as well as
- * {@link org.springframework.web.context.support.XmlWebApplicationContext}.
+ * {@link AbstractRefreshableApplicationContext}的子类，添加了指定配置位置的常见处理。
+ * 作为基类供基于XML的应用程序上下文实现使用，例如 {@link ClassPathXmlApplicationContext} 和
+ * {@link FileSystemXmlApplicationContext}，以及 {@link org.springframework.web.context.support.XmlWebApplicationContext}。
  *
  * @author Juergen Hoeller
- * @since 2.5.2
  * @see #setConfigLocation
  * @see #setConfigLocations
  * @see #getDefaultConfigLocations
+ * @since 2.5.2
  */
 public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
 		implements BeanNameAware, InitializingBean {
@@ -46,14 +44,15 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 
 
 	/**
-	 * Create a new AbstractRefreshableConfigApplicationContext with no parent.
+	 * 创建一个没有父上下文的新的AbstractRefreshableConfigApplicationContext。
 	 */
 	public AbstractRefreshableConfigApplicationContext() {
 	}
 
 	/**
-	 * Create a new AbstractRefreshableConfigApplicationContext with the given parent context.
-	 * @param parent the parent context
+	 * 使用给定的父上下文创建一个新的AbstractRefreshableConfigApplicationContext。
+	 *
+	 * @param parent 父上下文
 	 */
 	public AbstractRefreshableConfigApplicationContext(@Nullable ApplicationContext parent) {
 		super(parent);
@@ -61,17 +60,21 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 
 
 	/**
-	 * Set the config locations for this application context in init-param style,
-	 * i.e. with distinct locations separated by commas, semicolons or whitespace.
-	 * <p>If not set, the implementation may use a default as appropriate.
+	 * 以init-param样式设置此应用程序上下文的配置位置，
+	 * 即使用逗号、分号或空格分隔的不同位置。
+	 * <p>如果未设置，实现可能会使用适当的默认值。
+	 *
+	 * @param location 配置位置
 	 */
 	public void setConfigLocation(String location) {
 		setConfigLocations(StringUtils.tokenizeToStringArray(location, CONFIG_LOCATION_DELIMITERS));
 	}
 
 	/**
-	 * Set the config locations for this application context.
-	 * <p>If not set, the implementation may use a default as appropriate.
+	 * 设置此应用程序上下文的配置位置。
+	 * <p>如果未设置，实现可能会使用适当的默认值。
+	 *
+	 * @param locations 应用程序上下文的配置位置
 	 */
 	public void setConfigLocations(@Nullable String... locations) {
 		if (locations != null) {
@@ -80,19 +83,16 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 			for (int i = 0; i < locations.length; i++) {
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
-		}
-		else {
+		} else {
 			this.configLocations = null;
 		}
 	}
 
 	/**
-	 * Return an array of resource locations, referring to the XML bean definition
-	 * files that this context should be built with. Can also include location
-	 * patterns, which will get resolved via a ResourcePatternResolver.
-	 * <p>The default implementation returns {@code null}. Subclasses can override
-	 * this to provide a set of resource locations to load bean definitions from.
-	 * @return an array of resource locations, or {@code null} if none
+	 * 返回一个资源位置数组，指示应使用哪些 XML bean 定义文件构建此上下文。还可以包含位置模式，这将通过 ResourcePatternResolver 解析。
+	 * <p>默认实现返回 {@code null}。子类可以覆盖此方法，以提供一组从中加载 bean 定义的资源位置。
+	 *
+	 * @return 资源位置数组，如果没有则为 {@code null}
 	 * @see #getResources
 	 * @see #getResourcePatternResolver
 	 */
@@ -102,11 +102,10 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
-	 * Return the default config locations to use, for the case where no
-	 * explicit config locations have been specified.
-	 * <p>The default implementation returns {@code null},
-	 * requiring explicit config locations.
-	 * @return an array of default config locations, if any
+	 * 返回要在没有指定显式配置位置的情况下使用的默认配置位置。
+	 * <p>默认实现返回 {@code null}，需要明确的配置位置。
+	 *
+	 * @return 默认配置位置数组，如果有的话
 	 * @see #setConfigLocations
 	 */
 	@Nullable
@@ -115,10 +114,10 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
-	 * Resolve the given path, replacing placeholders with corresponding
-	 * environment property values if necessary. Applied to config locations.
-	 * @param path the original file path
-	 * @return the resolved file path
+	 * 解析给定的路径，在必要时用相应的环境属性值替换占位符。应用于配置位置。
+	 *
+	 * @param path 原始文件路径
+	 * @return 已解析的文件路径
 	 * @see org.springframework.core.env.Environment#resolveRequiredPlaceholders(String)
 	 */
 	protected String resolvePath(String path) {
@@ -133,8 +132,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
-	 * Sets the id of this context to the bean name by default,
-	 * for cases where the context instance is itself defined as a bean.
+	 * 默认情况下，将此上下文的ID设置为bean名称，用于上下文实例本身被定义为bean的情况。
 	 */
 	@Override
 	public void setBeanName(String name) {
@@ -145,8 +143,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
-	 * Triggers {@link #refresh()} if not refreshed in the concrete context's
-	 * constructor already.
+	 * 如果在具体上下文的构造函数中尚未刷新，则触发 {@link #refresh()}。
 	 */
 	@Override
 	public void afterPropertiesSet() {

@@ -16,8 +16,6 @@
 
 package org.springframework.context.support;
 
-import java.io.IOException;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -25,35 +23,27 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+
 /**
- * Base class for {@link org.springframework.context.ApplicationContext}
- * implementations which are supposed to support multiple calls to {@link #refresh()},
- * creating a new internal bean factory instance every time.
- * Typically (but not necessarily), such a context will be driven by
- * a set of config locations to load bean definitions from.
+ * 支持多次调用 {@link #refresh()} 的 {@link org.springframework.context.ApplicationContext} 实现的基类，
+ * 每次都会创建一个新的内部 Bean 工厂实例。通常（但不一定），这样的上下文将由一组配置位置驱动，以从中加载 bean 定义。
  *
- * <p>The only method to be implemented by subclasses is {@link #loadBeanDefinitions},
- * which gets invoked on each refresh. A concrete implementation is supposed to load
- * bean definitions into the given
- * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory},
- * typically delegating to one or more specific bean definition readers.
+ * <p>子类唯一需要实现的方法是 {@link #loadBeanDefinitions}，该方法在每次刷新时调用。
+ * 具体的实现应该将 bean 定义加载到给定的 {@link org.springframework.beans.factory.support.DefaultListableBeanFactory} 中，
+ * 通常委托给一个或多个特定的 bean 定义读取器。
  *
- * <p><b>Note that there is a similar base class for WebApplicationContexts.</b>
+ * <p><b>注意，WebApplicationContexts 也有一个类似的基类。</b>
  * {@link org.springframework.web.context.support.AbstractRefreshableWebApplicationContext}
- * provides the same subclassing strategy, but additionally pre-implements
- * all context functionality for web environments. There is also a
- * pre-defined way to receive config locations for a web context.
+ * 提供了相同的子类化策略，但此外还为 Web 环境预实现了所有上下文功能。还有一种预定义的方式来接收 Web 上下文的配置位置。
  *
- * <p>Concrete standalone subclasses of this base class, reading in a
- * specific bean definition format, are {@link ClassPathXmlApplicationContext}
- * and {@link FileSystemXmlApplicationContext}, which both derive from the
- * common {@link AbstractXmlApplicationContext} base class;
+ * <p>此基类的具体独立子类，按特定的 bean 定义格式读取，包括 {@link ClassPathXmlApplicationContext}
+ * 和 {@link FileSystemXmlApplicationContext}，它们都派生自共同的 {@link AbstractXmlApplicationContext} 基类；
  * {@link org.springframework.context.annotation.AnnotationConfigApplicationContext}
- * supports {@code @Configuration}-annotated classes as a source of bean definitions.
+ * 支持将 {@code @Configuration} 注解的类作为 bean 定义的来源。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
- * @since 1.1.3
  * @see #loadBeanDefinitions
  * @see org.springframework.beans.factory.support.DefaultListableBeanFactory
  * @see org.springframework.web.context.support.AbstractRefreshableWebApplicationContext
@@ -61,29 +51,39 @@ import org.springframework.lang.Nullable;
  * @see ClassPathXmlApplicationContext
  * @see FileSystemXmlApplicationContext
  * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
+ * @since 1.1.3
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
+	/**
+	 * 是否允许bean定义覆盖
+	 */
 	@Nullable
 	private Boolean allowBeanDefinitionOverriding;
 
+	/**
+	 * 是否允许循环引用
+	 */
 	@Nullable
 	private Boolean allowCircularReferences;
 
-	/** Bean factory for this context. */
+	/**
+	 * 此上下文的Bean工厂。
+	 */
 	@Nullable
 	private volatile DefaultListableBeanFactory beanFactory;
 
 
 	/**
-	 * Create a new AbstractRefreshableApplicationContext with no parent.
+	 * 创建一个没有父级的新的 {@link AbstractRefreshableApplicationContext}。
 	 */
 	public AbstractRefreshableApplicationContext() {
 	}
 
 	/**
-	 * Create a new AbstractRefreshableApplicationContext with the given parent context.
-	 * @param parent the parent context
+	 * 使用给定的父级上下文创建一个新的 {@link AbstractRefreshableApplicationContext}。
+	 *
+	 * @param parent 父级上下文
 	 */
 	public AbstractRefreshableApplicationContext(@Nullable ApplicationContext parent) {
 		super(parent);
@@ -91,9 +91,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 
 	/**
-	 * Set whether it should be allowed to override bean definitions by registering
-	 * a different definition with the same name, automatically replacing the former.
-	 * If not, an exception will be thrown. Default is "true".
+	 * 设置是否允许通过注册具有相同名称的不同定义来覆盖 bean 定义，自动替换前者。
+	 * 如果不允许，将抛出异常。默认值为 "true"。
+	 *
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
 	 */
 	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
@@ -101,10 +101,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Set whether to allow circular references between beans - and automatically
-	 * try to resolve them.
-	 * <p>Default is "true". Turn this off to throw an exception when encountering
-	 * a circular reference, disallowing them completely.
+	 * 设置是否允许在 bean 之间存在循环引用，并自动尝试解决它们。
+	 * <p>默认值为 "true"。将其关闭以在遇到循环引用时抛出异常，完全禁止它们。
+	 *
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
 	 */
 	public void setAllowCircularReferences(boolean allowCircularReferences) {
@@ -113,9 +112,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 
 	/**
-	 * This implementation performs an actual refresh of this context's underlying
-	 * bean factory, shutting down the previous bean factory (if any) and
-	 * initializing a fresh bean factory for the next phase of the context's lifecycle.
+	 * 此实现执行刷新此上下文底层的 bean 工厂，关闭先前的 bean 工厂（如果有的话），
+	 * 并为上下文生命周期的下一阶段初始化一个新的 bean 工厂。
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
@@ -129,8 +127,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			customizeBeanFactory(beanFactory);
 			loadBeanDefinitions(beanFactory);
 			this.beanFactory = beanFactory;
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			throw new ApplicationContextException("I/O error parsing bean definition source for " + getDisplayName(), ex);
 		}
 	}
@@ -154,8 +151,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Determine whether this context currently holds a bean factory,
-	 * i.e. has been refreshed at least once and not been closed yet.
+	 * 确定此上下文当前是否持有一个 bean 工厂，
+	 * 即已经刷新至少一次且尚未关闭。
 	 */
 	protected final boolean hasBeanFactory() {
 		return (this.beanFactory != null);
@@ -172,22 +169,22 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Overridden to turn it into a no-op: With AbstractRefreshableApplicationContext,
-	 * {@link #getBeanFactory()} serves a strong assertion for an active context anyway.
+	 * 被覆盖为一个空操作：对于 AbstractRefreshableApplicationContext，
+	 * {@link #getBeanFactory()} 在任何情况下都是对活动上下文的强烈断言。
 	 */
 	@Override
 	protected void assertBeanFactoryActive() {
 	}
 
 	/**
-	 * Create an internal bean factory for this context.
-	 * Called for each {@link #refresh()} attempt.
-	 * <p>The default implementation creates a
-	 * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
-	 * with the {@linkplain #getInternalParentBeanFactory() internal bean factory} of this
-	 * context's parent as parent bean factory. Can be overridden in subclasses,
-	 * for example to customize DefaultListableBeanFactory's settings.
-	 * @return the bean factory for this context
+	 * 为此上下文创建一个内部的 bean 工厂。
+	 * 每次 {@link #refresh()} 尝试时调用。
+	 * <p>默认实现创建一个
+	 * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}，
+	 * 将此上下文的父上下文的{@linkplain #getInternalParentBeanFactory() 内部 bean 工厂}作为父 bean 工厂。
+	 * 可以在子类中覆盖，例如自定义 DefaultListableBeanFactory 的设置。
+	 *
+	 * @return 此上下文的 bean 工厂
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowEagerClassLoading
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
@@ -198,14 +195,14 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Customize the internal bean factory used by this context.
-	 * Called for each {@link #refresh()} attempt.
-	 * <p>The default implementation applies this context's
+	 * 定制此上下文使用的内部 bean 工厂。
+	 * 每次 {@link #refresh()} 尝试时调用。
+	 * <p>默认实现应用此上下文的
 	 * {@linkplain #setAllowBeanDefinitionOverriding "allowBeanDefinitionOverriding"}
-	 * and {@linkplain #setAllowCircularReferences "allowCircularReferences"} settings,
-	 * if specified. Can be overridden in subclasses to customize any of
-	 * {@link DefaultListableBeanFactory}'s settings.
-	 * @param beanFactory the newly created bean factory for this context
+	 * 和 {@linkplain #setAllowCircularReferences "allowCircularReferences"} 设置，如果指定。
+	 * 可以在子类中覆盖以定制任何 {@link DefaultListableBeanFactory} 的设置。
+	 *
+	 * @param beanFactory 为此上下文新创建的 bean 工厂
 	 * @see DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
 	 * @see DefaultListableBeanFactory#setAllowCircularReferences
 	 * @see DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
@@ -221,11 +218,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Load bean definitions into the given bean factory, typically through
-	 * delegating to one or more bean definition readers.
-	 * @param beanFactory the bean factory to load bean definitions into
-	 * @throws BeansException if parsing of the bean definitions failed
-	 * @throws IOException if loading of bean definition files failed
+	 * 将 bean 定义加载到给定的 bean 工厂中，通常通过委托给一个或多个 bean 定义读取器。
+	 *
+	 * @param beanFactory 要将 bean 定义加载到的 bean 工厂
+	 * @throws BeansException 如果解析 bean 定义失败
+	 * @throws IOException    如果加载 bean 定义文件失败
 	 * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 */
