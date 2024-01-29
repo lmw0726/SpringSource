@@ -579,54 +579,42 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		synchronized (this.startupShutdownMonitor) {
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
-			// Prepare this context for refreshing.
 			//准备对此上下文进行刷新
 			prepareRefresh();
 
-			// Tell the subclass to refresh the internal bean factory.
 			//告诉子类刷新内部Bean工厂
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			// Prepare the bean factory for use in this context.
 			//准备在此上下文中使用Bean工厂
 			prepareBeanFactory(beanFactory);
 
 			try {
-				// Allows post-processing of the bean factory in context subclasses.
 				//允许在上下文子类中对 bean 工厂进行后处理。
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
-				// Invoke factory processors registered as beans in the context.
 				//调用在上下文中注册为 bean 的工厂处理器。
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// Register bean processors that intercept bean creation.
 				//注册拦截 bean 创建的 bean 处理器。
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 
-				// Initialize message source for this context.
 				//为此上下文初始化消息源。
 				initMessageSource();
 
-				// Initialize event multicaster for this context.
 				//为此上下文初始化事件多播器。
 				initApplicationEventMulticaster();
 
-				// Initialize other special beans in specific context subclasses.
 				//初始化特定上下文子类中的其他特殊 bean。
 				onRefresh();
 
-				// Check for listener beans and register them.
 				//检查侦听器 bean 并注册它们。
 				registerListeners();
 
-				// Instantiate all remaining (non-lazy-init) singletons.
 				//实例化所有剩余的（非懒加载）单例。
 				finishBeanFactoryInitialization(beanFactory);
 
-				// Last step: publish corresponding event.
 				//最后一步：发布相应的事件。
 				finishRefresh();
 			} catch (BeansException ex) {
@@ -635,20 +623,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 							"cancelling refresh attempt: " + ex);
 				}
 
-				// Destroy already created singletons to avoid dangling resources.
 				//销毁已经创建的单例以避免悬空资源。
 				destroyBeans();
 
-				// Reset 'active' flag.
 				//重置“活动”标志。
 				cancelRefresh(ex);
 
-				// Propagate exception to caller.
 				//将异常传播给调用者。
 				throw ex;
 			} finally {
-				// Reset common introspection caches in Spring's core, since we
-				// might not ever need metadata for singleton beans anymore...
 				//重置 Spring 核心中的常见自省缓存，因为我们可能不再需要单例 bean 的元数据......
 				resetCommonCaches();
 				contextRefresh.end();
@@ -806,16 +789,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
-	 * respecting explicit order if given.
-	 * <p>Must be called before singleton instantiation.
+	 * 实例化和调用所有已注册的 BeanFactoryPostProcessor bean，如果给定的话，遵循显式顺序。
+	 * <p>必须在单例实例化之前调用。
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+
 		//调用 Bean Factory 后处理器
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
-		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
-		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
 		//检测 LoadTimeWeaver 并准备编织（如果同时发现）
 		//（例如，通过 ConfigurationClassPostProcessor 注册的 @Bean 方法）
 		if (!NativeDetector.inNativeImage() && beanFactory.getTempClassLoader() == null && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
