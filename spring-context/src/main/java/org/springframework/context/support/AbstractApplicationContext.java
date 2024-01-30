@@ -991,19 +991,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Cancel this context's refresh attempt, resetting the {@code active} flag
-	 * after an exception got thrown.
+	 * 取消此上下文的刷新尝试，在抛出异常后重置 active 标志。
 	 *
-	 * @param ex the exception that led to the cancellation
+	 * @param ex 导致取消的异常
 	 */
 	protected void cancelRefresh(BeansException ex) {
 		this.active.set(false);
 	}
 
 	/**
-	 * Reset Spring's common reflection metadata caches, in particular the
-	 * {@link ReflectionUtils}, {@link AnnotationUtils}, {@link ResolvableType}
-	 * and {@link CachedIntrospectionResults} caches.
+	 * 重置Spring的常见反射元数据缓存，特别是ReflectionUtils、AnnotationUtils、ResolvableType和CachedIntrospectionResults的缓存。
 	 *
 	 * @see ReflectionUtils#clearCache()
 	 * @see AnnotationUtils#clearCache()
@@ -1018,12 +1015,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		CachedIntrospectionResults.clearClassLoader(getClassLoader());
 	}
 
-
 	/**
-	 * Register a shutdown hook {@linkplain Thread#getName() named}
-	 * {@code SpringContextShutdownHook} with the JVM runtime, closing this
-	 * context on JVM shutdown unless it has already been closed at that time.
-	 * <p>Delegates to {@code doClose()} for the actual closing procedure.
+	 * 注册一个名为"SpringContextShutdownHook"的JVM运行时关闭挂钩线程，
+	 * 在JVM关闭时关闭此上下文，除非在那时已经关闭。
+	 * <p>委托给{@code doClose()}执行实际的关闭过程。
 	 *
 	 * @see Runtime#addShutdownHook
 	 * @see ConfigurableApplicationContext#SHUTDOWN_HOOK_THREAD_NAME
@@ -1033,7 +1028,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void registerShutdownHook() {
 		if (this.shutdownHook == null) {
-			// No shutdown hook registered yet.
+			// 还没有注册关闭钩子函数。
 			this.shutdownHook = new Thread(SHUTDOWN_HOOK_THREAD_NAME) {
 				@Override
 				public void run() {
@@ -1047,12 +1042,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Callback for destruction of this instance, originally attached
-	 * to a {@code DisposableBean} implementation (not anymore in 5.0).
-	 * <p>The {@link #close()} method is the native way to shut down
-	 * an ApplicationContext, which this method simply delegates to.
+	 * 用于销毁此实例的回调，最初附加到{@code DisposableBean}实现（在5.0中不再使用）。
+	 * <p>{@link #close()}方法是关闭ApplicationContext的本机方法，
+	 * 该方法只是委托给它。
 	 *
-	 * @deprecated as of Spring Framework 5.0, in favor of {@link #close()}
+	 * @deprecated 自Spring Framework 5.0起，推荐使用{@link #close()}
 	 */
 	@Deprecated
 	public void destroy() {
@@ -1060,9 +1054,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Close this application context, destroying all beans in its bean factory.
-	 * <p>Delegates to {@code doClose()} for the actual closing procedure.
-	 * Also removes a JVM shutdown hook, if registered, as it's not needed anymore.
+	 * 关闭此应用程序上下文，销毁其bean工厂中的所有bean。
+	 * <p>将实际的关闭过程委托给{@code doClose()}。
+	 * 同时，如果已注册，还会删除JVM关闭挂钩，因为它不再需要。
 	 *
 	 * @see #doClose()
 	 * @see #registerShutdownHook()
@@ -1071,22 +1065,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void close() {
 		synchronized (this.startupShutdownMonitor) {
 			doClose();
-			// If we registered a JVM shutdown hook, we don't need it anymore now:
-			// We've already explicitly closed the context.
+			// 如果已注册JVM关闭挂钩，现在我们不再需要它：
+			// 我们已经显式关闭了上下文。
 			if (this.shutdownHook != null) {
 				try {
 					Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
 				} catch (IllegalStateException ex) {
-					// ignore - VM is already shutting down
+					// 忽略 - VM已经在关闭
 				}
 			}
 		}
 	}
 
 	/**
-	 * Actually performs context closing: publishes a ContextClosedEvent and
-	 * destroys the singletons in the bean factory of this application context.
-	 * <p>Called by both {@code close()} and a JVM shutdown hook, if any.
+	 * 实际执行上下文关闭：发布ContextClosedEvent并销毁此应用程序上下文的bean工厂中的单例。
+	 * <p>由{@code close()}和JVM关闭挂钩（如果有的话）调用。
 	 *
 	 * @see org.springframework.context.event.ContextClosedEvent
 	 * @see #destroyBeans()
@@ -1095,60 +1088,63 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	@SuppressWarnings("deprecation")
 	protected void doClose() {
-		// Check whether an actual close attempt is necessary...
+		// 检查是否需要实际的关闭尝试...
 		if (this.active.get() && this.closed.compareAndSet(false, true)) {
+			// 如果上下文处于活动状态并成功将关闭状态从false设置为true，则执行关闭操作
 			if (logger.isDebugEnabled()) {
 				logger.debug("Closing " + this);
 			}
 
+			// 如果不在本机镜像中，取消注册LiveBeansView的ApplicationContext
 			if (!NativeDetector.inNativeImage()) {
 				LiveBeansView.unregisterApplicationContext(this);
 			}
 
 			try {
-				// Publish shutdown event.
+				// 发布关闭事件。
 				publishEvent(new ContextClosedEvent(this));
 			} catch (Throwable ex) {
+				// 捕获并记录处理ContextClosedEvent的ApplicationListener时抛出的异常
 				logger.warn("Exception thrown from ApplicationListener handling ContextClosedEvent", ex);
 			}
 
-			// Stop all Lifecycle beans, to avoid delays during individual destruction.
+			// 停止所有Lifecycle类型的bean，以避免在单个销毁过程中出现延迟。
 			if (this.lifecycleProcessor != null) {
 				try {
+					// 调用LifecycleProcessor的onClose方法
 					this.lifecycleProcessor.onClose();
 				} catch (Throwable ex) {
+					// 捕获并记录LifecycleProcessor的onClose方法中抛出的异常
 					logger.warn("Exception thrown from LifecycleProcessor on context close", ex);
 				}
 			}
 
-			// Destroy all cached singletons in the context's BeanFactory.
+			// 销毁上下文的BeanFactory中所有缓存的单例bean。
 			destroyBeans();
 
-			// Close the state of this context itself.
+			// 关闭上下文本身的状态。
 			closeBeanFactory();
 
-			// Let subclasses do some final clean-up if they wish...
+			// 如果需要，让子类执行一些最终的清理操作...
 			onClose();
 
-			// Reset local application listeners to pre-refresh state.
+			// 将本地应用程序监听器重置为预刷新状态。
 			if (this.earlyApplicationListeners != null) {
 				this.applicationListeners.clear();
 				this.applicationListeners.addAll(this.earlyApplicationListeners);
 			}
 
-			// Switch to inactive.
+			// 切换到非活动状态。
 			this.active.set(false);
 		}
 	}
 
 	/**
-	 * Template method for destroying all beans that this context manages.
-	 * The default implementation destroy all cached singletons in this context,
-	 * invoking {@code DisposableBean.destroy()} and/or the specified
-	 * "destroy-method".
-	 * <p>Can be overridden to add context-specific bean destruction steps
-	 * right before or right after standard singleton destruction,
-	 * while the context's BeanFactory is still active.
+	 * 模板方法，用于销毁此上下文管理的所有bean。
+	 * 默认实现销毁此上下文中的所有缓存的单例，调用{@code DisposableBean.destroy()}和/或指定的
+	 * "destroy-method"。
+	 * <p>可以重写以在标准单例销毁之前或之后添加特定于上下文的bean销毁步骤，
+	 * 同时上下文的BeanFactory仍然处于活动状态。
 	 *
 	 * @see #getBeanFactory()
 	 * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#destroySingletons()
@@ -1158,15 +1154,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Template method which can be overridden to add context-specific shutdown work.
-	 * The default implementation is empty.
-	 * <p>Called at the end of {@link #doClose}'s shutdown procedure, after
-	 * this context's BeanFactory has been closed. If custom shutdown logic
-	 * needs to execute while the BeanFactory is still active, override
-	 * the {@link #destroyBeans()} method instead.
+	 * 模板方法，可重写以添加特定于上下文的关闭工作。
+	 * 默认实现为空。
+	 * <p>在{@link #doClose}的关闭过程结束时调用，
+	 * 在此上下文的BeanFactory已关闭之后。
+	 * 如果在BeanFactory仍处于活动状态时需要执行自定义关闭逻辑，
+	 * 而不是重写{@link #destroyBeans()}方法。
 	 */
 	protected void onClose() {
-		// For subclasses: do nothing by default.
+		// 对于子类：默认情况下什么都不做。
 	}
 
 	@Override
@@ -1175,13 +1171,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Assert that this context's BeanFactory is currently active,
-	 * throwing an {@link IllegalStateException} if it isn't.
-	 * <p>Invoked by all {@link BeanFactory} delegation methods that depend
-	 * on an active context, i.e. in particular all bean accessor methods.
-	 * <p>The default implementation checks the {@link #isActive() 'active'} status
-	 * of this context overall. May be overridden for more specific checks, or for a
-	 * no-op if {@link #getBeanFactory()} itself throws an exception in such a case.
+	 * 断言此上下文的BeanFactory当前处于活动状态，
+	 * 如果不是，则抛出{@link IllegalStateException}。
+	 * <p>被所有依赖于活动上下文的{@link BeanFactory}委托方法调用，
+	 * 特别是所有bean访问器方法。
+	 * <p>默认实现检查此上下文整体的{@link #isActive() 'active'}状态。
+	 * 可以针对更具体的检查进行重写，或者如果{@link #getBeanFactory()}本身在这种情况下抛出异常，则进行无操作。
 	 */
 	protected void assertBeanFactoryActive() {
 		if (!this.active.get()) {
@@ -1408,8 +1403,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Return the internal bean factory of the parent context if it implements
-	 * ConfigurableApplicationContext; else, return the parent context itself.
+	 * 如果父上下文实现了ConfigurableApplicationContext，则返回父上下文的内部bean工厂；
+	 * 否则，返回父上下文本身。
 	 *
 	 * @see org.springframework.context.ConfigurableApplicationContext#getBeanFactory
 	 */
@@ -1440,10 +1435,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Return the internal MessageSource used by the context.
+	 * 返回上下文使用的内部MessageSource。
 	 *
-	 * @return the internal MessageSource (never {@code null})
-	 * @throws IllegalStateException if the context has not been initialized yet
+	 * @return 内部MessageSource（永远不会为null）
+	 * @throws IllegalStateException 如果上下文尚未初始化
 	 */
 	private MessageSource getMessageSource() throws IllegalStateException {
 		if (this.messageSource == null) {
@@ -1454,8 +1449,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Return the internal message source of the parent context if it is an
-	 * AbstractApplicationContext too; else, return the parent context itself.
+	 * 如果父上下文也是AbstractApplicationContext，则返回父上下文的内部消息源；
+	 * 否则，返回父上下文本身。
+	 *
+	 * @return 内部消息源或者父上下文本身（可以为null）
 	 */
 	@Nullable
 	protected MessageSource getInternalParentMessageSource() {
@@ -1501,36 +1498,31 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	//---------------------------------------------------------------------
 
 	/**
-	 * Subclasses must implement this method to perform the actual configuration load.
-	 * The method is invoked by {@link #refresh()} before any other initialization work.
-	 * <p>A subclass will either create a new bean factory and hold a reference to it,
-	 * or return a single BeanFactory instance that it holds. In the latter case, it will
-	 * usually throw an IllegalStateException if refreshing the context more than once.
+	 * 子类必须实现此方法来执行实际的配置加载。
+	 * 该方法由{@link #refresh()}在任何其他初始化工作之前调用。
+	 * <p>子类将创建一个新的bean工厂并保持对其的引用，或者返回一个它持有的单个BeanFactory实例。
+	 * 在后一种情况下，如果刷新上下文超过一次，通常会抛出IllegalStateException。
 	 *
-	 * @throws BeansException        if initialization of the bean factory failed
-	 * @throws IllegalStateException if already initialized and multiple refresh
-	 *                               attempts are not supported
+	 * @throws BeansException        如果初始化bean工厂失败
+	 * @throws IllegalStateException 如果已经初始化并且不支持多次刷新尝试
 	 */
 	protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
 
 	/**
-	 * Subclasses must implement this method to release their internal bean factory.
-	 * This method gets invoked by {@link #close()} after all other shutdown work.
-	 * <p>Should never throw an exception but rather log shutdown failures.
+	 * 子类必须实现此方法来释放其内部的bean工厂。
+	 * 该方法由{@link #close()}在所有其他关闭工作之后调用。
+	 * <p>不应该抛出异常，而是记录关闭失败。
 	 */
 	protected abstract void closeBeanFactory();
 
 	/**
-	 * Subclasses must return their internal bean factory here. They should implement the
-	 * lookup efficiently, so that it can be called repeatedly without a performance penalty.
-	 * <p>Note: Subclasses should check whether the context is still active before
-	 * returning the internal bean factory. The internal factory should generally be
-	 * considered unavailable once the context has been closed.
+	 * 子类必须在此处返回它们的内部bean工厂。它们应该有效地实现查找，以便可以重复调用而不会有性能损失。
+	 * <p>注意：在返回内部bean工厂之前，子类应该检查上下文是否仍然活动。
+	 * 一般来说，一旦上下文已经关闭，内部工厂应该被视为不可用。
 	 *
-	 * @return this application context's internal bean factory (never {@code null})
-	 * @throws IllegalStateException if the context does not hold an internal bean factory yet
-	 *                               (usually if {@link #refresh()} has never been called) or if the context has been
-	 *                               closed already
+	 * @return 此应用程序上下文的内部bean工厂（永远不为{@code null}）
+	 * @throws IllegalStateException 如果上下文尚未持有内部bean工厂
+	 *                               （通常是如果从未调用{@link #refresh()}）或者如果上下文已经关闭
 	 * @see #refreshBeanFactory()
 	 * @see #closeBeanFactory()
 	 */
@@ -1539,7 +1531,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	/**
-	 * Return information about this context.
+	 * 返回有关此上下文的信息。
 	 */
 	@Override
 	public String toString() {
