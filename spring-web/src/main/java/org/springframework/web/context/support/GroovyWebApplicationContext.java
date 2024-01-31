@@ -16,12 +16,9 @@
 
 package org.springframework.web.context.support;
 
-import java.io.IOException;
-
 import groovy.lang.GroovyObject;
 import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
-
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
@@ -30,124 +27,132 @@ import org.springframework.beans.factory.groovy.GroovyBeanDefinitionReader;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+
 /**
- * {@link org.springframework.web.context.WebApplicationContext} implementation which takes
- * its configuration from Groovy bean definition scripts and/or XML files, as understood by
- * a {@link org.springframework.beans.factory.groovy.GroovyBeanDefinitionReader}.
- * This is essentially the equivalent of
- * {@link org.springframework.context.support.GenericGroovyApplicationContext}
- * for a web environment.
+ * {@link org.springframework.web.context.WebApplicationContext} 实现，从 Groovy
+ * bean 定义脚本和/或 XML 文件中获取配置，由 {@link org.springframework.beans.factory.groovy.GroovyBeanDefinitionReader}
+ * 解析。在 web 环境中，这本质上相当于 {@link org.springframework.context.support.GenericGroovyApplicationContext}。
+ * <p>
+ * 默认情况下，根上下文的配置将从 "/WEB-INF/applicationContext.groovy" 获取，
+ * 具有命名空间 "test-servlet" 的上下文将从 "/WEB-INF/test-servlet.groovy" 获取
+ * （例如，对于 servlet-name 为 "test" 的 DispatcherServlet 实例）。
+ * <p>
+ * 配置位置的默认值可以通过 {@link org.springframework.web.context.ContextLoader} 的
+ * "contextConfigLocation" 上下文参数和 {@link org.springframework.web.servlet.FrameworkServlet}
+ * 的 servlet 初始化参数 "contextConfigLocation" 进行覆盖。配置位置可以表示具体的文件，如
+ * "/WEB-INF/context.groovy"，也可以表示 Ant 风格的模式，如 "/WEB-INF/*-context.groovy"
+ * （请参阅 {@link org.springframework.util.PathMatcher} 的文档以了解模式的详细信息）。注意，
+ * ".xml" 文件将被解析为 XML 内容；所有其他类型的资源将被解析为 Groovy 脚本。
+ * <p>
+ * 注意：在存在多个配置位置的情况下，后加载的文件将覆盖先加载的文件中定义的 bean 定义。
+ * 可以利用这一点有意覆盖某些 bean 定义，通过额外的 Groovy 脚本。
  *
- * <p>By default, the configuration will be taken from "/WEB-INF/applicationContext.groovy"
- * for the root context, and "/WEB-INF/test-servlet.groovy" for a context with the namespace
- * "test-servlet" (like for a DispatcherServlet instance with the servlet-name "test").
- *
- * <p>The config location defaults can be overridden via the "contextConfigLocation"
- * context-param of {@link org.springframework.web.context.ContextLoader} and servlet
- * init-param of {@link org.springframework.web.servlet.FrameworkServlet}. Config locations
- * can either denote concrete files like "/WEB-INF/context.groovy" or Ant-style patterns
- * like "/WEB-INF/*-context.groovy" (see {@link org.springframework.util.PathMatcher}
- * javadoc for pattern details). Note that ".xml" files will be parsed as XML content;
- * all other kinds of resources will be parsed as Groovy scripts.
- *
- * <p>Note: In case of multiple config locations, later bean definitions will
- * override ones defined in earlier loaded files. This can be leveraged to
- * deliberately override certain bean definitions via an extra Groovy script.
- *
- * <p><b>For a WebApplicationContext that reads in a different bean definition format,
- * create an analogous subclass of {@link AbstractRefreshableWebApplicationContext}.</b>
- * Such a context implementation can be specified as "contextClass" context-param
- * for ContextLoader or "contextClass" init-param for FrameworkServlet.
+ * <b>对于读取不同 bean 定义格式的 WebApplicationContext，请创建 {@link AbstractRefreshableWebApplicationContext}
+ * 的类似子类。</b> 这样的上下文实现可以被指定为 ContextLoader 的 "contextClass" 上下文参数
+ * 或 FrameworkServlet 的 servlet 初始化参数 "contextClass"。
  *
  * @author Juergen Hoeller
- * @since 4.1
  * @see #setNamespace
  * @see #setConfigLocations
  * @see org.springframework.beans.factory.groovy.GroovyBeanDefinitionReader
  * @see org.springframework.web.context.ContextLoader#initWebApplicationContext
  * @see org.springframework.web.servlet.FrameworkServlet#initWebApplicationContext
+ * @since 4.1
  */
+@SuppressWarnings("JavadocReference")
 public class GroovyWebApplicationContext extends AbstractRefreshableWebApplicationContext implements GroovyObject {
 
-	/** Default config location for the root context. */
+	/**
+	 * 根上下文的默认配置位置。
+	 */
 	public static final String DEFAULT_CONFIG_LOCATION = "/WEB-INF/applicationContext.groovy";
 
-	/** Default prefix for building a config location for a namespace. */
+	/**
+	 * 用于构建命名空间配置位置的默认前缀。
+	 */
 	public static final String DEFAULT_CONFIG_LOCATION_PREFIX = "/WEB-INF/";
 
-	/** Default suffix for building a config location for a namespace. */
+	/**
+	 * 用于构建命名空间配置位置的默认后缀。
+	 */
 	public static final String DEFAULT_CONFIG_LOCATION_SUFFIX = ".groovy";
 
 
+	/**
+	 * 上下文Bean包装器
+	 */
 	private final BeanWrapper contextWrapper = new BeanWrapperImpl(this);
 
+	/**
+	 * 元类
+	 */
 	private MetaClass metaClass = GroovySystem.getMetaClassRegistry().getMetaClass(getClass());
 
 
 	/**
-	 * Loads the bean definitions via an GroovyBeanDefinitionReader.
+	 * 通过 GroovyBeanDefinitionReader 加载 bean 定义。
+	 *
 	 * @see org.springframework.beans.factory.groovy.GroovyBeanDefinitionReader
 	 * @see #initBeanDefinitionReader
 	 * @see #loadBeanDefinitions
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
-		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
+		// 为给定的 BeanFactory 创建一个新的 GroovyBeanDefinitionReader。
 		GroovyBeanDefinitionReader beanDefinitionReader = new GroovyBeanDefinitionReader(beanFactory);
 
-		// Configure the bean definition reader with this context's
-		// resource loading environment.
+		// 使用此上下文的资源加载环境配置 bean 定义读取器。
 		beanDefinitionReader.setEnvironment(getEnvironment());
 		beanDefinitionReader.setResourceLoader(this);
 
-		// Allow a subclass to provide custom initialization of the reader,
-		// then proceed with actually loading the bean definitions.
+		// 允许子类提供读者的自定义初始化，然后继续加载 bean 定义。
 		initBeanDefinitionReader(beanDefinitionReader);
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
 	/**
-	 * Initialize the bean definition reader used for loading the bean
-	 * definitions of this context. Default implementation is empty.
-	 * <p>Can be overridden in subclasses.
-	 * @param beanDefinitionReader the bean definition reader used by this context
+	 * 初始化用于加载此上下文的 bean 定义读取器。默认实现为空。
+	 * <p>可以在子类中重写。
+	 *
+	 * @param beanDefinitionReader 此上下文使用的 bean 定义读取器
 	 */
 	protected void initBeanDefinitionReader(GroovyBeanDefinitionReader beanDefinitionReader) {
 	}
 
 	/**
-	 * Load the bean definitions with the given GroovyBeanDefinitionReader.
-	 * <p>The lifecycle of the bean factory is handled by the refreshBeanFactory method;
-	 * therefore this method is just supposed to load and/or register bean definitions.
-	 * <p>Delegates to a ResourcePatternResolver for resolving location patterns
-	 * into Resource instances.
-	 * @throws IOException if the required Groovy script or XML file isn't found
+	 * 使用给定的 GroovyBeanDefinitionReader 加载 bean 定义。
+	 * <p>Bean 工厂的生命周期由 refreshBeanFactory 方法处理；因此，此方法只是用于加载和/或注册 bean 定义。
+	 * <p>委托给 ResourcePatternResolver 将位置模式解析为 Resource 实例。
+	 *
+	 * @throws IOException 如果找不到所需的 Groovy 脚本或 XML 文件
 	 * @see #refreshBeanFactory
 	 * @see #getConfigLocations
 	 * @see #getResources
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(GroovyBeanDefinitionReader reader) throws IOException {
+		// 获取配置位置
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
 			for (String configLocation : configLocations) {
+				// 加载配置中的Bean定义
 				reader.loadBeanDefinitions(configLocation);
 			}
 		}
 	}
 
 	/**
-	 * The default location for the root context is "/WEB-INF/applicationContext.groovy",
-	 * and "/WEB-INF/test-servlet.groovy" for a context with the namespace "test-servlet"
-	 * (like for a DispatcherServlet instance with the servlet-name "test").
+	 * 获取默认的配置位置数组。对于根上下文，默认位置是 "/WEB-INF/applicationContext.groovy"，
+	 * 对于命名空间为 "test-servlet" 的上下文，默认位置是 "/WEB-INF/test-servlet.groovy"
+	 * （例如，对于 servlet-name 为 "test" 的 DispatcherServlet 实例）。
 	 */
 	@Override
 	protected String[] getDefaultConfigLocations() {
 		if (getNamespace() != null) {
-			return new String[] {DEFAULT_CONFIG_LOCATION_PREFIX + getNamespace() + DEFAULT_CONFIG_LOCATION_SUFFIX};
-		}
-		else {
-			return new String[] {DEFAULT_CONFIG_LOCATION};
+			return new String[]{DEFAULT_CONFIG_LOCATION_PREFIX + getNamespace() + DEFAULT_CONFIG_LOCATION_SUFFIX};
+		} else {
+			return new String[]{DEFAULT_CONFIG_LOCATION};
 		}
 	}
 
@@ -177,12 +182,16 @@ public class GroovyWebApplicationContext extends AbstractRefreshableWebApplicati
 	@Override
 	@Nullable
 	public Object getProperty(String property) {
+		// 检查是否包含名为property的Bean
 		if (containsBean(property)) {
+			// 如果包含，通过getBean方法获取该Bean
 			return getBean(property);
-		}
-		else if (this.contextWrapper.isReadableProperty(property)) {
+		} else if (this.contextWrapper.isReadableProperty(property)) {
+			// 如果不包含，但是上下文包装器可读取该属性，则通过contextWrapper的getPropertyValue方法获取属性值
 			return this.contextWrapper.getPropertyValue(property);
 		}
+
+		// 如果都不满足，则抛出NoSuchBeanDefinitionException异常
 		throw new NoSuchBeanDefinitionException(property);
 	}
 
