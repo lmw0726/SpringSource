@@ -65,37 +65,50 @@ import java.util.function.Supplier;
  *
  * MyBean myBean = (MyBean) ctx.getBean("myBean");
  * ...</pre>
- *
+ * <p>
  * 对于典型的 XML Bean 定义情况，只需使用 {@link ClassPathXmlApplicationContext}
  * 或 {@link FileSystemXmlApplicationContext}，这些更容易设置 - 但更不灵活，因为您只能对 XML
  * Bean 定义使用标准资源位置，而不是混合任意 Bean 定义格式。在 Web 环境中的等效部分是
  * {@link org.springframework.web.context.support.XmlWebApplicationContext}。
- *
+ * <p>
  * 对于那些应以可刷新的方式读取特殊 Bean 定义格式的自定义应用程序上下文实现，
  * 考虑从 {@link AbstractRefreshableApplicationContext} 基类派生。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
- * @since 1.1.2
  * @see #registerBeanDefinition
  * @see #refresh()
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
+ * @since 1.1.2
  */
 public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
 
+	/**
+	 * Bean工厂
+	 */
 	private final DefaultListableBeanFactory beanFactory;
 
+	/**
+	 * 资源加载器
+	 */
 	@Nullable
 	private ResourceLoader resourceLoader;
 
+	/**
+	 * 是否是自定义类加载器
+	 */
 	private boolean customClassLoader = false;
 
+	/**
+	 * 是否刷新bean工厂
+	 */
 	private final AtomicBoolean refreshed = new AtomicBoolean();
 
 
 	/**
-	 * Create a new GenericApplicationContext.
+	 * 创建一个新的 GenericApplicationContext。
+	 *
 	 * @see #registerBeanDefinition
 	 * @see #refresh
 	 */
@@ -104,8 +117,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Create a new GenericApplicationContext with the given DefaultListableBeanFactory.
-	 * @param beanFactory the DefaultListableBeanFactory instance to use for this context
+	 * 使用给定的 DefaultListableBeanFactory 创建一个新的 GenericApplicationContext。
+	 *
+	 * @param beanFactory 用于此上下文的 DefaultListableBeanFactory 实例
 	 * @see #registerBeanDefinition
 	 * @see #refresh
 	 */
@@ -115,8 +129,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Create a new GenericApplicationContext with the given parent.
-	 * @param parent the parent application context
+	 * 使用给定的父级创建一个新的 GenericApplicationContext。
+	 *
+	 * @param parent 父级应用程序上下文
 	 * @see #registerBeanDefinition
 	 * @see #refresh
 	 */
@@ -126,9 +141,10 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Create a new GenericApplicationContext with the given DefaultListableBeanFactory.
-	 * @param beanFactory the DefaultListableBeanFactory instance to use for this context
-	 * @param parent the parent application context
+	 * 使用给定的 DefaultListableBeanFactory 和父级创建一个新的 GenericApplicationContext。
+	 *
+	 * @param beanFactory 用于此上下文的 DefaultListableBeanFactory 实例
+	 * @param parent      父级应用程序上下文
 	 * @see #registerBeanDefinition
 	 * @see #refresh
 	 */
@@ -139,8 +155,8 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 
 	/**
-	 * Set the parent of this application context, also setting
-	 * the parent of the internal BeanFactory accordingly.
+	 * 设置此应用程序上下文的父级，同时相应地设置内部 BeanFactory 的父级。
+	 *
 	 * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#setParentBeanFactory
 	 */
 	@Override
@@ -156,40 +172,34 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Set whether it should be allowed to override bean definitions by registering
-	 * a different definition with the same name, automatically replacing the former.
-	 * If not, an exception will be thrown. Default is "true".
-	 * @since 3.0
+	 * 设置是否允许通过注册具有相同名称的不同定义来覆盖bean定义，自动替换前者。
+	 * 如果不允许，则会抛出异常。默认值为 "true"。
+	 *
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
+	 * @since 3.0
 	 */
 	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
 		this.beanFactory.setAllowBeanDefinitionOverriding(allowBeanDefinitionOverriding);
 	}
 
 	/**
-	 * Set whether to allow circular references between beans - and automatically
-	 * try to resolve them.
-	 * <p>Default is "true". Turn this off to throw an exception when encountering
-	 * a circular reference, disallowing them completely.
-	 * @since 3.0
+	 * 设置是否允许bean之间的循环引用，并自动尝试解决它们。
+	 * <p>默认值为 "true"。关闭此选项以在遇到循环引用时抛出异常，完全禁止循环引用。
+	 *
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
+	 * @since 3.0
 	 */
 	public void setAllowCircularReferences(boolean allowCircularReferences) {
 		this.beanFactory.setAllowCircularReferences(allowCircularReferences);
 	}
 
 	/**
-	 * Set a ResourceLoader to use for this context. If set, the context will
-	 * delegate all {@code getResource} calls to the given ResourceLoader.
-	 * If not set, default resource loading will apply.
-	 * <p>The main reason to specify a custom ResourceLoader is to resolve
-	 * resource paths (without URL prefix) in a specific fashion.
-	 * The default behavior is to resolve such paths as class path locations.
-	 * To resolve resource paths as file system locations, specify a
-	 * FileSystemResourceLoader here.
-	 * <p>You can also pass in a full ResourcePatternResolver, which will
-	 * be autodetected by the context and used for {@code getResources}
-	 * calls as well. Else, default resource pattern matching will apply.
+	 * 设置用于此上下文的ResourceLoader。如果设置了，上下文将所有的 {@code getResource} 调用委托给给定的ResourceLoader。
+	 * 如果未设置，则将应用默认的资源加载。
+	 * <p>指定自定义ResourceLoader的主要原因是以特定方式解析资源路径（没有URL前缀）。
+	 * 默认行为是将这些路径解析为类路径位置。要将资源路径解析为文件系统位置，请在这里指定FileSystemResourceLoader。
+	 * <p>还可以传递一个完整的ResourcePatternResolver，上下文将自动检测并用于 {@code getResources} 调用。否则，将应用默认的资源模式匹配。
+	 *
 	 * @see #getResource
 	 * @see org.springframework.core.io.DefaultResourceLoader
 	 * @see org.springframework.core.io.FileSystemResourceLoader
@@ -206,8 +216,8 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	//---------------------------------------------------------------------
 
 	/**
-	 * This implementation delegates to this context's ResourceLoader if set,
-	 * falling back to the default superclass behavior else.
+	 * 此实现如果设置了上下文的ResourceLoader，则委托给上下文的ResourceLoader，否则回退到默认的超类行为。
+	 *
 	 * @see #setResourceLoader
 	 */
 	@Override
@@ -219,16 +229,20 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * This implementation delegates to this context's ResourceLoader if it
-	 * implements the ResourcePatternResolver interface, falling back to the
-	 * default superclass behavior else.
+	 * 此实现如果ResourceLoader实现了ResourcePatternResolver接口，则委托给上下文的ResourceLoader，
+	 * 否则回退到默认的超类行为。
+	 *
 	 * @see #setResourceLoader
 	 */
 	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
+		// 检查资源加载器是否是资源模式解析器
 		if (this.resourceLoader instanceof ResourcePatternResolver) {
+			// 如果是资源模式解析器，则使用其解析指定位置模式的资源
 			return ((ResourcePatternResolver) this.resourceLoader).getResources(locationPattern);
 		}
+
+		// 如果资源加载器不是资源模式解析器，则调用父类的方法获取资源
 		return super.getResources(locationPattern);
 	}
 
@@ -253,8 +267,8 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	//---------------------------------------------------------------------
 
 	/**
-	 * Do nothing: We hold a single internal BeanFactory and rely on callers
-	 * to register beans through our public methods (or the BeanFactory's).
+	 * 什么也不做：我们持有一个内部的BeanFactory，并依赖调用者通过我们的公共方法（或BeanFactory的方法）注册bean。
+	 *
 	 * @see #registerBeanDefinition
 	 */
 	@Override
@@ -273,8 +287,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Not much to do: We hold a single internal BeanFactory that will never
-	 * get released.
+	 * 没有太多要做的事情：我们持有一个永远不会被释放的内部BeanFactory。
 	 */
 	@Override
 	protected final void closeBeanFactory() {
@@ -282,8 +295,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Return the single internal BeanFactory held by this context
-	 * (as ConfigurableListableBeanFactory).
+	 * 返回由此上下文持有的单个内部BeanFactory（作为ConfigurableListableBeanFactory）。
 	 */
 	@Override
 	public final ConfigurableListableBeanFactory getBeanFactory() {
@@ -291,12 +303,11 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Return the underlying bean factory of this context,
-	 * available for registering bean definitions.
-	 * <p><b>NOTE:</b> You need to call {@link #refresh()} to initialize the
-	 * bean factory and its contained beans with application context semantics
-	 * (autodetecting BeanFactoryPostProcessors, etc).
-	 * @return the internal bean factory (as DefaultListableBeanFactory)
+	 * 返回此上下文的底层Bean工厂，可用于注册Bean定义。
+	 * <p><b>注意：</b>您需要调用{@link #refresh()}来初始化
+	 * Bean工厂及其包含的Bean，以应用上下文语义（自动检测BeanFactoryPostProcessors等）。
+	 *
+	 * @return 内部Bean工厂（作为DefaultListableBeanFactory）
 	 */
 	public final DefaultListableBeanFactory getDefaultListableBeanFactory() {
 		return this.beanFactory;
@@ -352,67 +363,60 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 
 	//---------------------------------------------------------------------
-	// Convenient methods for registering individual beans
+	// 注册单个bean的便捷方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * Register a bean from the given bean class, optionally providing explicit
-	 * constructor arguments for consideration in the autowiring process.
-	 * @param beanClass the class of the bean
-	 * @param constructorArgs custom argument values to be fed into Spring's
-	 * constructor resolution algorithm, resolving either all arguments or just
-	 * specific ones, with the rest to be resolved through regular autowiring
-	 * (may be {@code null} or empty)
-	 * @since 5.2 (since 5.0 on the AnnotationConfigApplicationContext subclass)
+	 * 注册给定Bean类的Bean，可选择为自动装配过程提供显式构造函数参数。
+	 *
+	 * @param beanClass       Bean的类
+	 * @param constructorArgs 提供给Spring构造函数解析算法的自定义参数值，
+	 *                        可以解析所有参数或仅解析特定参数，其余参数将通过常规自动装配解析（可以为null或空）
+	 * @since 5.2（在AnnotationConfigApplicationContext子类上自5.0起）
 	 */
 	public <T> void registerBean(Class<T> beanClass, Object... constructorArgs) {
 		registerBean(null, beanClass, constructorArgs);
 	}
 
 	/**
-	 * Register a bean from the given bean class, optionally providing explicit
-	 * constructor arguments for consideration in the autowiring process.
-	 * @param beanName the name of the bean (may be {@code null})
-	 * @param beanClass the class of the bean
-	 * @param constructorArgs custom argument values to be fed into Spring's
-	 * constructor resolution algorithm, resolving either all arguments or just
-	 * specific ones, with the rest to be resolved through regular autowiring
-	 * (may be {@code null} or empty)
-	 * @since 5.2 (since 5.0 on the AnnotationConfigApplicationContext subclass)
+	 * 注册给定Bean类的Bean，可选择为自动装配过程提供显式构造函数参数。
+	 *
+	 * @param beanName        Bean的名称（可以为null）
+	 * @param beanClass       Bean的类
+	 * @param constructorArgs 提供给Spring构造函数解析算法的自定义参数值，
+	 *                        可以解析所有参数或仅解析特定参数，其余参数将通过常规自动装配解析（可以为null或空）
+	 * @since 5.2（在AnnotationConfigApplicationContext子类上自5.0起）
 	 */
 	public <T> void registerBean(@Nullable String beanName, Class<T> beanClass, Object... constructorArgs) {
 		registerBean(beanName, beanClass, (Supplier<T>) null,
 				bd -> {
 					for (Object arg : constructorArgs) {
+						// bean定义中的构造参数添加当前参数值
 						bd.getConstructorArgumentValues().addGenericArgumentValue(arg);
 					}
 				});
 	}
 
 	/**
-	 * Register a bean from the given bean class, optionally customizing its
-	 * bean definition metadata (typically declared as a lambda expression).
-	 * @param beanClass the class of the bean (resolving a public constructor
-	 * to be autowired, possibly simply the default constructor)
-	 * @param customizers one or more callbacks for customizing the factory's
-	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
-	 * @since 5.0
+	 * 从给定的Bean类注册一个Bean，可选择自定义其Bean定义元数据（通常声明为lambda表达式）。
+	 *
+	 * @param beanClass   Bean的类（解析为要自动装配的公共构造函数，可能只是默认构造函数）
+	 * @param customizers 用于自定义工厂的{@link BeanDefinition}的一个或多个回调，例如设置lazy-init或primary标志
 	 * @see #registerBean(String, Class, Supplier, BeanDefinitionCustomizer...)
+	 * @since 5.0
 	 */
 	public final <T> void registerBean(Class<T> beanClass, BeanDefinitionCustomizer... customizers) {
 		registerBean(null, beanClass, null, customizers);
 	}
 
 	/**
-	 * Register a bean from the given bean class, optionally customizing its
-	 * bean definition metadata (typically declared as a lambda expression).
-	 * @param beanName the name of the bean (may be {@code null})
-	 * @param beanClass the class of the bean (resolving a public constructor
-	 * to be autowired, possibly simply the default constructor)
-	 * @param customizers one or more callbacks for customizing the factory's
-	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
-	 * @since 5.0
+	 * 从给定的Bean类注册一个Bean，可选择自定义其Bean定义元数据（通常声明为lambda表达式）。
+	 *
+	 * @param beanName    Bean的名称（可以为{@code null}）
+	 * @param beanClass   Bean的类（解析为要自动装配的公共构造函数，可能只是默认构造函数）
+	 * @param customizers 用于自定义工厂的{@link BeanDefinition}的一个或多个回调，例如设置lazy-init或primary标志
 	 * @see #registerBean(String, Class, Supplier, BeanDefinitionCustomizer...)
+	 * @since 5.0
 	 */
 	public final <T> void registerBean(
 			@Nullable String beanName, Class<T> beanClass, BeanDefinitionCustomizer... customizers) {
@@ -421,16 +425,15 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Register a bean from the given bean class, using the given supplier for
-	 * obtaining a new instance (typically declared as a lambda expression or
-	 * method reference), optionally customizing its bean definition metadata
-	 * (again typically declared as a lambda expression).
-	 * @param beanClass the class of the bean
-	 * @param supplier a callback for creating an instance of the bean
-	 * @param customizers one or more callbacks for customizing the factory's
-	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
-	 * @since 5.0
+	 * 注册一个来自给定bean类的bean，使用提供新实例的回调（通常声明为lambda表达式或方法引用），
+	 * 可选地自定义其bean定义元数据（同样通常声明为lambda表达式）。
+	 *
+	 * @param beanClass   bean的类
+	 * @param supplier    用于创建bean实例的回调
+	 * @param customizers 用于自定义工厂的{@link BeanDefinition}的一个或多个回调，
+	 *                    例如设置lazy-init或primary标志
 	 * @see #registerBean(String, Class, Supplier, BeanDefinitionCustomizer...)
+	 * @since 5.0
 	 */
 	public final <T> void registerBean(
 			Class<T> beanClass, Supplier<T> supplier, BeanDefinitionCustomizer... customizers) {
@@ -439,32 +442,37 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
-	 * Register a bean from the given bean class, using the given supplier for
-	 * obtaining a new instance (typically declared as a lambda expression or
-	 * method reference), optionally customizing its bean definition metadata
-	 * (again typically declared as a lambda expression).
-	 * <p>This method can be overridden to adapt the registration mechanism for
-	 * all {@code registerBean} methods (since they all delegate to this one).
-	 * @param beanName the name of the bean (may be {@code null})
-	 * @param beanClass the class of the bean
-	 * @param supplier a callback for creating an instance of the bean (in case
-	 * of {@code null}, resolving a public constructor to be autowired instead)
-	 * @param customizers one or more callbacks for customizing the factory's
-	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
+	 * 注册一个来自给定bean类的bean，使用提供新实例的回调（通常声明为lambda表达式或方法引用），
+	 * 可选地自定义其bean定义元数据（同样通常声明为lambda表达式）。
+	 * <p>此方法可以被重写以适应所有{@code registerBean}方法的注册机制（因为它们都委托给这个方法）。
+	 *
+	 * @param beanName    bean的名称（可能为{@code null}）
+	 * @param beanClass   bean的类
+	 * @param supplier    用于创建bean实例的回调（如果为{@code null}，则解析一个要自动装配的公共构造函数）
+	 * @param customizers 用于自定义工厂的{@link BeanDefinition}的一个或多个回调，
+	 *                    例如设置lazy-init或primary标志
 	 * @since 5.0
 	 */
 	public <T> void registerBean(@Nullable String beanName, Class<T> beanClass,
-			@Nullable Supplier<T> supplier, BeanDefinitionCustomizer... customizers) {
+								 @Nullable Supplier<T> supplier, BeanDefinitionCustomizer... customizers) {
 
+		// 创建一个基于类派生的Bean定义
 		ClassDerivedBeanDefinition beanDefinition = new ClassDerivedBeanDefinition(beanClass);
+
+		// 如果提供了供应商（supplier），则将其设置为Bean定义的实例供应商
 		if (supplier != null) {
 			beanDefinition.setInstanceSupplier(supplier);
 		}
+
+		// 对于每个自定义器，调用其customize方法以自定义Bean定义
 		for (BeanDefinitionCustomizer customizer : customizers) {
 			customizer.customize(beanDefinition);
 		}
 
+		// 确定要使用的Bean名称，如果提供了beanName，则使用提供的名称，否则使用类名
 		String nameToUse = (beanName != null ? beanName : beanClass.getName());
+
+		// 注册Bean定义
 		registerBeanDefinition(nameToUse, beanDefinition);
 	}
 
@@ -486,12 +494,21 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 		@Override
 		@Nullable
 		public Constructor<?>[] getPreferredConstructors() {
+			// 获取Bean的类
 			Class<?> clazz = getBeanClass();
+
+			// 查找主要构造函数
 			Constructor<?> primaryCtor = BeanUtils.findPrimaryConstructor(clazz);
+
+			// 如果找到主要构造函数，则返回包含该构造函数的数组
 			if (primaryCtor != null) {
-				return new Constructor<?>[] {primaryCtor};
+				return new Constructor<?>[]{primaryCtor};
 			}
+
+			// 如果没有主要构造函数，则获取所有公共构造函数
 			Constructor<?>[] publicCtors = clazz.getConstructors();
+
+			// 如果有公共构造函数，则返回包含这些构造函数的数组，否则返回null
 			if (publicCtors.length > 0) {
 				return publicCtors;
 			}

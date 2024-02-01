@@ -16,8 +16,6 @@
 
 package org.springframework.context.support;
 
-import java.util.Locale;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -25,11 +23,11 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 
+import java.util.Locale;
+
 /**
- * {@link org.springframework.context.ApplicationContext} implementation
- * which supports programmatic registration of beans and messages,
- * rather than reading bean definitions from external configuration sources.
- * Mainly useful for testing.
+ * {@link org.springframework.context.ApplicationContext} 的实现，支持以编程方式注册bean和消息，
+ * 而不是从外部配置源中读取bean定义。主要用于测试。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -39,12 +37,15 @@ import org.springframework.lang.Nullable;
  * @see #refresh
  */
 public class StaticApplicationContext extends GenericApplicationContext {
-
+	/**
+	 * 静态消息源
+	 */
 	private final StaticMessageSource staticMessageSource;
 
 
 	/**
-	 * Create a new StaticApplicationContext.
+	 * 创建一个新的StaticApplicationContext。
+	 *
 	 * @see #registerSingleton
 	 * @see #registerPrototype
 	 * @see #registerBeanDefinition
@@ -55,7 +56,8 @@ public class StaticApplicationContext extends GenericApplicationContext {
 	}
 
 	/**
-	 * Create a new StaticApplicationContext with the given parent.
+	 * 创建一个具有给定父级的新的StaticApplicationContext。
+	 *
 	 * @see #registerSingleton
 	 * @see #registerPrototype
 	 * @see #registerBeanDefinition
@@ -64,22 +66,23 @@ public class StaticApplicationContext extends GenericApplicationContext {
 	public StaticApplicationContext(@Nullable ApplicationContext parent) throws BeansException {
 		super(parent);
 
-		// Initialize and register a StaticMessageSource.
+		// 初始化并注册StaticMessageSource。
 		this.staticMessageSource = new StaticMessageSource();
 		getBeanFactory().registerSingleton(MESSAGE_SOURCE_BEAN_NAME, this.staticMessageSource);
 	}
 
 
 	/**
-	 * Overridden to turn it into a no-op, to be more lenient towards test cases.
+	 * 被重写为不执行任何操作，以对测试用例更宽松一些。
 	 */
 	@Override
 	protected void assertBeanFactoryActive() {
 	}
 
 	/**
-	 * Return the internal StaticMessageSource used by this context.
-	 * Can be used to register messages on it.
+	 * 返回此上下文使用的内部StaticMessageSource。
+	 * 可以用于在其上注册消息。
+	 *
 	 * @see #addMessage
 	 */
 	public final StaticMessageSource getStaticMessageSource() {
@@ -87,58 +90,105 @@ public class StaticApplicationContext extends GenericApplicationContext {
 	}
 
 	/**
-	 * Register a singleton bean with the underlying bean factory.
-	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
+	 * 使用底层的bean工厂注册一个单例bean。
+	 * <p>对于更高级的需求，请直接在底层的BeanFactory中注册。
+	 *
+	 * @param name  bean的名称
+	 * @param clazz bean的类
+	 * @throws BeansException 如果注册失败
 	 * @see #getDefaultListableBeanFactory
 	 */
 	public void registerSingleton(String name, Class<?> clazz) throws BeansException {
+		// 创建一个GenericBeanDefinition
 		GenericBeanDefinition bd = new GenericBeanDefinition();
+
+		// 设置Bean的类
 		bd.setBeanClass(clazz);
+
+		// 获取DefaultListableBeanFactory并注册BeanDefinition
 		getDefaultListableBeanFactory().registerBeanDefinition(name, bd);
 	}
 
 	/**
-	 * Register a singleton bean with the underlying bean factory.
-	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
+	 * 使用底层的bean工厂注册一个单例bean。
+	 * <p>对于更高级的需求，请直接在底层的BeanFactory中注册。
+	 *
+	 * @param name  bean的名称
+	 * @param clazz bean的类
+	 * @param pvs   属性值
+	 * @throws BeansException 如果注册失败
 	 * @see #getDefaultListableBeanFactory
 	 */
 	public void registerSingleton(String name, Class<?> clazz, MutablePropertyValues pvs) throws BeansException {
+		// 创建一个GenericBeanDefinition
 		GenericBeanDefinition bd = new GenericBeanDefinition();
+
+		// 设置Bean的类
 		bd.setBeanClass(clazz);
+
+		// 设置Bean的属性值
 		bd.setPropertyValues(pvs);
+
+		// 获取DefaultListableBeanFactory并注册BeanDefinition
 		getDefaultListableBeanFactory().registerBeanDefinition(name, bd);
 	}
 
 	/**
-	 * Register a prototype bean with the underlying bean factory.
-	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
+	 * 使用底层的bean工厂注册一个原型bean。
+	 * <p>对于更高级的需求，请直接在底层的BeanFactory中注册。
+	 *
+	 * @param name  bean的名称
+	 * @param clazz bean的类
+	 * @throws BeansException 如果注册失败
 	 * @see #getDefaultListableBeanFactory
 	 */
 	public void registerPrototype(String name, Class<?> clazz) throws BeansException {
+		// 创建一个GenericBeanDefinition
 		GenericBeanDefinition bd = new GenericBeanDefinition();
+
+		// 设置Bean的作用域为SCOPE_PROTOTYPE
 		bd.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+
+		// 设置Bean的类
 		bd.setBeanClass(clazz);
+
+		// 获取DefaultListableBeanFactory并注册BeanDefinition
 		getDefaultListableBeanFactory().registerBeanDefinition(name, bd);
 	}
 
 	/**
-	 * Register a prototype bean with the underlying bean factory.
-	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
+	 * 使用底层的bean工厂注册一个原型bean。
+	 * <p>对于更高级的需求，请直接在底层的BeanFactory中注册。
+	 *
+	 * @param name  bean的名称
+	 * @param clazz bean的类
+	 * @param pvs   属性值
+	 * @throws BeansException 如果注册失败
 	 * @see #getDefaultListableBeanFactory
 	 */
 	public void registerPrototype(String name, Class<?> clazz, MutablePropertyValues pvs) throws BeansException {
+		// 创建一个GenericBeanDefinition
 		GenericBeanDefinition bd = new GenericBeanDefinition();
+
+		// 设置Bean的作用域为SCOPE_PROTOTYPE
 		bd.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+
+		// 设置Bean的类
 		bd.setBeanClass(clazz);
+
+		// 设置Bean的属性值
 		bd.setPropertyValues(pvs);
+
+		// 获取DefaultListableBeanFactory并注册BeanDefinition
 		getDefaultListableBeanFactory().registerBeanDefinition(name, bd);
 	}
 
 	/**
-	 * Associate the given message with the given code.
-	 * @param code lookup code
-	 * @param locale the locale message should be found within
-	 * @param defaultMessage message associated with this lookup code
+	 * 将给定的消息与给定的代码关联。
+	 *
+	 * @param code             查找代码
+	 * @param locale           应在其中查找消息的区域设置
+	 * @param defaultMessage   与此查找代码关联的消息
 	 * @see #getStaticMessageSource
 	 */
 	public void addMessage(String code, Locale locale, String defaultMessage) {

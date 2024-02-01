@@ -16,20 +16,19 @@
 
 package org.springframework.jca.context;
 
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.work.WorkManager;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.util.Assert;
 
+import javax.resource.spi.BootstrapContext;
+import javax.resource.spi.work.WorkManager;
+
 /**
- * {@link org.springframework.context.ApplicationContext} implementation
- * for a JCA ResourceAdapter. Needs to be initialized with the JCA
- * {@link javax.resource.spi.BootstrapContext}, passing it on to
- * Spring-managed beans that implement {@link BootstrapContextAware}.
+ * 用于JCA ResourceAdapter的{@link org.springframework.context.ApplicationContext}实现。
+ * 需要使用JCA {@link javax.resource.spi.BootstrapContext}初始化，
+ * 将其传递给实现{@link BootstrapContextAware}的Spring管理的bean。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -38,13 +37,16 @@ import org.springframework.util.Assert;
  */
 public class ResourceAdapterApplicationContext extends GenericApplicationContext {
 
+	/**
+	 * 引导上下文
+	 */
 	private final BootstrapContext bootstrapContext;
 
 
 	/**
-	 * Create a new ResourceAdapterApplicationContext for the given BootstrapContext.
-	 * @param bootstrapContext the JCA BootstrapContext that the ResourceAdapter
-	 * has been started with
+	 * 使用给定的BootstrapContext创建一个新的ResourceAdapterApplicationContext。
+	 *
+	 * @param bootstrapContext ResourceAdapter启动时使用的JCA BootstrapContext
 	 */
 	public ResourceAdapterApplicationContext(BootstrapContext bootstrapContext) {
 		Assert.notNull(bootstrapContext, "BootstrapContext must not be null");
@@ -54,11 +56,17 @@ public class ResourceAdapterApplicationContext extends GenericApplicationContext
 
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		// 向BeanFactory添加BootstrapContextAwareProcessor的BeanPostProcessor
 		beanFactory.addBeanPostProcessor(new BootstrapContextAwareProcessor(this.bootstrapContext));
+
+		// 忽略BootstrapContextAware接口的依赖
 		beanFactory.ignoreDependencyInterface(BootstrapContextAware.class);
+
+		// 注册BootstrapContext类的可解决依赖，使用提供的BootstrapContext实例
 		beanFactory.registerResolvableDependency(BootstrapContext.class, this.bootstrapContext);
 
-		// JCA WorkManager resolved lazily - may not be available.
+		// JCA WorkManager延迟解决-可能不可用。
+		// 注册WorkManager类的可解决依赖，使用提供的工厂方法从BootstrapContext中获取WorkManager实例
 		beanFactory.registerResolvableDependency(WorkManager.class,
 				(ObjectFactory<WorkManager>) this.bootstrapContext::getWorkManager);
 	}

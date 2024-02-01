@@ -16,9 +16,6 @@
 
 package org.springframework.web.context.support;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -33,23 +30,22 @@ import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.ServletConfigAware;
 import org.springframework.web.context.ServletContextAware;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+
 /**
- * Static {@link org.springframework.web.context.WebApplicationContext}
- * implementation for testing. Not intended for use in production applications.
+ * 用于测试的静态{@link org.springframework.web.context.WebApplicationContext}实现。
+ * 不适用于生产应用程序。
  *
- * <p>Implements the {@link org.springframework.web.context.ConfigurableWebApplicationContext}
- * interface to allow for direct replacement of an {@link XmlWebApplicationContext},
- * despite not actually supporting external configuration files.
+ * <p>实现{@link org.springframework.web.context.ConfigurableWebApplicationContext}
+ * 接口，允许直接替换{@link XmlWebApplicationContext}，尽管实际上不支持外部配置文件。
  *
- * <p>Interprets resource paths as servlet context resources, i.e. as paths beneath
- * the web application root. Absolute paths, e.g. for files outside the web app root,
- * can be accessed via "file:" URLs, as implemented by
- * {@link org.springframework.core.io.DefaultResourceLoader}.
+ * <p>将资源路径解释为servlet上下文资源，即位于web应用程序根目录下的路径。
+ * 绝对路径，例如位于web应用程序根目录之外的文件，可以通过"file:" URL访问，由
+ * {@link org.springframework.core.io.DefaultResourceLoader}实现。
  *
- * <p>In addition to the special beans detected by
- * {@link org.springframework.context.support.AbstractApplicationContext},
- * this class detects a bean of type {@link org.springframework.ui.context.ThemeSource}
- * in the context, under the special bean name "themeSource".
+ * <p>除了由{@link org.springframework.context.support.AbstractApplicationContext}检测到的特殊bean之外，
+ * 此类还在上下文中检测到类型为{@link org.springframework.ui.context.ThemeSource}的bean，其特殊bean名称为"themeSource"。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -58,15 +54,27 @@ import org.springframework.web.context.ServletContextAware;
 public class StaticWebApplicationContext extends StaticApplicationContext
 		implements ConfigurableWebApplicationContext, ThemeSource {
 
+	/**
+	 * Servlet上下文
+	 */
 	@Nullable
 	private ServletContext servletContext;
 
+	/**
+	 * Servlet配置
+	 */
 	@Nullable
 	private ServletConfig servletConfig;
 
+	/**
+	 * 命名空间
+	 */
 	@Nullable
 	private String namespace;
 
+	/**
+	 * 主题资源
+	 */
 	@Nullable
 	private ThemeSource themeSource;
 
@@ -77,7 +85,7 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 
 
 	/**
-	 * Set the ServletContext that this WebApplicationContext runs in.
+	 * 设置运行此WebApplicationContext的ServletContext。
 	 */
 	@Override
 	public void setServletContext(@Nullable ServletContext servletContext) {
@@ -119,8 +127,10 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	}
 
 	/**
-	 * The {@link StaticWebApplicationContext} class does not support this method.
-	 * @throws UnsupportedOperationException <b>always</b>
+	 * {@link StaticWebApplicationContext}类不支持此方法。
+	 *
+	 * @param configLocation 配置位置
+	 * @throws UnsupportedOperationException <b>总是</b>
 	 */
 	@Override
 	public void setConfigLocation(String configLocation) {
@@ -128,8 +138,10 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	}
 
 	/**
-	 * The {@link StaticWebApplicationContext} class does not support this method.
-	 * @throws UnsupportedOperationException <b>always</b>
+	 * {@link StaticWebApplicationContext}类不支持此方法。
+	 *
+	 * @param configLocations 配置位置
+	 * @throws UnsupportedOperationException <b>总是</b>
 	 */
 	@Override
 	public void setConfigLocations(String... configLocations) {
@@ -143,20 +155,30 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 
 
 	/**
-	 * Register request/session scopes, a {@link ServletContextAwareProcessor}, etc.
+	 * 注册请求/会话作用域、{@link ServletContextAwareProcessor}等。
+	 *
+	 * @param beanFactory 可配置的可列表的Bean工厂
 	 */
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		// 创建一个ServletContextAwareProcessor，并添加到BeanFactory的BeanPostProcessor列表中
 		beanFactory.addBeanPostProcessor(new ServletContextAwareProcessor(this.servletContext, this.servletConfig));
+
+		// 忽略BeanFactory对ServletContextAware和ServletConfigAware接口的依赖
 		beanFactory.ignoreDependencyInterface(ServletContextAware.class);
 		beanFactory.ignoreDependencyInterface(ServletConfigAware.class);
 
+		// 在BeanFactory中注册Web应用程序范围
 		WebApplicationContextUtils.registerWebApplicationScopes(beanFactory, this.servletContext);
+
+		// 在BeanFactory中注册与环境相关的Beans
 		WebApplicationContextUtils.registerEnvironmentBeans(beanFactory, this.servletContext, this.servletConfig);
 	}
 
 	/**
-	 * This implementation supports file paths beneath the root of the ServletContext.
+	 * 此实现支持位于ServletContext根目录下的文件路径。
+	 *
+	 * @param path 资源路径
 	 * @see ServletContextResource
 	 */
 	@Override
@@ -166,7 +188,9 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	}
 
 	/**
-	 * This implementation supports pattern matching in unexpanded WARs too.
+	 * 此实现在未展开的WAR中支持模式匹配。
+	 *
+	 * @return ServletContextResourcePatternResolver
 	 * @see ServletContextResourcePatternResolver
 	 */
 	@Override
@@ -175,7 +199,9 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	}
 
 	/**
-	 * Create and return a new {@link StandardServletEnvironment}.
+	 * 创建并返回一个新的{@link StandardServletEnvironment}。
+	 *
+	 * @return ConfigurableEnvironment
 	 */
 	@Override
 	protected ConfigurableEnvironment createEnvironment() {
@@ -183,7 +209,7 @@ public class StaticWebApplicationContext extends StaticApplicationContext
 	}
 
 	/**
-	 * Initialize the theme capability.
+	 * 初始化主题功能。
 	 */
 	@Override
 	protected void onRefresh() {
