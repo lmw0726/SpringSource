@@ -16,112 +16,136 @@
 
 package org.springframework.core.io.support;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.PropertiesPersister;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.PropertiesPersister;
-
 /**
- * Base class for JavaBean-style components that need to load properties
- * from one or more resources. Supports local properties as well, with
- * configurable overriding.
+ * JavaBean风格组件的基类，需要从一个或多个资源加载属性。还支持本地属性，可配置覆盖。
  *
  * @author Juergen Hoeller
  * @since 1.2.2
  */
 public abstract class PropertiesLoaderSupport {
 
-	/** Logger available to subclasses. */
+	/**
+	 * 可用于子类的记录器。
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 本地属性
+	 */
 	@Nullable
 	protected Properties[] localProperties;
 
+	/**
+	 * 本地属性是否覆盖文件中的属性
+	 */
 	protected boolean localOverride = false;
 
+	/**
+	 * 资源位置
+	 */
 	@Nullable
 	private Resource[] locations;
 
+	/**
+	 * 是否忽略未发现的资源
+	 */
 	private boolean ignoreResourceNotFound = false;
 
+	/**
+	 * 文件编码
+	 */
 	@Nullable
 	private String fileEncoding;
 
+	/**
+	 * 属性持久化器
+	 */
 	private PropertiesPersister propertiesPersister = ResourcePropertiesPersister.INSTANCE;
 
 
 	/**
-	 * Set local properties, e.g. via the "props" tag in XML bean definitions.
-	 * These can be considered defaults, to be overridden by properties
-	 * loaded from files.
+	 * 设置本地属性，例如通过XML bean定义中的 "props" 标签设置。
+	 * 这些属性可以被认为是默认值，可以被从文件中加载的属性覆盖。
+	 *
+	 * @param properties 要设置的本地属性
 	 */
 	public void setProperties(Properties properties) {
-		this.localProperties = new Properties[] {properties};
+		this.localProperties = new Properties[]{properties};
 	}
 
 	/**
-	 * Set local properties, e.g. via the "props" tag in XML bean definitions,
-	 * allowing for merging multiple properties sets into one.
+	 * 设置本地属性，例如通过XML bean定义中的 "props" 标签设置，
+	 * 允许将多个属性集合合并为一个。
+	 *
+	 * @param propertiesArray 要设置的本地属性数组
 	 */
 	public void setPropertiesArray(Properties... propertiesArray) {
 		this.localProperties = propertiesArray;
 	}
 
 	/**
-	 * Set a location of a properties file to be loaded.
-	 * <p>Can point to a classic properties file or to an XML file
-	 * that follows JDK 1.5's properties XML format.
+	 * 设置要加载的属性文件的位置。
+	 * <p>可以指向经典的属性文件，也可以指向遵循JDK 1.5的属性XML格式的XML文件。
+	 *
+	 * @param location 要设置的位置资源
 	 */
 	public void setLocation(Resource location) {
-		this.locations = new Resource[] {location};
+		this.locations = new Resource[]{location};
 	}
 
 	/**
-	 * Set locations of properties files to be loaded.
-	 * <p>Can point to classic properties files or to XML files
-	 * that follow JDK 1.5's properties XML format.
-	 * <p>Note: Properties defined in later files will override
-	 * properties defined earlier files, in case of overlapping keys.
-	 * Hence, make sure that the most specific files are the last
-	 * ones in the given list of locations.
+	 * 设置要加载的属性文件的位置。
+	 * <p>可以指向经典的属性文件，也可以指向遵循JDK 1.5的属性XML格式的XML文件。
+	 * <p>注意：后续文件中定义的属性将覆盖较早文件中定义的属性，如果存在重叠的键。
+	 * 因此，请确保给定位置列表中的最具体文件位于最后。
+	 *
+	 * @param locations 要设置的属性文件的位置资源数组
 	 */
 	public void setLocations(Resource... locations) {
 		this.locations = locations;
 	}
 
 	/**
-	 * Set whether local properties override properties from files.
-	 * <p>Default is "false": Properties from files override local defaults.
-	 * Can be switched to "true" to let local properties override defaults
-	 * from files.
+	 * 设置本地属性是否覆盖文件中的属性。
+	 * <p>默认为 "false"：文件中的属性覆盖本地默认值。
+	 * 可以切换为 "true"，以便让本地属性覆盖文件中的默认值。
+	 *
+	 * @param localOverride 是否本地属性覆盖文件中的属性
 	 */
 	public void setLocalOverride(boolean localOverride) {
 		this.localOverride = localOverride;
 	}
 
 	/**
-	 * Set if failure to find the property resource should be ignored.
-	 * <p>"true" is appropriate if the properties file is completely optional.
-	 * Default is "false".
+	 * 设置是否忽略找不到属性资源的失败。
+	 * <p>如果属性文件是完全可选的，则选择 "true"。
+	 * 默认为 "false"。
+	 *
+	 * @param ignoreResourceNotFound 是否忽略找不到属性资源的失败
 	 */
 	public void setIgnoreResourceNotFound(boolean ignoreResourceNotFound) {
 		this.ignoreResourceNotFound = ignoreResourceNotFound;
 	}
 
 	/**
-	 * Set the encoding to use for parsing properties files.
-	 * <p>Default is none, using the {@code java.util.Properties}
-	 * default encoding.
-	 * <p>Only applies to classic properties files, not to XML files.
+	 * 设置用于解析属性文件的编码。
+	 * <p>默认为 none，使用 {@code java.util.Properties} 的默认编码。
+	 * <p>仅适用于经典的属性文件，不适用于 XML 文件。
+	 *
+	 * @param encoding 要使用的编码
 	 * @see org.springframework.util.PropertiesPersister#load
 	 */
 	public void setFileEncoding(String encoding) {
@@ -129,8 +153,10 @@ public abstract class PropertiesLoaderSupport {
 	}
 
 	/**
-	 * Set the PropertiesPersister to use for parsing properties files.
-	 * The default is ResourcePropertiesPersister.
+	 * 设置用于解析属性文件的 属性持久化器。
+	 * 默认为 ResourcePropertiesPersister。
+	 *
+	 * @param propertiesPersister 要使用的 PropertiesPersister
 	 * @see ResourcePropertiesPersister#INSTANCE
 	 */
 	public void setPropertiesPersister(@Nullable PropertiesPersister propertiesPersister) {
@@ -140,14 +166,15 @@ public abstract class PropertiesLoaderSupport {
 
 
 	/**
-	 * Return a merged Properties instance containing both the
-	 * loaded properties and properties set on this FactoryBean.
+	 * 返回一个合并的 Properties 实例，其中包含加载的属性和在此 FactoryBean 上设置的属性。
+	 *
+	 * @return 合并后的 Properties 实例
 	 */
 	protected Properties mergeProperties() throws IOException {
 		Properties result = new Properties();
 
 		if (this.localOverride) {
-			// Load properties from file upfront, to let local properties override.
+			// 提前从文件加载属性，以便让本地属性覆盖。
 			loadProperties(result);
 		}
 
@@ -158,7 +185,7 @@ public abstract class PropertiesLoaderSupport {
 		}
 
 		if (!this.localOverride) {
-			// Load properties from file afterwards, to let those properties override.
+			// 后续从文件加载属性，以便让这些属性覆盖。
 			loadProperties(result);
 		}
 
@@ -166,30 +193,31 @@ public abstract class PropertiesLoaderSupport {
 	}
 
 	/**
-	 * Load properties into the given instance.
-	 * @param props the Properties instance to load into
-	 * @throws IOException in case of I/O errors
+	 * 将属性加载到给定实例中。
+	 *
+	 * @param props 要加载到的 Properties 实例
+	 * @throws IOException 如果出现 I/O 错误
 	 * @see #setLocations
 	 */
 	protected void loadProperties(Properties props) throws IOException {
-		if (this.locations != null) {
-			for (Resource location : this.locations) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("Loading properties file from " + location);
-				}
-				try {
-					PropertiesLoaderUtils.fillProperties(
-							props, new EncodedResource(location, this.fileEncoding), this.propertiesPersister);
-				}
-				catch (FileNotFoundException | UnknownHostException | SocketException ex) {
-					if (this.ignoreResourceNotFound) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("Properties resource not found: " + ex.getMessage());
-						}
+		if (this.locations == null) {
+			return;
+		}
+		for (Resource location : this.locations) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Loading properties file from " + location);
+			}
+			try {
+				// 使用指定的文件编码、资源位置和属性持久化器填充属性
+				PropertiesLoaderUtils.fillProperties(
+						props, new EncodedResource(location, this.fileEncoding), this.propertiesPersister);
+			} catch (FileNotFoundException | UnknownHostException | SocketException ex) {
+				if (this.ignoreResourceNotFound) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Properties resource not found: " + ex.getMessage());
 					}
-					else {
-						throw ex;
-					}
+				} else {
+					throw ex;
 				}
 			}
 		}
