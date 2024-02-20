@@ -16,22 +16,20 @@
 
 package org.springframework.core.convert.support;
 
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.ConverterRegistry;
+import org.springframework.lang.Nullable;
+
 import java.nio.charset.Charset;
 import java.util.Currency;
 import java.util.Locale;
 import java.util.UUID;
 
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.converter.ConverterRegistry;
-import org.springframework.lang.Nullable;
-
 /**
- * A specialization of {@link GenericConversionService} configured by default
- * with converters appropriate for most environments.
+ * DefaultConversionService 的特化版本，通过默认配置适用于大多数环境的转换器。
  *
- * <p>Designed for direct instantiation but also exposes the static
- * {@link #addDefaultConverters(ConverterRegistry)} utility method for ad-hoc
- * use against any {@code ConverterRegistry} instance.
+ * <p>设计为直接实例化，但也公开了静态的 {@link #addDefaultConverters(ConverterRegistry)} 实用方法，
+ * 用于针对任何 {@code ConverterRegistry} 实例的临时使用。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -40,13 +38,15 @@ import org.springframework.lang.Nullable;
  */
 public class DefaultConversionService extends GenericConversionService {
 
+	/**
+	 * 默认转换器服务，共享实例
+	 */
 	@Nullable
 	private static volatile DefaultConversionService sharedInstance;
 
 
 	/**
-	 * Create a new {@code DefaultConversionService} with the set of
-	 * {@linkplain DefaultConversionService#addDefaultConverters(ConverterRegistry) default converters}.
+	 * 使用一组 {@linkplain DefaultConversionService#addDefaultConverters(ConverterRegistry) 默认转换器} 创建一个新的 {@code DefaultConversionService}。
 	 */
 	public DefaultConversionService() {
 		addDefaultConverters(this);
@@ -77,11 +77,11 @@ public class DefaultConversionService extends GenericConversionService {
 	}
 
 	/**
-	 * Add converters appropriate for most environments.
+	 * 向大多数环境添加适当的转换器。
 	 *
-	 * @param converterRegistry the registry of converters to add to
-	 *                          (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
-	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a ConversionService
+	 * @param converterRegistry 要添加到的转换器注册表
+	 *                          (必须也可转换为 ConversionService，例如是 {@link ConfigurableConversionService})
+	 * @throws ClassCastException 如果给定的 ConverterRegistry 无法转换为 ConversionService
 	 */
 	public static void addDefaultConverters(ConverterRegistry converterRegistry) {
 		addScalarConverters(converterRegistry);
@@ -99,11 +99,11 @@ public class DefaultConversionService extends GenericConversionService {
 	}
 
 	/**
-	 * Add common collection converters.
+	 * 添加常见的集合转换器。
 	 *
-	 * @param converterRegistry the registry of converters to add to
-	 *                          (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
-	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a ConversionService
+	 * @param converterRegistry 要添加到的转换器注册表
+	 *                          (必须也可转换为 ConversionService，例如是 {@link ConfigurableConversionService})
+	 * @throws ClassCastException 如果给定的 ConverterRegistry 无法转换为 ConversionService
 	 * @since 4.2.3
 	 */
 	public static void addCollectionConverters(ConverterRegistry converterRegistry) {
@@ -131,6 +131,13 @@ public class DefaultConversionService extends GenericConversionService {
 		converterRegistry.addConverter(new StreamConverter(conversionService));
 	}
 
+	/**
+	 * 添加标量转换器。
+	 *
+	 * @param converterRegistry 要添加到的转换器注册表
+	 *                          (必须也可转换为 ConversionService，例如是 {@link ConfigurableConversionService})
+	 * @throws ClassCastException 如果给定的 ConverterRegistry 无法转换为 ConversionService
+	 */
 	private static void addScalarConverters(ConverterRegistry converterRegistry) {
 		converterRegistry.addConverterFactory(new NumberToNumberConverterFactory());
 

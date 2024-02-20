@@ -19,8 +19,7 @@ package org.springframework.core.convert;
 import org.springframework.lang.Nullable;
 
 /**
- * A service interface for type conversion. This is the entry point into the convert system.
- * Call {@link #convert(Object, Class)} to perform a thread-safe type conversion using this system.
+ * 类型转换的服务接口。这是进入转换系统的入口点。调用{@link #convert(Object, Class)}使用此系统执行线程安全的类型转换。
  *
  * @author Keith Donald
  * @author Phillip Webb
@@ -29,40 +28,31 @@ import org.springframework.lang.Nullable;
 public interface ConversionService {
 
 	/**
-	 * Return {@code true} if objects of {@code sourceType} can be converted to the {@code targetType}.
-	 * <p>If this method returns {@code true}, it means {@link #convert(Object, Class)} is capable
-	 * of converting an instance of {@code sourceType} to {@code targetType}.
-	 * <p>Special note on collections, arrays, and maps types:
-	 * For conversion between collection, array, and map types, this method will return {@code true}
-	 * even though a convert invocation may still generate a {@link ConversionException} if the
-	 * underlying elements are not convertible. Callers are expected to handle this exceptional case
-	 * when working with collections and maps.
+	 * 如果{@code sourceType}的对象可以转换为{@code targetType}，则返回{@code true}。
+	 * <p>如果此方法返回{@code true}，则意味着{@link #convert(Object, Class)}能够将{@code sourceType}的实例转换为{@code targetType}。
+	 * <p>关于集合、数组和映射类型的特别说明：
+	 * 对于集合、数组和映射类型之间的转换，即使调用convert可能仍会生成{@link ConversionException}（如果底层元素不可转换），此方法也将返回{@code true}。
+	 * 调用者在使用集合和映射时应处理此特殊情况。
 	 *
-	 * @param sourceType the source type to convert from (may be {@code null} if source is {@code null})
-	 * @param targetType the target type to convert to (required)
-	 * @return {@code true} if a conversion can be performed, {@code false} if not
-	 * @throws IllegalArgumentException if {@code targetType} is {@code null}
+	 * @param sourceType 要转换的源类型（如果源为{@code null}，则可以为{@code null}）
+	 * @param targetType 要转换为的目标类型（必需）
+	 * @return 如果可以执行转换，则为{@code true}；否则为{@code false}
+	 * @throws IllegalArgumentException 如果{@code targetType}为{@code null}
 	 */
 	boolean canConvert(@Nullable Class<?> sourceType, Class<?> targetType);
 
 	/**
-	 * Return {@code true} if objects of {@code sourceType} can be converted to the {@code targetType}.
-	 * The TypeDescriptors provide additional context about the source and target locations
-	 * where conversion would occur, often object fields or property locations.
-	 * <p>If this method returns {@code true}, it means {@link #convert(Object, TypeDescriptor, TypeDescriptor)}
-	 * is capable of converting an instance of {@code sourceType} to {@code targetType}.
-	 * <p>Special note on collections, arrays, and maps types:
-	 * For conversion between collection, array, and map types, this method will return {@code true}
-	 * even though a convert invocation may still generate a {@link ConversionException} if the
-	 * underlying elements are not convertible. Callers are expected to handle this exceptional case
-	 * when working with collections and maps.
+	 * 如果{@code sourceType}的对象可以转换为{@code targetType}，则返回{@code true}。
+	 * TypeDescriptors提供有关转换将发生的源和目标位置的附加上下文，通常是对象字段或属性位置。
+	 * <p>如果此方法返回{@code true}，则意味着{@link #convert(Object, TypeDescriptor, TypeDescriptor)}能够将{@code sourceType}的实例转换为{@code targetType}。
+	 * <p>关于集合、数组和映射类型的特别说明：
+	 * 对于集合、数组和映射类型之间的转换，即使调用convert可能仍会生成{@link ConversionException}（如果底层元素不可转换），此方法也将返回{@code true}。
+	 * 调用者在使用集合和映射时应处理此特殊情况。
 	 *
-	 * @param sourceType context about the source type to convert from
-	 *                   (may be {@code null} if source is {@code null})
-	 * @param targetType context about the target type to convert to (required)
-	 * @return {@code true} if a conversion can be performed between the source and target types,
-	 * {@code false} if not
-	 * @throws IllegalArgumentException if {@code targetType} is {@code null}
+	 * @param sourceType 关于要转换的源类型的上下文（如果源为{@code null}，则可以为{@code null}）
+	 * @param targetType 要转换为的目标类型的上下文（必需）
+	 * @return 如果可以在源和目标类型之间执行转换，则为{@code true}；否则为{@code false}
+	 * @throws IllegalArgumentException 如果{@code targetType}为{@code null}
 	 */
 	boolean canConvert(@Nullable TypeDescriptor sourceType, TypeDescriptor targetType);
 
@@ -79,18 +69,15 @@ public interface ConversionService {
 	<T> T convert(@Nullable Object source, Class<T> targetType);
 
 	/**
-	 * Convert the given {@code source} to the specified {@code targetType}.
-	 * The TypeDescriptors provide additional context about the source and target locations
-	 * where conversion will occur, often object fields or property locations.
+	 * 将给定的{@code source}转换为指定的{@code targetType}。
+	 * TypeDescriptors提供有关转换将发生的源和目标位置的附加上下文，通常是对象字段或属性位置。
 	 *
-	 * @param source     the source object to convert (may be {@code null})
-	 * @param sourceType context about the source type to convert from
-	 *                   (may be {@code null} if source is {@code null})
-	 * @param targetType context about the target type to convert to (required)
-	 * @return the converted object, an instance of {@link TypeDescriptor#getObjectType() targetType}
-	 * @throws ConversionException      if a conversion exception occurred
-	 * @throws IllegalArgumentException if targetType is {@code null},
-	 *                                  or {@code sourceType} is {@code null} but source is not {@code null}
+	 * @param source     要转换的源对象（可以为{@code null}）
+	 * @param sourceType 关于要转换的源类型的上下文（如果源为{@code null}，则可以为{@code null}）
+	 * @param targetType 要转换为的目标类型的上下文（必需）
+	 * @return 转换后的对象，一个{@link TypeDescriptor#getObjectType() targetType}的实例
+	 * @throws ConversionException      如果发生转换异常
+	 * @throws IllegalArgumentException 如果targetType为{@code null}，或者{@code sourceType}为{@code null}但源不为{@code null}
 	 */
 	@Nullable
 	Object convert(@Nullable Object source, @Nullable TypeDescriptor sourceType, TypeDescriptor targetType);

@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Internal utilities for the conversion package.
+ * 转换包的内部工具。
  *
  * @author Keith Donald
  * @author Stephane Nicoll
@@ -50,24 +50,30 @@ abstract class ConversionUtils {
 	public static boolean canConvertElements(@Nullable TypeDescriptor sourceElementType,
 											 @Nullable TypeDescriptor targetElementType, ConversionService conversionService) {
 
+		// 如果目标元素类型为null，则直接返回true，因为不需要进行转换
 		if (targetElementType == null) {
-			// yes
+			// 是
 			return true;
 		}
+		// 如果源元素类型为null，则可能需要进行转换，返回true
 		if (sourceElementType == null) {
-			// maybe
+			// 可能是
 			return true;
 		}
+		// 如果转换服务可以将源元素类型转换为目标元素类型，则返回true
 		if (conversionService.canConvert(sourceElementType, targetElementType)) {
-			// yes
+			// 是
 			return true;
 		}
+		// 如果源元素类型可以分配给目标元素类型，则可能需要进行转换，返回true
 		if (ClassUtils.isAssignable(sourceElementType.getType(), targetElementType.getType())) {
-			// maybe
+			// 可能是
 			return true;
 		}
-		// no
+		// 否则，不需要进行转换，返回false
+		// 否
 		return false;
+
 	}
 
 	public static Class<?> getEnumType(Class<?> targetType) {

@@ -17,19 +17,13 @@
 package org.springframework.core;
 
 /**
- * Interface to be implemented by decorating proxies, in particular Spring AOP
- * proxies but potentially also custom proxies with decorator semantics.
+ * 由装饰代理实现的接口，特别是Spring AOP代理，但也可能是具有装饰器语义的自定义代理。
  *
- * <p>Note that this interface should just be implemented if the decorated class
- * is not within the hierarchy of the proxy class to begin with. In particular,
- * a "target-class" proxy such as a Spring AOP CGLIB proxy should not implement
- * it since any lookup on the target class can simply be performed on the proxy
- * class there anyway.
+ * <p>请注意，仅当装饰的类不在代理类的层次结构中时，才应该实现此接口。特别是，
+ * 类似于Spring AOP CGLIB代理的“目标类”代理不应该实现它，因为在那里可以在代理类上简单地执行对目标类的任何查找。
  *
- * <p>Defined in the core module in order to allow
- * {@link org.springframework.core.annotation.AnnotationAwareOrderComparator}
- * (and potential other candidates without spring-aop dependencies) to use it
- * for introspection purposes, in particular annotation lookups.
+ * <p>在核心模块中定义，以便允许{@link org.springframework.core.annotation.AnnotationAwareOrderComparator}
+ * （以及潜在的其他不依赖spring-aop的候选项）用于内省目的，特别是注解查找。
  *
  * @author Juergen Hoeller
  * @since 4.3
@@ -37,10 +31,10 @@ package org.springframework.core;
 public interface DecoratingProxy {
 
 	/**
-	 * Return the (ultimate) decorated class behind this proxy.
-	 * <p>In case of an AOP proxy, this will be the ultimate target class,
-	 * not just the immediate target (in case of multiple nested proxies).
-	 * @return the decorated class (never {@code null})
+	 * 返回此代理后面（最终）的装饰类。
+	 * <p>在AOP代理的情况下，这将是最终的目标类，而不仅仅是立即目标（在多个嵌套代理的情况下）。
+	 *
+	 * @return 装饰的类（永远不会为{@code null}）
 	 */
 	Class<?> getDecoratedClass();
 

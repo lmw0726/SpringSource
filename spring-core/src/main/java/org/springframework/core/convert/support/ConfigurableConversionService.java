@@ -20,20 +20,19 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.ConverterRegistry;
 
 /**
- * Configuration interface to be implemented by most if not all {@link ConversionService}
- * types. Consolidates the read-only operations exposed by {@link ConversionService} and
- * the mutating operations of {@link ConverterRegistry} to allow for convenient ad-hoc
- * addition and removal of {@link org.springframework.core.convert.converter.Converter
- * Converters} through. The latter is particularly useful when working against a
- * {@link org.springframework.core.env.ConfigurableEnvironment ConfigurableEnvironment}
- * instance in application context bootstrapping code.
+ * 配置接口，大多数（如果不是全部）{@link ConversionService} 类型都应该实现。
+ * 将{@link ConversionService}暴露的只读操作和{@link ConverterRegistry}的可变操作整合在一起，
+ * 允许通过方便的临时添加和移除{@link org.springframework.core.convert.converter.Converter Converter}。
+ * 后者在应用程序上下文引导代码中针对{@link org.springframework.core.env.ConfigurableEnvironment ConfigurableEnvironment}
+ * 实例进行操作时特别有用。
  *
  * @author Chris Beams
- * @since 3.1
  * @see org.springframework.core.env.ConfigurablePropertyResolver#getConversionService()
  * @see org.springframework.core.env.ConfigurableEnvironment
  * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment()
+ * @since 3.1
  */
 public interface ConfigurableConversionService extends ConversionService, ConverterRegistry {
 
 }
+
