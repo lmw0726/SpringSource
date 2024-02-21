@@ -20,40 +20,38 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A converter converts a source object of type {@code S} to a target of type {@code T}.
+ * 转换器将类型为 {@code S} 的源对象转换为类型为 {@code T} 的目标对象。
  *
- * <p>Implementations of this interface are thread-safe and can be shared.
+ * <p>该接口的实现是线程安全的，可以共享。
  *
- * <p>Implementations may additionally implement {@link ConditionalConverter}.
+ * <p>实现还可以实现 {@link ConditionalConverter}。
  *
+ * @param <S> 源类型
+ * @param <T> 目标类型
  * @author Keith Donald
  * @author Josh Cummings
  * @since 3.0
- * @param <S> the source type
- * @param <T> the target type
  */
 @FunctionalInterface
 public interface Converter<S, T> {
 
 	/**
-	 * Convert the source object of type {@code S} to target type {@code T}.
-	 * @param source the source object to convert, which must be an instance of {@code S} (never {@code null})
-	 * @return the converted object, which must be an instance of {@code T} (potentially {@code null})
-	 * @throws IllegalArgumentException if the source cannot be converted to the desired target type
+	 * 将类型为 {@code S} 的源对象转换为类型为 {@code T} 的目标对象。
+	 *
+	 * @param source 要转换的源对象，必须是 {@code S} 的实例（永远不会是 {@code null}）
+	 * @return 转换后的对象，必须是 {@code T} 的实例（可能是 {@code null}）
+	 * @throws IllegalArgumentException 如果源对象无法转换为所需的目标类型
 	 */
 	@Nullable
 	T convert(S source);
 
 	/**
-	 * Construct a composed {@link Converter} that first applies this {@link Converter}
-	 * to its input, and then applies the {@code after} {@link Converter} to the
-	 * result.
-	 * @param after the {@link Converter} to apply after this {@link Converter}
-	 * is applied
-	 * @param <U> the type of output of both the {@code after} {@link Converter}
-	 * and the composed {@link Converter}
-	 * @return a composed {@link Converter} that first applies this {@link Converter}
-	 * and then applies the {@code after} {@link Converter}
+	 * 构造一个组合的 {@link Converter}，该组合首先将此 {@link Converter} 应用于其输入，然后将 {@code after}
+	 * {@link Converter} 应用于结果。
+	 *
+	 * @param after 应用于此 {@link Converter} 后的 {@link Converter}
+	 * @param <U>   {@code after} {@link Converter} 和组合的 {@link Converter} 的输出类型
+	 * @return 首先应用此 {@link Converter}，然后应用 {@code after} {@link Converter} 的组合 {@link Converter}
 	 * @since 5.3
 	 */
 	default <U> Converter<S, U> andThen(Converter<? super T, ? extends U> after) {
