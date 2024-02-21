@@ -16,26 +16,20 @@
 
 package org.springframework.core.convert.converter;
 
-import java.util.Set;
-
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.Set;
+
 /**
- * Generic converter interface for converting between two or more types.
- *
- * <p>This is the most flexible of the Converter SPI interfaces, but also the most complex.
- * It is flexible in that a GenericConverter may support converting between multiple source/target
- * type pairs (see {@link #getConvertibleTypes()}. In addition, GenericConverter implementations
- * have access to source/target {@link TypeDescriptor field context} during the type conversion
- * process. This allows for resolving source and target field metadata such as annotations and
- * generics information, which can be used to influence the conversion logic.
- *
- * <p>This interface should generally not be used when the simpler {@link Converter} or
- * {@link ConverterFactory} interface is sufficient.
- *
- * <p>Implementations may additionally implement {@link ConditionalConverter}.
+ * 用于在两个或多个类型之间进行转换的通用转换器接口。
+ * <p> 这是转换器 SPI 接口中最灵活的接口，但也是最复杂的接口。
+ * 它是灵活的，因为 GenericConverter 可能支持在多个源/目标类型对之间进行转换（参见 getConvertibleTypes()）。
+ * 此外，GenericConverter 实现在类型转换过程中可以访问源/目标 TypeDescriptor 的字段上下文。
+ * 这允许解析源和目标字段元数据，如注解和泛型信息，这些信息可以用来影响转换逻辑。
+ * <p> 当简单的 Converter 或 ConverterFactory 接口足够时，通常不应使用此接口。
+ * <p> 实现类还可以实现 ConditionalConverter 接口。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -68,19 +62,23 @@ public interface GenericConverter {
 
 
 	/**
-	 * Holder for a source-to-target class pair.
+	 * 源类型和目标类型的持有者。
 	 */
 	final class ConvertiblePair {
-
+		/**
+		 * 源类型
+		 */
 		private final Class<?> sourceType;
-
+		/**
+		 * 目标类型
+		 */
 		private final Class<?> targetType;
 
 		/**
-		 * Create a new source-to-target pair.
+		 * 创建一个新的源类型到目标类型的对应关系。
 		 *
-		 * @param sourceType the source type
-		 * @param targetType the target type
+		 * @param sourceType 源类型
+		 * @param targetType 目标类型
 		 */
 		public ConvertiblePair(Class<?> sourceType, Class<?> targetType) {
 			Assert.notNull(sourceType, "Source type must not be null");

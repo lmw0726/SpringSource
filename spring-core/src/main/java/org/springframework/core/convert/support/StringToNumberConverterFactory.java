@@ -22,10 +22,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.NumberUtils;
 
 /**
- * Converts from a String any JDK-standard Number implementation.
+ * 将字符串转换为任何 JDK 标准数字实现。
  *
- * <p>Support Number classes including Byte, Short, Integer, Float, Double, Long, BigInteger, BigDecimal. This class
- * delegates to {@link NumberUtils#parseNumber(String, Class)} to perform the conversion.
+ * <p>支持的 Number 类包括 Byte、Short、Integer、Float、Double、Long、BigInteger、BigDecimal。此类
+ * 委托给 {@link NumberUtils#parseNumber(String, Class)} 来执行转换。
  *
  * @author Keith Donald
  * @since 3.0
@@ -48,7 +48,9 @@ final class StringToNumberConverterFactory implements ConverterFactory<String, N
 
 
 	private static final class StringToNumber<T extends Number> implements Converter<String, T> {
-
+		/**
+		 * 目标类型
+		 */
 		private final Class<T> targetType;
 
 		public StringToNumber(Class<T> targetType) {
@@ -59,8 +61,10 @@ final class StringToNumberConverterFactory implements ConverterFactory<String, N
 		@Nullable
 		public T convert(String source) {
 			if (source.isEmpty()) {
+				// 如果字符串为空，则返回null
 				return null;
 			}
+			//将字符串解析为目标类型（Number子类）
 			return NumberUtils.parseNumber(source, this.targetType);
 		}
 	}

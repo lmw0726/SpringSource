@@ -16,24 +16,25 @@
 
 package org.springframework.core.convert.support;
 
-import java.lang.reflect.Array;
-import java.util.Collections;
-import java.util.Set;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 
+import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Converts an array to an Object by returning the first array element
- * after converting it to the desired target type.
+ * 通过将第一个数组元素转换为所需的目标类型后返回，将数组转换为对象。
  *
  * @author Keith Donald
  * @since 3.0
  */
 final class ArrayToObjectConverter implements ConditionalGenericConverter {
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -55,16 +56,21 @@ final class ArrayToObjectConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 如果源对象为null，则返回null
 		if (source == null) {
 			return null;
 		}
+		// 如果源类型可分配给目标类型，则直接返回源对象
 		if (sourceType.isAssignableTo(targetType)) {
 			return source;
 		}
+		// 如果源数组长度为0，则返回null
 		if (Array.getLength(source) == 0) {
 			return null;
 		}
+		// 获取源数组的第一个元素
 		Object firstElement = Array.get(source, 0);
+		// 将源数组的第一个元素转换为目标类型，并返回结果
 		return this.conversionService.convert(firstElement, sourceType.elementTypeDescriptor(firstElement), targetType);
 	}
 

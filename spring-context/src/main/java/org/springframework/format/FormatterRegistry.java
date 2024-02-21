@@ -16,12 +16,12 @@
 
 package org.springframework.format;
 
-import java.lang.annotation.Annotation;
-
 import org.springframework.core.convert.converter.ConverterRegistry;
 
+import java.lang.annotation.Annotation;
+
 /**
- * A registry of field formatting logic.
+ * 字段格式化逻辑的注册表。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -30,60 +30,61 @@ import org.springframework.core.convert.converter.ConverterRegistry;
 public interface FormatterRegistry extends ConverterRegistry {
 
 	/**
-	 * Adds a Printer to print fields of a specific type.
-	 * The field type is implied by the parameterized Printer instance.
-	 * @param printer the printer to add
-	 * @since 5.2
+	 * 添加一个Printer以打印特定类型的字段。
+	 * 字段类型由参数化的Printer实例暗示。
+	 *
+	 * @param printer 要添加的打印机
 	 * @see #addFormatter(Formatter)
+	 * @since 5.2
 	 */
 	void addPrinter(Printer<?> printer);
 
 	/**
-	 * Adds a Parser to parse fields of a specific type.
-	 * The field type is implied by the parameterized Parser instance.
-	 * @param parser the parser to add
-	 * @since 5.2
+	 * 添加一个Parser以解析特定类型的字段。
+	 * 字段类型由参数化的Parser实例暗示。
+	 *
+	 * @param parser 要添加的解析器
 	 * @see #addFormatter(Formatter)
+	 * @since 5.2
 	 */
 	void addParser(Parser<?> parser);
 
 	/**
-	 * Adds a Formatter to format fields of a specific type.
-	 * The field type is implied by the parameterized Formatter instance.
-	 * @param formatter the formatter to add
-	 * @since 3.1
+	 * 添加一个Formatter以格式化特定类型的字段。
+	 * 字段类型由参数化的Formatter实例暗示。
+	 *
+	 * @param formatter 要添加的格式化程序
 	 * @see #addFormatterForFieldType(Class, Formatter)
+	 * @since 3.1
 	 */
 	void addFormatter(Formatter<?> formatter);
 
 	/**
-	 * Adds a Formatter to format fields of the given type.
-	 * <p>On print, if the Formatter's type T is declared and {@code fieldType} is not assignable to T,
-	 * a coercion to T will be attempted before delegating to {@code formatter} to print a field value.
-	 * On parse, if the parsed object returned by {@code formatter} is not assignable to the runtime field type,
-	 * a coercion to the field type will be attempted before returning the parsed field value.
-	 * @param fieldType the field type to format
-	 * @param formatter the formatter to add
+	 * 添加一个Formatter以格式化给定类型的字段。
+	 * <p>在打印时，如果Formatter的类型T已声明并且fieldType不可分配给T，则将尝试强制转换为T，然后再委托给formatter打印字段值。
+	 * 在解析时，如果由formatter返回的解析对象不可分配给运行时字段类型，则将尝试强制转换为字段类型，然后再返回解析的字段值。
+	 *
+	 * @param fieldType 要格式化的字段类型
+	 * @param formatter 要添加的格式化程序
 	 */
 	void addFormatterForFieldType(Class<?> fieldType, Formatter<?> formatter);
 
 	/**
-	 * Adds a Printer/Parser pair to format fields of a specific type.
-	 * The formatter will delegate to the specified {@code printer} for printing
-	 * and the specified {@code parser} for parsing.
-	 * <p>On print, if the Printer's type T is declared and {@code fieldType} is not assignable to T,
-	 * a coercion to T will be attempted before delegating to {@code printer} to print a field value.
-	 * On parse, if the object returned by the Parser is not assignable to the runtime field type,
-	 * a coercion to the field type will be attempted before returning the parsed field value.
-	 * @param fieldType the field type to format
-	 * @param printer the printing part of the formatter
-	 * @param parser the parsing part of the formatter
+	 * 添加一个Printer/Parser对以格式化特定类型的字段。
+	 * 格式化程序将委托给指定的打印机打印和指定的解析器解析。
+	 * <p>在打印时，如果Printer的类型T已声明并且fieldType不可分配给T，则将尝试强制转换为T，然后再委托给printer打印字段值。
+	 * 在解析时，如果解析器返回的对象不可分配给运行时字段类型，则将尝试强制转换为字段类型，然后再返回解析的字段值。
+	 *
+	 * @param fieldType 要格式化的字段类型
+	 * @param printer   格式化程序的打印部分
+	 * @param parser    格式化程序的解析部分
 	 */
 	void addFormatterForFieldType(Class<?> fieldType, Printer<?> printer, Parser<?> parser);
 
 	/**
-	 * Adds a Formatter to format fields annotated with a specific format annotation.
-	 * @param annotationFormatterFactory the annotation formatter factory to add
+	 * 添加一个Formatter以格式化带有特定格式注释的字段。
+	 *
+	 * @param annotationFormatterFactory 要添加的注释格式化程序工厂
 	 */
 	void addFormatterForFieldAnnotation(AnnotationFormatterFactory<? extends Annotation> annotationFormatterFactory);
 

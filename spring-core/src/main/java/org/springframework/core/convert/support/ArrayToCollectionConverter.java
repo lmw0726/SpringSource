@@ -16,31 +16,32 @@
 
 package org.springframework.core.convert.support;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Converts an array to a Collection.
+ * 将数组转换为集合。
  *
- * <p>First, creates a new Collection of the requested target type.
- * Then adds each array element to the target collection.
- * Will perform an element conversion from the source component type
- * to the collection's parameterized type if necessary.
+ * <p>首先，创建一个请求的目标类型的新集合。
+ * 然后将每个数组元素添加到目标集合中。
+ * 如果需要，将从源组件类型转换为集合的参数化类型。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @since 3.0
  */
 final class ArrayToCollectionConverter implements ConditionalGenericConverter {
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -63,22 +64,27 @@ final class ArrayToCollectionConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 如果源对象为null，则直接返回null
 		if (source == null) {
 			return null;
 		}
 
+		// 获取源数组的长度和目标元素的类型描述符
 		int length = Array.getLength(source);
 		TypeDescriptor elementDesc = targetType.getElementTypeDescriptor();
+
+		// 创建目标集合
 		Collection<Object> target = CollectionFactory.createCollection(targetType.getType(),
 				(elementDesc != null ? elementDesc.getType() : null), length);
 
+		// 如果目标元素的描述符为null，则直接将源数组中的元素添加到目标集合中
 		if (elementDesc == null) {
 			for (int i = 0; i < length; i++) {
 				Object sourceElement = Array.get(source, i);
 				target.add(sourceElement);
 			}
-		}
-		else {
+		} else {
+			// 否则，将源数组中的每个元素转换为目标元素后添加到目标集合中
 			for (int i = 0; i < length; i++) {
 				Object sourceElement = Array.get(source, i);
 				Object targetElement = this.conversionService.convert(sourceElement,
@@ -86,6 +92,7 @@ final class ArrayToCollectionConverter implements ConditionalGenericConverter {
 				target.add(targetElement);
 			}
 		}
+		// 返回转换后的目标集合
 		return target;
 	}
 

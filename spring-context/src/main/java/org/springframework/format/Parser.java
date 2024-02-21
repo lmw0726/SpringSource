@@ -20,22 +20,23 @@ import java.text.ParseException;
 import java.util.Locale;
 
 /**
- * Parses text strings to produce instances of T.
+ * 将文本字符串解析为T的实例。
  *
+ * @param <T> 此Parser生成的对象类型
  * @author Keith Donald
  * @since 3.0
- * @param <T> the type of object this Parser produces
  */
 @FunctionalInterface
 public interface Parser<T> {
 
 	/**
-	 * Parse a text String to produce a T.
-	 * @param text the text string
-	 * @param locale the current user locale
-	 * @return an instance of T
-	 * @throws ParseException when a parse exception occurs in a java.text parsing library
-	 * @throws IllegalArgumentException when a parse exception occurs
+	 * 解析文本字符串以生成一个T。
+	 *
+	 * @param text   文本字符串
+	 * @param locale 当前用户语言环境
+	 * @return T的实例
+	 * @throws ParseException           当在java.text解析库中发生解析异常时
+	 * @throws IllegalArgumentException 当发生解析异常时
 	 */
 	T parse(String text, Locale locale) throws ParseException;
 

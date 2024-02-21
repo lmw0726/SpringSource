@@ -16,20 +16,20 @@
 
 package org.springframework.core.convert.support;
 
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.convert.converter.ConditionalGenericConverter;
+import org.springframework.lang.Nullable;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.core.convert.converter.ConditionalGenericConverter;
-import org.springframework.lang.Nullable;
-
 /**
- * Converts a {@link ByteBuffer} directly to and from {@code byte[] ByteBuffer} directly to and from {@code byte[]s} and indirectly
- * to any type that the {@link ConversionService} support via {@code byte[]}.
+ * 直接将 {@link ByteBuffer} 转换为 {@code byte[]}，以及直接将 {@code byte[]} 转换为 {@link ByteBuffer}，并间接地
+ * 通过 {@code byte[]} 转换为 {@link ConversionService} 支持的任何类型。
  *
  * @author Phillip Webb
  * @author Juergen Hoeller
@@ -37,10 +37,19 @@ import org.springframework.lang.Nullable;
  */
 final class ByteBufferConverter implements ConditionalGenericConverter {
 
+	/**
+	 * {@code ByteBuffer} 类型描述符。
+	 */
 	private static final TypeDescriptor BYTE_BUFFER_TYPE = TypeDescriptor.valueOf(ByteBuffer.class);
 
+	/**
+	 * {@code byte[]} 类型描述符。
+	 */
 	private static final TypeDescriptor BYTE_ARRAY_TYPE = TypeDescriptor.valueOf(byte[].class);
 
+	/**
+	 * 可转换的类型对集合。
+	 */
 	private static final Set<ConvertiblePair> CONVERTIBLE_PAIRS;
 
 	static {
@@ -52,7 +61,9 @@ final class ByteBufferConverter implements ConditionalGenericConverter {
 		CONVERTIBLE_PAIRS = Collections.unmodifiableSet(convertiblePairs);
 	}
 
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -68,10 +79,16 @@ final class ByteBufferConverter implements ConditionalGenericConverter {
 
 	@Override
 	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 检查目标类型是否可赋值给ByteBuffer类型
 		boolean byteBufferTarget = targetType.isAssignableTo(BYTE_BUFFER_TYPE);
+
+		// 如果源类型可赋值给ByteBuffer类型
 		if (sourceType.isAssignableTo(BYTE_BUFFER_TYPE)) {
+			// 返回目标类型也可赋值给ByteBuffer类型，或者检查从ByteBuffer到目标类型的匹配情况
 			return (byteBufferTarget || matchesFromByteBuffer(targetType));
 		}
+
+		// 如果目标类型可赋值给ByteBuffer类型
 		return (byteBufferTarget && matchesToByteBuffer(sourceType));
 	}
 
@@ -88,23 +105,33 @@ final class ByteBufferConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 检查目标类型是否可赋值给ByteBuffer类型
 		boolean byteBufferTarget = targetType.isAssignableTo(BYTE_BUFFER_TYPE);
+
+		// 如果源是ByteBuffer类型
 		if (source instanceof ByteBuffer) {
 			ByteBuffer buffer = (ByteBuffer) source;
+			// 如果目标类型也是ByteBuffer类型，则返回ByteBuffer的副本，否则转换为目标类型
 			return (byteBufferTarget ? buffer.duplicate() : convertFromByteBuffer(buffer, targetType));
 		}
+
+		// 如果目标类型是ByteBuffer类型，则将源转换为ByteBuffer类型
 		if (byteBufferTarget) {
 			return convertToByteBuffer(source, sourceType);
 		}
-		// Should not happen
+
+		// 不应该发生的情况
 		throw new IllegalStateException("Unexpected source/target types");
 	}
 
 	@Nullable
 	private Object convertFromByteBuffer(ByteBuffer source, TypeDescriptor targetType) {
+		// 创建与源ByteBuffer大小相同的字节数组
 		byte[] bytes = new byte[source.remaining()];
+		// 从源ByteBuffer中读取字节到字节数组中
 		source.get(bytes);
 
+		// 如果目标类型可赋值给字节数组类型，则直接返回字节数组，否则使用转换服务进行转换
 		if (targetType.isAssignableTo(BYTE_ARRAY_TYPE)) {
 			return bytes;
 		}
@@ -112,19 +139,21 @@ final class ByteBufferConverter implements ConditionalGenericConverter {
 	}
 
 	private Object convertToByteBuffer(@Nullable Object source, TypeDescriptor sourceType) {
+		// 将源对象转换为字节数组，如果源对象已经是字节数组，则直接使用，否则通过转换服务进行转换
 		byte[] bytes = (byte[]) (source instanceof byte[] ? source :
 				this.conversionService.convert(source, sourceType, BYTE_ARRAY_TYPE));
 
+		// 如果转换后的字节数组为空，则创建一个空的ByteBuffer并返回
 		if (bytes == null) {
 			return ByteBuffer.wrap(new byte[0]);
 		}
 
+		// 创建一个ByteBuffer并将字节数组放入其中
 		ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
 		byteBuffer.put(bytes);
 
-		// Extra cast necessary for compiling on JDK 9 plus running on JDK 8, since
-		// otherwise the overridden ByteBuffer-returning rewind method would be chosen
-		// which isn't available on JDK 8.
+		// 将ByteBuffer的位置设为0并返回
+		// 在JDK 8上运行的JDK 9 plus上进行编译所需的额外强制转换，因为否则将选择在JDK 8上不可用的重写ByteBuffer返回rewind方法。
 		return ((Buffer) byteBuffer).rewind();
 	}
 

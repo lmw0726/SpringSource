@@ -16,30 +16,32 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 /**
- * Converts an array to another array. First adapts the source array to a List,
- * then delegates to {@link CollectionToArrayConverter} to perform the target
- * array conversion.
+ * 将数组转换为另一个数组。首先将源数组适配为列表，然后委托给 {@link CollectionToArrayConverter} 来执行目标数组转换。
  *
  * @author Keith Donald
  * @author Phillip Webb
  * @since 3.0
  */
 final class ArrayToArrayConverter implements ConditionalGenericConverter {
-
+	/**
+	 * 集合转数组转换器
+	 */
 	private final CollectionToArrayConverter helperConverter;
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -62,14 +64,18 @@ final class ArrayToArrayConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 如果转换服务是通用转换服务，则检查是否可以绕过转换
 		if (this.conversionService instanceof GenericConversionService) {
+			// 获取目标类型的元素描述符
 			TypeDescriptor targetElement = targetType.getElementTypeDescriptor();
+			// 如果目标元素不为null，并且可以绕过转换，则直接返回源对象
 			if (targetElement != null &&
 					((GenericConversionService) this.conversionService).canBypassConvert(
 							sourceType.getElementTypeDescriptor(), targetElement)) {
 				return source;
 			}
 		}
+		// 将源数组转换为列表，并使用辅助转换器进行转换
 		List<Object> sourceList = Arrays.asList(ObjectUtils.toObjectArray(source));
 		return this.helperConverter.convert(sourceList, sourceType, targetType);
 	}

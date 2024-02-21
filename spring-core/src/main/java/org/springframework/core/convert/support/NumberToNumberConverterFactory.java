@@ -23,13 +23,12 @@ import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.util.NumberUtils;
 
 /**
- * Converts from any JDK-standard Number implementation to any other JDK-standard Number implementation.
+ * 将任何 JDK 标准数字实现转换为另一个 JDK 标准数字实现。
  *
- * <p>Support Number classes including Byte, Short, Integer, Float, Double, Long, BigInteger, BigDecimal. This class
- * delegates to {@link NumberUtils#convertNumberToTargetClass(Number, Class)} to perform the conversion.
+ * <p>支持的 Number 类包括 Byte、Short、Integer、Float、Double、Long、BigInteger、BigDecimal。此类
+ * 委托给 {@link NumberUtils#convertNumberToTargetClass(Number, Class)} 来执行转换。
  *
  * @author Keith Donald
- * @since 3.0
  * @see java.lang.Byte
  * @see java.lang.Short
  * @see java.lang.Integer
@@ -39,6 +38,7 @@ import org.springframework.util.NumberUtils;
  * @see java.lang.Double
  * @see java.math.BigDecimal
  * @see NumberUtils
+ * @since 3.0
  */
 final class NumberToNumberConverterFactory implements ConverterFactory<Number, Number>, ConditionalConverter {
 
@@ -54,7 +54,9 @@ final class NumberToNumberConverterFactory implements ConverterFactory<Number, N
 
 
 	private static final class NumberToNumber<T extends Number> implements Converter<Number, T> {
-
+		/**
+		 * 目标类型
+		 */
 		private final Class<T> targetType;
 
 		NumberToNumber(Class<T> targetType) {

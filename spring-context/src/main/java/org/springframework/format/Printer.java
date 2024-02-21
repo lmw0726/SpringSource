@@ -19,20 +19,20 @@ package org.springframework.format;
 import java.util.Locale;
 
 /**
- * Prints objects of type T for display.
+ * 打印类型为T的对象以供显示。
  *
  * @author Keith Donald
  * @since 3.0
- * @param <T> the type of object this Printer prints
+ * @param <T> 此Printer打印的对象类型
  */
 @FunctionalInterface
 public interface Printer<T> {
 
 	/**
-	 * Print the object of type T for display.
-	 * @param object the instance to print
-	 * @param locale the current user locale
-	 * @return the printed text string
+	 * 打印类型为T的对象以供显示。
+	 * @param object 要打印的实例
+	 * @param locale 当前用户语言环境
+	 * @return 打印的文本字符串
 	 */
 	String print(T object, Locale locale);
 

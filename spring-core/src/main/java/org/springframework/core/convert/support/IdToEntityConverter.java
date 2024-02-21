@@ -16,11 +16,6 @@
 
 package org.springframework.core.convert.support;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.Set;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
@@ -29,19 +24,24 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Converts an entity identifier to a entity reference by calling a static finder method
- * on the target entity type.
+ * 通过在目标实体类型上调用静态查找方法，将实体标识符转换为实体引用。
  *
- * <p>For this converter to match, the finder method must be static, have the signature
- * {@code find[EntityName]([IdType])}, and return an instance of the desired entity type.
+ * <p>为了使该转换器匹配，查找方法必须是静态的，具有签名{@code find[EntityName]([IdType])}，并返回所需实体类型的实例。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @since 3.0
  */
 final class IdToEntityConverter implements ConditionalGenericConverter {
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -65,31 +65,45 @@ final class IdToEntityConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 如果源对象为空，则直接返回null
 		if (source == null) {
 			return null;
 		}
+
+		// 获取目标类型的查找方法
 		Method finder = getFinder(targetType.getType());
+
+		// 断言确保查找方法不为空
 		Assert.state(finder != null, "No finder method");
+
+		// 将源对象转换为查找方法的参数类型
 		Object id = this.conversionService.convert(
 				source, sourceType, TypeDescriptor.valueOf(finder.getParameterTypes()[0]));
+
+		// 通过反射调用查找方法并返回结果
 		return ReflectionUtils.invokeMethod(finder, source, id);
 	}
 
 	@Nullable
 	private Method getFinder(Class<?> entityClass) {
+		// 构建查找方法名
 		String finderMethod = "find" + getEntityName(entityClass);
+
+		// 初始化方法数组和本地过滤标志位
 		Method[] methods;
 		boolean localOnlyFiltered;
+
 		try {
+			// 尝试获取实体类的声明方法
 			methods = entityClass.getDeclaredMethods();
 			localOnlyFiltered = true;
-		}
-		catch (SecurityException ex) {
-			// Not allowed to access non-public methods...
-			// Fallback: check locally declared public methods only.
+		} catch (SecurityException ex) {
+			// 如果无法访问非公共方法，则回退到仅检查本地声明的公共方法
 			methods = entityClass.getMethods();
 			localOnlyFiltered = false;
 		}
+
+		// 遍历方法数组，寻找匹配的查找方法
 		for (Method method : methods) {
 			if (Modifier.isStatic(method.getModifiers()) && method.getName().equals(finderMethod) &&
 					method.getParameterCount() == 1 && method.getReturnType().equals(entityClass) &&
@@ -97,16 +111,22 @@ final class IdToEntityConverter implements ConditionalGenericConverter {
 				return method;
 			}
 		}
+
+		// 如果找不到匹配的查找方法，则返回null
 		return null;
 	}
 
 	private String getEntityName(Class<?> entityClass) {
+		// 获取实体类的简称
 		String shortName = ClassUtils.getShortName(entityClass);
+
+		// 查找最后一个点的位置
 		int lastDot = shortName.lastIndexOf('.');
+
+		// 如果存在点，则返回点之后的部分，否则返回原始简称
 		if (lastDot != -1) {
 			return shortName.substring(lastDot + 1);
-		}
-		else {
+		} else {
 			return shortName;
 		}
 	}

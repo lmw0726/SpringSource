@@ -16,21 +16,19 @@
 
 package org.springframework.core.convert.support;
 
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.convert.converter.ConditionalGenericConverter;
+import org.springframework.lang.Nullable;
+
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.core.convert.converter.ConditionalGenericConverter;
-import org.springframework.lang.Nullable;
-
 /**
- * Convert an Object to {@code java.util.Optional<T>} if necessary using the
- * {@code ConversionService} to convert the source Object to the generic type
- * of Optional when known.
+ * 如果需要，使用 {@code ConversionService} 将源对象转换为 {@code java.util.Optional<T>}，其中 T 是可选项的泛型类型。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -38,6 +36,9 @@ import org.springframework.lang.Nullable;
  */
 final class ObjectToOptionalConverter implements ConditionalGenericConverter {
 
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -59,8 +60,7 @@ final class ObjectToOptionalConverter implements ConditionalGenericConverter {
 	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
 		if (targetType.getResolvableType().hasGenerics()) {
 			return this.conversionService.canConvert(sourceType, new GenericTypeDescriptor(targetType));
-		}
-		else {
+		} else {
 			return true;
 		}
 	}
@@ -68,20 +68,24 @@ final class ObjectToOptionalConverter implements ConditionalGenericConverter {
 	@Override
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
 		if (source == null) {
+			// 如果源为null，则返回一个空的Optional对象
 			return Optional.empty();
-		}
-		else if (source instanceof Optional) {
+		} else if (source instanceof Optional) {
+			// 如果源已经是Optional类型，则直接返回
 			return source;
-		}
-		else if (targetType.getResolvableType().hasGenerics()) {
+		} else if (targetType.getResolvableType().hasGenerics()) {
+			// 如果目标类型具有泛型信息
+			// 使用ConversionService将源转换为目标类型
 			Object target = this.conversionService.convert(source, sourceType, new GenericTypeDescriptor(targetType));
+			// 如果转换后的目标对象为null，或者是空数组，或者是空集合，则返回一个空的Optional对象
 			if (target == null || (target.getClass().isArray() && Array.getLength(target) == 0) ||
-						(target instanceof Collection && ((Collection<?>) target).isEmpty())) {
+					(target instanceof Collection && ((Collection<?>) target).isEmpty())) {
 				return Optional.empty();
 			}
+			// 否则，返回一个包含转换后目标对象的Optional对象
 			return Optional.of(target);
-		}
-		else {
+		} else {
+			// 否则，直接返回一个包含源对象的Optional对象
 			return Optional.of(source);
 		}
 	}

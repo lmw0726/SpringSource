@@ -16,30 +16,27 @@
 
 package org.springframework.core.convert.support;
 
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.Set;
-
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Simply calls {@link Object#toString()} to convert any supported object
- * to a {@link String}.
+ * 简单调用 {@link Object#toString()} 将任何支持的对象转换为 {@link String}。
  *
- * <p>Supports {@link CharSequence}, {@link StringWriter}, and any class
- * with a String constructor or one of the following static factory methods:
- * {@code valueOf(String)}, {@code of(String)}, {@code from(String)}.
+ * <p>支持 {@link CharSequence}、{@link StringWriter} 和具有 String 构造函数或以下静态工厂方法之一的任何类：
+ * {@code valueOf(String)}、{@code of(String)}、{@code from(String)}。
  *
- * <p>Used by the {@link DefaultConversionService} as a fallback if there
- * are no other explicit to-String converters registered.
+ * <p>在 {@link DefaultConversionService} 中用作后备，如果没有其他显式的转换器注册为 to-String 转换器。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 3.0
  * @see ObjectToObjectConverter
+ * @since 3.0
  */
 final class FallbackObjectToStringConverter implements ConditionalGenericConverter {
 
@@ -50,11 +47,15 @@ final class FallbackObjectToStringConverter implements ConditionalGenericConvert
 
 	@Override
 	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 获取源类型的对象类型
 		Class<?> sourceClass = sourceType.getObjectType();
+
+		// 如果源类型是字符串类型，则无需转换，返回false
 		if (String.class == sourceClass) {
-			// no conversion required
 			return false;
 		}
+
+		// 检查源类型是否是CharSequence的子类，或者是StringWriter的子类，或者具有从源类型到String类型的转换方法或构造函数
 		return (CharSequence.class.isAssignableFrom(sourceClass) ||
 				StringWriter.class.isAssignableFrom(sourceClass) ||
 				ObjectToObjectConverter.hasConversionMethodOrConstructor(sourceClass, String.class));

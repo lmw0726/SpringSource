@@ -16,26 +16,28 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Converts an array to a comma-delimited String. First adapts the source array
- * to a List, then delegates to {@link CollectionToStringConverter} to perform
- * the target String conversion.
+ * 将数组转换为逗号分隔的字符串。
+ * 首先将源数组适配为列表，然后委托给 {@link CollectionToStringConverter} 来执行目标字符串转换。
  *
  * @author Keith Donald
  * @since 3.0
  */
 final class ArrayToStringConverter implements ConditionalGenericConverter {
 
+	/**
+	 * 集合转字符串转换器
+	 */
 	private final CollectionToStringConverter helperConverter;
 
 

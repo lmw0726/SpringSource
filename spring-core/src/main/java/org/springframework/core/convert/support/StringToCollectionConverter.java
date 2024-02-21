@@ -16,10 +16,6 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
@@ -27,17 +23,22 @@ import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Converts a comma-delimited String to a Collection.
- * If the target collection element type is declared, only matches if
- * {@code String.class} can be converted to it.
+ * 将逗号分隔的字符串转换为集合。
+ * 如果目标集合元素类型已声明，则只有当{@code String.class}可以转换为它时才匹配。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @since 3.0
  */
 final class StringToCollectionConverter implements ConditionalGenericConverter {
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -60,22 +61,31 @@ final class StringToCollectionConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 如果源对象为null，则直接返回null
 		if (source == null) {
 			return null;
 		}
+
+		// 将源对象转换为字符串类型
 		String string = (String) source;
 
+		// 将逗号分隔的字符串转换为字符串数组
 		String[] fields = StringUtils.commaDelimitedListToStringArray(string);
+
+		// 获取目标类型的元素类型描述符
 		TypeDescriptor elementDesc = targetType.getElementTypeDescriptor();
+
+		// 创建一个目标集合对象
 		Collection<Object> target = CollectionFactory.createCollection(targetType.getType(),
 				(elementDesc != null ? elementDesc.getType() : null), fields.length);
 
+		// 如果目标元素类型描述符为null，则将每个字符串元素直接添加到目标集合中
 		if (elementDesc == null) {
 			for (String field : fields) {
 				target.add(field.trim());
 			}
-		}
-		else {
+		} else {
+			// 否则，将每个字符串元素转换为目标类型的元素，然后添加到目标集合中
 			for (String field : fields) {
 				Object targetElement = this.conversionService.convert(field.trim(), sourceType, elementDesc);
 				target.add(targetElement);

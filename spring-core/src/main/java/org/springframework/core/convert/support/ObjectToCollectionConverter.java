@@ -16,26 +16,28 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Converts an Object to a single-element Collection containing the Object.
- * Will convert the Object to the target Collection's parameterized type if necessary.
+ * 将对象转换为包含该对象的单元素集合。
+ * 如果需要，将对象转换为目标集合的参数化类型。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @since 3.0
  */
 final class ObjectToCollectionConverter implements ConditionalGenericConverter {
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -57,21 +59,28 @@ final class ObjectToCollectionConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 如果源对象为null，则直接返回null
 		if (source == null) {
 			return null;
 		}
 
+		// 获取目标元素的类型描述符
 		TypeDescriptor elementDesc = targetType.getElementTypeDescriptor();
+
+		// 创建目标集合
 		Collection<Object> target = CollectionFactory.createCollection(targetType.getType(),
 				(elementDesc != null ? elementDesc.getType() : null), 1);
 
+		// 如果目标元素描述符为null或者目标元素是集合类型，则直接将源对象添加到目标集合中
 		if (elementDesc == null || elementDesc.isCollection()) {
 			target.add(source);
-		}
-		else {
+		} else {
+			// 否则，将源对象转换为目标元素后添加到目标集合中
 			Object singleElement = this.conversionService.convert(source, sourceType, elementDesc);
 			target.add(singleElement);
 		}
+
+		// 返回目标集合
 		return target;
 	}
 

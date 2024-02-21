@@ -16,25 +16,19 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 
+import java.util.*;
+
 /**
- * Converts a Map to another Map.
+ * 将一个 Map 转换为另一个 Map。
  *
- * <p>First, creates a new Map of the requested targetType with a size equal to the
- * size of the source Map. Then copies each element in the source map to the target map.
- * Will perform a conversion from the source maps's parameterized K,V types to the target
- * map's parameterized types K,V if necessary.
+ * <p>首先，创建一个大小等于源 Map 大小的请求 targetType 的新 Map。然后将源 Map 中的每个元素复制到目标 Map 中。
+ * 如果需要，将从源 Map 的参数化 K、V 类型转换为目标 Map 的参数化类型 K、V。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -42,6 +36,9 @@ import org.springframework.lang.Nullable;
  */
 final class MapToMapConverter implements ConditionalGenericConverter {
 
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -63,38 +60,53 @@ final class MapToMapConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 如果源对象为null，则返回null
 		if (source == null) {
 			return null;
 		}
+
+		// 将源对象转换为Map类型
 		@SuppressWarnings("unchecked")
 		Map<Object, Object> sourceMap = (Map<Object, Object>) source;
 
-		// Shortcut if possible...
+		// 如果目标类型不是源对象的实例并且源Map为空，则无需复制，直接返回源Map
 		boolean copyRequired = !targetType.getType().isInstance(source);
 		if (!copyRequired && sourceMap.isEmpty()) {
 			return sourceMap;
 		}
+
+		// 获取目标Map的键和值的类型描述符
 		TypeDescriptor keyDesc = targetType.getMapKeyTypeDescriptor();
 		TypeDescriptor valueDesc = targetType.getMapValueTypeDescriptor();
 
+		// 存储转换后的键值对
 		List<MapEntry> targetEntries = new ArrayList<>(sourceMap.size());
+
+		// 遍历源Map中的键值对，进行转换
 		for (Map.Entry<Object, Object> entry : sourceMap.entrySet()) {
 			Object sourceKey = entry.getKey();
 			Object sourceValue = entry.getValue();
+			// 转换键和值
 			Object targetKey = convertKey(sourceKey, sourceType, keyDesc);
 			Object targetValue = convertValue(sourceValue, sourceType, valueDesc);
+			// 将转换后的键值对添加到目标条目列表中
 			targetEntries.add(new MapEntry(targetKey, targetValue));
+			// 如果键或值发生了变化，则需要复制
 			if (sourceKey != targetKey || sourceValue != targetValue) {
 				copyRequired = true;
 			}
 		}
+
+		// 如果不需要复制，则直接返回源Map
 		if (!copyRequired) {
 			return sourceMap;
 		}
 
+		// 创建目标Map对象
 		Map<Object, Object> targetMap = CollectionFactory.createMap(targetType.getType(),
 				(keyDesc != null ? keyDesc.getType() : null), sourceMap.size());
 
+		// 将转换后的键值对添加到目标Map中
 		for (MapEntry entry : targetEntries) {
 			entry.addToMap(targetMap);
 		}

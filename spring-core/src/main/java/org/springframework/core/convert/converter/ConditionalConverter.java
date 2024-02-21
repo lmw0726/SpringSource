@@ -19,18 +19,14 @@ package org.springframework.core.convert.converter;
 import org.springframework.core.convert.TypeDescriptor;
 
 /**
- * Allows a {@link Converter}, {@link GenericConverter} or {@link ConverterFactory} to
- * conditionally execute based on attributes of the {@code source} and {@code target}
- * {@link TypeDescriptor}.
+ * 允许 {@link Converter}、{@link GenericConverter} 或 {@link ConverterFactory}
+ * 根据 {@code source} 和 {@code target} {@link TypeDescriptor} 的属性有条件地执行。
  *
- * <p>Often used to selectively match custom conversion logic based on the presence of a
- * field or class-level characteristic, such as an annotation or method. For example, when
- * converting from a String field to a Date field, an implementation might return
- * {@code true} if the target field has also been annotated with {@code @DateTimeFormat}.
+ * <p>通常用于根据字段或类级别的特征（例如注解或方法）有选择地匹配自定义转换逻辑。例如，当从 String 字段转换为 Date 字段时，
+ * 如果目标字段也已用 {@code @DateTimeFormat} 注解，实现可能会返回 {@code true}。
  *
- * <p>As another example, when converting from a String field to an {@code Account} field,
- * an implementation might return {@code true} if the target Account class defines a
- * {@code public static findAccount(String)} method.
+ * <p>另一个例子是，当从 String 字段转换为 Account 字段时，如果目标 Account 类定义了一个 {@code public static findAccount(String)} 方法，
+ * 实现可能会返回 {@code true}。
  *
  * @author Phillip Webb
  * @author Keith Donald

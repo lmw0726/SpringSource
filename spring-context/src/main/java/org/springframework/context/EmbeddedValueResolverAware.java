@@ -20,23 +20,23 @@ import org.springframework.beans.factory.Aware;
 import org.springframework.util.StringValueResolver;
 
 /**
- * Interface to be implemented by any object that wishes to be notified of a
- * {@code StringValueResolver} for the resolution of embedded definition values.
- *
- * <p>This is an alternative to a full ConfigurableBeanFactory dependency via the
- * {@code ApplicationContextAware}/{@code BeanFactoryAware} interfaces.
+ * 任何希望被通知用于解析嵌入式定义值的StringValueResolver的对象都必须实现的接口。
+ * <p>
+ * 这是通过ApplicationContextAware/BeanFactoryAware接口的一种替代方式，而不是通过完整的ConfigurableBeanFactory依赖。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
- * @since 3.0.3
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#resolveEmbeddedValue(String)
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#getBeanExpressionResolver()
  * @see org.springframework.beans.factory.config.EmbeddedValueResolver
+ * @since 3.0.3
  */
 public interface EmbeddedValueResolverAware extends Aware {
 
 	/**
-	 * Set the StringValueResolver to use for resolving embedded definition values.
+	 * 设置StringValueResolver用于解析嵌入式定义值。
+	 *
+	 * @param resolver 字符串值解析器
 	 */
 	void setEmbeddedValueResolver(StringValueResolver resolver);
 

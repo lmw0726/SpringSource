@@ -21,7 +21,7 @@ import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.lang.Nullable;
 
 /**
- * Converts from a String to a {@link java.lang.Enum} by calling {@link Enum#valueOf(Class, String)}.
+ * 通过调用 {@link Enum#valueOf(Class, String)} 将 String 转换为 {@link java.lang.Enum}。
  *
  * @author Keith Donald
  * @author Stephane Nicoll
@@ -37,7 +37,9 @@ final class StringToEnumConverterFactory implements ConverterFactory<String, Enu
 
 
 	private static class StringToEnum<T extends Enum> implements Converter<String, T> {
-
+		/**
+		 * 枚举类型
+		 */
 		private final Class<T> enumType;
 
 		StringToEnum(Class<T> enumType) {
@@ -48,7 +50,7 @@ final class StringToEnumConverterFactory implements ConverterFactory<String, Enu
 		@Nullable
 		public T convert(String source) {
 			if (source.isEmpty()) {
-				// It's an empty enum identifier: reset the enum value to null.
+				// 它是一个空的枚举标识符: 将枚举值重置为null。
 				return null;
 			}
 			return (T) Enum.valueOf(this.enumType, source.trim());

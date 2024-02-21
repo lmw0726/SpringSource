@@ -21,10 +21,10 @@ import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.util.NumberUtils;
 
 /**
- * Converts from a Character to any JDK-standard Number implementation.
+ * 将 Character 转换为任何 JDK 标准数字实现。
  *
- * <p>Support Number classes including Byte, Short, Integer, Float, Double, Long, BigInteger, BigDecimal. This class
- * delegates to {@link NumberUtils#convertNumberToTargetClass(Number, Class)} to perform the conversion.
+ * <p>支持的 Number 类包括 Byte、Short、Integer、Float、Double、Long、BigInteger、BigDecimal。此类
+ * 委托给 {@link NumberUtils#convertNumberToTargetClass(Number, Class)} 来执行转换。
  *
  * @author Keith Donald
  * @since 3.0
@@ -46,7 +46,9 @@ final class CharacterToNumberFactory implements ConverterFactory<Character, Numb
 	}
 
 	private static final class CharacterToNumber<T extends Number> implements Converter<Character, T> {
-
+		/**
+		 * 目标类型
+		 */
 		private final Class<T> targetType;
 
 		public CharacterToNumber(Class<T> targetType) {
@@ -55,6 +57,7 @@ final class CharacterToNumberFactory implements ConverterFactory<Character, Numb
 
 		@Override
 		public T convert(Character source) {
+			// 将Number转换为目标类型
 			return NumberUtils.convertNumberToTargetClass((short) source.charValue(), this.targetType);
 		}
 	}

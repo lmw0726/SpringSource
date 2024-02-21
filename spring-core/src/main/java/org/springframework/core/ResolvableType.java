@@ -500,7 +500,7 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return {@code true} if this type contains generic parameters.
+	 * 如果此类型包含泛型参数，则返回{@code true}。
 	 *
 	 * @see #getGeneric(int...)
 	 * @see #getGenerics()
@@ -647,36 +647,41 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return a {@link ResolvableType} representing the generic parameter for the
-	 * given indexes. Indexes are zero based; for example given the type
-	 * {@code Map<Integer, List<String>>}, {@code getGeneric(0)} will access the
-	 * {@code Integer}. Nested generics can be accessed by specifying multiple indexes;
-	 * for example {@code getGeneric(1, 0)} will access the {@code String} from the
-	 * nested {@code List}. For convenience, if no indexes are specified the first
-	 * generic is returned.
-	 * <p>If no generic is available at the specified indexes {@link #NONE} is returned.
+	 * 返回表示给定索引的泛型参数的{@link ResolvableType}。索引从零开始；例如，给定类型
+	 * {@code Map<Integer, List<String>>}，{@code getGeneric(0)} 将访问 {@code Integer}。
+	 * 可以通过指定多个索引来访问嵌套泛型；例如，{@code getGeneric(1, 0)} 将访问嵌套 {@code List} 中的 {@code String}。
+	 * 为方便起见，如果未指定索引，则返回第一个泛型。
+	 * <p>如果在指定的索引处没有可用的泛型，则返回 {@link #NONE}。
 	 *
-	 * @param indexes the indexes that refer to the generic parameter
-	 *                (may be omitted to return the first generic)
-	 * @return a {@link ResolvableType} for the specified generic, or {@link #NONE}
+	 * @param indexes 引用泛型参数的索引（可以省略以返回第一个泛型）
+	 * @return 指定泛型的{@link ResolvableType}，或 {@link #NONE}
 	 * @see #hasGenerics()
 	 * @see #getGenerics()
 	 * @see #resolveGeneric(int...)
 	 * @see #resolveGenerics()
 	 */
 	public ResolvableType getGeneric(@Nullable int... indexes) {
+		// 获取当前 ResolvableType 对象的泛型数组
 		ResolvableType[] generics = getGenerics();
+		// 如果索引数组为空或长度为 0
 		if (indexes == null || indexes.length == 0) {
+			// 如果泛型数组为空，则返回 NONE，否则返回第一个泛型类型
 			return (generics.length == 0 ? NONE : generics[0]);
 		}
+		// 初始化泛型为当前 ResolvableType 对象
 		ResolvableType generic = this;
+		// 遍历索引数组
 		for (int index : indexes) {
+			// 获取当前泛型对象的泛型数组
 			generics = generic.getGenerics();
+			// 如果索引小于 0 或大于等于泛型数组长度，则返回 NONE
 			if (index < 0 || index >= generics.length) {
 				return NONE;
 			}
+			// 更新泛型为指定索引处的泛型对象
 			generic = generics[index];
 		}
+		// 返回最终的泛型对象
 		return generic;
 	}
 

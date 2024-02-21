@@ -20,7 +20,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 
 /**
- * Converts from a Integer to a {@link java.lang.Enum} by calling {@link Class#getEnumConstants()}.
+ * 通过调用 {@link Class#getEnumConstants()} 将 Integer 转换为 {@link java.lang.Enum}。
  *
  * @author Yanming Zhou
  * @author Stephane Nicoll
@@ -37,6 +37,9 @@ final class IntegerToEnumConverterFactory implements ConverterFactory<Integer, E
 
 	private static class IntegerToEnum<T extends Enum> implements Converter<Integer, T> {
 
+		/**
+		 * 枚举类型
+		 */
 		private final Class<T> enumType;
 
 		public IntegerToEnum(Class<T> enumType) {

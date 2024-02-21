@@ -16,26 +16,28 @@
 
 package org.springframework.core.convert.support;
 
-import java.lang.reflect.Array;
-import java.util.Collections;
-import java.util.Set;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Converts an Object to a single-element array containing the Object.
- * Will convert the Object to the target array's component type if necessary.
+ * 将对象转换为包含该对象的单元素数组。
+ * 如果需要，将对象转换为目标数组的组件类型。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @since 3.0
  */
 final class ObjectToArrayConverter implements ConditionalGenericConverter {
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
@@ -58,14 +60,23 @@ final class ObjectToArrayConverter implements ConditionalGenericConverter {
 	@Override
 	@Nullable
 	public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 如果源对象为空，则返回空
 		if (source == null) {
 			return null;
 		}
+
+		// 获取目标元素类型描述符，确保不为空
 		TypeDescriptor targetElementType = targetType.getElementTypeDescriptor();
 		Assert.state(targetElementType != null, "No target element type");
+
+		// 创建一个长度为1的目标数组
 		Object target = Array.newInstance(targetElementType.getType(), 1);
+
+		// 将源对象转换为目标元素类型并放入目标数组中
 		Object targetElement = this.conversionService.convert(source, sourceType, targetElementType);
 		Array.set(target, 0, targetElement);
+
+		// 返回目标数组
 		return target;
 	}
 
