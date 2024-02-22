@@ -16,20 +16,6 @@
 
 package org.springframework.format.datetime.standard;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.context.support.EmbeddedValueResolutionSupport;
 import org.springframework.format.AnnotationFormatterFactory;
 import org.springframework.format.Parser;
@@ -37,14 +23,19 @@ import org.springframework.format.Printer;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
 
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
+
 /**
  * Formats fields annotated with the {@link DateTimeFormat} annotation using the
  * JSR-310 <code>java.time</code> package in JDK 8.
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 4.0
  * @see org.springframework.format.annotation.DateTimeFormat
+ * @since 4.0
  */
 public class Jsr310DateTimeFormatAnnotationFormatterFactory extends EmbeddedValueResolutionSupport
 		implements AnnotationFormatterFactory<DateTimeFormat> {
@@ -78,13 +69,11 @@ public class Jsr310DateTimeFormatAnnotationFormatterFactory extends EmbeddedValu
 			if (isLocal(fieldType)) {
 				formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 			}
-		}
-		else if (formatter == DateTimeFormatter.ISO_TIME) {
+		} else if (formatter == DateTimeFormatter.ISO_TIME) {
 			if (isLocal(fieldType)) {
 				formatter = DateTimeFormatter.ISO_LOCAL_TIME;
 			}
-		}
-		else if (formatter == DateTimeFormatter.ISO_DATE_TIME) {
+		} else if (formatter == DateTimeFormatter.ISO_DATE_TIME) {
 			if (isLocal(fieldType)) {
 				formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 			}
@@ -111,8 +100,9 @@ public class Jsr310DateTimeFormatAnnotationFormatterFactory extends EmbeddedValu
 
 	/**
 	 * Factory method used to create a {@link DateTimeFormatter}.
+	 *
 	 * @param annotation the format annotation for the field
-	 * @param fieldType the declared type of the field
+	 * @param fieldType  the declared type of the field
 	 * @return a {@link DateTimeFormatter} instance
 	 */
 	protected DateTimeFormatter getFormatter(DateTimeFormat annotation, Class<?> fieldType) {

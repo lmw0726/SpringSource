@@ -16,27 +16,18 @@
 
 package org.springframework.format.datetime.standard;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.format.datetime.DateFormatterRegistrar;
 
+import java.time.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 /**
- * Installs lower-level type converters required to integrate
- * JSR-310 support into Spring's field formatting system.
+ * 安装所需的较低级别类型转换器，以将 JSR-310 支持集成到 Spring 的字段格式化系统中。
  *
- * <p>Note: {@link DateTimeFormatterRegistrar} installs these converters but
- * does not rely on them for its formatters. They are just being registered
- * for custom conversion scenarios between different JSR-310 value types
- * and also between {@link java.util.Calendar} and JSR-310 value types.
+ * <p>注意：{@link DateTimeFormatterRegistrar} 安装这些转换器，但不依赖于它们进行格式化。 它们只是注册为不同 JSR-310 值类型之间的自定义转换场景以及 {@link java.util.Calendar} 和 JSR-310 值类型之间的转换。
  *
  * @author Juergen Hoeller
  * @since 4.0.1
@@ -48,10 +39,12 @@ final class DateTimeConverters {
 
 
 	/**
-	 * Install the converters into the converter registry.
-	 * @param registry the converter registry
+	 * 将转换器安装到转换器注册表中。
+	 *
+	 * @param registry 转换器注册表
 	 */
 	public static void registerConverters(ConverterRegistry registry) {
+		// 添加日期转换器
 		DateFormatterRegistrar.addDateConverters(registry);
 
 		registry.addConverter(new LocalDateTimeToLocalDateConverter());
@@ -77,10 +70,11 @@ final class DateTimeConverters {
 	}
 
 	private static ZonedDateTime calendarToZonedDateTime(Calendar source) {
+		// 如果源对象是GregorianCalendar类型，则转换为ZonedDateTime类型
 		if (source instanceof GregorianCalendar) {
 			return ((GregorianCalendar) source).toZonedDateTime();
-		}
-		else {
+		} else {
+			// 否则，使用源对象的时间戳和时区信息创建ZonedDateTime对象
 			return ZonedDateTime.ofInstant(Instant.ofEpochMilli(source.getTimeInMillis()),
 					source.getTimeZone().toZoneId());
 		}

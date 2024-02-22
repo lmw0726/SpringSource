@@ -16,17 +16,16 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.Set;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.lang.Nullable;
 
+import java.util.Set;
+
 /**
- * A factory for common {@link org.springframework.core.convert.ConversionService}
- * configurations.
+ * 一个常见的 {@link org.springframework.core.convert.ConversionService} 配置的工厂。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -40,27 +39,31 @@ public final class ConversionServiceFactory {
 
 
 	/**
-	 * Register the given Converter objects with the given target ConverterRegistry.
-	 * @param converters the converter objects: implementing {@link Converter},
-	 * {@link ConverterFactory}, or {@link GenericConverter}
-	 * @param registry the target registry
+	 * 使用给定的目标 ConverterRegistry 注册给定的转换器对象。
+	 *
+	 * @param converters 转换器对象集合：实现 {@link Converter}、{@link ConverterFactory} 或 {@link GenericConverter}
+	 * @param registry 目标注册表
 	 */
 	public static void registerConverters(@Nullable Set<?> converters, ConverterRegistry registry) {
-		if (converters != null) {
-			for (Object converter : converters) {
-				if (converter instanceof GenericConverter) {
-					registry.addConverter((GenericConverter) converter);
-				}
-				else if (converter instanceof Converter<?, ?>) {
-					registry.addConverter((Converter<?, ?>) converter);
-				}
-				else if (converter instanceof ConverterFactory<?, ?>) {
-					registry.addConverterFactory((ConverterFactory<?, ?>) converter);
-				}
-				else {
-					throw new IllegalArgumentException("Each converter object must implement one of the " +
-							"Converter, ConverterFactory, or GenericConverter interfaces");
-				}
+		if (converters == null) {
+			return;
+		}
+		// 遍历转换器列表
+		for (Object converter : converters) {
+			// 判断转换器类型并添加到注册表中
+			if (converter instanceof GenericConverter) {
+				// 如果是GenericConverter类型，则添加到注册表中
+				registry.addConverter((GenericConverter) converter);
+			} else if (converter instanceof Converter<?, ?>) {
+				// 如果是Converter类型，则添加到注册表中
+				registry.addConverter((Converter<?, ?>) converter);
+			} else if (converter instanceof ConverterFactory<?, ?>) {
+				// 如果是ConverterFactory类型，则添加到注册表中
+				registry.addConverterFactory((ConverterFactory<?, ?>) converter);
+			} else {
+				// 如果转换器不是上述类型之一，则抛出异常
+				throw new IllegalArgumentException("Each converter object must implement one of the " +
+						"Converter, ConverterFactory, or GenericConverter interfaces");
 			}
 		}
 	}

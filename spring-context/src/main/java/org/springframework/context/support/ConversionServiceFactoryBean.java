@@ -16,8 +16,6 @@
 
 package org.springframework.context.support;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.ConversionService;
@@ -26,22 +24,17 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.lang.Nullable;
 
+import java.util.Set;
+
 /**
- * A factory providing convenient access to a ConversionService configured with
- * converters appropriate for most environments. Set the
- * {@link #setConverters "converters"} property to supplement the default converters.
- *
- * <p>This implementation creates a {@link DefaultConversionService}.
- * Subclasses may override {@link #createConversionService()} in order to return
- * a {@link GenericConversionService} instance of their choosing.
- *
- * <p>Like all {@code FactoryBean} implementations, this class is suitable for
- * use when configuring a Spring application context using Spring {@code <beans>}
- * XML. When configuring the container with
- * {@link org.springframework.context.annotation.Configuration @Configuration}
- * classes, simply instantiate, configure and return the appropriate
- * {@code ConversionService} object from a {@link
- * org.springframework.context.annotation.Bean @Bean} method.
+ * ConversionServiceFactoryBean 是一个工厂，提供了方便访问的 ConversionService，配置了适用于大多数环境的转换器。
+ * 设置 "converters" 属性以补充默认转换器。
+ * <p>
+ * 此实现创建一个 DefaultConversionService。子类可以覆盖 createConversionService() 方法，以返回所选的 GenericConversionService 实例。
+ * <p>
+ * 像所有 FactoryBean 实现一样，此类适用于使用 Spring <beans> XML 配置 Spring 应用程序上下文。
+ * 在使用 org.springframework.context.annotation.Configuration @Configuration 类配置容器时，
+ * 只需从 @Bean 方法中实例化、配置并返回适当的 ConversionService 对象即可。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -50,18 +43,25 @@ import org.springframework.lang.Nullable;
  */
 public class ConversionServiceFactoryBean implements FactoryBean<ConversionService>, InitializingBean {
 
+	/**
+	 * 转换器集合
+	 */
 	@Nullable
 	private Set<?> converters;
-
+	/**
+	 * 通用转换器服务
+	 */
 	@Nullable
 	private GenericConversionService conversionService;
 
 
 	/**
-	 * Configure the set of custom converter objects that should be added:
-	 * implementing {@link org.springframework.core.convert.converter.Converter},
-	 * {@link org.springframework.core.convert.converter.ConverterFactory},
-	 * or {@link org.springframework.core.convert.converter.GenericConverter}.
+	 * 配置应添加的自定义转换器对象集合：
+	 * 实现 {@link org.springframework.core.convert.converter.Converter}、
+	 * {@link org.springframework.core.convert.converter.ConverterFactory} 或
+	 * {@link org.springframework.core.convert.converter.GenericConverter} 接口的对象。
+	 *
+	 * @param converters 应添加的自定义转换器对象集合
 	 */
 	public void setConverters(Set<?> converters) {
 		this.converters = converters;
@@ -69,15 +69,18 @@ public class ConversionServiceFactoryBean implements FactoryBean<ConversionServi
 
 	@Override
 	public void afterPropertiesSet() {
+		// 创建转换服务
 		this.conversionService = createConversionService();
+		// 将转换器注册到转换服务中
 		ConversionServiceFactory.registerConverters(this.converters, this.conversionService);
 	}
 
 	/**
-	 * Create the ConversionService instance returned by this factory bean.
-	 * <p>Creates a simple {@link GenericConversionService} instance by default.
-	 * Subclasses may override to customize the ConversionService instance that
-	 * gets created.
+	 * 创建此工厂bean返回的 ConversionService 实例。
+	 * <p>默认情况下创建一个简单的 {@link GenericConversionService} 实例。
+	 * 子类可以重写此方法以定制要创建的 ConversionService 实例。
+	 *
+	 * @return 此工厂bean返回的 ConversionService 实例
 	 */
 	protected GenericConversionService createConversionService() {
 		return new DefaultConversionService();

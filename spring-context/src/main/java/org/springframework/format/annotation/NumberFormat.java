@@ -23,21 +23,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Declares that a field or method parameter should be formatted as a number.
+ * 声明字段或方法参数应该格式化为数字。
  *
- * <p>Supports formatting by style or custom pattern string. Can be applied
- * to any JDK {@code Number} type such as {@code Double} and {@code Long}.
+ * <p>支持按样式或自定义模式字符串格式化。可应用于任何 JDK {@code Number} 类型，如 {@code Double} 和 {@code Long}。
  *
- * <p>For style-based formatting, set the {@link #style} attribute to be the
- * desired {@link Style}. For custom formatting, set the {@link #pattern}
- * attribute to be the number pattern, such as {@code #, ###.##}.
+ * <p>对于基于样式的格式化，请将 {@link #style} 属性设置为所需的 {@link Style}。对于自定义格式，请将 {@link #pattern}
+ * 属性设置为数字模式，例如 {@code #,###.##}。
  *
- * <p>Each attribute is mutually exclusive, so only set one attribute per
- * annotation instance (the one most convenient one for your formatting needs).
- * When the {@link #pattern} attribute is specified, it takes precedence over
- * the {@link #style} attribute. When no annotation attributes are specified,
- * the default format applied is style-based for either number of currency,
- * depending on the annotated field or method parameter type.
+ * <p>每个属性都是互斥的，因此每个注解实例只能设置一个属性（选择对格式化需求最方便的属性）。
+ * 当指定 {@link #pattern} 属性时，它将覆盖 {@link #style} 属性。
+ * 当未指定任何注解属性时，默认应用的格式是基于样式的数字或货币格式，具体取决于所注释的字段或方法参数类型。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -50,47 +45,43 @@ import java.lang.annotation.Target;
 public @interface NumberFormat {
 
 	/**
-	 * The style pattern to use to format the field.
-	 * <p>Defaults to {@link Style#DEFAULT} for general-purpose number formatting
-	 * for most annotated types, except for money types which default to currency
-	 * formatting. Set this attribute when you wish to format your field in
-	 * accordance with a common style other than the default style.
+	 * 用于格式化字段的样式模式。
+	 * <p>默认为 {@link Style#DEFAULT}，用于大多数注释类型的通用数字格式化，除了默认为货币格式的货币类型。
+	 * 当您希望根据与默认样式不同的常见样式格式化字段时，请设置此属性。
 	 */
 	Style style() default Style.DEFAULT;
 
 	/**
-	 * The custom pattern to use to format the field.
-	 * <p>Defaults to empty String, indicating no custom pattern String has been specified.
-	 * Set this attribute when you wish to format your field in accordance with a
-	 * custom number pattern not represented by a style.
+	 * 用于格式化字段的自定义模式。
+	 * <p>默认为空字符串，表示未指定自定义模式字符串。
+	 * 当您希望根据不由样式表示的自定义数字模式格式化字段时，请设置此属性。
 	 */
 	String pattern() default "";
 
 
 	/**
-	 * Common number format styles.
+	 * 常见的数字格式样式。
 	 */
 	enum Style {
 
 		/**
-		 * The default format for the annotated type: typically 'number' but possibly
-		 * 'currency' for a money type (e.g. {@code javax.money.MonetaryAmount)}.
+		 * 注释类型的默认格式：通常为'number'，但对于货币类型（例如 {@code javax.money.MonetaryAmount}）可能为'currency'。
 		 * @since 4.2
 		 */
 		DEFAULT,
 
 		/**
-		 * The general-purpose number format for the current locale.
+		 * 当前区域设置的通用数字格式。
 		 */
 		NUMBER,
 
 		/**
-		 * The percent format for the current locale.
+		 * 当前区域设置的百分比格式。
 		 */
 		PERCENT,
 
 		/**
-		 * The currency format for the current locale.
+		 * 当前区域设置的货币格式。
 		 */
 		CURRENCY
 	}

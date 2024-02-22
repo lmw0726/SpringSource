@@ -16,14 +16,6 @@
 
 package org.springframework.format.datetime;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.context.support.EmbeddedValueResolutionSupport;
 import org.springframework.format.AnnotationFormatterFactory;
 import org.springframework.format.Formatter;
@@ -32,15 +24,17 @@ import org.springframework.format.Printer;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
 
+import java.util.*;
+
 /**
- * Formats fields annotated with the {@link DateTimeFormat} annotation using a {@link DateFormatter}.
+ * 使用 {@link DateFormatter} 格式化带有 {@link DateTimeFormat} 注解的字段。
  *
  * @author Phillip Webb
  * @author Sam Brannen
  * @since 3.2
  * @see org.springframework.format.datetime.joda.JodaDateTimeFormatAnnotationFormatterFactory
  */
-public class DateTimeFormatAnnotationFormatterFactory  extends EmbeddedValueResolutionSupport
+public class DateTimeFormatAnnotationFormatterFactory extends EmbeddedValueResolutionSupport
 		implements AnnotationFormatterFactory<DateTimeFormat> {
 
 	private static final Set<Class<?>> FIELD_TYPES;

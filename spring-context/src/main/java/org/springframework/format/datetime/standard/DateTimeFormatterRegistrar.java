@@ -16,34 +16,21 @@
 
 package org.springframework.format.datetime.standard;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Month;
-import java.time.MonthDay;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Period;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZonedDateTime;
+import org.springframework.format.FormatterRegistrar;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.EnumMap;
 import java.util.Map;
 
-import org.springframework.format.FormatterRegistrar;
-import org.springframework.format.FormatterRegistry;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
-
 /**
- * Configures the JSR-310 <code>java.time</code> formatting system for use with Spring.
+ * 配置用于与Spring一起使用的JSR-310 <code>java.time</code>格式化系统。
  *
  * @author Juergen Hoeller
  * @author Phillip Webb
- * @since 4.0
  * @see #setDateStyle
  * @see #setTimeStyle
  * @see #setDateTimeStyle
@@ -51,6 +38,7 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
  * @see org.springframework.format.FormatterRegistrar#registerFormatters
  * @see org.springframework.format.datetime.DateFormatterRegistrar
  * @see org.springframework.format.datetime.joda.DateTimeFormatterFactoryBean
+ * @since 4.0
  */
 public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 
@@ -58,12 +46,12 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 
 
 	/**
-	 * User-defined formatters.
+	 * 用户定义的格式化程序。
 	 */
 	private final Map<Type, DateTimeFormatter> formatters = new EnumMap<>(Type.class);
 
 	/**
-	 * Factories used when specific formatters have not been specified.
+	 * 当未指定特定格式化程序时使用的工厂。
 	 */
 	private final Map<Type, DateTimeFormatterFactory> factories = new EnumMap<>(Type.class);
 
@@ -76,10 +64,9 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 
 
 	/**
-	 * Set whether standard ISO formatting should be applied to all date/time types.
-	 * Default is "false" (no).
-	 * <p>If set to "true", the "dateStyle", "timeStyle" and "dateTimeStyle"
-	 * properties are effectively ignored.
+	 * 设置是否应用标准的 ISO 格式化到所有的日期/时间类型。
+	 * 默认值为 "false"（否）。
+	 * <p>如果设置为 "true"，则 "dateStyle"、"timeStyle" 和 "dateTimeStyle" 属性将被有效地忽略。
 	 */
 	public void setUseIsoFormat(boolean useIsoFormat) {
 		this.factories.get(Type.DATE).setIso(useIsoFormat ? ISO.DATE : ISO.NONE);
@@ -88,35 +75,35 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 	}
 
 	/**
-	 * Set the default format style of {@link java.time.LocalDate} objects.
-	 * Default is {@link java.time.format.FormatStyle#SHORT}.
+	 * 设置 {@link java.time.LocalDate} 对象的默认格式样式。
+	 * 默认值为 {@link java.time.format.FormatStyle#SHORT}。
 	 */
 	public void setDateStyle(FormatStyle dateStyle) {
 		this.factories.get(Type.DATE).setDateStyle(dateStyle);
 	}
 
 	/**
-	 * Set the default format style of {@link java.time.LocalTime} objects.
-	 * Default is {@link java.time.format.FormatStyle#SHORT}.
+	 * 设置 {@link java.time.LocalTime} 对象的默认格式样式。
+	 * 默认值为 {@link java.time.format.FormatStyle#SHORT}。
 	 */
 	public void setTimeStyle(FormatStyle timeStyle) {
 		this.factories.get(Type.TIME).setTimeStyle(timeStyle);
 	}
 
 	/**
-	 * Set the default format style of {@link java.time.LocalDateTime} objects.
-	 * Default is {@link java.time.format.FormatStyle#SHORT}.
+	 * 设置 {@link java.time.LocalDateTime} 对象的默认格式样式。
+	 * 默认值为 {@link java.time.format.FormatStyle#SHORT}。
 	 */
 	public void setDateTimeStyle(FormatStyle dateTimeStyle) {
 		this.factories.get(Type.DATE_TIME).setDateTimeStyle(dateTimeStyle);
 	}
 
 	/**
-	 * Set the formatter that will be used for objects representing date values.
-	 * <p>This formatter will be used for the {@link LocalDate} type.
-	 * When specified, the {@link #setDateStyle dateStyle} and
-	 * {@link #setUseIsoFormat useIsoFormat} properties will be ignored.
-	 * @param formatter the formatter to use
+	 * 设置用于表示日期值的对象的格式化程序。
+	 * <p>此格式化程序将用于 {@link LocalDate} 类型。
+	 * 当指定此属性时，将忽略 {@link #setDateStyle dateStyle} 和 {@link #setUseIsoFormat useIsoFormat} 属性。
+	 *
+	 * @param formatter 要使用的格式化程序
 	 * @see #setTimeFormatter
 	 * @see #setDateTimeFormatter
 	 */
@@ -125,11 +112,11 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 	}
 
 	/**
-	 * Set the formatter that will be used for objects representing time values.
-	 * <p>This formatter will be used for the {@link LocalTime} and {@link OffsetTime}
-	 * types. When specified, the {@link #setTimeStyle timeStyle} and
-	 * {@link #setUseIsoFormat useIsoFormat} properties will be ignored.
-	 * @param formatter the formatter to use
+	 * 设置用于表示时间值的对象的格式化程序。
+	 * <p>此格式化程序将用于 {@link LocalTime} 和 {@link OffsetTime} 类型。
+	 * 当指定此属性时，将忽略 {@link #setTimeStyle timeStyle} 和 {@link #setUseIsoFormat useIsoFormat} 属性。
+	 *
+	 * @param formatter 要使用的格式化程序
 	 * @see #setDateFormatter
 	 * @see #setDateTimeFormatter
 	 */
@@ -138,12 +125,11 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 	}
 
 	/**
-	 * Set the formatter that will be used for objects representing date and time values.
-	 * <p>This formatter will be used for {@link LocalDateTime}, {@link ZonedDateTime}
-	 * and {@link OffsetDateTime} types. When specified, the
-	 * {@link #setDateTimeStyle dateTimeStyle} and
-	 * {@link #setUseIsoFormat useIsoFormat} properties will be ignored.
-	 * @param formatter the formatter to use
+	 * 设置用于表示日期和时间值的对象的格式化程序。
+	 * <p>此格式化程序将用于 {@link LocalDateTime}、{@link ZonedDateTime} 和 {@link OffsetDateTime} 类型。
+	 * 当指定此属性时，将忽略 {@link #setDateTimeStyle dateTimeStyle} 和 {@link #setUseIsoFormat useIsoFormat} 属性。
+	 *
+	 * @param formatter 要使用的格式化程序
 	 * @see #setDateFormatter
 	 * @see #setTimeFormatter
 	 */
@@ -154,66 +140,96 @@ public class DateTimeFormatterRegistrar implements FormatterRegistrar {
 
 	@Override
 	public void registerFormatters(FormatterRegistry registry) {
+		// 注册日期时间转换器
 		DateTimeConverters.registerConverters(registry);
 
+		// 获取日期、时间和日期时间的格式化器
 		DateTimeFormatter df = getFormatter(Type.DATE);
 		DateTimeFormatter tf = getFormatter(Type.TIME);
 		DateTimeFormatter dtf = getFormatter(Type.DATE_TIME);
 
-		// Efficient ISO_LOCAL_* variants for printing since they are twice as fast...
+		// 使用效率高的 ISO_LOCAL_* 变体进行打印，因为它们的速度是其他变体的两倍...
 
+		// 注册 LocalDate 的格式化器
 		registry.addFormatterForFieldType(LocalDate.class,
 				new TemporalAccessorPrinter(
 						df == DateTimeFormatter.ISO_DATE ? DateTimeFormatter.ISO_LOCAL_DATE : df),
 				new TemporalAccessorParser(LocalDate.class, df));
 
+		// 注册 LocalTime 的格式化器
 		registry.addFormatterForFieldType(LocalTime.class,
 				new TemporalAccessorPrinter(
 						tf == DateTimeFormatter.ISO_TIME ? DateTimeFormatter.ISO_LOCAL_TIME : tf),
 				new TemporalAccessorParser(LocalTime.class, tf));
 
+		// 注册 LocalDateTime 的格式化器
 		registry.addFormatterForFieldType(LocalDateTime.class,
 				new TemporalAccessorPrinter(
 						dtf == DateTimeFormatter.ISO_DATE_TIME ? DateTimeFormatter.ISO_LOCAL_DATE_TIME : dtf),
 				new TemporalAccessorParser(LocalDateTime.class, dtf));
 
+		// 注册 ZonedDateTime 的格式化器
 		registry.addFormatterForFieldType(ZonedDateTime.class,
 				new TemporalAccessorPrinter(dtf),
 				new TemporalAccessorParser(ZonedDateTime.class, dtf));
 
+		// 注册 OffsetDateTime 的格式化器
 		registry.addFormatterForFieldType(OffsetDateTime.class,
 				new TemporalAccessorPrinter(dtf),
 				new TemporalAccessorParser(OffsetDateTime.class, dtf));
 
+		// 注册 OffsetTime 的格式化器
 		registry.addFormatterForFieldType(OffsetTime.class,
 				new TemporalAccessorPrinter(tf),
 				new TemporalAccessorParser(OffsetTime.class, tf));
 
+		// 注册 Instant 的格式化器
 		registry.addFormatterForFieldType(Instant.class, new InstantFormatter());
+
+		// 注册 Period 的格式化器
 		registry.addFormatterForFieldType(Period.class, new PeriodFormatter());
+
+		// 注册 Duration 的格式化器
 		registry.addFormatterForFieldType(Duration.class, new DurationFormatter());
+
+		// 注册 Year 的格式化器
 		registry.addFormatterForFieldType(Year.class, new YearFormatter());
+
+		// 注册 Month 的格式化器
 		registry.addFormatterForFieldType(Month.class, new MonthFormatter());
+
+		// 注册 YearMonth 的格式化器
 		registry.addFormatterForFieldType(YearMonth.class, new YearMonthFormatter());
+
+		// 注册 MonthDay 的格式化器
 		registry.addFormatterForFieldType(MonthDay.class, new MonthDayFormatter());
 
+		// 注册 JSR-310 的日期时间格式化注解工厂
 		registry.addFormatterForFieldAnnotation(new Jsr310DateTimeFormatAnnotationFormatterFactory());
 	}
 
 	private DateTimeFormatter getFormatter(Type type) {
+		// 获取指定类型的日期时间格式化器
 		DateTimeFormatter formatter = this.formatters.get(type);
 		if (formatter != null) {
 			return formatter;
 		}
+
+		// 获取后备的日期时间格式化器
 		DateTimeFormatter fallbackFormatter = getFallbackFormatter(type);
+
+		// 使用工厂创建日期时间格式化器
 		return this.factories.get(type).createDateTimeFormatter(fallbackFormatter);
 	}
 
 	private DateTimeFormatter getFallbackFormatter(Type type) {
 		switch (type) {
-			case DATE: return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-			case TIME: return DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
-			default: return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+			case DATE:
+				return DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+			case TIME:
+				return DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
+			default:
+				return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
 		}
 	}
 
