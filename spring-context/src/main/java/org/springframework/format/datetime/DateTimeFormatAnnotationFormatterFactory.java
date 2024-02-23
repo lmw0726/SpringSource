@@ -36,7 +36,9 @@ import java.util.*;
  */
 public class DateTimeFormatAnnotationFormatterFactory extends EmbeddedValueResolutionSupport
 		implements AnnotationFormatterFactory<DateTimeFormat> {
-
+	/**
+	 * 允许注解的字段类型
+	 */
 	private static final Set<Class<?>> FIELD_TYPES;
 
 	static {
@@ -65,16 +67,20 @@ public class DateTimeFormatAnnotationFormatterFactory extends EmbeddedValueResol
 
 	protected Formatter<Date> getFormatter(DateTimeFormat annotation, Class<?> fieldType) {
 		DateFormatter formatter = new DateFormatter();
+		// 设置来源注解
 		formatter.setSource(annotation);
+		// 设置是否使用 ISO 格式
 		formatter.setIso(annotation.iso());
 
 		String style = resolveEmbeddedValue(annotation.style());
 		if (StringUtils.hasLength(style)) {
+			// 如果样式非空，则设置样式模式
 			formatter.setStylePattern(style);
 		}
 
 		String pattern = resolveEmbeddedValue(annotation.pattern());
 		if (StringUtils.hasLength(pattern)) {
+			// 如果模式非空，则设置模式
 			formatter.setPattern(pattern);
 		}
 
@@ -82,10 +88,12 @@ public class DateTimeFormatAnnotationFormatterFactory extends EmbeddedValueResol
 		for (String fallbackPattern : annotation.fallbackPatterns()) {
 			String resolvedFallbackPattern = resolveEmbeddedValue(fallbackPattern);
 			if (StringUtils.hasLength(resolvedFallbackPattern)) {
+				// 如果回退模式非空，则将其添加到已解析回退模式列表中
 				resolvedFallbackPatterns.add(resolvedFallbackPattern);
 			}
 		}
 		if (!resolvedFallbackPatterns.isEmpty()) {
+			// 如果已解析的回退模式列表不为空，则设置回退模式
 			formatter.setFallbackPatterns(resolvedFallbackPatterns.toArray(new String[0]));
 		}
 

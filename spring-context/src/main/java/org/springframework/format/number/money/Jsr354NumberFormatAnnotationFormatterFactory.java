@@ -98,7 +98,9 @@ public class Jsr354NumberFormatAnnotationFormatterFactory extends EmbeddedValueR
 
 
 	private static class NumberDecoratingFormatter implements Formatter<MonetaryAmount> {
-
+		/**
+		 * 数字格式化器
+		 */
 		private final Formatter<Number> numberFormatter;
 
 		public NumberDecoratingFormatter(Formatter<Number> numberFormatter) {
@@ -112,15 +114,20 @@ public class Jsr354NumberFormatAnnotationFormatterFactory extends EmbeddedValueR
 
 		@Override
 		public MonetaryAmount parse(String text, Locale locale) throws ParseException {
+			// 使用给定的地区获取货币单位
 			CurrencyUnit currencyUnit = Monetary.getCurrency(locale);
+			// 使用数字格式化器解析文本并获取数字值
 			Number numberValue = this.numberFormatter.parse(text, locale);
+			// 创建并返回一个MonetaryAmount对象，设置数字值和货币单位
 			return Monetary.getDefaultAmountFactory().setNumber(numberValue).setCurrency(currencyUnit).create();
 		}
 	}
 
 
 	private static class PatternDecoratingFormatter implements Formatter<MonetaryAmount> {
-
+		/**
+		 * 模式
+		 */
 		private final String pattern;
 
 		public PatternDecoratingFormatter(String pattern) {
@@ -129,38 +136,58 @@ public class Jsr354NumberFormatAnnotationFormatterFactory extends EmbeddedValueR
 
 		@Override
 		public String print(MonetaryAmount object, Locale locale) {
+			// 创建一个货币样式格式化器对象
 			CurrencyStyleFormatter formatter = new CurrencyStyleFormatter();
+			// 获取货币代码对应的货币对象，并设置货币单位
 			formatter.setCurrency(Currency.getInstance(object.getCurrency().getCurrencyCode()));
+			// 设置格式化模式为指定的模式
 			formatter.setPattern(this.pattern);
+			// 使用格式化器将给定的数字值格式化为货币字符串，并返回结果
 			return formatter.print(object.getNumber(), locale);
 		}
 
 		@Override
 		public MonetaryAmount parse(String text, Locale locale) throws ParseException {
+			// 创建一个货币样式格式化器对象
 			CurrencyStyleFormatter formatter = new CurrencyStyleFormatter();
+			// 确定货币对象
 			Currency currency = determineCurrency(text, locale);
+			// 获取货币代码对应的货币单位
 			CurrencyUnit currencyUnit = Monetary.getCurrency(currency.getCurrencyCode());
+			// 设置格式化器的货币对象
 			formatter.setCurrency(currency);
+			// 设置格式化模式为指定的模式
 			formatter.setPattern(this.pattern);
+			// 使用格式化器解析文本，并返回解析后的数字值
 			Number numberValue = formatter.parse(text, locale);
+			// 创建并返回货币对象的金额
 			return Monetary.getDefaultAmountFactory().setNumber(numberValue).setCurrency(currencyUnit).create();
 		}
 
+		/**
+		 * 推断货币
+		 *
+		 * @param text   文本字符串
+		 * @param locale 当前用户语言环境
+		 * @return 货币对象
+		 */
 		private Currency determineCurrency(String text, Locale locale) {
 			try {
 				if (text.length() < 3) {
-					// Could not possibly contain a currency code ->
-					// try with locale and likely let it fail on parse.
+					// 文本长度小于3，不可能包含货币代码 -> 尝试使用区域设置，可能会在解析时失败。
 					return Currency.getInstance(locale);
 				} else if (this.pattern.startsWith(CURRENCY_CODE_PATTERN)) {
+					// 根据模式的起始位置获取货币代码
 					return Currency.getInstance(text.substring(0, 3));
 				} else if (this.pattern.endsWith(CURRENCY_CODE_PATTERN)) {
+					// 根据模式的末尾位置获取货币代码
 					return Currency.getInstance(text.substring(text.length() - 3));
 				} else {
-					// A pattern without a currency code...
+					// 没有货币代码的模式...
 					return Currency.getInstance(locale);
 				}
 			} catch (IllegalArgumentException ex) {
+				// 捕获IllegalArgumentException异常，抛出带有详细信息的新异常
 				throw new IllegalArgumentException("Cannot determine currency for number value [" + text + "]", ex);
 			}
 		}
