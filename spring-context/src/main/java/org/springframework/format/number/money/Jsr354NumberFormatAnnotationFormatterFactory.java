@@ -16,16 +16,6 @@
 
 package org.springframework.format.number.money;
 
-import java.text.ParseException;
-import java.util.Collections;
-import java.util.Currency;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.money.CurrencyUnit;
-import javax.money.Monetary;
-import javax.money.MonetaryAmount;
-
 import org.springframework.context.support.EmbeddedValueResolutionSupport;
 import org.springframework.format.AnnotationFormatterFactory;
 import org.springframework.format.Formatter;
@@ -38,17 +28,27 @@ import org.springframework.format.number.NumberStyleFormatter;
 import org.springframework.format.number.PercentStyleFormatter;
 import org.springframework.util.StringUtils;
 
+import javax.money.CurrencyUnit;
+import javax.money.Monetary;
+import javax.money.MonetaryAmount;
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.Currency;
+import java.util.Locale;
+import java.util.Set;
+
 /**
- * Formats {@link javax.money.MonetaryAmount} fields annotated
- * with Spring's common {@link NumberFormat} annotation.
+ * 格式化使用 Spring 的常见 {@link NumberFormat} 注解注释的 {@link javax.money.MonetaryAmount} 字段。
  *
  * @author Juergen Hoeller
- * @since 4.2
  * @see NumberFormat
+ * @since 4.2
  */
 public class Jsr354NumberFormatAnnotationFormatterFactory extends EmbeddedValueResolutionSupport
 		implements AnnotationFormatterFactory<NumberFormat> {
-
+	/**
+	 * 货币代码模式
+	 */
 	private static final String CURRENCY_CODE_PATTERN = "\u00A4\u00A4";
 
 
@@ -68,20 +68,29 @@ public class Jsr354NumberFormatAnnotationFormatterFactory extends EmbeddedValueR
 	}
 
 
+	/**
+	 * 从 {@link NumberFormat} 注解配置 Formatter<MonetaryAmount>。
+	 *
+	 * @param annotation 注解对象
+	 * @return Formatter<MonetaryAmount> 格式化器对象
+	 */
 	private Formatter<MonetaryAmount> configureFormatterFrom(NumberFormat annotation) {
+		// 解析嵌入值注解中的模式
 		String pattern = resolveEmbeddedValue(annotation.pattern());
+		// 如果模式长度大于0，返回使用模式的模式装饰格式化器
 		if (StringUtils.hasLength(pattern)) {
 			return new PatternDecoratingFormatter(pattern);
-		}
-		else {
+		} else {
+			// 如果模式长度为0，根据样式创建相应的装饰格式化器
 			Style style = annotation.style();
 			if (style == Style.NUMBER) {
+				// 如果是通用数字格式，返回数字样式格式化器的装饰器
 				return new NumberDecoratingFormatter(new NumberStyleFormatter());
-			}
-			else if (style == Style.PERCENT) {
+			} else if (style == Style.PERCENT) {
+				// 如果是百分比格式，返回百分比样式格式化器的装饰器
 				return new NumberDecoratingFormatter(new PercentStyleFormatter());
-			}
-			else {
+			} else {
+				// 否则返回货币样式格式化器的装饰器
 				return new NumberDecoratingFormatter(new CurrencyStyleFormatter());
 			}
 		}
@@ -143,19 +152,15 @@ public class Jsr354NumberFormatAnnotationFormatterFactory extends EmbeddedValueR
 					// Could not possibly contain a currency code ->
 					// try with locale and likely let it fail on parse.
 					return Currency.getInstance(locale);
-				}
-				else if (this.pattern.startsWith(CURRENCY_CODE_PATTERN)) {
+				} else if (this.pattern.startsWith(CURRENCY_CODE_PATTERN)) {
 					return Currency.getInstance(text.substring(0, 3));
-				}
-				else if (this.pattern.endsWith(CURRENCY_CODE_PATTERN)) {
+				} else if (this.pattern.endsWith(CURRENCY_CODE_PATTERN)) {
 					return Currency.getInstance(text.substring(text.length() - 3));
-				}
-				else {
+				} else {
 					// A pattern without a currency code...
 					return Currency.getInstance(locale);
 				}
-			}
-			catch (IllegalArgumentException ex) {
+			} catch (IllegalArgumentException ex) {
 				throw new IllegalArgumentException("Cannot determine currency for number value [" + text + "]", ex);
 			}
 		}

@@ -16,8 +16,6 @@
 
 package org.springframework.format.number;
 
-import java.util.Set;
-
 import org.springframework.context.support.EmbeddedValueResolutionSupport;
 import org.springframework.format.AnnotationFormatterFactory;
 import org.springframework.format.Formatter;
@@ -28,13 +26,15 @@ import org.springframework.format.annotation.NumberFormat.Style;
 import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Set;
+
 /**
- * Formats fields annotated with the {@link NumberFormat} annotation.
+ * 格式化带有 {@link NumberFormat} 注解的字段。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
- * @since 3.0
  * @see NumberFormat
+ * @since 3.0
  */
 public class NumberFormatAnnotationFormatterFactory extends EmbeddedValueResolutionSupport
 		implements AnnotationFormatterFactory<NumberFormat> {
@@ -54,21 +54,29 @@ public class NumberFormatAnnotationFormatterFactory extends EmbeddedValueResolut
 		return configureFormatterFrom(annotation);
 	}
 
-
+	/**
+	 * 根据注解配置格式化程序。
+	 *
+	 * @param annotation 注解
+	 * @return 格式化程序
+	 */
 	private Formatter<Number> configureFormatterFrom(NumberFormat annotation) {
+		// 解析嵌入值注解中的模式
 		String pattern = resolveEmbeddedValue(annotation.pattern());
+		// 如果模式长度大于0，返回数字样式格式化器，使用解析的模式
 		if (StringUtils.hasLength(pattern)) {
 			return new NumberStyleFormatter(pattern);
-		}
-		else {
+		} else {
+			// 如果模式长度为0，根据样式创建相应的格式化器
 			Style style = annotation.style();
 			if (style == Style.CURRENCY) {
+				// 如果是当前区域设置的货币格式，则创建货币样式格式化器
 				return new CurrencyStyleFormatter();
-			}
-			else if (style == Style.PERCENT) {
+			} else if (style == Style.PERCENT) {
+				// 如果是当前区域设置的百分比格式，则创建百分比样式格式化器
 				return new PercentStyleFormatter();
-			}
-			else {
+			} else {
+				// 否则创建空的数字化样式格式化器
 				return new NumberStyleFormatter();
 			}
 		}
