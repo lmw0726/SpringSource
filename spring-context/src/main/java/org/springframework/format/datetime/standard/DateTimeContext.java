@@ -16,43 +16,48 @@
 
 package org.springframework.format.datetime.standard;
 
-import java.time.ZoneId;
-import java.time.chrono.Chronology;
-import java.time.format.DateTimeFormatter;
-import java.util.TimeZone;
-
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
 import org.springframework.lang.Nullable;
 
+import java.time.ZoneId;
+import java.time.chrono.Chronology;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
+
 /**
- * A context that holds user-specific <code>java.time</code> (JSR-310) settings
- * such as the user's Chronology (calendar system) and time zone.
- * <p>A {@code null} property value indicates the user has not specified a setting.
+ * 一个上下文，保存用户特定的 <code>java.time</code>（JSR-310）设置，例如用户的年表（日历系统）和时区。
+ * <p>{@code null} 属性值表示用户未指定设置。
  *
  * @author Juergen Hoeller
- * @since 4.0
  * @see DateTimeContextHolder
+ * @since 4.0
  */
 public class DateTimeContext {
-
+	/**
+	 * 用于保存用户特定的年表（日历系统）。
+	 */
 	@Nullable
 	private Chronology chronology;
-
+	/**
+	 * 用于保存用户特定的时区。
+	 */
 	@Nullable
 	private ZoneId timeZone;
 
 
 	/**
-	 * Set the user's chronology (calendar system).
+	 * 设置用户的年表（日历系统）。
+	 * @param chronology 用户的年表
 	 */
 	public void setChronology(@Nullable Chronology chronology) {
 		this.chronology = chronology;
 	}
 
 	/**
-	 * Return the user's chronology (calendar system), if any.
+	 * 返回用户的年表（日历系统），如果有的话。
+	 * @return 用户的年表，如果没有则为 null
 	 */
 	@Nullable
 	public Chronology getChronology() {
@@ -60,10 +65,11 @@ public class DateTimeContext {
 	}
 
 	/**
-	 * Set the user's time zone.
-	 * <p>Alternatively, set a {@link TimeZoneAwareLocaleContext} on
-	 * {@link LocaleContextHolder}. This context class will fall back to
-	 * checking the locale context if no setting has been provided here.
+	 * 设置用户的时区。
+	 * <p>或者，在 {@link LocaleContextHolder} 上设置 {@link TimeZoneAwareLocaleContext}。
+	 * 如果未提供设置，则此上下文类将回退到检查语言环境上下文。
+	 *
+	 * @param timeZone 用户的时区
 	 * @see org.springframework.context.i18n.LocaleContextHolder#getTimeZone()
 	 * @see org.springframework.context.i18n.LocaleContextHolder#setLocaleContext
 	 */
@@ -72,7 +78,9 @@ public class DateTimeContext {
 	}
 
 	/**
-	 * Return the user's time zone, if any.
+	 * 返回用户的时区，如果有的话。
+	 *
+	 * @return 用户的时区，如果没有则为 null
 	 */
 	@Nullable
 	public ZoneId getTimeZone() {
@@ -81,28 +89,33 @@ public class DateTimeContext {
 
 
 	/**
-	 * Get the DateTimeFormatter with this context's settings applied to the
-	 * base {@code formatter}.
-	 * @param formatter the base formatter that establishes default
-	 * formatting rules, generally context-independent
-	 * @return the contextual DateTimeFormatter
+	 * 获取应用了此上下文设置的 DateTimeFormatter 到基础 {@code formatter}。
+	 *
+	 * @param formatter 基础格式化器，用于建立默认的格式化规则，通常是与上下文无关的
+	 * @return 上下文相关的 DateTimeFormatter
 	 */
 	public DateTimeFormatter getFormatter(DateTimeFormatter formatter) {
+		// 如果指定了年表，则将其应用于 DateTimeFormatter 对象
 		if (this.chronology != null) {
 			formatter = formatter.withChronology(this.chronology);
 		}
+		// 如果指定了时区，则将其应用于 DateTimeFormatter 对象
 		if (this.timeZone != null) {
 			formatter = formatter.withZone(this.timeZone);
-		}
-		else {
+		} else {
+			// 否则，尝试从当前的 LocaleContext 中获取时区
 			LocaleContext localeContext = LocaleContextHolder.getLocaleContext();
+			// 如果当前的 LocaleContext 是 TimeZoneAwareLocaleContext 的实例
 			if (localeContext instanceof TimeZoneAwareLocaleContext) {
+				// 从 TimeZoneAwareLocaleContext 中获取时区信息
 				TimeZone timeZone = ((TimeZoneAwareLocaleContext) localeContext).getTimeZone();
+				// 如果时区不为空，则将其转换为 ZoneId 并应用于 DateTimeFormatter 对象
 				if (timeZone != null) {
 					formatter = formatter.withZone(timeZone.toZoneId());
 				}
 			}
 		}
+		// 返回应用了年表和时区的 DateTimeFormatter 对象
 		return formatter;
 	}
 

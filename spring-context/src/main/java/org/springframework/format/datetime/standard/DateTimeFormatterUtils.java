@@ -16,24 +16,33 @@
 
 package org.springframework.format.datetime.standard;
 
+import org.springframework.util.StringUtils;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
 
-import org.springframework.util.StringUtils;
-
 /**
- * Internal {@link DateTimeFormatter} utilities.
+ * 内部的 {@link DateTimeFormatter} 实用程序。
  *
  * @author Juergen Hoeller
  * @since 5.3.5
  */
 abstract class DateTimeFormatterUtils {
 
+	/**
+	 * 创建严格的 {@link DateTimeFormatter}。
+	 * <p>
+	 * 使用严格的解析以与 Joda-Time 和标准 DateFormat 行为一致：
+	 * 否则，像对于非闰年的二月29日这样的溢出将不会被拒绝。
+	 * 但是，使用严格的解析，年份数字需要指定为 'u'...
+	 *
+	 * @param pattern 要使用的模式
+	 * @return 严格的 {@link DateTimeFormatter}
+	 */
 	static DateTimeFormatter createStrictDateTimeFormatter(String pattern) {
-		// Using strict parsing to align with Joda-Time and standard DateFormat behavior:
-		// otherwise, an overflow like e.g. Feb 29 for a non-leap-year wouldn't get rejected.
-		// However, with strict parsing, a year digit needs to be specified as 'u'...
+		// 将模式中的 "yy" 替换为 "uu"，以适应 Java 8 的新日期时间格式
 		String patternToUse = StringUtils.replace(pattern, "yy", "uu");
+		// 使用给定的模式创建并返回一个 DateTimeFormatter 对象，同时设置解析样式为 STRICT
 		return DateTimeFormatter.ofPattern(patternToUse).withResolverStyle(ResolverStyle.STRICT);
 	}
 

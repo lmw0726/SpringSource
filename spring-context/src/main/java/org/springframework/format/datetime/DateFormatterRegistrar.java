@@ -62,6 +62,7 @@ public class DateFormatterRegistrar implements FormatterRegistrar {
 
 	@Override
 	public void registerFormatters(FormatterRegistry registry) {
+		// 将日期转换器添加到指定的注册表中。
 		addDateConverters(registry);
 		// 为了保持向后兼容性，只有在指定了用户定义的格式化器时才注册 Date/Calendar 类型（参见 SPR-10105）
 		if (this.dateFormatter != null) {

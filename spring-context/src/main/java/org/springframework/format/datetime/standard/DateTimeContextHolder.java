@@ -16,21 +16,23 @@
 
 package org.springframework.format.datetime.standard;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.lang.Nullable;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /**
- * A holder for a thread-local user {@link DateTimeContext}.
+ * 用于线程本地用户 {@link DateTimeContext} 的持有者。
  *
  * @author Juergen Hoeller
- * @since 4.0
  * @see org.springframework.context.i18n.LocaleContextHolder
+ * @since 4.0
  */
 public final class DateTimeContextHolder {
-
+	/**
+	 * 日期时间上下文持有者
+	 */
 	private static final ThreadLocal<DateTimeContext> dateTimeContextHolder =
 			new NamedThreadLocal<>("DateTimeContext");
 
@@ -40,29 +42,32 @@ public final class DateTimeContextHolder {
 
 
 	/**
-	 * Reset the DateTimeContext for the current thread.
+	 * 重置当前线程的 DateTimeContext。
 	 */
 	public static void resetDateTimeContext() {
 		dateTimeContextHolder.remove();
 	}
 
 	/**
-	 * Associate the given DateTimeContext with the current thread.
-	 * @param dateTimeContext the current DateTimeContext,
-	 * or {@code null} to reset the thread-bound context
+	 * 将给定的 DateTimeContext 关联到当前线程。
+	 *
+	 * @param dateTimeContext 当前的 DateTimeContext，
+	 *                        或 {@code null} 以重置线程绑定的上下文
 	 */
 	public static void setDateTimeContext(@Nullable DateTimeContext dateTimeContext) {
+		// 如果 dateTimeContext 为 null，则重置 dateTimeContext
 		if (dateTimeContext == null) {
 			resetDateTimeContext();
-		}
-		else {
+		} else {
+			// 否则设置 dateTimeContext 到 dateTimeContextHolder
 			dateTimeContextHolder.set(dateTimeContext);
 		}
 	}
 
 	/**
-	 * Return the DateTimeContext associated with the current thread, if any.
-	 * @return the current DateTimeContext, or {@code null} if none
+	 * 返回当前线程关联的 DateTimeContext（如果有）。
+	 *
+	 * @return 当前的 DateTimeContext，如果没有则返回 {@code null}
 	 */
 	@Nullable
 	public static DateTimeContext getDateTimeContext() {
@@ -70,15 +75,18 @@ public final class DateTimeContextHolder {
 	}
 
 	/**
-	 * Obtain a DateTimeFormatter with user-specific settings applied to the given base formatter.
-	 * @param formatter the base formatter that establishes default formatting rules
-	 * (generally user independent)
-	 * @param locale the current user locale (may be {@code null} if not known)
-	 * @return the user-specific DateTimeFormatter
+	 * 获取应用于给定基础格式化程序的用户特定设置的 DateTimeFormatter。
+	 *
+	 * @param formatter 基础格式化程序，用于建立默认格式规则（通常是用户独立的）
+	 * @param locale    当前用户的区域设置（如果不可用，则可能为 {@code null}）
+	 * @return 用户特定的 DateTimeFormatter
 	 */
 	public static DateTimeFormatter getFormatter(DateTimeFormatter formatter, @Nullable Locale locale) {
+		// 如果 locale 不为 null，则使用 formatter.withLocale(locale)，否则使用原始的 formatter
 		DateTimeFormatter formatterToUse = (locale != null ? formatter.withLocale(locale) : formatter);
+		// 获取 DateTimeContext
 		DateTimeContext context = getDateTimeContext();
+		// 如果 context 不为 null，则尝试从 context 中获取 formatterToUse，否则直接返回 formatterToUse
 		return (context != null ? context.getFormatter(formatterToUse) : formatterToUse);
 	}
 

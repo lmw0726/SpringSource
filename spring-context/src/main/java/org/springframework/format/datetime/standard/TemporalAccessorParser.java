@@ -28,39 +28,49 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
 /**
- * {@link Parser} implementation for a JSR-310 {@link java.time.temporal.TemporalAccessor},
- * using a {@link java.time.format.DateTimeFormatter} (the contextual one, if available).
- *
- * @author Juergen Hoeller
- * @author Sam Brannen
- * @see DateTimeContextHolder#getFormatter
- * @see java.time.LocalDate#parse(CharSequence, java.time.format.DateTimeFormatter)
- * @see java.time.LocalTime#parse(CharSequence, java.time.format.DateTimeFormatter)
- * @see java.time.LocalDateTime#parse(CharSequence, java.time.format.DateTimeFormatter)
- * @see java.time.ZonedDateTime#parse(CharSequence, java.time.format.DateTimeFormatter)
- * @see java.time.OffsetDateTime#parse(CharSequence, java.time.format.DateTimeFormatter)
- * @see java.time.OffsetTime#parse(CharSequence, java.time.format.DateTimeFormatter)
- * @since 4.0
+ * {@link Parser} 实现，用于 JSR-310 {@link java.time.temporal.TemporalAccessor}，
+ * 使用 {@link java.time.format.DateTimeFormatter}（如果可用则使用上下文中的）。
+ * <p>
+ * 作者：Juergen Hoeller
+ * 参见：DateTimeContextHolder#getFormatter
+ * 参见：java.time.LocalDate#parse(CharSequence, java.time.format.DateTimeFormatter)
+ * 参见：java.time.LocalTime#parse(CharSequence, java.time.format.DateTimeFormatter)
+ * 参见：java.time.LocalDateTime#parse(CharSequence, java.time.format.DateTimeFormatter)
+ * 参见：java.time.ZonedDateTime#parse(CharSequence, java.time.format.DateTimeFormatter)
+ * 参见：java.time.OffsetDateTime#parse(CharSequence, java.time.format.DateTimeFormatter)
+ * 参见：java.time.OffsetTime#parse(CharSequence, java.time.format.DateTimeFormatter)
+ * 自 4.0 起
  */
 public final class TemporalAccessorParser implements Parser<TemporalAccessor> {
 
+	/**
+	 * 时间访问器类型
+	 */
 	private final Class<? extends TemporalAccessor> temporalAccessorType;
 
+	/**
+	 * 日期时间格式化器
+	 */
 	private final DateTimeFormatter formatter;
 
+	/**
+	 * 回退模式
+	 */
 	@Nullable
 	private final String[] fallbackPatterns;
 
+	/**
+	 * 数据源
+	 */
 	@Nullable
 	private final Object source;
 
 
 	/**
-	 * Create a new TemporalAccessorParser for the given TemporalAccessor type.
+	 * 为给定的 TemporalAccessor 类型创建一个新的 TemporalAccessorParser。
 	 *
-	 * @param temporalAccessorType the specific TemporalAccessor class
-	 *                             (LocalDate, LocalTime, LocalDateTime, ZonedDateTime, OffsetDateTime, OffsetTime)
-	 * @param formatter            the base DateTimeFormatter instance
+	 * @param temporalAccessorType 具体的 TemporalAccessor 类（LocalDate、LocalTime、LocalDateTime、ZonedDateTime、OffsetDateTime、OffsetTime）
+	 * @param formatter            基础的 DateTimeFormatter 实例
 	 */
 	public TemporalAccessorParser(Class<? extends TemporalAccessor> temporalAccessorType, DateTimeFormatter formatter) {
 		this(temporalAccessorType, formatter, null, null);
@@ -78,45 +88,69 @@ public final class TemporalAccessorParser implements Parser<TemporalAccessor> {
 	@Override
 	public TemporalAccessor parse(String text, Locale locale) throws ParseException {
 		try {
+			// 尝试使用当前的 日期时间格式化器 解析文本
 			return doParse(text, locale, this.formatter);
 		} catch (DateTimeParseException ex) {
+			// 如果解析失败，并且有提供备选模式
 			if (!ObjectUtils.isEmpty(this.fallbackPatterns)) {
+				// 遍历备选模式
 				for (String pattern : this.fallbackPatterns) {
 					try {
+						// 使用备选模式创建严格的 DateTimeFormatter
 						DateTimeFormatter fallbackFormatter = DateTimeFormatterUtils.createStrictDateTimeFormatter(pattern);
+						// 使用备选模式重新解析文本
 						return doParse(text, locale, fallbackFormatter);
 					} catch (DateTimeParseException ignoredException) {
-						// Ignore fallback parsing exceptions since the exception thrown below
-						// will include information from the "source" if available -- for example,
-						// the toString() of a @DateTimeFormat annotation.
+						// 忽略备选解析时的异常，因为下面的异常会包含来自 "source" 的信息，
+						// 例如，@DateTimeFormat 注解的 toString() 方法的返回值。
 					}
 				}
 			}
+			// 如果设置了 source，抛出带有源信息的 DateTimeParseException
 			if (this.source != null) {
 				throw new DateTimeParseException(
 						String.format("Unable to parse date time value \"%s\" using configuration from %s", text, this.source),
 						text, ex.getErrorIndex(), ex);
 			}
-			// else rethrow original exception
+			// 否则，重新抛出原始异常
 			throw ex;
 		}
 	}
 
+	/**
+	 * 使用指定的 Locale 和 DateTimeFormatter 解析文本，并返回对应的 TemporalAccessor。
+	 *
+	 * @param text      要解析的文本
+	 * @param locale    区域设置
+	 * @param formatter DateTimeFormatter 实例
+	 * @return 解析后的 TemporalAccessor
+	 * @throws DateTimeParseException 如果解析失败
+	 */
 	private TemporalAccessor doParse(String text, Locale locale, DateTimeFormatter formatter) throws DateTimeParseException {
+		// 获取当前线程的 DateTimeFormatter，使用指定的 formatter 和 locale
 		DateTimeFormatter formatterToUse = DateTimeContextHolder.getFormatter(formatter, locale);
+
+		// 根据指定的 TemporalAccessor 类型解析文本
 		if (LocalDate.class == this.temporalAccessorType) {
+			// 解析为 LocalDate
 			return LocalDate.parse(text, formatterToUse);
 		} else if (LocalTime.class == this.temporalAccessorType) {
+			// 解析为 LocalTime
 			return LocalTime.parse(text, formatterToUse);
 		} else if (LocalDateTime.class == this.temporalAccessorType) {
+			// 解析为 LocalDateTime
 			return LocalDateTime.parse(text, formatterToUse);
 		} else if (ZonedDateTime.class == this.temporalAccessorType) {
+			// 解析为 ZonedDateTime
 			return ZonedDateTime.parse(text, formatterToUse);
 		} else if (OffsetDateTime.class == this.temporalAccessorType) {
+			// 解析为 OffsetDateTime
 			return OffsetDateTime.parse(text, formatterToUse);
 		} else if (OffsetTime.class == this.temporalAccessorType) {
+			// 解析为 OffsetTime
 			return OffsetTime.parse(text, formatterToUse);
 		} else {
+			// 不支持的 TemporalAccessor 类型，抛出异常
 			throw new IllegalStateException("Unsupported TemporalAccessor type: " + this.temporalAccessorType);
 		}
 	}

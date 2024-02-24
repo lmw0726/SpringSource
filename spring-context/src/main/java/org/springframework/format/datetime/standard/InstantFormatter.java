@@ -16,37 +16,35 @@
 
 package org.springframework.format.datetime.standard;
 
+import org.springframework.format.Formatter;
+
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import org.springframework.format.Formatter;
-
 /**
- * {@link Formatter} implementation for a JSR-310 {@link java.time.Instant},
- * following JSR-310's parsing rules for an Instant (that is, not using a
- * configurable {@link java.time.format.DateTimeFormatter}): accepting the
- * default {@code ISO_INSTANT} format as well as {@code RFC_1123_DATE_TIME}
- * (which is commonly used for HTTP date header values), as of Spring 4.3.
+ * {@link Formatter} 的实现，用于JSR-310 {@link java.time.Instant}，遵循JSR-310的解析规则来解析 Instant
+ * (即，不使用可配置的 {@link java.time.format.DateTimeFormatter})：接受默认的 {@code ISO_INSTANT} 格式，
+ * 以及 {@code RFC_1123_DATE_TIME}（通常用于 HTTP 日期头值），截至 Spring 4.3。
  *
  * @author Juergen Hoeller
  * @author Andrei Nevedomskii
- * @since 4.0
  * @see java.time.Instant#parse
  * @see java.time.format.DateTimeFormatter#ISO_INSTANT
  * @see java.time.format.DateTimeFormatter#RFC_1123_DATE_TIME
+ * @since 4.0
  */
 public class InstantFormatter implements Formatter<Instant> {
 
 	@Override
 	public Instant parse(String text, Locale locale) throws ParseException {
+		// 如果文本长度大于零，并且第一个字符是字母
 		if (text.length() > 0 && Character.isAlphabetic(text.charAt(0))) {
-			// assuming RFC-1123 value a la "Tue, 3 Jun 2008 11:05:30 GMT"
+			// 假设文本是类似于 "Tue, 3 Jun 2008 11:05:30 GMT" 的 RFC-1123 格式
 			return Instant.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(text));
-		}
-		else {
-			// assuming UTC instant a la "2007-12-03T10:15:30.00Z"
+		} else {
+			// 如果不符合以上条件，假设文本是类似于 "2007-12-03T10:15:30.00Z" 的 UTC 时间格式
 			return Instant.parse(text);
 		}
 	}

@@ -16,15 +16,14 @@
 
 package org.springframework.format.datetime.standard;
 
+import org.springframework.format.Formatter;
+
 import java.text.ParseException;
 import java.time.MonthDay;
 import java.util.Locale;
 
-import org.springframework.format.Formatter;
-
 /**
- * {@link Formatter} implementation for a JSR-310 {@link MonthDay},
- * following JSR-310's parsing rules for a MonthDay.
+ * {@link Formatter} 的实现，用于JSR-310 {@link MonthDay}，遵循JSR-310的解析规则来解析 MonthDay。
  *
  * @author Juergen Hoeller
  * @since 4.2.4

@@ -16,28 +16,31 @@
 
 package org.springframework.format.support;
 
-import java.beans.PropertyEditor;
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.format.Formatter;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditor;
+import java.beans.PropertyEditorSupport;
+
 /**
- * Adapter that bridges between {@link Formatter} and {@link PropertyEditor}.
+ * 适配器，用于桥接 {@link Formatter} 和 {@link PropertyEditor}。
  *
  * @author Juergen Hoeller
  * @since 4.2
  */
 public class FormatterPropertyEditorAdapter extends PropertyEditorSupport {
-
+	/**
+	 * 格式化器
+	 */
 	private final Formatter<Object> formatter;
 
 
 	/**
-	 * Create a new {@code FormatterPropertyEditorAdapter} for the given {@link Formatter}.
-	 * @param formatter the {@link Formatter} to wrap
+	 * 为给定的 {@link Formatter} 创建一个新的 {@code FormatterPropertyEditorAdapter}。
+	 *
+	 * @param formatter 要包装的 {@link Formatter}
 	 */
 	@SuppressWarnings("unchecked")
 	public FormatterPropertyEditorAdapter(Formatter<?> formatter) {
@@ -47,11 +50,10 @@ public class FormatterPropertyEditorAdapter extends PropertyEditorSupport {
 
 
 	/**
-	 * Determine the {@link Formatter}-declared field type.
-	 * @return the field type declared in the wrapped {@link Formatter} implementation
-	 * (never {@code null})
-	 * @throws IllegalArgumentException if the {@link Formatter}-declared field type
-	 * cannot be inferred
+	 * 确定 {@link Formatter} 声明的字段类型。
+	 *
+	 * @return 在包装的 {@link Formatter} 实现中声明的字段类型（永远不会为 {@code null}）
+	 * @throws IllegalArgumentException 如果无法推断出 {@link Formatter} 声明的字段类型
 	 */
 	public Class<?> getFieldType() {
 		return FormattingConversionService.getFieldType(this.formatter);
@@ -60,25 +62,29 @@ public class FormatterPropertyEditorAdapter extends PropertyEditorSupport {
 
 	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
+		// 如果文本不为空
 		if (StringUtils.hasText(text)) {
 			try {
+				// 使用当前语言环境解析文本，并设置值
 				setValue(this.formatter.parse(text, LocaleContextHolder.getLocale()));
-			}
-			catch (IllegalArgumentException ex) {
+			} catch (IllegalArgumentException ex) {
+				// 如果解析失败，则抛出 IllegalArgumentException 异常
 				throw ex;
-			}
-			catch (Throwable ex) {
+			} catch (Throwable ex) {
+				// 如果发生其他异常，则抛出 IllegalArgumentException 异常，附带解析失败的文本信息
 				throw new IllegalArgumentException("Parse attempt failed for value [" + text + "]", ex);
 			}
-		}
-		else {
+		} else {
+			// 如果文本为空，则设置值为 null
 			setValue(null);
 		}
 	}
 
 	@Override
 	public String getAsText() {
+		// 获取当前值
 		Object value = getValue();
+		// 如果值不为空，则使用当前语言环境将值格式化为字符串；否则返回空字符串
 		return (value != null ? this.formatter.print(value, LocaleContextHolder.getLocale()) : "");
 	}
 

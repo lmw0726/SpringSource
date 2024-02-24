@@ -16,30 +16,33 @@
 
 package org.springframework.context.i18n;
 
-import java.util.Locale;
-
 import org.springframework.lang.Nullable;
 
+import java.util.Locale;
+
 /**
- * Simple implementation of the {@link LocaleContext} interface,
- * always returning a specified {@code Locale}.
+ * LocaleContext 接口的简单实现，始终返回指定的 Locale。
  *
  * @author Juergen Hoeller
- * @since 1.2
  * @see LocaleContextHolder#setLocaleContext
  * @see LocaleContextHolder#getLocale()
  * @see SimpleTimeZoneAwareLocaleContext
+ * @since 1.2
  */
 public class SimpleLocaleContext implements LocaleContext {
 
+	/**
+	 * 区域设置
+	 */
 	@Nullable
 	private final Locale locale;
 
 
 	/**
-	 * Create a new {@code SimpleLocaleContext} that exposes the specified {@link Locale}.
-	 * <p>Every {@link #getLocale()} call will return this locale.
-	 * @param locale the {@code Locale} to expose, or {@code null} for no specific one
+	 * 创建一个新的 SimpleLocaleContext，用于公开指定的 Locale。
+	 * 每次调用 getLocale() 都会返回此 Locale。
+	 *
+	 * @param locale 要公开的 Locale，如果没有指定，则为 null
 	 */
 	public SimpleLocaleContext(@Nullable Locale locale) {
 		this.locale = locale;

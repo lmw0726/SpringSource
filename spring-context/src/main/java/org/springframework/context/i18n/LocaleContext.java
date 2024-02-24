@@ -16,15 +16,14 @@
 
 package org.springframework.context.i18n;
 
-import java.util.Locale;
-
 import org.springframework.lang.Nullable;
 
+import java.util.Locale;
+
 /**
- * Strategy interface for determining the current Locale.
+ * 确定当前 Locale 的策略接口。
  *
- * <p>A LocaleContext instance can be associated with a thread
- * via the LocaleContextHolder class.
+ * <p>通过 LocaleContextHolder 类，可以将 LocaleContext 实例与线程关联。
  *
  * @author Juergen Hoeller
  * @since 1.2
@@ -34,9 +33,9 @@ import org.springframework.lang.Nullable;
 public interface LocaleContext {
 
 	/**
-	 * Return the current Locale, which can be fixed or determined dynamically,
-	 * depending on the implementation strategy.
-	 * @return the current Locale, or {@code null} if no specific Locale associated
+	 * 返回当前 Locale，其可以是固定的或根据实现策略动态确定的。
+	 *
+	 * @return 当前 Locale，如果没有关联特定的 Locale，则返回 {@code null}
 	 */
 	@Nullable
 	Locale getLocale();

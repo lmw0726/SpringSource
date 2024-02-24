@@ -16,15 +16,14 @@
 
 package org.springframework.format.datetime.standard;
 
+import org.springframework.format.Formatter;
+
 import java.text.ParseException;
 import java.time.Month;
 import java.util.Locale;
 
-import org.springframework.format.Formatter;
-
 /**
- * {@link Formatter} implementation for a JSR-310 {@link Month},
- * resolving a given String against the Month enum values (ignoring case).
+ * {@link Formatter} 的实现，用于JSR-310 {@link Month}，将给定的字符串解析为 Month 枚举值（不区分大小写）。
  *
  * @author Juergen Hoeller
  * @since 5.0.4

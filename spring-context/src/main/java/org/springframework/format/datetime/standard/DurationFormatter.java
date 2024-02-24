@@ -16,15 +16,14 @@
 
 package org.springframework.format.datetime.standard;
 
+import org.springframework.format.Formatter;
+
 import java.text.ParseException;
 import java.time.Duration;
 import java.util.Locale;
 
-import org.springframework.format.Formatter;
-
 /**
- * {@link Formatter} implementation for a JSR-310 {@link Duration},
- * following JSR-310's parsing rules for a Duration.
+ * {@link Formatter} 的实现，用于JSR-310 {@link Duration}，遵循JSR-310的解析规则来解析 Duration。
  *
  * @author Juergen Hoeller
  * @since 4.2.4
