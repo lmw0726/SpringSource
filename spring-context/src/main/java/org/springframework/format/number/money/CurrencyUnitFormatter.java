@@ -16,16 +16,16 @@
 
 package org.springframework.format.number.money;
 
-import java.util.Locale;
+import org.springframework.format.Formatter;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
-
-import org.springframework.format.Formatter;
+import java.util.Locale;
 
 /**
- * Formatter for JSR-354 {@link javax.money.CurrencyUnit} values,
- * from and to currency code Strings.
+ * JSR-354 {@link javax.money.CurrencyUnit} 值的格式化器，从货币代码字符串到货币单位。
+ *
+ * 该格式化器将货币代码字符串转换为 {@link javax.money.CurrencyUnit} 对象，并且可以将 {@link javax.money.CurrencyUnit} 对象格式化为货币代码字符串。
  *
  * @author Juergen Hoeller
  * @since 4.2

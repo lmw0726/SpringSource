@@ -16,16 +16,15 @@
 
 package org.springframework.format.datetime.joda;
 
+import org.joda.time.YearMonth;
+import org.springframework.format.Formatter;
+
 import java.text.ParseException;
 import java.util.Locale;
 
-import org.joda.time.YearMonth;
-
-import org.springframework.format.Formatter;
-
 /**
- * {@link Formatter} implementation for a Joda-Time {@link YearMonth},
- * following Joda-Time's parsing rules for a YearMonth.
+ * {@link Formatter} 实现，用于 Joda-Time {@link YearMonth}，
+ * 遵循 Joda-Time 对 YearMonth 的解析规则。
  *
  * @author Juergen Hoeller
  * @since 4.2.4

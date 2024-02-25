@@ -16,16 +16,16 @@
 
 package org.springframework.format.datetime.joda;
 
+import org.joda.time.Period;
+import org.springframework.format.Formatter;
+
 import java.text.ParseException;
 import java.util.Locale;
 
-import org.joda.time.Period;
-
-import org.springframework.format.Formatter;
-
 /**
- * {@link Formatter} implementation for a Joda-Time {@link Period},
- * following Joda-Time's parsing rules for a Period.
+ * Joda-Time {@link Period} 的 {@link Formatter} 实现，遵循 Joda-Time 对 Period 的解析规则。
+ *
+ * 该格式化器将 Period 解析为字符串，并将字符串解析为 Period 对象。
  *
  * @author Juergen Hoeller
  * @since 4.2.4

@@ -16,6 +16,8 @@
 
 package org.springframework.format.number;
 
+import org.springframework.lang.Nullable;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -24,14 +26,12 @@ import java.text.ParseException;
 import java.util.Currency;
 import java.util.Locale;
 
-import org.springframework.lang.Nullable;
-
 /**
- * A BigDecimal formatter for number values in currency style.
+ * 用于以货币样式格式化数字值的BigDecimal格式化程序。
  *
- * <p>Delegates to {@link java.text.NumberFormat#getCurrencyInstance(Locale)}.
- * Configures BigDecimal parsing so there is no loss of precision.
- * Can apply a specified {@link java.math.RoundingMode} to parsed values.
+ * <p>委托给{@link java.text.NumberFormat#getCurrencyInstance(Locale)}。
+ * 配置BigDecimal解析，以确保没有精度损失。
+ * 可以对解析后的值应用指定的{@link java.math.RoundingMode}。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -40,45 +40,54 @@ import org.springframework.lang.Nullable;
  * @see #setRoundingMode
  */
 public class CurrencyStyleFormatter extends AbstractNumberFormatter {
-
+	/**
+	 * 所需的小数位数，默认为2位小数
+	 */
 	private int fractionDigits = 2;
-
+	/**
+	 * 用于十进制解析的舍入模式。
+	 */
 	@Nullable
 	private RoundingMode roundingMode;
-
+	/**
+	 * 指定货币
+	 */
 	@Nullable
 	private Currency currency;
-
+	/**
+	 * 格式化数字值的模式
+	 */
 	@Nullable
 	private String pattern;
 
 
 	/**
-	 * Specify the desired number of fraction digits.
-	 * Default is 2.
+	 * 指定所需的小数位数。
+	 * 默认为2。
 	 */
 	public void setFractionDigits(int fractionDigits) {
 		this.fractionDigits = fractionDigits;
 	}
 
 	/**
-	 * Specify the rounding mode to use for decimal parsing.
-	 * Default is {@link java.math.RoundingMode#UNNECESSARY}.
+	 * 指定用于十进制解析的舍入模式。
+	 * 默认为{@link java.math.RoundingMode#UNNECESSARY}。
 	 */
 	public void setRoundingMode(RoundingMode roundingMode) {
 		this.roundingMode = roundingMode;
 	}
 
 	/**
-	 * Specify the currency, if known.
+	 * 指定货币，如果已知。
 	 */
 	public void setCurrency(Currency currency) {
 		this.currency = currency;
 	}
 
 	/**
-	 * Specify the pattern to use to format number values.
-	 * If not specified, the default DecimalFormat pattern is used.
+	 * 指定用于格式化数字值的模式。
+	 * 如果未指定，则使用默认的DecimalFormat模式。
+	 *
 	 * @see java.text.DecimalFormat#applyPattern(String)
 	 */
 	public void setPattern(String pattern) {
@@ -88,31 +97,50 @@ public class CurrencyStyleFormatter extends AbstractNumberFormatter {
 
 	@Override
 	public BigDecimal parse(String text, Locale locale) throws ParseException {
+		// 使用父类的 parse 方法解析文本为 BigDecimal 对象
 		BigDecimal decimal = (BigDecimal) super.parse(text, locale);
+
+		// 如果设置了舍入模式
 		if (this.roundingMode != null) {
+			// 使用指定的舍入模式和小数位数对 BigDecimal 进行舍入
 			decimal = decimal.setScale(this.fractionDigits, this.roundingMode);
-		}
-		else {
+		} else {
+			// 使用指定的小数位数对 BigDecimal 进行舍入，默认采用的是舍入模式 ROUND_HALF_UP
 			decimal = decimal.setScale(this.fractionDigits);
 		}
+
+		// 返回舍入后的 BigDecimal 对象
 		return decimal;
 	}
 
 	@Override
 	protected NumberFormat getNumberFormat(Locale locale) {
+		// 获取指定 locale 的货币格式化实例
 		DecimalFormat format = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
+
+		// 设置解析时返回 BigDecimal 类型
 		format.setParseBigDecimal(true);
+
+		// 设置最大和最小小数位数
 		format.setMaximumFractionDigits(this.fractionDigits);
 		format.setMinimumFractionDigits(this.fractionDigits);
+
+		// 如果设置了舍入模式，则应用舍入模式
 		if (this.roundingMode != null) {
 			format.setRoundingMode(this.roundingMode);
 		}
+
+		// 如果设置了货币单位，则设置货币单位
 		if (this.currency != null) {
 			format.setCurrency(this.currency);
 		}
+
+		// 如果设置了模式，则应用模式
 		if (this.pattern != null) {
 			format.applyPattern(this.pattern);
 		}
+
+		// 返回设置完成的 DecimalFormat 对象
 		return format;
 	}
 

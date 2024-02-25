@@ -16,19 +16,19 @@
 
 package org.springframework.format.number;
 
+import org.springframework.lang.Nullable;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.springframework.lang.Nullable;
-
 /**
- * A general-purpose number formatter using NumberFormat's number style.
+ * 使用NumberFormat的数字样式的通用数字格式化程序。
  *
- * <p>Delegates to {@link java.text.NumberFormat#getInstance(Locale)}.
- * Configures BigDecimal parsing so there is no loss in precision.
- * Allows configuration over the decimal number pattern.
- * The {@link #parse(String, Locale)} routine always returns a BigDecimal.
+ * <p>委托给{@link java.text.NumberFormat#getInstance(Locale)}。
+ * 配置BigDecimal解析，以确保不会丢失精度。
+ * 允许配置小数数字模式。
+ * {@link #parse(String, Locale)}例程始终返回BigDecimal。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -37,20 +37,22 @@ import org.springframework.lang.Nullable;
  * @see #setLenient
  */
 public class NumberStyleFormatter extends AbstractNumberFormatter {
-
+	/**
+	 * 用于格式化数字值的模式
+	 */
 	@Nullable
 	private String pattern;
 
 
 	/**
-	 * Create a new NumberStyleFormatter without a pattern.
+	 * 创建一个没有模式的新NumberStyleFormatter。
 	 */
 	public NumberStyleFormatter() {
 	}
 
 	/**
-	 * Create a new NumberStyleFormatter with the specified pattern.
-	 * @param pattern the format pattern
+	 * 使用指定的模式创建一个新的NumberStyleFormatter。
+	 * @param pattern 格式模式
 	 * @see #setPattern
 	 */
 	public NumberStyleFormatter(String pattern) {
@@ -59,8 +61,8 @@ public class NumberStyleFormatter extends AbstractNumberFormatter {
 
 
 	/**
-	 * Specify the pattern to use to format number values.
-	 * If not specified, the default DecimalFormat pattern is used.
+	 * 指定用于格式化数字值的模式。
+	 * 如果未指定，则使用默认的DecimalFormat模式。
 	 * @see java.text.DecimalFormat#applyPattern(String)
 	 */
 	public void setPattern(String pattern) {
@@ -70,18 +72,31 @@ public class NumberStyleFormatter extends AbstractNumberFormatter {
 
 	@Override
 	public NumberFormat getNumberFormat(Locale locale) {
+		// 获取指定 locale 的通用数值格式化实例
 		NumberFormat format = NumberFormat.getInstance(locale);
+
+		// 如果格式化实例不是 DecimalFormat 类型，则抛出异常
 		if (!(format instanceof DecimalFormat)) {
 			if (this.pattern != null) {
+				// 如果设置了模式，但格式化实例不是 DecimalFormat 类型，则抛出异常
 				throw new IllegalStateException("Cannot support pattern for non-DecimalFormat: " + format);
 			}
+			// 返回格式化实例
 			return format;
 		}
+
+		// 将格式化实例强制转换为 DecimalFormat 类型
 		DecimalFormat decimalFormat = (DecimalFormat) format;
+
+		// 设置解析时返回 BigDecimal 类型
 		decimalFormat.setParseBigDecimal(true);
+
+		// 如果设置了模式，则应用模式
 		if (this.pattern != null) {
 			decimalFormat.applyPattern(this.pattern);
 		}
+
+		// 返回设置完成的 DecimalFormat 对象
 		return decimalFormat;
 	}
 

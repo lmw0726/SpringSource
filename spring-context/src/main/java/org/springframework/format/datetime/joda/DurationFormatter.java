@@ -16,16 +16,15 @@
 
 package org.springframework.format.datetime.joda;
 
+import org.joda.time.Duration;
+import org.springframework.format.Formatter;
+
 import java.text.ParseException;
 import java.util.Locale;
 
-import org.joda.time.Duration;
-
-import org.springframework.format.Formatter;
-
 /**
- * {@link Formatter} implementation for a Joda-Time {@link Duration},
- * following Joda-Time's parsing rules for a Duration.
+ * {@link Formatter} 实现，用于 Joda-Time {@link Duration}，
+ * 遵循 Joda-Time 对 Duration 的解析规则。
  *
  * @author Juergen Hoeller
  * @since 4.2.4

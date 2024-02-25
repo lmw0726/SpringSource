@@ -16,40 +16,42 @@
 
 package org.springframework.format.number.money;
 
-import java.util.Locale;
+import org.springframework.format.Formatter;
+import org.springframework.lang.Nullable;
 
 import javax.money.MonetaryAmount;
 import javax.money.format.MonetaryAmountFormat;
 import javax.money.format.MonetaryFormats;
-
-import org.springframework.format.Formatter;
-import org.springframework.lang.Nullable;
+import java.util.Locale;
 
 /**
- * Formatter for JSR-354 {@link javax.money.MonetaryAmount} values,
- * delegating to {@link javax.money.format.MonetaryAmountFormat#format}
- * and {@link javax.money.format.MonetaryAmountFormat#parse}.
+ * 用于 JSR-354 {@link javax.money.MonetaryAmount} 值的格式化器，
+ * 委托给 {@link javax.money.format.MonetaryAmountFormat#format} 和 {@link javax.money.format.MonetaryAmountFormat#parse}。
+ * <p>
+ * 该格式化器将 MonetaryAmount 解析为字符串，并将字符串解析为 MonetaryAmount 对象。
  *
  * @author Juergen Hoeller
- * @since 4.2
  * @see #getMonetaryAmountFormat
+ * @since 4.2
  */
 public class MonetaryAmountFormatter implements Formatter<MonetaryAmount> {
-
+	/**
+	 * 格式名称
+	 */
 	@Nullable
 	private String formatName;
 
 
 	/**
-	 * Create a locale-driven MonetaryAmountFormatter.
+	 * 创建一个基于区域设置的 MonetaryAmountFormatter。
 	 */
 	public MonetaryAmountFormatter() {
 	}
 
 	/**
-	 * Create a new MonetaryAmountFormatter for the given format name.
-	 * @param formatName the format name, to be resolved by the JSR-354
-	 * provider at runtime
+	 * 根据给定的格式名称创建一个新的 MonetaryAmountFormatter。
+	 *
+	 * @param formatName 格式名称，在运行时由 JSR-354 提供程序解析
 	 */
 	public MonetaryAmountFormatter(String formatName) {
 		this.formatName = formatName;
@@ -57,10 +59,8 @@ public class MonetaryAmountFormatter implements Formatter<MonetaryAmount> {
 
 
 	/**
-	 * Specify the format name, to be resolved by the JSR-354 provider
-	 * at runtime.
-	 * <p>Default is none, obtaining a {@link MonetaryAmountFormat}
-	 * based on the current locale.
+	 * 指定格式名称，由运行时的 JSR-354 提供程序解析。
+	 * <p>默认值为无，基于当前区域设置获取 {@link MonetaryAmountFormat}。
 	 */
 	public void setFormatName(String formatName) {
 		this.formatName = formatName;
@@ -79,19 +79,18 @@ public class MonetaryAmountFormatter implements Formatter<MonetaryAmount> {
 
 
 	/**
-	 * Obtain a MonetaryAmountFormat for the given locale.
-	 * <p>The default implementation simply calls
-	 * {@link javax.money.format.MonetaryFormats#getAmountFormat}
-	 * with either the configured format name or the given locale.
-	 * @param locale the current locale
-	 * @return the MonetaryAmountFormat (never {@code null})
+	 * 获取给定区域设置的 MonetaryAmountFormat。
+	 * <p>默认实现简单地调用 {@link javax.money.format.MonetaryFormats#getAmountFormat}
+	 * 使用配置的格式名称或给定的区域设置。
+	 *
+	 * @param locale 当前区域设置
+	 * @return MonetaryAmountFormat（永不为 {@code null}）
 	 * @see #setFormatName
 	 */
 	protected MonetaryAmountFormat getMonetaryAmountFormat(Locale locale) {
 		if (this.formatName != null) {
 			return MonetaryFormats.getAmountFormat(this.formatName);
-		}
-		else {
+		} else {
 			return MonetaryFormats.getAmountFormat(locale);
 		}
 	}
