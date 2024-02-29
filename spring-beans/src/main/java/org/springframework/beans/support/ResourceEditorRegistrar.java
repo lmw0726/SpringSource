@@ -16,6 +16,16 @@
 
 package org.springframework.beans.support;
 
+import org.springframework.beans.PropertyEditorRegistrar;
+import org.springframework.beans.PropertyEditorRegistry;
+import org.springframework.beans.PropertyEditorRegistrySupport;
+import org.springframework.beans.propertyeditors.*;
+import org.springframework.core.env.PropertyResolver;
+import org.springframework.core.io.*;
+import org.springframework.core.io.support.ResourceArrayPropertyEditor;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.xml.sax.InputSource;
+
 import java.beans.PropertyEditor;
 import java.io.File;
 import java.io.InputStream;
@@ -24,54 +34,30 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 
-import org.xml.sax.InputSource;
-
-import org.springframework.beans.PropertyEditorRegistrar;
-import org.springframework.beans.PropertyEditorRegistry;
-import org.springframework.beans.PropertyEditorRegistrySupport;
-import org.springframework.beans.propertyeditors.ClassArrayEditor;
-import org.springframework.beans.propertyeditors.ClassEditor;
-import org.springframework.beans.propertyeditors.FileEditor;
-import org.springframework.beans.propertyeditors.InputSourceEditor;
-import org.springframework.beans.propertyeditors.InputStreamEditor;
-import org.springframework.beans.propertyeditors.PathEditor;
-import org.springframework.beans.propertyeditors.ReaderEditor;
-import org.springframework.beans.propertyeditors.URIEditor;
-import org.springframework.beans.propertyeditors.URLEditor;
-import org.springframework.core.env.PropertyResolver;
-import org.springframework.core.io.ContextResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceEditor;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.WritableResource;
-import org.springframework.core.io.support.ResourceArrayPropertyEditor;
-import org.springframework.core.io.support.ResourcePatternResolver;
-
 /**
- * PropertyEditorRegistrar implementation that populates a given
- * {@link org.springframework.beans.PropertyEditorRegistry}
- * (typically a {@link org.springframework.beans.BeanWrapper} used for bean
- * creation within an {@link org.springframework.context.ApplicationContext})
- * with resource editors. Used by
- * {@link org.springframework.context.support.AbstractApplicationContext}.
+ * PropertyEditorRegistrar 的实现，用于向给定的 PropertyEditorRegistry（通常是用于在 ApplicationContext 中创建 bean 的 BeanWrapper）
+ * 注册资源编辑器。被 AbstractApplicationContext 使用。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 2.0
  */
 public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
-
+	/**
+	 * 属性解析器
+	 */
 	private final PropertyResolver propertyResolver;
-
+	/**
+	 * 资源加载器
+	 */
 	private final ResourceLoader resourceLoader;
 
 
 	/**
-	 * Create a new ResourceEditorRegistrar for the given {@link ResourceLoader}
-	 * and {@link PropertyResolver}.
-	 * @param resourceLoader the ResourceLoader (or ResourcePatternResolver)
-	 * to create editors for (usually an ApplicationContext)
-	 * @param propertyResolver the PropertyResolver (usually an Environment)
+	 * 为给定的 ResourceLoader 和 PropertyResolver 创建一个新的 ResourceEditorRegistrar。
+	 *
+	 * @param resourceLoader   ResourceLoader（或 ResourcePatternResolver），用于为其创建编辑器（通常是 ApplicationContext）
+	 * @param propertyResolver PropertyResolver（通常是 Environment）
 	 * @see org.springframework.core.env.Environment
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.context.ApplicationContext
@@ -83,11 +69,10 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 
 
 	/**
-	 * Populate the given {@code registry} with the following resource editors:
-	 * ResourceEditor, InputStreamEditor, InputSourceEditor, FileEditor, URLEditor,
-	 * URIEditor, ClassEditor, ClassArrayEditor.
-	 * <p>If this registrar has been configured with a {@link ResourcePatternResolver},
-	 * a ResourceArrayPropertyEditor will be registered as well.
+	 * 使用以下资源编辑器填充给定的注册表 registry：
+	 * ResourceEditor、InputStreamEditor、InputSourceEditor、FileEditor、URLEditor、URIEditor、ClassEditor、ClassArrayEditor。
+	 * <p>如果此注册器已配置了 ResourcePatternResolver，则还将注册 ResourceArrayPropertyEditor。
+	 *
 	 * @see org.springframework.core.io.ResourceEditor
 	 * @see org.springframework.beans.propertyeditors.InputStreamEditor
 	 * @see org.springframework.beans.propertyeditors.InputSourceEditor
@@ -100,37 +85,58 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 */
 	@Override
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
+		// 创建 ResourceEditor 实例，并使用 resourceLoader 和 propertyResolver 进行初始化
 		ResourceEditor baseEditor = new ResourceEditor(this.resourceLoader, this.propertyResolver);
+		// 注册 Resource 类型的编辑器
 		doRegisterEditor(registry, Resource.class, baseEditor);
+		// 注册 ContextResource 类型的编辑器
 		doRegisterEditor(registry, ContextResource.class, baseEditor);
+		// 注册 WritableResource 类型的编辑器
 		doRegisterEditor(registry, WritableResource.class, baseEditor);
+		// 注册 InputStream 类型的编辑器
 		doRegisterEditor(registry, InputStream.class, new InputStreamEditor(baseEditor));
+		// 注册 InputSource 类型的编辑器
 		doRegisterEditor(registry, InputSource.class, new InputSourceEditor(baseEditor));
+		// 注册 File 类型的编辑器
 		doRegisterEditor(registry, File.class, new FileEditor(baseEditor));
+		// 注册 Path 类型的编辑器
 		doRegisterEditor(registry, Path.class, new PathEditor(baseEditor));
+		// 注册 Reader 类型的编辑器
 		doRegisterEditor(registry, Reader.class, new ReaderEditor(baseEditor));
+		// 注册 URL 类型的编辑器
 		doRegisterEditor(registry, URL.class, new URLEditor(baseEditor));
 
+		// 获取资源加载器的类加载器
 		ClassLoader classLoader = this.resourceLoader.getClassLoader();
+		// 注册 URI 类型的编辑器
 		doRegisterEditor(registry, URI.class, new URIEditor(classLoader));
+		// 注册 Class 类型的编辑器
 		doRegisterEditor(registry, Class.class, new ClassEditor(classLoader));
+		// 注册 Class[] 类型的编辑器
 		doRegisterEditor(registry, Class[].class, new ClassArrayEditor(classLoader));
 
+		// 如果资源加载器是 ResourcePatternResolver 类型
 		if (this.resourceLoader instanceof ResourcePatternResolver) {
+			// 注册 Resource[] 类型的编辑器
 			doRegisterEditor(registry, Resource[].class,
 					new ResourceArrayPropertyEditor((ResourcePatternResolver) this.resourceLoader, this.propertyResolver));
 		}
 	}
 
 	/**
-	 * Override default editor, if possible (since that's what we really mean to do here);
-	 * otherwise register as a custom editor.
+	 * 如果可能，覆盖默认编辑器（因为这实际上是我们想要在这里做的事情）；否则注册为自定义编辑器。
+	 *
+	 * @param registry     属性编辑器注册表
+	 * @param requiredType 所需类型
+	 * @param editor       属性编辑器
 	 */
 	private void doRegisterEditor(PropertyEditorRegistry registry, Class<?> requiredType, PropertyEditor editor) {
+		// 如果 registry 是 PropertyEditorRegistrySupport 的实例
 		if (registry instanceof PropertyEditorRegistrySupport) {
+			// 使用 overrideDefaultEditor 方法覆盖默认的编辑器
 			((PropertyEditorRegistrySupport) registry).overrideDefaultEditor(requiredType, editor);
-		}
-		else {
+		} else {
+			// 否则，使用 registerCustomEditor 方法注册自定义编辑器
 			registry.registerCustomEditor(requiredType, editor);
 		}
 	}

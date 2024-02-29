@@ -1321,13 +1321,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Initialize the given BeanWrapper with the custom editors registered
-	 * with this factory. To be called for BeanWrappers that will create
-	 * and populate bean instances.
-	 * <p>The default implementation delegates to {@link #registerCustomEditors}.
-	 * Can be overridden in subclasses.
+	 * 使用此工厂注册的自定义编辑器初始化给定的 BeanWrapper。应该为将创建和填充bean实例的 BeanWrapper 调用此方法。
+	 * <p>默认实现委托给 {@link #registerCustomEditors}。可以在子类中重写。
 	 *
-	 * @param bw the BeanWrapper to initialize
+	 * @param bw 要初始化的 BeanWrapper
 	 */
 	protected void initBeanWrapper(BeanWrapper bw) {
 		bw.setConversionService(getConversionService());
@@ -1335,43 +1332,51 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Initialize the given PropertyEditorRegistry with the custom editors
-	 * that have been registered with this BeanFactory.
-	 * <p>To be called for BeanWrappers that will create and populate bean
-	 * instances, and for SimpleTypeConverter used for constructor argument
-	 * and factory method type conversion.
+	 * 使用在此 BeanFactory 中注册的自定义编辑器初始化给定的 PropertyEditorRegistry。
+	 * <p>应该为将创建和填充bean实例的 BeanWrapper，以及用于构造函数参数和工厂方法类型转换的 SimpleTypeConverter 调用此方法。
 	 *
-	 * @param registry the PropertyEditorRegistry to initialize
+	 * @param registry 要初始化的 PropertyEditorRegistry
 	 */
 	protected void registerCustomEditors(PropertyEditorRegistry registry) {
+		// 如果注册表实现了 PropertyEditorRegistrySupport 接口，则使用配置值编辑器
 		if (registry instanceof PropertyEditorRegistrySupport) {
 			((PropertyEditorRegistrySupport) registry).useConfigValueEditors();
 		}
+		// 如果存在自定义的属性编辑器注册器
 		if (!this.propertyEditorRegistrars.isEmpty()) {
+			// 遍历所有注册的属性编辑器注册器
 			for (PropertyEditorRegistrar registrar : this.propertyEditorRegistrars) {
 				try {
+					// 注册自定义编辑器
 					registrar.registerCustomEditors(registry);
 				} catch (BeanCreationException ex) {
+					// 捕获 BeanCreationException 异常
 					Throwable rootCause = ex.getMostSpecificCause();
 					if (rootCause instanceof BeanCurrentlyInCreationException) {
 						BeanCreationException bce = (BeanCreationException) rootCause;
 						String bceBeanName = bce.getBeanName();
+						// 如果存在当前正在创建的 bean
 						if (bceBeanName != null && isCurrentlyInCreation(bceBeanName)) {
 							if (logger.isDebugEnabled()) {
 								logger.debug("PropertyEditorRegistrar [" + registrar.getClass().getName() +
 										"] failed because it tried to obtain currently created bean '" +
 										ex.getBeanName() + "': " + ex.getMessage());
 							}
+							// 记录抑制的异常
 							onSuppressedException(ex);
 							continue;
 						}
 					}
+					// 抛出异常
 					throw ex;
 				}
 			}
 		}
+		// 如果存在自定义的编辑器
 		if (!this.customEditors.isEmpty()) {
+			// 遍历所有自定义编辑器
 			this.customEditors.forEach((requiredType, editorClass) ->
+					// 为所需类型注册自定义编辑器
 					registry.registerCustomEditor(requiredType, BeanUtils.instantiateClass(editorClass)));
 		}
 	}
