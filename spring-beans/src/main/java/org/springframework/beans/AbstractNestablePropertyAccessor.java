@@ -190,11 +190,17 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	 * @param rootObject 路径顶部的根对象
 	 */
 	public void setWrappedInstance(Object object, @Nullable String nestedPath, @Nullable Object rootObject) {
+		// 如果是Optional对象，则获取它的解包后的对象，并赋值给包装对象。
 		this.wrappedObject = ObjectUtils.unwrapOptional(object);
+		// 断言 包装对象 不为空
 		Assert.notNull(this.wrappedObject, "Target object must not be null");
+		// 设置 嵌套路径 属性，如果 嵌套 不为 null 则使用传入的值，否则设置为空字符串
 		this.nestedPath = (nestedPath != null ? nestedPath : "");
+		// 设置 根对象 属性，如果 嵌套路径 不为空则使用传入的 rootObject，否则使用 包装对象
 		this.rootObject = (!this.nestedPath.isEmpty() ? rootObject : this.wrappedObject);
+		// 将 嵌套的属性访问器映射 设为 null
 		this.nestedPropertyAccessors = null;
+		// 创建 TypeConverterDelegate 实例并将其赋给 typeConverterDelegate 属性
 		this.typeConverterDelegate = new TypeConverterDelegate(this, this.wrappedObject);
 	}
 
