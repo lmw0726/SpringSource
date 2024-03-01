@@ -16,21 +16,18 @@
 
 package org.springframework.beans;
 
+import org.springframework.core.Ordered;
+import org.springframework.lang.Nullable;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 
-import org.springframework.core.Ordered;
-import org.springframework.lang.Nullable;
-
 /**
- * {@link BeanInfoFactory} implementation that evaluates whether bean classes have
- * "non-standard" JavaBeans setter methods and are thus candidates for introspection
- * by Spring's (package-visible) {@code ExtendedBeanInfo} implementation.
+ * {@link BeanInfoFactory} 的实现，用于评估 bean 类是否具有“非标准”JavaBeans setter方法，因此可以由 Spring 的（包可见的）{@code ExtendedBeanInfo} 实现进行内省。
  *
- * <p>Ordered at {@link Ordered#LOWEST_PRECEDENCE} to allow other user-defined
- * {@link BeanInfoFactory} types to take precedence.
+ * <p>在 {@link Ordered#LOWEST_PRECEDENCE} 排序，以允许其他用户定义的 {@link BeanInfoFactory} 类型优先。
  *
  * @author Chris Beams
  * @since 3.2
@@ -40,7 +37,7 @@ import org.springframework.lang.Nullable;
 public class ExtendedBeanInfoFactory implements BeanInfoFactory, Ordered {
 
 	/**
-	 * Return an {@link ExtendedBeanInfo} for the given bean class, if applicable.
+	 * 如果适用，则为给定的 bean 类返回一个 {@link ExtendedBeanInfo}。
 	 */
 	@Override
 	@Nullable
@@ -49,15 +46,18 @@ public class ExtendedBeanInfoFactory implements BeanInfoFactory, Ordered {
 	}
 
 	/**
-	 * Return whether the given bean class declares or inherits any non-void
-	 * returning bean property or indexed property setter methods.
+	 * 返回给定的 bean 类是否声明或继承任何非 void 返回的 bean 属性或索引属性 setter 方法。
 	 */
 	private boolean supports(Class<?> beanClass) {
+		// 遍历 beanClass 的所有方法
 		for (Method method : beanClass.getMethods()) {
+			// 如果方法是候选的写方法
 			if (ExtendedBeanInfo.isCandidateWriteMethod(method)) {
+				// 返回 true
 				return true;
 			}
 		}
+		// 如果没有找到候选的写方法，返回 false
 		return false;
 	}
 

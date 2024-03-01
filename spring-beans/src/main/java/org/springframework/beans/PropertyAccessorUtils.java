@@ -29,8 +29,9 @@ public abstract class PropertyAccessorUtils {
 
 	/**
 	 * Return the actual property name for the given property path.
+	 *
 	 * @param propertyPath the property path to determine the property name
-	 * for (can include property keys, for example for specifying a map entry)
+	 *                     for (can include property keys, for example for specifying a map entry)
 	 * @return the actual property name, without any key elements
 	 */
 	public static String getPropertyName(String propertyPath) {
@@ -41,6 +42,7 @@ public abstract class PropertyAccessorUtils {
 
 	/**
 	 * Check whether the given property path indicates an indexed or nested property.
+	 *
 	 * @param propertyPath the property path to check
 	 * @return whether the path indicates an indexed or nested property
 	 */
@@ -59,10 +61,10 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Determine the first nested property separator in the
-	 * given property path, ignoring dots in keys (like "map[my.key]").
-	 * @param propertyPath the property path to check
-	 * @return the index of the nested property separator, or -1 if none
+	 * 确定给定属性路径中的第一个嵌套属性分隔符，忽略键中的点（如"map[my.key]"）。
+	 *
+	 * @param propertyPath 要检查的属性路径
+	 * @return 嵌套属性分隔符的索引，如果没有则返回-1
 	 */
 	public static int getFirstNestedPropertySeparatorIndex(String propertyPath) {
 		return getNestedPropertySeparatorIndex(propertyPath, false);
@@ -71,6 +73,7 @@ public abstract class PropertyAccessorUtils {
 	/**
 	 * Determine the first nested property separator in the
 	 * given property path, ignoring dots in keys (like "map[my.key]").
+	 *
 	 * @param propertyPath the property path to check
 	 * @return the index of the nested property separator, or -1 if none
 	 */
@@ -79,41 +82,50 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Determine the first (or last) nested property separator in the
-	 * given property path, ignoring dots in keys (like "map[my.key]").
-	 * @param propertyPath the property path to check
-	 * @param last whether to return the last separator rather than the first
-	 * @return the index of the nested property separator, or -1 if none
+	 * 确定给定属性路径中的第一个（或最后一个）嵌套属性分隔符，忽略键中的点（如"map[my.key]"）。
+	 *
+	 * @param propertyPath 要检查的属性路径
+	 * @param last         是否返回最后一个分隔符而不是第一个
+	 * @return 嵌套属性分隔符的索引，如果没有则返回-1
 	 */
 	private static int getNestedPropertySeparatorIndex(String propertyPath, boolean last) {
+		// 初始化 inKey 变量为 false，表示当前不在键的内部
 		boolean inKey = false;
+		// 获取 propertyPath 的长度
 		int length = propertyPath.length();
+		// 如果是 last，则从后向前遍历，否则从前向后遍历
 		int i = (last ? length - 1 : 0);
+		// 遍历 propertyPath
 		while (last ? i >= 0 : i < length) {
+			// 根据当前字符进行不同的处理
 			switch (propertyPath.charAt(i)) {
+				// 如果是属性键的前缀或后缀字符，则更新 inKey 变量的值
 				case PropertyAccessor.PROPERTY_KEY_PREFIX_CHAR:
 				case PropertyAccessor.PROPERTY_KEY_SUFFIX_CHAR:
 					inKey = !inKey;
 					break;
+				// 如果是嵌套属性分隔符，且当前不在键的内部，则返回当前位置
 				case PropertyAccessor.NESTED_PROPERTY_SEPARATOR_CHAR:
 					if (!inKey) {
 						return i;
 					}
 			}
+			// 如果是 last，则递减索引 i，否则递增索引 i
 			if (last) {
 				i--;
-			}
-			else {
+			} else {
 				i++;
 			}
 		}
+		// 如果没有找到嵌套属性分隔符，则返回 -1
 		return -1;
 	}
 
 	/**
 	 * Determine whether the given registered path matches the given property path,
 	 * either indicating the property itself or an indexed element of the property.
-	 * @param propertyPath the property path (typically without index)
+	 *
+	 * @param propertyPath   the property path (typically without index)
 	 * @param registeredPath the registered path (potentially with index)
 	 * @return whether the paths match
 	 */
@@ -136,6 +148,7 @@ public abstract class PropertyAccessorUtils {
 	 * Removes surrounding quotes from map keys:<br>
 	 * {@code map['key']} &rarr; {@code map[key]}<br>
 	 * {@code map["key"]} &rarr; {@code map[key]}
+	 *
 	 * @param propertyName the bean property path
 	 * @return the canonical representation of the property path
 	 */
@@ -168,6 +181,7 @@ public abstract class PropertyAccessorUtils {
 
 	/**
 	 * Determine the canonical names for the given property paths.
+	 *
 	 * @param propertyNames the bean property paths (as array)
 	 * @return the canonical representation of the property paths
 	 * (as array of the same size)
