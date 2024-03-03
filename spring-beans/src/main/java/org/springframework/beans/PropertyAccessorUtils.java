@@ -71,11 +71,10 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Determine the first nested property separator in the
-	 * given property path, ignoring dots in keys (like "map[my.key]").
+	 * 确定给定属性路径中第一个嵌套属性分隔符，忽略键中的点（如 "map[my.key]"）。
 	 *
-	 * @param propertyPath the property path to check
-	 * @return the index of the nested property separator, or -1 if none
+	 * @param propertyPath 要检查的属性路径
+	 * @return 嵌套属性分隔符的索引，如果没有则返回-1
 	 */
 	public static int getLastNestedPropertySeparatorIndex(String propertyPath) {
 		return getNestedPropertySeparatorIndex(propertyPath, true);

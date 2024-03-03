@@ -1,5 +1,7 @@
 package com.lmw.learn.bean.bean.wrapper;
 
+import java.util.Map;
+
 /**
  * 水果类
  *
@@ -17,6 +19,11 @@ public class Fruit {
 	 */
 	private String size;
 
+	/**
+	 * 其他属性
+	 */
+	private Map<String, String> other;
+
 	public String getColor() {
 		return color;
 	}
@@ -31,5 +38,13 @@ public class Fruit {
 
 	public void setSize(String size) {
 		this.size = size;
+	}
+
+	public Map<String, String> getOther() {
+		return other;
+	}
+
+	public void setOther(Map<String, String> other) {
+		this.other = other;
 	}
 }

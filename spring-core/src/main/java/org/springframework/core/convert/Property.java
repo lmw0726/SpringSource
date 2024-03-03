@@ -16,19 +16,19 @@
 
 package org.springframework.core.convert;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A description of a JavaBeans Property that allows us to avoid a dependency on
@@ -41,9 +41,9 @@ import org.springframework.util.StringUtils;
  *
  * @author Keith Donald
  * @author Phillip Webb
- * @since 3.1
  * @see TypeDescriptor#TypeDescriptor(Property)
  * @see TypeDescriptor#nested(Property, int)
+ * @since 3.1
  */
 public final class Property {
 
@@ -139,35 +139,34 @@ public final class Property {
 			int index = this.readMethod.getName().indexOf("get");
 			if (index != -1) {
 				index += 3;
-			}
-			else {
+			} else {
 				index = this.readMethod.getName().indexOf("is");
 				if (index != -1) {
 					index += 2;
-				}
-				else {
+				} else {
 					// Record-style plain accessor method, e.g. name()
 					index = 0;
 				}
 			}
 			return StringUtils.uncapitalize(this.readMethod.getName().substring(index));
-		}
-		else if (this.writeMethod != null) {
+		} else if (this.writeMethod != null) {
 			int index = this.writeMethod.getName().indexOf("set");
 			if (index == -1) {
 				throw new IllegalArgumentException("Not a setter method");
 			}
 			index += 3;
 			return StringUtils.uncapitalize(this.writeMethod.getName().substring(index));
-		}
-		else {
+		} else {
 			throw new IllegalStateException("Property is neither readable nor writeable");
 		}
 	}
 
 	private MethodParameter resolveMethodParameter() {
+		// 解析读取方法的参数
 		MethodParameter read = resolveReadMethodParameter();
+		// 解析写入方法的参数
 		MethodParameter write = resolveWriteMethodParameter();
+		// 如果写入方法为空，则抛出异常
 		if (write == null) {
 			if (read == null) {
 				throw new IllegalStateException("Property is neither readable nor writeable");
@@ -175,12 +174,15 @@ public final class Property {
 			return read;
 		}
 		if (read != null) {
+			// 如果读取方法不为空，则比较读取方法的参数类型和写入方法的参数类型
 			Class<?> readType = read.getParameterType();
 			Class<?> writeType = write.getParameterType();
 			if (!writeType.equals(readType) && writeType.isAssignableFrom(readType)) {
+				// 如果写入方法的参数类型是读取方法的子类，则返回读取方法
 				return read;
 			}
 		}
+		// 否则返回写入方法
 		return write;
 	}
 
@@ -248,11 +250,9 @@ public final class Property {
 	private Class<?> declaringClass() {
 		if (getReadMethod() != null) {
 			return getReadMethod().getDeclaringClass();
-		}
-		else if (getWriteMethod() != null) {
+		} else if (getWriteMethod() != null) {
 			return getWriteMethod().getDeclaringClass();
-		}
-		else {
+		} else {
 			return null;
 		}
 	}

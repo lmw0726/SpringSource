@@ -16,14 +16,10 @@
 
 package org.springframework.util;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.StringJoiner;
-
 import org.springframework.lang.Nullable;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Miscellaneous object utility methods.
@@ -161,24 +157,29 @@ public abstract class ObjectUtils {
 	}
 
 	/**
-	 * Unwrap the given object which is potentially a {@link java.util.Optional}.
+	 * 解包可能是 {@link java.util.Optional} 的给定对象。
 	 *
-	 * @param obj the candidate object
-	 * @return either the value held within the {@code Optional}, {@code null}
-	 * if the {@code Optional} is empty, or simply the given object as-is
+	 * @param obj 候选对象
+	 * @return {@code Optional} 中保存的值，如果 {@code Optional} 为空，则为 {@code null}；或者直接返回给定对象
 	 * @since 5.0
 	 */
 	@Nullable
 	public static Object unwrapOptional(@Nullable Object obj) {
+		// 检查对象是否为Optional类型
 		if (obj instanceof Optional) {
+			// 将对象转换为Optional
 			Optional<?> optional = (Optional<?>) obj;
+			// 如果Optional为空，则返回null
 			if (!optional.isPresent()) {
 				return null;
 			}
+			// 获取Optional中的值
 			Object result = optional.get();
+			// 断言：结果不应该是Optional类型，避免多级Optional使用
 			Assert.isTrue(!(result instanceof Optional), "Multi-level Optional usage not supported");
 			return result;
 		}
+		// 如果不是Optional类型，则直接返回对象
 		return obj;
 	}
 

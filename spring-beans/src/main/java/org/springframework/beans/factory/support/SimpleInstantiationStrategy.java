@@ -151,7 +151,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				ReflectionUtils.makeAccessible(factoryMethod);
 			}
 
-			//获取原 方法对象
+			//获取原方法对象
 			Method priorInvokedFactoryMethod = currentlyInvokedFactoryMethod.get();
 			try {
 				// 设置新的方法对象，到currentlyInvokedFactoryMethod中
