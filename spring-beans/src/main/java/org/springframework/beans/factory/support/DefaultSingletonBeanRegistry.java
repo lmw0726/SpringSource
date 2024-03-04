@@ -27,28 +27,20 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Generic registry for shared bean instances, implementing the
- * {@link org.springframework.beans.factory.config.SingletonBeanRegistry}.
- * Allows for registering singleton instances that should be shared
- * for all callers of the registry, to be obtained via bean name.
+ * 通用注册表，用于共享 bean 实例，实现了 {@link org.springframework.beans.factory.config.SingletonBeanRegistry}。
+ * 允许注册应该在注册表的所有调用者之间共享的单例实例，通过 bean 名称获取。
  *
- * <p>Also supports registration of
- * {@link org.springframework.beans.factory.DisposableBean} instances,
- * (which might or might not correspond to registered singletons),
- * to be destroyed on shutdown of the registry. Dependencies between
- * beans can be registered to enforce an appropriate shutdown order.
+ * <p>还支持注册 {@link org.springframework.beans.factory.DisposableBean} 实例
+ * （这些实例可能与注册的单例实例对应，也可能不对应），
+ * 以在注册表关闭时销毁。可以注册 bean 之间的依赖关系，以强制执行适当的关闭顺序。
  *
- * <p>This class mainly serves as base class for
- * {@link org.springframework.beans.factory.BeanFactory} implementations,
- * factoring out the common management of singleton bean instances. Note that
- * the {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}
- * interface extends the {@link SingletonBeanRegistry} interface.
+ * <p>此类主要用作 {@link org.springframework.beans.factory.BeanFactory} 实现的基类，
+ * 提取了单例 bean 实例的常见管理。注意，
+ * {@link org.springframework.beans.factory.config.ConfigurableBeanFactory} 接口扩展了 {@link SingletonBeanRegistry} 接口。
  *
- * <p>Note that this class assumes neither a bean definition concept
- * nor a specific creation process for bean instances, in contrast to
- * {@link AbstractBeanFactory} and {@link DefaultListableBeanFactory}
- * (which inherit from it). Can alternatively also be used as a nested
- * helper to delegate to.
+ * <p>请注意，与 {@link AbstractBeanFactory} 和 {@link DefaultListableBeanFactory} 不同（它们从中继承），
+ * 此类既不假设 bean 定义概念，也不假设特定的 bean 实例创建过程。
+ * 也可以用作委托的嵌套辅助工具。
  *
  * @author Juergen Hoeller
  * @see #registerSingleton
@@ -433,14 +425,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 
 	/**
-	 * Add the given bean to the list of disposable beans in this registry.
-	 * <p>Disposable beans usually correspond to registered singletons,
-	 * matching the bean name but potentially being a different instance
-	 * (for example, a DisposableBean adapter for a singleton that does not
-	 * naturally implement Spring's DisposableBean interface).
+	 * 将给定的 bean 添加到此注册表中的可销毁 bean 列表中。
+	 * <p>可销毁的 bean 通常与已注册的单例相对应，匹配 bean 名称但可能是不同的实例
+	 * （例如，对于不自然实现 Spring 的 DisposableBean 接口的单例的 DisposableBean 适配器）。
 	 *
-	 * @param beanName the name of the bean
-	 * @param bean     the bean instance
+	 * @param beanName bean 的名称
+	 * @param bean     bean 实例
 	 */
 	public void registerDisposableBean(String beanName, DisposableBean bean) {
 		synchronized (this.disposableBeans) {
@@ -449,23 +439,26 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Register a containment relationship between two beans,
-	 * e.g. between an inner bean and its containing outer bean.
-	 * <p>Also registers the containing bean as dependent on the contained bean
-	 * in terms of destruction order.
+	 * 注册两个 bean 之间的包含关系，
+	 * 例如，内部 bean 和其包含的外部 bean 之间的关系。
+	 * <p>在销毁顺序方面，还将包含的 bean 注册为依赖于包含的 bean。
 	 *
-	 * @param containedBeanName  the name of the contained (inner) bean
-	 * @param containingBeanName the name of the containing (outer) bean
+	 * @param containedBeanName  包含的（内部）bean 的名称
+	 * @param containingBeanName 包含的（外部）bean 的名称
 	 * @see #registerDependentBean
 	 */
 	public void registerContainedBean(String containedBeanName, String containingBeanName) {
+		// 同步块，锁定 containedBeanMap
 		synchronized (this.containedBeanMap) {
+			// 获取包含 Bean 名称对应的已包含 Bean 集合，如果不存在，则新建一个集合
 			Set<String> containedBeans =
 					this.containedBeanMap.computeIfAbsent(containingBeanName, k -> new LinkedHashSet<>(8));
+			// 将被包含的 Bean 添加到集合中，如果添加失败（即已存在），则直接返回
 			if (!containedBeans.add(containedBeanName)) {
 				return;
 			}
 		}
+		// 注册依赖关系，即被包含的 Bean 依赖于包含的 Bean
 		registerDependentBean(containedBeanName, containingBeanName);
 	}
 
@@ -542,43 +535,51 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Determine whether a dependent bean has been registered for the given name.
+	 * 检查给定名称的 bean 是否已经注册了依赖的 bean。
 	 *
-	 * @param beanName the name of the bean to check
+	 * @param beanName 要检查的 bean 的名称
+	 * @return 如果已经注册了依赖的 bean，则为 true；否则为 false
 	 */
 	protected boolean hasDependentBean(String beanName) {
 		return this.dependentBeanMap.containsKey(beanName);
 	}
 
 	/**
-	 * Return the names of all beans which depend on the specified bean, if any.
+	 * 返回所有依赖于指定 bean 的 bean 的名称（如果有）。
 	 *
-	 * @param beanName the name of the bean
-	 * @return the array of dependent bean names, or an empty array if none
+	 * @param beanName bean 的名称
+	 * @return 依赖的 bean 名称数组，如果没有，则返回一个空数组
 	 */
 	public String[] getDependentBeans(String beanName) {
+		// 获取依赖于指定 Bean 的所有 Bean 名称集合
 		Set<String> dependentBeans = this.dependentBeanMap.get(beanName);
+		// 如果依赖集合为空，则返回空数组
 		if (dependentBeans == null) {
 			return new String[0];
 		}
+		// 同步块，锁定 dependentBeanMap
 		synchronized (this.dependentBeanMap) {
+			// 将依赖集合转换为数组返回
 			return StringUtils.toStringArray(dependentBeans);
 		}
 	}
 
 	/**
-	 * Return the names of all beans that the specified bean depends on, if any.
+	 * 返回指定 bean 依赖的所有 bean 的名称（如果有）。
 	 *
-	 * @param beanName the name of the bean
-	 * @return the array of names of beans which the bean depends on,
-	 * or an empty array if none
+	 * @param beanName bean 的名称
+	 * @return 依赖的 bean 名称数组，如果没有，则返回一个空数组
 	 */
 	public String[] getDependenciesForBean(String beanName) {
+		// 获取指定 Bean 的所有依赖的 Bean 名称集合
 		Set<String> dependenciesForBean = this.dependenciesForBeanMap.get(beanName);
+		// 如果依赖集合为空，则返回空数组
 		if (dependenciesForBean == null) {
 			return new String[0];
 		}
+		// 同步块，锁定 dependenciesForBeanMap
 		synchronized (this.dependenciesForBeanMap) {
+			// 将依赖集合转换为数组返回
 			return StringUtils.toStringArray(dependenciesForBean);
 		}
 	}
@@ -587,27 +588,33 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		if (logger.isTraceEnabled()) {
 			logger.trace("Destroying singletons in " + this);
 		}
+		// 锁定 singletonObjects，标记当前正在销毁单例对象
 		synchronized (this.singletonObjects) {
 			this.singletonsCurrentlyInDestruction = true;
 		}
 
 		String[] disposableBeanNames;
+		// 锁定 disposableBeans，获取所有可销毁的 Bean 名称数组
 		synchronized (this.disposableBeans) {
 			disposableBeanNames = StringUtils.toStringArray(this.disposableBeans.keySet());
 		}
+		// 逆序遍历所有可销毁的 Bean 名称数组
 		for (int i = disposableBeanNames.length - 1; i >= 0; i--) {
+			// 销毁单例对象
 			destroySingleton(disposableBeanNames[i]);
 		}
 
+		// 清空 containedBeanMap、dependentBeanMap 和 dependenciesForBeanMap
 		this.containedBeanMap.clear();
 		this.dependentBeanMap.clear();
 		this.dependenciesForBeanMap.clear();
 
+		// 清除单例对象缓存
 		clearSingletonCache();
 	}
 
 	/**
-	 * Clear all cached singleton instances in this registry.
+	 * 清除此注册表中的所有缓存的单例实例。
 	 *
 	 * @since 4.3.15
 	 */

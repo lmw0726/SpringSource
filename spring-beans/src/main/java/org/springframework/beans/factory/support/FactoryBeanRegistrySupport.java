@@ -28,11 +28,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Support base class for singleton registries which need to handle
- * {@link org.springframework.beans.factory.FactoryBean} instances,
- * integrated with {@link DefaultSingletonBeanRegistry}'s singleton management.
+ * 支持处理 {@link org.springframework.beans.factory.FactoryBean} 实例的单例注册表的基类，
+ * 与 {@link DefaultSingletonBeanRegistry} 的单例管理集成。
  *
- * <p>Serves as base class for {@link AbstractBeanFactory}.
+ * <p>作为 {@link AbstractBeanFactory} 的基类。
  *
  * @author Juergen Hoeller
  * @since 2.5.1
@@ -215,12 +214,12 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	}
 
 	/**
-	 * Get a FactoryBean for the given bean if possible.
+	 * 如果可能的话，获取给定 bean 的 FactoryBean。
 	 *
-	 * @param beanName     the name of the bean
-	 * @param beanInstance the corresponding bean instance
-	 * @return the bean instance as FactoryBean
-	 * @throws BeansException if the given bean cannot be exposed as a FactoryBean
+	 * @param beanName     bean 的名称
+	 * @param beanInstance 相应的 bean 实例
+	 * @return bean 实例作为 FactoryBean
+	 * @throws BeansException 如果给定的 bean 无法暴露为 FactoryBean
 	 */
 	protected FactoryBean<?> getFactoryBean(String beanName, Object beanInstance) throws BeansException {
 		if (!(beanInstance instanceof FactoryBean)) {
@@ -242,7 +241,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	}
 
 	/**
-	 * Overridden to clear the FactoryBean object cache as well.
+	 * 覆盖以清除 FactoryBean 对象缓存。
 	 */
 	@Override
 	protected void clearSingletonCache() {

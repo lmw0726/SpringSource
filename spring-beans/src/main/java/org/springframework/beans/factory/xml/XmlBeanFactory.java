@@ -22,24 +22,17 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Convenience extension of {@link DefaultListableBeanFactory} that reads bean definitions
- * from an XML document. Delegates to {@link XmlBeanDefinitionReader} underneath; effectively
- * equivalent to using an XmlBeanDefinitionReader with a DefaultListableBeanFactory.
+ * {@link DefaultListableBeanFactory} 的便利扩展，从 XML 文档中读取 bean 定义。
+ * 在底层委托给 {@link XmlBeanDefinitionReader}；与使用 XmlBeanDefinitionReader 和 DefaultListableBeanFactory 效果相同。
  *
- * <p>The structure, element and attribute names of the required XML document
- * are hard-coded in this class. (Of course a transform could be run if necessary
- * to produce this format). "beans" doesn't need to be the root element of the XML
- * document: This class will parse all bean definition elements in the XML file.
+ * <p>所需 XML 文档的结构、元素和属性名称在此类中是硬编码的。（当然，如果需要，可以运行转换来生成此格式）。
+ * “beans” 不需要是 XML 文档的根元素：此类将解析 XML 文件中的所有 bean 定义元素。
  *
- * <p>This class registers each bean definition with the {@link DefaultListableBeanFactory}
- * superclass, and relies on the latter's implementation of the {@link BeanFactory} interface.
- * It supports singletons, prototypes, and references to either of these kinds of bean.
- * See {@code "spring-beans-3.x.xsd"} (or historically, {@code "spring-beans-2.0.dtd"}) for
- * details on options and configuration style.
+ * <p>此类使用 {@link DefaultListableBeanFactory} 超类向其注册每个 bean 定义，并依赖后者对 {@link BeanFactory} 接口的实现。
+ * 它支持单例、原型和对这些种类的 bean 的引用。有关选项和配置样式的详细信息，请参见 “spring-beans-3.x.xsd”（或历史上的 “spring-beans-2.0.dtd”）。
  *
- * <p><b>For advanced needs, consider using a {@link DefaultListableBeanFactory} with
- * an {@link XmlBeanDefinitionReader}.</b> The latter allows for reading from multiple XML
- * resources and is highly configurable in its actual XML parsing behavior.
+ * <p><b>对于高级需求，请考虑使用 {@link DefaultListableBeanFactory} 和 {@link XmlBeanDefinitionReader}。</b>
+ * 后者允许从多个 XML 资源中读取，并且在其实际 XML 解析行为方面高度可配置。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -47,13 +40,15 @@ import org.springframework.core.io.Resource;
  * @see org.springframework.beans.factory.support.DefaultListableBeanFactory
  * @see XmlBeanDefinitionReader
  * @since 15 April 2001
- * @deprecated as of Spring 3.1 in favor of {@link DefaultListableBeanFactory} and
- * {@link XmlBeanDefinitionReader}
+ * @deprecated 自 Spring 3.1 起已弃用，推荐使用 {@link DefaultListableBeanFactory} 和 {@link XmlBeanDefinitionReader}
  */
 @Deprecated
 @SuppressWarnings({"serial", "all"})
 public class XmlBeanFactory extends DefaultListableBeanFactory {
 
+	/**
+	 * xmlBean定义阅读器
+	 */
 	private final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(this);
 
 

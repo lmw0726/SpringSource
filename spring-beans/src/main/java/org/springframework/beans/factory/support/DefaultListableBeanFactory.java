@@ -680,17 +680,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return StringUtils.toStringArray(result);
 	}
 
+	/**
+	 * 判断给定的 bean 是否为单例。
+	 *
+	 * @param beanName bean 的名称
+	 * @param mbd      根 bean 定义
+	 * @param dbd      从父 bean 工厂中获取的 bean 定义
+	 * @return 如果是单例则返回 true，否则返回 false
+	 */
 	private boolean isSingleton(String beanName, RootBeanDefinition mbd, @Nullable BeanDefinitionHolder dbd) {
 		return (dbd != null ? mbd.isSingleton() : isSingleton(beanName));
 	}
 
 	/**
-	 * Check whether the specified bean would need to be eagerly initialized
-	 * in order to determine its type.
+	 * 检查指定的 bean 是否需要在 eager 初始化以确定其类型。
 	 *
-	 * @param factoryBeanName a factory-bean reference that the bean definition
-	 *                        defines a factory method for
-	 * @return whether eager initialization is necessary
+	 * @param factoryBeanName bean 定义定义工厂方法的工厂 bean 引用
+	 * @return 是否需要 eager 初始化
 	 */
 	private boolean requiresEagerInitForType(@Nullable String factoryBeanName) {
 		return (factoryBeanName != null && isFactoryBean(factoryBeanName) && !containsSingleton(factoryBeanName));
@@ -705,31 +711,38 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@SuppressWarnings("unchecked")
 	public <T> Map<String, T> getBeansOfType(
 			@Nullable Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
-
+		// 根据类型获取bean名称
 		String[] beanNames = getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 		Map<String, T> result = CollectionUtils.newLinkedHashMap(beanNames.length);
+
+		// 遍历所有的符合条件的Bean名称。
 		for (String beanName : beanNames) {
 			try {
+				// 获取Bean实例。
 				Object beanInstance = getBean(beanName);
+				// 如果不是NullBean实例，则添加到结果Map中。
 				if (!(beanInstance instanceof NullBean)) {
 					result.put(beanName, (T) beanInstance);
 				}
 			} catch (BeanCreationException ex) {
+				// 处理Bean创建异常。
 				Throwable rootCause = ex.getMostSpecificCause();
 				if (rootCause instanceof BeanCurrentlyInCreationException) {
 					BeanCreationException bce = (BeanCreationException) rootCause;
 					String exBeanName = bce.getBeanName();
+					// 如果是循环引用，则忽略当前正在创建的Bean。
 					if (exBeanName != null && isCurrentlyInCreation(exBeanName)) {
 						if (logger.isTraceEnabled()) {
 							logger.trace("Ignoring match to currently created bean '" + exBeanName + "': " +
 									ex.getMessage());
 						}
+						// 忽略该异常，表示在自动装配构造函数时存在循环引用。
+						// 我们希望找到的匹配项不包括当前正在创建的Bean本身。
 						onSuppressedException(ex);
-						// Ignore: indicates a circular reference when autowiring constructors.
-						// We want to find matches other than the currently created bean itself.
 						continue;
 					}
 				}
+				// 如果不是循环引用，则抛出异常。
 				throw ex;
 			}
 		}
@@ -739,13 +752,20 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Override
 	public String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotationType) {
 		List<String> result = new ArrayList<>();
+
+		// 遍历所有的 BeanDefinition 名称。
 		for (String beanName : this.beanDefinitionNames) {
+			// 获取 BeanDefinition 对象。
 			BeanDefinition bd = this.beanDefinitionMap.get(beanName);
+			// 如果 BeanDefinition 存在且不是抽象的，并且具有指定的注解类型，则将其添加到结果列表中。
 			if (bd != null && !bd.isAbstract() && findAnnotationOnBean(beanName, annotationType) != null) {
 				result.add(beanName);
 			}
 		}
+
+		// 再次遍历手动注册的单例 Bean 名称。
 		for (String beanName : this.manualSingletonNames) {
+			// 如果结果列表不包含该 Bean 名称，并且具有指定的注解类型，则将其添加到结果列表中。
 			if (!result.contains(beanName) && findAnnotationOnBean(beanName, annotationType) != null) {
 				result.add(beanName);
 			}
@@ -753,12 +773,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return StringUtils.toStringArray(result);
 	}
 
+	/**
+	 * 获取带有指定注解的所有 Bean 实例。
+	 *
+	 * @param annotationType 要搜索的注解类型
+	 * @return 包含 Bean 名称和对应实例的映射
+	 */
 	@Override
 	public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) {
+		// 获取带有指定注解的所有 Bean 名称
 		String[] beanNames = getBeanNamesForAnnotation(annotationType);
+		// 创建结果映射
 		Map<String, Object> result = CollectionUtils.newLinkedHashMap(beanNames.length);
+		// 遍历每个 Bean 名称
 		for (String beanName : beanNames) {
+			// 获取对应的 Bean 实例
 			Object beanInstance = getBean(beanName);
+			// 如果 Bean 实例不是 NullBean 类型，则加入到结果映射中
 			if (!(beanInstance instanceof NullBean)) {
 				result.put(beanName, beanInstance);
 			}
@@ -774,50 +805,82 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return findAnnotationOnBean(beanName, annotationType, true);
 	}
 
+	/**
+	 * 在指定的 Bean 上查找指定类型的注解。
+	 *
+	 * @param beanName             要搜索的 Bean 名称
+	 * @param annotationType       要查找的注解类型
+	 * @param allowFactoryBeanInit 是否允许初始化 FactoryBean
+	 * @param <A>                  注解类型
+	 * @return 如果找到注解，则返回注解实例；否则返回 null
+	 * @throws NoSuchBeanDefinitionException 如果找不到指定名称的 Bean
+	 */
 	@Override
 	@Nullable
 	public <A extends Annotation> A findAnnotationOnBean(
 			String beanName, Class<A> annotationType, boolean allowFactoryBeanInit)
 			throws NoSuchBeanDefinitionException {
 
+		// 查找指定 Bean 上合并的注解，并进行合成处理
 		return findMergedAnnotationOnBean(beanName, annotationType, allowFactoryBeanInit)
 				.synthesize(MergedAnnotation::isPresent).orElse(null);
 	}
 
+	/**
+	 * 在指定的 Bean 上查找合并的注解。
+	 *
+	 * @param beanName             要搜索的 Bean 名称
+	 * @param annotationType       要查找的注解类型
+	 * @param allowFactoryBeanInit 是否允许初始化 FactoryBean
+	 * @param <A>                  注解类型
+	 * @return 合并的注解
+	 */
 	private <A extends Annotation> MergedAnnotation<A> findMergedAnnotationOnBean(
 			String beanName, Class<A> annotationType, boolean allowFactoryBeanInit) {
 
 		Class<?> beanType = getType(beanName, allowFactoryBeanInit);
+
+		// 如果找到了 Bean 的类型，则尝试从其类型上获取指定注解的 MergedAnnotation。
 		if (beanType != null) {
 			MergedAnnotation<A> annotation =
 					MergedAnnotations.from(beanType, SearchStrategy.TYPE_HIERARCHY).get(annotationType);
+			// 如果注解存在，则返回该注解。
 			if (annotation.isPresent()) {
 				return annotation;
 			}
 		}
+
 		if (containsBeanDefinition(beanName)) {
+			// 如果 Bean 定义存在，获取合并本地bean定义
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			// Check raw bean class, e.g. in case of a proxy.
+			// 检查原始 Bean 类型，例如代理情况下。
 			if (bd.hasBeanClass()) {
+				// 获取 Bean 类型
 				Class<?> beanClass = bd.getBeanClass();
+				// 如果 Bean 类型与之前不同，则尝试从 Bean 类型上获取指定注解的 MergedAnnotation。
 				if (beanClass != beanType) {
 					MergedAnnotation<A> annotation =
 							MergedAnnotations.from(beanClass, SearchStrategy.TYPE_HIERARCHY).get(annotationType);
+					// 如果注解存在，则返回该注解。
 					if (annotation.isPresent()) {
 						return annotation;
 					}
 				}
 			}
-			// Check annotations declared on factory method, if any.
+			// 检查工厂方法上的声明的注解，如果有的话。
 			Method factoryMethod = bd.getResolvedFactoryMethod();
 			if (factoryMethod != null) {
+				// 如果存在工厂方法，获取合并注解
 				MergedAnnotation<A> annotation =
 						MergedAnnotations.from(factoryMethod, SearchStrategy.TYPE_HIERARCHY).get(annotationType);
+				// 如果注解存在，则返回该注解。
 				if (annotation.isPresent()) {
 					return annotation;
 				}
 			}
 		}
+
+		// 如果未找到注解，则返回缺失的 MergedAnnotation。
 		return MergedAnnotation.missing();
 	}
 
@@ -830,10 +893,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	public void registerResolvableDependency(Class<?> dependencyType, @Nullable Object autowiredValue) {
 		Assert.notNull(dependencyType, "Dependency type must not be null");
 		if (autowiredValue != null) {
+			// 如果存在自动装配值
 			if (!(autowiredValue instanceof ObjectFactory || dependencyType.isInstance(autowiredValue))) {
 				throw new IllegalArgumentException("Value [" + autowiredValue +
 						"] does not implement specified dependency type [" + dependencyType.getName() + "]");
 			}
+			// 添加进已解析依赖映射中
 			this.resolvableDependencies.put(dependencyType, autowiredValue);
 		}
 	}
@@ -846,59 +911,73 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Determine whether the specified bean definition qualifies as an autowire candidate,
-	 * to be injected into other beans which declare a dependency of matching type.
+	 * 确定指定的 Bean 定义是否符合自动装配候选资格，
+	 * 可以注入到其他声明匹配类型依赖关系的 Bean 中。
 	 *
-	 * @param beanName   the name of the bean definition to check
-	 * @param descriptor the descriptor of the dependency to resolve
-	 * @param resolver   the AutowireCandidateResolver to use for the actual resolution algorithm
-	 * @return whether the bean should be considered as autowire candidate
+	 * @param beanName   要检查的 Bean 定义的名称
+	 * @param descriptor 要解析的依赖项描述符
+	 * @param resolver   用于实际解析算法的 AutowireCandidateResolver
+	 * @return 是否应将 Bean 视为自动装配候选项
+	 * @throws NoSuchBeanDefinitionException 如果找不到相应的 Bean 定义
 	 */
 	protected boolean isAutowireCandidate(
 			String beanName, DependencyDescriptor descriptor, AutowireCandidateResolver resolver)
 			throws NoSuchBeanDefinitionException {
-
+		// 将 Bean 名称转换为规范化的 BeanDefinition 名称。
 		String bdName = BeanFactoryUtils.transformedBeanName(beanName);
+
 		if (containsBeanDefinition(bdName)) {
+			// 如果包含规范化的 BeanDefinition，则判断该 Bean 是否是自动装配候选对象。
 			return isAutowireCandidate(beanName, getMergedLocalBeanDefinition(bdName), descriptor, resolver);
 		} else if (containsSingleton(beanName)) {
+			// 如果不包含规范化的 BeanDefinition，则尝试检查是否是单例 Bean。
 			return isAutowireCandidate(beanName, new RootBeanDefinition(getType(beanName)), descriptor, resolver);
 		}
 
 		BeanFactory parent = getParentBeanFactory();
 		if (parent instanceof DefaultListableBeanFactory) {
-			// No bean definition found in this factory -> delegate to parent.
+			// 如果父级 BeanFactory 是 DefaultListableBeanFactory，则委托给父级。
 			return ((DefaultListableBeanFactory) parent).isAutowireCandidate(beanName, descriptor, resolver);
 		} else if (parent instanceof ConfigurableListableBeanFactory) {
-			// If no DefaultListableBeanFactory, can't pass the resolver along.
+			// 如果父级 BeanFactory 是 ConfigurableListableBeanFactory，则无法传递解析器，只能进行基本的自动装配候选性检查。
 			return ((ConfigurableListableBeanFactory) parent).isAutowireCandidate(beanName, descriptor);
 		} else {
+			// 如果父级 BeanFactory 不是以上两种类型，则默认为该 Bean 是自动装配候选对象。
 			return true;
 		}
 	}
 
 	/**
-	 * Determine whether the specified bean definition qualifies as an autowire candidate,
-	 * to be injected into other beans which declare a dependency of matching type.
+	 * 确定指定的 Bean 定义是否符合自动装配候选资格，
+	 * 可以注入到其他声明匹配类型依赖关系的 Bean 中。
 	 *
-	 * @param beanName   the name of the bean definition to check
-	 * @param mbd        the merged bean definition to check
-	 * @param descriptor the descriptor of the dependency to resolve
-	 * @param resolver   the AutowireCandidateResolver to use for the actual resolution algorithm
-	 * @return whether the bean should be considered as autowire candidate
+	 * @param beanName   要检查的 Bean 定义的名称
+	 * @param mbd        要检查的合并 Bean 定义
+	 * @param descriptor 要解析的依赖项描述符
+	 * @param resolver   用于实际解析算法的 AutowireCandidateResolver
+	 * @return 是否应将 Bean 视为自动装配候选项
 	 */
 	protected boolean isAutowireCandidate(String beanName, RootBeanDefinition mbd,
 										  DependencyDescriptor descriptor, AutowireCandidateResolver resolver) {
 
+		// 将 Bean 名称转换为规范化的 BeanDefinition 名称。
 		String bdName = BeanFactoryUtils.transformedBeanName(beanName);
+
+		// 解析 Bean 的类信息。
 		resolveBeanClass(mbd, bdName);
+
+		// 如果 Bean 的工厂方法是唯一的且尚未解析，则尝试解析工厂方法。
 		if (mbd.isFactoryMethodUnique && mbd.factoryMethodToIntrospect == null) {
 			new ConstructorResolver(this).resolveFactoryMethodIfPossible(mbd);
 		}
+
+		// 创建 BeanDefinitionHolder，该对象包含 BeanDefinition、Bean 名称以及 Bean 的别名。
 		BeanDefinitionHolder holder = (beanName.equals(bdName) ?
 				this.mergedBeanDefinitionHolders.computeIfAbsent(beanName,
 						key -> new BeanDefinitionHolder(mbd, beanName, getAliases(bdName))) :
 				new BeanDefinitionHolder(mbd, beanName, getAliases(bdName)));
+
+		// 调用解析器的 isAutowireCandidate 方法，判断 Bean 是否是自动装配的候选对象。
 		return resolver.isAutowireCandidate(holder, descriptor);
 	}
 
@@ -951,9 +1030,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Considers all beans as eligible for metadata caching
-	 * if the factory's configuration has been marked as frozen.
+	 * 如果工厂的配置已标记为冻结，则将所有 Bean 视为符合元数据缓存的资格。
 	 *
+	 * @param beanName 要检查的 Bean 的名称
 	 * @see #freezeConfiguration()
 	 */
 	@Override
@@ -967,19 +1046,24 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			logger.trace("Pre-instantiating singletons in " + this);
 		}
 
-		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
-		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+		// 迭代一个副本以允许初始化方法注册新的 Bean 定义。
+		// 虽然这可能不是常规工厂引导的一部分，但它在其他情况下运行良好。
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
-		// Trigger initialization of all non-lazy singleton beans...
+		// 触发所有非懒加载单例 Bean 的初始化...
 		for (String beanName : beanNames) {
+			// 获取合并后的本地 BeanDefinition。
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			// 如果 Bean 不是抽象的、是单例的，并且不是懒加载的，则进行初始化。
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
 				if (isFactoryBean(beanName)) {
+					// 如果是 FactoryBean，则先获取 FactoryBean
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
+						// 如果bean是工厂bean
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
+						// 如果存在安全管理器且 FactoryBean 是智能 FactoryBean，则使用安全管理器来获取是否提前初始化。
 						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
 							isEagerInit = AccessController.doPrivileged(
 									(PrivilegedAction<Boolean>) ((SmartFactoryBean<?>) factory)::isEagerInit,
@@ -988,31 +1072,39 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
+						// 如果是提前初始化，则进行初始化。
 						if (isEagerInit) {
 							getBean(beanName);
 						}
 					}
 				} else {
+					// 如果不是 FactoryBean，则直接进行初始化。
 					getBean(beanName);
 				}
 			}
 		}
 
-		// Trigger post-initialization callback for all applicable beans...
+		// 触发所有适用 Bean 的后初始化回调...
 		for (String beanName : beanNames) {
+			// 获取单例 Bean 实例。
 			Object singletonInstance = getSingleton(beanName);
+			// 如果单例实例实现了 SmartInitializingSingleton 接口，则调用其 afterSingletonsInstantiated 方法。
 			if (singletonInstance instanceof SmartInitializingSingleton) {
+				// 使用应用程序启动进行智能初始化。
 				StartupStep smartInitialize = this.getApplicationStartup().start("spring.beans.smart-initialize")
 						.tag("beanName", beanName);
 				SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;
+				// 如果存在安全管理器，则使用安全管理器来调用 afterSingletonsInstantiated 方法。
 				if (System.getSecurityManager() != null) {
 					AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 						smartSingleton.afterSingletonsInstantiated();
 						return null;
 					}, getAccessControlContext());
 				} else {
+					// 调用单例初始化后执行程序
 					smartSingleton.afterSingletonsInstantiated();
 				}
+				// 结束智能初始化的启动步骤。
 				smartInitialize.end();
 			}
 		}
@@ -1114,9 +1206,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
+		// 断言 beanName 不为空
 		Assert.hasText(beanName, "'beanName' must not be empty");
 
+		// 从 beanDefinitionMap 中移除 beanName 对应的 BeanDefinition
 		BeanDefinition bd = this.beanDefinitionMap.remove(beanName);
+
+		// 如果 BeanDefinition 为空，则抛出 NoSuchBeanDefinitionException 异常
 		if (bd == null) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("No bean named '" + beanName + "' found in " + this);
@@ -1125,18 +1221,21 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		if (hasBeanCreationStarted()) {
-			// Cannot modify startup-time collection elements anymore (for stable iteration)
+			// 如果 Bean 的创建已经开始，则不能修改启动时集合的元素（为了稳定的迭代）
 			synchronized (this.beanDefinitionMap) {
 				List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames);
 				updatedDefinitions.remove(beanName);
 				this.beanDefinitionNames = updatedDefinitions;
 			}
 		} else {
-			// Still in startup registration phase
+			// 如果仍在启动注册阶段，则移除 beanName
 			this.beanDefinitionNames.remove(beanName);
 		}
+
+		// 清空冻结的 BeanDefinition 名称数组
 		this.frozenBeanDefinitionNames = null;
 
+		// 重置 beanName 对应的 BeanDefinition
 		resetBeanDefinition(beanName);
 	}
 
@@ -1179,7 +1278,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Only allows alias overriding if bean definition overriding is allowed.
+	 * 仅当允许 bean 定义覆盖时才允许别名覆盖。
 	 */
 	@Override
 	protected boolean allowAliasOverriding() {
@@ -1187,7 +1286,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Also checks for an alias overriding a bean definition of the same name.
+	 * 还会检查别名是否覆盖了同名的 bean 定义。
 	 */
 	@Override
 	protected void checkForAliasCircle(String name, String alias) {
@@ -1210,8 +1309,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public void destroySingletons() {
+		// 销毁单例 Bean
 		super.destroySingletons();
+
+		// 更新手动注册的单例 Bean 名称集合
 		updateManualSingletonNames(Set::clear, set -> !set.isEmpty());
+
+		// 清除类型缓存
 		clearByTypeCache();
 	}
 
@@ -1277,15 +1381,26 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public <T> NamedBeanHolder<T> resolveNamedBean(Class<T> requiredType) throws BeansException {
+		// 断言必需的类型不为空
 		Assert.notNull(requiredType, "Required type must not be null");
+
+		// 解析具名的 Bean
 		NamedBeanHolder<T> namedBean = resolveNamedBean(ResolvableType.forRawClass(requiredType), null, false);
+
+		// 如果找到了具名的 Bean，则返回该 Bean
 		if (namedBean != null) {
 			return namedBean;
 		}
+
+		// 获取父 Bean 工厂
 		BeanFactory parent = getParentBeanFactory();
+
+		// 如果父 Bean 工厂是可自动装配的 Bean 工厂，则委托给父 Bean 工厂解析具名的 Bean
 		if (parent instanceof AutowireCapableBeanFactory) {
 			return ((AutowireCapableBeanFactory) parent).resolveNamedBean(requiredType);
 		}
+
+		// 如果未找到具名的 Bean，则抛出 NoSuchBeanDefinitionException 异常
 		throw new NoSuchBeanDefinitionException(requiredType);
 	}
 
@@ -1294,52 +1409,72 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private <T> NamedBeanHolder<T> resolveNamedBean(
 			ResolvableType requiredType, @Nullable Object[] args, boolean nonUniqueAsNull) throws BeansException {
 
+		// 断言必需的类型不为空
 		Assert.notNull(requiredType, "Required type must not be null");
+
+		// 获取给定类型的所有 Bean 名称
 		String[] candidateNames = getBeanNamesForType(requiredType);
 
 		if (candidateNames.length > 1) {
+			// 如果有多个候选名，则进行筛选以确定自动装配的候选名
 			List<String> autowireCandidates = new ArrayList<>(candidateNames.length);
 			for (String beanName : candidateNames) {
+				// 筛选出符合自动装配条件的候选名
 				if (!containsBeanDefinition(beanName) || getBeanDefinition(beanName).isAutowireCandidate()) {
 					autowireCandidates.add(beanName);
 				}
 			}
+			// 如果存在自动装配的候选名，则使用它们
 			if (!autowireCandidates.isEmpty()) {
 				candidateNames = StringUtils.toStringArray(autowireCandidates);
 			}
 		}
 
 		if (candidateNames.length == 1) {
+			// 如果只有一个候选名，则解析该候选名的具名 Bean
 			return resolveNamedBean(candidateNames[0], requiredType, args);
 		} else if (candidateNames.length > 1) {
+			// 如果存在多个候选名，则需要进一步处理
+			// 创建一个 Map 用于存储候选名及其对应的 Bean 实例或类型
 			Map<String, Object> candidates = CollectionUtils.newLinkedHashMap(candidateNames.length);
 			for (String beanName : candidateNames) {
+				// 如果是单例 Bean 且不需要构造参数，则直接获取 Bean 实例
 				if (containsSingleton(beanName) && args == null) {
 					Object beanInstance = getBean(beanName);
+					// 如果是 NullBean，则将其视为空值
 					candidates.put(beanName, (beanInstance instanceof NullBean ? null : beanInstance));
 				} else {
+					// 否则，只记录 Bean 的类型
 					candidates.put(beanName, getType(beanName));
 				}
 			}
+			// 确定主要的候选名
 			String candidateName = determinePrimaryCandidate(candidates, requiredType.toClass());
+			// 如果没有主要的候选名，则选择优先级最高的候选名
 			if (candidateName == null) {
 				candidateName = determineHighestPriorityCandidate(candidates, requiredType.toClass());
 			}
+			// 如果找到了候选名，则返回具名 Bean
 			if (candidateName != null) {
 				Object beanInstance = candidates.get(candidateName);
+				// 如果 Bean 实例为空，则直接返回空
 				if (beanInstance == null) {
 					return null;
 				}
+				// 如果 Bean 实例是一个 Class，则解析该候选名的具名 Bean
 				if (beanInstance instanceof Class) {
 					return resolveNamedBean(candidateName, requiredType, args);
 				}
+				// 否则，返回具名 Bean
 				return new NamedBeanHolder<>(candidateName, (T) beanInstance);
 			}
+			// 如果不允许多个候选名，则抛出 NoUniqueBeanDefinitionException 异常
 			if (!nonUniqueAsNull) {
 				throw new NoUniqueBeanDefinitionException(requiredType, candidates.keySet());
 			}
 		}
 
+		// 如果没有找到符合条件的候选名，则返回空
 		return null;
 	}
 
@@ -1347,10 +1482,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private <T> NamedBeanHolder<T> resolveNamedBean(
 			String beanName, ResolvableType requiredType, @Nullable Object[] args) throws BeansException {
 
+		// 获取指定名称的 Bean 实例
 		Object bean = getBean(beanName, null, args);
+
+		// 如果 Bean 实例是 NullBean，则返回空
 		if (bean instanceof NullBean) {
 			return null;
 		}
+
+		// 将 Bean 实例适配为所需类型，并创建具名 Bean 持有者
 		return new NamedBeanHolder<T>(beanName, adaptBeanInstance(beanName, bean, requiredType.toClass()));
 	}
 
@@ -1517,40 +1657,57 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private Object resolveMultipleBeans(DependencyDescriptor descriptor, @Nullable String beanName,
 										@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) {
 
+		// 获取依赖的类型
 		Class<?> type = descriptor.getDependencyType();
 
+		// 如果是流依赖描述符
 		if (descriptor instanceof StreamDependencyDescriptor) {
+			// 查找自动装配的候选 Bean
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, type, descriptor);
+			// 如果需要记录自动装配的 Bean 名称，则添加到集合中
 			if (autowiredBeanNames != null) {
 				autowiredBeanNames.addAll(matchingBeans.keySet());
 			}
+			// 创建流，将匹配的 Bean 转换为流，并过滤掉空 Bean
 			Stream<Object> stream = matchingBeans.keySet().stream()
 					.map(name -> descriptor.resolveCandidate(name, type, this))
 					.filter(bean -> !(bean instanceof NullBean));
+			// 如果描述符指定排序，则按照适配的排序比较器进行排序
 			if (((StreamDependencyDescriptor) descriptor).isOrdered()) {
 				stream = stream.sorted(adaptOrderComparator(matchingBeans));
 			}
 			return stream;
 		} else if (type.isArray()) {
+			// 如果是数组类型
+			// 获取数组元素类型
 			Class<?> componentType = type.getComponentType();
+			// 获取可解析的类型
 			ResolvableType resolvableType = descriptor.getResolvableType();
+			// 解析类型
 			Class<?> resolvedArrayType = resolvableType.resolve(type);
 			if (resolvedArrayType != type) {
+				// 如果解析的类型不是数组类型，则获取组件类型，并解析
 				componentType = resolvableType.getComponentType().resolve();
 			}
+			// 如果组件类型为空，则返回空
 			if (componentType == null) {
 				return null;
 			}
+			// 查找自动装配的候选 Bean
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, componentType,
 					new MultiElementDescriptor(descriptor));
+			// 如果没有匹配的 Bean，则返回空
 			if (matchingBeans.isEmpty()) {
 				return null;
 			}
+			// 如果需要记录自动装配的 Bean 名称，则添加到集合中
 			if (autowiredBeanNames != null) {
 				autowiredBeanNames.addAll(matchingBeans.keySet());
 			}
+			// 获取类型转换器，并将匹配的 Bean 转换为数组类型
 			TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
 			Object result = converter.convertIfNecessary(matchingBeans.values(), resolvedArrayType);
+			// 如果结果是数组，则根据适配的依赖比较器进行排序
 			if (result instanceof Object[]) {
 				Comparator<Object> comparator = adaptDependencyComparator(matchingBeans);
 				if (comparator != null) {
@@ -1559,20 +1716,28 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			return result;
 		} else if (Collection.class.isAssignableFrom(type) && type.isInterface()) {
+			// 如果是集合类型
+			// 获取集合元素类型
 			Class<?> elementType = descriptor.getResolvableType().asCollection().resolveGeneric();
+			// 如果元素类型为空，则返回空
 			if (elementType == null) {
 				return null;
 			}
+			// 查找自动装配的候选 Bean
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, elementType,
 					new MultiElementDescriptor(descriptor));
+			// 如果没有匹配的 Bean，则返回空
 			if (matchingBeans.isEmpty()) {
 				return null;
 			}
+			// 如果需要记录自动装配的 Bean 名称，则添加到集合中
 			if (autowiredBeanNames != null) {
 				autowiredBeanNames.addAll(matchingBeans.keySet());
 			}
+			// 获取类型转换器，并将匹配的 Bean 转换为集合类型
 			TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
 			Object result = converter.convertIfNecessary(matchingBeans.values(), type);
+			// 如果结果是列表，则根据适配的依赖比较器进行排序
 			if (result instanceof List) {
 				if (((List<?>) result).size() > 1) {
 					Comparator<Object> comparator = adaptDependencyComparator(matchingBeans);
@@ -1583,20 +1748,27 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 			return result;
 		} else if (Map.class == type) {
+			// 如果是 Map 类型
+			// 获取键类型和值类型
 			ResolvableType mapType = descriptor.getResolvableType().asMap();
+			//解析第一个泛型类型
 			Class<?> keyType = mapType.resolveGeneric(0);
 			if (String.class != keyType) {
 				return null;
 			}
+			//解析第二个泛型类型
 			Class<?> valueType = mapType.resolveGeneric(1);
 			if (valueType == null) {
 				return null;
 			}
+			// 查找自动装配的候选 Bean
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, valueType,
 					new MultiElementDescriptor(descriptor));
+			// 如果没有匹配的 Bean，则返回空
 			if (matchingBeans.isEmpty()) {
 				return null;
 			}
+			// 如果需要记录自动装配的 Bean 名称，则添加到集合中
 			if (autowiredBeanNames != null) {
 				autowiredBeanNames.addAll(matchingBeans.keySet());
 			}
@@ -1606,10 +1778,22 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 	}
 
+	/**
+	 * 检查依赖描述符是否为必需的。
+	 *
+	 * @param descriptor 依赖描述符
+	 * @return 如果依赖描述符为必需，则为 true
+	 */
 	private boolean isRequired(DependencyDescriptor descriptor) {
 		return getAutowireCandidateResolver().isRequired(descriptor);
 	}
 
+	/**
+	 * 判断指定类型是否表示多个 bean。
+	 *
+	 * @param type 类型
+	 * @return 如果类型表示数组、集合或映射，则为 true
+	 */
 	private boolean indicatesMultipleBeans(Class<?> type) {
 		return (type.isArray() || (type.isInterface() &&
 				(Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type))));
@@ -1617,15 +1801,24 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Nullable
 	private Comparator<Object> adaptDependencyComparator(Map<String, ?> matchingBeans) {
+		// 获取依赖比较器
 		Comparator<Object> comparator = getDependencyComparator();
+		// 如果比较器是 OrderComparator 类型，则设置源提供者为工厂感知的排序源提供者
 		if (comparator instanceof OrderComparator) {
 			return ((OrderComparator) comparator).withSourceProvider(
 					createFactoryAwareOrderSourceProvider(matchingBeans));
 		} else {
+			// 否则直接返回比较器
 			return comparator;
 		}
 	}
 
+	/**
+	 * 适配顺序比较器以考虑匹配的 bean。
+	 *
+	 * @param matchingBeans 匹配的 bean 的映射
+	 * @return 适配后的比较器
+	 */
 	private Comparator<Object> adaptOrderComparator(Map<String, ?> matchingBeans) {
 		Comparator<Object> dependencyComparator = getDependencyComparator();
 		OrderComparator comparator = (dependencyComparator instanceof OrderComparator ?
@@ -1633,6 +1826,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return comparator.withSourceProvider(createFactoryAwareOrderSourceProvider(matchingBeans));
 	}
 
+	/**
+	 * 创建一个考虑工厂的顺序源提供程序。
+	 *
+	 * @param beans bean 的映射
+	 * @return 工厂感知的顺序源提供程序
+	 */
 	private OrderComparator.OrderSourceProvider createFactoryAwareOrderSourceProvider(Map<String, ?> beans) {
 		IdentityHashMap<Object, String> instancesToBeanNames = new IdentityHashMap<>();
 		beans.forEach((beanName, instance) -> instancesToBeanNames.put(instance, beanName));
@@ -1723,22 +1922,32 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Add an entry to the candidate map: a bean instance if available or just the resolved
-	 * type, preventing early bean initialization ahead of primary candidate selection.
+	 * 向候选对象映射中添加条目：如果可用则是一个 bean 实例，否则是已解析的类型，
+	 * 避免在主要候选对象选择之前进行早期的 bean 初始化。
+	 *
+	 * @param candidates    候选对象映射
+	 * @param candidateName 候选对象的名称
+	 * @param descriptor    依赖描述符
+	 * @param requiredType  所需类型
 	 */
 	private void addCandidateEntry(Map<String, Object> candidates, String candidateName,
 								   DependencyDescriptor descriptor, Class<?> requiredType) {
 
+		// 如果描述符是 MultiElementDescriptor 类型
 		if (descriptor instanceof MultiElementDescriptor) {
+			// 解析候选对象并添加到候选对象集合中
 			Object beanInstance = descriptor.resolveCandidate(candidateName, requiredType, this);
 			if (!(beanInstance instanceof NullBean)) {
 				candidates.put(candidateName, beanInstance);
 			}
 		} else if (containsSingleton(candidateName) || (descriptor instanceof StreamDependencyDescriptor &&
 				((StreamDependencyDescriptor) descriptor).isOrdered())) {
+			// 如果候选对象是单例对象或者描述符是 StreamDependencyDescriptor 类型且是有序的
+			// 解析候选对象并添加到候选对象集合中
 			Object beanInstance = descriptor.resolveCandidate(candidateName, requiredType, this);
 			candidates.put(candidateName, (beanInstance instanceof NullBean ? null : beanInstance));
 		} else {
+			// 否则，将候选对象的类型添加到候选对象集合中
 			candidates.put(candidateName, getType(candidateName));
 		}
 	}
@@ -1783,123 +1992,147 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Determine the primary candidate in the given set of beans.
+	 * 在给定的一组 bean 中确定主要候选对象。
 	 *
-	 * @param candidates   a Map of candidate names and candidate instances
-	 *                     (or candidate classes if not created yet) that match the required type
-	 * @param requiredType the target dependency type to match against
-	 * @return the name of the primary candidate, or {@code null} if none found
+	 * @param candidates   匹配所需类型的候选对象名称和候选对象实例
+	 *                     （如果尚未创建则是候选对象类）的映射
+	 * @param requiredType 要匹配的目标依赖类型
+	 * @return 主要候选对象的名称；如果找不到，则为 {@code null}
 	 * @see #isPrimary(String, Object)
 	 */
 	@Nullable
 	protected String determinePrimaryCandidate(Map<String, Object> candidates, Class<?> requiredType) {
+		// 初始化主要候选对象名称为null
 		String primaryBeanName = null;
+		// 遍历候选对象集合
 		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
+			// 获取候选对象的名称和实例
 			String candidateBeanName = entry.getKey();
 			Object beanInstance = entry.getValue();
+			// 如果该候选对象是主要候选对象
 			if (isPrimary(candidateBeanName, beanInstance)) {
+				// 如果已经存在主要候选对象，则抛出异常
 				if (primaryBeanName != null) {
+					// 检查候选对象和已存在的主要候选对象是否都是本地定义的
 					boolean candidateLocal = containsBeanDefinition(candidateBeanName);
 					boolean primaryLocal = containsBeanDefinition(primaryBeanName);
 					if (candidateLocal && primaryLocal) {
 						throw new NoUniqueBeanDefinitionException(requiredType, candidates.size(),
 								"more than one 'primary' bean found among candidates: " + candidates.keySet());
 					} else if (candidateLocal) {
+						// 如果候选对象是本地定义的，则将候选对象设置为主要候选对象
 						primaryBeanName = candidateBeanName;
 					}
 				} else {
+					// 如果尚未存在主要候选对象，则将候选对象设置为主要候选对象
 					primaryBeanName = candidateBeanName;
 				}
 			}
 		}
+		// 返回主要候选对象名称
 		return primaryBeanName;
 	}
 
 	/**
-	 * Determine the candidate with the highest priority in the given set of beans.
-	 * <p>Based on {@code @javax.annotation.Priority}. As defined by the related
-	 * {@link org.springframework.core.Ordered} interface, the lowest value has
-	 * the highest priority.
+	 * 在给定的一组 bean 中确定具有最高优先级的候选对象。
+	 * <p>基于 {@code @javax.annotation.Priority}。如 {@link org.springframework.core.Ordered} 接口所定义，
+	 * 最低值具有最高优先级。
 	 *
-	 * @param candidates   a Map of candidate names and candidate instances
-	 *                     (or candidate classes if not created yet) that match the required type
-	 * @param requiredType the target dependency type to match against
-	 * @return the name of the candidate with the highest priority,
-	 * or {@code null} if none found
+	 * @param candidates   匹配所需类型的候选对象名称和候选对象实例
+	 *                     （如果尚未创建则是候选对象类）的映射
+	 * @param requiredType 要匹配的目标依赖类型
+	 * @return 具有最高优先级的候选对象的名称，如果找不到，则为 {@code null}
 	 * @see #getPriority(Object)
 	 */
 	@Nullable
 	protected String determineHighestPriorityCandidate(Map<String, Object> candidates, Class<?> requiredType) {
+		// 初始化最高优先级候选对象名称和优先级为null
 		String highestPriorityBeanName = null;
 		Integer highestPriority = null;
+		// 遍历候选对象集合
 		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
+			// 获取候选对象的名称和实例
 			String candidateBeanName = entry.getKey();
 			Object beanInstance = entry.getValue();
+			// 如果候选对象不为null
 			if (beanInstance != null) {
+				// 获取候选对象的优先级
 				Integer candidatePriority = getPriority(beanInstance);
+				// 如果候选对象的优先级不为null
 				if (candidatePriority != null) {
+					// 如果已经存在最高优先级候选对象
 					if (highestPriorityBeanName != null) {
+						// 如果候选对象的优先级与已存在的最高优先级相同，则抛出异常
 						if (candidatePriority.equals(highestPriority)) {
 							throw new NoUniqueBeanDefinitionException(requiredType, candidates.size(),
 									"Multiple beans found with the same priority ('" + highestPriority +
 											"') among candidates: " + candidates.keySet());
 						} else if (candidatePriority < highestPriority) {
+							// 如果候选对象的优先级比已存在的最高优先级更高，则更新最高优先级候选对象和优先级
 							highestPriorityBeanName = candidateBeanName;
 							highestPriority = candidatePriority;
 						}
 					} else {
+						// 如果尚未存在最高优先级候选对象，则将当前候选对象设置为最高优先级候选对象
 						highestPriorityBeanName = candidateBeanName;
 						highestPriority = candidatePriority;
 					}
 				}
 			}
 		}
+		// 返回最高优先级候选对象名称
 		return highestPriorityBeanName;
 	}
 
 	/**
-	 * Return whether the bean definition for the given bean name has been
-	 * marked as a primary bean.
+	 * 返回给定 bean 名称的 bean 定义是否已标记为主要 bean。
 	 *
-	 * @param beanName     the name of the bean
-	 * @param beanInstance the corresponding bean instance (can be null)
-	 * @return whether the given bean qualifies as primary
+	 * @param beanName     bean 的名称
+	 * @param beanInstance 相应的 bean 实例（可以为 null）
+	 * @return 给定 bean 是否符合主要条件
 	 */
 	protected boolean isPrimary(String beanName, Object beanInstance) {
+		// 转换bean名称
 		String transformedBeanName = transformedBeanName(beanName);
+		// 检查转换后的bean名称是否存在于本地bean定义中
 		if (containsBeanDefinition(transformedBeanName)) {
+			// 如果存在，则返回该bean是否为主要候选对象
 			return getMergedLocalBeanDefinition(transformedBeanName).isPrimary();
 		}
+		// 获取父级Bean工厂
 		BeanFactory parent = getParentBeanFactory();
+		// 如果父级Bean工厂是DefaultListableBeanFactory类型，则委托父级Bean工厂判断bean是否为主要候选对象
 		return (parent instanceof DefaultListableBeanFactory &&
 				((DefaultListableBeanFactory) parent).isPrimary(transformedBeanName, beanInstance));
 	}
 
 	/**
-	 * Return the priority assigned for the given bean instance by
-	 * the {@code javax.annotation.Priority} annotation.
-	 * <p>The default implementation delegates to the specified
-	 * {@link #setDependencyComparator dependency comparator}, checking its
-	 * {@link OrderComparator#getPriority method} if it is an extension of
-	 * Spring's common {@link OrderComparator} - typically, an
-	 * {@link org.springframework.core.annotation.AnnotationAwareOrderComparator}.
-	 * If no such comparator is present, this implementation returns {@code null}.
+	 * 返回通过 {@code javax.annotation.Priority} 注解为给定的 bean 实例分配的优先级。
+	 * <p>默认实现委托给指定的 {@link #setDependencyComparator 依赖比较器}，
+	 * 如果它是 Spring 的通用 {@link OrderComparator} 的扩展（通常是 {@link org.springframework.core.annotation.AnnotationAwareOrderComparator}），
+	 * 则检查其 {@link OrderComparator#getPriority 方法}。如果不存在这样的比较器，则此实现返回 {@code null}。
 	 *
-	 * @param beanInstance the bean instance to check (can be {@code null})
-	 * @return the priority assigned to that bean or {@code null} if none is set
+	 * @param beanInstance 要检查的 bean 实例（可以为 {@code null}）
+	 * @return 为该 bean 分配的优先级，如果未设置则返回 {@code null}
 	 */
 	@Nullable
 	protected Integer getPriority(Object beanInstance) {
+		// 获取依赖项比较器
 		Comparator<Object> comparator = getDependencyComparator();
 		if (comparator instanceof OrderComparator) {
+			// 如果比较器是OrderComparator类型，则获取bean实例的优先级
 			return ((OrderComparator) comparator).getPriority(beanInstance);
 		}
+		// 否则返回空
 		return null;
 	}
 
 	/**
-	 * Determine whether the given candidate name matches the bean name or the aliases
-	 * stored in this bean definition.
+	 * 确定给定的候选名称是否与此 bean 定义中存储的 bean 名称或别名匹配。
+	 *
+	 * @param beanName      bean 名称
+	 * @param candidateName 候选名称
+	 * @return 如果候选名称与 bean 名称或别名匹配，则为 {@code true}
 	 */
 	protected boolean matchesBeanName(String beanName, @Nullable String candidateName) {
 		return (candidateName != null &&
@@ -1907,9 +2140,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Determine whether the given beanName/candidateName pair indicates a self reference,
-	 * i.e. whether the candidate points back to the original bean or to a factory method
-	 * on the original bean.
+	 * 确定给定的 beanName/candidateName 对是否表示自引用，
+	 * 即候选项是否指向原始 bean 或原始 bean 上的工厂方法。
+	 *
+	 * @param beanName      bean 名称
+	 * @param candidateName 候选名称
+	 * @return 如果候选项指向原始 bean 或原始 bean 上的工厂方法，则为 {@code true}
 	 */
 	private boolean isSelfReference(@Nullable String beanName, @Nullable String candidateName) {
 		return (beanName != null && candidateName != null &&
@@ -1931,41 +2167,56 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Raise a BeanNotOfRequiredTypeException for an unresolvable dependency, if applicable,
-	 * i.e. if the target type of the bean would match but an exposed proxy doesn't.
+	 * 如果适用，则为无法解析的依赖项引发 BeanNotOfRequiredTypeException，即如果 bean 的目标类型将匹配但公开的代理不匹配。
+	 *
+	 * @param type        目标类型
+	 * @param descriptor  依赖项描述符
 	 */
 	private void checkBeanNotOfRequiredType(Class<?> type, DependencyDescriptor descriptor) {
 		for (String beanName : this.beanDefinitionNames) {
 			try {
+				// 获取合并后的本地Bean定义
 				RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+				// 获取目标类型
 				Class<?> targetType = mbd.getTargetType();
+				// 如果目标类型不为空，并且类型是可分配给目标类型的，并且是自动装配候选的
 				if (targetType != null && type.isAssignableFrom(targetType) &&
 						isAutowireCandidate(beanName, mbd, descriptor, getAutowireCandidateResolver())) {
-					// Probably a proxy interfering with target type match -> throw meaningful exception.
+					// 可能是代理干扰目标类型匹配 -> 抛出有意义的异常。
 					Object beanInstance = getSingleton(beanName, false);
+					// 获取bean的实际类型
 					Class<?> beanType = (beanInstance != null && beanInstance.getClass() != NullBean.class ?
 							beanInstance.getClass() : predictBeanType(beanName, mbd));
+					// 如果bean类型不为空并且不是目标类型的子类，则抛出异常
 					if (beanType != null && !type.isAssignableFrom(beanType)) {
 						throw new BeanNotOfRequiredTypeException(beanName, type, beanType);
 					}
 				}
 			} catch (NoSuchBeanDefinitionException ex) {
-				// Bean definition got removed while we were iterating -> ignore.
+				// 当我们迭代时，Bean定义被删除了-> 忽略。
 			}
 		}
 
+		// 获取父级Bean工厂
 		BeanFactory parent = getParentBeanFactory();
+		// 如果父级Bean工厂是DefaultListableBeanFactory类型，则继续检查
 		if (parent instanceof DefaultListableBeanFactory) {
 			((DefaultListableBeanFactory) parent).checkBeanNotOfRequiredType(type, descriptor);
 		}
 	}
 
 	/**
-	 * Create an {@link Optional} wrapper for the specified dependency.
+	 * 为指定的依赖项创建一个 Optional 包装器。
+	 *
+	 * @param descriptor 依赖项描述符
+	 * @param beanName   bean 的名称（可为 null）
+	 * @param args       参数数组
+	 * @return 包装后的 Optional 实例
 	 */
 	private Optional<?> createOptionalDependency(
 			DependencyDescriptor descriptor, @Nullable String beanName, final Object... args) {
 
+		// 创建一个自定义的DependencyDescriptor，继承自NestedDependencyDescriptor
 		DependencyDescriptor descriptorToUse = new NestedDependencyDescriptor(descriptor) {
 			@Override
 			public boolean isRequired() {
@@ -1974,11 +2225,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 			@Override
 			public Object resolveCandidate(String beanName, Class<?> requiredType, BeanFactory beanFactory) {
+				// 如果args不为空，则使用args来获取bean
 				return (!ObjectUtils.isEmpty(args) ? beanFactory.getBean(beanName, args) :
 						super.resolveCandidate(beanName, requiredType, beanFactory));
 			}
 		};
+		// 解析依赖项
 		Object result = doResolveDependency(descriptorToUse, beanName, null, null);
+		// 将解析结果转换为Optional类型
 		return (result instanceof Optional ? (Optional<?>) result : Optional.ofNullable(result));
 	}
 
@@ -2018,8 +2272,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * Minimal id reference to the factory.
-	 * Resolved to the actual factory instance on deserialization.
+	 * 对工厂的最小 id 引用。
+	 * 在反序列化时，将解析为实际的工厂实例。
 	 */
 	private static class SerializedBeanFactoryReference implements Serializable {
 
@@ -2030,14 +2284,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		private Object readResolve() {
+			// 从serializableFactories中获取对应id的Reference
 			Reference<?> ref = serializableFactories.get(this.id);
 			if (ref != null) {
+				// 如果ref不为null，则获取其中的对象
 				Object result = ref.get();
 				if (result != null) {
+					// 如果result不为null，则返回结果
 					return result;
 				}
 			}
-			// Lenient fallback: dummy factory in case of original factory not found...
+			// 如果serializableFactories中未找到对应的对象，则创建一个默认的Bean工厂作为fallback
 			DefaultListableBeanFactory dummyFactory = new DefaultListableBeanFactory();
 			dummyFactory.serializationId = this.id;
 			return dummyFactory;
@@ -2046,7 +2303,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * A dependency descriptor marker for nested elements.
+	 * 用于嵌套元素的依赖描述符标记。
 	 */
 	private static class NestedDependencyDescriptor extends DependencyDescriptor {
 
@@ -2058,7 +2315,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * A dependency descriptor for a multi-element declaration with nested elements.
+	 * 用于具有嵌套元素的多元素声明的依赖描述符。
 	 */
 	private static class MultiElementDescriptor extends NestedDependencyDescriptor {
 
@@ -2069,7 +2326,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * A dependency descriptor marker for stream access to multiple elements.
+	 * 用于流访问多个元素的依赖描述符标记。
 	 */
 	private static class StreamDependencyDescriptor extends DependencyDescriptor {
 
@@ -2080,6 +2337,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			this.ordered = ordered;
 		}
 
+		/**
+		 * 检查流访问是否有序。
+		 *
+		 * @return 如果流访问有序，则为true；否则为false。
+		 */
 		public boolean isOrdered() {
 			return this.ordered;
 		}
@@ -2091,14 +2353,20 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * Serializable ObjectFactory/ObjectProvider for lazy resolution of a dependency.
+	 * 用于延迟解析依赖关系的可序列化 ObjectFactory/ObjectProvider。
 	 */
-	private class DependencyObjectProvider implements BeanObjectProvider<Object> {
-
+	private class DependencyObjectProvider implements BeanObjectProvider<Object>, Serializable {
+		/**
+		 * 依赖描述
+		 */
 		private final DependencyDescriptor descriptor;
-
+		/**
+		 * 是否是可选的
+		 */
 		private final boolean optional;
-
+		/**
+		 * bean名称
+		 */
 		@Nullable
 		private final String beanName;
 
@@ -2111,12 +2379,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		@Override
 		public Object getObject() throws BeansException {
 			if (this.optional) {
+				// 如果依赖是可选的，则创建一个Optional对象包装解析的依赖
 				return createOptionalDependency(this.descriptor, this.beanName);
 			} else {
+				// 如果依赖不是可选的，则尝试解析依赖
 				Object result = doResolveDependency(this.descriptor, this.beanName, null, null);
+				// 如果解析的结果为空，则抛出NoSuchBeanDefinitionException异常
 				if (result == null) {
 					throw new NoSuchBeanDefinitionException(this.descriptor.getResolvableType());
 				}
+				// 否则返回解析的结果
 				return result;
 			}
 		}
@@ -2124,18 +2396,24 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		@Override
 		public Object getObject(final Object... args) throws BeansException {
 			if (this.optional) {
+				// 如果依赖是可选的，则创建一个Optional对象包装解析的依赖
 				return createOptionalDependency(this.descriptor, this.beanName, args);
 			} else {
+				// 如果依赖不是可选的，则创建一个新的DependencyDescriptor，并覆盖resolveCandidate方法
 				DependencyDescriptor descriptorToUse = new DependencyDescriptor(this.descriptor) {
 					@Override
 					public Object resolveCandidate(String beanName, Class<?> requiredType, BeanFactory beanFactory) {
+						// 解析依赖时传递了参数args
 						return beanFactory.getBean(beanName, args);
 					}
 				};
+				// 尝试解析依赖
 				Object result = doResolveDependency(descriptorToUse, this.beanName, null, null);
+				// 如果解析的结果为空，则抛出NoSuchBeanDefinitionException异常
 				if (result == null) {
 					throw new NoSuchBeanDefinitionException(this.descriptor.getResolvableType());
 				}
+				// 否则返回解析的结果
 				return result;
 			}
 		}
@@ -2145,18 +2423,22 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		public Object getIfAvailable() throws BeansException {
 			try {
 				if (this.optional) {
+					// 如果依赖是可选的，则创建一个Optional对象包装解析的依赖
 					return createOptionalDependency(this.descriptor, this.beanName);
 				} else {
+					// 如果依赖不是可选的，则创建一个新的DependencyDescriptor，并覆盖isRequired方法
 					DependencyDescriptor descriptorToUse = new DependencyDescriptor(this.descriptor) {
 						@Override
 						public boolean isRequired() {
+							// 将isRequired方法重写为返回false，表示依赖不是必需的
 							return false;
 						}
 					};
+					// 尝试解析依赖
 					return doResolveDependency(descriptorToUse, this.beanName, null, null);
 				}
 			} catch (ScopeNotActiveException ex) {
-				// Ignore resolved bean in non-active scope
+				// 如果ScopeNotActiveException异常被捕获，则忽略在非活动范围中解析的bean
 				return null;
 			}
 		}
@@ -2166,9 +2448,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			Object dependency = getIfAvailable();
 			if (dependency != null) {
 				try {
+					// 尝试接受依赖对象并执行操作
 					dependencyConsumer.accept(dependency);
 				} catch (ScopeNotActiveException ex) {
-					// Ignore resolved bean in non-active scope, even on scoped proxy invocation
+					// 如果ScopeNotActiveException异常被捕获，则忽略在非活动范围中解析的bean，即使在作用域代理调用中也是如此
 				}
 			}
 		}
@@ -2176,6 +2459,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		@Override
 		@Nullable
 		public Object getIfUnique() throws BeansException {
+			// 创建一个新的依赖描述
 			DependencyDescriptor descriptorToUse = new DependencyDescriptor(this.descriptor) {
 				@Override
 				public boolean isRequired() {
@@ -2190,12 +2474,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			};
 			try {
 				if (this.optional) {
+					// 创建可选的依赖项
 					return createOptionalDependency(descriptorToUse, this.beanName);
 				} else {
+					// 解析依赖项
 					return doResolveDependency(descriptorToUse, this.beanName, null, null);
 				}
 			} catch (ScopeNotActiveException ex) {
-				// Ignore resolved bean in non-active scope
+				// 如果ScopeNotActiveException异常被捕获，则忽略在非活动范围中解析的bean
 				return null;
 			}
 		}
@@ -2205,9 +2491,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			Object dependency = getIfUnique();
 			if (dependency != null) {
 				try {
+					// 尝试接受依赖项
 					dependencyConsumer.accept(dependency);
 				} catch (ScopeNotActiveException ex) {
-					// Ignore resolved bean in non-active scope, even on scoped proxy invocation
+					// 如果ScopeNotActiveException异常被捕获，则忽略在非活动范围中解析的bean，即使是在作用域代理调用时也是如此
 				}
 			}
 		}
@@ -2215,8 +2502,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		@Nullable
 		protected Object getValue() throws BeansException {
 			if (this.optional) {
+				// 如果是可选依赖，则创建Optional依赖项
 				return createOptionalDependency(this.descriptor, this.beanName);
 			} else {
+				// 否则，解析依赖项
 				return doResolveDependency(this.descriptor, this.beanName, null, null);
 			}
 		}
@@ -2233,17 +2522,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		@SuppressWarnings("unchecked")
 		private Stream<Object> resolveStream(boolean ordered) {
+			// 创建流依赖项描述符
 			DependencyDescriptor descriptorToUse = new StreamDependencyDescriptor(this.descriptor, ordered);
+			// 解析依赖项
 			Object result = doResolveDependency(descriptorToUse, this.beanName, null, null);
+			// 如果结果是流，则直接返回结果，否则将结果包装成单元素流返回
 			return (result instanceof Stream ? (Stream<Object>) result : Stream.of(result));
 		}
 	}
 
 
 	/**
-	 * Separate inner class for avoiding a hard dependency on the {@code javax.inject} API.
-	 * Actual {@code javax.inject.Provider} implementation is nested here in order to make it
-	 * invisible for Graal's introspection of DefaultListableBeanFactory's nested classes.
+	 * 为了避免对 javax.inject API 的硬依赖而单独创建的内部类。
+	 * 实际的 javax.inject.Provider 实现被嵌套在这里，以使其对 DefaultListableBeanFactory 的嵌套类的 Graal 反射不可见。
 	 */
 	private class Jsr330Factory implements Serializable {
 
@@ -2267,14 +2558,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * An {@link org.springframework.core.OrderComparator.OrderSourceProvider} implementation
-	 * that is aware of the bean metadata of the instances to sort.
-	 * <p>Lookup for the method factory of an instance to sort, if any, and let the
-	 * comparator retrieve the {@link org.springframework.core.annotation.Order}
-	 * value defined on it. This essentially allows for the following construct:
+	 * 一个实现 org.springframework.core.OrderComparator.OrderSourceProvider 接口的类，
+	 * 它能够识别要排序的实例的 bean 元数据。
+	 * <p>查找要排序的实例的方法工厂（如果有），并让比较器检索其上定义的 org.springframework.core.annotation.Order 值。
+	 * 这基本上允许以下结构：
 	 */
 	private class FactoryAwareOrderSourceProvider implements OrderComparator.OrderSourceProvider {
 
+		/**
+		 * 实例和bean名称映射
+		 */
 		private final Map<Object, String> instancesToBeanNames;
 
 		public FactoryAwareOrderSourceProvider(Map<Object, String> instancesToBeanNames) {
@@ -2284,20 +2577,29 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		@Override
 		@Nullable
 		public Object getOrderSource(Object obj) {
+			// 获取给定实例所对应的 Bean 名称
 			String beanName = this.instancesToBeanNames.get(obj);
+			// 如果 Bean 名称为空或者不存在于 Bean 定义中，则返回 null
 			if (beanName == null || !containsBeanDefinition(beanName)) {
 				return null;
 			}
+			// 获取合并后的本地 Bean 定义
 			RootBeanDefinition beanDefinition = getMergedLocalBeanDefinition(beanName);
+			// 创建源列表
 			List<Object> sources = new ArrayList<>(2);
+			// 获取解析后的工厂方法
 			Method factoryMethod = beanDefinition.getResolvedFactoryMethod();
+			// 如果工厂方法不为空，则加入源列表
 			if (factoryMethod != null) {
 				sources.add(factoryMethod);
 			}
+			// 获取目标类型
 			Class<?> targetType = beanDefinition.getTargetType();
+			// 如果目标类型不为空且与给定实例的类型不同，则加入源列表
 			if (targetType != null && targetType != obj.getClass()) {
 				sources.add(targetType);
 			}
+			// 将源列表转换为数组并返回
 			return sources.toArray();
 		}
 	}

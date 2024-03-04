@@ -40,27 +40,18 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 /**
- * Abstract bean factory superclass that implements default bean creation,
- * with the full capabilities specified by the {@link RootBeanDefinition} class.
- * Implements the {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
- * interface in addition to AbstractBeanFactory's {@link #createBean} method.
- *
- * <p>Provides bean creation (with constructor resolution), property population,
- * wiring (including autowiring), and initialization. Handles runtime bean
- * references, resolves managed collections, calls initialization methods, etc.
- * Supports autowiring constructors, properties by name, and properties by type.
- *
- * <p>The main template method to be implemented by subclasses is
- * {@link #resolveDependency(DependencyDescriptor, String, Set, TypeConverter)},
- * used for autowiring by type. In case of a factory which is capable of searching
- * its bean definitions, matching beans will typically be implemented through such
- * a search. For other factory styles, simplified matching algorithms can be implemented.
- *
- * <p>Note that this class does <i>not</i> assume or implement bean definition
- * registry capabilities. See {@link DefaultListableBeanFactory} for an implementation
- * of the {@link org.springframework.beans.factory.ListableBeanFactory} and
- * {@link BeanDefinitionRegistry} interfaces, which represent the API and SPI
- * view of such a factory, respectively.
+ * 抽象的Bean工厂超类，实现了默认的Bean创建功能，具有RootBeanDefinition类指定的完整功能。
+ * 除了AbstractBeanFactory的createBean方法之外，还实现了org.springframework.beans.factory.config.AutowireCapableBeanFactory接口。
+ * <p>
+ * 提供Bean的创建（包括构造函数解析）、属性填充、装配（包括自动装配）和初始化。处理运行时Bean引用、解析托管集合、调用初始化方法等。
+ * 支持按名称、按类型自动装配构造函数和属性。
+ * <p>
+ * 子类需要实现的主要模板方法是resolveDependency(DependencyDescriptor, String, Set, TypeConverter)，
+ * 用于按类型进行自动装配。在具有搜索Bean定义能力的工厂中，匹配的Bean通常通过这种搜索来实现。对于其他工厂样式，
+ * 可以实现简化的匹配算法。
+ * <p>
+ * 请注意，此类不假设或实现Bean定义注册表功能。有关org.springframework.beans.factory.ListableBeanFactory和
+ * BeanDefinitionRegistry接口的实现，请参见DefaultListableBeanFactory，它们分别表示此类工厂的API和SPI视图。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -79,24 +70,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		implements AutowireCapableBeanFactory {
 
 	/**
-	 * Strategy for creating bean instances.
+	 * 创建Bean实例的策略。
 	 */
 	private InstantiationStrategy instantiationStrategy;
 
 	/**
-	 * Resolver strategy for method parameter names.
+	 * 方法参数名称的解析策略。
 	 */
 	@Nullable
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
 	/**
-	 * Whether to automatically try to resolve circular references between beans.
+	 * 是否自动尝试解析Bean之间的循环引用。
 	 */
 	private boolean allowCircularReferences = true;
 
 	/**
-	 * Whether to resort to injecting a raw bean instance in case of circular reference,
-	 * even if the injected bean eventually got wrapped.
+	 * 在发生循环引用的情况下是否采取注入原始Bean实例的策略，
+	 * 即使最终注入的Bean已被包装。
 	 */
 	private boolean allowRawInjectionDespiteWrapping = false;
 
@@ -106,8 +97,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private final Set<Class<?>> ignoredDependencyTypes = new HashSet<>();
 
 	/**
-	 * Dependency interfaces to ignore on dependency check and autowire, as Set of
-	 * Class objects. By default, only the BeanFactory interface is ignored.
+	 * 在依赖检查和自动装配时忽略的依赖接口，作为Class对象的集合。
+	 * 默认情况下，仅忽略BeanFactory接口。
 	 */
 	private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<>();
 
@@ -117,7 +108,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private final NamedThreadLocal<String> currentlyCreatedBean = new NamedThreadLocal<>("Currently created bean");
 
 	/**
-	 * Cache of unfinished FactoryBean instances: FactoryBean name to BeanWrapper.
+	 * 未完成的FactoryBean实例的缓存：FactoryBean名称到BeanWrapper的映射。
 	 */
 	private final ConcurrentMap<String, BeanWrapper> factoryBeanInstanceCache = new ConcurrentHashMap<>();
 
@@ -128,7 +119,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private final ConcurrentMap<Class<?>, Method[]> factoryMethodCandidateCache = new ConcurrentHashMap<>();
 
 	/**
-	 * Cache of filtered PropertyDescriptors: bean Class to PropertyDescriptor array.
+	 * 过滤后的属性描述符的缓存：Bean类到PropertyDescriptor数组的映射。
 	 */
 	private final ConcurrentMap<Class<?>, PropertyDescriptor[]> filteredPropertyDescriptorsCache =
 			new ConcurrentHashMap<>();
@@ -138,21 +129,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * Create a new AbstractAutowireCapableBeanFactory.
 	 */
 	public AbstractAutowireCapableBeanFactory() {
+		// 调用父类构造函数
 		super();
+		// 忽略依赖接口：BeanNameAware、BeanFactoryAware、BeanClassLoaderAware
 		ignoreDependencyInterface(BeanNameAware.class);
 		ignoreDependencyInterface(BeanFactoryAware.class);
 		ignoreDependencyInterface(BeanClassLoaderAware.class);
+		// 根据是否在Native Image环境下选择实例化策略
 		if (NativeDetector.inNativeImage()) {
+			// 在Native Image环境下使用简单实例化策略
 			this.instantiationStrategy = new SimpleInstantiationStrategy();
 		} else {
+			// 否则使用Cglib子类化实例化策略
 			this.instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 		}
 	}
 
 	/**
-	 * Create a new AbstractAutowireCapableBeanFactory with the given parent.
+	 * 使用给定的父bean工厂创建一个新的AbstractAutowireCapableBeanFactory。
 	 *
-	 * @param parentBeanFactory parent bean factory, or {@code null} if none
+	 * @param parentBeanFactory 父bean工厂，如果没有则为{@code null}
 	 */
 	public AbstractAutowireCapableBeanFactory(@Nullable BeanFactory parentBeanFactory) {
 		this();
@@ -161,9 +157,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
-	 * Set the instantiation strategy to use for creating bean instances.
-	 * Default is CglibSubclassingInstantiationStrategy.
+	 * 设置用于创建bean实例的实例化策略。默认为CglibSubclassingInstantiationStrategy。
 	 *
+	 * @param instantiationStrategy 用于创建bean实例的实例化策略
 	 * @see CglibSubclassingInstantiationStrategy
 	 */
 	public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
@@ -171,16 +167,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Return the instantiation strategy to use for creating bean instances.
+	 * 返回用于创建bean实例的实例化策略。
+	 *
+	 * @return 用于创建bean实例的实例化策略
 	 */
 	protected InstantiationStrategy getInstantiationStrategy() {
 		return this.instantiationStrategy;
 	}
 
 	/**
-	 * Set the ParameterNameDiscoverer to use for resolving method parameter
-	 * names if needed (e.g. for constructor names).
-	 * <p>Default is a {@link DefaultParameterNameDiscoverer}.
+	 * 设置用于解析方法参数名称（如果需要）的ParameterNameDiscoverer。
+	 * 默认为DefaultParameterNameDiscoverer。
+	 *
+	 * @param parameterNameDiscoverer 用于解析方法参数名称的ParameterNameDiscoverer
 	 */
 	public void setParameterNameDiscoverer(@Nullable ParameterNameDiscoverer parameterNameDiscoverer) {
 		this.parameterNameDiscoverer = parameterNameDiscoverer;
@@ -195,25 +194,22 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Set whether to allow circular references between beans - and automatically
-	 * try to resolve them.
-	 * <p>Note that circular reference resolution means that one of the involved beans
-	 * will receive a reference to another bean that is not fully initialized yet.
-	 * This can lead to subtle and not-so-subtle side effects on initialization;
-	 * it does work fine for many scenarios, though.
-	 * <p>Default is "true". Turn this off to throw an exception when encountering
-	 * a circular reference, disallowing them completely.
-	 * <p><b>NOTE:</b> It is generally recommended to not rely on circular references
-	 * between your beans. Refactor your application logic to have the two beans
-	 * involved delegate to a third bean that encapsulates their common logic.
+	 * 设置是否允许bean之间存在循环引用，并自动尝试解决它们。
+	 * <p>请注意，循环引用解析意味着涉及的其中一个bean将接收对另一个尚未完全初始化的bean的引用。
+	 * 这可能会导致初始化的细微和不太显着的副作用；但对于许多场景，它确实能够很好地工作。
+	 * <p>默认为"true"。将其关闭以在遇到循环引用时抛出异常，完全禁止它们。
+	 * <p><b>注意：</b>通常建议不要依赖于bean之间的循环引用。重构应用程序逻辑，使涉及的两个bean委托给一个封装了它们共同逻辑的第三个bean。
+	 *
+	 * @param allowCircularReferences 是否允许bean之间存在循环引用
 	 */
 	public void setAllowCircularReferences(boolean allowCircularReferences) {
 		this.allowCircularReferences = allowCircularReferences;
 	}
 
 	/**
-	 * Return whether to allow circular references between beans.
+	 * 返回是否允许bean之间存在循环引用。
 	 *
+	 * @return 是否允许bean之间存在循环引用
 	 * @see #setAllowCircularReferences
 	 * @since 5.3.10
 	 */
@@ -222,18 +218,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Set whether to allow the raw injection of a bean instance into some other
-	 * bean's property, despite the injected bean eventually getting wrapped
-	 * (for example, through AOP auto-proxying).
-	 * <p>This will only be used as a last resort in case of a circular reference
-	 * that cannot be resolved otherwise: essentially, preferring a raw instance
-	 * getting injected over a failure of the entire bean wiring process.
-	 * <p>Default is "false", as of Spring 2.0. Turn this on to allow for non-wrapped
-	 * raw beans injected into some of your references, which was Spring 1.2's
-	 * (arguably unclean) default behavior.
-	 * <p><b>NOTE:</b> It is generally recommended to not rely on circular references
-	 * between your beans, in particular with auto-proxying involved.
+	 * 设置是否允许将bean实例原始注入到另一个bean的属性中，尽管注入的bean最终会被包装
+	 * （例如，通过AOP自动代理）。
+	 * <p>这仅在无法以其他方式解析循环引用的情况下作为最后的手段使用：
+	 * 基本上，优先考虑原始实例被注入，而不是整个bean装配过程失败。
+	 * <p>默认为"false"，从Spring 2.0开始。将其打开以允许将未包装的原始bean注入到您的一些引用中，
+	 * 这是Spring 1.2的（可以说不太干净的）默认行为。
+	 * <p><b>注意：</b>通常建议不要依赖于bean之间的循环引用，特别是涉及到自动代理时。
 	 *
+	 * @param allowRawInjectionDespiteWrapping 是否允许将bean实例原始注入
 	 * @see #setAllowCircularReferences
 	 */
 	public void setAllowRawInjectionDespiteWrapping(boolean allowRawInjectionDespiteWrapping) {
@@ -241,8 +234,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Return whether to allow the raw injection of a bean instance.
+	 * 返回是否允许将bean实例原始注入。
 	 *
+	 * @return 是否允许将bean实例原始注入
 	 * @see #setAllowRawInjectionDespiteWrapping
 	 * @since 5.3.10
 	 */
@@ -251,21 +245,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Ignore the given dependency type for autowiring:
-	 * for example, String. Default is none.
+	 * 忽略自动装配时给定的依赖类型：
+	 * 例如，String。默认为无。
+	 *
+	 * @param type 要忽略的依赖类型
 	 */
 	public void ignoreDependencyType(Class<?> type) {
 		this.ignoredDependencyTypes.add(type);
 	}
 
 	/**
-	 * Ignore the given dependency interface for autowiring.
-	 * <p>This will typically be used by application contexts to register
-	 * dependencies that are resolved in other ways, like BeanFactory through
-	 * BeanFactoryAware or ApplicationContext through ApplicationContextAware.
-	 * <p>By default, only the BeanFactoryAware interface is ignored.
-	 * For further types to ignore, invoke this method for each type.
+	 * 忽略自动装配时给定的依赖接口。
+	 * <p>这通常由应用程序上下文使用来注册通过其他方式解析的依赖项，如BeanFactory通过BeanFactoryAware或
+	 * ApplicationContext通过ApplicationContextAware。
+	 * <p>默认情况下，只有BeanFactoryAware接口被忽略。
+	 * 要忽略更多类型，请为每个类型调用此方法。
 	 *
+	 * @param ifc 要忽略的依赖接口
 	 * @see org.springframework.beans.factory.BeanFactoryAware
 	 * @see org.springframework.context.ApplicationContextAware
 	 */
@@ -275,13 +271,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	@Override
 	public void copyConfigurationFrom(ConfigurableBeanFactory otherFactory) {
+		// 调用父类方法复制配置
 		super.copyConfigurationFrom(otherFactory);
+		// 如果otherFactory是AbstractAutowireCapableBeanFactory类型，则进行相应配置复制
 		if (otherFactory instanceof AbstractAutowireCapableBeanFactory) {
 			AbstractAutowireCapableBeanFactory otherAutowireFactory =
 					(AbstractAutowireCapableBeanFactory) otherFactory;
+			// 复制实例化策略
 			this.instantiationStrategy = otherAutowireFactory.instantiationStrategy;
+			// 复制是否允许循环引用的设置
 			this.allowCircularReferences = otherAutowireFactory.allowCircularReferences;
+			// 复制忽略的依赖类型列表
 			this.ignoredDependencyTypes.addAll(otherAutowireFactory.ignoredDependencyTypes);
+			// 复制忽略的依赖接口列表
 			this.ignoredDependencyInterfaces.addAll(otherAutowireFactory.ignoredDependencyInterfaces);
 		}
 	}
@@ -294,43 +296,60 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T createBean(Class<T> beanClass) throws BeansException {
-		// Use prototype bean definition, to avoid registering bean as dependent bean.
+		// 使用原型（prototype）bean定义，以避免将bean注册为依赖bean。
 		RootBeanDefinition bd = new RootBeanDefinition(beanClass);
+		// 设置bean的作用域为原型（prototype）
 		bd.setScope(SCOPE_PROTOTYPE);
 		bd.allowCaching = ClassUtils.isCacheSafe(beanClass, getBeanClassLoader());
+		// 调用createBean方法创建bean实例
 		return (T) createBean(beanClass.getName(), bd, null);
 	}
 
 	@Override
 	public void autowireBean(Object existingBean) {
-		// Use non-singleton bean definition, to avoid registering bean as dependent bean.
+		// 使用非单例（non-singleton）bean定义，以避免将bean注册为依赖bean。
 		RootBeanDefinition bd = new RootBeanDefinition(ClassUtils.getUserClass(existingBean));
+		// 设置bean的作用域为原型（prototype）
 		bd.setScope(SCOPE_PROTOTYPE);
 		bd.allowCaching = ClassUtils.isCacheSafe(bd.getBeanClass(), getBeanClassLoader());
+		// 创建bean包租昂起
 		BeanWrapper bw = new BeanWrapperImpl(existingBean);
+		// 初始化bean包装器
 		initBeanWrapper(bw);
+		// 填充属性
 		populateBean(bd.getBeanClass().getName(), bd, bw);
 	}
 
 	@Override
 	public Object configureBean(Object existingBean, String beanName) throws BeansException {
+		// 将bean标记为已创建
 		markBeanAsCreated(beanName);
+		// 获取合并的bean定义
 		BeanDefinition mbd = getMergedBeanDefinition(beanName);
+		// 创建根bean定义
 		RootBeanDefinition bd = null;
 		if (mbd instanceof RootBeanDefinition) {
+			// 如果合并bean定义是根bean定义
 			RootBeanDefinition rbd = (RootBeanDefinition) mbd;
+			//如果是原型bean则使用rbd，否则使用它的克隆作为根定义
 			bd = (rbd.isPrototype() ? rbd : rbd.cloneBeanDefinition());
 		}
 		if (bd == null) {
 			bd = new RootBeanDefinition(mbd);
 		}
+		// 如果不是原型（prototype），则将其设置为原型作用域
 		if (!bd.isPrototype()) {
 			bd.setScope(SCOPE_PROTOTYPE);
+			// 允许缓存，如果bean类是缓存安全的
 			bd.allowCaching = ClassUtils.isCacheSafe(ClassUtils.getUserClass(existingBean), getBeanClassLoader());
 		}
+		// 使用现有的bean实例创建BeanWrapper
 		BeanWrapper bw = new BeanWrapperImpl(existingBean);
+		// 初始化BeanWrapper
 		initBeanWrapper(bw);
+		// 填充bean属性
 		populateBean(beanName, bd, bw);
+		// 初始化bean并返回
 		return initializeBean(beanName, existingBean, bd);
 	}
 
