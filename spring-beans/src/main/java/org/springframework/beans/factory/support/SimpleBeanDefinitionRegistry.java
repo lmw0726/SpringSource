@@ -27,9 +27,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Simple implementation of the {@link BeanDefinitionRegistry} interface.
- * Provides registry capabilities only, with no factory capabilities built in.
- * Can for example be used for testing bean definition readers.
+ * {@link BeanDefinitionRegistry} 接口的简单实现。
+ * 仅提供注册功能，没有内置的工厂功能。
+ * 例如，可以用于测试bean定义读取器。
  *
  * @author Juergen Hoeller
  * @since 2.5.2

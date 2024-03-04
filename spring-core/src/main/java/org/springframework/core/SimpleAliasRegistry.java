@@ -30,11 +30,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Simple implementation of the {@link AliasRegistry} interface.
+ * {@link AliasRegistry} 接口的简单实现。
  *
- * <p>Serves as base class for
- * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
- * implementations.
+ * <p>作为 {@link org.springframework.beans.factory.support.BeanDefinitionRegistry} 实现的基类。
  *
  * @author Juergen Hoeller
  * @author Qimiao Chen
