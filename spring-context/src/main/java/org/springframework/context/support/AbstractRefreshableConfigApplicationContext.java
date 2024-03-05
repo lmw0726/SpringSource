@@ -36,10 +36,14 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
 		implements BeanNameAware, InitializingBean {
-
+	/**
+	 * 配置的位置数组
+	 */
 	@Nullable
 	private String[] configLocations;
-
+	/**
+	 * 是否设置Id调用
+	 */
 	private boolean setIdCalled = false;
 
 

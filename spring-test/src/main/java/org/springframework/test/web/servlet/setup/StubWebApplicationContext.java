@@ -16,15 +16,6 @@
 
 package org.springframework.test.web.servlet.setup;
 
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.TypeConverter;
@@ -35,12 +26,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.config.NamedBeanHolder;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceResolvable;
-import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.*;
 import org.springframework.context.support.DelegatingMessageSource;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.env.Environment;
@@ -53,14 +39,18 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.ServletContextResourcePatternResolver;
 
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 /**
- * A stub WebApplicationContext that accepts registrations of object instances.
+ * 一个存根 WebApplicationContext，接受对象实例的注册。
  *
- * <p>As registered object instances are instantiated and initialized externally,
- * there is no wiring, bean initialization, lifecycle events, as well as no
- * pre-processing and post-processing hooks typically associated with beans
- * managed by an {@link ApplicationContext}. Just a simple lookup into a
- * {@link StaticListableBeanFactory}.
+ * <p>由于注册的对象实例是外部实例化和初始化的，因此没有与 {@link ApplicationContext} 管理的 Bean 通常相关联的装配、Bean 初始化、生命周期事件，以及预处理和后处理钩子。只是一个简单的查找进入 {@link StaticListableBeanFactory}。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -68,20 +58,44 @@ import org.springframework.web.context.support.ServletContextResourcePatternReso
  */
 class StubWebApplicationContext implements WebApplicationContext {
 
+	/**
+	 * Servlet上下文对象。
+	 */
 	private final ServletContext servletContext;
 
+	/**
+	 * 存根 BeanFactory 对象。
+	 */
 	private final StubBeanFactory beanFactory = new StubBeanFactory();
 
+	/**
+	 * 上下文唯一标识符。
+	 */
 	private final String id = ObjectUtils.identityToString(this);
 
+	/**
+	 * 上下文显示名称。
+	 */
 	private final String displayName = ObjectUtils.identityToString(this);
 
+	/**
+	 * 上下文启动时间。
+	 */
 	private final long startupDate = System.currentTimeMillis();
 
+	/**
+	 * 环境对象。
+	 */
 	private final Environment environment = new StandardEnvironment();
 
+	/**
+	 * 消息源对象。
+	 */
 	private final MessageSource messageSource = new DelegatingMessageSource();
 
+	/**
+	 * 资源模式解析器对象。
+	 */
 	private final ResourcePatternResolver resourcePatternResolver;
 
 
@@ -92,7 +106,7 @@ class StubWebApplicationContext implements WebApplicationContext {
 
 
 	/**
-	 * Returns an instance that can initialize {@link ApplicationContextAware} beans.
+	 * 返回一个可以初始化 {@link ApplicationContextAware} bean 的实例。
 	 */
 	@Override
 	public AutowireCapableBeanFactory getAutowireCapableBeanFactory() throws IllegalStateException {
@@ -136,7 +150,7 @@ class StubWebApplicationContext implements WebApplicationContext {
 
 	@Override
 	public Environment getEnvironment() {
-		return this.environment ;
+		return this.environment;
 	}
 
 	public void addBean(String name, Object bean) {
@@ -144,9 +158,12 @@ class StubWebApplicationContext implements WebApplicationContext {
 	}
 
 	public void addBeans(@Nullable List<?> beans) {
+		// 如果传入的 beans 不为空，则遍历每个 bean
 		if (beans != null) {
 			for (Object bean : beans) {
+				// 生成一个唯一的 bean 名称，格式为类名 + "#" + 对象的十六进制标识符
 				String name = bean.getClass().getName() + "#" + ObjectUtils.getIdentityHexString(bean);
+				// 将 bean 添加到 beanFactory 中
 				this.beanFactory.addBean(name, bean);
 			}
 		}
@@ -309,7 +326,7 @@ class StubWebApplicationContext implements WebApplicationContext {
 	@Override
 	@Nullable
 	public <A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> annotationType)
-			throws NoSuchBeanDefinitionException{
+			throws NoSuchBeanDefinitionException {
 
 		return this.beanFactory.findAnnotationOnBean(beanName, annotationType);
 	}
@@ -394,17 +411,18 @@ class StubWebApplicationContext implements WebApplicationContext {
 
 
 	/**
-	 * An extension of StaticListableBeanFactory that implements
-	 * AutowireCapableBeanFactory in order to allow bean initialization of
-	 * {@link ApplicationContextAware} singletons.
+	 * 一个 StaticListableBeanFactory 的扩展，它实现了 AutowireCapableBeanFactory，以允许初始化 {@link ApplicationContextAware} 单例的 Bean。
 	 */
 	private class StubBeanFactory extends StaticListableBeanFactory implements AutowireCapableBeanFactory {
 
 		@Override
 		public Object initializeBean(Object existingBean, String beanName) throws BeansException {
 			if (existingBean instanceof ApplicationContextAware) {
+				// 如果现有的 bean 实现了 ApplicationContextAware 接口，
+				// 则将 StubWebApplicationContext 设置为其 ApplicationContext
 				((ApplicationContextAware) existingBean).setApplicationContext(StubWebApplicationContext.this);
 			}
+			// 返回现有的 bean
 			return existingBean;
 		}
 
@@ -455,7 +473,7 @@ class StubWebApplicationContext implements WebApplicationContext {
 		@Override
 		@Nullable
 		public Object resolveDependency(DependencyDescriptor descriptor, @Nullable String requestingBeanName,
-				@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) {
+										@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) {
 			throw new UnsupportedOperationException("Dependency resolution not supported");
 		}
 

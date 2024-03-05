@@ -398,29 +398,34 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void publishEvent(Object event, @Nullable ResolvableType eventType) {
 		Assert.notNull(event, "Event must not be null");
 
-		// 如果必要，将事件装饰为 ApplicationEvent
+		// 如果必要，将事件转换为  ApplicationEvent 类型
 		ApplicationEvent applicationEvent;
 		if (event instanceof ApplicationEvent) {
 			applicationEvent = (ApplicationEvent) event;
 		} else {
+			// 如果事件不是 ApplicationEvent 类型，则创建一个 PayloadApplicationEvent 对象
 			applicationEvent = new PayloadApplicationEvent<>(this, event);
+			// 如果事件类型为空，则从 PayloadApplicationEvent 中获取 ResolvableType
 			if (eventType == null) {
 				eventType = ((PayloadApplicationEvent<?>) applicationEvent).getResolvableType();
 			}
 		}
 
-		// 如果可能，立即进行多播 - 或者在多播器初始化后慢慢地进行
 		if (this.earlyApplicationEvents != null) {
+			// 如果存在早期的事件列表，则将事件添加到列表中
 			this.earlyApplicationEvents.add(applicationEvent);
 		} else {
+			// 否则立即进行事件的多播
 			getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);
 		}
 
-		// 通过父上下文也发布事件...
+		// 通过父上下文也发布事件
 		if (this.parent != null) {
 			if (this.parent instanceof AbstractApplicationContext) {
+				// 如果父上下文是 AbstractApplicationContext 类型，则调用其 publishEvent 方法
 				((AbstractApplicationContext) this.parent).publishEvent(event, eventType);
 			} else {
+				// 如果父上下文不是 AbstractApplicationContext 类型，则直接调用其 publishEvent 方法
 				this.parent.publishEvent(event);
 			}
 		}

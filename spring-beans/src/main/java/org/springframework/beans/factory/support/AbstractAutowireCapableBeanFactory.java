@@ -360,21 +360,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	@Override
 	public Object createBean(Class<?> beanClass, int autowireMode, boolean dependencyCheck) throws BeansException {
-		// Use non-singleton bean definition, to avoid registering bean as dependent bean.
+		// 使用非单例的 bean 定义，以避免将 bean 注册为依赖 bean
 		RootBeanDefinition bd = new RootBeanDefinition(beanClass, autowireMode, dependencyCheck);
 		bd.setScope(SCOPE_PROTOTYPE);
+		// 创建并返回 bean 实例
 		return createBean(beanClass.getName(), bd, null);
 	}
 
 	@Override
 	public Object autowire(Class<?> beanClass, int autowireMode, boolean dependencyCheck) throws BeansException {
-		// Use non-singleton bean definition, to avoid registering bean as dependent bean.
+		// 使用非单例的 bean 定义，以避免将 bean 注册为依赖 bean
 		RootBeanDefinition bd = new RootBeanDefinition(beanClass, autowireMode, dependencyCheck);
 		bd.setScope(SCOPE_PROTOTYPE);
+
+		// 如果使用构造器自动装配模式，则使用自动装配构造器创建 bean 实例
 		if (bd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR) {
 			return autowireConstructor(beanClass.getName(), bd, null, null).getWrappedInstance();
 		} else {
 			Object bean;
+			// 使用特权代码块来实例化 bean
 			if (System.getSecurityManager() != null) {
 				bean = AccessController.doPrivileged(
 						(PrivilegedAction<Object>) () -> getInstantiationStrategy().instantiate(bd, null, this),
@@ -382,6 +386,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			} else {
 				bean = getInstantiationStrategy().instantiate(bd, null, this);
 			}
+			// 填充 bean 的属性值
 			populateBean(beanClass.getName(), bd, new BeanWrapperImpl(bean));
 			return bean;
 		}
@@ -394,21 +399,33 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (autowireMode == AUTOWIRE_CONSTRUCTOR) {
 			throw new IllegalArgumentException("AUTOWIRE_CONSTRUCTOR not supported for existing bean instance");
 		}
-		// Use non-singleton bean definition, to avoid registering bean as dependent bean.
+
+		// 使用非单例的 bean 定义，以避免将 bean 注册为依赖 bean
 		RootBeanDefinition bd =
 				new RootBeanDefinition(ClassUtils.getUserClass(existingBean), autowireMode, dependencyCheck);
 		bd.setScope(SCOPE_PROTOTYPE);
+
+		// 使用现有的 bean 实例创建并初始化 BeanWrapper
 		BeanWrapper bw = new BeanWrapperImpl(existingBean);
 		initBeanWrapper(bw);
+
+		// 填充 bean 的属性值
 		populateBean(bd.getBeanClass().getName(), bd, bw);
 	}
 
 	@Override
 	public void applyBeanPropertyValues(Object existingBean, String beanName) throws BeansException {
+		// 将 bean 标记为已创建
 		markBeanAsCreated(beanName);
+
+		// 获取合并的 bean 定义
 		BeanDefinition bd = getMergedBeanDefinition(beanName);
+
+		// 使用现有的 bean 实例创建并初始化 BeanWrapper
 		BeanWrapper bw = new BeanWrapperImpl(existingBean);
 		initBeanWrapper(bw);
+
+		// 应用属性值到 bean 实例
 		applyPropertyValues(beanName, bd, bw, bd.getPropertyValues());
 	}
 
@@ -485,10 +502,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	@Override
 	public Object resolveBeanByName(String name, DependencyDescriptor descriptor) {
+		// 保存之前的注入点，设置当前注入点为指定的描述符
 		InjectionPoint previousInjectionPoint = ConstructorResolver.setCurrentInjectionPoint(descriptor);
 		try {
+			// 获取具有指定依赖类型的 bean
 			return getBean(name, descriptor.getDependencyType());
 		} finally {
+			// 恢复之前的注入点
 			ConstructorResolver.setCurrentInjectionPoint(previousInjectionPoint);
 		}
 	}
@@ -549,16 +569,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			// 创建 bean 实例
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
+			// 如果启用了跟踪日志，则记录 bean 实例创建完成的消息
 			if (logger.isTraceEnabled()) {
 				logger.trace("Finished creating instance of bean '" + beanName + "'");
 			}
 			return beanInstance;
 		} catch (BeanCreationException | ImplicitlyAppearedSingletonException ex) {
-			// A previously detected exception with proper bean creation context already,
-			// or illegal singleton state to be communicated up to DefaultSingletonBeanRegistry.
+			// 如果之前检测到有适当的 bean 创建上下文的异常，
+			// 或者发现非法的单例状态需要通知给 DefaultSingletonBeanRegistry，则直接抛出异常
 			throw ex;
 		} catch (Throwable ex) {
+			// 捕获并处理异常，将其封装为 BeanCreationException 并抛出
 			throw new BeanCreationException(
 					mbdToUse.getResourceDescription(), beanName, "Unexpected exception during bean creation", ex);
 		}

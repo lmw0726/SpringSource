@@ -16,60 +16,48 @@
 
 package org.springframework.jndi.support;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingException;
-
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
-import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.*;
 import org.springframework.core.ResolvableType;
 import org.springframework.jndi.JndiLocatorSupport;
 import org.springframework.jndi.TypeMismatchNamingException;
 import org.springframework.lang.Nullable;
 
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
+import java.util.*;
+
 /**
- * Simple JNDI-based implementation of Spring's
- * {@link org.springframework.beans.factory.BeanFactory} interface.
- * Does not support enumerating bean definitions, hence doesn't implement
- * the {@link org.springframework.beans.factory.ListableBeanFactory} interface.
+ * Spring的简单基于JNDI的 {@link org.springframework.beans.factory.BeanFactory} 接口的实现。
+ * 不支持枚举 Bean 定义，因此不实现 {@link org.springframework.beans.factory.ListableBeanFactory} 接口。
  *
- * <p>This factory resolves given bean names as JNDI names within the
- * Java EE application's "java:comp/env/" namespace. It caches the resolved
- * types for all obtained objects, and optionally also caches shareable
- * objects (if they are explicitly marked as
- * {@link #addShareableResource shareable resource}.
+ * <p>此工厂将给定的 Bean 名称解析为 Java EE 应用程序的 "java:comp/env/" 命名空间中的 JNDI 名称。
+ * 它缓存了所有获取对象的已解析类型，并且可选择地也缓存可共享的对象（如果它们显式标记为 {@link #addShareableResource shareable resource}）。
  *
- * <p>The main intent of this factory is usage in combination with Spring's
- * {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor},
- * configured as "resourceFactory" for resolving {@code @Resource}
- * annotations as JNDI objects without intermediate bean definitions.
- * It may be used for similar lookup scenarios as well, of course,
- * in particular if BeanFactory-style type checking is required.
+ * <p>此工厂的主要目的是与 Spring 的 {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor} 结合使用，
+ * 配置为 {@code @Resource} 注解的 JNDI 对象的解析器，而不需要中间 Bean 定义。
+ * 当然，如果需要 BeanFactory 风格的类型检查，它也可以用于类似的查找场景。
  *
  * @author Juergen Hoeller
- * @since 2.5
  * @see org.springframework.beans.factory.support.DefaultListableBeanFactory
  * @see org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
+ * @since 2.5
  */
 public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFactory {
 
-	/** JNDI names of resources that are known to be shareable, i.e. can be cached */
+	/**
+	 * 已知可共享的资源的 JNDI 名称集合
+	 */
 	private final Set<String> shareableResources = new HashSet<>();
 
-	/** Cache of shareable singleton objects: bean name to bean instance. */
+	/**
+	 * 可共享的单例对象的缓存：Bean 名称到 Bean 实例的映射
+	 */
 	private final Map<String, Object> singletonObjects = new HashMap<>();
 
-	/** Cache of the types of nonshareable resources: bean name to bean type. */
+	/**
+	 * 非共享资源类型的缓存：Bean 名称到 Bean 类型的映射
+	 */
 	private final Map<String, Class<?>> resourceTypes = new HashMap<>();
 
 
@@ -79,20 +67,20 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 
 
 	/**
-	 * Add the name of a shareable JNDI resource,
-	 * which this factory is allowed to cache once obtained.
-	 * @param shareableResource the JNDI name
-	 * (typically within the "java:comp/env/" namespace)
+	 * 添加一个可共享的 JNDI 资源的名称，
+	 * 一旦获取到，此工厂就允许缓存它。
+	 *
+	 * @param shareableResource JNDI 名称（通常位于 "java:comp/env/" 命名空间）
 	 */
 	public void addShareableResource(String shareableResource) {
 		this.shareableResources.add(shareableResource);
 	}
 
 	/**
-	 * Set a list of names of shareable JNDI resources,
-	 * which this factory is allowed to cache once obtained.
-	 * @param shareableResources the JNDI names
-	 * (typically within the "java:comp/env/" namespace)
+	 * 设置一个可共享的 JNDI 资源名称列表，
+	 * 一旦获取到，此工厂就允许缓存它。
+	 *
+	 * @param shareableResources JNDI 名称（通常位于 "java:comp/env/" 命名空间）
 	 */
 	public void setShareableResources(String... shareableResources) {
 		Collections.addAll(this.shareableResources, shareableResources);
@@ -112,20 +100,22 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 	@Override
 	public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
 		try {
+			// 检查 bean 是否为单例
 			if (isSingleton(name)) {
+				// 如果是单例，则调用 doGetSingleton 方法获取单例 bean
 				return doGetSingleton(name, requiredType);
-			}
-			else {
+			} else {
+				// 如果不是单例，则调用 lookup 方法进行查找
 				return lookup(name, requiredType);
 			}
-		}
-		catch (NameNotFoundException ex) {
+		} catch (NameNotFoundException ex) {
+			// 如果在 JNDI 环境中找不到指定的 bean，则抛出 NoSuchBeanDefinitionException 异常
 			throw new NoSuchBeanDefinitionException(name, "not found in JNDI environment");
-		}
-		catch (TypeMismatchNamingException ex) {
+		} catch (TypeMismatchNamingException ex) {
+			// 如果 JNDI 环境中的 bean 类型与要求的类型不匹配，则抛出 BeanNotOfRequiredTypeException 异常
 			throw new BeanNotOfRequiredTypeException(name, ex.getRequiredType(), ex.getActualType());
-		}
-		catch (NamingException ex) {
+		} catch (NamingException ex) {
+			// 如果 JNDI 查找过程中发生命名异常，则抛出 BeanDefinitionStoreException 异常
 			throw new BeanDefinitionStoreException("JNDI environment", name, "JNDI lookup failed", ex);
 		}
 	}
@@ -160,30 +150,30 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 			public T getObject() throws BeansException {
 				return getBean(requiredType);
 			}
+
 			@Override
 			public T getObject(Object... args) throws BeansException {
 				return getBean(requiredType, args);
 			}
+
 			@Override
 			@Nullable
 			public T getIfAvailable() throws BeansException {
 				try {
 					return getBean(requiredType);
-				}
-				catch (NoUniqueBeanDefinitionException ex) {
+				} catch (NoUniqueBeanDefinitionException ex) {
 					throw ex;
-				}
-				catch (NoSuchBeanDefinitionException ex) {
+				} catch (NoSuchBeanDefinitionException ex) {
 					return null;
 				}
 			}
+
 			@Override
 			@Nullable
 			public T getIfUnique() throws BeansException {
 				try {
 					return getBean(requiredType);
-				}
-				catch (NoSuchBeanDefinitionException ex) {
+				} catch (NoSuchBeanDefinitionException ex) {
 					return null;
 				}
 			}
@@ -199,13 +189,16 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 	@Override
 	public boolean containsBean(String name) {
 		if (this.singletonObjects.containsKey(name) || this.resourceTypes.containsKey(name)) {
+			// 如果指定名称的 bean 存在于单例对象映射或资源类型映射中，则返回 true
 			return true;
 		}
 		try {
+			// 否则，尝试获取指定名称的类型
 			doGetType(name);
+			// 如果能够成功获取类型，则返回 true
 			return true;
-		}
-		catch (NamingException ex) {
+		} catch (NamingException ex) {
+			// 如果获取类型过程中发生命名异常，则返回 false
 			return false;
 		}
 	}
@@ -243,11 +236,9 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 	public Class<?> getType(String name, boolean allowFactoryBeanInit) throws NoSuchBeanDefinitionException {
 		try {
 			return doGetType(name);
-		}
-		catch (NameNotFoundException ex) {
+		} catch (NameNotFoundException ex) {
 			throw new NoSuchBeanDefinitionException(name, "not found in JNDI environment");
-		}
-		catch (NamingException ex) {
+		} catch (NamingException ex) {
 			return null;
 		}
 	}
@@ -261,30 +252,40 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 	@SuppressWarnings("unchecked")
 	private <T> T doGetSingleton(String name, @Nullable Class<T> requiredType) throws NamingException {
 		synchronized (this.singletonObjects) {
+			// 从单例对象映射中获取指定名称的 bean 实例
 			Object singleton = this.singletonObjects.get(name);
+			// 如果能够找到指定名称的单例对象
 			if (singleton != null) {
+				// 如果指定了期望的类型，并且单例对象的类型不符合要求，则抛出类型不匹配的异常
 				if (requiredType != null && !requiredType.isInstance(singleton)) {
 					throw new TypeMismatchNamingException(convertJndiName(name), requiredType, singleton.getClass());
 				}
+				// 返回单例对象
 				return (T) singleton;
 			}
+			// 否则，通过 JNDI 进行查找并获取指定名称的对象
 			T jndiObject = lookup(name, requiredType);
+			// 将查找到的对象放入单例对象映射中
 			this.singletonObjects.put(name, jndiObject);
+			// 返回查找到的对象
 			return jndiObject;
 		}
 	}
 
 	private Class<?> doGetType(String name) throws NamingException {
 		if (isSingleton(name)) {
+			// 如果指定名称的 bean 是单例的，则直接从单例对象映射中获取其类型
 			return doGetSingleton(name, null).getClass();
-		}
-		else {
+		} else {
 			synchronized (this.resourceTypes) {
+				// 否则，通过 JNDI 查找指定名称的资源类型
 				Class<?> type = this.resourceTypes.get(name);
+				// 如果资源类型为空，则进行 JNDI 查找，并将其类型放入资源类型映射中
 				if (type == null) {
 					type = lookup(name, null).getClass();
 					this.resourceTypes.put(name, type);
 				}
+				// 返回资源类型
 				return type;
 			}
 		}
