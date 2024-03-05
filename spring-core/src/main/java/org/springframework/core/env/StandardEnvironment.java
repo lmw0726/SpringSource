@@ -17,33 +17,24 @@
 package org.springframework.core.env;
 
 /**
- * {@link Environment} implementation suitable for use in 'standard' (i.e. non-web)
- * applications.
+ * 适用于“标准”（即非Web）应用程序的{@link Environment}实现。
  *
- * <p>In addition to the usual functions of a {@link ConfigurableEnvironment} such as
- * property resolution and profile-related operations, this implementation configures two
- * default property sources, to be searched in the following order:
+ * <p>除了{@link ConfigurableEnvironment}的常规功能（例如属性解析和与配置文件相关的操作）之外，
+ * 此实现配置了两个默认属性源，按以下顺序搜索：
  * <ul>
- * <li>{@linkplain AbstractEnvironment#getSystemProperties() system properties}
- * <li>{@linkplain AbstractEnvironment#getSystemEnvironment() system environment variables}
+ * <li>{@linkplain AbstractEnvironment#getSystemProperties() 系统属性}
+ * <li>{@linkplain AbstractEnvironment#getSystemEnvironment() 系统环境变量}
  * </ul>
  *
- * That is, if the key "xyz" is present both in the JVM system properties as well as in
- * the set of environment variables for the current process, the value of key "xyz" from
- * system properties will return from a call to {@code environment.getProperty("xyz")}.
- * This ordering is chosen by default because system properties are per-JVM, while
- * environment variables may be the same across many JVMs on a given system.  Giving
- * system properties precedence allows for overriding of environment variables on a
- * per-JVM basis.
+ * 也就是说，如果键“xyz”同时存在于JVM系统属性和当前进程的环境变量集中，
+ * 则调用{@code environment.getProperty("xyz")}时将从系统属性中返回键“xyz”的值。
+ * 默认选择此顺序是因为系统属性是每个JVM的，而环境变量可能是在给定系统上的许多JVM中相同的。
+ * 给予系统属性的优先级允许在每个JVM基础上覆盖环境变量。
  *
- * <p>These default property sources may be removed, reordered, or replaced; and
- * additional property sources may be added using the {@link MutablePropertySources}
- * instance available from {@link #getPropertySources()}. See
- * {@link ConfigurableEnvironment} Javadoc for usage examples.
+ * <p>可以删除、重新排序或替换这些默认属性源，并且可以使用{@link MutablePropertySources}实例
+ * （从{@link #getPropertySources()}中获得）添加其他属性源。有关用法示例，请参阅{@link ConfigurableEnvironment} Javadoc。
  *
- * <p>See {@link SystemEnvironmentPropertySource} javadoc for details on special handling
- * of property names in shell environments (e.g. Bash) that disallow period characters in
- * variable names.
+ * <p>有关在shell环境（例如Bash）中处理属性名称的详细信息，请参阅{@link SystemEnvironmentPropertySource} Javadoc。
  *
  * @author Chris Beams
  * @author Phillip Webb
@@ -54,24 +45,22 @@ package org.springframework.core.env;
  */
 public class StandardEnvironment extends AbstractEnvironment {
 
-	/** System environment property source name: {@value}. */
+	/** 系统环境属性源名称：{@value}. */
 	public static final String SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME = "systemEnvironment";
 
-	/** JVM system properties property source name: {@value}. */
+	/** JVM系统属性属性源名称：{@value}. */
 	public static final String SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME = "systemProperties";
 
 
 	/**
-	 * Create a new {@code StandardEnvironment} instance with a default
-	 * {@link MutablePropertySources} instance.
+	 * 使用默认的{@link MutablePropertySources}实例创建一个新的{@code StandardEnvironment}实例。
 	 */
 	public StandardEnvironment() {
 	}
 
 	/**
-	 * Create a new {@code StandardEnvironment} instance with a specific
-	 * {@link MutablePropertySources} instance.
-	 * @param propertySources property sources to use
+	 * 使用特定的{@link MutablePropertySources}实例创建一个新的{@code StandardEnvironment}实例。
+	 * @param propertySources 要使用的属性源
 	 * @since 5.3.4
 	 */
 	protected StandardEnvironment(MutablePropertySources propertySources) {
@@ -80,24 +69,22 @@ public class StandardEnvironment extends AbstractEnvironment {
 
 
 	/**
-	 * Customize the set of property sources with those appropriate for any standard
-	 * Java environment:
+	 * 自定义属性源集合，包括适用于任何标准Java环境的那些：
 	 * <ul>
 	 * <li>{@value #SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME}
 	 * <li>{@value #SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}
 	 * </ul>
-	 * <p>Properties present in {@value #SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME} will
-	 * take precedence over those in {@value #SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}.
+	 * <p>{@value #SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME}中存在的属性将优先于{@value #SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}中的属性。
 	 * @see AbstractEnvironment#customizePropertySources(MutablePropertySources)
 	 * @see #getSystemProperties()
 	 * @see #getSystemEnvironment()
 	 */
 	@Override
 	protected void customizePropertySources(MutablePropertySources propertySources) {
-		propertySources.addLast(
-				new PropertiesPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, getSystemProperties()));
-		propertySources.addLast(
-				new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, getSystemEnvironment()));
+		// 将系统属性添加到属性源列表的末尾作为属性源
+		propertySources.addLast(new PropertiesPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, getSystemProperties()));
+		// 将系统环境变量添加到属性源列表的末尾作为属性源
+		propertySources.addLast(new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, getSystemEnvironment()));
 	}
 
 }

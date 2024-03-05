@@ -16,17 +16,15 @@
 
 package org.springframework.web.context;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+
 /**
- * Specialization of {@link ConfigurableEnvironment} allowing initialization of
- * servlet-related {@link org.springframework.core.env.PropertySource} objects at the
- * earliest moment that the {@link ServletContext} and (optionally) {@link ServletConfig}
- * become available.
+ * {@link ConfigurableEnvironment}的特化版本，允许在{@link ServletContext}和（可选）{@link ServletConfig}最早可用时初始化与Servlet相关的
+ * {@link org.springframework.core.env.PropertySource}对象。
  *
  * @author Chris Beams
  * @since 3.1.2
@@ -35,12 +33,11 @@ import org.springframework.lang.Nullable;
 public interface ConfigurableWebEnvironment extends ConfigurableEnvironment {
 
 	/**
-	 * Replace any {@linkplain
-	 * org.springframework.core.env.PropertySource.StubPropertySource stub property source}
-	 * instances acting as placeholders with real servlet context/config property sources
-	 * using the given parameters.
-	 * @param servletContext the {@link ServletContext} (may not be {@code null})
-	 * @param servletConfig the {@link ServletConfig} ({@code null} if not available)
+	 * 使用给定的参数，将任何充当占位符的{@linkplain
+	 * org.springframework.core.env.PropertySource.StubPropertySource stub property source}实例替换为真正的servlet上下文/配置属性源。
+	 *
+	 * @param servletContext {@link ServletContext}（不能为空）
+	 * @param servletConfig {@link ServletConfig}（如果不可用，则为{@code null}）
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources(
 	 * org.springframework.core.env.MutablePropertySources, ServletContext, ServletConfig)
 	 */

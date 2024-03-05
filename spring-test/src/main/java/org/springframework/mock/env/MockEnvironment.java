@@ -20,37 +20,39 @@ import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Simple {@link ConfigurableEnvironment} implementation exposing
- * {@link #setProperty(String, String)} and {@link #withProperty(String, String)}
- * methods for testing purposes.
+ * 用于测试目的的简单{@link ConfigurableEnvironment}实现，暴露了{@link #setProperty(String, String)}和{@link #withProperty(String, String)}方法。
  *
  * @author Chris Beams
  * @author Sam Brannen
- * @since 3.2
  * @see org.springframework.mock.env.MockPropertySource
+ * @since 3.2
  */
 public class MockEnvironment extends AbstractEnvironment {
 
+	/**
+	 * 模拟属性源
+	 */
 	private MockPropertySource propertySource = new MockPropertySource();
 
 	/**
-	 * Create a new {@code MockEnvironment} with a single {@link MockPropertySource}.
+	 * 创建一个带有单个{@link MockPropertySource}的新{@code MockEnvironment}。
 	 */
 	public MockEnvironment() {
 		getPropertySources().addLast(this.propertySource);
 	}
 
 	/**
-	 * Set a property on the underlying {@link MockPropertySource} for this environment.
+	 * 在此环境的基础{@link MockPropertySource}上设置属性。
 	 */
 	public void setProperty(String key, String value) {
 		this.propertySource.setProperty(key, value);
 	}
 
 	/**
-	 * Convenient synonym for {@link #setProperty} that returns the current instance.
-	 * Useful for method chaining and fluent-style use.
-	 * @return this {@link MockEnvironment} instance
+	 * {@link #setProperty}的方便同义词，返回当前实例。
+	 * 用于方法链接和流畅式使用。
+	 *
+	 * @return 此{@link MockEnvironment}实例
 	 * @see MockPropertySource#withProperty
 	 */
 	public MockEnvironment withProperty(String key, String value) {
