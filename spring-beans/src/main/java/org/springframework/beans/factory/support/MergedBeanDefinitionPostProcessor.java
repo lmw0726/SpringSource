@@ -19,17 +19,10 @@ package org.springframework.beans.factory.support;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * Post-processor callback interface for <i>merged</i> bean definitions at runtime.
- * {@link BeanPostProcessor} implementations may implement this sub-interface in order
- * to post-process the merged bean definition (a processed copy of the original bean
- * definition) that the Spring {@code BeanFactory} uses to create a bean instance.
+ * 运行时用于合并的bean定义的后处理器回调接口。
+ * {@link BeanPostProcessor}实现可以实现此子接口，以便对Spring {@code BeanFactory}用于创建bean实例的合并bean定义（原始bean定义的处理副本）进行后处理。
  *
- * <p>The {@link #postProcessMergedBeanDefinition} method may for example introspect
- * the bean definition in order to prepare some cached metadata before post-processing
- * actual instances of a bean. It is also allowed to modify the bean definition but
- * <i>only</i> for definition properties which are actually intended for concurrent
- * modification. Essentially, this only applies to operations defined on the
- * {@link RootBeanDefinition} itself but not to the properties of its base classes.
+ * <p> {@link #postProcessMergedBeanDefinition}方法可以例如内省bean定义，以准备一些缓存的元数据，然后再后处理bean的实际实例。也允许修改bean定义，但<i>只</i>适用于实际用于并发修改的定义属性。基本上，这仅适用于在{@link RootBeanDefinition}本身上定义的操作，而不适用于其基类的属性。
  *
  * @author Juergen Hoeller
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#getMergedBeanDefinition
@@ -38,11 +31,11 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 public interface MergedBeanDefinitionPostProcessor extends BeanPostProcessor {
 
 	/**
-	 * Post-process the given merged bean definition for the specified bean.
+	 * 后处理指定bean的给定合并bean定义。
 	 *
-	 * @param beanDefinition the merged bean definition for the bean
-	 * @param beanType       the actual type of the managed bean instance
-	 * @param beanName       the name of the bean
+	 * @param beanDefinition bean的合并bean定义
+	 * @param beanType       托管bean实例的实际类型
+	 * @param beanName       bean的名称
 	 * @see AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors
 	 */
 	void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName);

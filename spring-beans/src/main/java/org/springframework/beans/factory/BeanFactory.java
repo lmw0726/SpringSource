@@ -19,80 +19,58 @@ package org.springframework.beans.factory;
 import org.springframework.beans.BeansException;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
-
 /**
- * The root interface for accessing a Spring bean container.
+ * 用于访问 Spring Bean 容器的根接口。
  *
- * <p>This is the basic client view of a bean container;
- * further interfaces such as {@link ListableBeanFactory} and
- * {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}
- * are available for specific purposes.
+ * <p>这是 Bean 容器的基本客户端视图；进一步的接口，如 {@link ListableBeanFactory} 和
+ * {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}，可用于特定目的。
  *
- * <p>This interface is implemented by objects that hold a number of bean definitions,
- * each uniquely identified by a String name. Depending on the bean definition,
- * the factory will return either an independent instance of a contained object
- * (the Prototype design pattern), or a single shared instance (a superior
- * alternative to the Singleton design pattern, in which the instance is a
- * singleton in the scope of the factory). Which type of instance will be returned
- * depends on the bean factory configuration: the API is the same. Since Spring
- * 2.0, further scopes are available depending on the concrete application
- * context (e.g. "request" and "session" scopes in a web environment).
+ * <p>此接口由持有多个 Bean 定义的对象实现，每个 Bean 定义都由一个 String 名称唯一标识。根据 Bean 定义的不同，
+ * 工厂将返回一个包含对象的独立实例（Prototype 设计模式）或一个单个共享实例（Singleton 设计模式的一个优秀替代品，
+ * 其中实例是工厂范围内的单例）。将返回哪种类型的实例取决于 Bean 工厂的配置：API 是相同的。从 Spring 2.0 开始，
+ * 根据具体的应用程序上下文（例如，在 Web 环境中的 "request" 和 "session" 作用域）还提供了进一步的作用域。
  *
- * <p>The point of this approach is that the BeanFactory is a central registry
- * of application components, and centralizes configuration of application
- * components (no more do individual objects need to read properties files,
- * for example). See chapters 4 and 11 of "Expert One-on-One J2EE Design and
- * Development" for a discussion of the benefits of this approach.
+ * <p>此方法的重点在于 BeanFactory 是应用程序组件的中央注册表，并且集中了应用程序组件的配置（例如，不再需要单个对象读取属性文件）。
+ * 有关此方法的好处的讨论，请参阅 "Expert One-on-One J2EE Design and Development" 的第 4 和 11 章。
  *
- * <p>Note that it is generally better to rely on Dependency Injection
- * ("push" configuration) to configure application objects through setters
- * or constructors, rather than use any form of "pull" configuration like a
- * BeanFactory lookup. Spring's Dependency Injection functionality is
- * implemented using this BeanFactory interface and its subinterfaces.
+ * <p>请注意，通常最好依赖依赖注入（"push" 配置）通过 setter 或构造函数来配置应用程序对象，而不是使用任何形式的 "pull" 配置，
+ * 如 BeanFactory 查找。Spring 的依赖注入功能是使用此 BeanFactory 接口及其子接口实现的。
  *
- * <p>Normally a BeanFactory will load bean definitions stored in a configuration
- * source (such as an XML document), and use the {@code org.springframework.beans}
- * package to configure the beans. However, an implementation could simply return
- * Java objects it creates as necessary directly in Java code. There are no
- * constraints on how the definitions could be stored: LDAP, RDBMS, XML,
- * properties file, etc. Implementations are encouraged to support references
- * amongst beans (Dependency Injection).
+ * <p>通常，BeanFactory 将加载存储在配置源（例如 XML 文档）中的 Bean 定义，并使用 {@code org.springframework.beans} 包来配置这些 Bean。
+ * 但是，实现可以简单地直接在 Java 代码中根据需要返回 Java 对象。关于定义可以存储在哪里的约束没有：LDAP、RDBMS、XML、属性文件等。
+ * 鼓励实现支持 Bean 之间的引用（依赖注入）。
  *
- * <p>In contrast to the methods in {@link ListableBeanFactory}, all of the
- * operations in this interface will also check parent factories if this is a
- * {@link HierarchicalBeanFactory}. If a bean is not found in this factory instance,
- * the immediate parent factory will be asked. Beans in this factory instance
- * are supposed to override beans of the same name in any parent factory.
+ * <p>与 {@link ListableBeanFactory} 中的方法相反，此接口中的所有操作都将检查父工厂（如果这是一个 {@link HierarchicalBeanFactory}）。
+ * 如果在此工厂实例中找不到 Bean，则将询问其直接父工厂。此工厂实例中的 Bean 应该覆盖任何父工厂中同名的 Bean。
  *
- * <p>Bean factory implementations should support the standard bean lifecycle interfaces
- * as far as possible. The full set of initialization methods and their standard order is:
+ * <p>Bean 工厂实现应尽可能支持标准的 Bean 生命周期接口。初始化方法及其标准顺序的完整集合如下：
  * <ol>
- * <li>BeanNameAware's {@code setBeanName}
- * <li>BeanClassLoaderAware's {@code setBeanClassLoader}
- * <li>BeanFactoryAware's {@code setBeanFactory}
- * <li>EnvironmentAware's {@code setEnvironment}
- * <li>EmbeddedValueResolverAware's {@code setEmbeddedValueResolver}
- * <li>ResourceLoaderAware's {@code setResourceLoader}
- * (only applicable when running in an application context)
- * <li>ApplicationEventPublisherAware's {@code setApplicationEventPublisher}
- * (only applicable when running in an application context)
- * <li>MessageSourceAware's {@code setMessageSource}
- * (only applicable when running in an application context)
- * <li>ApplicationContextAware's {@code setApplicationContext}
- * (only applicable when running in an application context)
- * <li>ServletContextAware's {@code setServletContext}
- * (only applicable when running in a web application context)
- * <li>{@code postProcessBeforeInitialization} methods of BeanPostProcessors
- * <li>InitializingBean's {@code afterPropertiesSet}
- * <li>a custom {@code init-method} definition
- * <li>{@code postProcessAfterInitialization} methods of BeanPostProcessors
+ * <li>BeanNameAware 的 {@code setBeanName}
+ * <li>BeanClassLoaderAware 的 {@code setBeanClassLoader}
+ * <li>BeanFactoryAware 的 {@code setBeanFactory}
+ * <li>EnvironmentAware 的 {@code setEnvironment}
+ * <li>EmbeddedValueResolverAware 的 {@code setEmbeddedValueResolver}
+ * <li>ResourceLoaderAware 的 {@code setResourceLoader}
+ * （仅在应用程序上下文中运行时适用）
+ * <li>ApplicationEventPublisherAware 的 {@code setApplicationEventPublisher}
+ * （仅在应用程序上下文中运行时适用）
+ * <li>MessageSourceAware 的 {@code setMessageSource}
+ * （仅在应用程序上下文中运行时适用）
+ * <li>ApplicationContextAware 的 {@code setApplicationContext}
+ * （仅在应用程序上下文中运行时适用）
+ * <li>ServletContextAware 的 {@code setServletContext}
+ * （仅在 Web 应用程序上下文中运行时适用）
+ * <li>BeanPostProcessors 的 {@code postProcessBeforeInitialization} 方法
+ * <li>InitializingBean 的 {@code afterPropertiesSet}
+ * <li>自定义 {@code init-method} 定义
+ * <li>BeanPostProcessors 的 {@code postProcessAfterInitialization} 方法
  * </ol>
  *
- * <p>On shutdown of a bean factory, the following lifecycle methods apply:
+ * <p>在关闭 Bean 工厂时，以下生命周期方法适用：
  * <ol>
- * <li>{@code postProcessBeforeDestruction} methods of DestructionAwareBeanPostProcessors
- * <li>DisposableBean's {@code destroy}
- * <li>a custom {@code destroy-method} definition
+ * <li>DestructionAwareBeanPostProcessors 的 {@code postProcessBeforeDestruction} 方法
+ * <li>DisposableBean 的 {@code destroy}
+ * <li>自定义 {@code destroy-method} 定义
  * </ol>
  *
  * @author Rod Johnson

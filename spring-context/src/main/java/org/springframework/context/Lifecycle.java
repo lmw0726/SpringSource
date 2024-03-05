@@ -17,28 +17,22 @@
 package org.springframework.context;
 
 /**
- * A common interface defining methods for start/stop lifecycle control.
- * The typical use case for this is to control asynchronous processing.
- * <b>NOTE: This interface does not imply specific auto-startup semantics.
- * Consider implementing {@link SmartLifecycle} for that purpose.</b>
+ * 定义用于启动/停止生命周期控制的方法的通用接口。
+ * 这个接口的典型用例是控制异步处理。
+ * <b>注意：这个接口不暗示特定的自动启动语义。
+ * 考虑实现 {@link SmartLifecycle} 来实现这个目的。</b>
  *
- * <p>Can be implemented by both components (typically a Spring bean defined in a
- * Spring context) and containers  (typically a Spring {@link ApplicationContext}
- * itself). Containers will propagate start/stop signals to all components that
- * apply within each container, e.g. for a stop/restart scenario at runtime.
+ * <p>可以由组件（通常是在 Spring 上下文中定义的 Spring bean）和容器（通常是 Spring {@link ApplicationContext} 本身）来实现。
+ * 容器将在每个容器中传播启动/停止信号给所有适用的组件，例如在运行时进行停止/重启场景。
  *
- * <p>Can be used for direct invocations or for management operations via JMX.
- * In the latter case, the {@link org.springframework.jmx.export.MBeanExporter}
- * will typically be defined with an
- * {@link org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler},
- * restricting the visibility of activity-controlled components to the Lifecycle
- * interface.
+ * <p>可以用于直接调用或通过 JMX 进行管理操作。
+ * 在后一种情况下，通常会使用 {@link org.springframework.jmx.export.MBeanExporter}
+ * 定义一个 {@link org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler}，
+ * 将受控制的活动组件的可见性限制为 Lifecycle 接口。
  *
- * <p>Note that the present {@code Lifecycle} interface is only supported on
- * <b>top-level singleton beans</b>. On any other component, the {@code Lifecycle}
- * interface will remain undetected and hence ignored. Also, note that the extended
- * {@link SmartLifecycle} interface provides sophisticated integration with the
- * application context's startup and shutdown phases.
+ * <p>请注意，当前的 {@code Lifecycle} 接口仅在顶级单例 bean 上受支持。
+ * 在任何其他组件上，{@code Lifecycle} 接口将保持未被检测到，因此被忽略。
+ * 另外，请注意，扩展的 {@link SmartLifecycle} 接口与应用程序上下文的启动和关闭阶段进行了复杂的集成。
  *
  * @author Juergen Hoeller
  * @see SmartLifecycle
@@ -46,10 +40,6 @@ package org.springframework.context;
  * @see org.springframework.jms.listener.AbstractMessageListenerContainer
  * @see org.springframework.scheduling.quartz.SchedulerFactoryBean
  * @since 2.0
- */
-
-/**
- * 定义组件生命周期的接口。
  */
 public interface Lifecycle {
 

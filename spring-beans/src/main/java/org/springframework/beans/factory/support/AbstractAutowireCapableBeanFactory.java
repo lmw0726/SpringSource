@@ -675,7 +675,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// 注册 bean 作为可销毁的。
 		try {
 			// 如果需要，注册 bean 以便在销毁时进行清理
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
@@ -690,20 +689,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Override
 	@Nullable
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
-		//类型推断
+		// 类型推断
 		Class<?> targetType = determineTargetType(beanName, mbd, typesToMatch);
-		// Apply SmartInstantiationAwareBeanPostProcessors to predict the
-		// eventual type after a before-instantiation shortcut.
+		// 如果目标类型不为空且bean定义不是合成的，并且存在SmartInstantiationAwareBeanPostProcessors，则尝试预测实例化之前的类型
 		if (targetType != null && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+			// 如果typesToMatch只包含FactoryBean.class，则只匹配FactoryBean
 			boolean matchingOnlyFactoryBean = typesToMatch.length == 1 && typesToMatch[0] == FactoryBean.class;
+			// 遍历所有的SmartInstantiationAwareBeanPostProcessors
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
+				// 预测bean的类型
 				Class<?> predicted = bp.predictBeanType(targetType, beanName);
+				// 如果预测结果不为空，并且满足只匹配FactoryBean的条件，则返回预测结果
 				if (predicted != null &&
 						(!matchingOnlyFactoryBean || FactoryBean.class.isAssignableFrom(predicted))) {
 					return predicted;
 				}
 			}
 		}
+		// 返回目标类型
 		return targetType;
 	}
 
@@ -890,99 +893,111 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * This implementation attempts to query the FactoryBean's generic parameter metadata
-	 * if present to determine the object type. If not present, i.e. the FactoryBean is
-	 * declared as a raw type, checks the FactoryBean's {@code getObjectType} method
-	 * on a plain instance of the FactoryBean, without bean properties applied yet.
-	 * If this doesn't return a type yet, and {@code allowInit} is {@code true} a
-	 * full creation of the FactoryBean is used as fallback (through delegation to the
-	 * superclass's implementation).
-	 * <p>The shortcut check for a FactoryBean is only applied in case of a singleton
-	 * FactoryBean. If the FactoryBean instance itself is not kept as singleton,
-	 * it will be fully created to check the type of its exposed object.
+	 * 此实现尝试查询FactoryBean的泛型参数元数据（如果存在）以确定对象类型。
+	 * 如果不存在，即FactoryBean声明为原始类型，将在未应用bean属性的情况下，
+	 * 在FactoryBean的普通实例上检查FactoryBean的{@code getObjectType}方法。
+	 * 如果这还没有返回类型，并且{@code allowInit}为{@code true}，
+	 * 则会使用完整的FactoryBean创建作为后备（通过委派到超类的实现）。
+	 * <p>仅在单例FactoryBean的情况下应用FactoryBean的快捷方式检查。
+	 * 如果FactoryBean实例本身不保持为单例，则将完全创建它以检查其公开对象的类型。
+	 *
+	 * @param beanName  bean名称
+	 * @param mbd       bean的根bean定义
+	 * @param allowInit 是否允许完整初始化FactoryBean以检索对象类型
+	 * @return FactoryBean的对象类型，如果找不到则为{@code null}
 	 */
 	@Override
 	protected ResolvableType getTypeForFactoryBean(String beanName, RootBeanDefinition mbd, boolean allowInit) {
-		// Check if the bean definition itself has defined the type with an attribute
+		// 检查bean定义本身是否通过属性定义了类型
 		ResolvableType result = getTypeForFactoryBeanFromAttributes(mbd);
 		if (result != ResolvableType.NONE) {
 			return result;
 		}
 
-		ResolvableType beanType =
-				(mbd.hasBeanClass() ? ResolvableType.forClass(mbd.getBeanClass()) : ResolvableType.NONE);
+		// 获取bean的ResolvableType，如果存在beanClass则使用它，否则为NONE
+		ResolvableType beanType = (mbd.hasBeanClass() ? ResolvableType.forClass(mbd.getBeanClass()) : ResolvableType.NONE);
 
-		// For instance supplied beans try the target type and bean class
+		// 对于通过实例提供的bean，尝试获取目标类型和bean类的泛型类型
 		if (mbd.getInstanceSupplier() != null) {
+			// 获取目标类型的泛型
 			result = getFactoryBeanGeneric(mbd.targetType);
 			if (result.resolve() != null) {
+				// 如果存在泛型，则返回该已解析类型
 				return result;
 			}
+			// 获取bean类的泛型
 			result = getFactoryBeanGeneric(beanType);
 			if (result.resolve() != null) {
+				//如果存在泛型，则返回该bean类
 				return result;
 			}
 		}
 
-		// Consider factory methods
+		// 考虑工厂方法
 		String factoryBeanName = mbd.getFactoryBeanName();
 		String factoryMethodName = mbd.getFactoryMethodName();
 
-		// Scan the factory bean methods
+		// 扫描工厂Bean的方法
 		if (factoryBeanName != null) {
+			// 如果存在工厂bean名称
 			if (factoryMethodName != null) {
-				// Try to obtain the FactoryBean's object type from its factory method
-				// declaration without instantiating the containing bean at all.
+				// 并且存在工厂方法名称
+				// 尝试从工厂方法的声明中获取FactoryBean的对象类型，而不需要实例化包含的bean
 				BeanDefinition factoryBeanDefinition = getBeanDefinition(factoryBeanName);
 				Class<?> factoryBeanClass;
 				if (factoryBeanDefinition instanceof AbstractBeanDefinition &&
 						((AbstractBeanDefinition) factoryBeanDefinition).hasBeanClass()) {
+					// 如果工厂bean定义是AbstractBeanDefinition类型，并且有bean类，则获取该bean类
 					factoryBeanClass = ((AbstractBeanDefinition) factoryBeanDefinition).getBeanClass();
 				} else {
+					// 通过工厂bean名称和工厂bean定义获取合并bean定义
 					RootBeanDefinition fbmbd = getMergedBeanDefinition(factoryBeanName, factoryBeanDefinition);
+					// 使用上述的工厂bean名称和合并bean定义推断类型
 					factoryBeanClass = determineTargetType(factoryBeanName, fbmbd);
 				}
 				if (factoryBeanClass != null) {
+					// 如果工厂bean类型存在，则通过该工厂bean类型和工厂方法获取类型
 					result = getTypeForFactoryBeanFromMethod(factoryBeanClass, factoryMethodName);
 					if (result.resolve() != null) {
+						// 如果这个类型存在，则返回
 						return result;
 					}
 				}
 			}
-			// If not resolvable above and the referenced factory bean doesn't exist yet,
-			// exit here - we don't want to force the creation of another bean just to
-			// obtain a FactoryBean's object type...
+			// 如果以上情况均不可解析，且引用的工厂bean尚不存在，则退出 - 我们不希望强制创建另一个bean来获取FactoryBean的对象类型...
 			if (!isBeanEligibleForMetadataCaching(factoryBeanName)) {
 				return ResolvableType.NONE;
 			}
 		}
 
-		// If we're allowed, we can create the factory bean and call getObjectType() early
+		// 如果允许，可以创建工厂bean并提前调用getObjectType()
 		if (allowInit) {
+			// 如果允许初始化，则获取工厂bean
 			FactoryBean<?> factoryBean = (mbd.isSingleton() ?
 					getSingletonFactoryBeanForTypeCheck(beanName, mbd) :
 					getNonSingletonFactoryBeanForTypeCheck(beanName, mbd));
 			if (factoryBean != null) {
-				// Try to obtain the FactoryBean's object type from this early stage of the instance.
+				// 尝试从这个实例的早期阶段获取FactoryBean的对象类型
 				Class<?> type = getTypeForFactoryBean(factoryBean);
 				if (type != null) {
 					return ResolvableType.forClass(type);
 				}
-				// No type found for shortcut FactoryBean instance:
-				// fall back to full creation of the FactoryBean instance.
+				// 如果没有找到类型的快捷方式FactoryBean实例：回退到完整创建FactoryBean实例
 				return super.getTypeForFactoryBean(beanName, mbd, true);
 			}
 		}
 
+		// 如果factoryBeanName为空且存在beanClass且factoryMethodName不为空，则无法进行早期bean实例化：从静态工厂方法签名或类继承层次结构中确定FactoryBean的类型...
 		if (factoryBeanName == null && mbd.hasBeanClass() && factoryMethodName != null) {
-			// No early bean instantiation possible: determine FactoryBean's type from
-			// static factory method signature or from class inheritance hierarchy...
 			return getTypeForFactoryBeanFromMethod(mbd.getBeanClass(), factoryMethodName);
 		}
+
+		// 获取bean的泛型类型
 		result = getFactoryBeanGeneric(beanType);
 		if (result.resolve() != null) {
 			return result;
 		}
+
 		return ResolvableType.NONE;
 	}
 
@@ -994,31 +1009,28 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Introspect the factory method signatures on the given bean class,
-	 * trying to find a common {@code FactoryBean} object type declared there.
+	 * 对给定的bean类进行内省，尝试在其中查找通用的{@code FactoryBean}对象类型声明的工厂方法。
 	 *
-	 * @param beanClass         the bean class to find the factory method on
-	 * @param factoryMethodName the name of the factory method
-	 * @return the common {@code FactoryBean} object type, or {@code null} if none
+	 * @param beanClass         要查找工厂方法的bean类
+	 * @param factoryMethodName 工厂方法的名称
+	 * @return 通用的{@code FactoryBean}对象类型，如果没有则为{@code null}
 	 */
 	private ResolvableType getTypeForFactoryBeanFromMethod(Class<?> beanClass, String factoryMethodName) {
-		// CGLIB subclass methods hide generic parameters; look at the original user class.
+		// CGLIB子类方法隐藏泛型参数；查看原始用户类。
 		Class<?> factoryBeanClass = ClassUtils.getUserClass(beanClass);
 		FactoryBeanMethodTypeFinder finder = new FactoryBeanMethodTypeFinder(factoryMethodName);
+		// 使用ReflectionUtils.doWithMethods检查工厂Bean类中的方法，查找返回类型
 		ReflectionUtils.doWithMethods(factoryBeanClass, finder, ReflectionUtils.USER_DECLARED_METHODS);
+		// 返回查找结果
 		return finder.getResult();
 	}
 
 	/**
-	 * This implementation attempts to query the FactoryBean's generic parameter metadata
-	 * if present to determine the object type. If not present, i.e. the FactoryBean is
-	 * declared as a raw type, checks the FactoryBean's {@code getObjectType} method
-	 * on a plain instance of the FactoryBean, without bean properties applied yet.
-	 * If this doesn't return a type yet, a full creation of the FactoryBean is
-	 * used as fallback (through delegation to the superclass's implementation).
-	 * <p>The shortcut check for a FactoryBean is only applied in case of a singleton
-	 * FactoryBean. If the FactoryBean instance itself is not kept as singleton,
-	 * it will be fully created to check the type of its exposed object.
+	 * 此实现尝试查询FactoryBean的泛型参数元数据（如果存在）以确定对象类型。如果不存在，
+	 * 即FactoryBean声明为原始类型，则在未应用bean属性的FactoryBean的纯实例上检查FactoryBean的{@code getObjectType}方法。
+	 * 如果此方法尚未返回类型，则使用FactoryBean的完全创建作为后备（通过委托给超类的实现）。
+	 * <p>仅在单例FactoryBean的情况下应用对FactoryBean的快捷检查。如果FactoryBean实例本身不作为单例保存，
+	 * 则将完全创建它以检查其暴露对象的类型。
 	 */
 	@Override
 	@Deprecated
@@ -1056,61 +1068,65 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	//---------------------------------------------------------------------
 
 	/**
-	 * Obtain a "shortcut" singleton FactoryBean instance to use for a
-	 * {@code getObjectType()} call, without full initialization of the FactoryBean.
+	 * 获取用于{@code getObjectType()}调用的“快捷”单例FactoryBean实例，而无需完全初始化FactoryBean。
 	 *
-	 * @param beanName the name of the bean
-	 * @param mbd      the bean definition for the bean
-	 * @return the FactoryBean instance, or {@code null} to indicate
-	 * that we couldn't obtain a shortcut FactoryBean instance
+	 * @param beanName bean的名称
+	 * @param mbd      bean的bean定义
+	 * @return FactoryBean实例，如果我们无法获取快捷FactoryBean实例，则返回{@code null}
 	 */
 	@Nullable
 	private FactoryBean<?> getSingletonFactoryBeanForTypeCheck(String beanName, RootBeanDefinition mbd) {
 		synchronized (getSingletonMutex()) {
+			// 从缓存中获取包装器
 			BeanWrapper bw = this.factoryBeanInstanceCache.get(beanName);
+			// 如果已经存在，直接返回包装器中的实例
 			if (bw != null) {
 				return (FactoryBean<?>) bw.getWrappedInstance();
 			}
+			// 从单例缓存中获取实例
 			Object beanInstance = getSingleton(beanName, false);
+			// 如果实例是FactoryBean类型，直接返回
 			if (beanInstance instanceof FactoryBean) {
 				return (FactoryBean<?>) beanInstance;
 			}
-			if (isSingletonCurrentlyInCreation(beanName) ||
-					(mbd.getFactoryBeanName() != null && isSingletonCurrentlyInCreation(mbd.getFactoryBeanName()))) {
+			// 检查当前bean是否正在创建中，或者依赖的工厂bean是否正在创建中
+			if (isSingletonCurrentlyInCreation(beanName) || (mbd.getFactoryBeanName() != null && isSingletonCurrentlyInCreation(mbd.getFactoryBeanName()))) {
 				return null;
 			}
 
 			Object instance;
 			try {
-				// Mark this bean as currently in creation, even if just partially.
+				// 标记该bean当前正在创建中
 				beforeSingletonCreation(beanName);
-				// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+				// 在实例化bean之前，让BeanPostProcessors有机会返回代理而不是目标bean实例
 				instance = resolveBeforeInstantiation(beanName, mbd);
+				// 如果没有返回代理，尝试创建bean实例
 				if (instance == null) {
 					bw = createBeanInstance(beanName, mbd, null);
 					instance = bw.getWrappedInstance();
 				}
 			} catch (UnsatisfiedDependencyException ex) {
-				// Don't swallow, probably misconfiguration...
+				// 不要吞掉异常，可能是配置错误
 				throw ex;
 			} catch (BeanCreationException ex) {
-				// Don't swallow a linkage error since it contains a full stacktrace on
-				// first occurrence... and just a plain NoClassDefFoundError afterwards.
+				// 不要吞掉链接错误，因为它包含第一次出现时的完整堆栈跟踪... 之后只是一个普通的NoClassDefFoundError。
 				if (ex.contains(LinkageError.class)) {
 					throw ex;
 				}
-				// Instantiation failure, maybe too early...
+				// 实例化失败，可能是因为太早...
 				if (logger.isDebugEnabled()) {
 					logger.debug("Bean creation exception on singleton FactoryBean type check: " + ex);
 				}
 				onSuppressedException(ex);
 				return null;
 			} finally {
-				// Finished partial creation of this bean.
+				// 完成该bean的部分创建
 				afterSingletonCreation(beanName);
 			}
 
+			// 获取FactoryBean实例
 			FactoryBean<?> fb = getFactoryBean(beanName, instance);
+			// 将包装器放入缓存
 			if (bw != null) {
 				this.factoryBeanInstanceCache.put(beanName, bw);
 			}
@@ -1119,42 +1135,42 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Obtain a "shortcut" non-singleton FactoryBean instance to use for a
-	 * {@code getObjectType()} call, without full initialization of the FactoryBean.
+	 * 获取用于{@code getObjectType()}调用的“快捷”非单例FactoryBean实例，而无需完全初始化FactoryBean。
 	 *
-	 * @param beanName the name of the bean
-	 * @param mbd      the bean definition for the bean
-	 * @return the FactoryBean instance, or {@code null} to indicate
-	 * that we couldn't obtain a shortcut FactoryBean instance
+	 * @param beanName bean的名称
+	 * @param mbd      bean的bean定义
+	 * @return FactoryBean实例，如果我们无法获取快捷FactoryBean实例，则返回{@code null}
 	 */
 	@Nullable
 	private FactoryBean<?> getNonSingletonFactoryBeanForTypeCheck(String beanName, RootBeanDefinition mbd) {
+		// 如果该原型bean当前正在创建中，返回null
 		if (isPrototypeCurrentlyInCreation(beanName)) {
 			return null;
 		}
 
 		Object instance;
 		try {
-			// Mark this bean as currently in creation, even if just partially.
+			// 标记该bean当前正在创建中
 			beforePrototypeCreation(beanName);
-			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// 在实例化bean之前，让BeanPostProcessors有机会返回代理而不是目标bean实例
 			instance = resolveBeforeInstantiation(beanName, mbd);
+			// 如果没有返回代理，尝试创建bean实例
 			if (instance == null) {
 				BeanWrapper bw = createBeanInstance(beanName, mbd, null);
 				instance = bw.getWrappedInstance();
 			}
 		} catch (UnsatisfiedDependencyException ex) {
-			// Don't swallow, probably misconfiguration...
+			// 不要吞掉异常，可能是配置错误
 			throw ex;
 		} catch (BeanCreationException ex) {
-			// Instantiation failure, maybe too early...
+			// 实例化失败，可能是因为太早...
 			if (logger.isDebugEnabled()) {
 				logger.debug("Bean creation exception on non-singleton FactoryBean type check: " + ex);
 			}
 			onSuppressedException(ex);
 			return null;
 		} finally {
-			// Finished partial creation of this bean.
+			// 完成该bean的部分创建
 			afterPrototypeCreation(beanName);
 		}
 
@@ -1162,12 +1178,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Apply MergedBeanDefinitionPostProcessors to the specified bean definition,
-	 * invoking their {@code postProcessMergedBeanDefinition} methods.
+	 * 将MergedBeanDefinitionPostProcessors应用于指定的bean定义，调用它们的{@code postProcessMergedBeanDefinition}方法。
 	 *
-	 * @param mbd      the merged bean definition for the bean
-	 * @param beanType the actual type of the managed bean instance
-	 * @param beanName the name of the bean
+	 * @param mbd      bean的合并bean定义
+	 * @param beanType 托管bean实例的实际类型
+	 * @param beanName bean的名称
 	 * @see MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition
 	 */
 	protected void applyMergedBeanDefinitionPostProcessors(RootBeanDefinition mbd, Class<?> beanType, String beanName) {
@@ -1369,22 +1384,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Determine candidate constructors to use for the given bean, checking all registered
-	 * {@link SmartInstantiationAwareBeanPostProcessor SmartInstantiationAwareBeanPostProcessors}.
+	 * 确定用于给定bean的候选构造函数，检查所有已注册的{@link SmartInstantiationAwareBeanPostProcessor SmartInstantiationAwareBeanPostProcessors}。
 	 *
-	 * @param beanClass the raw class of the bean
-	 * @param beanName  the name of the bean
-	 * @return the candidate constructors, or {@code null} if none specified
-	 * @throws org.springframework.beans.BeansException in case of errors
+	 * @param beanClass bean的原始类
+	 * @param beanName  bean的名称
+	 * @return 候选构造函数，如果没有指定，则为{@code null}
+	 * @throws org.springframework.beans.BeansException 如果出现错误
 	 * @see org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor#determineCandidateConstructors
 	 */
 	@Nullable
 	protected Constructor<?>[] determineConstructorsFromBeanPostProcessors(@Nullable Class<?> beanClass, String beanName)
 			throws BeansException {
 
+		// 如果beanClass不为null，并且存在InstantiationAwareBeanPostProcessors，则遍历处理器列表
 		if (beanClass != null && hasInstantiationAwareBeanPostProcessors()) {
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
+				// 确定候选构造函数
 				Constructor<?>[] ctors = bp.determineCandidateConstructors(beanClass, beanName);
+				// 如果构造函数不为null，则返回
 				if (ctors != null) {
 					return ctors;
 				}
@@ -1679,22 +1696,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Extract a filtered set of PropertyDescriptors from the given BeanWrapper,
-	 * excluding ignored dependency types or properties defined on ignored dependency interfaces.
+	 * 从给定的BeanWrapper中提取一组过滤后的属性描述符，排除已忽略的依赖类型或在已忽略的依赖接口上定义的属性。
 	 *
-	 * @param bw    the BeanWrapper the bean was created with
-	 * @param cache whether to cache filtered PropertyDescriptors for the given bean Class
-	 * @return the filtered PropertyDescriptors
+	 * @param bw    使用BeanWrapper创建的BeanWrapper
+	 * @param cache 是否为给定的Bean类缓存过滤后的PropertyDescriptor
+	 * @return 过滤后的PropertyDescriptor
 	 * @see #isExcludedFromDependencyCheck
 	 * @see #filterPropertyDescriptorsForDependencyCheck(org.springframework.beans.BeanWrapper)
 	 */
 	protected PropertyDescriptor[] filterPropertyDescriptorsForDependencyCheck(BeanWrapper bw, boolean cache) {
+		// 从缓存中获取属性描述符数组
 		PropertyDescriptor[] filtered = this.filteredPropertyDescriptorsCache.get(bw.getWrappedClass());
+		// 如果缓存中不存在，则进行过滤，并将结果缓存起来
 		if (filtered == null) {
+			// 对属性描述符进行过滤以进行依赖检查
 			filtered = filterPropertyDescriptorsForDependencyCheck(bw);
+			// 如果需要缓存，则将结果放入缓存中
 			if (cache) {
-				PropertyDescriptor[] existing =
-						this.filteredPropertyDescriptorsCache.putIfAbsent(bw.getWrappedClass(), filtered);
+				PropertyDescriptor[] existing = this.filteredPropertyDescriptorsCache.putIfAbsent(bw.getWrappedClass(), filtered);
+				// 如果已存在缓存，则使用已存在的结果
 				if (existing != null) {
 					filtered = existing;
 				}
@@ -1704,11 +1724,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Extract a filtered set of PropertyDescriptors from the given BeanWrapper,
-	 * excluding ignored dependency types or properties defined on ignored dependency interfaces.
+	 * 从给定的BeanWrapper中提取一组过滤后的属性描述符，排除已忽略的依赖类型或在已忽略的依赖接口上定义的属性。
 	 *
-	 * @param bw the BeanWrapper the bean was created with
-	 * @return the filtered PropertyDescriptors
+	 * @param bw 使用BeanWrapper创建的BeanWrapper
+	 * @return 过滤后的PropertyDescriptor
 	 * @see #isExcludedFromDependencyCheck
 	 */
 	protected PropertyDescriptor[] filterPropertyDescriptorsForDependencyCheck(BeanWrapper bw) {
@@ -1733,27 +1752,33 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Perform a dependency check that all properties exposed have been set,
-	 * if desired. Dependency checks can be objects (collaborating beans),
-	 * simple (primitives and String), or all (both).
+	 * 如果需要，执行依赖性检查，确保所有公开的属性都已设置。
+	 * 依赖性检查可以是对象（协作bean）、简单类型（基本类型和字符串）或全部（两者）。
 	 *
-	 * @param beanName the name of the bean
-	 * @param mbd      the merged bean definition the bean was created with
-	 * @param pds      the relevant property descriptors for the target bean
-	 * @param pvs      the property values to be applied to the bean
+	 * @param beanName bean的名称
+	 * @param mbd      bean创建时使用的合并bean定义
+	 * @param pds      目标bean的相关属性描述符
+	 * @param pvs      要应用于bean的属性值
+	 * @throws UnsatisfiedDependencyException 如果依赖项无法满足
 	 * @see #isExcludedFromDependencyCheck(java.beans.PropertyDescriptor)
 	 */
 	protected void checkDependencies(
 			String beanName, AbstractBeanDefinition mbd, PropertyDescriptor[] pds, @Nullable PropertyValues pvs)
 			throws UnsatisfiedDependencyException {
 
+		// 获取依赖检查模式
 		int dependencyCheck = mbd.getDependencyCheck();
+		// 遍历属性描述符数组
 		for (PropertyDescriptor pd : pds) {
+			// 如果属性有写方法且不在显式指定的属性值集合中
 			if (pd.getWriteMethod() != null && (pvs == null || !pvs.contains(pd.getName()))) {
+				// 检查属性类型是否是简单类型
 				boolean isSimple = BeanUtils.isSimpleProperty(pd.getPropertyType());
+				// 根据依赖检查模式判断是否不满足依赖
 				boolean unsatisfied = (dependencyCheck == AbstractBeanDefinition.DEPENDENCY_CHECK_ALL) ||
 						(isSimple && dependencyCheck == AbstractBeanDefinition.DEPENDENCY_CHECK_SIMPLE) ||
 						(!isSimple && dependencyCheck == AbstractBeanDefinition.DEPENDENCY_CHECK_OBJECTS);
+				// 如果不满足依赖，则抛出异常
 				if (unsatisfied) {
 					throw new UnsatisfiedDependencyException(mbd.getResourceDescription(), beanName, pd.getName(),
 							"Set this property value or disable dependency checking for this bean.");
@@ -2136,18 +2161,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Overridden to clear FactoryBean instance cache as well.
+	 * 重写以清除 FactoryBean 实例缓存。
+	 *
+	 * @param beanName 要移除的bean名称
 	 */
 	@Override
 	protected void removeSingleton(String beanName) {
 		synchronized (getSingletonMutex()) {
 			super.removeSingleton(beanName);
+			// 移除未完成的FactoryBean实例缓存
 			this.factoryBeanInstanceCache.remove(beanName);
 		}
 	}
 
 	/**
-	 * Overridden to clear FactoryBean instance cache as well.
+	 * 重写以清除 FactoryBean 实例缓存。
 	 */
 	@Override
 	protected void clearSingletonCache() {
@@ -2158,7 +2186,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Expose the logger to collaborating delegates.
+	 * 将日志记录器暴露给协作委托。
 	 *
 	 * @since 5.0.7
 	 */
@@ -2168,8 +2196,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
-	 * Special DependencyDescriptor variant for Spring's good old autowire="byType" mode.
-	 * Always optional; never considering the parameter name for choosing a primary candidate.
+	 * Spring 的经典 autowire="byType" 模式的特殊 DependencyDescriptor 变体。
+	 * 总是可选的；从不考虑参数名称来选择主要的候选项。
 	 */
 	@SuppressWarnings("serial")
 	private static class AutowireByTypeDependencyDescriptor extends DependencyDescriptor {
@@ -2186,10 +2214,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
-	 * {@link MethodCallback} used to find {@link FactoryBean} type information.
+	 * 用于查找 {@link FactoryBean} 类型信息的 {@link MethodCallback}。
 	 */
 	private static class FactoryBeanMethodTypeFinder implements MethodCallback {
-
+		/**
+		 * 工厂方法名称
+		 */
 		private final String factoryMethodName;
 
 		private ResolvableType result = ResolvableType.NONE;
@@ -2200,14 +2230,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		@Override
 		public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+			// 检查方法是否是 FactoryBean 方法
 			if (isFactoryBeanMethod(method)) {
+				// 获取方法返回类型的 ResolvableType
 				ResolvableType returnType = ResolvableType.forMethodReturnType(method);
+				// 获取 FactoryBean 返回值的泛型类型
 				ResolvableType candidate = returnType.as(FactoryBean.class).getGeneric();
+				// 如果结果为 ResolvableType.NONE，则直接赋值为 candidate
 				if (this.result == ResolvableType.NONE) {
 					this.result = candidate;
 				} else {
+					// 否则，尝试确定结果与 candidate 的最近共同祖先类型
 					Class<?> resolvedResult = this.result.resolve();
 					Class<?> commonAncestor = ClassUtils.determineCommonAncestor(candidate.resolve(), resolvedResult);
+					// 如果最近共同祖先类型与结果不相等，则更新结果为最近共同祖先类型
 					if (!ObjectUtils.nullSafeEquals(resolvedResult, commonAncestor)) {
 						this.result = ResolvableType.forClass(commonAncestor);
 					}
