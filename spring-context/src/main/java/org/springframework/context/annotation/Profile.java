@@ -16,74 +16,48 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Profiles;
 
+import java.lang.annotation.*;
+
 /**
- * Indicates that a component is eligible for registration when one or more
- * {@linkplain #value specified profiles} are active.
+ * 表示当一个或多个指定的激活配置文件处于活动状态时，组件是可注册的。
  *
- * <p>A <em>profile</em> is a named logical grouping that may be activated
- * programmatically via {@link ConfigurableEnvironment#setActiveProfiles} or declaratively
- * by setting the {@link AbstractEnvironment#ACTIVE_PROFILES_PROPERTY_NAME
- * spring.profiles.active} property as a JVM system property, as an
- * environment variable, or as a Servlet context parameter in {@code web.xml}
- * for web applications. Profiles may also be activated declaratively in
- * integration tests via the {@code @ActiveProfiles} annotation.
+ * <p>一个<em>配置文件</em>是一个命名的逻辑分组，可以通过编程方式使用 {@link ConfigurableEnvironment#setActiveProfiles} 激活，
+ * 或通过在 {@code web.xml} 中设置 {@linkplain AbstractEnvironment#ACTIVE_PROFILES_PROPERTY_NAME spring.profiles.active}
+ * 作为 JVM 系统属性、环境变量或 Servlet 上下文参数来声明。
+ * 配置文件也可以通过集成测试中的 {@code @ActiveProfiles} 注解来声明。
  *
- * <p>The {@code @Profile} annotation may be used in any of the following ways:
+ * <p>{@code @Profile} 注解可以以以下任何方式使用：
  * <ul>
- * <li>as a type-level annotation on any class directly or indirectly annotated with
- * {@code @Component}, including {@link Configuration @Configuration} classes</li>
- * <li>as a meta-annotation, for the purpose of composing custom stereotype annotations</li>
- * <li>as a method-level annotation on any {@link Bean @Bean} method</li>
+ * <li>作为任何直接或间接注解了 {@code @Component} 的类的类型级别注解，包括 {@link Configuration @Configuration} 类</li>
+ * <li>作为元注解，用于组合自定义构造型注解</li>
+ * <li>作为任何 {@link Bean @Bean} 方法的方法级别注解</li>
  * </ul>
  *
- * <p>If a {@code @Configuration} class is marked with {@code @Profile}, all of the
- * {@code @Bean} methods and {@link Import @Import} annotations associated with that class
- * will be bypassed unless one or more of the specified profiles are active. A profile
- * string may contain a simple profile name (for example {@code "p1"}) or a profile
- * expression. A profile expression allows for more complicated profile logic to be
- * expressed, for example {@code "p1 & p2"}. See {@link Profiles#of(String...)} for more
- * details about supported formats.
+ * <p>如果一个 {@code @Configuration} 类标记了 {@code @Profile}，那么与该类相关联的所有 {@code @Bean} 方法和 {@link Import @Import}
+ * 注解将被绕过，除非指定的一个或多个配置文件处于活动状态。配置文件字符串可以包含一个简单的配置文件名（例如 {@code "p1"}）或一个配置文件表达式。
+ * 配置文件表达式允许表达更复杂的配置文件逻辑，例如 {@code "p1 & p2"}。有关支持的格式的详细信息，请参阅 {@link Profiles#of(String...)}。
  *
- * <p>This is analogous to the behavior in Spring XML: if the {@code profile} attribute of
- * the {@code beans} element is supplied e.g., {@code <beans profile="p1,p2">}, the
- * {@code beans} element will not be parsed unless at least profile 'p1' or 'p2' has been
- * activated. Likewise, if a {@code @Component} or {@code @Configuration} class is marked
- * with {@code @Profile({"p1", "p2"})}, that class will not be registered or processed unless
- * at least profile 'p1' or 'p2' has been activated.
+ * <p>这类似于在 Spring XML 中的行为：如果 {@code beans} 元素的 {@code profile} 属性已经被提供，例如，{@code <beans profile="p1,p2">}，
+ * 那么除非至少激活了配置文件 'p1' 或 'p2'，否则 {@code beans} 元素将不会被解析。同样地，如果一个 {@code @Component} 或 {@code @Configuration}
+ * 类被标记为 {@code @Profile({"p1", "p2"})}，那么除非至少激活了配置文件 'p1' 或 'p2'，否则该类将不会被注册或处理。
  *
- * <p>If a given profile is prefixed with the NOT operator ({@code !}), the annotated
- * component will be registered if the profile is <em>not</em> active &mdash; for example,
- * given {@code @Profile({"p1", "!p2"})}, registration will occur if profile 'p1' is active
- * or if profile 'p2' is <em>not</em> active.
+ * <p>如果给定的配置文件以 NOT 运算符（{@code !}）开头，那么如果该配置文件 <em>不</em> 处于活动状态，将会注册被注解的组件 —— 例如，
+ * 给定 {@code @Profile({"p1", "!p2"})}，如果配置文件 'p1' 处于活动状态或配置文件 'p2' <em>不</em> 处于活动状态，则会发生注册。
  *
- * <p>If the {@code @Profile} annotation is omitted, registration will occur regardless
- * of which (if any) profiles are active.
+ * <p>如果省略了 {@code @Profile} 注解，那么无论哪个（如果有的话）配置文件处于活动状态，都会发生注册。
  *
- * <p><b>NOTE:</b> With {@code @Profile} on {@code @Bean} methods, a special scenario may
- * apply: In the case of overloaded {@code @Bean} methods of the same Java method name
- * (analogous to constructor overloading), an {@code @Profile} condition needs to be
- * consistently declared on all overloaded methods. If the conditions are inconsistent,
- * only the condition on the first declaration among the overloaded methods will matter.
- * {@code @Profile} can therefore not be used to select an overloaded method with a
- * particular argument signature over another; resolution between all factory methods
- * for the same bean follows Spring's constructor resolution algorithm at creation time.
- * <b>Use distinct Java method names pointing to the same {@link Bean#name bean name}
- * if you'd like to define alternative beans with different profile conditions</b>;
- * see {@code ProfileDatabaseConfig} in {@link Configuration @Configuration}'s javadoc.
+ * <p><b>注意：</b> 在 {@code @Bean} 方法上使用 {@code @Profile} 时，可能会存在一个特殊的情况：对于同一个 Java 方法名称的重载 {@code @Bean} 方法
+ * （类似于构造函数重载），需要在所有重载方法上一致地声明一个 {@code @Profile} 条件。如果条件不一致，那么只有在重载方法中的第一个声明上的条件才会生效。
+ * 因此，{@code @Profile} 不能用于选择具有特定参数签名的重载方法。在创建时，相同 bean 的所有工厂方法之间的解析都遵循 Spring 的构造函数解析算法。
+ * <b>如果要定义具有不同配置文件条件的替代 bean，请使用指向相同 {@link Bean#name bean 名称} 的不同 Java 方法名称；请参见
+ * {@link Configuration @Configuration} 的 javadoc 中的 {@code ProfileDatabaseConfig}。</b>
  *
- * <p>When defining Spring beans via XML, the {@code "profile"} attribute of the
- * {@code <beans>} element may be used. See the documentation in the
- * {@code spring-beans} XSD (version 3.1 or greater) for details.
+ * <p>在 XML 中通过 {@code <beans>} 元素的 {@code "profile"} 属性可以定义 Spring bean。有关详细信息，请参阅
+ * {@code spring-beans} XSD（版本 3.1 或更高版本）中的文档。
  *
  * @author Chris Beams
  * @author Phillip Webb
@@ -103,7 +77,7 @@ import org.springframework.core.env.Profiles;
 public @interface Profile {
 
 	/**
-	 * The set of profiles for which the annotated component should be registered.
+	 * 注册组件所需的配置文件集。
 	 */
 	String[] value();
 
