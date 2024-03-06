@@ -19,7 +19,7 @@ package org.springframework.core.env;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface for resolving properties against any underlying source.
+ * 用于根据任何底层源解析属性的接口。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -30,8 +30,10 @@ import org.springframework.lang.Nullable;
 public interface PropertyResolver {
 
 	/**
-	 * Return whether the given property key is available for resolution,
-	 * i.e. if the value for the given key is not {@code null}.
+	 * 返回给定属性键是否可供解析，即给定键的值是否不为 {@code null}。
+	 *
+	 * @param key 要检查的属性键
+	 * @return 如果属性键可供解析，则为 {@code true}；否则为 {@code false}
 	 */
 	boolean containsProperty(String key);
 
@@ -47,62 +49,65 @@ public interface PropertyResolver {
 	String getProperty(String key);
 
 	/**
-	 * Return the property value associated with the given key, or
-	 * {@code defaultValue} if the key cannot be resolved.
+	 * 返回与给定键关联的属性值，如果无法解析键，则返回 {@code defaultValue}。
 	 *
-	 * @param key          the property name to resolve
-	 * @param defaultValue the default value to return if no value is found
+	 * @param key          要解析的属性名称
+	 * @param defaultValue 如果找不到值，则返回的默认值
+	 * @return 给定键的属性值，如果无法解析键，则为 {@code defaultValue}
 	 * @see #getRequiredProperty(String)
 	 * @see #getProperty(String, Class)
 	 */
 	String getProperty(String key, String defaultValue);
 
 	/**
-	 * Return the property value associated with the given key,
-	 * or {@code null} if the key cannot be resolved.
+	 * 返回与给定键关联的属性值，如果无法解析键，则返回 {@code null}。
 	 *
-	 * @param key        the property name to resolve
-	 * @param targetType the expected type of the property value
+	 * @param key        要解析的属性名称
+	 * @param targetType 属性值的期望类型
+	 * @return 给定键的属性值，如果无法解析键，则为 {@code null}
 	 * @see #getRequiredProperty(String, Class)
 	 */
 	@Nullable
 	<T> T getProperty(String key, Class<T> targetType);
 
 	/**
-	 * Return the property value associated with the given key,
-	 * or {@code defaultValue} if the key cannot be resolved.
+	 * 返回与给定键关联的属性值，如果无法解析键，则返回 {@code defaultValue}。
 	 *
-	 * @param key          the property name to resolve
-	 * @param targetType   the expected type of the property value
-	 * @param defaultValue the default value to return if no value is found
+	 * @param key          要解析的属性名称
+	 * @param targetType   属性值的期望类型
+	 * @param defaultValue 如果找不到值，则返回的默认值
+	 * @return 给定键的属性值，如果无法解析键，则为 {@code defaultValue}
 	 * @see #getRequiredProperty(String, Class)
 	 */
 	<T> T getProperty(String key, Class<T> targetType, T defaultValue);
 
 	/**
-	 * Return the property value associated with the given key (never {@code null}).
+	 * 返回与给定键关联的属性值（永远不会为 {@code null}）。
 	 *
-	 * @throws IllegalStateException if the key cannot be resolved
+	 * @param key 要解析的属性名称
+	 * @return 给定键的属性值
+	 * @throws IllegalStateException 如果无法解析给定键
 	 * @see #getRequiredProperty(String, Class)
 	 */
 	String getRequiredProperty(String key) throws IllegalStateException;
 
 	/**
-	 * Return the property value associated with the given key, converted to the given
-	 * targetType (never {@code null}).
+	 * 返回与给定键关联的属性值，转换为给定的 targetType（永远不会为 {@code null}）。
 	 *
-	 * @throws IllegalStateException if the given key cannot be resolved
+	 * @param key        要解析的属性名称
+	 * @param targetType 目标类型
+	 * @return 给定键的属性值
+	 * @throws IllegalStateException 如果无法解析给定键
 	 */
 	<T> T getRequiredProperty(String key, Class<T> targetType) throws IllegalStateException;
 
 	/**
-	 * Resolve ${...} placeholders in the given text, replacing them with corresponding
-	 * property values as resolved by {@link #getProperty}. Unresolvable placeholders with
-	 * no default value are ignored and passed through unchanged.
+	 * 解析给定文本中的 ${...} 占位符，将其替换为通过 {@link #getProperty} 解析的相应属性值。
+	 * 不能解析的占位符（没有默认值）将被忽略并保持不变。
 	 *
-	 * @param text the String to resolve
-	 * @return the resolved String (never {@code null})
-	 * @throws IllegalArgumentException if given text is {@code null}
+	 * @param text 要解析的字符串
+	 * @return 解析后的字符串（永远不会为 {@code null}）
+	 * @throws IllegalArgumentException 如果给定的文本为 {@code null}
 	 * @see #resolveRequiredPlaceholders
 	 */
 	String resolvePlaceholders(String text);

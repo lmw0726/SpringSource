@@ -475,18 +475,24 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Map<String, Object> getSystemEnvironment() {
 		if (suppressGetenvAccess()) {
+			// 如果禁止访问环境变量，则返回空的映射
 			return Collections.emptyMap();
 		}
 		try {
+			// 尝试获取系统环境变量并返回
 			return (Map) System.getenv();
 		} catch (AccessControlException ex) {
+			// 如果没有权限获取系统环境变量，则返回只读的系统属性映射
 			return (Map) new ReadOnlySystemAttributesMap() {
 				@Override
 				@Nullable
+				// 重写方法以获取系统环境变量
 				protected String getSystemAttribute(String attributeName) {
 					try {
+						// 尝试获取系统环境变量值
 						return System.getenv(attributeName);
 					} catch (AccessControlException ex) {
+						// 如果获取系统环境变量时抛出AccessControlException，记录错误信息并返回null
 						if (logger.isInfoEnabled()) {
 							logger.info("Caught AccessControlException when accessing system environment variable '" +
 									attributeName + "'; its value will be returned [null]. Reason: " + ex.getMessage());
@@ -499,14 +505,12 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	}
 
 	/**
-	 * Determine whether to suppress {@link System#getenv()}/{@link System#getenv(String)}
-	 * access for the purposes of {@link #getSystemEnvironment()}.
-	 * <p>If this method returns {@code true}, an empty dummy Map will be used instead
-	 * of the regular system environment Map, never even trying to call {@code getenv}
-	 * and therefore avoiding security manager warnings (if any).
-	 * <p>The default implementation checks for the "spring.getenv.ignore" system property,
-	 * returning {@code true} if its value equals "true" in any case.
+	 * 确定是否要抑制 {@link System#getenv()}/{@link System#getenv(String)} 访问，用于 {@link #getSystemEnvironment()}。
+	 * <p>如果此方法返回 {@code true}，则将使用空的虚拟 Map 替代常规系统环境 Map，甚至不尝试调用 {@code getenv}，
+	 * 从而避免安全管理器警告（如果有的话）。
+	 * <p>默认实现检查 "spring.getenv.ignore" 系统属性，如果其值为 "true"（不区分大小写），则返回 {@code true}。
 	 *
+	 * @return 是否抑制 {@code getenv} 访问
 	 * @see #IGNORE_GETENV_PROPERTY_NAME
 	 * @see SpringProperties#getFlag
 	 */
@@ -517,19 +521,23 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	@Override
 	public void merge(ConfigurableEnvironment parent) {
 		for (PropertySource<?> ps : parent.getPropertySources()) {
+			// 如果父级属性源在当前容器中不存在，则将其添加到末尾
 			if (!this.propertySources.contains(ps.getName())) {
 				this.propertySources.addLast(ps);
 			}
 		}
 		String[] parentActiveProfiles = parent.getActiveProfiles();
+		// 如果父级容器包含活动配置文件，则添加到当前容器的活动配置文件列表中
 		if (!ObjectUtils.isEmpty(parentActiveProfiles)) {
 			synchronized (this.activeProfiles) {
 				Collections.addAll(this.activeProfiles, parentActiveProfiles);
 			}
 		}
 		String[] parentDefaultProfiles = parent.getDefaultProfiles();
+		// 如果父级容器包含默认配置文件，则添加到当前容器的默认配置文件列表中
 		if (!ObjectUtils.isEmpty(parentDefaultProfiles)) {
 			synchronized (this.defaultProfiles) {
+				// 移除预留的默认配置文件名称，并将父级容器的默认配置文件添加到当前容器中
 				this.defaultProfiles.remove(RESERVED_DEFAULT_PROFILE_NAME);
 				Collections.addAll(this.defaultProfiles, parentDefaultProfiles);
 			}

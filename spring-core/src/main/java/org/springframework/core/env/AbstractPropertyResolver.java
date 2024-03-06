@@ -16,13 +16,8 @@
 
 package org.springframework.core.env;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -32,8 +27,12 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.SystemPropertyUtils;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
- * Abstract base class for resolving properties against any underlying source.
+ * 抽象基类，用于根据任何底层源解析属性。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -43,33 +42,58 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/*
+	 * 可配置转换服务，用于执行类型转换。
+	 */
 	@Nullable
 	private volatile ConfigurableConversionService conversionService;
 
+	/*
+	 * 非严格属性占位符辅助器，用于处理属性占位符替换。
+	 */
 	@Nullable
 	private PropertyPlaceholderHelper nonStrictHelper;
 
+	/*
+	 * 严格属性占位符辅助器，用于处理属性占位符替换，但更严格地执行。
+	 */
 	@Nullable
 	private PropertyPlaceholderHelper strictHelper;
 
+	/*
+	 * 是否忽略无法解析的嵌套属性占位符。
+	 */
 	private boolean ignoreUnresolvableNestedPlaceholders = false;
 
+	/*
+	 * 占位符前缀，默认为系统属性工具类定义的占位符前缀。
+	 */
 	private String placeholderPrefix = SystemPropertyUtils.PLACEHOLDER_PREFIX;
 
+	/*
+	 * 占位符后缀，默认为系统属性工具类定义的占位符后缀。
+	 */
 	private String placeholderSuffix = SystemPropertyUtils.PLACEHOLDER_SUFFIX;
 
+	/*
+	 * 值分隔符，用于将多个值分隔开。
+	 */
 	@Nullable
 	private String valueSeparator = SystemPropertyUtils.VALUE_SEPARATOR;
 
+	/*
+	 * 必需属性集合，用于存储需要被替换的属性。
+	 */
 	private final Set<String> requiredProperties = new LinkedHashSet<>();
 
 
 	@Override
 	public ConfigurableConversionService getConversionService() {
-		// Need to provide an independent DefaultConversionService, not the
-		// shared DefaultConversionService used by PropertySourcesPropertyResolver.
+		// 需要提供一个独立的 DefaultConversionService，而不是 PropertySourcesPropertyResolver 使用的共享 DefaultConversionService。
 		ConfigurableConversionService cs = this.conversionService;
+		// 如果 conversionService 为 null，则创建一个新的 DefaultConversionService 实例
 		if (cs == null) {
+			// 使用双重检查锁定确保线程安全地创建 DefaultConversionService
 			synchronized (this) {
 				cs = this.conversionService;
 				if (cs == null) {
@@ -88,8 +112,8 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	}
 
 	/**
-	 * Set the prefix that placeholders replaced by this resolver must begin with.
-	 * <p>The default is "${".
+	 * 设置此解析器替换的占位符必须以的前缀。
+	 * <p>默认值为 "${"。
 	 *
 	 * @see org.springframework.util.SystemPropertyUtils#PLACEHOLDER_PREFIX
 	 */
@@ -100,8 +124,8 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	}
 
 	/**
-	 * Set the suffix that placeholders replaced by this resolver must end with.
-	 * <p>The default is "}".
+	 * 设置此解析器替换的占位符必须以的后缀。
+	 * <p>默认值为 "}"。
 	 *
 	 * @see org.springframework.util.SystemPropertyUtils#PLACEHOLDER_SUFFIX
 	 */
@@ -112,10 +136,8 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	}
 
 	/**
-	 * Specify the separating character between the placeholders replaced by this
-	 * resolver and their associated default value, or {@code null} if no such
-	 * special character should be processed as a value separator.
-	 * <p>The default is ":".
+	 * 指定此解析器替换的占位符与其关联的默认值之间的分隔字符，如果不应将此类特殊字符处理为值分隔符，则为{@code null}。
+	 * <p>默认值为 ":"。
 	 *
 	 * @see org.springframework.util.SystemPropertyUtils#VALUE_SEPARATOR
 	 */
@@ -125,12 +147,9 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	}
 
 	/**
-	 * Set whether to throw an exception when encountering an unresolvable placeholder
-	 * nested within the value of a given property. A {@code false} value indicates strict
-	 * resolution, i.e. that an exception will be thrown. A {@code true} value indicates
-	 * that unresolvable nested placeholders should be passed through in their unresolved
-	 * ${...} form.
-	 * <p>The default is {@code false}.
+	 * 设置是否在遇到给定属性值中的无法解析的嵌套占位符时抛出异常。 {@code false} 值表示严格解析，即将抛出异常。
+	 * {@code true} 值表示无法解析的嵌套占位符应以其未解析的 ${...} 形式传递。
+	 * <p>默认值为 {@code false}。
 	 *
 	 * @since 3.2
 	 */
@@ -146,12 +165,15 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 
 	@Override
 	public void validateRequiredProperties() {
+		// 创建 MissingRequiredPropertiesException 实例
 		MissingRequiredPropertiesException ex = new MissingRequiredPropertiesException();
+		// 检查每个必需的属性是否存在，如果不存在，则将其添加到异常中
 		for (String key : this.requiredProperties) {
 			if (this.getProperty(key) == null) {
 				ex.addMissingRequiredProperty(key);
 			}
 		}
+		// 如果存在缺失的必需属性，则抛出异常
 		if (!ex.getMissingRequiredProperties().isEmpty()) {
 			throw ex;
 		}

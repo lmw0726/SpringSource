@@ -19,8 +19,7 @@ package org.springframework.core.env;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link PropertyResolver} implementation that resolves property values against
- * an underlying set of {@link PropertySources}.
+ * {@link PropertyResolver} 的实现，根据底层的一组 {@link PropertySources} 来解析属性值。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -38,9 +37,9 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
 
 	/**
-	 * Create a new resolver against the given property sources.
+	 * 根据给定的属性源创建一个新的解析器。
 	 *
-	 * @param propertySources the set of {@link PropertySource} objects to use
+	 * @param propertySources 要使用的 {@link PropertySource} 对象集合
 	 */
 	public PropertySourcesPropertyResolver(@Nullable PropertySources propertySources) {
 		this.propertySources = propertySources;
@@ -49,13 +48,16 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
 	@Override
 	public boolean containsProperty(String key) {
+		// 如果属性源不为空，则遍历属性源列表
 		if (this.propertySources != null) {
 			for (PropertySource<?> propertySource : this.propertySources) {
+				// 检查属性源是否包含指定的属性键，如果是，则返回 true
 				if (propertySource.containsProperty(key)) {
 					return true;
 				}
 			}
 		}
+		// 如果未找到属性，则返回 false
 		return false;
 	}
 
