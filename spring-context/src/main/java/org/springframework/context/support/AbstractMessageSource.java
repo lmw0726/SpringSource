@@ -16,18 +16,18 @@
 
 package org.springframework.context.support;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-
 import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
 
 /**
  * Abstract implementation of the {@link HierarchicalMessageSource} interface,
@@ -138,13 +138,17 @@ public abstract class AbstractMessageSource extends MessageSourceSupport impleme
 
 	@Override
 	public final String getMessage(String code, @Nullable Object[] args, @Nullable String defaultMessage, Locale locale) {
+		// 获取内部消息
 		String msg = getMessageInternal(code, args, locale);
+		// 如果内部消息不为空，则返回内部消息
 		if (msg != null) {
 			return msg;
 		}
+		// 如果默认消息为空，则获取默认消息
 		if (defaultMessage == null) {
 			return getDefaultMessage(code);
 		}
+		// 否则渲染默认消息，并返回
 		return renderDefaultMessage(defaultMessage, args, locale);
 	}
 
