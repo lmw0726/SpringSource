@@ -16,16 +16,11 @@
 
 package org.springframework.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.lang.Nullable;
+
+import java.util.*;
 
 /**
  * Utility class for working with Strings that have placeholder values in them.
@@ -76,29 +71,35 @@ public class PropertyPlaceholderHelper {
 	}
 
 	/**
-	 * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
+	 * 创建一个新的 {@code PropertyPlaceholderHelper}，它使用提供的前缀和后缀。
 	 *
-	 * @param placeholderPrefix              the prefix that denotes the start of a placeholder
-	 * @param placeholderSuffix              the suffix that denotes the end of a placeholder
-	 * @param valueSeparator                 the separating character between the placeholder variable
-	 *                                       and the associated default value, if any
-	 * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
-	 *                                       be ignored ({@code true}) or cause an exception ({@code false})
+	 * @param placeholderPrefix              表示占位符起始的前缀
+	 * @param placeholderSuffix              表示占位符结束的后缀
+	 * @param valueSeparator                 占位符变量与关联默认值之间的分隔字符（如果有）
+	 * @param ignoreUnresolvablePlaceholders 指示是否应忽略无法解析的占位符（{@code true}），还是引发异常（{@code false}）
 	 */
 	public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix,
 									 @Nullable String valueSeparator, boolean ignoreUnresolvablePlaceholders) {
 
 		Assert.notNull(placeholderPrefix, "'placeholderPrefix' must not be null");
 		Assert.notNull(placeholderSuffix, "'placeholderSuffix' must not be null");
+		// 设置占位符的前缀和后缀
 		this.placeholderPrefix = placeholderPrefix;
 		this.placeholderSuffix = placeholderSuffix;
+
+		// 检查是否存在简单的后缀前缀对应关系，如果有则设置简单前缀
 		String simplePrefixForSuffix = wellKnownSimplePrefixes.get(this.placeholderSuffix);
 		if (simplePrefixForSuffix != null && this.placeholderPrefix.endsWith(simplePrefixForSuffix)) {
 			this.simplePrefix = simplePrefixForSuffix;
 		} else {
+			// 否则设置为占位符前缀
 			this.simplePrefix = this.placeholderPrefix;
 		}
+
+		// 设置占位符值的分隔符
 		this.valueSeparator = valueSeparator;
+
+		// 设置是否忽略无法解析的占位符
 		this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
 	}
 
