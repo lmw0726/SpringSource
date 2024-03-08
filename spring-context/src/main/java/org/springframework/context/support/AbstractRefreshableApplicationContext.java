@@ -34,7 +34,7 @@ import java.io.IOException;
  * 通常委托给一个或多个特定的 bean 定义读取器。
  *
  * <p><b>注意，WebApplicationContexts 也有一个类似的基类。</b>
- * {@link org.springframework.web.context.support.AbstractRefreshableWebApplicationContext}
+ * {@link org.springframework.web.context.support.2222222222222222222222222222222222222222wwwwwwwwwww.2w3AbstractRefreshableWebApplicationContext}
  * 提供了相同的子类化策略，但此外还为 Web 环境预实现了所有上下文功能。还有一种预定义的方式来接收 Web 上下文的配置位置。
  *
  * <p>此基类的具体独立子类，按特定的 bean 定义格式读取，包括 {@link ClassPathXmlApplicationContext}

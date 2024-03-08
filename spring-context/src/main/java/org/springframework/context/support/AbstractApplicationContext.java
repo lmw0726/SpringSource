@@ -822,7 +822,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 获取可配置的可列举的Bean工厂
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
-		// 如果Bean工厂包含名为APPLICATION_EVENT_MULTICASTER_BEAN_NAME的本地Bean
+		// 如果Bean工厂包含名为 applicationEventMulticaster 的本地Bean
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
 			// 获取ApplicationEventMulticaster实例
 			this.applicationEventMulticaster =
@@ -833,15 +833,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				logger.trace("Using ApplicationEventMulticaster [" + this.applicationEventMulticaster + "]");
 			}
 		} else {
-			// 如果Bean工厂不包含名为APPLICATION_EVENT_MULTICASTER_BEAN_NAME的本地Bean
+			// 如果Bean工厂不包含名为 applicationEventMulticaster 的本地Bean
 
 			// 创建一个新的SimpleApplicationEventMulticaster，并将其设置为应用程序事件的多路广播器
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
 
-			// 在Bean工厂中注册单例的APPLICATION_EVENT_MULTICASTER_BEAN_NAME，并将其设置为刚刚创建的ApplicationEventMulticaster实例
+			// 在Bean工厂中注册单例的 applicationEventMulticaster ，并将其设置为刚刚创建的ApplicationEventMulticaster实例
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 
-			// 输出日志，显示未找到APPLICATION_EVENT_MULTICASTER_BEAN_NAME的Bean，使用新创建的ApplicationEventMulticaster
+			// 输出日志，显示未找到 applicationEventMulticaster 的Bean，使用新创建的ApplicationEventMulticaster
 			if (logger.isTraceEnabled()) {
 				logger.trace("No '" + APPLICATION_EVENT_MULTICASTER_BEAN_NAME + "' bean, using " +
 						"[" + this.applicationEventMulticaster.getClass().getSimpleName() + "]");

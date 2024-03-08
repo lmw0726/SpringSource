@@ -16,10 +16,7 @@
 
 package org.springframework.dao.annotation;
 
-import java.lang.annotation.Annotation;
-
 import org.aopalliance.aop.Advice;
-
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractPointcutAdvisor;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
@@ -27,6 +24,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.dao.support.PersistenceExceptionTranslationInterceptor;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 
+import java.lang.annotation.Annotation;
 /**
  * Spring AOP exception translation aspect for use at Repository or DAO layer level.
  * Translates native persistence exceptions into Spring's DataAccessException hierarchy,
