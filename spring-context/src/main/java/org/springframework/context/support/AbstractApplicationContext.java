@@ -609,8 +609,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * 准备刷新此上下文，设置其启动日期和活动标志，以及执行属性源的任何初始化。
 	 */
 	protected void prepareRefresh() {
-		// 切换为活动状态。
+		// 设置启动日期
 		this.startupDate = System.currentTimeMillis();
+		// 切换为活动状态。
 		this.closed.set(false);
 		this.active.set(true);
 
