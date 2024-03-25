@@ -49,3 +49,4 @@ ci/
 /ci/
 
 *.class
+/spring-aop/out/

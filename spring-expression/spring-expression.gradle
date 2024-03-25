@@ -2,6 +2,10 @@ description = "Spring Expression Language (SpEL)"
 
 apply plugin: "kotlin"
 
+jar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
 	api(project(":spring-core"))
 	testImplementation(testFixtures(project(":spring-core")))

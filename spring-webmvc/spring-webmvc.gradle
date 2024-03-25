@@ -2,6 +2,10 @@ description = "Spring Web MVC"
 
 apply plugin: "kotlin"
 
+jar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
 	api(project(":spring-aop"))
 	api(project(":spring-beans"))

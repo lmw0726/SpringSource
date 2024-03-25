@@ -1,5 +1,9 @@
 description = "Spring AOP"
 
+jar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
 	api(project(":spring-beans"))
 	api(project(":spring-core"))

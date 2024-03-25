@@ -3,6 +3,10 @@ description = "Spring Beans"
 apply plugin: "groovy"
 apply plugin: "kotlin"
 
+jar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
 	api(project(":spring-core"))
 	optional("javax.inject:javax.inject")

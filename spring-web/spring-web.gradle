@@ -3,6 +3,10 @@ description = "Spring Web"
 apply plugin: "kotlin"
 apply plugin: "kotlinx-serialization"
 
+jar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
 	api(project(":spring-beans"))
 	api(project(":spring-core"))
