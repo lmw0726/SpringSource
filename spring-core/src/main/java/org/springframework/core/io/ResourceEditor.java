@@ -16,75 +16,78 @@
 
 package org.springframework.core.io;
 
-import java.beans.PropertyEditorSupport;
-import java.io.IOException;
-
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditorSupport;
+import java.io.IOException;
+
 /**
- * {@link java.beans.PropertyEditor Editor} for {@link Resource}
- * descriptors, to automatically convert {@code String} locations
- * e.g. {@code file:C:/myfile.txt} or {@code classpath:myfile.txt} to
- * {@code Resource} properties instead of using a {@code String} location property.
+ * {@link java.beans.PropertyEditor Editor} 用于{@link Resource}描述符，以自动将{@code String}位置
+ * (例如{@code file:C:/myfile.txt}或{@code classpath:myfile.txt})转换为{@code Resource}属性，
+ * 而不是使用{@code String}位置属性。
  *
- * <p>The path may contain {@code ${...}} placeholders, to be
- * resolved as {@link org.springframework.core.env.Environment} properties:
- * e.g. {@code ${user.dir}}. Unresolvable placeholders are ignored by default.
+ * <p>路径可能包含{@code ${...}}占位符，要作为{@link org.springframework.core.env.Environment}属性解析：
+ * 例如 {@code ${user.dir}}。 默认情况下，无法解析的占位符将被忽略。
  *
- * <p>Delegates to a {@link ResourceLoader} to do the heavy lifting,
- * by default using a {@link DefaultResourceLoader}.
+ * <p>默认情况下，委托给{@link ResourceLoader}来执行繁重的工作，使用的是{@link DefaultResourceLoader}。
  *
  * @author Juergen Hoeller
  * @author Dave Syer
  * @author Chris Beams
- * @since 28.12.2003
  * @see Resource
  * @see ResourceLoader
  * @see DefaultResourceLoader
  * @see PropertyResolver#resolvePlaceholders
+ * @since 28.12.2003
  */
 public class ResourceEditor extends PropertyEditorSupport {
 
+	/**
+	 * 资源加载器
+	 */
 	private final ResourceLoader resourceLoader;
-
+	/**
+	 * 属性解析器
+	 */
 	@Nullable
 	private PropertyResolver propertyResolver;
 
+	/**
+	 * 是否忽略无法解析的占位符
+	 */
 	private final boolean ignoreUnresolvablePlaceholders;
 
 
 	/**
-	 * Create a new instance of the {@link ResourceEditor} class
-	 * using a {@link DefaultResourceLoader} and {@link StandardEnvironment}.
+	 * 使用{@link DefaultResourceLoader}和{@link StandardEnvironment}创建{@link ResourceEditor}类的新实例。
 	 */
 	public ResourceEditor() {
 		this(new DefaultResourceLoader(), null);
 	}
 
 	/**
-	 * Create a new instance of the {@link ResourceEditor} class
-	 * using the given {@link ResourceLoader} and {@link PropertyResolver}.
-	 * @param resourceLoader the {@code ResourceLoader} to use
-	 * @param propertyResolver the {@code PropertyResolver} to use
+	 * 使用给定的{@link ResourceLoader}和{@link PropertyResolver}创建{@link ResourceEditor}类的新实例。
+	 *
+	 * @param resourceLoader   要使用的{@code ResourceLoader}
+	 * @param propertyResolver 要使用的{@code PropertyResolver}
 	 */
 	public ResourceEditor(ResourceLoader resourceLoader, @Nullable PropertyResolver propertyResolver) {
 		this(resourceLoader, propertyResolver, true);
 	}
 
 	/**
-	 * Create a new instance of the {@link ResourceEditor} class
-	 * using the given {@link ResourceLoader}.
-	 * @param resourceLoader the {@code ResourceLoader} to use
-	 * @param propertyResolver the {@code PropertyResolver} to use
-	 * @param ignoreUnresolvablePlaceholders whether to ignore unresolvable placeholders
-	 * if no corresponding property could be found in the given {@code propertyResolver}
+	 * 使用给定的{@link ResourceLoader}创建{@link ResourceEditor}类的新实例。
+	 *
+	 * @param resourceLoader                 要使用的{@code ResourceLoader}
+	 * @param propertyResolver               要使用的{@code PropertyResolver}
+	 * @param ignoreUnresolvablePlaceholders 是否忽略无法解析的占位符，如果在给定的{@code propertyResolver}中找不到对应的属性
 	 */
 	public ResourceEditor(ResourceLoader resourceLoader, @Nullable PropertyResolver propertyResolver,
-			boolean ignoreUnresolvablePlaceholders) {
+						  boolean ignoreUnresolvablePlaceholders) {
 
 		Assert.notNull(resourceLoader, "ResourceLoader must not be null");
 		this.resourceLoader = resourceLoader;
@@ -95,27 +98,33 @@ public class ResourceEditor extends PropertyEditorSupport {
 
 	@Override
 	public void setAsText(String text) {
+		// 如果文本不为空
 		if (StringUtils.hasText(text)) {
+			// 解析路径并去除首尾空白字符
 			String locationToUse = resolvePath(text).trim();
+			// 设置属性值为解析后的资源
 			setValue(this.resourceLoader.getResource(locationToUse));
-		}
-		else {
+		} else {
+			// 如果文本为空，则将属性值设为 null
 			setValue(null);
 		}
 	}
 
 	/**
-	 * Resolve the given path, replacing placeholders with corresponding
-	 * property values from the {@code environment} if necessary.
-	 * @param path the original file path
-	 * @return the resolved file path
+	 * 解析给定的路径，必要时使用{@code environment}中的对应属性值替换占位符。
+	 *
+	 * @param path 原始文件路径
+	 * @return 解析后的文件路径
 	 * @see PropertyResolver#resolvePlaceholders
 	 * @see PropertyResolver#resolveRequiredPlaceholders
 	 */
 	protected String resolvePath(String path) {
 		if (this.propertyResolver == null) {
+			// 如果属性解析器为空，则创建一个标准环境的属性解析器
 			this.propertyResolver = new StandardEnvironment();
 		}
+		// 返回解析后的属性值，根据是否忽略未解析的占位符来决定使用 resolvePlaceholders
+		// 还是 resolveRequiredPlaceholders 方法
 		return (this.ignoreUnresolvablePlaceholders ? this.propertyResolver.resolvePlaceholders(path) :
 				this.propertyResolver.resolveRequiredPlaceholders(path));
 	}
@@ -124,14 +133,13 @@ public class ResourceEditor extends PropertyEditorSupport {
 	@Override
 	@Nullable
 	public String getAsText() {
+		// 获取属性值并尝试获取资源的 URL 地址
 		Resource value = (Resource) getValue();
 		try {
-			// Try to determine URL for resource.
+			// 尝试获取资源的 URL 地址并转换为外部字符串形式
 			return (value != null ? value.getURL().toExternalForm() : "");
-		}
-		catch (IOException ex) {
-			// Couldn't determine resource URL - return null to indicate
-			// that there is no appropriate text representation.
+		} catch (IOException ex) {
+			// 如果无法确定资源的 URL 地址，则返回 null 表示没有适当的文本表示
 			return null;
 		}
 	}
