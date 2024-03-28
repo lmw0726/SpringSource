@@ -16,27 +16,25 @@
 
 package org.springframework.web.servlet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.lang.Nullable;
+import org.springframework.util.CollectionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Handler execution chain, consisting of handler object and any handler interceptors.
  * Returned by HandlerMapping's {@link HandlerMapping#getHandler} method.
  *
  * @author Juergen Hoeller
- * @since 20.06.2003
  * @see HandlerInterceptor
+ * @since 20.06.2003
  */
 public class HandlerExecutionChain {
 
@@ -51,6 +49,7 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Create a new HandlerExecutionChain.
+	 *
 	 * @param handler the handler object to execute
 	 */
 	public HandlerExecutionChain(Object handler) {
@@ -59,9 +58,10 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Create a new HandlerExecutionChain.
-	 * @param handler the handler object to execute
+	 *
+	 * @param handler      the handler object to execute
 	 * @param interceptors the array of interceptors to apply
-	 * (in the given order) before the handler itself executes
+	 *                     (in the given order) before the handler itself executes
 	 */
 	public HandlerExecutionChain(Object handler, @Nullable HandlerInterceptor... interceptors) {
 		this(handler, (interceptors != null ? Arrays.asList(interceptors) : Collections.emptyList()));
@@ -69,9 +69,10 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Create a new HandlerExecutionChain.
-	 * @param handler the handler object to execute
+	 *
+	 * @param handler         the handler object to execute
 	 * @param interceptorList the list of interceptors to apply
-	 * (in the given order) before the handler itself executes
+	 *                        (in the given order) before the handler itself executes
 	 * @since 5.3
 	 */
 	public HandlerExecutionChain(Object handler, List<HandlerInterceptor> interceptorList) {
@@ -79,8 +80,7 @@ public class HandlerExecutionChain {
 			HandlerExecutionChain originalChain = (HandlerExecutionChain) handler;
 			this.handler = originalChain.getHandler();
 			this.interceptorList.addAll(originalChain.interceptorList);
-		}
-		else {
+		} else {
 			this.handler = handler;
 		}
 		this.interceptorList.addAll(interceptorList);
@@ -103,6 +103,7 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Add the given interceptor at the specified index of this chain.
+	 *
 	 * @since 5.2
 	 */
 	public void addInterceptor(int index, HandlerInterceptor interceptor) {
@@ -118,6 +119,7 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Return the array of interceptors to apply (in the given order).
+	 *
 	 * @return the array of HandlerInterceptors instances (may be {@code null})
 	 */
 	@Nullable
@@ -127,6 +129,7 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Return the list of interceptors to apply (in the given order).
+	 *
 	 * @return the list of HandlerInterceptors instances (potentially empty)
 	 * @since 5.3
 	 */
@@ -137,20 +140,24 @@ public class HandlerExecutionChain {
 
 
 	/**
-	 * Apply preHandle methods of registered interceptors.
-	 * @return {@code true} if the execution chain should proceed with the
-	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
-	 * that this interceptor has already dealt with the response itself.
+	 * 应用注册的拦截器的preHandle方法。
+	 *
+	 * @return 如果执行链应继续下一个拦截器或处理程序本身，则为{@code true}。否则，DispatcherServlet假定此拦截器已经处理了响应本身。
 	 */
 	boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		for (int i = 0; i < this.interceptorList.size(); i++) {
+			// 遍历拦截器列表，并依次获取拦截器对象。
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
+			// 如果拦截器的预处理方法返回false，则触发完成后方法并返回false。
 			if (!interceptor.preHandle(request, response, this.handler)) {
+				// 触发拦截器完成后的执行方法
 				triggerAfterCompletion(request, response, null);
 				return false;
 			}
+			// 更新当前拦截器索引。
 			this.interceptorIndex = i;
 		}
+		// 如果所有拦截器的预处理方法都返回true，则返回true。
 		return true;
 	}
 
@@ -167,18 +174,16 @@ public class HandlerExecutionChain {
 	}
 
 	/**
-	 * Trigger afterCompletion callbacks on the mapped HandlerInterceptors.
-	 * Will just invoke afterCompletion for all interceptors whose preHandle invocation
-	 * has successfully completed and returned true.
+	 * 触发映射的HandlerInterceptors的afterCompletion回调。
+	 * 仅对成功完成并返回true的所有拦截器的preHandle调用触发afterCompletion。
 	 */
 	void triggerAfterCompletion(HttpServletRequest request, HttpServletResponse response, @Nullable Exception ex) {
 		for (int i = this.interceptorIndex; i >= 0; i--) {
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
 			try {
 				interceptor.afterCompletion(request, response, this.handler, ex);
-			}
-			catch (Throwable ex2) {
-				logger.error("HandlerInterceptor.afterCompletion threw exception", ex2);
+			} catch (Throwable ex2) {
+				logger.error("HandlerInterceptor.afterCompletion抛出异常", ex2);
 			}
 		}
 	}
@@ -193,8 +198,7 @@ public class HandlerExecutionChain {
 				try {
 					AsyncHandlerInterceptor asyncInterceptor = (AsyncHandlerInterceptor) interceptor;
 					asyncInterceptor.afterConcurrentHandlingStarted(request, response, this.handler);
-				}
-				catch (Throwable ex) {
+				} catch (Throwable ex) {
 					if (logger.isErrorEnabled()) {
 						logger.error("Interceptor [" + interceptor + "] failed in afterConcurrentHandlingStarted", ex);
 					}
