@@ -16,22 +16,19 @@
 
 package org.springframework.web.servlet.view.groovy;
 
-import java.util.Locale;
-
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
+import java.util.Locale;
+
 /**
- * Convenience subclass of {@link AbstractTemplateViewResolver} that supports
- * {@link GroovyMarkupView} (i.e. Groovy XML/XHTML markup templates) and
- * custom subclasses of it.
+ * 方便的 {@link AbstractTemplateViewResolver} 子类，支持 {@link GroovyMarkupView}
+ * （即 Groovy XML/XHTML 标记模板）和其自定义子类。
  *
- * <p>The view class for all views created by this resolver can be specified
- * via {@link #setViewClass(Class)}.
+ * <p>通过 {@link #setViewClass(Class)} 可以指定此解析器创建的所有视图的视图类。
  *
- * <p><b>Note:</b> When chaining ViewResolvers this resolver will check for the
- * existence of the specified template resources and only return a non-null
- * {@code View} object if a template is actually found.
+ * <p><b>注意:</b> 当链接 ViewResolvers 时，此解析器将检查指定模板资源的存在，
+ * 仅当实际找到模板时才返回非空的 {@code View} 对象。
  *
  * @author Brian Clozel
  * @since 4.1
@@ -40,18 +37,17 @@ import org.springframework.web.servlet.view.AbstractUrlBasedView;
 public class GroovyMarkupViewResolver extends AbstractTemplateViewResolver {
 
 	/**
-	 * Sets the default {@link #setViewClass view class} to {@link #requiredViewClass}:
-	 * by default {@link GroovyMarkupView}.
+	 * 将默认的 {@link #setViewClass view 类} 设置为 {@link #requiredViewClass}：
+	 * 默认为 {@link GroovyMarkupView}。
 	 */
 	public GroovyMarkupViewResolver() {
 		setViewClass(requiredViewClass());
 	}
 
 	/**
-	 * A convenience constructor that allows for specifying the {@link #setPrefix prefix}
-	 * and {@link #setSuffix suffix} as constructor arguments.
-	 * @param prefix the prefix that gets prepended to view names when building a URL
-	 * @param suffix the suffix that gets appended to view names when building a URL
+	 * 一个方便的构造函数，允许指定 {@link #setPrefix 前缀} 和 {@link #setSuffix 后缀} 作为构造参数。
+	 * @param prefix 构建 URL 时要添加到视图名称之前的前缀
+	 * @param suffix 构建 URL 时要添加到视图名称之后的后缀
 	 * @since 4.3
 	 */
 	public GroovyMarkupViewResolver(String prefix, String suffix) {
@@ -72,7 +68,7 @@ public class GroovyMarkupViewResolver extends AbstractTemplateViewResolver {
 	}
 
 	/**
-	 * This resolver supports i18n, so cache keys should contain the locale.
+	 * 此解析器支持国际化，因此缓存键应包含区域设置信息。
 	 */
 	@Override
 	protected Object getCacheKey(String viewName, Locale locale) {

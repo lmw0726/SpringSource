@@ -17,26 +17,39 @@
 package org.springframework.web.servlet.view;
 
 /**
- * Abstract base class for template view resolvers, in particular for FreeMarker views.
+ * 模板视图解析器的抽象基类，特别用于 FreeMarker 视图。
  *
- * <p>Provides a convenient way to specify {@link AbstractTemplateView}'s exposure
- * flags for request attributes, session attributes, and Spring's macro helpers.
+ * <p>提供了一种方便的方式来指定 {@link AbstractTemplateView} 的请求属性、会话属性和 Spring 宏助手的暴露标志。
  *
  * @author Juergen Hoeller
- * @since 1.1
  * @see AbstractTemplateView
  * @see org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver
+ * @since 1.1
  */
 public abstract class AbstractTemplateViewResolver extends UrlBasedViewResolver {
-
+	/**
+	 * 是否暴露请求属性
+	 */
 	private boolean exposeRequestAttributes = false;
 
+	/**
+	 * 是否允许请求覆盖
+	 */
 	private boolean allowRequestOverride = false;
 
+	/**
+	 * 是否暴露会话属性
+	 */
 	private boolean exposeSessionAttributes = false;
 
+	/**
+	 * 是否允许会话覆盖
+	 */
 	private boolean allowSessionOverride = false;
 
+	/**
+	 * 是否暴露Spring宏助手
+	 */
 	private boolean exposeSpringMacroHelpers = true;
 
 
@@ -46,8 +59,8 @@ public abstract class AbstractTemplateViewResolver extends UrlBasedViewResolver 
 	}
 
 	/**
-	 * Set whether all request attributes should be added to the
-	 * model prior to merging with the template. Default is "false".
+	 * 设置是否在与模板合并之前添加所有请求属性到模型中。默认为 "false"。
+	 *
 	 * @see AbstractTemplateView#setExposeRequestAttributes
 	 */
 	public void setExposeRequestAttributes(boolean exposeRequestAttributes) {
@@ -55,10 +68,9 @@ public abstract class AbstractTemplateViewResolver extends UrlBasedViewResolver 
 	}
 
 	/**
-	 * Set whether HttpServletRequest attributes are allowed to override (hide)
-	 * controller generated model attributes of the same name. Default is "false",
-	 * which causes an exception to be thrown if request attributes of the same
-	 * name as model attributes are found.
+	 * 设置是否允许 HttpServletRequest 属性覆盖（隐藏）相同名称的控制器生成的模型属性。默认为 "false"，
+	 * 如果找到相同名称的请求属性和模型属性，则会引发异常。
+	 *
 	 * @see AbstractTemplateView#setAllowRequestOverride
 	 */
 	public void setAllowRequestOverride(boolean allowRequestOverride) {
@@ -66,8 +78,8 @@ public abstract class AbstractTemplateViewResolver extends UrlBasedViewResolver 
 	}
 
 	/**
-	 * Set whether all HttpSession attributes should be added to the
-	 * model prior to merging with the template. Default is "false".
+	 * 设置是否在与模板合并之前添加所有 HttpSession 属性到模型中。默认为 "false"。
+	 *
 	 * @see AbstractTemplateView#setExposeSessionAttributes
 	 */
 	public void setExposeSessionAttributes(boolean exposeSessionAttributes) {
@@ -75,10 +87,9 @@ public abstract class AbstractTemplateViewResolver extends UrlBasedViewResolver 
 	}
 
 	/**
-	 * Set whether HttpSession attributes are allowed to override (hide)
-	 * controller generated model attributes of the same name. Default is "false",
-	 * which causes an exception to be thrown if session attributes of the same
-	 * name as model attributes are found.
+	 * 设置是否允许 HttpSession 属性覆盖（隐藏）相同名称的控制器生成的模型属性。默认为 "false"，
+	 * 如果找到相同名称的会话属性和模型属性，则会引发异常。
+	 *
 	 * @see AbstractTemplateView#setAllowSessionOverride
 	 */
 	public void setAllowSessionOverride(boolean allowSessionOverride) {
@@ -86,8 +97,8 @@ public abstract class AbstractTemplateViewResolver extends UrlBasedViewResolver 
 	}
 
 	/**
-	 * Set whether to expose a RequestContext for use by Spring's macro library,
-	 * under the name "springMacroRequestContext". Default is "true".
+	 * 设置是否暴露 RequestContext 供 Spring 的宏库使用，名称为 "springMacroRequestContext"。默认为 "true"。
+	 *
 	 * @see AbstractTemplateView#setExposeSpringMacroHelpers
 	 */
 	public void setExposeSpringMacroHelpers(boolean exposeSpringMacroHelpers) {
@@ -97,7 +108,9 @@ public abstract class AbstractTemplateViewResolver extends UrlBasedViewResolver 
 
 	@Override
 	protected AbstractUrlBasedView buildView(String viewName) throws Exception {
+		// 构建抽象模板视图类
 		AbstractTemplateView view = (AbstractTemplateView) super.buildView(viewName);
+		// 设置各项属性
 		view.setExposeRequestAttributes(this.exposeRequestAttributes);
 		view.setAllowRequestOverride(this.allowRequestOverride);
 		view.setExposeSessionAttributes(this.exposeSessionAttributes);

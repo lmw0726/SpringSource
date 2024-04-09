@@ -16,45 +16,60 @@
 
 package org.springframework.web.servlet.view.xslt;
 
-import java.util.Properties;
-
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.URIResolver;
-
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.URIResolver;
+import java.util.Properties;
+
 /**
- * {@link org.springframework.web.servlet.ViewResolver} implementation that
- * resolves instances of {@link XsltView} by translating the supplied view name
- * into the URL of the XSLT stylesheet.
+ * {@link org.springframework.web.servlet.ViewResolver} 实现，通过将提供的视图名称转换为 XSLT 样式表的 URL，
+ * 解析 {@link XsltView} 的实例。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
  */
 public class XsltViewResolver extends UrlBasedViewResolver {
-
+	/**
+	 * XSLT 源的模型属性的名称
+	 */
 	@Nullable
 	private String sourceKey;
 
+	/**
+	 * URL解析器
+	 */
 	@Nullable
 	private URIResolver uriResolver;
 
+	/**
+	 * 错误监听器
+	 */
 	@Nullable
 	private ErrorListener errorListener;
 
+	/**
+	 * 设置 XSLT 转换器在输出结果树时是否可以添加额外的空格。
+	 */
 	private boolean indent = true;
 
+	/**
+	 * 输出的属性
+	 */
 	@Nullable
 	private Properties outputProperties;
 
+	/**
+	 * 是否缓存模板
+	 */
 	private boolean cacheTemplates = true;
 
 
 	/**
-	 * This resolver requires {@link XsltView}.
+	 * 此解析器需要 {@link XsltView}。
 	 */
 	public XsltViewResolver() {
 		setViewClass(requiredViewClass());
@@ -62,63 +77,52 @@ public class XsltViewResolver extends UrlBasedViewResolver {
 
 
 	/**
-	 * Set the name of the model attribute that represents the XSLT Source.
-	 * If not specified, the model map will be searched for a matching value type.
-	 * <p>The following source types are supported out of the box:
-	 * {@link javax.xml.transform.Source}, {@link org.w3c.dom.Document},
-	 * {@link org.w3c.dom.Node}, {@link java.io.Reader}, {@link java.io.InputStream}
-	 * and {@link org.springframework.core.io.Resource}.
+	 * 设置表示 XSLT 源的模型属性的名称。
+	 * 如果未指定，则将搜索模型映射以查找匹配的值类型。
+	 * 支持以下源类型：{@link javax.xml.transform.Source}、{@link org.w3c.dom.Document}、
+	 * {@link org.w3c.dom.Node}、{@link java.io.Reader}、{@link java.io.InputStream}
+	 * 和 {@link org.springframework.core.io.Resource}。
 	 */
 	public void setSourceKey(String sourceKey) {
 		this.sourceKey = sourceKey;
 	}
 
 	/**
-	 * Set the URIResolver used in the transform.
-	 * <p>The URIResolver handles calls to the XSLT {@code document()} function.
+	 * 设置用于转换的 URIResolver。
+	 * URIResolver 处理对 XSLT {@code document()} 函数的调用。
 	 */
 	public void setUriResolver(URIResolver uriResolver) {
 		this.uriResolver = uriResolver;
 	}
 
 	/**
-	 * Set an implementation of the {@link javax.xml.transform.ErrorListener}
-	 * interface for custom handling of transformation errors and warnings.
-	 * <p>If not set, a default
-	 * {@link org.springframework.util.xml.SimpleTransformErrorListener} is
-	 * used that simply logs warnings using the logger instance of the view class,
-	 * and rethrows errors to discontinue the XML transformation.
-	 * @see org.springframework.util.xml.SimpleTransformErrorListener
+	 * 设置实现 {@link javax.xml.transform.ErrorListener} 接口的错误处理和警告的自定义处理程序。
+	 * 如果未设置，将使用默认的 {@link org.springframework.util.xml.SimpleTransformErrorListener}，
+	 * 该监听器仅使用视图类的记录器实例记录警告，并重新抛出错误以终止 XML 转换。
 	 */
 	public void setErrorListener(ErrorListener errorListener) {
 		this.errorListener = errorListener;
 	}
 
 	/**
-	 * Set whether the XSLT transformer may add additional whitespace when
-	 * outputting the result tree.
-	 * <p>Default is {@code true} (on); set this to {@code false} (off)
-	 * to not specify an "indent" key, leaving the choice up to the stylesheet.
-	 * @see javax.xml.transform.OutputKeys#INDENT
+	 * 设置 XSLT 转换器在输出结果树时是否可以添加额外的空格。
+	 * 默认为 {@code true}（开启）；将其设置为 {@code false}（关闭）以不指定 "indent" 键，将选择权留给样式表。
 	 */
 	public void setIndent(boolean indent) {
 		this.indent = indent;
 	}
 
 	/**
-	 * Set arbitrary transformer output properties to be applied to the stylesheet.
-	 * <p>Any values specified here will override defaults that this view sets
-	 * programmatically.
-	 * @see javax.xml.transform.Transformer#setOutputProperty
+	 * 设置要应用于样式表的任意转换器输出属性。
+	 * 此处指定的任何值将覆盖此视图在程序上设置的默认值。
 	 */
 	public void setOutputProperties(Properties outputProperties) {
 		this.outputProperties = outputProperties;
 	}
 
 	/**
-	 * Turn on/off the caching of the XSLT templates.
-	 * <p>The default value is "true". Only set this to "false" in development,
-	 * where caching does not seriously impact performance.
+	 * 打开/关闭 XSLT 模板的缓存。
+	 * 默认值为 "true"。仅在开发环境中将其设置为 "false"，其中缓存不会严重影响性能。
 	 */
 	public void setCacheTemplates(boolean cacheTemplates) {
 		this.cacheTemplates = cacheTemplates;
@@ -137,7 +141,9 @@ public class XsltViewResolver extends UrlBasedViewResolver {
 
 	@Override
 	protected AbstractUrlBasedView buildView(String viewName) throws Exception {
+		// 构建 XSLT 视图
 		XsltView view = (XsltView) super.buildView(viewName);
+		// 设置各项属性
 		if (this.sourceKey != null) {
 			view.setSourceKey(this.sourceKey);
 		}

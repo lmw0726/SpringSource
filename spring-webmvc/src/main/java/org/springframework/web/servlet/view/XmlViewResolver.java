@@ -16,8 +16,6 @@
 
 package org.springframework.web.servlet.view;
 
-import java.util.Locale;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -33,59 +31,68 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.springframework.web.servlet.View;
 
+import java.util.Locale;
+
 /**
- * A {@link org.springframework.web.servlet.ViewResolver} implementation that uses
- * bean definitions in a dedicated XML file for view definitions, specified by
- * resource location. The file will typically be located in the WEB-INF directory;
- * the default is "/WEB-INF/views.xml".
+ * {@link org.springframework.web.servlet.ViewResolver} 的实现，使用专用的 XML 文件作为视图定义的 bean 定义，
+ * 资源位置由 location 指定。
+ * 该文件通常位于 WEB-INF 目录中；默认值为 "/WEB-INF/views.xml"。
  *
- * <p>This {@code ViewResolver} does not support internationalization at the level
- * of its definition resources. Consider {@link ResourceBundleViewResolver} if you
- * need to apply different view resources per locale.
+ * <p>此 {@code ViewResolver} 不支持在其定义资源级别进行国际化。如果需要针对每个区域设置不同的视图资源，
+ * 请考虑使用 {@link ResourceBundleViewResolver}。
  *
- * <p>Note: This {@code ViewResolver} implements the {@link Ordered} interface
- * in order to allow for flexible participation in {@code ViewResolver} chaining.
- * For example, some special views could be defined via this {@code ViewResolver}
- * (giving it 0 as "order" value), while all remaining views could be resolved by
- * a {@link UrlBasedViewResolver}.
+ * <p>注意：此 {@code ViewResolver} 实现了 {@link Ordered} 接口，以允许灵活地参与 {@code ViewResolver} 链。
+ * 例如，可以通过此 {@code ViewResolver} 定义一些特殊视图（将其作为 "order" 值为 0 的参数），
+ * 而所有其他视图可以由 {@link UrlBasedViewResolver} 解析。
  *
  * @author Juergen Hoeller
- * @since 18.06.2003
  * @see org.springframework.context.ApplicationContext#getResource
  * @see UrlBasedViewResolver
  * @see BeanNameViewResolver
- * @deprecated as of 5.3, in favor of Spring's common view resolver variants
- * and/or custom resolver implementations
+ * @since 2003-06-18
+ * @deprecated 自 5.3 版本起，建议使用 Spring 提供的通用视图解析器变种和/或自定义解析器实现
  */
 @Deprecated
 public class XmlViewResolver extends AbstractCachingViewResolver
 		implements Ordered, InitializingBean, DisposableBean {
 
-	/** Default if no other location is supplied. */
+	/**
+	 * 如果没有其他位置，则使用默认位置。
+	 */
 	public static final String DEFAULT_LOCATION = "/WEB-INF/views.xml";
 
-
+	/**
+	 * 资源位置
+	 */
 	@Nullable
 	private Resource location;
 
+	/**
+	 * 缓存的bean工厂
+	 */
 	@Nullable
 	private ConfigurableApplicationContext cachedFactory;
 
-	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
+	/**
+	 * 默认值：与非有序相同
+	 */
+	private int order = Ordered.LOWEST_PRECEDENCE;
 
 
 	/**
-	 * Set the location of the XML file that defines the view beans.
-	 * <p>The default is "/WEB-INF/views.xml".
-	 * @param location the location of the XML file.
+	 * 设置定义视图 bean 的 XML 文件的位置。
+	 * <p>默认值为 "/WEB-INF/views.xml"。
+	 *
+	 * @param location XML 文件的位置。
 	 */
 	public void setLocation(Resource location) {
 		this.location = location;
 	}
 
 	/**
-	 * Specify the order value for this ViewResolver bean.
-	 * <p>The default value is {@code Ordered.LOWEST_PRECEDENCE}, meaning non-ordered.
+	 * 为此 ViewResolver bean 指定排序值。
+	 * <p>默认值为 {@code Ordered.LOWEST_PRECEDENCE}，表示非有序。
+	 *
 	 * @see org.springframework.core.Ordered#getOrder()
 	 */
 	public void setOrder(int order) {
@@ -98,20 +105,21 @@ public class XmlViewResolver extends AbstractCachingViewResolver
 	}
 
 	/**
-	 * Pre-initialize the factory from the XML file.
-	 * Only effective if caching is enabled.
+	 * 预先从 XML 文件初始化工厂。
+	 * 仅在启用缓存时有效。
 	 */
 	@Override
 	public void afterPropertiesSet() throws BeansException {
 		if (isCache()) {
+			// 如果启用了缓存，则初始化bean工厂
 			initFactory();
 		}
 	}
 
 
 	/**
-	 * This implementation returns just the view name,
-	 * as XmlViewResolver doesn't support localized resolution.
+	 * 此实现仅返回视图名称，
+	 * 因为 XmlViewResolver 不支持本地化解析。
 	 */
 	@Override
 	protected Object getCacheKey(String viewName, Locale locale) {
@@ -120,47 +128,59 @@ public class XmlViewResolver extends AbstractCachingViewResolver
 
 	@Override
 	protected View loadView(String viewName, Locale locale) throws BeansException {
+		// 初始化bean工厂
 		BeanFactory factory = initFactory();
 		try {
+			// 根据视图名称加载具体视图类
 			return factory.getBean(viewName, View.class);
-		}
-		catch (NoSuchBeanDefinitionException ex) {
-			// Allow for ViewResolver chaining...
+		} catch (NoSuchBeanDefinitionException ex) {
+			// 允许 ViewResolver 链接...
 			return null;
 		}
 	}
 
 	/**
-	 * Initialize the view bean factory from the XML file.
-	 * Synchronized because of access by parallel threads.
-	 * @throws BeansException in case of initialization errors
+	 * 从 XML 文件初始化视图 bean 工厂。
+	 * 因为有并行线程访问，所以采用同步方式。
+	 *
+	 * @throws BeansException 如果初始化出现错误
 	 */
 	protected synchronized BeanFactory initFactory() throws BeansException {
 		if (this.cachedFactory != null) {
+			// 如果已经有缓存的工厂，则直接返回它
 			return this.cachedFactory;
 		}
 
+		// 获取应用程序上下文
 		ApplicationContext applicationContext = obtainApplicationContext();
 
 		Resource actualLocation = this.location;
 		if (actualLocation == null) {
+			// 如果没有指定位置，则使用默认位置
 			actualLocation = applicationContext.getResource(DEFAULT_LOCATION);
 		}
 
-		// Create child ApplicationContext for views.
+		// 创建用于视图的子 ApplicationContext
 		GenericWebApplicationContext factory = new GenericWebApplicationContext();
+		// 设置父应用上下文
 		factory.setParent(applicationContext);
+		// 设置Servlet应用上下文
 		factory.setServletContext(getServletContext());
 
-		// Load XML resource with context-aware entity resolver.
+		// 使用上下文感知的实体解析器加载 XML 资源
 		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
+		// 设置环境
 		reader.setEnvironment(applicationContext.getEnvironment());
+		// 设置实体解析器
 		reader.setEntityResolver(new ResourceEntityResolver(applicationContext));
+		// 从实际位置上加载bean定义
 		reader.loadBeanDefinitions(actualLocation);
 
+		// 刷新应用上下文
 		factory.refresh();
 
 		if (isCache()) {
+			// 如果启用了缓存，则将工厂缓存起来
 			this.cachedFactory = factory;
 		}
 		return factory;
@@ -168,7 +188,7 @@ public class XmlViewResolver extends AbstractCachingViewResolver
 
 
 	/**
-	 * Close the view bean factory on context shutdown.
+	 * 在上下文关闭时关闭视图 bean 工厂。
 	 */
 	@Override
 	public void destroy() throws BeansException {
