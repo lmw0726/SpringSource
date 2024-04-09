@@ -16,28 +16,25 @@
 
 package org.springframework.web.servlet.view;
 
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * Convenient base class for {@link org.springframework.web.servlet.ViewResolver}
- * implementations. Caches {@link org.springframework.web.servlet.View} objects
- * once resolved: This means that view resolution won't be a performance problem,
- * no matter how costly initial view retrieval is.
+ * 用于{@link org.springframework.web.servlet.ViewResolver}实现的便捷基类。
+ * 一旦解析，它会缓存{@link org.springframework.web.servlet.View}对象：
+ * 这意味着无论初始视图检索的成本如何，视图解析都不会成为性能问题。
  *
- * <p>Subclasses need to implement the {@link #loadView} template method,
- * building the View object for a specific view name and locale.
+ * <p>子类需要实现{@link #loadView}模板方法，为特定的视图名称和区域设置构建View对象。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -45,10 +42,10 @@ import org.springframework.web.servlet.ViewResolver;
  */
 public abstract class AbstractCachingViewResolver extends WebApplicationObjectSupport implements ViewResolver {
 
-	/** Default maximum number of entries for the view cache: 1024. */
+	/** 视图缓存的默认最大条目数：1024。 */
 	public static final int DEFAULT_CACHE_LIMIT = 1024;
 
-	/** Dummy marker object for unresolved views in the cache Maps. */
+	/** 缓存Maps中未解析视图的虚拟标记对象。 */
 	private static final View UNRESOLVED_VIEW = new View() {
 		@Override
 		@Nullable
@@ -60,20 +57,19 @@ public abstract class AbstractCachingViewResolver extends WebApplicationObjectSu
 		}
 	};
 
-	/** Default cache filter that always caches. */
+	/** 默认的缓存过滤器，始终进行缓存。 */
 	private static final CacheFilter DEFAULT_CACHE_FILTER = (view, viewName, locale) -> true;
 
-
-	/** The maximum number of entries in the cache. */
+	/** 缓存中的条目最大数量。 */
 	private volatile int cacheLimit = DEFAULT_CACHE_LIMIT;
 
-	/** Whether we should refrain from resolving views again if unresolved once. */
+	/** 如果视图一旦未解析，是否应避免再次解析。 */
 	private boolean cacheUnresolved = true;
 
-	/** Filter function that determines if view should be cached. */
+	/** 确定是否应将视图缓存的过滤器功能。 */
 	private CacheFilter cacheFilter = DEFAULT_CACHE_FILTER;
 
-	/** Fast access cache for Views, returning already cached instances without a global lock. */
+	/** 用于快速访问视图的缓存，返回已经缓存的实例而不需要全局锁。 */
 	private final Map<Object, View> viewAccessCache = new ConcurrentHashMap<>(DEFAULT_CACHE_LIMIT);
 
 	/** Map from view key to View instance, synchronized for View creation. */

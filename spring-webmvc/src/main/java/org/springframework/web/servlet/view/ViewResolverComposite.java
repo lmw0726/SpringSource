@@ -16,13 +16,6 @@
 
 package org.springframework.web.servlet.view;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.ServletContext;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -34,8 +27,14 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
+import javax.servlet.ServletContext;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
 /**
- * A {@link org.springframework.web.servlet.ViewResolver} that delegates to others.
+ * 一个委托给其他视图解析器的 {@link org.springframework.web.servlet.ViewResolver}。
  *
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
@@ -44,13 +43,19 @@ import org.springframework.web.servlet.ViewResolver;
 public class ViewResolverComposite implements ViewResolver, Ordered, InitializingBean,
 		ApplicationContextAware, ServletContextAware {
 
+	/**
+	 * 视图解析器列表
+	 */
 	private final List<ViewResolver> viewResolvers = new ArrayList<>();
 
+	/**
+	 * 解析视图的顺序
+	 */
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 
 	/**
-	 * Set the list of view viewResolvers to delegate to.
+	 * 设置要委托的视图解析器列表。
 	 */
 	public void setViewResolvers(List<ViewResolver> viewResolvers) {
 		this.viewResolvers.clear();
@@ -60,7 +65,7 @@ public class ViewResolverComposite implements ViewResolver, Ordered, Initializin
 	}
 
 	/**
-	 * Return the list of view viewResolvers to delegate to.
+	 * 返回要委托的视图解析器列表。
 	 */
 	public List<ViewResolver> getViewResolvers() {
 		return Collections.unmodifiableList(this.viewResolvers);
@@ -79,7 +84,8 @@ public class ViewResolverComposite implements ViewResolver, Ordered, Initializin
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		for (ViewResolver viewResolver : this.viewResolvers) {
 			if (viewResolver instanceof ApplicationContextAware) {
-				((ApplicationContextAware)viewResolver).setApplicationContext(applicationContext);
+				// 如果视图解析器是 应用上下文感知器 实例，则设置应用上下文
+				((ApplicationContextAware) viewResolver).setApplicationContext(applicationContext);
 			}
 		}
 	}
@@ -88,7 +94,8 @@ public class ViewResolverComposite implements ViewResolver, Ordered, Initializin
 	public void setServletContext(ServletContext servletContext) {
 		for (ViewResolver viewResolver : this.viewResolvers) {
 			if (viewResolver instanceof ServletContextAware) {
-				((ServletContextAware)viewResolver).setServletContext(servletContext);
+				// 如果视图解析器是 Servlet上下文感知器 的实例，则设置Servlet上下文
+				((ServletContextAware) viewResolver).setServletContext(servletContext);
 			}
 		}
 	}
@@ -97,6 +104,7 @@ public class ViewResolverComposite implements ViewResolver, Ordered, Initializin
 	public void afterPropertiesSet() throws Exception {
 		for (ViewResolver viewResolver : this.viewResolvers) {
 			if (viewResolver instanceof InitializingBean) {
+				// 如果视图解析器是 初始化Bean实例，则调用它的 afterPropertiesSet 方法
 				((InitializingBean) viewResolver).afterPropertiesSet();
 			}
 		}
@@ -106,8 +114,10 @@ public class ViewResolverComposite implements ViewResolver, Ordered, Initializin
 	@Nullable
 	public View resolveViewName(String viewName, Locale locale) throws Exception {
 		for (ViewResolver viewResolver : this.viewResolvers) {
+			// 遍历视图解析器，并解析出视图
 			View view = viewResolver.resolveViewName(viewName, locale);
 			if (view != null) {
+				// 如果视图不为空，则返回该视图
 				return view;
 			}
 		}
