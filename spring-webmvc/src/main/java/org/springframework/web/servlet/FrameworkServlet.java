@@ -50,17 +50,13 @@ import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.util.NestedServletException;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -213,11 +209,11 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 */
 	private boolean enableLoggingRequestDetails = false;
 
-	/**
-	 * 此servlet的WebApplicationContext。
-	 */
-	@Nullable
-	private WebApplicationContext webApplicationContext;
+		/**
+		 * 此servlet的WebApplicationContext。
+		 */
+		@Nullable
+		private WebApplicationContext webApplicationContext;
 
 	/**
 	 * 如果WebApplicationContext是通过{@link #setApplicationContext}注入的。
@@ -569,32 +565,32 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		return wac;
 	}
 
-	/**
-	 * 从具有{@link #setContextAttribute 配置名称}的{@code ServletContext}属性中检索{@code WebApplicationContext}。
-	 * 在初始化（或调用）此servlet之前，{@code WebApplicationContext}必须已经加载并存储在{@code ServletContext}中。
-	 * 子类可以覆盖此方法以提供不同的{@code WebApplicationContext}检索策略。
-	 *
-	 * @return 此servlet的WebApplicationContext，如果未找到则返回{@code null}
-	 * @see #getContextAttribute()
-	 */
-	@Nullable
-	protected WebApplicationContext findWebApplicationContext() {
-		// 获取上下文属性名称
-		String attrName = getContextAttribute();
-		// 如果上下文属性名称为空，则返回 null
-		if (attrName == null) {
-			return null;
+		/**
+		 * 从具有{@link #setContextAttribute 配置名称}的{@code ServletContext}属性中检索{@code WebApplicationContext}。
+		 * 在初始化（或调用）此servlet之前，{@code WebApplicationContext}必须已经加载并存储在{@code ServletContext}中。
+		 * 子类可以覆盖此方法以提供不同的{@code WebApplicationContext}检索策略。
+		 *
+		 * @return 此servlet的WebApplicationContext，如果未找到则返回{@code null}
+		 * @see #getContextAttribute()
+		 */
+		@Nullable
+		protected WebApplicationContext findWebApplicationContext() {
+			// 获取上下文属性名称
+			String attrName = getContextAttribute();
+			// 如果上下文属性名称为空，则返回 null
+			if (attrName == null) {
+				return null;
+			}
+			// 通过上下文属性名称从 Servlet 上下文中获取 Web 应用程序上下文
+			WebApplicationContext wac =
+					WebApplicationContextUtils.getWebApplicationContext(getServletContext(), attrName);
+			// 如果未找到 Web 应用程序上下文，则抛出 IllegalStateException 异常
+			if (wac == null) {
+				throw new IllegalStateException("No WebApplicationContext found: initializer not registered?");
+			}
+			// 返回获取的 Web 应用程序上下文
+			return wac;
 		}
-		// 通过上下文属性名称从 Servlet 上下文中获取 Web 应用程序上下文
-		WebApplicationContext wac =
-				WebApplicationContextUtils.getWebApplicationContext(getServletContext(), attrName);
-		// 如果未找到 Web 应用程序上下文，则抛出 IllegalStateException 异常
-		if (wac == null) {
-			throw new IllegalStateException("No WebApplicationContext found: initializer not registered?");
-		}
-		// 返回获取的 Web 应用程序上下文
-		return wac;
-	}
 
 	/**
 	 * 实例化此servlet的WebApplicationContext，可以是默认的{@link org.springframework.web.context.support.XmlWebApplicationContext}

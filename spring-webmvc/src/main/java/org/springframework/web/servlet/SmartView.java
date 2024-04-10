@@ -17,8 +17,7 @@
 package org.springframework.web.servlet;
 
 /**
- * Provides additional information about a View such as whether it
- * performs redirects.
+ * 提供有关视图的其他信息，例如它是否执行重定向。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
@@ -26,7 +25,7 @@ package org.springframework.web.servlet;
 public interface SmartView extends View {
 
 	/**
-	 * Whether the view performs a redirect.
+	 * 视图是否执行重定向。
 	 */
 	boolean isRedirectView();
 
