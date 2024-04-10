@@ -22,47 +22,35 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface for web-based theme resolution strategies that allows for
- * both theme resolution via the request and theme modification via
- * request and response.
+ * 用于基于Web的主题解析策略的接口，允许通过请求进行主题解析和通过请求和响应进行主题修改。
  *
- * <p>This interface allows for implementations based on session,
- * cookies, etc. The default implementation is
- * {@link org.springframework.web.servlet.theme.FixedThemeResolver},
- * simply using a configured default theme.
- *
- * <p>Note that this resolver is only responsible for determining the
- * current theme name. The Theme instance for the resolved theme name
- * gets looked up by DispatcherServlet via the respective ThemeSource,
- * i.e. the current WebApplicationContext.
- *
- * <p>Use {@link org.springframework.web.servlet.support.RequestContext#getTheme()}
- * to retrieve the current theme in controllers or views, independent
- * of the actual resolution strategy.
+ * <p>该接口允许基于会话、cookie等实现。默认实现是{@link org.springframework.web.servlet.theme.FixedThemeResolver}，简单地使用配置的默认主题。
+ * <p>请注意，此解析器仅负责确定当前主题名称。通过相应的ThemeSource（即当前的WebApplicationContext）通过DispatcherServlet查找已解析的主题名称的Theme实例。
+ * <p>在控制器或视图中使用{@link org.springframework.web.servlet.support.RequestContext#getTheme()}来检索当前主题，与实际解析策略无关。
  *
  * @author Jean-Pierre Pawlak
  * @author Juergen Hoeller
- * @since 17.06.2003
  * @see org.springframework.ui.context.Theme
  * @see org.springframework.ui.context.ThemeSource
+ * @since 17.06.2003
  */
 public interface ThemeResolver {
 
 	/**
-	 * Resolve the current theme name via the given request.
-	 * Should return a default theme as fallback in any case.
-	 * @param request the request to be used for resolution
-	 * @return the current theme name
+	 * 通过给定的请求解析当前主题名称。在任何情况下都应返回默认主题作为后备。
+	 *
+	 * @param request 用于解析的请求
+	 * @return 当前主题名称
 	 */
 	String resolveThemeName(HttpServletRequest request);
 
 	/**
-	 * Set the current theme name to the given one.
-	 * @param request the request to be used for theme name modification
-	 * @param response the response to be used for theme name modification
-	 * @param themeName the new theme name ({@code null} or empty to reset it)
-	 * @throws UnsupportedOperationException if the ThemeResolver implementation
-	 * does not support dynamic changing of the theme
+	 * 将当前主题名称设置为给定的名称。
+	 *
+	 * @param request   用于主题名称修改的请求
+	 * @param response  用于主题名称修改的响应
+	 * @param themeName 新的主题名称（{@code null}或空表示重置）
+	 * @throws UnsupportedOperationException 如果ThemeResolver实现不支持动态更改主题
 	 */
 	void setThemeName(HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable String themeName);
 
