@@ -16,33 +16,35 @@
 
 package org.springframework.web.servlet.view;
 
-import java.util.Locale;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 
+import java.util.Locale;
+
 /**
- * Abstract base class for URL-based views. Provides a consistent way of
- * holding the URL that a View wraps, in the form of a "url" bean property.
+ * 基于URL的视图的抽象基类。提供了一种一致的方式来保存视图包装的URL，以"url" bean属性的形式。
  *
  * @author Juergen Hoeller
- * @since 13.12.2003
+ * @since 2003年12月13日
  */
 public abstract class AbstractUrlBasedView extends AbstractView implements InitializingBean {
 
+	/**
+	 * URL
+	 */
 	@Nullable
 	private String url;
 
 
 	/**
-	 * Constructor for use as a bean.
+	 * 用作bean的构造函数。
 	 */
 	protected AbstractUrlBasedView() {
 	}
 
 	/**
-	 * Create a new AbstractUrlBasedView with the given URL.
-	 * @param url the URL to forward to
+	 * 使用给定的URL创建一个新的AbstractUrlBasedView。
+	 * @param url 要转发到的URL
 	 */
 	protected AbstractUrlBasedView(String url) {
 		this.url = url;
@@ -50,15 +52,15 @@ public abstract class AbstractUrlBasedView extends AbstractView implements Initi
 
 
 	/**
-	 * Set the URL of the resource that this view wraps.
-	 * The URL must be appropriate for the concrete View implementation.
+	 * 设置此视图包装的资源的URL。
+	 * URL必须适用于具体的视图实现。
 	 */
 	public void setUrl(@Nullable String url) {
 		this.url = url;
 	}
 
 	/**
-	 * Return the URL of the resource that this view wraps.
+	 * 返回此视图包装的资源的URL。
 	 */
 	@Nullable
 	public String getUrl() {
@@ -73,21 +75,19 @@ public abstract class AbstractUrlBasedView extends AbstractView implements Initi
 	}
 
 	/**
-	 * Return whether the 'url' property is required.
-	 * <p>The default implementation returns {@code true}.
-	 * This can be overridden in subclasses.
+	 * 返回是否需要"url"属性。
+	 * <p>默认实现返回{@code true}。
+	 * 可以在子类中进行覆盖。
 	 */
 	protected boolean isUrlRequired() {
 		return true;
 	}
 
 	/**
-	 * Check whether the underlying resource that the configured URL points to
-	 * actually exists.
-	 * @param locale the desired Locale that we're looking for
-	 * @return {@code true} if the resource exists (or is assumed to exist);
-	 * {@code false} if we know that it does not exist
-	 * @throws Exception if the resource exists but is invalid (e.g. could not be parsed)
+	 * 检查配置的URL指向的底层资源是否确实存在。
+	 * @param locale 我们正在查找的期望Locale
+	 * @return 如果资源存在（或假定存在）则为{@code true}；如果我们知道它不存在，则为{@code false}
+	 * @throws Exception 如果资源存在但无效（例如，无法解析）
 	 */
 	public boolean checkResource(Locale locale) throws Exception {
 		return true;

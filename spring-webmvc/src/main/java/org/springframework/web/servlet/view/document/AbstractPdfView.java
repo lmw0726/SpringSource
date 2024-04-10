@@ -16,34 +16,26 @@
 
 package org.springframework.web.servlet.view.document;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.PdfWriter;
-
 import org.springframework.web.servlet.view.AbstractView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.util.Map;
+
 /**
- * Abstract superclass for PDF views. Application-specific view classes
- * will extend this class. The view will be held in the subclass itself,
- * not in a template.
+ * PDF视图的抽象超类。应用程序特定的视图类将扩展此类。视图将保存在子类本身中，而不是模板中。
  *
- * <p>This view implementation uses Bruno Lowagie's
- * <a href="https://www.lowagie.com/iText">iText</a> API.
- * Known to work with the original iText 2.1.7 as well as its fork
- * <a href="https://github.com/LibrePDF/OpenPDF">OpenPDF</a>.
- * <b>We strongly recommend OpenPDF since it is actively maintained
- * and fixes an important vulnerability for untrusted PDF content.</b>
+ * <p>此视图实现使用Bruno Lowagie的<a href="https://www.lowagie.com/iText">iText</a> API。
+ * 已知与原始iText 2.1.7及其分支<a href="https://github.com/LibrePDF/OpenPDF">OpenPDF</a>一起使用。
+ * <b>我们强烈建议使用OpenPDF，因为它正在积极维护并修复了一个针对不受信任的PDF内容的重要漏洞。</b>
  *
- * <p>Note: Internet Explorer requires a ".pdf" extension, as it doesn't
- * always respect the declared content type.
+ * <p>注意：Internet Explorer需要".pdf"扩展名，因为它并不总是尊重声明的内容类型。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -53,9 +45,8 @@ import org.springframework.web.servlet.view.AbstractView;
 public abstract class AbstractPdfView extends AbstractView {
 
 	/**
-	 * This constructor sets the appropriate content type "application/pdf".
-	 * Note that IE won't take much notice of this, but there's not a lot we
-	 * can do about this. Generated documents should have a ".pdf" extension.
+	 * 此构造函数设置适当的内容类型“application/pdf”。
+	 * 请注意，IE对此并不关心，但我们对此无能为力。生成的文档应具有“.pdf”扩展名。
 	 */
 	public AbstractPdfView() {
 		setContentType("application/pdf");
@@ -71,29 +62,30 @@ public abstract class AbstractPdfView extends AbstractView {
 	protected final void renderMergedOutputModel(
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// IE workaround: write into byte array first.
+		// IE解决方法：先写入字节数组。
 		ByteArrayOutputStream baos = createTemporaryOutputStream();
 
-		// Apply preferences and build metadata.
+		// 应用首选项并构建元数据。
 		Document document = newDocument();
 		PdfWriter writer = newWriter(document, baos);
+		// 准备写入器
 		prepareWriter(model, writer, request);
+		// 构建PDF元数据
 		buildPdfMetadata(model, document, request);
 
-		// Build PDF document.
+		// 构建PDF文档。
 		document.open();
 		buildPdfDocument(model, document, writer, request, response);
 		document.close();
 
-		// Flush to HTTP response.
+		// 刷新到HTTP响应。
 		writeToResponse(response, baos);
 	}
 
 	/**
-	 * Create a new document to hold the PDF contents.
-	 * <p>By default returns an A4 document, but the subclass can specify any
-	 * Document, possibly parameterized via bean properties defined on the View.
-	 * @return the newly created iText Document instance
+	 * 创建一个新文档以保存PDF内容。
+	 * <p>默认情况下返回A4文档，但子类可以指定任何Document，可能通过在视图上定义的bean属性进行参数化。
+	 * @return 新创建的iText Document实例
 	 * @see com.lowagie.text.Document#Document(com.lowagie.text.Rectangle)
 	 */
 	protected Document newDocument() {
@@ -101,26 +93,24 @@ public abstract class AbstractPdfView extends AbstractView {
 	}
 
 	/**
-	 * Create a new PdfWriter for the given iText Document.
-	 * @param document the iText Document to create a writer for
-	 * @param os the OutputStream to write to
-	 * @return the PdfWriter instance to use
-	 * @throws DocumentException if thrown during writer creation
+	 * 为给定的iText文档创建一个新的PdfWriter。
+	 * @param document 要为其创建写入器的iText文档
+	 * @param os 要写入的OutputStream
+	 * @return 要使用的PdfWriter实例
+	 * @throws DocumentException 创建写入器期间抛出DocumentException
 	 */
 	protected PdfWriter newWriter(Document document, OutputStream os) throws DocumentException {
 		return PdfWriter.getInstance(document, os);
 	}
 
 	/**
-	 * Prepare the given PdfWriter. Called before building the PDF document,
-	 * that is, before the call to {@code Document.open()}.
-	 * <p>Useful for registering a page event listener, for example.
-	 * The default implementation sets the viewer preferences as returned
-	 * by this class's {@code getViewerPreferences()} method.
-	 * @param model the model, in case meta information must be populated from it
-	 * @param writer the PdfWriter to prepare
-	 * @param request in case we need locale etc. Shouldn't look at attributes.
-	 * @throws DocumentException if thrown during writer preparation
+	 * 准备给定的PdfWriter。在构建PDF文档之前调用，即在调用{@code Document.open()}之前。
+	 * <p>例如，用于注册页面事件监听器。
+	 * 默认实现设置此类的{@code getViewerPreferences()}方法返回的查看器首选项。
+	 * @param model 如果必须从模型中填充元信息，则为模型
+	 * @param writer 要准备的PdfWriter
+	 * @param request 如果需要区域设置等，则为请求。不应查看属性。
+	 * @throws DocumentException 准备写入器期间抛出的DocumentException
 	 * @see com.lowagie.text.Document#open()
 	 * @see com.lowagie.text.pdf.PdfWriter#setPageEvent
 	 * @see com.lowagie.text.pdf.PdfWriter#setViewerPreferences
@@ -133,12 +123,10 @@ public abstract class AbstractPdfView extends AbstractView {
 	}
 
 	/**
-	 * Return the viewer preferences for the PDF file.
-	 * <p>By default returns {@code AllowPrinting} and
-	 * {@code PageLayoutSinglePage}, but can be subclassed.
-	 * The subclass can either have fixed preferences or retrieve
-	 * them from bean properties defined on the View.
-	 * @return an int containing the bits information against PdfWriter definitions
+	 * 返回PDF文件的查看器首选项。
+	 * <p>默认情况下返回{@code AllowPrinting}和{@code PageLayoutSinglePage}，但可以被子类覆盖。
+	 * 子类可以具有固定首选项，也可以从在视图上定义的bean属性中检索它们。
+	 * @return 包含位信息的int，针对PdfWriter定义
 	 * @see com.lowagie.text.pdf.PdfWriter#AllowPrinting
 	 * @see com.lowagie.text.pdf.PdfWriter#PageLayoutSinglePage
 	 */
@@ -147,14 +135,12 @@ public abstract class AbstractPdfView extends AbstractView {
 	}
 
 	/**
-	 * Populate the iText Document's meta fields (author, title, etc.).
-	 * <br>Default is an empty implementation. Subclasses may override this method
-	 * to add meta fields such as title, subject, author, creator, keywords, etc.
-	 * This method is called after assigning a PdfWriter to the Document and
-	 * before calling {@code document.open()}.
-	 * @param model the model, in case meta information must be populated from it
-	 * @param document the iText document being populated
-	 * @param request in case we need locale etc. Shouldn't look at attributes.
+	 * 填充iText文档的元字段（作者、标题等）。
+	 * <br>默认为空实现。子类可以覆盖此方法以添加元字段，例如标题、主题、作者、创建者、关键字等。
+	 * 在为Document分配PdfWriter并在调用{@code document.open()}之后调用此方法。
+	 * @param model 如果必须从模型中填充元信息，则为模型
+	 * @param document 要填充的iText文档
+	 * @param request 如果需要区域设置等，则为请求。不应查看属性。
 	 * @see com.lowagie.text.Document#addTitle
 	 * @see com.lowagie.text.Document#addSubject
 	 * @see com.lowagie.text.Document#addKeywords
@@ -168,22 +154,19 @@ public abstract class AbstractPdfView extends AbstractView {
 	}
 
 	/**
-	 * Subclasses must implement this method to build an iText PDF document,
-	 * given the model. Called between {@code Document.open()} and
-	 * {@code Document.close()} calls.
-	 * <p>Note that the passed-in HTTP response is just supposed to be used
-	 * for setting cookies or other HTTP headers. The built PDF document itself
-	 * will automatically get written to the response after this method returns.
-	 * @param model the model Map
-	 * @param document the iText Document to add elements to
-	 * @param writer the PdfWriter to use
-	 * @param request in case we need locale etc. Shouldn't look at attributes.
-	 * @param response in case we need to set cookies. Shouldn't write to it.
-	 * @throws Exception any exception that occurred during document building
+	 * 子类必须实现此方法以构建一个iText PDF文档，给定模型。在调用{@code Document.open()}和{@code Document.close()}之间调用。
+	 * <p>请注意，传入的HTTP响应仅应用于设置cookie或其他HTTP标头。
+	 * 构建的PDF文档本身将在此方法返回后自动写入响应。
+	 * @param model 模型Map
+	 * @param document 要添加元素的iText Document
+	 * @param writer 要使用的PdfWriter
+	 * @param request 如果需要区域设置等，则为请求。不应查看属性。
+	 * @param response 如果需要设置cookie，则应用于设置cookie。不应写入它。
+	 * @throws Exception 构建文档期间发生的任何异常
 	 * @see com.lowagie.text.Document#open()
 	 * @see com.lowagie.text.Document#close()
 	 */
 	protected abstract void buildPdfDocument(Map<String, Object> model, Document document, PdfWriter writer,
-			HttpServletRequest request, HttpServletResponse response) throws Exception;
+											 HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 }

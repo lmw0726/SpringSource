@@ -16,11 +16,8 @@
 
 package org.springframework.web.servlet.view.xml;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -28,46 +25,48 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.json.AbstractJackson2View;
 
+import java.util.Map;
+
 /**
- * Spring MVC {@link View} that renders XML content by serializing the model for the current request
- * using <a href="https://github.com/FasterXML/jackson">Jackson 2's</a> {@link XmlMapper}.
+ * 通过使用<a href="https://github.com/FasterXML/jackson">Jackson 2</a>的{@link XmlMapper}，
+ * 将模型序列化为当前请求的XML内容的Spring MVC {@link View}。
  *
- * <p>The Object to be serialized is supplied as a parameter in the model. The first serializable
- * entry is used. Users can either specify a specific entry in the model via the
- * {@link #setModelKey(String) sourceKey} property.
+ * <p>要序列化的对象作为模型的参数提供。将使用第一个可序列化的条目。用户可以通过{@link #setModelKey(String) sourceKey}属性指定模型中的特定条目。
  *
- * <p>The default constructor uses the default configuration provided by {@link Jackson2ObjectMapperBuilder}.
+ * <p>默认构造函数使用由{@link Jackson2ObjectMapperBuilder}提供的默认配置，并将内容类型设置为{@code application/xml}。
  *
- * <p>Compatible with Jackson 2.9 to 2.12, as of Spring 5.3.
+ * <p>截至Spring 5.3，兼容Jackson 2.9到2.12。
  *
  * @author Sebastien Deleuze
- * @since 4.1
  * @see org.springframework.web.servlet.view.json.MappingJackson2JsonView
+ * @since 4.1
  */
 public class MappingJackson2XmlView extends AbstractJackson2View {
 
 	/**
-	 * The default content type for the view.
+	 * 视图的默认内容类型。
 	 */
 	public static final String DEFAULT_CONTENT_TYPE = "application/xml";
 
-
+	/**
+	 * 此模型中渲染的属性
+	 */
 	@Nullable
 	private String modelKey;
 
 
 	/**
-	 * Construct a new {@code MappingJackson2XmlView} using default configuration
-	 * provided by {@link Jackson2ObjectMapperBuilder} and setting the content type
-	 * to {@code application/xml}.
+	 * 使用由{@link Jackson2ObjectMapperBuilder}提供的默认配置构造一个新的{@code MappingJackson2XmlView}，
+	 * 并将内容类型设置为{@code application/xml}。
 	 */
 	public MappingJackson2XmlView() {
 		super(Jackson2ObjectMapperBuilder.xml().build(), DEFAULT_CONTENT_TYPE);
 	}
 
 	/**
-	 * Construct a new {@code MappingJackson2XmlView} using the provided {@link XmlMapper}
-	 * and setting the content type to {@code application/xml}.
+	 * 使用提供的{@link XmlMapper}构造一个新的{@code MappingJackson2XmlView}，
+	 * 并将内容类型设置为{@code application/xml}。
+	 *
 	 * @since 4.2.1
 	 */
 	public MappingJackson2XmlView(XmlMapper xmlMapper) {
@@ -84,16 +83,18 @@ public class MappingJackson2XmlView extends AbstractJackson2View {
 	protected Object filterModel(Map<String, Object> model) {
 		Object value = null;
 		if (this.modelKey != null) {
+			// 根据指定的键获取模型中的对象
 			value = model.get(this.modelKey);
 			if (value == null) {
 				throw new IllegalStateException(
 						"Model contains no object with key [" + this.modelKey + "]");
 			}
-		}
-		else {
+		} else {
+			// 如果没有指定键，则遍历模型，找到第一个可渲染的对象
 			for (Map.Entry<String, Object> entry : model.entrySet()) {
 				if (!(entry.getValue() instanceof BindingResult) && !entry.getKey().equals(JsonView.class.getName())) {
 					if (value != null) {
+						// 如果找到了多个可渲染的对象，则抛出异常
 						throw new IllegalStateException("Model contains more than one object to render, only one is supported");
 					}
 					value = entry.getValue();

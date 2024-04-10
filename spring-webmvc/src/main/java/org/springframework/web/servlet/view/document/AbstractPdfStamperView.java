@@ -16,32 +16,27 @@
 
 package org.springframework.web.servlet.view.document;
 
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
+import org.springframework.util.Assert;
+import org.springframework.web.servlet.view.AbstractUrlBasedView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
-
-import org.springframework.util.Assert;
-import org.springframework.web.servlet.view.AbstractUrlBasedView;
-
 /**
- * Abstract superclass for PDF views that operate on an existing
- * document with an AcroForm. Application-specific view classes
- * will extend this class to merge the PDF form with model data.
+ * PDF视图的抽象超类，用于在具有AcroForm的现有文档上操作。应用程序特定的视图类将扩展此类以将PDF表单与模型数据合并。
  *
- * <p>This view implementation uses Bruno Lowagie's
- * <a href="https://www.lowagie.com/iText">iText</a> API.
- * Known to work with the original iText 2.1.7 as well as its fork
- * <a href="https://github.com/LibrePDF/OpenPDF">OpenPDF</a>.
- * <b>We strongly recommend OpenPDF since it is actively maintained
- * and fixes an important vulnerability for untrusted PDF content.</b>
+ * <p>此视图实现使用Bruno Lowagie的
+ * <a href="https://www.lowagie.com/iText">iText</a> API。
+ * 已知与原始的iText 2.1.7以及其分支
+ * <a href="https://github.com/LibrePDF/OpenPDF">OpenPDF</a>一起使用。
+ * <b>我们强烈推荐OpenPDF，因为它正在积极维护并修复了一些关于不受信任的PDF内容的重要漏洞。</b>
  *
- * <p>Thanks to Bryant Larsen for the suggestion and the original prototype!
+ * <p>感谢Bryant Larsen提出建议并创建原型！
  *
  * @author Juergen Hoeller
  * @since 2.5.4
@@ -63,24 +58,26 @@ public abstract class AbstractPdfStamperView extends AbstractUrlBasedView {
 	protected final void renderMergedOutputModel(
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// IE workaround: write into byte array first.
+		// IE解决方案：首先写入字节数组。
 		ByteArrayOutputStream baos = createTemporaryOutputStream();
-
+		// 构建PDF读取器
 		PdfReader reader = readPdfResource();
+		// 获取PDF印章
 		PdfStamper stamper = new PdfStamper(reader, baos);
+		// 合并到PDF文档中
 		mergePdfDocument(model, stamper, request, response);
+		// 关闭PDF印章
 		stamper.close();
 
-		// Flush to HTTP response.
+		// 写入到HTTP响应。
 		writeToResponse(response, baos);
 	}
 
 	/**
-	 * Read the raw PDF resource into an iText PdfReader.
-	 * <p>The default implementation resolve the specified "url" property
-	 * as ApplicationContext resource.
-	 * @return the PdfReader instance
-	 * @throws IOException if resource access failed
+	 * 将原始PDF资源读取为iText PdfReader。
+	 * <p>默认实现将指定的"url"属性解析为ApplicationContext资源。
+	 * @return PdfReader实例
+	 * @throws IOException 如果资源访问失败
 	 * @see #setUrl
 	 */
 	protected PdfReader readPdfResource() throws IOException {
@@ -90,32 +87,28 @@ public abstract class AbstractPdfStamperView extends AbstractUrlBasedView {
 	}
 
 	/**
-	 * Subclasses must implement this method to merge the PDF form
-	 * with the given model data.
-	 * <p>This is where you are able to set values on the AcroForm.
-	 * An example of what can be done at this level is:
+	 * 子类必须实现此方法以将PDF表单与给定的模型数据合并。
+	 * <p>这是您可以在此级别执行的操作：
 	 * <pre class="code">
-	 * // get the form from the document
+	 * //从文档中获取表单
 	 * AcroFields form = stamper.getAcroFields();
 	 *
-	 * // set some values on the form
+	 * //在表单上设置一些值
 	 * form.setField("field1", "value1");
 	 * form.setField("field2", "Vvlue2");
 	 *
-	 * // set the disposition and filename
+	 * //设置位置和文件名
 	 * response.setHeader("Content-disposition", "attachment; FILENAME=someName.pdf");</pre>
-	 * <p>Note that the passed-in HTTP response is just supposed to be used
-	 * for setting cookies or other HTTP headers. The built PDF document itself
-	 * will automatically get written to the response after this method returns.
-	 * @param model the model Map
-	 * @param stamper the PdfStamper instance that will contain the AcroFields.
-	 * You may also customize this PdfStamper instance according to your needs,
-	 * e.g. setting the "formFlattening" property.
-	 * @param request in case we need locale etc. Shouldn't look at attributes.
-	 * @param response in case we need to set cookies. Shouldn't write to it.
-	 * @throws Exception any exception that occurred during document building
-     */
+	 * <p>请注意，传入的HTTP响应仅应用于设置cookie或其他HTTP标头。
+	 * 构建的PDF文档本身将在此方法返回后自动写入响应。
+	 * @param model 模型Map
+	 * @param stamper 将包含AcroFields的PdfStamper实例。
+	 * 您还可以根据需要自定义此PdfStamper实例，例如设置"formFlattening"属性。
+	 * @param request 以防需要区域设置等。不应查看属性。
+	 * @param response 以防需要设置cookie。不应向其写入。
+	 * @throws Exception 在构建文档期间发生的任何异常
+	 */
 	protected abstract void mergePdfDocument(Map<String, Object> model, PdfStamper stamper,
-			HttpServletRequest request, HttpServletResponse response) throws Exception;
+											 HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 }
