@@ -16,38 +16,34 @@
 
 package org.springframework.web.servlet.view;
 
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.springframework.web.servlet.support.RequestContext;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * Adapter base class for template-based view technologies such as FreeMarker,
- * with the ability to use request and session attributes in their model and
- * the option to expose helper objects for Spring's FreeMarker macro library.
+ * 基于模板的视图技术（如 FreeMarker）的适配器基类，具有在其模型中使用请求和会话属性的能力，
+ * 并具有为 Spring 的 FreeMarker 宏库公开辅助对象的选项。
  *
- * <p>JSP/JSTL and other view technologies automatically have access to the
- * HttpServletRequest object and thereby the request/session attributes
- * for the current user. Furthermore, they are able to create and cache
- * helper objects as request attributes themselves.
+ * <p>JSP/JSTL 和其他视图技术自动可以访问 HttpServletRequest 对象，从而可以获取当前用户的请求/会话属性，
+ * 此外，它们能够作为请求属性自行创建和缓存辅助对象。
  *
  * @author Juergen Hoeller
  * @author Darren Davison
- * @since 1.0.2
  * @see AbstractTemplateViewResolver
  * @see org.springframework.web.servlet.view.freemarker.FreeMarkerView
+ * @since 1.0.2
  */
 public abstract class AbstractTemplateView extends AbstractUrlBasedView {
 
 	/**
-	 * Variable name of the RequestContext instance in the template model,
-	 * available to Spring's macros: e.g. for creating BindStatus objects.
+	 * 在模板模型中的 RequestContext 实例的变量名，
+	 * 可供 Spring 的宏使用：例如用于创建 BindStatus 对象。
 	 */
 	public static final String SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE = "springMacroRequestContext";
 
@@ -64,47 +60,36 @@ public abstract class AbstractTemplateView extends AbstractUrlBasedView {
 
 
 	/**
-	 * Set whether all request attributes should be added to the
-	 * model prior to merging with the template. Default is "false".
+	 * 设置是否应在与模板合并之前将所有请求属性添加到模型中。
+	 * 默认值为 "false"。
 	 */
 	public void setExposeRequestAttributes(boolean exposeRequestAttributes) {
 		this.exposeRequestAttributes = exposeRequestAttributes;
 	}
 
 	/**
-	 * Set whether HttpServletRequest attributes are allowed to override (hide)
-	 * controller generated model attributes of the same name. Default is "false",
-	 * which causes an exception to be thrown if request attributes of the same
-	 * name as model attributes are found.
+	 * 设置是否允许 HttpServletRequest 属性覆盖（隐藏）控制器生成的同名模型属性。
+	 * 默认值为 "false"，如果发现同名的请求属性和模型属性，将抛出异常。
 	 */
 	public void setAllowRequestOverride(boolean allowRequestOverride) {
 		this.allowRequestOverride = allowRequestOverride;
 	}
 
 	/**
-	 * Set whether all HttpSession attributes should be added to the
-	 * model prior to merging with the template. Default is "false".
+	 * 设置是否应将所有 HttpSession 属性添加到模型中，在与模板合并之前。
+	 * 默认值为 "false"。
 	 */
 	public void setExposeSessionAttributes(boolean exposeSessionAttributes) {
 		this.exposeSessionAttributes = exposeSessionAttributes;
 	}
 
 	/**
-	 * Set whether HttpSession attributes are allowed to override (hide)
-	 * controller generated model attributes of the same name. Default is "false",
-	 * which causes an exception to be thrown if session attributes of the same
-	 * name as model attributes are found.
-	 */
-	public void setAllowSessionOverride(boolean allowSessionOverride) {
-		this.allowSessionOverride = allowSessionOverride;
-	}
-
-	/**
-	 * Set whether to expose a RequestContext for use by Spring's macro library,
-	 * under the name "springMacroRequestContext". Default is "true".
-	 * <p>Currently needed for Spring's FreeMarker default macros.
-	 * Note that this is <i>not</i> required for templates that use HTML forms
-	 * <i>unless</i> you wish to take advantage of the Spring helper macros.
+	 * 设置是否公开用于 Spring 的宏库的 RequestContext，
+	 * 在名称 "springMacroRequestContext" 下。默认值为 "true"。
+	 * <p>目前对于 Spring 的 FreeMarker 默认宏是需要的。
+	 * 请注意，这 <i>不</i> 是使用 HTML 表单的模板所必需的，
+	 * <i>除非</i>您希望利用 Spring 辅助宏。
+	 *
 	 * @see #SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE
 	 */
 	public void setExposeSpringMacroHelpers(boolean exposeSpringMacroHelpers) {
@@ -112,95 +97,119 @@ public abstract class AbstractTemplateView extends AbstractUrlBasedView {
 	}
 
 
+	/**
+	 * 重写父类的方法，用于渲染合并后的输出模型
+	 *
+	 * @param model    模型
+	 * @param request  HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws Exception 异常
+	 */
 	@Override
 	protected final void renderMergedOutputModel(
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+		// 判断是否需要暴露请求属性
 		if (this.exposeRequestAttributes) {
 			Map<String, Object> exposed = null;
-			for (Enumeration<String> en = request.getAttributeNames(); en.hasMoreElements();) {
+			// 遍历请求属性
+			for (Enumeration<String> en = request.getAttributeNames(); en.hasMoreElements(); ) {
 				String attribute = en.nextElement();
+				// 如果模型中已存在同名对象，且不允许覆盖，则抛出异常
 				if (model.containsKey(attribute) && !this.allowRequestOverride) {
 					throw new ServletException("Cannot expose request attribute '" + attribute +
-						"' because of an existing model object of the same name");
+							"' because of an existing model object of the same name");
 				}
 				Object attributeValue = request.getAttribute(attribute);
+				// 如果开启了调试模式，记录暴露的请求属性
 				if (logger.isDebugEnabled()) {
 					exposed = exposed != null ? exposed : new LinkedHashMap<>();
 					exposed.put(attribute, attributeValue);
 				}
+				// 将请求属性添加到模型中
 				model.put(attribute, attributeValue);
 			}
+			// 如果开启了跟踪模式，记录暴露的请求属性
 			if (logger.isTraceEnabled() && exposed != null) {
 				logger.trace("Exposed request attributes to model: " + exposed);
 			}
 		}
 
+		// 判断是否需要暴露会话属性
 		if (this.exposeSessionAttributes) {
 			HttpSession session = request.getSession(false);
+			// 如果存在会话
 			if (session != null) {
 				Map<String, Object> exposed = null;
-				for (Enumeration<String> en = session.getAttributeNames(); en.hasMoreElements();) {
+				// 遍历会话属性
+				for (Enumeration<String> en = session.getAttributeNames(); en.hasMoreElements(); ) {
 					String attribute = en.nextElement();
+					// 如果模型中已存在同名对象，且不允许覆盖，则抛出异常
 					if (model.containsKey(attribute) && !this.allowSessionOverride) {
 						throw new ServletException("Cannot expose session attribute '" + attribute +
-							"' because of an existing model object of the same name");
+								"' because of an existing model object of the same name");
 					}
 					Object attributeValue = session.getAttribute(attribute);
+					// 如果开启了调试模式，记录暴露的会话属性
 					if (logger.isDebugEnabled()) {
 						exposed = exposed != null ? exposed : new LinkedHashMap<>();
 						exposed.put(attribute, attributeValue);
 					}
+					// 将会话属性添加到模型中
 					model.put(attribute, attributeValue);
 				}
+				// 如果开启了跟踪模式，记录暴露的会话属性
 				if (logger.isTraceEnabled() && exposed != null) {
 					logger.trace("Exposed session attributes to model: " + exposed);
 				}
 			}
 		}
 
+		// 判断是否需要暴露 Spring 宏助手
 		if (this.exposeSpringMacroHelpers) {
+			// 如果模型中已存在同名对象，则抛出异常
 			if (model.containsKey(SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE)) {
 				throw new ServletException(
 						"Cannot expose bind macro helper '" + SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE +
-						"' because of an existing model object of the same name");
+								"' because of an existing model object of the same name");
 			}
-			// Expose RequestContext instance for Spring macros.
+			// 公开 RequestContext 实例以供 Spring 宏使用。
 			model.put(SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE,
 					new RequestContext(request, response, getServletContext(), model));
 		}
-
+		// 设置HTTP响应的内容类型
 		applyContentType(response);
 
+		// 如果开启了调试模式，记录渲染的 URL
 		if (logger.isDebugEnabled()) {
 			logger.debug("Rendering [" + getUrl() + "]");
 		}
 
+		// 渲染合并后的模板模型
 		renderMergedTemplateModel(model, request, response);
 	}
 
 	/**
-	 * Apply this view's content type as specified in the "contentType"
-	 * bean property to the given response.
-	 * <p>Only applies the view's contentType if no content type has been
-	 * set on the response before. This allows handlers to override the
-	 * default content type beforehand.
-	 * @param response current HTTP response
+	 * 应用此视图的内容类型（如在 "contentType"  bean 属性中指定）到给定的响应。
+	 * <p>仅在响应之前未设置内容类型的情况下应用视图的内容类型。
+	 * 这允许处理程序在之前覆盖默认的内容类型。
+	 *
+	 * @param response 当前 HTTP 响应
 	 * @see #setContentType
 	 */
-	protected void applyContentType(HttpServletResponse response)	{
+	protected void applyContentType(HttpServletResponse response) {
 		if (response.getContentType() == null) {
 			response.setContentType(getContentType());
 		}
 	}
 
 	/**
-	 * Subclasses must implement this method to actually render the view.
-	 * @param model combined output Map, with request attributes and
-	 * session attributes merged into it if required
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @throws Exception if rendering failed
+	 * 子类必须实现此方法以实际渲染视图。
+	 *
+	 * @param model    合并后的输出 Map，其中如果需要，将请求属性和会话属性与之合并
+	 * @param request  当前 HTTP 请求
+	 * @param response 当前 HTTP 响应
+	 * @throws Exception 如果渲染失败
 	 */
 	protected abstract void renderMergedTemplateModel(
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception;
