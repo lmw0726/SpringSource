@@ -16,26 +16,6 @@
 
 package org.springframework.web.servlet.view.script;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -53,73 +33,120 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
+import javax.script.*;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 /**
- * An {@link AbstractUrlBasedView} subclass designed to run any template library
- * based on a JSR-223 script engine.
+ * {@link AbstractUrlBasedView}的子类，设计用于运行基于JSR-223脚本引擎的任何模板库。
  *
- * <p>If not set, each property is auto-detected by looking up a single
- * {@link ScriptTemplateConfig} bean in the web application context and using
- * it to obtain the configured properties.
+ * <p>如果未设置，则通过查找Web应用程序上下文中的单个{@link ScriptTemplateConfig} bean，并使用它来获取配置的属性来自动检测每个属性。
  *
- * <p>The Nashorn JavaScript engine requires Java 8+ and may require setting the
- * {@code sharedEngine} property to {@code false} in order to run properly. See
- * {@link ScriptTemplateConfigurer#setSharedEngine(Boolean)} for more details.
+ * <p>Nashorn JavaScript引擎需要Java 8+，并且可能需要将{@code sharedEngine}属性设置为{@code false}才能正常运行。有关更多详细信息，请参见{@link ScriptTemplateConfigurer#setSharedEngine(Boolean)}。
  *
  * @author Sebastien Deleuze
  * @author Juergen Hoeller
- * @since 4.2
  * @see ScriptTemplateConfigurer
  * @see ScriptTemplateViewResolver
+ * @since 4.2
  */
 public class ScriptTemplateView extends AbstractUrlBasedView {
 
 	/**
-	 * The default content type for the view.
+	 * 视图的默认内容类型。
 	 */
 	public static final String DEFAULT_CONTENT_TYPE = "text/html";
-
+	/**
+	 * 默认的字符编码
+	 */
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
+	/**
+	 * 默认资源加载路径
+	 */
 	private static final String DEFAULT_RESOURCE_LOADER_PATH = "classpath:";
 
-
+	/**
+	 * 引擎持有者
+	 */
 	private static final ThreadLocal<Map<Object, ScriptEngine>> enginesHolder =
 			new NamedThreadLocal<>("ScriptTemplateView engines");
 
-
+	/**
+	 * 脚本引擎
+	 */
 	@Nullable
 	private ScriptEngine engine;
 
+	/**
+	 * 引擎提供方
+	 */
 	@Nullable
 	private Supplier<ScriptEngine> engineSupplier;
 
+	/**
+	 * 引擎名称
+	 */
 	@Nullable
 	private String engineName;
 
+	/**
+	 * 是否是共享引擎
+	 */
 	@Nullable
 	private Boolean sharedEngine;
 
+	/**
+	 * 脚本数组
+	 */
 	@Nullable
 	private String[] scripts;
 
+	/**
+	 * 渲染的对象
+	 */
 	@Nullable
 	private String renderObject;
 
+	/**
+	 * 渲染函数
+	 */
 	@Nullable
 	private String renderFunction;
 
+	/**
+	 * 字符编码
+	 */
 	@Nullable
 	private Charset charset;
 
+	/**
+	 * 资源加载路径数组
+	 */
 	@Nullable
 	private String[] resourceLoaderPaths;
 
+	/**
+	 * 脚本引擎管理器
+	 */
 	@Nullable
 	private volatile ScriptEngineManager scriptEngineManager;
 
 
 	/**
-	 * Constructor for use as a bean.
+	 * 用作bean的构造函数。
+	 *
 	 * @see #setUrl
 	 */
 	public ScriptTemplateView() {
@@ -127,7 +154,8 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 	}
 
 	/**
-	 * Create a new ScriptTemplateView with the given URL.
+	 * 使用给定的URL创建一个新的ScriptTemplateView。
+	 *
 	 * @since 4.2.1
 	 */
 	public ScriptTemplateView(String url) {
@@ -137,14 +165,15 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setEngine(ScriptEngine)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setEngine(ScriptEngine)}文档。
 	 */
 	public void setEngine(ScriptEngine engine) {
 		this.engine = engine;
 	}
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setEngineSupplier(Supplier)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setEngineSupplier(Supplier)}文档。
+	 *
 	 * @since 5.2
 	 */
 	public void setEngineSupplier(Supplier<ScriptEngine> engineSupplier) {
@@ -152,49 +181,49 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 	}
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setEngineName(String)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setEngineName(String)}文档。
 	 */
 	public void setEngineName(String engineName) {
 		this.engineName = engineName;
 	}
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setSharedEngine(Boolean)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setSharedEngine(Boolean)}文档。
 	 */
 	public void setSharedEngine(Boolean sharedEngine) {
 		this.sharedEngine = sharedEngine;
 	}
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setScripts(String...)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setScripts(String...)}文档。
 	 */
 	public void setScripts(String... scripts) {
 		this.scripts = scripts;
 	}
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setRenderObject(String)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setRenderObject(String)}文档。
 	 */
 	public void setRenderObject(String renderObject) {
 		this.renderObject = renderObject;
 	}
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setRenderFunction(String)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setRenderFunction(String)}文档。
 	 */
 	public void setRenderFunction(String functionName) {
 		this.renderFunction = functionName;
 	}
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setCharset(Charset)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setCharset(Charset)}文档。
 	 */
 	public void setCharset(Charset charset) {
 		this.charset = charset;
 	}
 
 	/**
-	 * See {@link ScriptTemplateConfigurer#setResourceLoaderPath(String)} documentation.
+	 * 参见{@link ScriptTemplateConfigurer#setResourceLoaderPath(String)}文档。
 	 */
 	public void setResourceLoaderPath(String resourceLoaderPath) {
 		String[] paths = StringUtils.commaDelimitedListToStringArray(resourceLoaderPath);
@@ -212,41 +241,55 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 
 	@Override
 	protected void initApplicationContext(ApplicationContext context) {
+		// 调用父类方法初始化应用程序上下文
 		super.initApplicationContext(context);
 
+		// 检测视图配置并设置视图相关属性
 		ScriptTemplateConfig viewConfig = autodetectViewConfig();
+		// 设置脚本引擎
 		if (this.engine == null && viewConfig.getEngine() != null) {
 			this.engine = viewConfig.getEngine();
 		}
+		// 设置引擎提供方
 		if (this.engineSupplier == null && viewConfig.getEngineSupplier() != null) {
 			this.engineSupplier = viewConfig.getEngineSupplier();
 		}
+		// 设置引擎名称
 		if (this.engineName == null && viewConfig.getEngineName() != null) {
 			this.engineName = viewConfig.getEngineName();
 		}
+		// 暂存视图配置中的脚本
 		if (this.scripts == null && viewConfig.getScripts() != null) {
 			this.scripts = viewConfig.getScripts();
 		}
+		// 设置渲染对象
 		if (this.renderObject == null && viewConfig.getRenderObject() != null) {
 			this.renderObject = viewConfig.getRenderObject();
 		}
+		// 设置渲染函数
 		if (this.renderFunction == null && viewConfig.getRenderFunction() != null) {
 			this.renderFunction = viewConfig.getRenderFunction();
 		}
+		// 设置HTTP内容类型
 		if (this.getContentType() == null) {
 			setContentType(viewConfig.getContentType() != null ? viewConfig.getContentType() : DEFAULT_CONTENT_TYPE);
 		}
+		//设置字符编码
 		if (this.charset == null) {
 			this.charset = (viewConfig.getCharset() != null ? viewConfig.getCharset() : DEFAULT_CHARSET);
 		}
 		if (this.resourceLoaderPaths == null) {
+			// 如果资源加载路径不存在，先从视图配置中获取资源加载路径
 			String resourceLoaderPath = viewConfig.getResourceLoaderPath();
+			// 如果资源加载路径不存在，则使用默认的资源加载路径，并设置资源加载路径
 			setResourceLoaderPath(resourceLoaderPath != null ? resourceLoaderPath : DEFAULT_RESOURCE_LOADER_PATH);
 		}
+		// 设置是否是共享引擎
 		if (this.sharedEngine == null && viewConfig.isSharedEngine() != null) {
 			this.sharedEngine = viewConfig.isSharedEngine();
 		}
 
+		// 确保只定义了一个脚本引擎
 		int engineCount = 0;
 		if (this.engine != null) {
 			engineCount++;
@@ -260,21 +303,23 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 		Assert.isTrue(engineCount == 1,
 				"You should define either 'engine', 'engineSupplier' or 'engineName'.");
 
+		// 当不是共享引擎时，检查脚本引擎的配置是否正确
 		if (Boolean.FALSE.equals(this.sharedEngine)) {
 			Assert.isTrue(this.engine == null,
 					"When 'sharedEngine' is set to false, you should specify the " +
-					"script engine using 'engineName' or 'engineSupplier' , not 'engine'.");
-		}
-		else if (this.engine != null) {
+							"script engine using 'engineName' or 'engineSupplier' , not 'engine'.");
+		} else if (this.engine != null) {
+			// 引擎存在，则加载引擎
 			loadScripts(this.engine);
-		}
-		else if (this.engineName != null) {
+		} else if (this.engineName != null) {
+			// 引擎名称存在，则根据引擎名称创建并设置脚本引擎
 			setEngine(createEngineFromName(this.engineName));
-		}
-		else {
+		} else {
+			// 根据引擎提供方创建并设置引擎
 			setEngine(createEngineFromSupplier());
 		}
 
+		// 如果定义了 '渲染函数'，则验证脚本引擎是否实现了 Invocable 接口
 		if (this.renderFunction != null && this.engine != null) {
 			Assert.isInstanceOf(Invocable.class, this.engine,
 					"ScriptEngine must implement Invocable when 'renderFunction' is specified");
@@ -294,15 +339,13 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 			if (engine == null) {
 				if (this.engineName != null) {
 					engine = createEngineFromName(this.engineName);
-				}
-				else {
+				} else {
 					engine = createEngineFromSupplier();
 				}
 				engines.put(engineKey, engine);
 			}
 			return engine;
-		}
-		else {
+		} else {
 			// Simply return the configured ScriptEngine...
 			Assert.state(this.engine != null, "No shared engine available");
 			return this.engine;
@@ -341,8 +384,7 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 				}
 				try {
 					engine.eval(new InputStreamReader(resource.getInputStream()));
-				}
-				catch (Throwable ex) {
+				} catch (Throwable ex) {
 					throw new IllegalStateException("Failed to evaluate script [" + script + "]", ex);
 				}
 			}
@@ -366,8 +408,7 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 		try {
 			return BeanFactoryUtils.beanOfTypeIncludingAncestors(
 					obtainApplicationContext(), ScriptTemplateConfig.class, true, false);
-		}
-		catch (NoSuchBeanDefinitionException ex) {
+		} catch (NoSuchBeanDefinitionException ex) {
 			throw new ApplicationContextException("Expected a single ScriptTemplateConfig bean in the current " +
 					"Servlet web application context or the parent root context: ScriptTemplateConfigurer is " +
 					"the usual implementation. This bean may have any name.", ex);
@@ -394,7 +435,7 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 
 	@Override
 	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+										   HttpServletResponse response) throws Exception {
 
 		try {
 			ScriptEngine engine = getEngine();
@@ -405,8 +446,7 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 			Function<String, String> templateLoader = path -> {
 				try {
 					return getTemplate(path);
-				}
-				catch (IOException ex) {
+				} catch (IOException ex) {
 					throw new IllegalStateException(ex);
 				}
 			};
@@ -420,18 +460,15 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 				bindings.putAll(model);
 				model.put("renderingContext", context);
 				html = engine.eval(template, bindings);
-			}
-			else if (this.renderObject != null) {
+			} else if (this.renderObject != null) {
 				Object thiz = engine.eval(this.renderObject);
 				html = ((Invocable) engine).invokeMethod(thiz, this.renderFunction, template, model, context);
-			}
-			else {
+			} else {
 				html = ((Invocable) engine).invokeFunction(this.renderFunction, template, model, context);
 			}
 
 			response.getWriter().write(String.valueOf(html));
-		}
-		catch (ScriptException ex) {
+		} catch (ScriptException ex) {
 			throw new ServletException("Failed to render script template", new StandardScriptEvalException(ex));
 		}
 	}
@@ -449,16 +486,26 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 
 
 	/**
-	 * Key class for the {@code enginesHolder ThreadLocal}.
-	 * Only used if scripts have been specified; otherwise, the
-	 * {@code engineName String} will be used as cache key directly.
+	 * {@code enginesHolder ThreadLocal}的关键类。
+	 * 仅在指定了脚本时使用；否则，将直接使用{@code engineName String}作为缓存键。
 	 */
 	private static class EngineKey {
-
+		/**
+		 * 引擎名称
+		 */
 		private final String engineName;
 
+		/**
+		 * 脚本数组
+		 */
 		private final String[] scripts;
 
+		/**
+		 * 构造函数。
+		 *
+		 * @param engineName 引擎名称
+		 * @param scripts    脚本数组
+		 */
 		public EngineKey(String engineName, String[] scripts) {
 			this.engineName = engineName;
 			this.scripts = scripts;

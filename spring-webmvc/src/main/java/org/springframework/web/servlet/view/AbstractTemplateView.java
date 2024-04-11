@@ -47,15 +47,29 @@ public abstract class AbstractTemplateView extends AbstractUrlBasedView {
 	 */
 	public static final String SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE = "springMacroRequestContext";
 
-
+	/**
+	 * 是否需要暴露请求属性
+	 */
 	private boolean exposeRequestAttributes = false;
 
+	/**
+	 * 是否允许请求覆盖
+	 */
 	private boolean allowRequestOverride = false;
 
+	/**
+	 * 是否保存会话属性
+	 */
 	private boolean exposeSessionAttributes = false;
 
+	/**
+	 * 是否允许会话覆盖
+	 */
 	private boolean allowSessionOverride = false;
 
+	/**
+	 * 是否暴露Spring宏助手
+	 */
 	private boolean exposeSpringMacroHelpers = true;
 
 
