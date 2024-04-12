@@ -328,25 +328,30 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 
 	protected ScriptEngine getEngine() {
 		if (Boolean.FALSE.equals(this.sharedEngine)) {
+			// 如果不是共享引擎
 			Map<Object, ScriptEngine> engines = enginesHolder.get();
 			if (engines == null) {
 				engines = new HashMap<>(4);
 				enginesHolder.set(engines);
 			}
+			// 生成引擎的键
 			String name = (this.engineName != null ? this.engineName : "");
 			Object engineKey = (!ObjectUtils.isEmpty(this.scripts) ? new EngineKey(name, this.scripts) : name);
+			// 检查是否已经存在引擎，如果不存在则创建一个
 			ScriptEngine engine = engines.get(engineKey);
 			if (engine == null) {
 				if (this.engineName != null) {
+					// 如果引擎名称存在，则从名称中创建引擎
 					engine = createEngineFromName(this.engineName);
 				} else {
+					// 否则，从供应者中创建引擎
 					engine = createEngineFromSupplier();
 				}
 				engines.put(engineKey, engine);
 			}
 			return engine;
 		} else {
-			// Simply return the configured ScriptEngine...
+			// 返回配置的共享脚本引擎
 			Assert.state(this.engine != null, "No shared engine available");
 			return this.engine;
 		}
@@ -355,36 +360,46 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 	protected ScriptEngine createEngineFromName(String engineName) {
 		ScriptEngineManager scriptEngineManager = this.scriptEngineManager;
 		if (scriptEngineManager == null) {
+			// 如果ScriptEngineManager为空，使用应用程序上下文的类加载器创建一个新的脚本引擎管理器
 			scriptEngineManager = new ScriptEngineManager(obtainApplicationContext().getClassLoader());
 			this.scriptEngineManager = scriptEngineManager;
 		}
 
+		// 通过引擎名称检索引擎
 		ScriptEngine engine = StandardScriptUtils.retrieveEngineByName(scriptEngineManager, engineName);
+		// 加载脚本到引擎中
 		loadScripts(engine);
 		return engine;
 	}
 
 	private ScriptEngine createEngineFromSupplier() {
 		Assert.state(this.engineSupplier != null, "No engine supplier available");
+		// 获取脚本引擎
 		ScriptEngine engine = this.engineSupplier.get();
 		if (this.renderFunction != null) {
 			Assert.isInstanceOf(Invocable.class, engine,
 					"ScriptEngine must implement Invocable when 'renderFunction' is specified");
 		}
+		// 通过引擎加载脚本
 		loadScripts(engine);
 		return engine;
 	}
 
 	protected void loadScripts(ScriptEngine engine) {
 		if (!ObjectUtils.isEmpty(this.scripts)) {
+			// 遍历所有脚本路径
 			for (String script : this.scripts) {
+				// 获取资源
 				Resource resource = getResource(script);
 				if (resource == null) {
+					// 如果资源为空，则抛出异常
 					throw new IllegalStateException("Script resource [" + script + "] not found");
 				}
 				try {
+					// 通过引擎执行脚本
 					engine.eval(new InputStreamReader(resource.getInputStream()));
 				} catch (Throwable ex) {
+					// 捕获可能的异常，并抛出新的异常
 					throw new IllegalStateException("Failed to evaluate script [" + script + "]", ex);
 				}
 			}
@@ -394,21 +409,27 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 	@Nullable
 	protected Resource getResource(String location) {
 		if (this.resourceLoaderPaths != null) {
+			// 遍历资源加载路径
 			for (String path : this.resourceLoaderPaths) {
+				// 获取资源
 				Resource resource = obtainApplicationContext().getResource(path + location);
+				// 如果资源存在，则返回该资源
 				if (resource.exists()) {
 					return resource;
 				}
 			}
 		}
+		// 如果资源不存在，则返回null
 		return null;
 	}
 
 	protected ScriptTemplateConfig autodetectViewConfig() throws BeansException {
 		try {
+			// 尝试获取上下文中的 ScriptTemplateConfig 类型的 bean
 			return BeanFactoryUtils.beanOfTypeIncludingAncestors(
 					obtainApplicationContext(), ScriptTemplateConfig.class, true, false);
 		} catch (NoSuchBeanDefinitionException ex) {
+			// 如果未找到对应的 bean，则抛出 ApplicationContextException 异常
 			throw new ApplicationContextException("Expected a single ScriptTemplateConfig bean in the current " +
 					"Servlet web application context or the parent root context: ScriptTemplateConfigurer is " +
 					"the usual implementation. This bean may have any name.", ex);
@@ -418,8 +439,10 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 
 	@Override
 	public boolean checkResource(Locale locale) throws Exception {
+		// 获取URL
 		String url = getUrl();
 		Assert.state(url != null, "'url' not set");
+		// 通过URL获取资源，并判断该资源是否存在
 		return (getResource(url) != null);
 	}
 
@@ -427,7 +450,9 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 	protected void prepareResponse(HttpServletRequest request, HttpServletResponse response) {
 		super.prepareResponse(request, response);
 
+		// 设置响应内容类型
 		setResponseContentType(request, response);
+		// 如果字符集不为空，则设置响应字符编码
 		if (this.charset != null) {
 			response.setCharacterEncoding(this.charset.name());
 		}
@@ -438,11 +463,16 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 										   HttpServletResponse response) throws Exception {
 
 		try {
+			// 获取脚本引擎
 			ScriptEngine engine = getEngine();
+			// 获取视图的 URL
 			String url = getUrl();
+			// 检查 URL 是否为空
 			Assert.state(url != null, "'url' not set");
+			// 获取模板内容
 			String template = getTemplate(url);
 
+			// 定义模板加载器函数
 			Function<String, String> templateLoader = path -> {
 				try {
 					return getTemplate(path);
@@ -451,24 +481,32 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 				}
 			};
 
+			// 获取请求的区域设置
 			Locale locale = RequestContextUtils.getLocale(request);
+			// 创建渲染上下文对象
 			RenderingContext context = new RenderingContext(obtainApplicationContext(), locale, templateLoader, url);
 
 			Object html;
 			if (this.renderFunction == null) {
+				// 如果未指定渲染函数，则使用默认方式进行渲染
 				SimpleBindings bindings = new SimpleBindings();
 				bindings.putAll(model);
 				model.put("renderingContext", context);
+				// 使用脚本引擎执行模板
 				html = engine.eval(template, bindings);
 			} else if (this.renderObject != null) {
+				// 如果指定了渲染对象和函数，则调用指定的渲染函数
 				Object thiz = engine.eval(this.renderObject);
 				html = ((Invocable) engine).invokeMethod(thiz, this.renderFunction, template, model, context);
 			} else {
+				// 调用指定的渲染函数
 				html = ((Invocable) engine).invokeFunction(this.renderFunction, template, model, context);
 			}
 
+			// 将渲染结果写入响应
 			response.getWriter().write(String.valueOf(html));
 		} catch (ScriptException ex) {
+			// 捕获脚本异常并抛出 Servlet 异常
 			throw new ServletException("Failed to render script template", new StandardScriptEvalException(ex));
 		}
 	}
@@ -476,11 +514,15 @@ public class ScriptTemplateView extends AbstractUrlBasedView {
 	protected String getTemplate(String path) throws IOException {
 		Resource resource = getResource(path);
 		if (resource == null) {
+			// 如果模板资源未找到，则抛出异常
 			throw new IllegalStateException("Template resource [" + path + "] not found");
 		}
 		InputStreamReader reader = (this.charset != null ?
+				// 如果设置了字符集，则使用指定字符集创建输入流读取模板内容
 				new InputStreamReader(resource.getInputStream(), this.charset) :
+				// 否则直接创建输入流读取模板内容
 				new InputStreamReader(resource.getInputStream()));
+		// 将模板内容读取为字符串并返回
 		return FileCopyUtils.copyToString(reader);
 	}
 

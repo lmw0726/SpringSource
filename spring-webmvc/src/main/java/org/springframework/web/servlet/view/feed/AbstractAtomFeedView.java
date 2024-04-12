@@ -16,27 +16,26 @@
 
 package org.springframework.web.servlet.view.feed;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.rometools.rome.feed.atom.Entry;
 import com.rometools.rome.feed.atom.Feed;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+
 /**
- * Abstract superclass for Atom Feed views, using the
- * <a href="https://github.com/rometools/rome">ROME</a> package.
+ * Atom Feed视图的抽象超类，使用
+ * <a href="https://github.com/rometools/rome">ROME</a>包。
  *
- * <p><b>NOTE: As of Spring 4.1, this is based on the {@code com.rometools}
- * variant of ROME, version 1.5. Please upgrade your build dependency.</b>
+ * <p><b>注意：从Spring 4.1开始，这是基于ROME的{@code com.rometools}变体，
+ * 版本为1.5。请升级您的构建依赖项。</b>
  *
- * <p>Application-specific view classes will extend this class.
- * The view will be held in the subclass itself, not in a template.
- * Main entry points are the {@link #buildFeedMetadata} and {@link #buildFeedEntries}.
+ * <p>应用程序特定的视图类将扩展此类。
+ * 视图将保存在子类本身中，而不是在模板中。
+ * 主要入口点是{@link #buildFeedMetadata}和{@link #buildFeedEntries}。
  *
- * <p>Thanks to Jettro Coenradie and Sergio Bossa for the original feed view prototype!
+ * <p>感谢Jettro Coenradie和Sergio Bossa提供的原始Feed视图原型！
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -48,10 +47,12 @@ import com.rometools.rome.feed.atom.Feed;
 public abstract class AbstractAtomFeedView extends AbstractFeedView<Feed> {
 
 	/**
-	 * The default feed type used.
+	 * 默认使用的Feed类型。
 	 */
 	public static final String DEFAULT_FEED_TYPE = "atom_1.0";
-
+	/**
+	 * Feed类型
+	 */
 	private String feedType = DEFAULT_FEED_TYPE;
 
 
@@ -60,8 +61,8 @@ public abstract class AbstractAtomFeedView extends AbstractFeedView<Feed> {
 	}
 
 	/**
-	 * Set the Rome feed type to use.
-	 * <p>Defaults to Atom 1.0.
+	 * 设置要使用的Rome Feed类型。
+	 * <p>默认为Atom 1.0。
 	 * @see Feed#setFeedType(String)
 	 * @see #DEFAULT_FEED_TYPE
 	 */
@@ -70,8 +71,8 @@ public abstract class AbstractAtomFeedView extends AbstractFeedView<Feed> {
 	}
 
 	/**
-	 * Create a new Feed instance to hold the entries.
-	 * <p>By default returns an Atom 1.0 feed, but the subclass can specify any Feed.
+	 * 创建一个新的Feed实例以容纳条目。
+	 * <p>默认返回Atom 1.0 feed，但子类可以指定任何Feed。
 	 * @see #setFeedType(String)
 	 */
 	@Override
@@ -80,27 +81,27 @@ public abstract class AbstractAtomFeedView extends AbstractFeedView<Feed> {
 	}
 
 	/**
-	 * Invokes {@link #buildFeedEntries(Map, HttpServletRequest, HttpServletResponse)}
-	 * to get a list of feed entries.
+	 * 调用{@link #buildFeedEntries(Map, HttpServletRequest, HttpServletResponse)}
+	 * 获取一组Feed条目。
 	 */
 	@Override
 	protected final void buildFeedEntries(Map<String, Object> model, Feed feed,
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+										  HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+		// 构建 Feed 条目列表
 		List<Entry> entries = buildFeedEntries(model, request, response);
+		// 设置 Feed 的条目列表
 		feed.setEntries(entries);
 	}
 
 	/**
-	 * Subclasses must implement this method to build feed entries, given the model.
-	 * <p>Note that the passed-in HTTP response is just supposed to be used for
-	 * setting cookies or other HTTP headers. The built feed itself will automatically
-	 * get written to the response after this method returns.
-	 * @param model	the model Map
-	 * @param request in case we need locale etc. Shouldn't look at attributes.
-	 * @param response in case we need to set cookies. Shouldn't write to it.
-	 * @return the feed entries to be added to the feed
-	 * @throws Exception any exception that occurred during document building
+	 * 子类必须实现此方法以构建Feed条目，给定模型。
+	 * <p>请注意，传入的HTTP响应仅应用于设置cookie或其他HTTP头。构建的Feed本身将在此方法返回后自动写入响应。
+	 * @param model 模型Map
+	 * @param request 如果我们需要区域设置等。不应查看属性。
+	 * @param response 如果我们需要设置cookie。不应写入它。
+	 * @return 要添加到Feed的Feed条目
+	 * @throws Exception 文档构建过程中发生的任何异常
 	 * @see Entry
 	 */
 	protected abstract List<Entry> buildFeedEntries(
