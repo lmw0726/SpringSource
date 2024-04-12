@@ -16,20 +16,17 @@
 
 package org.springframework.context;
 
-import java.util.Locale;
-
 import org.springframework.lang.Nullable;
 
+import java.util.Locale;
+
 /**
- * Strategy interface for resolving messages, with support for the parameterization
- * and internationalization of such messages.
+ * 用于解析消息的策略接口，支持消息的参数化和国际化。
  *
- * <p>Spring provides two out-of-the-box implementations for production:
+ * <p>Spring提供了两个生产环境的内置实现:
  * <ul>
- * <li>{@link org.springframework.context.support.ResourceBundleMessageSource}: built
- * on top of the standard {@link java.util.ResourceBundle}, sharing its limitations.
- * <li>{@link org.springframework.context.support.ReloadableResourceBundleMessageSource}:
- * highly configurable, in particular with respect to reloading message definitions.
+ * <li>{@link org.springframework.context.support.ResourceBundleMessageSource}：构建在标准{@link java.util.ResourceBundle}之上，共享其限制。
+ * <li>{@link org.springframework.context.support.ReloadableResourceBundleMessageSource}：高度可配置，特别是在重新加载消息定义方面。
  * </ul>
  *
  * @author Rod Johnson
@@ -40,17 +37,14 @@ import org.springframework.lang.Nullable;
 public interface MessageSource {
 
 	/**
-	 * Try to resolve the message. Return default message if no message was found.
-	 * @param code the message code to look up, e.g. 'calculator.noRateSet'.
-	 * MessageSource users are encouraged to base message names on qualified class
-	 * or package names, avoiding potential conflicts and ensuring maximum clarity.
-	 * @param args an array of arguments that will be filled in for params within
-	 * the message (params look like "{0}", "{1,date}", "{2,time}" within a message),
-	 * or {@code null} if none
-	 * @param defaultMessage a default message to return if the lookup fails
-	 * @param locale the locale in which to do the lookup
-	 * @return the resolved message if the lookup was successful, otherwise
-	 * the default message passed as a parameter (which may be {@code null})
+	 * 尝试解析消息。如果找不到消息，则返回默认消息。
+	 *
+	 * @param code           要查找的消息代码，例如'calculator.noRateSet'。
+	 *                       鼓励MessageSource用户基于限定的类或包名称设置消息名称，以避免潜在冲突并确保最大清晰度。
+	 * @param args           将填充消息中参数的参数数组（参数在消息中看起来像"{0}"、"{1,date}"、"{2,time}"），如果没有则为{@code null}
+	 * @param defaultMessage 如果查找失败，则返回的默认消息
+	 * @param locale         进行查找的区域设置
+	 * @return 如果查找成功，则返回已解析的消息；否则返回作为参数传递的默认消息（可能为{@code null}）
 	 * @see #getMessage(MessageSourceResolvable, Locale)
 	 * @see java.text.MessageFormat
 	 */
@@ -58,34 +52,28 @@ public interface MessageSource {
 	String getMessage(String code, @Nullable Object[] args, @Nullable String defaultMessage, Locale locale);
 
 	/**
-	 * Try to resolve the message. Treat as an error if the message can't be found.
-	 * @param code the message code to look up, e.g. 'calculator.noRateSet'.
-	 * MessageSource users are encouraged to base message names on qualified class
-	 * or package names, avoiding potential conflicts and ensuring maximum clarity.
-	 * @param args an array of arguments that will be filled in for params within
-	 * the message (params look like "{0}", "{1,date}", "{2,time}" within a message),
-	 * or {@code null} if none
-	 * @param locale the locale in which to do the lookup
-	 * @return the resolved message (never {@code null})
-	 * @throws NoSuchMessageException if no corresponding message was found
+	 * 尝试解析消息。如果找不到消息，则视为错误。
+	 *
+	 * @param code   要查找的消息代码，例如'calculator.noRateSet'。
+	 *               鼓励MessageSource用户基于限定的类或包名称设置消息名称，以避免潜在冲突并确保最大清晰度。
+	 * @param args   将填充消息中参数的参数数组（参数在消息中看起来像"{0}"、"{1,date}"、"{2,time}"），如果没有则为{@code null}
+	 * @param locale 进行查找的区域设置
+	 * @return 已解析的消息（永远不为{@code null}）
+	 * @throws NoSuchMessageException 如果未找到相应的消息
 	 * @see #getMessage(MessageSourceResolvable, Locale)
 	 * @see java.text.MessageFormat
 	 */
 	String getMessage(String code, @Nullable Object[] args, Locale locale) throws NoSuchMessageException;
 
 	/**
-	 * Try to resolve the message using all the attributes contained within the
-	 * {@code MessageSourceResolvable} argument that was passed in.
-	 * <p>NOTE: We must throw a {@code NoSuchMessageException} on this method
-	 * since at the time of calling this method we aren't able to determine if the
-	 * {@code defaultMessage} property of the resolvable is {@code null} or not.
-	 * @param resolvable the value object storing attributes required to resolve a message
-	 * (may include a default message)
-	 * @param locale the locale in which to do the lookup
-	 * @return the resolved message (never {@code null} since even a
-	 * {@code MessageSourceResolvable}-provided default message needs to be non-null)
-	 * @throws NoSuchMessageException if no corresponding message was found
-	 * (and no default message was provided by the {@code MessageSourceResolvable})
+	 * 使用传入的{@code MessageSourceResolvable}参数中包含的所有属性尝试解析消息。
+	 * <p>注意：在调用此方法时，我们必须抛出{@code NoSuchMessageException}，
+	 * 因为在调用此方法时，我们无法确定可解析的{@code defaultMessage}属性是否为{@code null}。
+	 *
+	 * @param resolvable 存储解析消息所需属性的值对象（可能包括默认消息）
+	 * @param locale     进行查找的区域设置
+	 * @return 已解析的消息（永远不为{@code null}，因为即使是{@code MessageSourceResolvable}提供的默认消息也需要是非null的）
+	 * @throws NoSuchMessageException 如果未找到相应的消息（并且{@code MessageSourceResolvable}未提供默认消息）
 	 * @see MessageSourceResolvable#getCodes()
 	 * @see MessageSourceResolvable#getArguments()
 	 * @see MessageSourceResolvable#getDefaultMessage()

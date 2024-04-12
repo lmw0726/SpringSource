@@ -16,38 +16,40 @@
 
 package org.springframework.context.support;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Simple implementation of {@link org.springframework.context.MessageSource}
- * which allows messages to be registered programmatically.
- * This MessageSource supports basic internationalization.
+ * {@link org.springframework.context.MessageSource}的简单实现，允许以编程方式注册消息。
+ * 此MessageSource支持基本的国际化。
  *
- * <p>Intended for testing rather than for use in production systems.
+ * <p>用于测试，而不是用于生产系统。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  */
 public class StaticMessageSource extends AbstractMessageSource {
-
+	/**
+	 * 消息代码-区域设置-消息持有者映射
+	 */
 	private final Map<String, Map<Locale, MessageHolder>> messageMap = new HashMap<>();
-
 
 	@Override
 	@Nullable
 	protected String resolveCodeWithoutArguments(String code, Locale locale) {
 		Map<Locale, MessageHolder> localeMap = this.messageMap.get(code);
 		if (localeMap == null) {
+			// 如果消息映射中不存在指定的消息代码，则返回 null
 			return null;
 		}
 		MessageHolder holder = localeMap.get(locale);
 		if (holder == null) {
+			// 如果消息映射中不存在指定的地区，则返回 null
 			return null;
 		}
 		return holder.getMessage();
@@ -58,20 +60,24 @@ public class StaticMessageSource extends AbstractMessageSource {
 	protected MessageFormat resolveCode(String code, Locale locale) {
 		Map<Locale, MessageHolder> localeMap = this.messageMap.get(code);
 		if (localeMap == null) {
+			// 如果消息映射中不存在指定的消息代码，则返回 null
 			return null;
 		}
 		MessageHolder holder = localeMap.get(locale);
 		if (holder == null) {
+			// 如果消息映射中不存在指定的地区，则返回 null
 			return null;
 		}
+		// 返回持有者中的消息格式化器
 		return holder.getMessageFormat();
 	}
 
 	/**
-	 * Associate the given message with the given code.
-	 * @param code the lookup code
-	 * @param locale the locale that the message should be found within
-	 * @param msg the message associated with this lookup code
+	 * 将给定的消息与给定的代码关联起来。
+	 *
+	 * @param code   查找代码
+	 * @param locale 应在其中找到消息的区域设置
+	 * @param msg    与此查找代码关联的消息
 	 */
 	public void addMessage(String code, Locale locale, String msg) {
 		Assert.notNull(code, "Code must not be null");
@@ -84,10 +90,10 @@ public class StaticMessageSource extends AbstractMessageSource {
 	}
 
 	/**
-	 * Associate the given message values with the given keys as codes.
-	 * @param messages the messages to register, with messages codes
-	 * as keys and message texts as values
-	 * @param locale the locale that the messages should be found within
+	 * 将给定的消息值与给定的键（作为代码）关联。
+	 *
+	 * @param messages 要注册的消息，消息代码作为键，消息文本作为值
+	 * @param locale   应在其中找到消息的区域设置
 	 */
 	public void addMessages(Map<String, String> messages, Locale locale) {
 		Assert.notNull(messages, "Messages Map must not be null");
@@ -102,11 +108,19 @@ public class StaticMessageSource extends AbstractMessageSource {
 
 
 	private class MessageHolder {
-
+		/**
+		 * 格式化好的消息
+		 */
 		private final String message;
 
+		/**
+		 * 区域设置
+		 */
 		private final Locale locale;
 
+		/**
+		 * 缓存的消息格式化器
+		 */
 		@Nullable
 		private volatile MessageFormat cachedFormat;
 
@@ -122,7 +136,9 @@ public class StaticMessageSource extends AbstractMessageSource {
 		public MessageFormat getMessageFormat() {
 			MessageFormat messageFormat = this.cachedFormat;
 			if (messageFormat == null) {
+				// 如果缓存中不存在消息格式对象，则创建一个新的消息格式对象
 				messageFormat = createMessageFormat(this.message, this.locale);
+				// 将新创建的消息格式对象缓存起来
 				this.cachedFormat = messageFormat;
 			}
 			return messageFormat;

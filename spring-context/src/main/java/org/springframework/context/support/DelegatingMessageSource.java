@@ -16,27 +16,30 @@
 
 package org.springframework.context.support;
 
-import java.util.Locale;
-
 import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.lang.Nullable;
 
+import java.util.Locale;
+
 /**
- * Empty {@link MessageSource} that delegates all calls to the parent MessageSource.
- * If no parent is available, it simply won't resolve any message.
+ * 将所有调用委托给父级MessageSource的空MessageSource。
+ * 如果没有可用的父级，则它将不会解析任何消息。
  *
- * <p>Used as placeholder by AbstractApplicationContext, if the context doesn't
- * define its own MessageSource. Not intended for direct use in applications.
+ * <p>如果上下文没有定义自己的MessageSource，则由AbstractApplicationContext使用作为占位符。
+ * 不打算在应用程序中直接使用。
  *
  * @author Juergen Hoeller
- * @since 1.1.5
  * @see AbstractApplicationContext
+ * @since 1.1.5
  */
 public class DelegatingMessageSource extends MessageSourceSupport implements HierarchicalMessageSource {
 
+	/**
+	 * 父消息源
+	 */
 	@Nullable
 	private MessageSource parentMessageSource;
 
@@ -57,12 +60,13 @@ public class DelegatingMessageSource extends MessageSourceSupport implements Hie
 	@Nullable
 	public String getMessage(String code, @Nullable Object[] args, @Nullable String defaultMessage, Locale locale) {
 		if (this.parentMessageSource != null) {
+			// 如果存在父消息源，则委托给父消息源进行消息获取
 			return this.parentMessageSource.getMessage(code, args, defaultMessage, locale);
-		}
-		else if (defaultMessage != null) {
+		} else if (defaultMessage != null) {
+			// 否则，如果存在默认消息，则使用默认消息进行渲染
 			return renderDefaultMessage(defaultMessage, args, locale);
-		}
-		else {
+		} else {
+			// 否则返回空
 			return null;
 		}
 	}
@@ -70,9 +74,10 @@ public class DelegatingMessageSource extends MessageSourceSupport implements Hie
 	@Override
 	public String getMessage(String code, @Nullable Object[] args, Locale locale) throws NoSuchMessageException {
 		if (this.parentMessageSource != null) {
+			// 如果存在父消息源，则委托给父消息源进行消息获取
 			return this.parentMessageSource.getMessage(code, args, locale);
-		}
-		else {
+		} else {
+			// 否则抛出 NoSuchMessageException 异常
 			throw new NoSuchMessageException(code, locale);
 		}
 	}
@@ -80,12 +85,14 @@ public class DelegatingMessageSource extends MessageSourceSupport implements Hie
 	@Override
 	public String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException {
 		if (this.parentMessageSource != null) {
+			// 如果存在父消息源，则委托给父消息源进行消息获取
 			return this.parentMessageSource.getMessage(resolvable, locale);
-		}
-		else {
+		} else {
 			if (resolvable.getDefaultMessage() != null) {
+				// 如果默认消息不为空，则使用默认消息渲染
 				return renderDefaultMessage(resolvable.getDefaultMessage(), resolvable.getArguments(), locale);
 			}
+			// 否则，获取消息码数组中的第一个消息码，如果为空，则抛出 NoSuchMessageException 异常
 			String[] codes = resolvable.getCodes();
 			String code = (codes != null && codes.length > 0 ? codes[0] : "");
 			throw new NoSuchMessageException(code, locale);
