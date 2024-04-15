@@ -16,47 +16,45 @@
 
 package org.springframework.web.servlet.i18n;
 
-import java.util.Locale;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.i18n.SimpleLocaleContext;
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.LocaleContextResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
+import java.util.TimeZone;
+
 /**
- * Abstract base class for {@link LocaleContextResolver} implementations.
+ * {@link LocaleContextResolver} 实现的抽象基类。
  *
- * <p>Provides support for a {@linkplain #setDefaultLocale(Locale) default locale}
- * and a {@linkplain #setDefaultTimeZone(TimeZone) default time zone}.
+ * <p>提供对 {@linkplain #setDefaultLocale(Locale) 默认区域设置} 和 {@linkplain #setDefaultTimeZone(TimeZone) 默认时区} 的支持。
  *
- * <p>Also provides pre-implemented versions of {@link #resolveLocale} and {@link #setLocale},
- * delegating to {@link #resolveLocaleContext} and {@link #setLocaleContext}.
+ * <p>还提供了 {@link #resolveLocale} 和 {@link #setLocale} 的预实现版本，
+ * 委托给 {@link #resolveLocaleContext} 和 {@link #setLocaleContext}。
  *
  * @author Juergen Hoeller
- * @since 4.0
  * @see #setDefaultLocale
  * @see #setDefaultTimeZone
+ * @since 4.0
  */
 public abstract class AbstractLocaleContextResolver extends AbstractLocaleResolver implements LocaleContextResolver {
-
+	/**
+	 * 默认时区
+	 */
 	@Nullable
 	private TimeZone defaultTimeZone;
 
 
 	/**
-	 * Set a default {@link TimeZone} that this resolver will return if no other
-	 * time zone is found.
+	 * 设置默认 {@link TimeZone}，如果没有找到其他时区，则此解析器将返回默认时区。
 	 */
 	public void setDefaultTimeZone(@Nullable TimeZone defaultTimeZone) {
 		this.defaultTimeZone = defaultTimeZone;
 	}
 
 	/**
-	 * Get the default {@link TimeZone} that this resolver is supposed to fall
-	 * back to, if any.
+	 * 获取默认 {@link TimeZone}，如果有的话，此解析器应该回退到该时区。
 	 */
 	@Nullable
 	public TimeZone getDefaultTimeZone() {
@@ -66,7 +64,9 @@ public abstract class AbstractLocaleContextResolver extends AbstractLocaleResolv
 
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
+		// 解析区域设置上下文，并获取区域设置
 		Locale locale = resolveLocaleContext(request).getLocale();
+		// 如果区域设置不为空，则使用区域设置，否则使用请求中的区域设置
 		return (locale != null ? locale : request.getLocale());
 	}
 

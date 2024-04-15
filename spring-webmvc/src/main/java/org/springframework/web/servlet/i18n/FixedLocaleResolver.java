@@ -16,34 +16,31 @@
 
 package org.springframework.web.servlet.i18n;
 
-import java.util.Locale;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
+import java.util.TimeZone;
+
 /**
- * {@link org.springframework.web.servlet.LocaleResolver} implementation
- * that always returns a fixed default locale and optionally time zone.
- * Default is the current JVM's default locale.
+ * {@link org.springframework.web.servlet.LocaleResolver} 的实现，始终返回固定的默认区域设置和可选的时区。
+ * 默认情况下为当前 JVM 的默认区域设置。
  *
- * <p>Note: Does not support {@code setLocale(Context)}, as the fixed
- * locale and time zone cannot be changed.
+ * <p>注意：不支持 {@code setLocale(Context)}，因为无法更改固定的区域设置和时区。
  *
  * @author Juergen Hoeller
- * @since 1.1
  * @see #setDefaultLocale
  * @see #setDefaultTimeZone
+ * @since 1.1
  */
 public class FixedLocaleResolver extends AbstractLocaleContextResolver {
 
 	/**
-	 * Create a default FixedLocaleResolver, exposing a configured default
-	 * locale (or the JVM's default locale as fallback).
+	 * 创建一个默认的 FixedLocaleResolver，暴露一个配置的默认区域设置（或 JVM 的默认区域设置作为后备）。
+	 *
 	 * @see #setDefaultLocale
 	 * @see #setDefaultTimeZone
 	 */
@@ -52,28 +49,35 @@ public class FixedLocaleResolver extends AbstractLocaleContextResolver {
 	}
 
 	/**
-	 * Create a FixedLocaleResolver that exposes the given locale.
-	 * @param locale the locale to expose
+	 * 创建一个 FixedLocaleResolver，暴露给定的区域设置。
+	 *
+	 * @param locale 要暴露的区域设置
 	 */
 	public FixedLocaleResolver(Locale locale) {
+		// 设置默认区域设置
 		setDefaultLocale(locale);
 	}
 
 	/**
-	 * Create a FixedLocaleResolver that exposes the given locale and time zone.
-	 * @param locale the locale to expose
-	 * @param timeZone the time zone to expose
+	 * 创建一个 FixedLocaleResolver，暴露给定的区域设置和时区。
+	 *
+	 * @param locale   要暴露的区域设置
+	 * @param timeZone 要暴露的时区
 	 */
 	public FixedLocaleResolver(Locale locale, TimeZone timeZone) {
+		// 设置默认区域设置
 		setDefaultLocale(locale);
+		// 设置默认时区
 		setDefaultTimeZone(timeZone);
 	}
 
 
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
+		// 获取默认区域设置
 		Locale locale = getDefaultLocale();
 		if (locale == null) {
+			// 如果不存在，则从系统中获取当前设置的区域设置
 			locale = Locale.getDefault();
 		}
 		return locale;
@@ -87,6 +91,7 @@ public class FixedLocaleResolver extends AbstractLocaleContextResolver {
 			public Locale getLocale() {
 				return getDefaultLocale();
 			}
+
 			@Override
 			public TimeZone getTimeZone() {
 				return getDefaultTimeZone();
@@ -95,8 +100,8 @@ public class FixedLocaleResolver extends AbstractLocaleContextResolver {
 	}
 
 	@Override
-	public void setLocaleContext( HttpServletRequest request, @Nullable HttpServletResponse response,
-			@Nullable LocaleContext localeContext) {
+	public void setLocaleContext(HttpServletRequest request, @Nullable HttpServletResponse response,
+								 @Nullable LocaleContext localeContext) {
 
 		throw new UnsupportedOperationException("Cannot change fixed locale - use a different locale resolution strategy");
 	}

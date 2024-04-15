@@ -16,80 +16,71 @@
 
 package org.springframework.web.servlet.i18n;
 
-import java.util.Locale;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
 import org.springframework.lang.Nullable;
 import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
+import java.util.TimeZone;
+
 /**
- * {@link org.springframework.web.servlet.LocaleResolver} implementation that
- * uses a locale attribute in the user's session in case of a custom setting,
- * with a fallback to the configured default locale, the request's
- * {@code Accept-Language} header, or the default locale for the server.
+ * {@link org.springframework.web.servlet.LocaleResolver} 的实现，如果存在自定义设置，则使用用户会话中的区域设置属性，否则返回配置的默认区域设置、请求的 {@code Accept-Language} 标头或服务器的默认区域设置。
  *
- * <p>This is most appropriate if the application needs user sessions anyway,
- * i.e. when the {@code HttpSession} does not have to be created just for storing
- * the user's locale. The session may optionally contain an associated time zone
- * attribute as well; alternatively, you may specify a default time zone.
+ * <p>如果应用程序需要用户会话，即 {@code HttpSession} 不必仅用于存储用户的区域设置，则此方案最为适用。会话还可以选择包含一个关联的时区属性；或者，您可以指定默认时区。
  *
- * <p>Custom controllers can override the user's locale and time zone by calling
- * {@code #setLocale(Context)} on the resolver, e.g. responding to a locale change
- * request. As a more convenient alternative, consider using
- * {@link org.springframework.web.servlet.support.RequestContext#changeLocale}.
+ * <p>自定义控制器可以通过调用 {@code #setLocale(Context)} 来覆盖用户的区域设置和时区，例如，响应区域设置更改请求。作为更方便的替代方案，请考虑使用 {@link org.springframework.web.servlet.support.RequestContext#changeLocale}。
  *
- * <p>In contrast to {@link CookieLocaleResolver}, this strategy stores locally
- * chosen locale settings in the Servlet container's {@code HttpSession}. As a
- * consequence, those settings are just temporary for each session and therefore
- * lost when each session terminates.
+ * <p>与 {@link CookieLocaleResolver} 相比，此策略将本地选择的区域设置存储在 Servlet 容器的 {@code HttpSession} 中。因此，这些设置对于每个会话仅是临时的，因此在每个会话终止时丢失。
  *
- * <p>Note that there is no direct relationship with external session management
- * mechanisms such as the "Spring Session" project. This {@code LocaleResolver}
- * will simply evaluate and modify corresponding {@code HttpSession} attributes
- * against the current {@code HttpServletRequest}.
+ * <p>请注意，与外部会话管理机制（如“Spring Session”项目）之间没有直接关系。此 {@code LocaleResolver} 将简单地针对当前 {@code HttpServletRequest} 评估和修改相应的 {@code HttpSession} 属性。
  *
  * @author Juergen Hoeller
- * @since 27.02.2003
  * @see #setDefaultLocale
  * @see #setDefaultTimeZone
+ * @since 27.02.2003
  */
 public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 
 	/**
-	 * Default name of the session attribute that holds the Locale.
-	 * <p>Only used internally by this implementation.
-	 * <p>Use {@code RequestContext(Utils).getLocale()}
-	 * to retrieve the current locale in controllers or views.
+	 * 默认的会话属性名称，用于保存区域设置。
+	 * <p>仅在此实现内部使用。
+	 * <p>在控制器或视图中使用 {@code RequestContext(Utils).getLocale()}
+	 * 来检索当前的locale。
+	 *
 	 * @see org.springframework.web.servlet.support.RequestContext#getLocale
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#getLocale
 	 */
 	public static final String LOCALE_SESSION_ATTRIBUTE_NAME = SessionLocaleResolver.class.getName() + ".LOCALE";
 
 	/**
-	 * Default name of the session attribute that holds the TimeZone.
-	 * <p>Only used internally by this implementation.
-	 * <p>Use {@code RequestContext(Utils).getTimeZone()}
-	 * to retrieve the current time zone in controllers or views.
+	 * 默认的会话属性名称，用于保存时区。
+	 * <p>仅在此实现内部使用。
+	 * <p>在控制器或视图中使用 {@code RequestContext(Utils).getTimeZone()}
+	 * 来检索当前的时区。
+	 *
 	 * @see org.springframework.web.servlet.support.RequestContext#getTimeZone
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#getTimeZone
 	 */
 	public static final String TIME_ZONE_SESSION_ATTRIBUTE_NAME = SessionLocaleResolver.class.getName() + ".TIME_ZONE";
 
-
+	/**
+	 * 区域设置属性名称
+	 */
 	private String localeAttributeName = LOCALE_SESSION_ATTRIBUTE_NAME;
 
+	/**
+	 * 时区属性名称
+	 */
 	private String timeZoneAttributeName = TIME_ZONE_SESSION_ATTRIBUTE_NAME;
 
 
 	/**
-	 * Specify the name of the corresponding attribute in the {@code HttpSession},
-	 * holding the current {@link Locale} value.
-	 * <p>The default is an internal {@link #LOCALE_SESSION_ATTRIBUTE_NAME}.
+	 * 指定保存当前{@link Locale}值的{@code HttpSession}中对应的属性名称。
+	 * <p>默认是内部{@link #LOCALE_SESSION_ATTRIBUTE_NAME}。
+	 *
 	 * @since 4.3.8
 	 */
 	public void setLocaleAttributeName(String localeAttributeName) {
@@ -97,9 +88,9 @@ public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 	}
 
 	/**
-	 * Specify the name of the corresponding attribute in the {@code HttpSession},
-	 * holding the current {@link TimeZone} value.
-	 * <p>The default is an internal {@link #TIME_ZONE_SESSION_ATTRIBUTE_NAME}.
+	 * 指定保存当前{@link TimeZone}值的{@code HttpSession}中对应的属性名称。
+	 * <p>默认是内部{@link #TIME_ZONE_SESSION_ATTRIBUTE_NAME}。
+	 *
 	 * @since 4.3.8
 	 */
 	public void setTimeZoneAttributeName(String timeZoneAttributeName) {
@@ -109,8 +100,10 @@ public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
+		// 从 会话 中获取区域设置
 		Locale locale = (Locale) WebUtils.getSessionAttribute(request, this.localeAttributeName);
 		if (locale == null) {
+			// 获取不到，则从默认区域设置中推断区域设置
 			locale = determineDefaultLocale(request);
 		}
 		return locale;
@@ -121,17 +114,22 @@ public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 		return new TimeZoneAwareLocaleContext() {
 			@Override
 			public Locale getLocale() {
+				// 从 会话 中获取区域设置
 				Locale locale = (Locale) WebUtils.getSessionAttribute(request, localeAttributeName);
 				if (locale == null) {
+					// 获取不到，则从默认区域设置中推断区域设置
 					locale = determineDefaultLocale(request);
 				}
 				return locale;
 			}
+
 			@Override
 			@Nullable
 			public TimeZone getTimeZone() {
+				// 从 会话中 获取时区
 				TimeZone timeZone = (TimeZone) WebUtils.getSessionAttribute(request, timeZoneAttributeName);
 				if (timeZone == null) {
+					// 获取不到，则从默认时区推断时区
 					timeZone = determineDefaultTimeZone(request);
 				}
 				return timeZone;
@@ -141,30 +139,31 @@ public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 
 	@Override
 	public void setLocaleContext(HttpServletRequest request, @Nullable HttpServletResponse response,
-			@Nullable LocaleContext localeContext) {
+								 @Nullable LocaleContext localeContext) {
 
 		Locale locale = null;
 		TimeZone timeZone = null;
 		if (localeContext != null) {
+			// 如果存在区域设置上下文，则获取区域设置
 			locale = localeContext.getLocale();
 			if (localeContext instanceof TimeZoneAwareLocaleContext) {
+				// 如果 区域设置上下文是 TimeZoneAwareLocaleContext类型，则获取时区
 				timeZone = ((TimeZoneAwareLocaleContext) localeContext).getTimeZone();
 			}
 		}
+		// 将区域设置和时区设置到会话中
 		WebUtils.setSessionAttribute(request, this.localeAttributeName, locale);
 		WebUtils.setSessionAttribute(request, this.timeZoneAttributeName, timeZone);
 	}
 
 
 	/**
-	 * Determine the default locale for the given request, called if no
-	 * {@link Locale} session attribute has been found.
-	 * <p>The default implementation returns the configured
-	 * {@linkplain #setDefaultLocale(Locale) default locale}, if any, and otherwise
-	 * falls back to the request's {@code Accept-Language} header locale or the
-	 * default locale for the server.
-	 * @param request the request to resolve the locale for
-	 * @return the default locale (never {@code null})
+	 * 确定给定请求的默认区域设置，如果没有找到{@link Locale}会话属性时调用。
+	 * <p>默认实现返回配置的{@linkplain #setDefaultLocale(Locale)默认区域设置}（如果有），
+	 * 否则回退到请求的{@code Accept-Language}头区域设置或服务器的默认区域设置。
+	 *
+	 * @param request 要解析区域设置的请求
+	 * @return 默认区域设置（永不为{@code null}）
 	 * @see #setDefaultLocale
 	 * @see javax.servlet.http.HttpServletRequest#getLocale()
 	 */
@@ -177,12 +176,11 @@ public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 	}
 
 	/**
-	 * Determine the default time zone for the given request, called if no
-	 * {@link TimeZone} session attribute has been found.
-	 * <p>The default implementation returns the configured default time zone,
-	 * if any, or {@code null} otherwise.
-	 * @param request the request to resolve the time zone for
-	 * @return the default time zone (or {@code null} if none defined)
+	 * 确定给定请求的默认时区，如果没有找到{@link TimeZone}会话属性时调用。
+	 * <p>默认实现返回配置的默认时区（如果有），否则返回{@code null}。
+	 *
+	 * @param request 要解析时区的请求
+	 * @return 默认时区（如果未定义，则为{@code null}）
 	 * @see #setDefaultTimeZone
 	 */
 	@Nullable

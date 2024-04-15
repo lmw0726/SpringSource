@@ -16,42 +16,36 @@
 
 package org.springframework.web.servlet;
 
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
+
 /**
- * Extension of {@link LocaleResolver} that adds support for a rich locale context
- * (potentially including locale and time zone information).
+ * {@link LocaleResolver} 的扩展，增加了对丰富的区域设置上下文（可能包括区域设置和时区信息）的支持。
  *
  * @author Juergen Hoeller
- * @since 4.0
  * @see org.springframework.context.i18n.LocaleContext
  * @see org.springframework.context.i18n.TimeZoneAwareLocaleContext
  * @see org.springframework.context.i18n.LocaleContextHolder
  * @see org.springframework.web.servlet.support.RequestContext#getTimeZone
  * @see org.springframework.web.servlet.support.RequestContextUtils#getTimeZone
+ * @since 4.0
  */
 public interface LocaleContextResolver extends LocaleResolver {
 
 	/**
-	 * Resolve the current locale context via the given request.
-	 * <p>This is primarily intended for framework-level processing; consider using
-	 * {@link org.springframework.web.servlet.support.RequestContextUtils} or
-	 * {@link org.springframework.web.servlet.support.RequestContext} for
-	 * application-level access to the current locale and/or time zone.
-	 * <p>The returned context may be a
-	 * {@link org.springframework.context.i18n.TimeZoneAwareLocaleContext},
-	 * containing a locale with associated time zone information.
-	 * Simply apply an {@code instanceof} check and downcast accordingly.
-	 * <p>Custom resolver implementations may also return extra settings in
-	 * the returned context, which again can be accessed through downcasting.
-	 * @param request the request to resolve the locale context for
-	 * @return the current locale context (never {@code null}
+	 * 通过给定的请求解析当前区域设置上下文。
+	 * <p>这主要用于框架级处理；考虑使用 {@link org.springframework.web.servlet.support.RequestContextUtils} 或
+	 * {@link org.springframework.web.servlet.support.RequestContext} 来访问当前区域设置和/或时区的应用级别。
+	 * <p>返回的上下文可能是一个 {@link org.springframework.context.i18n.TimeZoneAwareLocaleContext}，
+	 * 包含有关联的时区信息的区域设置。简单地应用 {@code instanceof} 检查并据此向下转换。
+	 * <p>自定义解析器实现也可以在返回的上下文中返回额外的设置，这些设置可以通过向下转换来访问。
+	 *
+	 * @param request 要解析区域设置上下文的请求
+	 * @return 当前区域设置上下文（永远不会为 {@code null}）
 	 * @see #resolveLocale(HttpServletRequest)
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#getLocale
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#getTimeZone
@@ -59,18 +53,18 @@ public interface LocaleContextResolver extends LocaleResolver {
 	LocaleContext resolveLocaleContext(HttpServletRequest request);
 
 	/**
-	 * Set the current locale context to the given one,
-	 * potentially including a locale with associated time zone information.
-	 * @param request the request to be used for locale modification
-	 * @param response the response to be used for locale modification
-	 * @param localeContext the new locale context, or {@code null} to clear the locale
-	 * @throws UnsupportedOperationException if the LocaleResolver implementation
-	 * does not support dynamic changing of the locale or time zone
+	 * 将当前区域设置上下文设置为给定的区域设置上下文，
+	 * 可能包括一个带有关联时区信息的区域设置。
+	 *
+	 * @param request       用于区域设置修改的请求
+	 * @param response      用于区域设置修改的响应
+	 * @param localeContext 新的区域设置上下文，或 {@code null} 以清除区域设置
+	 * @throws UnsupportedOperationException 如果 LocaleResolver 实现不支持动态更改区域设置或时区
 	 * @see #setLocale(HttpServletRequest, HttpServletResponse, Locale)
 	 * @see org.springframework.context.i18n.SimpleLocaleContext
 	 * @see org.springframework.context.i18n.SimpleTimeZoneAwareLocaleContext
 	 */
 	void setLocaleContext(HttpServletRequest request, @Nullable HttpServletResponse response,
-			@Nullable LocaleContext localeContext);
+						  @Nullable LocaleContext localeContext);
 
 }
