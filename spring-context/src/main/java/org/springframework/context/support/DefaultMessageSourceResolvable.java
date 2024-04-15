@@ -16,74 +16,87 @@
 
 package org.springframework.context.support;
 
-import java.io.Serializable;
-
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
+
 /**
- * Spring's default implementation of the {@link MessageSourceResolvable} interface.
- * Offers an easy way to store all the necessary values needed to resolve
- * a message via a {@link org.springframework.context.MessageSource}.
+ * Spring的{@link MessageSourceResolvable}接口的默认实现。
+ * 提供了一种简单的方式来存储解析消息所需的所有必要值，通过{@link org.springframework.context.MessageSource}。
  *
  * @author Juergen Hoeller
- * @since 13.02.2004
  * @see org.springframework.context.MessageSource#getMessage(MessageSourceResolvable, java.util.Locale)
+ * @since 13.02.2004
  */
 @SuppressWarnings("serial")
 public class DefaultMessageSourceResolvable implements MessageSourceResolvable, Serializable {
 
+	/**
+	 * 解析此消息的代码数组
+	 */
 	@Nullable
 	private final String[] codes;
 
+	/**
+	 * 消息参数
+	 */
 	@Nullable
 	private final Object[] arguments;
 
+	/**
+	 * 默认消息
+	 */
 	@Nullable
 	private final String defaultMessage;
 
 
 	/**
-	 * Create a new DefaultMessageSourceResolvable.
-	 * @param code the code to be used to resolve this message
+	 * 创建一个新的DefaultMessageSourceResolvable。
+	 *
+	 * @param code 用于解析此消息的代码
 	 */
 	public DefaultMessageSourceResolvable(String code) {
-		this(new String[] {code}, null, null);
+		this(new String[]{code}, null, null);
 	}
 
 	/**
-	 * Create a new DefaultMessageSourceResolvable.
-	 * @param codes the codes to be used to resolve this message
+	 * 创建一个新的DefaultMessageSourceResolvable。
+	 *
+	 * @param codes 用于解析此消息的代码
 	 */
 	public DefaultMessageSourceResolvable(String[] codes) {
 		this(codes, null, null);
 	}
 
 	/**
-	 * Create a new DefaultMessageSourceResolvable.
-	 * @param codes the codes to be used to resolve this message
-	 * @param defaultMessage the default message to be used to resolve this message
+	 * 创建一个新的DefaultMessageSourceResolvable。
+	 *
+	 * @param codes          用于解析此消息的代码
+	 * @param defaultMessage 用于解析此消息的默认消息
 	 */
 	public DefaultMessageSourceResolvable(String[] codes, String defaultMessage) {
 		this(codes, null, defaultMessage);
 	}
 
 	/**
-	 * Create a new DefaultMessageSourceResolvable.
-	 * @param codes the codes to be used to resolve this message
-	 * @param arguments the array of arguments to be used to resolve this message
+	 * 创建一个新的DefaultMessageSourceResolvable。
+	 *
+	 * @param codes     用于解析此消息的代码
+	 * @param arguments 用于解析此消息的参数数组
 	 */
 	public DefaultMessageSourceResolvable(String[] codes, Object[] arguments) {
 		this(codes, arguments, null);
 	}
 
 	/**
-	 * Create a new DefaultMessageSourceResolvable.
-	 * @param codes the codes to be used to resolve this message
-	 * @param arguments the array of arguments to be used to resolve this message
-	 * @param defaultMessage the default message to be used to resolve this message
+	 * 创建一个新的DefaultMessageSourceResolvable。
+	 *
+	 * @param codes          用于解析此消息的代码
+	 * @param arguments      用于解析此消息的参数数组
+	 * @param defaultMessage 用于解析此消息的默认消息
 	 */
 	public DefaultMessageSourceResolvable(
 			@Nullable String[] codes, @Nullable Object[] arguments, @Nullable String defaultMessage) {
@@ -94,8 +107,9 @@ public class DefaultMessageSourceResolvable implements MessageSourceResolvable, 
 	}
 
 	/**
-	 * Copy constructor: Create a new instance from another resolvable.
-	 * @param resolvable the resolvable to copy from
+	 * 复制构造函数：从另一个可解析对象创建一个新实例。
+	 *
+	 * @param resolvable 要复制的可解析对象
 	 */
 	public DefaultMessageSourceResolvable(MessageSourceResolvable resolvable) {
 		this(resolvable.getCodes(), resolvable.getArguments(), resolvable.getDefaultMessage());
@@ -103,8 +117,7 @@ public class DefaultMessageSourceResolvable implements MessageSourceResolvable, 
 
 
 	/**
-	 * Return the default code of this resolvable, that is,
-	 * the last one in the codes array.
+	 * 返回此可解析对象的默认代码，即代码数组中的最后一个。
 	 */
 	@Nullable
 	public String getCode() {
@@ -130,15 +143,14 @@ public class DefaultMessageSourceResolvable implements MessageSourceResolvable, 
 	}
 
 	/**
-	 * Indicate whether the specified default message needs to be rendered for
-	 * substituting placeholders and/or {@link java.text.MessageFormat} escaping.
-	 * @return {@code true} if the default message may contain argument placeholders;
-	 * {@code false} if it definitely does not contain placeholders or custom escaping
-	 * and can therefore be simply exposed as-is
-	 * @since 5.1.7
+	 * 指示是否需要为指定的默认消息渲染以替换占位符和/或{@link java.text.MessageFormat}转义。
+	 *
+	 * @return {@code true}，如果默认消息可能包含参数占位符；{@code false}，如果它绝对不包含占位符或自定义转义，
+	 * 因此可以简单地按原样公开
 	 * @see #getDefaultMessage()
 	 * @see #getArguments()
 	 * @see AbstractMessageSource#renderDefaultMessage
+	 * @since 5.1.7
 	 */
 	public boolean shouldRenderDefaultMessage() {
 		return true;
@@ -146,8 +158,8 @@ public class DefaultMessageSourceResolvable implements MessageSourceResolvable, 
 
 
 	/**
-	 * Build a default String representation for this MessageSourceResolvable:
-	 * including codes, arguments, and default message.
+	 * 为此MessageSourceResolvable构建默认的String表示形式：
+	 * 包括代码、参数和默认消息。
 	 */
 	protected final String resolvableToString() {
 		StringBuilder result = new StringBuilder(64);
@@ -158,9 +170,9 @@ public class DefaultMessageSourceResolvable implements MessageSourceResolvable, 
 	}
 
 	/**
-	 * The default implementation exposes the attributes of this MessageSourceResolvable.
-	 * <p>To be overridden in more specific subclasses, potentially including the
-	 * resolvable content through {@code resolvableToString()}.
+	 * 默认实现公开此MessageSourceResolvable的属性。
+	 * <p>在更具体的子类中被覆盖，可能通过{@code resolvableToString()}包含可解析的内容。
+	 *
 	 * @see #resolvableToString()
 	 */
 	@Override

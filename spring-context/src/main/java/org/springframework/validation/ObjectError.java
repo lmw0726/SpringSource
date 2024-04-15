@@ -21,41 +21,46 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Encapsulates an object error, that is, a global reason for rejecting
- * an object.
+ * 封装对象错误，即拒绝对象的全局原因。
  *
- * <p>See the {@link DefaultMessageCodesResolver} javadoc for details on
- * how a message code list is built for an {@code ObjectError}.
+ * <p>有关如何为 {@code ObjectError} 构建消息代码列表的详细信息，请参见 {@link DefaultMessageCodesResolver} 的 javadoc。
  *
  * @author Juergen Hoeller
- * @since 10.03.2003
  * @see FieldError
  * @see DefaultMessageCodesResolver
+ * @since 10.03.2003
  */
 @SuppressWarnings("serial")
 public class ObjectError extends DefaultMessageSourceResolvable {
-
+	/**
+	 * 对象名称
+	 */
 	private final String objectName;
 
+	/**
+	 * 源对象
+	 */
 	@Nullable
 	private transient Object source;
 
 
 	/**
-	 * Create a new instance of the ObjectError class.
-	 * @param objectName the name of the affected object
-	 * @param defaultMessage the default message to be used to resolve this message
+	 * 创建 ObjectError 类的新实例。
+	 *
+	 * @param objectName     受影响对象的名称
+	 * @param defaultMessage 用于解析此消息的默认消息
 	 */
 	public ObjectError(String objectName, String defaultMessage) {
 		this(objectName, null, null, defaultMessage);
 	}
 
 	/**
-	 * Create a new instance of the ObjectError class.
-	 * @param objectName the name of the affected object
-	 * @param codes the codes to be used to resolve this message
-	 * @param arguments	the array of arguments to be used to resolve this message
-	 * @param defaultMessage the default message to be used to resolve this message
+	 * 创建 ObjectError 类的新实例。
+	 *
+	 * @param objectName     受影响对象的名称
+	 * @param codes          用于解析此消息的代码
+	 * @param arguments      用于解析此消息的参数数组
+	 * @param defaultMessage 用于解析此消息的默认消息
 	 */
 	public ObjectError(
 			String objectName, @Nullable String[] codes, @Nullable Object[] arguments, @Nullable String defaultMessage) {
@@ -67,19 +72,18 @@ public class ObjectError extends DefaultMessageSourceResolvable {
 
 
 	/**
-	 * Return the name of the affected object.
+	 * 返回受影响对象的名称。
 	 */
 	public String getObjectName() {
 		return this.objectName;
 	}
 
 	/**
-	 * Preserve the source behind this error: possibly an {@link Exception}
-	 * (typically {@link org.springframework.beans.PropertyAccessException})
-	 * or a Bean Validation {@link javax.validation.ConstraintViolation}.
-	 * <p>Note that any such source object is being stored as transient:
-	 * that is, it won't be part of a serialized error representation.
-	 * @param source the source object
+	 * 保留此错误背后的源对象：可能是一个{@link Exception}（通常是{@link org.springframework.beans.PropertyAccessException}），
+	 * 或者是一个Bean Validation {@link javax.validation.ConstraintViolation}。
+	 * <p>注意，任何这样的源对象都将被存储为瞬态：也就是说，它不会成为序列化错误表示的一部分。
+	 *
+	 * @param source 源对象
 	 * @since 5.0.4
 	 */
 	public void wrap(Object source) {
@@ -90,22 +94,19 @@ public class ObjectError extends DefaultMessageSourceResolvable {
 	}
 
 	/**
-	 * Unwrap the source behind this error: possibly an {@link Exception}
-	 * (typically {@link org.springframework.beans.PropertyAccessException})
-	 * or a Bean Validation {@link javax.validation.ConstraintViolation}.
-	 * <p>The cause of the outermost exception will be introspected as well,
-	 * e.g. the underlying conversion exception or exception thrown from a setter
-	 * (instead of having to unwrap the {@code PropertyAccessException} in turn).
-	 * @return the source object of the given type
-	 * @throws IllegalArgumentException if no such source object is available
-	 * (i.e. none specified or not available anymore after deserialization)
+	 * 解包此错误背后的源对象：可能是一个{@link Exception}（通常是{@link org.springframework.beans.PropertyAccessException}），
+	 * 或者是一个Bean Validation {@link javax.validation.ConstraintViolation}。
+	 * <p>最外层异常的原因也将被检查，例如，底层转换异常或从setter抛出的异常
+	 * （而不必逐个解包{@code PropertyAccessException}）。
+	 *
+	 * @return 给定类型的源对象
+	 * @throws IllegalArgumentException 如果没有可用的源对象（即未指定或在反序列化后不再可用）
 	 * @since 5.0.4
 	 */
 	public <T> T unwrap(Class<T> sourceType) {
 		if (sourceType.isInstance(this.source)) {
 			return sourceType.cast(this.source);
-		}
-		else if (this.source instanceof Throwable) {
+		} else if (this.source instanceof Throwable) {
 			Throwable cause = ((Throwable) this.source).getCause();
 			if (sourceType.isInstance(cause)) {
 				return sourceType.cast(cause);
@@ -115,13 +116,12 @@ public class ObjectError extends DefaultMessageSourceResolvable {
 	}
 
 	/**
-	 * Check the source behind this error: possibly an {@link Exception}
-	 * (typically {@link org.springframework.beans.PropertyAccessException})
-	 * or a Bean Validation {@link javax.validation.ConstraintViolation}.
-	 * <p>The cause of the outermost exception will be introspected as well,
-	 * e.g. the underlying conversion exception or exception thrown from a setter
-	 * (instead of having to unwrap the {@code PropertyAccessException} in turn).
-	 * @return whether this error has been caused by a source object of the given type
+	 * 检查此错误是否由给定类型的源对象引起：可能是一个{@link Exception}（通常是{@link org.springframework.beans.PropertyAccessException}），
+	 * 或者是一个Bean Validation {@link javax.validation.ConstraintViolation}。
+	 * <p>最外层异常的原因也将被检查，例如，底层转换异常或从setter抛出的异常
+	 * （而不必逐个解包{@code PropertyAccessException}）。
+	 *
+	 * @return 是否此错误已由给定类型的源对象引起
 	 * @since 5.0.4
 	 */
 	public boolean contains(Class<?> sourceType) {
