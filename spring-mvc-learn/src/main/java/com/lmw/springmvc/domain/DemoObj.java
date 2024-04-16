@@ -1,6 +1,9 @@
 package com.lmw.springmvc.domain;
 
+import javax.validation.constraints.NotNull;
+
 public class DemoObj {
+	@NotNull(message = "{id.notNull}")
 	private Long id;
 	private String name;
 

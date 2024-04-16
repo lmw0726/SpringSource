@@ -16,34 +16,7 @@
 
 package org.springframework.validation.beanvalidation;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.function.Consumer;
-
-import javax.validation.Configuration;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
-import javax.validation.TraversableResolver;
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.ValidationProviderResolver;
-import javax.validation.Validator;
-import javax.validation.ValidatorContext;
-import javax.validation.ValidatorFactory;
-import javax.validation.bootstrap.GenericBootstrap;
-import javax.validation.bootstrap.ProviderSpecificBootstrap;
-
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -56,6 +29,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
+
+import javax.validation.*;
+import javax.validation.bootstrap.GenericBootstrap;
+import javax.validation.bootstrap.ProviderSpecificBootstrap;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * This is the central class for {@code javax.validation} (JSR-303) setup in a Spring
@@ -153,22 +136,16 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 	}
 
 	/**
-	 * Specify a custom Spring MessageSource for resolving validation messages,
-	 * instead of relying on JSR-303's default "ValidationMessages.properties" bundle
-	 * in the classpath. This may refer to a Spring context's shared "messageSource" bean,
-	 * or to some special MessageSource setup for validation purposes only.
-	 * <p><b>NOTE:</b> This feature requires Hibernate Validator 4.3 or higher on the classpath.
-	 * You may nevertheless use a different validation provider but Hibernate Validator's
-	 * {@link ResourceBundleMessageInterpolator} class must be accessible during configuration.
-	 * <p>Specify either this property or {@link #setMessageInterpolator "messageInterpolator"},
-	 * not both. If you would like to build a custom MessageInterpolator, consider deriving from
-	 * Hibernate Validator's {@link ResourceBundleMessageInterpolator} and passing in a
-	 * Spring-based {@code ResourceBundleLocator} when constructing your interpolator.
-	 * <p>In order for Hibernate's default validation messages to be resolved still, your
-	 * {@link MessageSource} must be configured for optional resolution (usually the default).
-	 * In particular, the {@code MessageSource} instance specified here should not apply
-	 * {@link org.springframework.context.support.AbstractMessageSource#setUseCodeAsDefaultMessage
-	 * "useCodeAsDefaultMessage"} behavior. Please double-check your setup accordingly.
+	 * 指定一个自定义的 Spring MessageSource 用于解析验证消息，而不是依赖于类路径中 JSR-303 默认的 "ValidationMessages.properties" bundle。
+	 * 这可以是指向 Spring 上下文的共享 "messageSource" bean，也可以是专门为验证目的设置的特殊 MessageSource。
+	 * <p><b>注意：</b>此功能需要类路径上存在 Hibernate Validator 4.3 或更高版本。您仍然可以使用不同的验证提供程序，
+	 * 但在配置期间必须可以访问 Hibernate Validator 的 {@link ResourceBundleMessageInterpolator} 类。
+	 * <p>只能指定此属性或 {@link #setMessageInterpolator "messageInterpolator"} 中的一个，不能同时指定两者。
+	 * 如果您想构建自定义的 MessageInterpolator，请考虑从 Hibernate Validator 的 {@link ResourceBundleMessageInterpolator} 派生，
+	 * 并在构造插值器时传递一个基于 Spring 的 {@code ResourceBundleLocator}。
+	 * <p>为了仍然解析 Hibernate 的默认验证消息，您的 {@link MessageSource} 必须配置为可选解析（通常是默认的）。
+	 * 特别地，这里指定的 {@code MessageSource} 实例不应用 {@link org.springframework.context.support.AbstractMessageSource#setUseCodeAsDefaultMessage
+	 * "useCodeAsDefaultMessage"} 行为。请仔细检查您的设置。
 	 * @see ResourceBundleMessageInterpolator
 	 */
 	public void setValidationMessageSource(MessageSource messageSource) {
