@@ -98,6 +98,14 @@ public abstract class AbstractTemplateView extends AbstractUrlBasedView {
 	}
 
 	/**
+	 * 设置是否允许 HttpSession 属性覆盖（隐藏）相同名称的控制器生成的模型属性。默认为 "false"，
+	 * 如果找到与模型属性相同名称的会话属性，则会引发异常。
+	 */
+	public void setAllowSessionOverride(boolean allowSessionOverride) {
+		this.allowSessionOverride = allowSessionOverride;
+	}
+
+	/**
 	 * 设置是否公开用于 Spring 的宏库的 RequestContext，
 	 * 在名称 "springMacroRequestContext" 下。默认值为 "true"。
 	 * <p>目前对于 Spring 的 FreeMarker 默认宏是需要的。
