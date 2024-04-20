@@ -315,22 +315,14 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
 	}
 
 	/**
-	 * Indicate whether this violation's interpolated message has remaining
-	 * placeholders and therefore requires {@link java.text.MessageFormat}
-	 * to be applied to it. Called for a Bean Validation defined message
-	 * (coming out {@code ValidationMessages.properties}) when rendered
-	 * as the default message in Spring's MessageSource.
-	 * <p>The default implementation considers a Spring-style "{0}" placeholder
-	 * for the field name as an indication for {@link java.text.MessageFormat}.
-	 * Any other placeholder or escape syntax occurrences are typically a
-	 * mismatch, coming out of regex pattern values or the like. Note that
-	 * standard Bean Validation does not support "{0}" style placeholders at all;
-	 * this is a feature typically used in Spring MessageSource resource bundles.
+	 * 指示此违规的插值消息是否还有剩余的占位符，因此需要对其应用 {@link java.text.MessageFormat}。
+	 * 在将 Bean Validation 定义的消息（来自 {@code ValidationMessages.properties}）渲染为 Spring 的 MessageSource 中的默认消息时调用。
+	 * <p>默认实现将 Spring 风格的 "{0}" 占位符作为需要 {@link java.text.MessageFormat} 的指示。
+	 * 任何其他占位符或转义语法出现通常都是不匹配的，可能来自正则表达式模式值或类似的情况。
+	 * 请注意，标准的 Bean Validation 根本不支持 "{0}" 样式的占位符；这通常是在 Spring MessageSource 资源束中使用的功能。
 	 *
-	 * @param violation the Bean Validation constraint violation, including
-	 *                  BV-defined interpolation of named attribute references in its message
-	 * @return {@code true} if {@code java.text.MessageFormat} is to be applied,
-	 * or {@code false} if the violation's message should be used as-is
+	 * @param violation Bean Validation 约束违规，包括其消息中的命名属性引用的 BV 定义的插值
+	 * @return 如果要应用 {@code java.text.MessageFormat}，则为 {@code true}；如果应该直接使用违规消息，则为 {@code false}
 	 * @see #getArgumentsForConstraint
 	 * @since 5.1.8
 	 */

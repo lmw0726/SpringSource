@@ -105,6 +105,7 @@ public abstract class AbstractTemplateView extends AbstractUrlBasedView {
 		this.allowSessionOverride = allowSessionOverride;
 	}
 
+
 	/**
 	 * 设置是否公开用于 Spring 的宏库的 RequestContext，
 	 * 在名称 "springMacroRequestContext" 下。默认值为 "true"。
