@@ -42,13 +42,12 @@ public class PathPatternParser {
 
 
 	/**
-	 * Whether a {@link PathPattern} produced by this parser should
-	 * automatically match request paths with a trailing slash.
-	 * <p>If set to {@code true} a {@code PathPattern} without a trailing slash
-	 * will also match request paths with a trailing slash. If set to
-	 * {@code false} a {@code PathPattern} will only match request paths with
-	 * a trailing slash.
-	 * <p>The default is {@code true}.
+	 * 设置此解析器生成的 {@link PathPattern} 是否应自动匹配带有尾随斜杠的请求路径。
+	 * <p>如果设置为 {@code true}，则没有尾随斜杠的 {@code PathPattern} 也将匹配带有尾随斜杠的请求路径。
+	 * 如果设置为 {@code false}，则 {@code PathPattern} 仅匹配带有尾随斜杠的请求路径。
+	 * <p>默认值为 {@code true}。
+	 *
+	 * @param matchOptionalTrailingSeparator 是否匹配可选的尾随斜杠
 	 */
 	public void setMatchOptionalTrailingSeparator(boolean matchOptionalTrailingSeparator) {
 		this.matchOptionalTrailingSeparator = matchOptionalTrailingSeparator;

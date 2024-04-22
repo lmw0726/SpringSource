@@ -16,10 +16,6 @@
 
 package org.springframework.web.servlet.theme;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -27,41 +23,46 @@ import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.util.CookieGenerator;
 import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
- * {@link ThemeResolver} implementation that uses a cookie sent back to the user
- * in case of a custom setting, with a fallback to the default theme.
- * This is particularly useful for stateless applications without user sessions.
+ * {@link ThemeResolver} 实现，它在存在自定义设置时使用发送回用户的 cookie，否则使用默认主题。
+ * 这对于没有用户会话的无状态应用程序特别有用。
  *
- * <p>Custom controllers can thus override the user's theme by calling
- * {@code setThemeName}, e.g. responding to a certain theme change request.
+ * <p>自定义控制器可以通过调用 {@code setThemeName} 来覆盖用户的主题，
+ * 例如，响应某个主题更改请求。
  *
  * @author Jean-Pierre Pawlak
  * @author Juergen Hoeller
- * @since 17.06.2003
  * @see #setThemeName
+ * @since 17.06.2003
  */
 public class CookieThemeResolver extends CookieGenerator implements ThemeResolver {
 
 	/**
-	 * The default theme name used if no alternative is provided.
+	 * 如果没有提供备选方案，则使用的默认主题名称。
 	 */
 	public static final String ORIGINAL_DEFAULT_THEME_NAME = "theme";
 
 	/**
-	 * Name of the request attribute that holds the theme name. Only used
-	 * for overriding a cookie value if the theme has been changed in the
-	 * course of the current request! Use RequestContext.getTheme() to
-	 * retrieve the current theme in controllers or views.
+	 * 存储主题名称的请求属性的名称。
+	 * 仅在当前请求过程中更改主题时用于覆盖 cookie 值！
+	 * 使用 RequestContext.getTheme() 在控制器或视图中检索当前主题。
+	 *
 	 * @see org.springframework.web.servlet.support.RequestContext#getTheme
 	 */
 	public static final String THEME_REQUEST_ATTRIBUTE_NAME = CookieThemeResolver.class.getName() + ".THEME";
 
 	/**
-	 * The default name of the cookie that holds the theme name.
+	 * 持有主题名称的 cookie 的默认名称。
 	 */
 	public static final String DEFAULT_COOKIE_NAME = CookieThemeResolver.class.getName() + ".THEME";
 
-
+	/**
+	 * 默认主题名称
+	 */
 	private String defaultThemeName = ORIGINAL_DEFAULT_THEME_NAME;
 
 
@@ -71,14 +72,14 @@ public class CookieThemeResolver extends CookieGenerator implements ThemeResolve
 
 
 	/**
-	 * Set the name of the default theme.
+	 * 设置默认主题的名称。
 	 */
 	public void setDefaultThemeName(String defaultThemeName) {
 		this.defaultThemeName = defaultThemeName;
 	}
 
 	/**
-	 * Return the name of the default theme.
+	 * 返回默认主题的名称。
 	 */
 	public String getDefaultThemeName() {
 		return this.defaultThemeName;
@@ -87,26 +88,30 @@ public class CookieThemeResolver extends CookieGenerator implements ThemeResolve
 
 	@Override
 	public String resolveThemeName(HttpServletRequest request) {
-		// Check request for preparsed or preset theme.
+		// 检查请求以获取预解析或预设置的主题。
 		String themeName = (String) request.getAttribute(THEME_REQUEST_ATTRIBUTE_NAME);
 		if (themeName != null) {
 			return themeName;
 		}
 
-		// Retrieve cookie value from request.
+		// 从请求中检索 cookie 值。
 		String cookieName = getCookieName();
 		if (cookieName != null) {
+			// 获取 cookie 值
 			Cookie cookie = WebUtils.getCookie(request, cookieName);
 			if (cookie != null) {
+				// 获取值
 				String value = cookie.getValue();
 				if (StringUtils.hasText(value)) {
+					// 如果值不为空，将其设置为主题名称
 					themeName = value;
 				}
 			}
 		}
 
-		// Fall back to default theme.
+		// 回退到默认主题。
 		if (themeName == null) {
+			// 如果主题名称为空，则设置为默认主题名称
 			themeName = getDefaultThemeName();
 		}
 		request.setAttribute(THEME_REQUEST_ATTRIBUTE_NAME, themeName);
@@ -120,12 +125,11 @@ public class CookieThemeResolver extends CookieGenerator implements ThemeResolve
 		Assert.notNull(response, "HttpServletResponse is required for CookieThemeResolver");
 
 		if (StringUtils.hasText(themeName)) {
-			// Set request attribute and add cookie.
+			// 设置请求属性并添加 cookie。
 			request.setAttribute(THEME_REQUEST_ATTRIBUTE_NAME, themeName);
 			addCookie(response, themeName);
-		}
-		else {
-			// Set request attribute to fallback theme and remove cookie.
+		} else {
+			// 设置请求属性为回退主题并删除 cookie。
 			request.setAttribute(THEME_REQUEST_ATTRIBUTE_NAME, getDefaultThemeName());
 			removeCookie(response);
 		}

@@ -16,38 +16,47 @@
 
 package org.springframework.web.servlet;
 
+import org.springframework.http.HttpHeaders;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.http.HttpHeaders;
-
 /**
- * By default when the DispatcherServlet can't find a handler for a request it
- * sends a 404 response. However if its property "throwExceptionIfNoHandlerFound"
- * is set to {@code true} this exception is raised and may be handled with
- * a configured HandlerExceptionResolver.
+ * 默认情况下，当 DispatcherServlet 找不到请求的处理程序时，它会发送一个 404 响应。
+ * 但是，如果它的属性 "throwExceptionIfNoHandlerFound" 设置为 {@code true}，则会引发此异常，
+ * 并可以使用配置的 HandlerExceptionResolver 进行处理。
  *
  * @author Brian Clozel
- * @since 4.0
  * @see DispatcherServlet#setThrowExceptionIfNoHandlerFound(boolean)
  * @see DispatcherServlet#noHandlerFound(HttpServletRequest, HttpServletResponse)
+ * @since 4.0
  */
 @SuppressWarnings("serial")
 public class NoHandlerFoundException extends ServletException {
 
+	/**
+	 * HTTP方法
+	 */
 	private final String httpMethod;
 
+	/**
+	 * 请求URL
+	 */
 	private final String requestURL;
 
+	/**
+	 * 请求头
+	 */
 	private final HttpHeaders headers;
 
 
 	/**
-	 * Constructor for NoHandlerFoundException.
-	 * @param httpMethod the HTTP method
-	 * @param requestURL the HTTP request URL
-	 * @param headers the HTTP request headers
+	 * NoHandlerFoundException 的构造函数。
+	 *
+	 * @param httpMethod HTTP 方法
+	 * @param requestURL HTTP 请求的 URL
+	 * @param headers    HTTP 请求头
 	 */
 	public NoHandlerFoundException(String httpMethod, String requestURL, HttpHeaders headers) {
 		super("No handler found for " + httpMethod + " " + requestURL);

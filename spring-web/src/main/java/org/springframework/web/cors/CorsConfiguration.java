@@ -16,23 +16,17 @@
 
 package org.springframework.web.cors;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.time.Duration;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A container for CORS configuration along with methods to check against the
@@ -380,8 +374,10 @@ public class CorsConfiguration {
 	}
 
 	/**
-	 * Whether user credentials are supported.
-	 * <p>By default this is not set (i.e. user credentials are not supported).
+	 * 是否支持用户凭证。
+	 * <p>默认情况下，此项未设置（即不支持用户凭证）。
+	 *
+	 * @param allowCredentials 是否允许用户凭证
 	 */
 	public void setAllowCredentials(@Nullable Boolean allowCredentials) {
 		this.allowCredentials = allowCredentials;

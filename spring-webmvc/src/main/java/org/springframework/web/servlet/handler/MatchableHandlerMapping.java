@@ -16,16 +16,14 @@
 
 package org.springframework.web.servlet.handler;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * Additional interface that a {@link HandlerMapping} can implement to expose
- * a request matching API aligned with its internal request matching
- * configuration and implementation.
+ * {@link HandlerMapping} 可以实现的附加接口，以公开与其内部请求匹配配置和实现对齐的请求匹配 API。
  *
  * @author Rossen Stoyanchev
  * @since 4.3.1
@@ -34,8 +32,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 public interface MatchableHandlerMapping extends HandlerMapping {
 
 	/**
-	 * Return the parser of this {@code HandlerMapping}, if configured in which
-	 * case pre-parsed patterns are used.
+	 * 返回此 {@code HandlerMapping} 的解析器，如果已配置，则使用预解析的模式。
 	 * @since 5.3
 	 */
 	@Nullable
@@ -44,12 +41,11 @@ public interface MatchableHandlerMapping extends HandlerMapping {
 	}
 
 	/**
-	 * Determine whether the request matches the given pattern. Use this method
-	 * when {@link #getPatternParser()} returns {@code null} which means that the
-	 * {@code HandlerMapping} is using String pattern matching.
-	 * @param request the current request
-	 * @param pattern the pattern to match
-	 * @return the result from request matching, or {@code null} if none
+	 * 确定请求是否与给定模式匹配。当 {@link #getPatternParser()} 返回 {@code null} 时使用此方法，
+	 * 这意味着 {@code HandlerMapping} 正在使用字符串模式匹配。
+	 * @param request 当前请求
+	 * @param pattern 要匹配的模式
+	 * @return 请求匹配的结果，如果没有则返回 {@code null}
 	 */
 	@Nullable
 	RequestMatchResult match(HttpServletRequest request, String pattern);
