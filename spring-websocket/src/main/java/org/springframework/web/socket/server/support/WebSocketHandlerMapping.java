@@ -16,9 +16,6 @@
 
 package org.springframework.web.socket.server.support;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.context.Lifecycle;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.http.HttpHeaders;
@@ -27,30 +24,35 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * Extension of {@link SimpleUrlHandlerMapping} with support for more
- * precise mapping of WebSocket handshake requests to handlers of type
- * {@link WebSocketHttpRequestHandler}. Also delegates {@link Lifecycle}
- * methods to handlers in the {@link #getUrlMap()} that implement it.
+ * {@link SimpleUrlHandlerMapping} 的扩展，支持将 WebSocket 握手请求更精确地映射到 {@link WebSocketHttpRequestHandler} 类型的处理器。
+ * 还将 {@link Lifecycle} 方法委托给 {@link #getUrlMap()} 中实现它的处理器。
  *
  * @author Rossen Stoyanchev
  * @since 4.2
  */
 public class WebSocketHandlerMapping extends SimpleUrlHandlerMapping implements SmartLifecycle {
 
+	/**
+	 * 是否匹配升级WebSocket
+	 */
 	private boolean webSocketUpgradeMatch;
 
+	/**
+	 * 是否在运行中
+	 */
 	private volatile boolean running;
 
 
 	/**
-	 * When this is set, if the matched handler is
-	 * {@link WebSocketHttpRequestHandler}, ensure the request is a WebSocket
-	 * handshake, i.e. HTTP GET with the header {@code "Upgrade:websocket"},
-	 * or otherwise suppress the match and return {@code null} allowing another
-	 * {@link org.springframework.web.servlet.HandlerMapping} to match for the
-	 * same URL path.
-	 * @param match whether to enable matching on {@code "Upgrade: websocket"}
+	 * 当设置了此标志时，如果匹配的处理器是 {@link WebSocketHttpRequestHandler}，
+	 * 确保请求是 WebSocket 握手，即使用带有头部 {@code "Upgrade:websocket"} 的 HTTP GET 请求，
+	 * 否则抑制匹配并返回 {@code null}，允许另一个 {@link org.springframework.web.servlet.HandlerMapping} 来匹配相同的 URL 路径。
+	 *
+	 * @param match 是否启用 {@code "Upgrade: websocket"} 匹配
 	 * @since 5.3.5
 	 */
 	public void setWebSocketUpgradeMatch(boolean match) {
@@ -62,6 +64,7 @@ public class WebSocketHandlerMapping extends SimpleUrlHandlerMapping implements 
 	protected void initServletContext(ServletContext servletContext) {
 		for (Object handler : getUrlMap().values()) {
 			if (handler instanceof ServletContextAware) {
+				// 如果处理器是 ServletContextAware 子类，则设置Servlet上下文
 				((ServletContextAware) handler).setServletContext(servletContext);
 			}
 		}
@@ -74,6 +77,7 @@ public class WebSocketHandlerMapping extends SimpleUrlHandlerMapping implements 
 			this.running = true;
 			for (Object handler : getUrlMap().values()) {
 				if (handler instanceof Lifecycle) {
+					// 如果处理器是 Lifecycle 子类，则启动生命周期
 					((Lifecycle) handler).start();
 				}
 			}
@@ -86,6 +90,7 @@ public class WebSocketHandlerMapping extends SimpleUrlHandlerMapping implements 
 			this.running = false;
 			for (Object handler : getUrlMap().values()) {
 				if (handler instanceof Lifecycle) {
+					// 如果处理器是 Lifecycle 子类，则关闭生命周期
 					((Lifecycle) handler).stop();
 				}
 			}
@@ -101,18 +106,27 @@ public class WebSocketHandlerMapping extends SimpleUrlHandlerMapping implements 
 	@Override
 	@Nullable
 	protected Object getHandlerInternal(HttpServletRequest request) throws Exception {
+		// 获取内部处理器
 		Object handler = super.getHandlerInternal(request);
+		// 如果匹配升级WebSocket，则返回处理器，否则返回null
 		return (matchWebSocketUpgrade(handler, request) ? handler : null);
 	}
 
 	private boolean matchWebSocketUpgrade(@Nullable Object handler, HttpServletRequest request) {
+		// 如果处理器是 HandlerExecutionChain 实例，则获取内部处理器
 		handler = (handler instanceof HandlerExecutionChain ?
 				((HandlerExecutionChain) handler).getHandler() : handler);
+
+		// 如果启用了 WebSocket 升级匹配，并且处理器是 WebSocketHttpRequestHandler，则检查请求是否是 WebSocket 升级请求
 		if (this.webSocketUpgradeMatch && handler instanceof WebSocketHttpRequestHandler) {
+			// 获取请求头中的升级属性
 			String header = request.getHeader(HttpHeaders.UPGRADE);
+			// 如果是Get方法，并且升级为websocket，则返回true
 			return (request.getMethod().equals("GET") &&
 					header != null && header.equalsIgnoreCase("websocket"));
 		}
+
+		// 默认情况下返回 true
 		return true;
 	}
 

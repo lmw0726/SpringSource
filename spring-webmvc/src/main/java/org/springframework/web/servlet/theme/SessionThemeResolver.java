@@ -16,34 +16,29 @@
 
 package org.springframework.web.servlet.theme;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
- * {@link org.springframework.web.servlet.ThemeResolver} implementation that
- * uses a theme attribute in the user's session in case of a custom setting,
- * with a fallback to the default theme. This is most appropriate if the
- * application needs user sessions anyway.
+ * {@link org.springframework.web.servlet.ThemeResolver} 实现，如果有自定义设置，则使用用户会话中的主题属性，否则回退到默认主题。如果应用程序需要用户会话，这是最合适的。
  *
- * <p>Custom controllers can override the user's theme by calling
- * {@code setThemeName}, e.g. responding to a theme change request.
+ * <p>自定义控制器可以通过调用 {@code setThemeName} 来覆盖用户的主题，例如响应主题更改请求。
  *
  * @author Jean-Pierre Pawlak
  * @author Juergen Hoeller
- * @since 17.06.2003
  * @see #setThemeName
+ * @since 17.06.2003
  */
 public class SessionThemeResolver extends AbstractThemeResolver {
 
 	/**
-	 * Name of the session attribute that holds the theme name.
-	 * Only used internally by this implementation.
-	 * Use {@code RequestContext(Utils).getTheme()}
-	 * to retrieve the current theme in controllers or views.
+	 * 保存主题名称的会话属性的名称。只在此实现中内部使用。
+	 * 使用 {@code RequestContext(Utils).getTheme()} 在控制器或视图中检索当前主题。
+	 *
 	 * @see org.springframework.web.servlet.support.RequestContext#getTheme
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#getTheme
 	 */
@@ -53,14 +48,14 @@ public class SessionThemeResolver extends AbstractThemeResolver {
 	@Override
 	public String resolveThemeName(HttpServletRequest request) {
 		String themeName = (String) WebUtils.getSessionAttribute(request, THEME_SESSION_ATTRIBUTE_NAME);
-		// A specific theme indicated, or do we need to fallback to the default?
+		// 指定了特定的主题，还是需要回退到默认主题？
 		return (themeName != null ? themeName : getDefaultThemeName());
 	}
 
 	@Override
 	public void setThemeName(
 			HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable String themeName) {
-
+		// 设置 Session 中的主题名称
 		WebUtils.setSessionAttribute(request, THEME_SESSION_ATTRIBUTE_NAME,
 				(StringUtils.hasText(themeName) ? themeName : null));
 	}

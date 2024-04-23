@@ -16,33 +16,26 @@
 
 package org.springframework.web.servlet.view;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.RequestToViewNameTranslator;
 import org.springframework.web.util.ServletRequestPathUtils;
 import org.springframework.web.util.UrlPathHelper;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * {@link RequestToViewNameTranslator} that simply transforms the URI of
- * the incoming request into a view name.
+ * {@link RequestToViewNameTranslator} 实现，简单地将传入请求的 URI 转换为视图名称。
  *
- * <p>Can be explicitly defined as the {@code viewNameTranslator} bean in a
- * {@link org.springframework.web.servlet.DispatcherServlet} context.
- * Otherwise, a plain default instance will be used.
+ * <p>可以在 {@link org.springframework.web.servlet.DispatcherServlet} 上下文中显式定义为 {@code viewNameTranslator} bean。
+ * 否则，将使用普通的默认实例。
  *
- * <p>The default transformation simply strips leading and trailing slashes
- * as well as the file extension of the URI, and returns the result as the
- * view name with the configured {@link #setPrefix prefix} and a
- * {@link #setSuffix suffix} added as appropriate.
+ * <p>默认转换简单地删除 URI 的前导和尾随斜杠以及文件扩展名，并将结果作为视图名称返回，添加了配置的 {@link #setPrefix prefix} 和 {@link #setSuffix suffix}。
  *
- * <p>The stripping of the leading slash and file extension can be disabled
- * using the {@link #setStripLeadingSlash stripLeadingSlash} and
- * {@link #setStripExtension stripExtension} properties, respectively.
+ * <p>可以使用 {@link #setStripLeadingSlash stripLeadingSlash} 和 {@link #setStripExtension stripExtension} 属性分别禁用前导斜杠和文件扩展名的删除。
  *
- * <p>Find below some examples of request to view name translation.
+ * <p>以下是一些请求到视图名称转换的示例。
  * <ul>
  * <li>{@code http://localhost:8080/gamecast/display.html} &raquo; {@code display}</li>
  * <li>{@code http://localhost:8080/gamecast/displayShoppingCart.html} &raquo; {@code displayShoppingCart}</li>
@@ -57,108 +50,98 @@ import org.springframework.web.util.UrlPathHelper;
  */
 public class DefaultRequestToViewNameTranslator implements RequestToViewNameTranslator {
 
+	/**
+	 * 斜杠
+	 */
 	private static final String SLASH = "/";
 
-
+	/**
+	 * 前缀
+	 */
 	private String prefix = "";
 
+	/**
+	 * 后缀
+	 */
 	private String suffix = "";
 
+	/**
+	 * 分割字符
+	 */
 	private String separator = SLASH;
 
+	/**
+	 * 是否删除 URI 中的前导斜杠
+	 */
 	private boolean stripLeadingSlash = true;
 
+	/**
+	 * 是否删除 URI 中的尾随斜杠。
+	 */
 	private boolean stripTrailingSlash = true;
 
+	/**
+	 * 是否从 URI 中删除文件扩展名。
+	 */
 	private boolean stripExtension = true;
 
 
 	/**
-	 * Set the prefix to prepend to generated view names.
-	 * @param prefix the prefix to prepend to generated view names
+	 * 设置要添加到生成的视图名称前面的前缀。
+	 * @param prefix 要添加到生成的视图名称前面的前缀
 	 */
 	public void setPrefix(@Nullable String prefix) {
 		this.prefix = (prefix != null ? prefix : "");
 	}
 
 	/**
-	 * Set the suffix to append to generated view names.
-	 * @param suffix the suffix to append to generated view names
+	 * 设置要追加到生成的视图名称后面的后缀。
+	 * @param suffix 要追加到生成的视图名称后面的后缀
 	 */
 	public void setSuffix(@Nullable String suffix) {
 		this.suffix = (suffix != null ? suffix : "");
 	}
 
 	/**
-	 * Set the value that will replace '{@code /}' as the separator
-	 * in the view name. The default behavior simply leaves '{@code /}'
-	 * as the separator.
+	 * 设置作为视图名称中的分隔符的值。默认行为仅将 '{@code /}' 保留为分隔符。
 	 */
 	public void setSeparator(String separator) {
 		this.separator = separator;
 	}
 
 	/**
-	 * Set whether or not leading slashes should be stripped from the URI when
-	 * generating the view name. Default is "true".
+	 * 设置在生成视图名称时是否应删除 URI 中的前导斜杠。默认为 "true"。
 	 */
 	public void setStripLeadingSlash(boolean stripLeadingSlash) {
 		this.stripLeadingSlash = stripLeadingSlash;
 	}
 
 	/**
-	 * Set whether or not trailing slashes should be stripped from the URI when
-	 * generating the view name. Default is "true".
+	 * 设置在生成视图名称时是否应删除 URI 中的尾随斜杠。默认为 "true"。
 	 */
 	public void setStripTrailingSlash(boolean stripTrailingSlash) {
 		this.stripTrailingSlash = stripTrailingSlash;
 	}
 
 	/**
-	 * Set whether or not file extensions should be stripped from the URI when
-	 * generating the view name. Default is "true".
+	 * 设置在生成视图名称时是否应从 URI 中删除文件扩展名。默认为 "true"。
 	 */
 	public void setStripExtension(boolean stripExtension) {
 		this.stripExtension = stripExtension;
 	}
 
 	/**
-	 * Shortcut to same property on underlying {@link #setUrlPathHelper UrlPathHelper}.
-	 * @see org.springframework.web.util.UrlPathHelper#setAlwaysUseFullPath
-	 * @deprecated as of 5.3, the path is resolved externally and obtained with
-	 * {@link ServletRequestPathUtils#getCachedPathValue(ServletRequest)}
-	 */
-	@Deprecated
-	public void setAlwaysUseFullPath(boolean alwaysUseFullPath) {
-	}
-
-	/**
-	 * Shortcut to same property on underlying {@link #setUrlPathHelper UrlPathHelper}.
-	 * @see org.springframework.web.util.UrlPathHelper#setUrlDecode
-	 * @deprecated as of 5.3, the path is resolved externally and obtained with
-	 * {@link ServletRequestPathUtils#getCachedPathValue(ServletRequest)}
-	 */
-	@Deprecated
-	public void setUrlDecode(boolean urlDecode) {
-	}
-
-	/**
-	 * Set if ";" (semicolon) content should be stripped from the request URI.
-	 * @see org.springframework.web.util.UrlPathHelper#setRemoveSemicolonContent(boolean)
-	 * @deprecated as of 5.3, the path is resolved externally and obtained with
-	 * {@link ServletRequestPathUtils#getCachedPathValue(ServletRequest)}
+	 * 将 ";"（分号）内容从请求 URI 中删除的设置。
+	 * @deprecated 自 5.3 开始，路径在外部解析，并使用 {@link ServletRequestPathUtils#getCachedPathValue(ServletRequest)} 获取
 	 */
 	@Deprecated
 	public void setRemoveSemicolonContent(boolean removeSemicolonContent) {
 	}
 
 	/**
-	 * Set the {@link org.springframework.web.util.UrlPathHelper} to use for
-	 * the resolution of lookup paths.
-	 * <p>Use this to override the default UrlPathHelper with a custom subclass,
-	 * or to share common UrlPathHelper settings across multiple web components.
-	 * @deprecated as of 5.3, the path is resolved externally and obtained with
-	 * {@link ServletRequestPathUtils#getCachedPathValue(ServletRequest)}
+	 * 设置用于查找路径解析的 {@link org.springframework.web.util.UrlPathHelper}。
+	 * <p>使用此方法来使用自定义子类覆盖默认的 UrlPathHelper，或者在多个 Web 组件之间共享通用的 UrlPathHelper 设置。
+	 * @deprecated 自 5.3 开始，路径在外部解析，并使用 {@link ServletRequestPathUtils#getCachedPathValue(ServletRequest)} 获取
 	 */
 	@Deprecated
 	public void setUrlPathHelper(UrlPathHelper urlPathHelper) {
@@ -166,42 +149,48 @@ public class DefaultRequestToViewNameTranslator implements RequestToViewNameTran
 
 
 	/**
-	 * Translates the request URI of the incoming {@link HttpServletRequest}
-	 * into the view name based on the configured parameters.
-	 * @throws IllegalArgumentException if neither a parsed RequestPath, nor a
-	 * String lookupPath have been resolved and cached as a request attribute.
+	 * 根据配置的参数将传入 {@link HttpServletRequest} 的请求 URI 转换为视图名称。
+	 * @throws IllegalArgumentException 如果未解析和缓存请求属性中的解析的 RequestPath 或 String lookupPath，则抛出异常
 	 * @see ServletRequestPathUtils#getCachedPath(ServletRequest)
 	 * @see #transformPath
 	 */
 	@Override
 	public String getViewName(HttpServletRequest request) {
+		// 获取缓存的路径
 		String path = ServletRequestPathUtils.getCachedPathValue(request);
 		return (this.prefix + transformPath(path) + this.suffix);
 	}
 
 	/**
-	 * Transform the request URI (in the context of the webapp) stripping
-	 * slashes and extensions, and replacing the separator as required.
-	 * @param lookupPath the lookup path for the current request,
-	 * as determined by the UrlPathHelper
-	 * @return the transformed path, with slashes and extensions stripped
-	 * if desired
+	 * 转换请求 URI（在 webapp 上下文中）去掉斜杠和扩展名，并根据需要替换分隔符。
+	 * @param lookupPath 当前请求的查找路径，由 UrlPathHelper 确定
+	 * @return 转换后的路径，去掉了斜杠和扩展名（如果需要）
 	 */
 	@Nullable
 	protected String transformPath(String lookupPath) {
+		// 将 lookupPath 赋值给 path
 		String path = lookupPath;
+		// 如果 stripLeadingSlash 为 true 并且 path 以斜杠开头
 		if (this.stripLeadingSlash && path.startsWith(SLASH)) {
+			// 去掉开头的斜杠
 			path = path.substring(1);
 		}
+		// 如果 stripTrailingSlash 为 true 并且 path 以斜杠结尾
 		if (this.stripTrailingSlash && path.endsWith(SLASH)) {
+			// 去掉结尾的斜杠
 			path = path.substring(0, path.length() - 1);
 		}
+		// 如果 stripExtension 为 true
 		if (this.stripExtension) {
+			// 去掉文件扩展名
 			path = StringUtils.stripFilenameExtension(path);
 		}
+		// 如果 separator 不是斜杠
 		if (!SLASH.equals(this.separator)) {
+			// 替换斜杠为指定的分隔符
 			path = StringUtils.replace(path, SLASH, this.separator);
 		}
+		// 返回处理后的路径
 		return path;
 	}
 
