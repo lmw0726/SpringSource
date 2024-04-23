@@ -16,18 +16,8 @@
 
 package org.springframework.web.servlet.support;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -37,8 +27,16 @@ import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.FlashMapManager;
 import org.springframework.web.util.UrlPathHelper;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 /**
- * A base class for {@link FlashMapManager} implementations.
+ * {@link FlashMapManager}实现的基类。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -58,23 +56,22 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 
 
 	/**
-	 * Set the amount of time in seconds after a {@link FlashMap} is saved
-	 * (at request completion) and before it expires.
-	 * <p>The default value is 180 seconds.
+	 * 设置FlashMap保存后（在请求完成时）到期之前的时间（以秒为单位）。
+	 * <p>默认值为180秒。
 	 */
 	public void setFlashMapTimeout(int flashMapTimeout) {
 		this.flashMapTimeout = flashMapTimeout;
 	}
 
 	/**
-	 * Return the amount of time in seconds before a FlashMap expires.
+	 * 返回FlashMap到期之前的时间量（以秒为单位）。
 	 */
 	public int getFlashMapTimeout() {
 		return this.flashMapTimeout;
 	}
 
 	/**
-	 * Set the UrlPathHelper to use to match FlashMap instances to requests.
+	 * 设置要用于将FlashMap实例与请求进行匹配的UrlPathHelper。
 	 */
 	public void setUrlPathHelper(UrlPathHelper urlPathHelper) {
 		Assert.notNull(urlPathHelper, "UrlPathHelper must not be null");
@@ -82,7 +79,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 	/**
-	 * Return the UrlPathHelper implementation to use.
+	 * 返回要使用的UrlPathHelper实现。
 	 */
 	public UrlPathHelper getUrlPathHelper() {
 		return this.urlPathHelper;
@@ -113,8 +110,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 						updateFlashMaps(allFlashMaps, request, response);
 					}
 				}
-			}
-			else {
+			} else {
 				allFlashMaps.removeAll(mapsToRemove);
 				updateFlashMaps(allFlashMaps, request, response);
 			}
@@ -124,7 +120,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 	/**
-	 * Return a list of expired FlashMap instances contained in the given list.
+	 * 返回给定列表中包含的已过期FlashMap实例的列表。
 	 */
 	private List<FlashMap> getExpiredFlashMaps(List<FlashMap> allMaps) {
 		List<FlashMap> result = new ArrayList<>();
@@ -137,8 +133,9 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 	/**
-	 * Return a FlashMap contained in the given list that matches the request.
-	 * @return a matching FlashMap or {@code null}
+	 * 返回给定列表中包含的与请求匹配的FlashMap。
+	 *
+	 * @return 匹配的FlashMap或{@code null}
 	 */
 	@Nullable
 	private FlashMap getMatchingFlashMap(List<FlashMap> allMaps, HttpServletRequest request) {
@@ -159,8 +156,8 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 	/**
-	 * Whether the given FlashMap matches the current request.
-	 * Uses the expected request path and query parameters saved in the FlashMap.
+	 * 指定的FlashMap是否与当前请求匹配。
+	 * 使用FlashMap中保存的预期请求路径和查询参数。
 	 */
 	protected boolean isFlashMapForRequest(FlashMap flashMap, HttpServletRequest request) {
 		String expectedPath = flashMap.getTargetRequestPath();
@@ -210,8 +207,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 				allFlashMaps.add(flashMap);
 				updateFlashMaps(allFlashMaps, request, response);
 			}
-		}
-		else {
+		} else {
 			List<FlashMap> allFlashMaps = retrieveFlashMaps(request);
 			allFlashMaps = (allFlashMaps != null ? allFlashMaps : new ArrayList<>(1));
 			allFlashMaps.add(flashMap);
@@ -233,30 +229,31 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 	/**
-	 * Retrieve saved FlashMap instances from the underlying storage.
-	 * @param request the current request
-	 * @return a List with FlashMap instances, or {@code null} if none found
+	 * 从底层存储中检索已保存的FlashMap实例。
+	 *
+	 * @param request 当前请求
+	 * @return 包含FlashMap实例的列表，如果没有找到则返回{@code null}
 	 */
 	@Nullable
 	protected abstract List<FlashMap> retrieveFlashMaps(HttpServletRequest request);
 
 	/**
-	 * Update the FlashMap instances in the underlying storage.
-	 * @param flashMaps a (potentially empty) list of FlashMap instances to save
-	 * @param request the current request
-	 * @param response the current response
+	 * 更新底层存储中的FlashMap实例。
+	 *
+	 * @param flashMaps 要保存的（可能为空的）FlashMap实例列表
+	 * @param request   当前请求
+	 * @param response  当前响应
 	 */
 	protected abstract void updateFlashMaps(
 			List<FlashMap> flashMaps, HttpServletRequest request, HttpServletResponse response);
 
 	/**
-	 * Obtain a mutex for modifying the FlashMap List as handled by
-	 * {@link #retrieveFlashMaps} and {@link #updateFlashMaps},
-	 * <p>The default implementation returns a shared static mutex.
-	 * Subclasses are encouraged to return a more specific mutex, or
-	 * {@code null} to indicate that no synchronization is necessary.
-	 * @param request the current request
-	 * @return the mutex to use (may be {@code null} if none applicable)
+	 * 获取用于修改由{@link #retrieveFlashMaps}和{@link #updateFlashMaps}处理的FlashMap列表的互斥锁。
+	 * <p>默认实现返回一个共享的静态互斥锁。
+	 * 鼓励子类返回一个更具体的互斥锁，或者返回{@code null}以指示不需要同步。
+	 *
+	 * @param request 当前请求
+	 * @return 要使用的互斥锁（如果没有适用的则可能为{@code null}）
 	 * @since 4.0.3
 	 */
 	@Nullable

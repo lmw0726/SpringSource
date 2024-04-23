@@ -16,30 +16,31 @@
 
 package org.springframework.web.servlet.support;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.List;
+
 /**
- * Store and retrieve {@link FlashMap} instances to and from the HTTP session.
+ * 将{@link FlashMap}实例存储到HTTP会话中，并从中检索。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @since 3.1.1
  */
 public class SessionFlashMapManager extends AbstractFlashMapManager {
-
+	/**
+	 * Flash映射会话属性
+	 */
 	private static final String FLASH_MAPS_SESSION_ATTRIBUTE = SessionFlashMapManager.class.getName() + ".FLASH_MAPS";
 
 
 	/**
-	 * Retrieves saved FlashMap instances from the HTTP session, if any.
+	 * 从HTTP会话中检索保存的FlashMap实例（如果有）。
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -50,7 +51,7 @@ public class SessionFlashMapManager extends AbstractFlashMapManager {
 	}
 
 	/**
-	 * Saves the given FlashMap instances in the HTTP session.
+	 * 将给定的FlashMap实例保存在HTTP会话中。
 	 */
 	@Override
 	protected void updateFlashMaps(List<FlashMap> flashMaps, HttpServletRequest request, HttpServletResponse response) {
@@ -58,7 +59,8 @@ public class SessionFlashMapManager extends AbstractFlashMapManager {
 	}
 
 	/**
-	 * Exposes the best available session mutex.
+	 * 公开最佳可用会话互斥体。
+	 *
 	 * @see org.springframework.web.util.WebUtils#getSessionMutex
 	 * @see org.springframework.web.util.HttpSessionMutexListener
 	 */
