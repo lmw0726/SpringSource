@@ -46,7 +46,9 @@ public class SessionFlashMapManager extends AbstractFlashMapManager {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	protected List<FlashMap> retrieveFlashMaps(HttpServletRequest request) {
+		// 获取当前请求的 HttpSession，如果不存在则返回 null
 		HttpSession session = request.getSession(false);
+		// 如果 HttpSession 存在，则尝试获取其中的 FlashMap 列表
 		return (session != null ? (List<FlashMap>) session.getAttribute(FLASH_MAPS_SESSION_ATTRIBUTE) : null);
 	}
 
@@ -55,6 +57,8 @@ public class SessionFlashMapManager extends AbstractFlashMapManager {
 	 */
 	@Override
 	protected void updateFlashMaps(List<FlashMap> flashMaps, HttpServletRequest request, HttpServletResponse response) {
+		// 如果 flashMaps 不为空，则将其设置为请求的 HttpSession 属性 FLASH_MAPS_SESSION_ATTRIBUTE
+		// 如果 flashMaps 为空，则将 FLASH_MAPS_SESSION_ATTRIBUTE 属性从 HttpSession 中移除
 		WebUtils.setSessionAttribute(request, FLASH_MAPS_SESSION_ATTRIBUTE, (!flashMaps.isEmpty() ? flashMaps : null));
 	}
 
@@ -66,6 +70,7 @@ public class SessionFlashMapManager extends AbstractFlashMapManager {
 	 */
 	@Override
 	protected Object getFlashMapsMutex(HttpServletRequest request) {
+		// 获取与给定 HttpSession 相关联的会话互斥对象（session mutex）
 		return WebUtils.getSessionMutex(request.getSession());
 	}
 

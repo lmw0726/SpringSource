@@ -45,13 +45,24 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class AbstractFlashMapManager implements FlashMapManager {
 
+	/**
+	 * 默认的闪存映射互斥对象
+	 */
 	private static final Object DEFAULT_FLASH_MAPS_MUTEX = new Object();
 
-
+	/**
+	 * 日志记录器
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 闪存映射过期时间，单位为秒，默认为180秒
+	 */
 	private int flashMapTimeout = 180;
 
+	/**
+	 * URL路径助手
+	 */
 	private UrlPathHelper urlPathHelper = UrlPathHelper.defaultInstance;
 
 
@@ -89,29 +100,40 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	@Override
 	@Nullable
 	public final FlashMap retrieveAndUpdate(HttpServletRequest request, HttpServletResponse response) {
+		// 检索请求中的所有 FlashMap
 		List<FlashMap> allFlashMaps = retrieveFlashMaps(request);
 		if (CollectionUtils.isEmpty(allFlashMaps)) {
+			// 如果 FlashMap 为空，返回 null
 			return null;
 		}
 
+		// 获取过期的 FlashMap
 		List<FlashMap> mapsToRemove = getExpiredFlashMaps(allFlashMaps);
+		// 获取与当前请求匹配的 FlashMap
 		FlashMap match = getMatchingFlashMap(allFlashMaps, request);
 		if (match != null) {
+			// 如果找到匹配的 FlashMap，将其添加到需要移除的 FlashMap 列表中
 			mapsToRemove.add(match);
 		}
 
 		if (!mapsToRemove.isEmpty()) {
+			// 如果有 FlashMap 需要移除
 			Object mutex = getFlashMapsMutex(request);
 			if (mutex != null) {
+				// 使用互斥锁进行同步
 				synchronized (mutex) {
+					// 重新检索 FlashMap，并移除需要移除的 FlashMap
 					allFlashMaps = retrieveFlashMaps(request);
 					if (allFlashMaps != null) {
 						allFlashMaps.removeAll(mapsToRemove);
+						// 更新 FlashMap
 						updateFlashMaps(allFlashMaps, request, response);
 					}
 				}
 			} else {
+				// 如果没有互斥锁，直接移除 FlashMap
 				allFlashMaps.removeAll(mapsToRemove);
+				// 更新 FlashMap
 				updateFlashMaps(allFlashMaps, request, response);
 			}
 		}
@@ -124,8 +146,10 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	 */
 	private List<FlashMap> getExpiredFlashMaps(List<FlashMap> allMaps) {
 		List<FlashMap> result = new ArrayList<>();
+		// 遍历所有的闪存映射
 		for (FlashMap map : allMaps) {
 			if (map.isExpired()) {
+				// 如果闪存映射是过期的，则添加到结果集中
 				result.add(map);
 			}
 		}
@@ -139,19 +163,26 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	 */
 	@Nullable
 	private FlashMap getMatchingFlashMap(List<FlashMap> allMaps, HttpServletRequest request) {
+		// 创建一个列表以存储匹配的 FlashMap
 		List<FlashMap> result = new ArrayList<>();
+		// 遍历所有 FlashMap
 		for (FlashMap flashMap : allMaps) {
+			// 检查 FlashMap 是否与当前请求匹配
 			if (isFlashMapForRequest(flashMap, request)) {
+				// 如果匹配，则将其添加到结果列表中
 				result.add(flashMap);
 			}
 		}
 		if (!result.isEmpty()) {
+			// 如果结果列表不为空，对其进行排序
 			Collections.sort(result);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Found " + result.get(0));
 			}
+			// 返回排序后的第一个 FlashMap
 			return result.get(0);
 		}
+		// 如果没有匹配的 FlashMap，则返回 null
 		return null;
 	}
 
@@ -191,26 +222,40 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	@Override
 	public final void saveOutputFlashMap(FlashMap flashMap, HttpServletRequest request, HttpServletResponse response) {
 		if (CollectionUtils.isEmpty(flashMap)) {
+			// 如果 FlashMap 为空，直接返回
 			return;
 		}
 
+		// 解码并规范化 FlashMap 的目标请求路径
 		String path = decodeAndNormalizePath(flashMap.getTargetRequestPath(), request);
+		// 设置目标路径
 		flashMap.setTargetRequestPath(path);
 
+		// 启动 FlashMap 的过期周期
 		flashMap.startExpirationPeriod(getFlashMapTimeout());
 
+		// 获取 FlashMap 的互斥锁对象
 		Object mutex = getFlashMapsMutex(request);
 		if (mutex != null) {
+			// 如果互斥锁对象不为空，则在互斥锁对象上同步操作
 			synchronized (mutex) {
+				// 获取当前请求的所有 FlashMap
 				List<FlashMap> allFlashMaps = retrieveFlashMaps(request);
+				// 如果当前请求的 FlashMap 为空，则创建一个新的 CopyOnWriteArrayList
 				allFlashMaps = (allFlashMaps != null ? allFlashMaps : new CopyOnWriteArrayList<>());
+				// 将新的 FlashMap 添加到所有 FlashMap 中
 				allFlashMaps.add(flashMap);
+				// 更新 FlashMap
 				updateFlashMaps(allFlashMaps, request, response);
 			}
 		} else {
+			// 如果互斥锁对象为空，则直接操作 FlashMap
 			List<FlashMap> allFlashMaps = retrieveFlashMaps(request);
+			// 如果当前请求的 FlashMap 为空，则创建一个新的 ArrayList
 			allFlashMaps = (allFlashMaps != null ? allFlashMaps : new ArrayList<>(1));
+			// 将新的 FlashMap 添加到所有 FlashMap 中
 			allFlashMaps.add(flashMap);
+			// 更新 FlashMap
 			updateFlashMaps(allFlashMaps, request, response);
 		}
 	}
@@ -218,9 +263,12 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	@Nullable
 	private String decodeAndNormalizePath(@Nullable String path, HttpServletRequest request) {
 		if (path != null && !path.isEmpty()) {
+			// 解码请求路径中的特殊字符
 			path = getUrlPathHelper().decodeRequestString(request, path);
 			if (path.charAt(0) != '/') {
+				// 如果路径不是以 '/' 开头，则获取请求的 URI
 				String requestUri = getUrlPathHelper().getRequestUri(request);
+				// 将路径添加到请求 URI 的最后一个 '/' 之后，并清理路径
 				path = requestUri.substring(0, requestUri.lastIndexOf('/') + 1) + path;
 				path = StringUtils.cleanPath(path);
 			}
