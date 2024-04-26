@@ -225,7 +225,7 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 				}
 			} else if (returnStatus / 100 == 3) {
 				// 如果状态码以 3 开头
-				String location = outputHeaders.getFirst("");
+				String location = outputHeaders.getFirst("location");
 				// 如果有重定向地址，则保存 闪存 属性
 				if (location != null) {
 					saveFlashAttributes(mavContainer, webRequest, location);
