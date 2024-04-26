@@ -29,56 +29,70 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Handler execution chain, consisting of handler object and any handler interceptors.
- * Returned by HandlerMapping's {@link HandlerMapping#getHandler} method.
+ * 处理程序执行链，包含处理程序对象和任何处理程序拦截器。
+ * HandlerMapping的{@link HandlerMapping#getHandler}方法返回。
  *
  * @author Juergen Hoeller
  * @see HandlerInterceptor
  * @since 20.06.2003
  */
 public class HandlerExecutionChain {
-
+	/**
+	 * 日志记录器
+	 */
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
+	/**
+	 * 要执行的处理器对象
+	 */
 	private final Object handler;
 
+	/**
+	 * 拦截器列表
+	 */
 	private final List<HandlerInterceptor> interceptorList = new ArrayList<>();
 
+	/**
+	 * 拦截器索引
+	 */
 	private int interceptorIndex = -1;
 
 
 	/**
-	 * Create a new HandlerExecutionChain.
+	 * 创建一个新的HandlerExecutionChain。
 	 *
-	 * @param handler the handler object to execute
+	 * @param handler 要执行的处理程序对象
 	 */
 	public HandlerExecutionChain(Object handler) {
 		this(handler, (HandlerInterceptor[]) null);
 	}
 
 	/**
-	 * Create a new HandlerExecutionChain.
+	 * 创建一个新的HandlerExecutionChain。
 	 *
-	 * @param handler      the handler object to execute
-	 * @param interceptors the array of interceptors to apply
-	 *                     (in the given order) before the handler itself executes
+	 * @param handler      要执行的处理程序对象
+	 * @param interceptors 要应用的拦截器数组
+	 *                     （按给定顺序）在处理程序自身执行之前
 	 */
 	public HandlerExecutionChain(Object handler, @Nullable HandlerInterceptor... interceptors) {
 		this(handler, (interceptors != null ? Arrays.asList(interceptors) : Collections.emptyList()));
 	}
 
 	/**
-	 * Create a new HandlerExecutionChain.
+	 * 创建一个新的HandlerExecutionChain。
 	 *
-	 * @param handler         the handler object to execute
-	 * @param interceptorList the list of interceptors to apply
-	 *                        (in the given order) before the handler itself executes
+	 * @param handler         要执行的处理程序对象
+	 * @param interceptorList 要应用的拦截器列表
+	 *                        （按给定顺序）在处理程序自身执行之前
 	 * @since 5.3
 	 */
 	public HandlerExecutionChain(Object handler, List<HandlerInterceptor> interceptorList) {
 		if (handler instanceof HandlerExecutionChain) {
+			// 如果是处理程序执行链器
 			HandlerExecutionChain originalChain = (HandlerExecutionChain) handler;
+			// 获取要执行的处理器对象
 			this.handler = originalChain.getHandler();
+			// 拷贝拦截器列表
 			this.interceptorList.addAll(originalChain.interceptorList);
 		} else {
 			this.handler = handler;
@@ -88,21 +102,21 @@ public class HandlerExecutionChain {
 
 
 	/**
-	 * Return the handler object to execute.
+	 * 返回要执行的处理器对象。
 	 */
 	public Object getHandler() {
 		return this.handler;
 	}
 
 	/**
-	 * Add the given interceptor to the end of this chain.
+	 * 将给定的拦截器添加到此链的末尾。
 	 */
 	public void addInterceptor(HandlerInterceptor interceptor) {
 		this.interceptorList.add(interceptor);
 	}
 
 	/**
-	 * Add the given interceptor at the specified index of this chain.
+	 * 将给定的拦截器添加到此链的指定索引处。
 	 *
 	 * @since 5.2
 	 */
@@ -111,16 +125,17 @@ public class HandlerExecutionChain {
 	}
 
 	/**
-	 * Add the given interceptors to the end of this chain.
+	 * 将给定的拦截器添加到此链的末尾。
 	 */
 	public void addInterceptors(HandlerInterceptor... interceptors) {
+		// 将给定的拦截器添加到此链的末尾
 		CollectionUtils.mergeArrayIntoCollection(interceptors, this.interceptorList);
 	}
 
 	/**
-	 * Return the array of interceptors to apply (in the given order).
+	 * 返回要应用的拦截器数组（按照给定的顺序）。
 	 *
-	 * @return the array of HandlerInterceptors instances (may be {@code null})
+	 * @return HandlerInterceptors实例的数组（可能为{@code null}）
 	 */
 	@Nullable
 	public HandlerInterceptor[] getInterceptors() {
@@ -128,12 +143,13 @@ public class HandlerExecutionChain {
 	}
 
 	/**
-	 * Return the list of interceptors to apply (in the given order).
+	 * 返回要应用的拦截器列表（按给定顺序）。
 	 *
-	 * @return the list of HandlerInterceptors instances (potentially empty)
+	 * @return 拦截器列表（可能为空）的HandlerInterceptors实例列表
 	 * @since 5.3
 	 */
 	public List<HandlerInterceptor> getInterceptorList() {
+		// 拦截器列表不是空的，则返回不可更改的集合对象，否则返回空集合
 		return (!this.interceptorList.isEmpty() ? Collections.unmodifiableList(this.interceptorList) :
 				Collections.emptyList());
 	}
@@ -162,13 +178,15 @@ public class HandlerExecutionChain {
 	}
 
 	/**
-	 * Apply postHandle methods of registered interceptors.
+	 * 应用注册拦截器的 postHandle 方法。
 	 */
 	void applyPostHandle(HttpServletRequest request, HttpServletResponse response, @Nullable ModelAndView mv)
 			throws Exception {
 
 		for (int i = this.interceptorList.size() - 1; i >= 0; i--) {
+			// 从后向前遍历拦截器列表
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
+			// 执行后置处理函数
 			interceptor.postHandle(request, response, this.handler, mv);
 		}
 	}
@@ -179,24 +197,29 @@ public class HandlerExecutionChain {
 	 */
 	void triggerAfterCompletion(HttpServletRequest request, HttpServletResponse response, @Nullable Exception ex) {
 		for (int i = this.interceptorIndex; i >= 0; i--) {
+			// 从后向前遍历拦截器
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
 			try {
+				// 执行完成时处理函数
 				interceptor.afterCompletion(request, response, this.handler, ex);
 			} catch (Throwable ex2) {
-				logger.error("HandlerInterceptor.afterCompletion抛出异常", ex2);
+				logger.error("HandlerInterceptor.afterCompletion threw exception", ex2);
 			}
 		}
 	}
 
 	/**
-	 * Apply afterConcurrentHandlerStarted callback on mapped AsyncHandlerInterceptors.
+	 * 对映射的 AsyncHandlerInterceptor 应用 afterConcurrentHandlerStarted 回调。
 	 */
 	void applyAfterConcurrentHandlingStarted(HttpServletRequest request, HttpServletResponse response) {
 		for (int i = this.interceptorList.size() - 1; i >= 0; i--) {
+			// 从后向前遍历拦截器
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
 			if (interceptor instanceof AsyncHandlerInterceptor) {
+				// 如果是异步处理拦截器
 				try {
 					AsyncHandlerInterceptor asyncInterceptor = (AsyncHandlerInterceptor) interceptor;
+					// 调用异步拦截器的 并发处理开始后 方法
 					asyncInterceptor.afterConcurrentHandlingStarted(request, response, this.handler);
 				} catch (Throwable ex) {
 					if (logger.isErrorEnabled()) {
@@ -209,7 +232,7 @@ public class HandlerExecutionChain {
 
 
 	/**
-	 * Delegates to the handler's {@code toString()} implementation.
+	 * 委托给处理程序的 {@code toString()} 实现。
 	 */
 	@Override
 	public String toString() {
