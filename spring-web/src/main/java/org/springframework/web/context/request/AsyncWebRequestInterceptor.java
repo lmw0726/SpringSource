@@ -17,32 +17,27 @@
 package org.springframework.web.context.request;
 
 /**
- * Extends {@code WebRequestInterceptor} with a callback method invoked during
- * asynchronous request handling.
+ * 通过在异步请求处理期间调用回调方法扩展 {@code WebRequestInterceptor}。
  *
- * <p>When a handler starts asynchronous request handling, the DispatcherServlet
- * exits without invoking {@code postHandle} and {@code afterCompletion}, as it
- * normally does, since the results of request handling (e.g. ModelAndView) are
- * not available in the current thread and handling is not yet complete.
- * In such scenarios, the {@link #afterConcurrentHandlingStarted(WebRequest)}
- * method is invoked instead allowing implementations to perform tasks such as
- * cleaning up thread bound attributes.
+ * <p>当处理程序开始异步请求处理时，DispatcherServlet 将退出而不调用 {@code postHandle}
+ * 和 {@code afterCompletion}，因为它通常不会，因为请求处理的结果（例如 ModelAndView）
+ * 在当前线程中不可用，并且处理尚未完成。
+ * 在这种情况下，将调用 {@link #afterConcurrentHandlingStarted(WebRequest)}
+ * 方法，允许实现执行诸如清理线程绑定属性等任务。
  *
- * <p>When asynchronous handling completes, the request is dispatched to the
- * container for further processing. At this stage the DispatcherServlet invokes
- * {@code preHandle}, {@code postHandle} and {@code afterCompletion} as usual.
+ * <p>当异步处理完成时，请求将被分派到容器进行进一步处理。在此阶段，DispatcherServlet
+ * 会像往常一样调用 {@code preHandle}、{@code postHandle} 和 {@code afterCompletion}。
  *
  * @author Rossen Stoyanchev
- * @since 3.2
- *
  * @see org.springframework.web.context.request.async.WebAsyncManager
+ * @since 3.2
  */
-public interface AsyncWebRequestInterceptor extends WebRequestInterceptor{
+public interface AsyncWebRequestInterceptor extends WebRequestInterceptor {
 
 	/**
-	 * Called instead of {@code postHandle} and {@code afterCompletion}, when the
-	 * handler started handling the request concurrently.
-	 * @param request the current request
+	 * 在处理程序开始并发处理请求时，调用此方法而不是 {@code postHandle} 和 {@code afterCompletion}。
+	 *
+	 * @param request 当前请求
 	 */
 	void afterConcurrentHandlingStarted(WebRequest request);
 

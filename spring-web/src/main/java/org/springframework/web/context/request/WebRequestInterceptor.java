@@ -20,24 +20,17 @@ import org.springframework.lang.Nullable;
 import org.springframework.ui.ModelMap;
 
 /**
- * Interface for general web request interception. Allows for being applied
- * to Servlet request by building on the {@link WebRequest} abstraction.
+ * 通用 Web 请求拦截的接口。通过构建在 {@link WebRequest} 抽象之上应用到 Servlet 请求。
  *
- * <p>This interface assumes MVC-style request processing: A handler gets executed,
- * exposes a set of model objects, then a view gets rendered based on that model.
- * Alternatively, a handler may also process the request completely, with no
- * view to be rendered.
+ * <p>该接口假定 MVC 风格的请求处理：执行处理程序，公开一组模型对象，然后基于该模型呈现视图。
+ * 或者，处理程序也可以完全处理请求，不需要呈现视图。
  *
- * <p>In an async processing scenario, the handler may be executed in a separate
- * thread while the main thread exits without rendering or invoking the
- * {@code postHandle} and {@code afterCompletion} callbacks. When concurrent
- * handler execution completes, the request is dispatched back in order to
- * proceed with rendering the model and all methods of this contract are invoked
- * again. For further options and comments see
- * {@code org.springframework.web.context.request.async.AsyncWebRequestInterceptor}
+ * <p>在异步处理场景中，处理程序可能在单独的线程中执行，而主线程退出而不呈现或调用
+ * {@code postHandle} 和 {@code afterCompletion} 回调。当并发处理程序执行完成时，
+ * 请求被重新分派以继续呈现模型，并再次调用此合同的所有方法。有关更多选项和注释，
+ * 请参见 {@code org.springframework.web.context.request.async.AsyncWebRequestInterceptor}
  *
- * <p>This interface is deliberately minimalistic to keep the dependencies of
- * generic request interceptors as minimal as feasible.
+ * <p>此接口有意保持最小化，以尽可能减少通用请求拦截器的依赖关系。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -49,36 +42,29 @@ import org.springframework.ui.ModelMap;
 public interface WebRequestInterceptor {
 
 	/**
-	 * Intercept the execution of a request handler <i>before</i> its invocation.
-	 * <p>Allows for preparing context resources (such as a Hibernate Session)
-	 * and expose them as request attributes or as thread-local objects.
-	 * @param request the current web request
-	 * @throws Exception in case of errors
+	 * 在调用请求处理程序 <i>之前</i> 拦截其执行。
+	 * <p>允许准备上下文资源（例如 Hibernate 会话）并将其公开为请求属性或线程本地对象。
+	 * @param request 当前的 Web 请求
+	 * @throws Exception 如果发生错误
 	 */
 	void preHandle(WebRequest request) throws Exception;
 
 	/**
-	 * Intercept the execution of a request handler <i>after</i> its successful
-	 * invocation, right before view rendering (if any).
-	 * <p>Allows for modifying context resources after successful handler
-	 * execution (for example, flushing a Hibernate Session).
-	 * @param request the current web request
-	 * @param model the map of model objects that will be exposed to the view
-	 * (may be {@code null}). Can be used to analyze the exposed model
-	 * and/or to add further model attributes, if desired.
-	 * @throws Exception in case of errors
+	 * 在请求处理程序 <i>成功</i> 调用后，在视图渲染之前拦截执行。
+	 * <p>允许在成功处理程序执行后修改上下文资源（例如，刷新 Hibernate 会话）。
+	 * @param request 当前的 Web 请求
+	 * @param model 将暴露给视图的模型对象的映射（可能为 {@code null}）。可用于分析暴露的模型和/或
+	 * 添加进一步的模型属性（如果需要）。
+	 * @throws Exception 如果发生错误
 	 */
 	void postHandle(WebRequest request, @Nullable ModelMap model) throws Exception;
 
 	/**
-	 * Callback after completion of request processing, that is, after rendering
-	 * the view. Will be called on any outcome of handler execution, thus allows
-	 * for proper resource cleanup.
-	 * <p>Note: Will only be called if this interceptor's {@code preHandle}
-	 * method has successfully completed!
-	 * @param request the current web request
-	 * @param ex exception thrown on handler execution, if any
-	 * @throws Exception in case of errors
+	 * 在请求处理完成后的回调，即在渲染视图之后。将在处理程序执行的任何结果上调用，因此可用于正确的资源清理。
+	 * <p>注意：仅在此拦截器的 {@code preHandle} 方法成功完成时才会调用！
+	 * @param request 当前的 Web 请求
+	 * @param ex 处理程序执行时抛出的异常（如果有）
+	 * @throws Exception 如果发生错误
 	 */
 	void afterCompletion(WebRequest request, @Nullable Exception ex) throws Exception;
 

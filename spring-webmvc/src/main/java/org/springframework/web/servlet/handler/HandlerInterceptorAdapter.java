@@ -20,13 +20,11 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
- * Abstract adapter class for the {@link AsyncHandlerInterceptor} interface,
- * for simplified implementation of pre-only/post-only interceptors.
+ * {@link AsyncHandlerInterceptor} 接口的抽象适配器类，用于简化仅前置或后置拦截器的实现。
  *
  * @author Juergen Hoeller
  * @since 05.12.2003
- * @deprecated as of 5.3 in favor of implementing {@link HandlerInterceptor}
- * and/or {@link AsyncHandlerInterceptor} directly.
+ * @deprecated 自 5.3 起，建议直接实现 {@link HandlerInterceptor} 和/或 {@link AsyncHandlerInterceptor}。
  */
 @Deprecated
 public abstract class HandlerInterceptorAdapter implements AsyncHandlerInterceptor {
