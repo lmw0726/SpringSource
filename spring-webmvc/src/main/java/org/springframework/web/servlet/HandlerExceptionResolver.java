@@ -16,19 +16,17 @@
 
 package org.springframework.web.servlet;
 
+import org.springframework.lang.Nullable;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Interface to be implemented by objects that can resolve exceptions thrown during
- * handler mapping or execution, in the typical case to error views. Implementors are
- * typically registered as beans in the application context.
+ * 实现了能够解析在处理程序映射或执行过程中抛出的异常的对象的接口，典型情况下用于错误视图。
+ * 实现者通常作为bean注册在应用程序上下文中。
  *
- * <p>Error views are analogous to JSP error pages but can be used with any kind of
- * exception including any checked exception, with potentially fine-grained mappings for
- * specific handlers.
+ * <p>错误视图类似于JSP错误页面，但可以与任何类型的异常一起使用，包括任何已检查异常，
+ * 还可以为特定处理程序提供潜在的细粒度映射。
  *
  * @author Juergen Hoeller
  * @since 22.11.2003
@@ -36,21 +34,21 @@ import org.springframework.lang.Nullable;
 public interface HandlerExceptionResolver {
 
 	/**
-	 * Try to resolve the given exception that got thrown during handler execution,
-	 * returning a {@link ModelAndView} that represents a specific error page if appropriate.
-	 * <p>The returned {@code ModelAndView} may be {@linkplain ModelAndView#isEmpty() empty}
-	 * to indicate that the exception has been resolved successfully but that no view
-	 * should be rendered, for instance by setting a status code.
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @param handler the executed handler, or {@code null} if none chosen at the
-	 * time of the exception (for example, if multipart resolution failed)
-	 * @param ex the exception that got thrown during handler execution
-	 * @return a corresponding {@code ModelAndView} to forward to,
-	 * or {@code null} for default processing in the resolution chain
+	 * 尝试解析在处理程序执行过程中抛出的给定异常，
+	 * 如果适用，则返回表示特定错误页面的{@link ModelAndView}。
+	 * <p>返回的{@code ModelAndView}可能会{@linkplain ModelAndView#isEmpty() empty}，
+	 * 以指示异常已成功解析，
+	 * 但不应渲染任何视图，例如通过设置状态代码。
+	 *
+	 * @param request  当前HTTP请求
+	 * @param response 当前HTTP响应
+	 * @param handler  执行的处理程序，如果在异常抛出时没有选择任何处理程序
+	 *                 （例如，如果multipart解析失败），则为{@code null}
+	 * @param ex       在处理程序执行期间抛出的异常
+	 * @return 相应的{@code ModelAndView}以转发到，或者对于解析链中的默认处理，{@code null}
 	 */
 	@Nullable
-	ModelAndView resolveException(
-			HttpServletRequest request, HttpServletResponse response, @Nullable Object handler, Exception ex);
+	ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response,
+								  @Nullable Object handler, Exception ex);
 
 }
