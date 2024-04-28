@@ -16,26 +16,26 @@
 
 package org.springframework.web.servlet.mvc;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.lang.Nullable;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.servlet.HandlerAdapter;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
- * Adapter to use the plain {@link org.springframework.web.HttpRequestHandler}
- * interface with the generic {@link org.springframework.web.servlet.DispatcherServlet}.
- * Supports handlers that implement the {@link LastModified} interface.
+ * 适配器，用于将普通的 {@link org.springframework.web.HttpRequestHandler} 接口与通用的
+ * {@link org.springframework.web.servlet.DispatcherServlet} 结合使用。支持实现了
+ * {@link LastModified} 接口的处理程序。
  *
- * <p>This is an SPI class, not used directly by application code.
+ * <p>这是一个SPI类，不直接被应用程序代码使用。
  *
  * @author Juergen Hoeller
- * @since 2.0
  * @see org.springframework.web.servlet.DispatcherServlet
  * @see org.springframework.web.HttpRequestHandler
  * @see SimpleControllerHandlerAdapter
+ * @since 2.0
  */
 public class HttpRequestHandlerAdapter implements HandlerAdapter {
 
