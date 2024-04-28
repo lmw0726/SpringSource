@@ -16,17 +16,16 @@
 
 package org.springframework.web.servlet.theme;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
- * Interceptor that allows for changing the current theme on every request,
- * via a configurable request parameter (default parameter name: "theme").
+ * 拦截器，允许通过可配置的请求参数（默认参数名："theme"）在每个请求上更改当前主题。
  *
  * @author Juergen Hoeller
  * @since 20.06.2003
@@ -35,24 +34,24 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 public class ThemeChangeInterceptor implements HandlerInterceptor {
 
 	/**
-	 * Default name of the theme specification parameter: "theme".
+	 * 主题规范参数的默认名称："theme"。
 	 */
 	public static final String DEFAULT_PARAM_NAME = "theme";
-
+	/**
+	 * 参数名称
+	 */
 	private String paramName = DEFAULT_PARAM_NAME;
 
 
 	/**
-	 * Set the name of the parameter that contains a theme specification
-	 * in a theme change request. Default is "theme".
+	 * 设置包含主题规范的参数的名称。默认为"theme"。
 	 */
 	public void setParamName(String paramName) {
 		this.paramName = paramName;
 	}
 
 	/**
-	 * Return the name of the parameter that contains a theme specification
-	 * in a theme change request.
+	 * 返回包含主题规范的参数的名称。
 	 */
 	public String getParamName() {
 		return this.paramName;
@@ -63,15 +62,22 @@ public class ThemeChangeInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws ServletException {
 
+		// 从请求中获取参数值作为新的主题
 		String newTheme = request.getParameter(this.paramName);
+
+		// 如果新主题不为空
 		if (newTheme != null) {
+			// 获取主题解析器
 			ThemeResolver themeResolver = RequestContextUtils.getThemeResolver(request);
+			// 如果主题解析器为空，则抛出异常
 			if (themeResolver == null) {
 				throw new IllegalStateException("No ThemeResolver found: not in a DispatcherServlet request?");
 			}
+			// 设置新的主题
 			themeResolver.setThemeName(request, response, newTheme);
 		}
-		// Proceed in any case.
+
+		// 无论如何都继续处理
 		return true;
 	}
 

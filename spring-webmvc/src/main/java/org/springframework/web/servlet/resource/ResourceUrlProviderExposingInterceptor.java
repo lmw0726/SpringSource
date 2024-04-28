@@ -16,16 +16,15 @@
 
 package org.springframework.web.servlet.resource;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.util.Assert;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
- * An interceptor that exposes the {@link ResourceUrlProvider} instance it
- * is configured with as a request attribute.
+ * 一个拦截器，将配置的ResourceUrlProvider实例作为请求属性暴露出来。
  *
  * @author Rossen Stoyanchev
  * @since 4.1
@@ -33,13 +32,20 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class ResourceUrlProviderExposingInterceptor implements HandlerInterceptor {
 
 	/**
-	 * Name of the request attribute that holds the {@link ResourceUrlProvider}.
+	 * 保存ResourceUrlProvider的请求属性名称。
 	 */
 	public static final String RESOURCE_URL_PROVIDER_ATTR = ResourceUrlProvider.class.getName();
 
+	/**
+	 * 资源URL提供者
+	 */
 	private final ResourceUrlProvider resourceUrlProvider;
 
-
+	/**
+	 * 构造函数，初始化 资源URL提供者 实例。
+	 *
+	 * @param resourceUrlProvider 资源URL提供者 实例，不能为空
+	 */
 	public ResourceUrlProviderExposingInterceptor(ResourceUrlProvider resourceUrlProvider) {
 		Assert.notNull(resourceUrlProvider, "ResourceUrlProvider is required");
 		this.resourceUrlProvider = resourceUrlProvider;
@@ -50,9 +56,10 @@ public class ResourceUrlProviderExposingInterceptor implements HandlerIntercepto
 			throws Exception {
 
 		try {
+			// 将ResourceUrlProvider实例设置为请求属性
 			request.setAttribute(RESOURCE_URL_PROVIDER_ATTR, this.resourceUrlProvider);
-		}
-		catch (ResourceUrlEncodingFilter.LookupPathIndexException ex) {
+		} catch (ResourceUrlEncodingFilter.LookupPathIndexException ex) {
+			// 如果发生异常，抛出ServletRequestBindingException
 			throw new ServletRequestBindingException(ex.getMessage(), ex);
 		}
 		return true;

@@ -16,32 +16,34 @@
 
 package org.springframework.web.servlet.handler;
 
-import java.io.IOException;
+import org.springframework.lang.Nullable;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.lang.Nullable;
-import org.springframework.web.servlet.HandlerInterceptor;
+import java.io.IOException;
 
 /**
- * Interceptor that checks the authorization of the current user via the
- * user's roles, as evaluated by HttpServletRequest's isUserInRole method.
+ * 拦截器，通过HttpServletRequest的isUserInRole方法评估用户的角色来检查当前用户的授权。
  *
  * @author Juergen Hoeller
- * @since 20.06.2003
  * @see javax.servlet.http.HttpServletRequest#isUserInRole
+ * @since 20.06.2003
  */
 public class UserRoleAuthorizationInterceptor implements HandlerInterceptor {
 
+	/**
+	 * 授权的角色名称数组
+	 */
 	@Nullable
 	private String[] authorizedRoles;
 
 
 	/**
-	 * Set the roles that this interceptor should treat as authorized.
-	 * @param authorizedRoles array of role names
+	 * 设置此拦截器应将其视为已授权的角色。
+	 *
+	 * @param authorizedRoles 角色名称数组
 	 */
 	public final void setAuthorizedRoles(String... authorizedRoles) {
 		this.authorizedRoles = authorizedRoles;
@@ -52,31 +54,38 @@ public class UserRoleAuthorizationInterceptor implements HandlerInterceptor {
 	public final boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws ServletException, IOException {
 
+		// 如果有授权角色
 		if (this.authorizedRoles != null) {
+			// 遍历每个授权角色
 			for (String role : this.authorizedRoles) {
+				// 如果请求中包含该角色，则返回 true
 				if (request.isUserInRole(role)) {
 					return true;
 				}
 			}
 		}
+
+		// 处理未授权的情况
 		handleNotAuthorized(request, response, handler);
+
+		// 返回 false
 		return false;
 	}
 
 	/**
-	 * Handle a request that is not authorized according to this interceptor.
-	 * Default implementation sends HTTP status code 403 ("forbidden").
-	 * <p>This method can be overridden to write a custom message, forward or
-	 * redirect to some error page or login page, or throw a ServletException.
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @param handler chosen handler to execute, for type and/or instance evaluation
-	 * @throws javax.servlet.ServletException if there is an internal error
-	 * @throws java.io.IOException in case of an I/O error when writing the response
+	 * 处理根据此拦截器未授权的请求。
+	 * 默认实现发送HTTP状态码403（"forbidden"）。
+	 * <p>此方法可以重写以编写自定义消息，转发或重定向到某些错误页面或登录页面，或抛出ServletException。
+	 *
+	 * @param request  当前HTTP请求
+	 * @param response 当前HTTP响应
+	 * @param handler  选择的处理程序以执行类型和/或实例评估
+	 * @throws javax.servlet.ServletException 如果存在内部错误
+	 * @throws java.io.IOException            在写入响应时出现I/O错误
 	 */
 	protected void handleNotAuthorized(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws ServletException, IOException {
-
+		// 设置 403 未授权状态码
 		response.sendError(HttpServletResponse.SC_FORBIDDEN);
 	}
 

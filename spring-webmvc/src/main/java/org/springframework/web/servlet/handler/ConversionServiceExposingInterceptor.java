@@ -16,35 +16,37 @@
 
 package org.springframework.web.servlet.handler;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 /**
- * Interceptor that places the configured {@link ConversionService} in request scope
- * so it's available during request processing. The request attribute name is
- * "org.springframework.core.convert.ConversionService", the value of
- * {@code ConversionService.class.getName()}.
+ * 拦截器将配置的 {@link ConversionService} 放置在请求范围内，以便在请求处理期间可用。
+ * 请求属性名称为
+ * "org.springframework.core.convert.ConversionService"，值为 {@code ConversionService.class.getName()}。
  *
- * <p>Mainly for use within JSP tags such as the spring:eval tag.
+ * <p>主要用于JSP标签，如spring:eval标签。
  *
  * @author Keith Donald
  * @since 3.0.1
  */
 public class ConversionServiceExposingInterceptor implements HandlerInterceptor {
 
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
 	/**
-	 * Creates a new {@link ConversionServiceExposingInterceptor}.
-	 * @param conversionService the conversion service to export to request scope when this interceptor is invoked
+	 * 创建一个新的 {@link ConversionServiceExposingInterceptor}。
+	 *
+	 * @param conversionService 当此拦截器被调用时要导出到请求范围的转换服务
 	 */
 	public ConversionServiceExposingInterceptor(ConversionService conversionService) {
 		Assert.notNull(conversionService, "The ConversionService may not be null");
