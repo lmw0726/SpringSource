@@ -16,17 +16,11 @@
 
 package org.springframework.web.servlet.view.freemarker;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.ServletContext;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.ext.jsp.TaglibFactory;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.lang.Nullable;
@@ -34,64 +28,67 @@ import org.springframework.ui.freemarker.FreeMarkerConfigurationFactory;
 import org.springframework.util.Assert;
 import org.springframework.web.context.ServletContextAware;
 
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.util.List;
+
 /**
- * JavaBean to configure FreeMarker for web usage, via the "configLocation"
- * and/or "freemarkerSettings" and/or "templateLoaderPath" properties.
- * The simplest way to use this class is to specify just a "templateLoaderPath";
- * you do not need any further configuration then.
+ * 用于配置 FreeMarker 以在 Web 中使用的 JavaBean，通过 "configLocation" 和/或 "freemarkerSettings"
+ * 和/或 "templateLoaderPath" 属性。
+ * 使用此类的最简单方式是仅指定 "templateLoaderPath"；然后您不需要进一步的配置。
  *
  * <pre class="code">
  * &lt;bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer"&gt;
  *   &lt;property name="templateLoaderPath"&gt;&lt;value&gt;/WEB-INF/freemarker/&lt;/value&gt;&lt;/property&gt;
  * &lt;/bean&gt;</pre>
+ * <p>
+ * 必须将此 bean 包含在使用 Spring 的 FreeMarkerView 进行 Web MVC 的任何应用程序的应用程序上下文中。
+ * 它纯粹存在于配置 FreeMarker。
+ * 它不是用于应用程序组件引用的，而是仅由 FreeMarkerView 内部引用。
+ * 实现 FreeMarkerConfig 以被 FreeMarkerView 发现，而不依赖于配置器的 bean 名称。
+ * 如果需要，每个 DispatcherServlet 可以定义自己的 FreeMarkerConfigurer。
  *
- * This bean must be included in the application context of any application
- * using Spring's FreeMarkerView for web MVC. It exists purely to configure FreeMarker.
- * It is not meant to be referenced by application components but just internally
- * by FreeMarkerView. Implements FreeMarkerConfig to be found by FreeMarkerView without
- * depending on the bean name of the configurer. Each DispatcherServlet can define its
- * own FreeMarkerConfigurer if desired.
+ * <p>请注意，您还可以引用预配置的 FreeMarker Configuration 实例，例如通过 FreeMarkerConfigurationFactoryBean 设置的实例，通过 "configuration" 属性。
+ * 这允许在 Web 和电子邮件使用中共享 FreeMarker Configuration，例如。
  *
- * <p>Note that you can also refer to a preconfigured FreeMarker Configuration
- * instance, for example one set up by FreeMarkerConfigurationFactoryBean, via
- * the "configuration" property. This allows to share a FreeMarker Configuration
- * for web and email usage, for example.
- *
- * <p>This configurer registers a template loader for this package, allowing to
- * reference the "spring.ftl" macro library contained in this package:
+ * <p>此配置程序为此包注册一个模板加载程序，允许引用此包中包含的 "spring.ftl" 宏库：
  *
  * <pre class="code">
  * &lt;#import "/spring.ftl" as spring/&gt;
  * &lt;@spring.bind "person.age"/&gt;
  * age is ${spring.status.value}</pre>
- *
- * Note: Spring's FreeMarker support requires FreeMarker 2.3 or higher.
+ * <p>
+ * 注意：Spring 的 FreeMarker 支持需要 FreeMarker 2.3 或更高版本。
  *
  * @author Darren Davison
  * @author Rob Harrop
- * @since 03.03.2004
  * @see #setConfigLocation
  * @see #setFreemarkerSettings
  * @see #setTemplateLoaderPath
  * @see #setConfiguration
  * @see org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean
  * @see FreeMarkerView
+ * @since 2004-03-03
  */
 public class FreeMarkerConfigurer extends FreeMarkerConfigurationFactory
 		implements FreeMarkerConfig, InitializingBean, ResourceLoaderAware, ServletContextAware {
-
+	/**
+	 * FreeMarker 配置
+	 */
 	@Nullable
 	private Configuration configuration;
 
+	/**
+	 * 标签库工厂
+	 */
 	@Nullable
 	private TaglibFactory taglibFactory;
 
 
 	/**
-	 * Set a preconfigured Configuration to use for the FreeMarker web config, e.g. a
-	 * shared one for web and email usage, set up via FreeMarkerConfigurationFactoryBean.
-	 * If this is not set, FreeMarkerConfigurationFactory's properties (inherited by
-	 * this class) have to be specified.
+	 * 设置要在 FreeMarker Web 配置中使用的预配置 Configuration，例如，为 Web 和电子邮件使用共享的配置，通过 FreeMarkerConfigurationFactoryBean 设置。
+	 * 如果未设置此项，则必须指定 FreeMarkerConfigurationFactory 的属性（由此类继承）。
+	 *
 	 * @see org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean
 	 */
 	public void setConfiguration(Configuration configuration) {
@@ -99,7 +96,7 @@ public class FreeMarkerConfigurer extends FreeMarkerConfigurationFactory
 	}
 
 	/**
-	 * Initialize the {@link TaglibFactory} for the given ServletContext.
+	 * 为给定的 ServletContext 初始化 {@link TaglibFactory}。
 	 */
 	@Override
 	public void setServletContext(ServletContext servletContext) {
@@ -108,9 +105,9 @@ public class FreeMarkerConfigurer extends FreeMarkerConfigurationFactory
 
 
 	/**
-	 * Initialize FreeMarkerConfigurationFactory's Configuration
-	 * if not overridden by a preconfigured FreeMarker Configuration.
-	 * <p>Sets up a ClassTemplateLoader to use for loading Spring macros.
+	 * 如果没有被预配置的 FreeMarker Configuration 覆盖，则初始化 FreeMarkerConfigurationFactory 的 Configuration。
+	 * <p>设置 ClassTemplateLoader 用于加载 Spring 宏。
+	 *
 	 * @see #createConfiguration
 	 * @see #setConfiguration
 	 */
@@ -122,8 +119,7 @@ public class FreeMarkerConfigurer extends FreeMarkerConfigurationFactory
 	}
 
 	/**
-	 * This implementation registers an additional ClassTemplateLoader
-	 * for the Spring-provided macros, added to the end of the list.
+	 * 此实现为此包注册了一个额外的 ClassTemplateLoader，添加到列表的末尾。
 	 */
 	@Override
 	protected void postProcessTemplateLoaders(List<TemplateLoader> templateLoaders) {
@@ -132,7 +128,7 @@ public class FreeMarkerConfigurer extends FreeMarkerConfigurationFactory
 
 
 	/**
-	 * Return the Configuration object wrapped by this bean.
+	 * 返回此 bean 包装的 Configuration 对象。
 	 */
 	@Override
 	public Configuration getConfiguration() {
@@ -141,7 +137,7 @@ public class FreeMarkerConfigurer extends FreeMarkerConfigurationFactory
 	}
 
 	/**
-	 * Return the TaglibFactory object wrapped by this bean.
+	 * 返回此 bean 包装的 TaglibFactory 对象。
 	 */
 	@Override
 	public TaglibFactory getTaglibFactory() {

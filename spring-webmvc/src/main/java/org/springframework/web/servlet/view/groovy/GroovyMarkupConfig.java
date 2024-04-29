@@ -19,21 +19,20 @@ package org.springframework.web.servlet.view.groovy;
 import groovy.text.markup.MarkupTemplateEngine;
 
 /**
- * Interface to be implemented by objects that configure and manage a Groovy
- * {@link MarkupTemplateEngine} for automatic lookup in a web environment.
- * Detected and used by {@link GroovyMarkupView}.
+ * 通过实现此接口的对象配置和管理 Groovy {@link MarkupTemplateEngine}，以便在 Web 环境中进行自动查找。
+ * 由 {@link GroovyMarkupView} 检测并使用。
  *
  * @author Brian Clozel
- * @since 4.1
  * @see GroovyMarkupConfigurer
+ * @since 4.1
  */
 public interface GroovyMarkupConfig {
 
 	/**
-	 * Return the Groovy {@link MarkupTemplateEngine} for the current
-	 * web application context. May be unique to one servlet, or shared
-	 * in the root context.
-	 * @return the Groovy MarkupTemplateEngine engine
+	 * 返回当前 Web 应用程序上下文的 Groovy {@link MarkupTemplateEngine}。
+	 * 可以是唯一的一个 servlet，也可以是共享的根上下文。
+	 *
+	 * @return Groovy MarkupTemplateEngine 引擎
 	 */
 	MarkupTemplateEngine getTemplateEngine();
 

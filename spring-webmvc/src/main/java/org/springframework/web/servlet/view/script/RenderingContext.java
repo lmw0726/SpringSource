@@ -16,41 +16,50 @@
 
 package org.springframework.web.servlet.view.script;
 
+import org.springframework.context.ApplicationContext;
+
 import java.util.Locale;
 import java.util.function.Function;
 
-import org.springframework.context.ApplicationContext;
-
 /**
- * Context passed to {@link ScriptTemplateView} render function in order to make
- * the application context, the locale, the template loader and the url available on
- * scripting side.
+ * 渲染函数传递给 {@link ScriptTemplateView} 的上下文，以便在脚本端提供应用程序上下文、区域设置、模板加载器和URL。
  *
  * @author Sebastien Deleuze
  * @since 5.0
  */
 public class RenderingContext {
 
+	/**
+	 * 应用程序上下文
+	 */
 	private final ApplicationContext applicationContext;
 
+	/**
+	 * 区域设置
+	 */
 	private final Locale locale;
 
+	/**
+	 * 模板加载器
+	 */
 	private final Function<String, String> templateLoader;
 
+	/**
+	 * URL
+	 */
 	private final String url;
 
 
 	/**
-	 * Create a new {@code RenderingContext}.
+	 * 创建一个新的 {@code RenderingContext}。
 	 *
-	 * @param applicationContext the application context
-	 * @param locale the locale of the rendered template
-	 * @param templateLoader a function that takes a template path as input and returns
-	 * the template content as a String
-	 * @param url the URL of the rendered template
+	 * @param applicationContext 应用程序上下文
+	 * @param locale 渲染模板的区域设置
+	 * @param templateLoader 一个函数，接受模板路径作为输入，并将模板内容作为字符串返回
+	 * @param url 渲染模板的URL
 	 */
 	public RenderingContext(ApplicationContext applicationContext, Locale locale,
-			Function<String, String> templateLoader, String url) {
+							Function<String, String> templateLoader, String url) {
 
 		this.applicationContext = applicationContext;
 		this.locale = locale;
@@ -60,29 +69,28 @@ public class RenderingContext {
 
 
 	/**
-	 * Return the application context.
+	 * 返回应用程序上下文。
 	 */
 	public ApplicationContext getApplicationContext() {
 		return this.applicationContext;
 	}
 
 	/**
-	 * Return the locale of the rendered template.
+	 * 返回渲染模板的区域设置。
 	 */
 	public Locale getLocale() {
 		return this.locale;
 	}
 
 	/**
-	 * Return a function that takes a template path as input and returns the template
-	 * content as a String.
+	 * 返回一个函数，接受模板路径作为输入，并将模板内容作为字符串返回。
 	 */
 	public Function<String, String> getTemplateLoader() {
 		return this.templateLoader;
 	}
 
 	/**
-	 * Return the URL of the rendered template.
+	 * 返回渲染模板的URL。
 	 */
 	public String getUrl() {
 		return this.url;
