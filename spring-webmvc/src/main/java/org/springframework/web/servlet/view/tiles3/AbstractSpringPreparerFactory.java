@@ -20,44 +20,48 @@ import org.apache.tiles.TilesException;
 import org.apache.tiles.preparer.ViewPreparer;
 import org.apache.tiles.preparer.factory.PreparerFactory;
 import org.apache.tiles.request.Request;
-
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
 /**
- * Abstract implementation of the Tiles {@link org.apache.tiles.preparer.factory.PreparerFactory}
- * interface, obtaining the current Spring WebApplicationContext and delegating to
- * {@link #getPreparer(String, org.springframework.web.context.WebApplicationContext)}.
+ * Tiles {@link org.apache.tiles.preparer.factory.PreparerFactory}接口的抽象实现，
+ * 获取当前的Spring WebApplicationContext并委托给{@link #getPreparer(String, org.springframework.web.context.WebApplicationContext)}。
  *
  * @author Juergen Hoeller
- * @since 3.2
  * @see #getPreparer(String, org.springframework.web.context.WebApplicationContext)
  * @see SimpleSpringPreparerFactory
  * @see SpringBeanPreparerFactory
+ * @since 3.2
  */
 public abstract class AbstractSpringPreparerFactory implements PreparerFactory {
 
 	@Override
 	public ViewPreparer getPreparer(String name, Request context) {
+		// 从上下文中获取request相关的Web应用上下文
 		WebApplicationContext webApplicationContext = (WebApplicationContext) context.getContext("request").get(
 				DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+		// 如果 Web应用上下文 为null
 		if (webApplicationContext == null) {
+			// 从上下文中获取application相关的 Web应用上下文
 			webApplicationContext = (WebApplicationContext) context.getContext("application").get(
 					WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+			// 如果 Web应用上下文 仍为null
 			if (webApplicationContext == null) {
+				// 抛出IllegalStateException异常
 				throw new IllegalStateException("No WebApplicationContext found: no ContextLoaderListener registered?");
 			}
 		}
+		// 根据名称从获取到的 Web应用上下文 中获取或创建ViewPreparer，并返回
 		return getPreparer(name, webApplicationContext);
 	}
 
 	/**
-	 * Obtain a preparer instance for the given preparer name,
-	 * based on the given Spring WebApplicationContext.
-	 * @param name the name of the preparer
-	 * @param context the current Spring WebApplicationContext
-	 * @return the preparer instance
-	 * @throws TilesException in case of failure
+	 * 根据给定的准备器名称和Spring WebApplicationContext获取准备器实例。
+	 *
+	 * @param name    准备器的名称
+	 * @param context 当前的Spring WebApplicationContext
+	 * @return 准备器实例
+	 * @throws TilesException 如果失败
 	 */
 	protected abstract ViewPreparer getPreparer(String name, WebApplicationContext context) throws TilesException;
 

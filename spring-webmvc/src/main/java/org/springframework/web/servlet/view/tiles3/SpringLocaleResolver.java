@@ -16,27 +16,24 @@
 
 package org.springframework.web.servlet.view.tiles3;
 
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.tiles.locale.impl.DefaultLocaleResolver;
 import org.apache.tiles.request.Request;
 import org.apache.tiles.request.servlet.NotAServletEnvironmentException;
 import org.apache.tiles.request.servlet.ServletUtil;
-
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
+
 /**
- * Tiles LocaleResolver adapter that delegates to a Spring
- * {@link org.springframework.web.servlet.LocaleResolver}, exposing the
- * DispatcherServlet-managed locale.
+ * Tiles LocaleResolver适配器，委托给Spring的{@link org.springframework.web.servlet.LocaleResolver}，
+ * 提供DispatcherServlet管理的区域设置。
  *
- * <p>This adapter gets automatically registered by {@link TilesConfigurer}.
+ * <p>此适配器由{@link TilesConfigurer}自动注册。
  *
  * @author Nicolas Le Bas
- * @since 3.2
  * @see org.apache.tiles.definition.UrlDefinitionsFactory#LOCALE_RESOLVER_IMPL_PROPERTY
+ * @since 3.2
  */
 public class SpringLocaleResolver extends DefaultLocaleResolver {
 
@@ -47,9 +44,8 @@ public class SpringLocaleResolver extends DefaultLocaleResolver {
 			if (servletRequest != null) {
 				return RequestContextUtils.getLocale(servletRequest);
 			}
-		}
-		catch (NotAServletEnvironmentException ex) {
-			// ignore
+		} catch (NotAServletEnvironmentException ex) {
+			// 忽略
 		}
 		return super.resolveLocale(request);
 	}

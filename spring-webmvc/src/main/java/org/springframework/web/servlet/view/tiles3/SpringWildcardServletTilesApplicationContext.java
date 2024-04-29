@@ -16,25 +16,23 @@
 
 package org.springframework.web.servlet.view.tiles3;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Locale;
-
-import javax.servlet.ServletContext;
-
 import org.apache.tiles.request.ApplicationResource;
 import org.apache.tiles.request.locale.URLApplicationResource;
 import org.apache.tiles.request.servlet.ServletApplicationContext;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.support.ServletContextResourcePatternResolver;
+
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Locale;
 
 /**
  * Spring-specific subclass of the Tiles ServletApplicationContext.
@@ -79,8 +77,7 @@ public class SpringWildcardServletTilesApplicationContext extends ServletApplica
 		Resource[] resources;
 		try {
 			resources = this.resolver.getResources(path);
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			((ServletContext) getContext()).log("Resource retrieval failed for path: " + path, ex);
 			return Collections.emptyList();
 		}
@@ -94,8 +91,7 @@ public class SpringWildcardServletTilesApplicationContext extends ServletApplica
 			try {
 				URL url = resource.getURL();
 				resourceList.add(new URLApplicationResource(url.toExternalForm(), url));
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				// Shouldn't happen with the kind of resources we're using
 				throw new IllegalArgumentException("No URL for " + resource, ex);
 			}

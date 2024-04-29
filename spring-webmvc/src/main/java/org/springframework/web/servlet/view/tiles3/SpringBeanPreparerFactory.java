@@ -18,19 +18,16 @@ package org.springframework.web.servlet.view.tiles3;
 
 import org.apache.tiles.TilesException;
 import org.apache.tiles.preparer.ViewPreparer;
-
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * Tiles {@link org.apache.tiles.preparer.factory.PreparerFactory} implementation
- * that expects preparer bean names and obtains preparer beans from the
- * Spring ApplicationContext. The full bean creation process will be in
- * the control of the Spring application context in this case, allowing
- * for the use of scoped beans etc.
+ * Tiles {@link org.apache.tiles.preparer.factory.PreparerFactory}实现，期望准备器bean名称，并从
+ * Spring ApplicationContext获取准备器bean。在这种情况下，完整的bean创建过程将由Spring应用程序上下文控制，
+ * 允许使用作用域bean等。
  *
  * @author Juergen Hoeller
- * @since 3.2
  * @see SimpleSpringPreparerFactory
+ * @since 3.2
  */
 public class SpringBeanPreparerFactory extends AbstractSpringPreparerFactory {
 
