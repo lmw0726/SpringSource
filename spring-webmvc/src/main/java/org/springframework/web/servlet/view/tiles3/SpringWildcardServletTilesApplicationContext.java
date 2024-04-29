@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 /**
- * Spring-specific subclass of the Tiles ServletApplicationContext.
+ * Tiles ServletApplicationContext的Spring特定子类。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -43,6 +43,9 @@ import java.util.Locale;
  */
 public class SpringWildcardServletTilesApplicationContext extends ServletApplicationContext {
 
+	/**
+	 * 资源路径解析器
+	 */
 	private final ResourcePatternResolver resolver;
 
 
@@ -55,20 +58,32 @@ public class SpringWildcardServletTilesApplicationContext extends ServletApplica
 	@Override
 	@Nullable
 	public ApplicationResource getResource(String localePath) {
+		// 获取给定路径的资源集合
 		Collection<ApplicationResource> urlSet = getResources(localePath);
+
+		// 如果资源集合不为空
 		if (!CollectionUtils.isEmpty(urlSet)) {
+			// 返回资源集合中的第一个资源
 			return urlSet.iterator().next();
 		}
+
+		// 如果资源集合为空，则返回 null
 		return null;
 	}
 
 	@Override
 	@Nullable
 	public ApplicationResource getResource(ApplicationResource base, Locale locale) {
+		// 获取给定语言环境对应的路径的资源集合
 		Collection<ApplicationResource> urlSet = getResources(base.getLocalePath(locale));
+
+		// 如果资源集合不为空
 		if (!CollectionUtils.isEmpty(urlSet)) {
+			// 返回资源集合中的第一个资源
 			return urlSet.iterator().next();
 		}
+
+		// 如果资源集合为空，则返回 null
 		return null;
 	}
 
@@ -76,26 +91,36 @@ public class SpringWildcardServletTilesApplicationContext extends ServletApplica
 	public Collection<ApplicationResource> getResources(String path) {
 		Resource[] resources;
 		try {
+			// 尝试获取指定路径的资源
 			resources = this.resolver.getResources(path);
 		} catch (IOException ex) {
+			// 如果资源检索失败，则记录日志并返回空列表
 			((ServletContext) getContext()).log("Resource retrieval failed for path: " + path, ex);
 			return Collections.emptyList();
 		}
+
 		if (ObjectUtils.isEmpty(resources)) {
+			// 如果资源数组为空，则记录日志并返回空列表
 			((ServletContext) getContext()).log("No resources found for path pattern: " + path);
 			return Collections.emptyList();
 		}
 
+		// 创建资源列表
 		Collection<ApplicationResource> resourceList = new ArrayList<>(resources.length);
+
+		// 遍历资源数组
 		for (Resource resource : resources) {
 			try {
 				URL url = resource.getURL();
+				// 将每个资源封装为 ApplicationResource，并添加到资源列表中
 				resourceList.add(new URLApplicationResource(url.toExternalForm(), url));
 			} catch (IOException ex) {
-				// Shouldn't happen with the kind of resources we're using
+				// 不应该发生，因为我们使用的是这种类型的资源
 				throw new IllegalArgumentException("No URL for " + resource, ex);
 			}
 		}
+
+		// 返回资源列表
 		return resourceList;
 	}
 
