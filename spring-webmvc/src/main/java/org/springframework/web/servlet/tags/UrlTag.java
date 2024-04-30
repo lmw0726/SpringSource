@@ -16,20 +16,6 @@
 
 package org.springframework.web.servlet.tags;
 
-import java.io.IOException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -38,49 +24,52 @@ import org.springframework.web.util.JavaScriptUtils;
 import org.springframework.web.util.TagUtils;
 import org.springframework.web.util.UriUtils;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.PageContext;
+import java.io.IOException;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.*;
+
 /**
- * The {@code <url>} tag creates URLs. Modeled after the JSTL {@code c:url} tag with
- * backwards compatibility in mind.
+ * {@code <url>} 标签用于创建 URL。模仿 JSTL {@code c:url} 标签，考虑了向后兼容性。
  *
- * <p>Enhancements to the JSTL functionality include:
+ * <p>对 JSTL 功能的增强包括：
  * <ul>
- * <li>URL encoded template URI variables</li>
- * <li>HTML/XML escaping of URLs</li>
- * <li>JavaScript escaping of URLs</li>
+ * <li>URL 编码的模板 URI 变量</li>
+ * <li>URL 的 HTML/XML 转义</li>
+ * <li>URL 的 JavaScript 转义</li>
  * </ul>
  *
- * <p>Template URI variables are indicated in the {@link #setValue(String) 'value'}
- * attribute and marked by braces '{variableName}'. The braces and attribute name are
- * replaced by the URL encoded value of a parameter defined with the spring:param tag
- * in the body of the url tag. If no parameter is available the literal value is
- * passed through. Params matched to template variables will not be added to the query
- * string.
+ * <p>模板 URI 变量在 {@link #setValue(String) 'value'} 属性中表示，并用大括号 '{variableName}' 标记。
+ * 大括号和属性名称将被替换为通过 body 中的 spring:param 标签定义的参数的 URL 编码值。如果没有可用的参数，
+ * 则通过文字值传递。与模板变量匹配的参数将不会添加到查询字符串中。
  *
- * <p>Use of the spring:param tag for URI template variables is strongly recommended
- * over direct EL substitution as the values are URL encoded.  Failure to properly
- * encode URL can leave an application vulnerable to XSS and other injection attacks.
+ * <p>强烈推荐使用 spring:param 标签来定义 URI 模板变量，而不是直接使用 EL 替换，因为值已经进行了 URL 编码。
+ * 如果未正确编码 URL，应用程序可能会容易受到 XSS 和其他注入攻击的威胁。
  *
- * <p>URLs can be HTML/XML escaped by setting the {@link #setHtmlEscape(boolean)
- * 'htmlEscape'} attribute to 'true'.  Detects an HTML escaping setting, either on
- * this tag instance, the page level, or the {@code web.xml} level. The default
- * is 'false'.  When setting the URL value into a variable, escaping is not recommended.
+ * <p>通过将 {@link #setHtmlEscape(boolean) 'htmlEscape'} 属性设置为 'true'，
+ * 可以对 URL 进行 HTML/XML 转义。检测 HTML 转义设置，可以是此标签实例上的设置，也可以是页面级别或 {@code web.xml} 级别的设置。
+ * 默认值为 'false'。不建议在将 URL 值设置到变量时进行转义。
  *
- * <p>Example usage:
+ * <p>示例用法：
  * <pre class="code">&lt;spring:url value="/url/path/{variableName}"&gt;
  *   &lt;spring:param name="variableName" value="more than JSTL c:url" /&gt;
  * &lt;/spring:url&gt;</pre>
  *
- * <p>The above results in:
+ * <p>上述示例结果为：
  * {@code /currentApplicationContext/url/path/more%20than%20JSTL%20c%3Aurl}
  *
  * <table>
- * <caption>Attribute Summary</caption>
+ * <caption>属性摘要</caption>
  * <thead>
  * <tr>
- * <th>Attribute</th>
- * <th>Required?</th>
- * <th>Runtime Expression?</th>
- * <th>Description</th>
+ * <th>属性</th>
+ * <th>必需?</th>
+ * <th>运行时表达式?</th>
+ * <th>描述</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -88,52 +77,46 @@ import org.springframework.web.util.UriUtils;
  * <td>value</td>
  * <td>true</td>
  * <td>true</td>
- * <td>The URL to build. This value can include template {placeholders} that are
- * replaced with the URL encoded value of the named parameter. Parameters
- * must be defined using the param tag inside the body of this tag.</td>
+ * <td>要构建的 URL。此值可以包含用于替换为命名参数的 URL 编码值的模板 {placeholders}。
+ * 必须使用 body 中的 param 标签定义参数。</td>
  * </tr>
  * <tr>
  * <td>context</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Specifies a remote application context path.
- * The default is the current application context path.</td>
+ * <td>指定远程应用程序上下文路径。默认为当前应用程序上下文路径。</td>
  * </tr>
  * <tr>
  * <td>var</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The name of the variable to export the URL value to.
- * If not specified the URL is written as output.</td>
+ * <td>要将 URL 值导出到的变量名称。如果未指定，则将 URL 写入输出。</td>
  * </tr>
  * <tr>
  * <td>scope</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The scope for the var. 'application', 'session', 'request' and 'page'
- * scopes are supported. Defaults to page scope. This attribute has no
- * effect unless the var attribute is also defined.</td>
+ * <td>要将 URL 变量导出到的范围。支持 'application'、'session'、'request' 和 'page' 范围。
+ * 默认为 page 范围。只有在还定义了 var 属性时，此属性才有效。</td>
  * </tr>
  * <tr>
  * <td>htmlEscape</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set HTML escaping for this tag, as a boolean value. Overrides the
- * default HTML escaping setting for the current page.</td>
+ * <td>为此标签设置 HTML 转义，作为布尔值。覆盖当前页面的默认 HTML 转义设置。</td>
  * </tr>
  * <tr>
  * <td>javaScriptEscape</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set JavaScript escaping for this tag, as a boolean value.
- * Default is false.</td>
+ * <td>为此标签设置 JavaScript 转义，作为布尔值。默认为 "false"。</td>
  * </tr>
  * </tbody>
  * </table>
  *
  * @author Scott Andrews
- * @since 3.0
  * @see ParamTag
+ * @since 3.0
  */
 @SuppressWarnings("serial")
 public class UrlTag extends HtmlEscapingAwareTag implements ParamAware {
@@ -149,12 +132,18 @@ public class UrlTag extends HtmlEscapingAwareTag implements ParamAware {
 
 	private Set<String> templateParams = Collections.emptySet();
 
+	/**
+	 * URL类型
+	 */
 	@Nullable
 	private UrlType type;
 
 	@Nullable
 	private String value;
 
+	/**
+	 * URL 的上下文路径
+	 */
 	@Nullable
 	private String context;
 
@@ -167,55 +156,57 @@ public class UrlTag extends HtmlEscapingAwareTag implements ParamAware {
 
 
 	/**
-	 * Set the value of the URL.
+	 * 设置 URL 的值。
 	 */
 	public void setValue(String value) {
+		// 如果值中包含绝对 URL 标志
 		if (value.contains(URL_TYPE_ABSOLUTE)) {
+			// 设置类型为绝对 URL
 			this.type = UrlType.ABSOLUTE;
+			// 将值设置为传入的值
 			this.value = value;
-		}
-		else if (value.startsWith("/")) {
+		} else if (value.startsWith("/")) {
+			// 如果值以斜杠开头
+			// 设置类型为相对于上下文的相对 URL
 			this.type = UrlType.CONTEXT_RELATIVE;
 			this.value = value;
-		}
-		else {
+		} else {
+			// 如果不符合以上两种情况
+			// 设置类型为相对 URL
 			this.type = UrlType.RELATIVE;
 			this.value = value;
 		}
 	}
 
 	/**
-	 * Set the context path for the URL.
-	 * Defaults to the current context.
+	 * 设置 URL 的上下文路径。默认为当前上下文。
 	 */
 	public void setContext(String context) {
 		if (context.startsWith("/")) {
 			this.context = context;
-		}
-		else {
+		} else {
 			this.context = "/" + context;
 		}
 	}
 
 	/**
-	 * Set the variable name to expose the URL under. Defaults to rendering the
-	 * URL to the current JspWriter
+	 * 设置要将 URL 导出到的变量名称。
+	 * 默认情况下，将 URL 渲染到当前 JspWriter。
 	 */
 	public void setVar(String var) {
 		this.var = var;
 	}
 
 	/**
-	 * Set the scope to export the URL variable to. This attribute has no
-	 * meaning unless var is also defined.
+	 * 设置要将 URL 变量导出到的范围。
+	 * 只有在还定义了 var 时，此属性才有效。
 	 */
 	public void setScope(String scope) {
 		this.scope = TagUtils.getScope(scope);
 	}
 
 	/**
-	 * Set JavaScript escaping for this tag, as boolean value.
-	 * Default is "false".
+	 * 设置 JavaScript 转义，作为布尔值。默认为 "false"。
 	 */
 	public void setJavaScriptEscape(boolean javaScriptEscape) throws JspException {
 		this.javaScriptEscape = javaScriptEscape;
@@ -236,161 +227,201 @@ public class UrlTag extends HtmlEscapingAwareTag implements ParamAware {
 
 	@Override
 	public int doEndTag() throws JspException {
+		// 创建 URL
 		String url = createUrl();
 
+		// 获取请求数据值处理器
 		RequestDataValueProcessor processor = getRequestContext().getRequestDataValueProcessor();
+		// 获取 Servlet 请求
 		ServletRequest request = this.pageContext.getRequest();
+		// 如果存在请求数据值处理器且请求是 HttpServletRequest 的实例
 		if ((processor != null) && (request instanceof HttpServletRequest)) {
+			// 处理 URL
 			url = processor.processUrl((HttpServletRequest) request, url);
 		}
 
+		// 如果未指定变量名
 		if (this.var == null) {
-			// print the url to the writer
+			// 将 URL 打印到 writer
 			try {
 				this.pageContext.getOut().print(url);
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
+				// 抛出 JSP 异常
 				throw new JspException(ex);
 			}
-		}
-		else {
-			// store the url as a variable
+		} else {
+			// 将 URL 存储为变量
 			this.pageContext.setAttribute(this.var, url, this.scope);
 		}
+		// 返回页面的评估
 		return EVAL_PAGE;
 	}
 
 
 	/**
-	 * Build the URL for the tag from the tag attributes and parameters.
-	 * @return the URL value as a String
+	 * 从标签属性和参数构建标签的 URL。
+	 *
+	 * @return URL 值作为字符串
 	 */
 	String createUrl() throws JspException {
 		Assert.state(this.value != null, "No value set");
+		// 获取 HttpServletRequest 对象
 		HttpServletRequest request = (HttpServletRequest) this.pageContext.getRequest();
+		// 获取 HttpServletResponse 对象
 		HttpServletResponse response = (HttpServletResponse) this.pageContext.getResponse();
 
+		// 创建 StringBuilder 对象来构建 URL
 		StringBuilder url = new StringBuilder();
+		// 如果 URL 类型是相对于上下文的相对 URL
 		if (this.type == UrlType.CONTEXT_RELATIVE) {
-			// add application context to url
+			// 将 上下文路径 添加到 URL
 			if (this.context == null) {
 				url.append(request.getContextPath());
-			}
-			else {
+			} else {
+				// 如果URL上下文路径以 / 结尾
 				if (this.context.endsWith("/")) {
+					// 添加 / 之前的字符串到URL中
 					url.append(this.context, 0, this.context.length() - 1);
-				}
-				else {
+				} else {
+					// 否则直接添加上下文路径
 					url.append(this.context);
 				}
 			}
 		}
+		// 如果 URL 类型不是相对和绝对 URL，并且值不以斜杠开头
 		if (this.type != UrlType.RELATIVE && this.type != UrlType.ABSOLUTE && !this.value.startsWith("/")) {
+			// 添加 /
 			url.append('/');
 		}
+		// 替换 URI 模板参数并添加到 URL
 		url.append(replaceUriTemplateParams(this.value, this.params, this.templateParams));
+		// 创建查询字符串并添加到 URL
 		url.append(createQueryString(this.params, this.templateParams, (url.indexOf("?") == -1)));
 
+		// 将 StringBuilder 转换为 String
 		String urlStr = url.toString();
+		// 如果 URL 类型不是绝对 URL
 		if (this.type != UrlType.ABSOLUTE) {
-			// Add the session identifier if needed
-			// (Do not embed the session identifier in a remote link!)
+			// 如果需要，在 URL 中添加会话标识符（不要将会话标识符嵌入到远程链接中！）
 			urlStr = response.encodeURL(urlStr);
 		}
 
-		// HTML and/or JavaScript escape, if demanded.
+		// 进行 HTML 和/或 JavaScript 转义，如果需要
 		urlStr = htmlEscape(urlStr);
 		urlStr = (this.javaScriptEscape ? JavaScriptUtils.javaScriptEscape(urlStr) : urlStr);
 
+		// 返回 URL 字符串
 		return urlStr;
 	}
 
 	/**
-	 * Build the query string from available parameters that have not already
-	 * been applied as template params.
-	 * <p>The names and values of parameters are URL encoded.
-	 * @param params the parameters to build the query string from
-	 * @param usedParams set of parameter names that have been applied as
-	 * template params
-	 * @param includeQueryStringDelimiter true if the query string should start
-	 * with a '?' instead of '&amp;'
-	 * @return the query string
+	 * 从可用参数构建查询字符串，这些参数尚未作为模板参数应用。
+	 * <p>参数的名称和值将进行 URL 编码。
+	 *
+	 * @param params                      从中构建查询字符串的参数
+	 * @param usedParams                  已应用为模板参数的参数名称集
+	 * @param includeQueryStringDelimiter 如果查询字符串应该以 '?' 而不是 '&' 开头，则为 true
+	 * @return 查询字符串
 	 */
 	protected String createQueryString(List<Param> params, Set<String> usedParams, boolean includeQueryStringDelimiter)
 			throws JspException {
 
+		// 获取响应的字符编码
 		String encoding = this.pageContext.getResponse().getCharacterEncoding();
+		// 创建 StringBuilder 对象来构建查询字符串
 		StringBuilder qs = new StringBuilder();
+		// 遍历参数列表
 		for (Param param : params) {
+			// 如果参数未被使用过且参数名不为空
 			if (!usedParams.contains(param.getName()) && StringUtils.hasLength(param.getName())) {
+				// 如果查询字符串需要以 ? 开头，并且查询字符串为空
 				if (includeQueryStringDelimiter && qs.length() == 0) {
+					// 添加 ?
 					qs.append('?');
-				}
-				else {
+				} else {
+					// 否则添加 &
 					qs.append('&');
 				}
 				try {
+					// 将参数名编码，并添加进查询字符串中
 					qs.append(UriUtils.encodeQueryParam(param.getName(), encoding));
+					// 如果参数值不为空
 					if (param.getValue() != null) {
+						// 添加参数值
 						qs.append('=');
+						// 将参数值编码，并添加进查询字符串中
 						qs.append(UriUtils.encodeQueryParam(param.getValue(), encoding));
 					}
-				}
-				catch (UnsupportedCharsetException ex) {
+				} catch (UnsupportedCharsetException ex) {
+					// 抛出 JSP 异常
 					throw new JspException(ex);
 				}
 			}
 		}
+		// 返回查询字符串
 		return qs.toString();
 	}
 
 	/**
-	 * Replace template markers in the URL matching available parameters. The
-	 * name of matched parameters are added to the used parameters set.
-	 * <p>Parameter values are URL encoded.
-	 * @param uri the URL with template parameters to replace
-	 * @param params parameters used to replace template markers
-	 * @param usedParams set of template parameter names that have been replaced
-	 * @return the URL with template parameters replaced
+	 * 替换 URL 中的模板标记，匹配可用参数。匹配参数的名称将添加到已使用参数集。
+	 * <p>参数值将进行 URL 编码。
+	 *
+	 * @param uri        要替换为模板参数的 URL
+	 * @param params     用于替换模板标记的参数
+	 * @param usedParams 已替换的模板参数名称集
+	 * @return 替换了模板参数的 URL
 	 */
 	protected String replaceUriTemplateParams(String uri, List<Param> params, Set<String> usedParams)
 			throws JspException {
 
+		// 获取Http响应的字符编码
 		String encoding = this.pageContext.getResponse().getCharacterEncoding();
+		// 遍历参数列表
 		for (Param param : params) {
+			// 构建参数模板
 			String template = URL_TEMPLATE_DELIMITER_PREFIX + param.getName() + URL_TEMPLATE_DELIMITER_SUFFIX;
+			// 如果 URI 中包含参数模板
 			if (uri.contains(template)) {
+				// 将参数标记为已使用
 				usedParams.add(param.getName());
+				// 获取参数值
 				String value = param.getValue();
 				try {
+					// 替换参数模板为编码后的参数值
 					uri = StringUtils.replace(uri, template,
 							(value != null ? UriUtils.encodePath(value, encoding) : ""));
-				}
-				catch (UnsupportedCharsetException ex) {
+				} catch (UnsupportedCharsetException ex) {
+					// 抛出 JSP 异常
 					throw new JspException(ex);
 				}
-			}
-			else {
+			} else {
+				// 如果 URI 中不包含参数模板
+				// 构建另一种参数模板
 				template = URL_TEMPLATE_DELIMITER_PREFIX + '/' + param.getName() + URL_TEMPLATE_DELIMITER_SUFFIX;
+				// 如果 URI 中包含参数模板
 				if (uri.contains(template)) {
+					// 将参数标记为已使用
 					usedParams.add(param.getName());
+					// 获取参数值
 					String value = param.getValue();
 					try {
+						// 替换参数模板为编码后的参数值
 						uri = StringUtils.replace(uri, template,
 								(value != null ? UriUtils.encodePathSegment(value, encoding) : ""));
-					}
-					catch (UnsupportedCharsetException ex) {
+					} catch (UnsupportedCharsetException ex) {
+						// 抛出 JSP 异常
 						throw new JspException(ex);
 					}
 				}
 			}
 		}
+		// 返回替换参数后的 URI
 		return uri;
 	}
 
 
 	/**
-	 * Internal enum that classifies URLs by type.
+	 * 内部枚举，按类型对 URL 进行分类。
 	 */
 	private enum UrlType {
 
