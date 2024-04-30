@@ -20,27 +20,22 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 
 /**
- * The {@code <theme>} tag looks up a theme message in the scope of this page.
- * Messages are looked up using the ApplicationContext's ThemeSource,
- * and thus should support internationalization.
+ * {@code <theme>} 标签在当前页面的范围内查找主题消息。消息使用 ApplicationContext 的 ThemeSource 进行查找，因此应支持国际化。
  *
- * <p>Regards a HTML escaping setting, either on this tag instance,
- * the page level, or the web.xml level.
+ * <p>与 HTML 转义设置有关，可以在此标签实例、页面级别或 web.xml 级别上设置。
  *
- * <p>If "code" isn't set or cannot be resolved, "text" will be used
- * as default message.
+ * <p>如果未设置 "code" 或无法解析，则将使用 "text" 作为默认消息。
  *
- * <p>Message arguments can be specified via the {@link #setArguments(Object)
- * arguments} attribute or by using nested {@code <spring:argument>} tags.
+ * <p>消息参数可以通过 {@link #setArguments(Object) arguments} 属性或使用嵌套的 {@code <spring:argument>} 标签指定。
  *
  * <table>
- * <caption>Attribute Summary</caption>
+ * <caption>属性摘要</caption>
  * <thead>
  * <tr>
- * <th>Attribute</th>
- * <th>Required?</th>
- * <th>Runtime Expression?</th>
- * <th>Description</th>
+ * <th>属性</th>
+ * <th>必需？</th>
+ * <th>运行时表达式？</th>
+ * <th>描述</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -48,66 +43,55 @@ import org.springframework.context.NoSuchMessageException;
  * <td>arguments</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set optional message arguments for this tag, as a (comma-)delimited
- * String (each String argument can contain JSP EL), an Object array (used as
- * argument array), or a single Object (used as single argument).</td>
+ * <td>为此标签设置可选的消息参数，作为 (逗号-) 分隔的字符串（每个字符串参数可以包含 JSP EL）、对象数组（用作参数数组）或单个对象（用作单个参数）。</td>
  * </tr>
  * <tr>
  * <td>argumentSeparator</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The separator character to be used for splitting the arguments string
- * value; defaults to a 'comma' (',').</td>
+ * <td>用于拆分参数字符串值的分隔符字符；默认为 '逗号' (',')。</td>
  * </tr>
  * <tr>
  * <td>code</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The code (key) to use when looking up the message. If code is not
- * provided, the text attribute will be used.</td>
+ * <td>查找消息时要使用的代码（键）。如果未提供 code，则将使用 text 属性。</td>
  * </tr>
  * <tr>
  * <td>htmlEscape</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set HTML escaping for this tag, as boolean value. Overrides the default
- * HTML escaping setting for the current page.</td>
+ * <td>为此标签设置 HTML 转义，作为布尔值。覆盖当前页面的默认 HTML 转义设置。</td>
  * </tr>
  * <tr>
  * <td>javaScriptEscape</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set JavaScript escaping for this tag, as boolean value.
- * Default is false.</td>
+ * <td>为此标签设置 JavaScript 转义，作为布尔值。默认为 false。</td>
  * </tr>
  * <tr>
  * <td>message</td>
  * <td>false</td>
  * <td>true</td>
- * <td>A MessageSourceResolvable argument (direct or through JSP EL).</td>
+ * <td>一个 MessageSourceResolvable 参数（直接或通过 JSP EL）。</td>
  * </tr>
  * <tr>
  * <td>scope</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The scope to use when exporting the result to a variable. This attribute
- * is only used when var is also set. Possible values are page, request, session
- * and application.</td>
+ * <td>将结果导出到变量时要使用的作用域。仅在同时设置 var 时使用此属性。可能的值为 page、request、session 和 application。</td>
  * </tr>
  * <tr>
  * <td>text</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Default text to output when a message for the given code could not be
- * found. If both text and code are not set, the tag will output null.</td>
+ * <td>在找不到给定代码的消息时要输出的默认文本。如果 text 和 code 都未设置，则标签将输出 null。</td>
  * </tr>
  * <tr>
  * <td>var</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The string to use when binding the result to the page, request, session
- * or application scope. If not specified, the result gets outputted to the
- * writer (i.e. typically directly to the JSP).</td>
+ * <td>用于将结果绑定到页面、请求、会话或应用程序范围的字符串。如果未指定，则结果将输出到写入器（即通常直接到 JSP）。</td>
  * </tr>
  * </tbody>
  * </table>
@@ -127,7 +111,7 @@ import org.springframework.context.NoSuchMessageException;
 public class ThemeTag extends MessageTag {
 
 	/**
-	 * Use the theme MessageSource for theme message resolution.
+	 * 使用主题 MessageSource 进行主题消息解析。
 	 */
 	@Override
 	protected MessageSource getMessageSource() {
@@ -135,7 +119,7 @@ public class ThemeTag extends MessageTag {
 	}
 
 	/**
-	 * Return exception message that indicates the current theme.
+	 * 返回指示当前主题的异常消息。
 	 */
 	@Override
 	protected String getNoSuchMessageExceptionDescription(NoSuchMessageException ex) {

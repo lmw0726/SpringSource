@@ -16,23 +16,23 @@
 
 package org.springframework.web.servlet.tags;
 
-import javax.servlet.jsp.JspTagException;
-
 import org.springframework.lang.Nullable;
 
+import javax.servlet.jsp.JspTagException;
+
 /**
- * Allows implementing tag to utilize nested {@code spring:argument} tags.
+ * 允许实现标签利用嵌套的 {@code spring:argument} 标签。
  *
  * @author Nicholas Williams
- * @since 4.0
  * @see ArgumentTag
+ * @since 4.0
  */
 public interface ArgumentAware {
 
 	/**
-	 * Callback hook for nested spring:argument tags to pass their value
-	 * to the parent tag.
-	 * @param argument the result of the nested {@code spring:argument} tag
+	 * 回调钩子，用于嵌套的 spring:argument 标签将它们的值传递给父标签。
+	 *
+	 * @param argument 嵌套的 {@code spring:argument} 标签的结果
 	 */
 	void addArgument(@Nullable Object argument) throws JspTagException;
 

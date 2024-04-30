@@ -16,15 +16,6 @@
 
 package org.springframework.web.servlet.tags;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspTagException;
-
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
@@ -34,28 +25,31 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.JavaScriptUtils;
 import org.springframework.web.util.TagUtils;
 
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspTagException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * The {@code <message>} tag looks up a message in the scope of this page.
- * Messages are resolved using the ApplicationContext and thus support
- * internationalization.
+ * {@code <message>} 标签在当前页面的范围内查找消息。消息使用 ApplicationContext 解析，因此支持国际化。
  *
- * <p>Detects an HTML escaping setting, either on this tag instance, the page level,
- * or the {@code web.xml} level. Can also apply JavaScript escaping.
+ * <p>检测 HTML 转义设置，可以在此标签实例、页面级别或 {@code web.xml} 级别上进行设置。还可以应用 JavaScript 转义。
  *
- * <p>If "code" isn't set or cannot be resolved, "text" will be used as default
- * message. Thus, this tag can also be used for HTML escaping of any texts.
+ * <p>如果未设置 "code" 或无法解析，则将使用 "text" 作为默认消息。因此，此标签也可用于对任何文本进行 HTML 转义。
  *
- * <p>Message arguments can be specified via the {@link #setArguments(Object) arguments}
- * attribute or by using nested {@code <spring:argument>} tags.
+ * <p>消息参数可以通过 {@link #setArguments(Object) arguments} 属性或使用嵌套的 {@code <spring:argument>} 标签指定。
  *
  * <table>
- * <caption>Attribute Summary</caption>
+ * <caption>属性摘要</caption>
  * <thead>
  * <tr>
- * <th>Attribute</th>
- * <th>Required?</th>
- * <th>Runtime Expression?</th>
- * <th>Description</th>
+ * <th>属性</th>
+ * <th>必需？</th>
+ * <th>运行时表达式？</th>
+ * <th>描述</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -63,72 +57,56 @@ import org.springframework.web.util.TagUtils;
  * <td>arguments</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set optional message arguments for this tag, as a (comma-)delimited
- * String (each String argument can contain JSP EL), an Object array (used as
- * argument array), or a single Object (used as single argument).</td>
+ * <td>为此标签设置可选的消息参数，作为 (逗号分隔的) 字符串（每个字符串参数可以包含 JSP EL）、对象数组（用作参数数组）或单个对象（用作单个参数）。</td>
  * </tr>
  * <tr>
  * <td>argumentSeparator</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The separator character to be used for splitting the arguments string
- * value; defaults to a 'comma' (',').</td>
+ * <td>用于分割参数字符串值的分隔符字符；默认为 '逗号' (',')。</td>
  * </tr>
  * <tr>
  * <td>code</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The code (key) to use when looking up the message.
- * If code is not provided, the text attribute will be used.</td>
+ * <td>在查找消息时要使用的代码（键）。如果未提供 code，则将使用 text 属性。</td>
  * </tr>
  * <tr>
  * <td>htmlEscape</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set HTML escaping for this tag, as boolean value.
- * Overrides the default HTML escaping setting for the current page.</td>
+ * <td>为此标签设置 HTML 转义，作为布尔值。覆盖当前页面的默认 HTML 转义设置。</td>
  * </tr>
  * <tr>
  * <td>javaScriptEscape</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set JavaScript escaping for this tag, as boolean value.
- * Default is false.</td>
+ * <td>为此标签设置 JavaScript 转义，作为布尔值。默认为 false。</td>
  * </tr>
  * <tr>
  * <td>message</td>
  * <td>false</td>
  * <td>true</td>
- * <td>A MessageSourceResolvable argument (direct or through JSP EL).
- * Fits nicely when used in conjunction with Spring’s own validation error
- * classes which all implement the MessageSourceResolvable interface.
- * For example, this allows you to iterate over all of the errors in a form,
- * passing each error (using a runtime expression) as the value of this
- * 'message' attribute, thus effecting the easy display of such error
- * messages.</td>
+ * <td>一个 MessageSourceResolvable 参数（直接或通过 JSP EL）。与 Spring 自己的验证错误类一起使用时非常适合，它们都实现了 MessageSourceResolvable 接口。
+ * 例如，这允许您迭代表单中的所有错误，将每个错误（使用运行时表达式）作为此 'message' 属性的值，从而简化了这些错误消息的显示。</td>
  * </tr>
  * <tr>
  * <td>scope</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The scope to use when exporting the result to a variable. This attribute
- * is only used when var is also set. Possible values are page, request, session
- * and application.</td>
+ * <td>将结果导出到变量时要使用的作用域。仅在同时设置 var 时使用此属性。可能的值为 page、request、session 和 application。</td>
  * </tr>
  * <tr>
  * <td>text</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Default text to output when a message for the given code could not be
- * found. If both text and code are not set, the tag will output null.</td>
+ * <td>在找不到给定代码的消息时要输出的默认文本。如果 text 和 code 都未设置，则标签将输出 null。</td>
  * </tr>
  * <tr>
  * <td>var</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The string to use when binding the result to the page, request, session
- * or application scope. If not specified, the result gets outputted to the writer
- * (i.e. typically directly to the JSP).</td>
+ * <td>将结果绑定到页面、请求、会话或应用程序范围时要使用的字符串。如果未指定，则结果将输出到写入器（即通常直接到 JSP）。</td>
  * </tr>
  * </tbody>
  * </table>
@@ -148,63 +126,88 @@ import org.springframework.web.util.TagUtils;
 public class MessageTag extends HtmlEscapingAwareTag implements ArgumentAware {
 
 	/**
-	 * Default separator for splitting an arguments String: a comma (",").
+	 * 默认用于拆分参数字符串的分隔符：逗号 (",")。
 	 */
 	public static final String DEFAULT_ARGUMENT_SEPARATOR = ",";
 
-
+	/**
+	 * 可解析的消息源
+	 */
 	@Nullable
 	private MessageSourceResolvable message;
 
+	/**
+	 * 消息代码
+	 */
 	@Nullable
 	private String code;
 
+	/**
+	 * 消息参数
+	 */
 	@Nullable
 	private Object arguments;
 
+	/**
+	 * 拆分参数字符串的分隔符。
+	 * 默认为逗号 (",")。
+	 */
 	private String argumentSeparator = DEFAULT_ARGUMENT_SEPARATOR;
 
+	/**
+	 * 嵌套的消息参数
+	 */
 	private List<Object> nestedArguments = Collections.emptyList();
 
+	/**
+	 * 消息文本
+	 */
 	@Nullable
 	private String text;
 
+	/**
+	 * PageContext 属性名称
+	 */
 	@Nullable
 	private String var;
 
+	/**
+	 * 变量的作用域。
+	 */
 	private String scope = TagUtils.SCOPE_PAGE;
 
+	/**
+	 * 是否对 JavaScript 进行转义
+	 */
 	private boolean javaScriptEscape = false;
 
 
 	/**
-	 * Set the MessageSourceResolvable for this tag.
-	 * <p>If a MessageSourceResolvable is specified, it effectively overrides
-	 * any code, arguments or text specified on this tag.
+	 * 设置此标签的 MessageSourceResolvable。
+	 * <p>如果指定了 MessageSourceResolvable，则它有效地覆盖了此标签上指定的任何代码、参数或文本。
 	 */
 	public void setMessage(MessageSourceResolvable message) {
 		this.message = message;
 	}
 
 	/**
-	 * Set the message code for this tag.
+	 * 设置此标签的消息代码。
 	 */
 	public void setCode(String code) {
 		this.code = code;
 	}
 
 	/**
-	 * Set optional message arguments for this tag, as a comma-delimited
-	 * String (each String argument can contain JSP EL), an Object array
-	 * (used as argument array), or a single Object (used as single argument).
+	 * 为此标签设置可选的消息参数，作为逗号分隔的字符串（每个字符串参数可以包含 JSP EL）、对象数组（用作参数数组）或单个对象（用作单个参数）。
 	 */
 	public void setArguments(Object arguments) {
 		this.arguments = arguments;
 	}
 
 	/**
-	 * Set the separator to use for splitting an arguments String.
-	 * Default is a comma (",").
+	 * 设置用于拆分参数字符串的分隔符。
+	 * 默认为逗号 (",")。
+	 *
 	 * @see #setArguments
 	 */
 	public void setArgumentSeparator(String argumentSeparator) {
@@ -217,15 +220,15 @@ public class MessageTag extends HtmlEscapingAwareTag implements ArgumentAware {
 	}
 
 	/**
-	 * Set the message text for this tag.
+	 * 设置此标签的消息文本。
 	 */
 	public void setText(String text) {
 		this.text = text;
 	}
 
 	/**
-	 * Set PageContext attribute name under which to expose
-	 * a variable that contains the resolved message.
+	 * 设置 PageContext 属性名称，用于公开一个包含解析后消息的变量。
+	 *
 	 * @see #setScope
 	 * @see javax.servlet.jsp.PageContext#setAttribute
 	 */
@@ -234,8 +237,9 @@ public class MessageTag extends HtmlEscapingAwareTag implements ArgumentAware {
 	}
 
 	/**
-	 * Set the scope to export the variable to.
-	 * Default is SCOPE_PAGE ("page").
+	 * 设置要导出变量的作用域。
+	 * 默认为 SCOPE_PAGE ("page")。
+	 *
 	 * @see #setVar
 	 * @see org.springframework.web.util.TagUtils#SCOPE_PAGE
 	 * @see javax.servlet.jsp.PageContext#setAttribute
@@ -245,8 +249,8 @@ public class MessageTag extends HtmlEscapingAwareTag implements ArgumentAware {
 	}
 
 	/**
-	 * Set JavaScript escaping for this tag, as boolean value.
-	 * Default is "false".
+	 * 设置此标签的 JavaScript 转义，作为布尔值。
+	 * 默认为 "false"。
 	 */
 	public void setJavaScriptEscape(boolean javaScriptEscape) throws JspException {
 		this.javaScriptEscape = javaScriptEscape;
@@ -260,8 +264,8 @@ public class MessageTag extends HtmlEscapingAwareTag implements ArgumentAware {
 	}
 
 	/**
-	 * Resolves the message, escapes it if demanded,
-	 * and writes it to the page (or exposes it as variable).
+	 * 解析消息，根据需要进行转义，并将其写入页面（或公开为变量）。
+	 *
 	 * @see #resolveMessage()
 	 * @see org.springframework.web.util.HtmlUtils#htmlEscape(String)
 	 * @see org.springframework.web.util.JavaScriptUtils#javaScriptEscape(String)
@@ -270,27 +274,27 @@ public class MessageTag extends HtmlEscapingAwareTag implements ArgumentAware {
 	@Override
 	public int doEndTag() throws JspException {
 		try {
-			// Resolve the unescaped message.
+			// 解析未转义的消息。
 			String msg = resolveMessage();
 
-			// HTML and/or JavaScript escape, if demanded.
+			// 如果需要，进行 HTML 和/或 JavaScript 转义。
 			msg = htmlEscape(msg);
+			// 如果需要对JavaScript进行转义，则进行转义
 			msg = this.javaScriptEscape ? JavaScriptUtils.javaScriptEscape(msg) : msg;
 
-			// Expose as variable, if demanded, else write to the page.
+			// 如果需要，公开为变量，否则写入页面。
 			if (this.var != null) {
+				// 在页面上下文中公开这个变量
 				this.pageContext.setAttribute(this.var, msg, TagUtils.getScope(this.scope));
-			}
-			else {
+			} else {
+				// 否则写入页面
 				writeMessage(msg);
 			}
 
 			return EVAL_PAGE;
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			throw new JspTagException(ex.getMessage(), ex);
-		}
-		catch (NoSuchMessageException ex) {
+		} catch (NoSuchMessageException ex) {
 			throw new JspTagException(getNoSuchMessageExceptionDescription(ex));
 		}
 	}
@@ -303,33 +307,37 @@ public class MessageTag extends HtmlEscapingAwareTag implements ArgumentAware {
 
 
 	/**
-	 * Resolve the specified message into a concrete message String.
-	 * The returned message String should be unescaped.
+	 * 将指定的消息解析为具体的消息字符串。
+	 * 返回的消息字符串应该是未转义的。
 	 */
 	protected String resolveMessage() throws JspException, NoSuchMessageException {
 		MessageSource messageSource = getMessageSource();
 
-		// Evaluate the specified MessageSourceResolvable, if any.
+		// 评估指定的 MessageSourceResolvable（如果有）。
 		if (this.message != null) {
-			// We have a given MessageSourceResolvable.
+			// 我们有一个给定的 MessageSourceResolvable。
+			// 如果有可解析的消息源，根据请求的区域设置进行语言切换
 			return messageSource.getMessage(this.message, getRequestContext().getLocale());
 		}
 
 		if (this.code != null || this.text != null) {
-			// We have a code or default text that we need to resolve.
+			// 我们有要解析的代码或默认文本。
+			// 解析参数
 			Object[] argumentsArray = resolveArguments(this.arguments);
 			if (!this.nestedArguments.isEmpty()) {
+				// 如果有嵌套参数，则将嵌套惨胡添加到参数数组中。
 				argumentsArray = appendArguments(argumentsArray, this.nestedArguments.toArray());
 			}
 
 			if (this.text != null) {
-				// We have a fallback text to consider.
+				// 我们有要考虑的备用文本。
+				// 根据请求的区域设置进行语言切换
 				String msg = messageSource.getMessage(
 						this.code, argumentsArray, this.text, getRequestContext().getLocale());
 				return (msg != null ? msg : "");
-			}
-			else {
-				// We have no fallback text to consider.
+			} else {
+				// 我们没有要考虑的备用文本。
+				// 根据请求的区域设置进行语言切换
 				return messageSource.getMessage(
 						this.code, argumentsArray, getRequestContext().getLocale());
 			}
@@ -340,60 +348,71 @@ public class MessageTag extends HtmlEscapingAwareTag implements ArgumentAware {
 
 	private Object[] appendArguments(@Nullable Object[] sourceArguments, Object[] additionalArguments) {
 		if (ObjectUtils.isEmpty(sourceArguments)) {
+			// 如果源参数数组为空，则直接返回附加参数数组
 			return additionalArguments;
 		}
+
+		// 创建新的参数数组
 		Object[] arguments = new Object[sourceArguments.length + additionalArguments.length];
+
+		// 将源参数数组复制到新的参数数组中
 		System.arraycopy(sourceArguments, 0, arguments, 0, sourceArguments.length);
+
+		// 将附加参数数组复制到新的参数数组中
 		System.arraycopy(additionalArguments, 0, arguments, sourceArguments.length, additionalArguments.length);
+
+		// 返回新的参数数组
 		return arguments;
 	}
 
 	/**
-	 * Resolve the given arguments Object into an arguments array.
-	 * @param arguments the specified arguments Object
-	 * @return the resolved arguments as array
-	 * @throws JspException if argument conversion failed
+	 * 解析给定的参数对象为参数数组。
+	 *
+	 * @param arguments 指定的参数对象
+	 * @return 解析后的参数数组
+	 * @throws JspException 如果参数转换失败
 	 * @see #setArguments
 	 */
 	@Nullable
 	protected Object[] resolveArguments(@Nullable Object arguments) throws JspException {
 		if (arguments instanceof String) {
+			// 如果参数是字符串类型，则将其按照指定的参数分隔符拆分为字符串数组返回
 			return StringUtils.delimitedListToStringArray((String) arguments, this.argumentSeparator);
-		}
-		else if (arguments instanceof Object[]) {
+		} else if (arguments instanceof Object[]) {
+			// 如果参数是数组类型，则直接返回
 			return (Object[]) arguments;
-		}
-		else if (arguments instanceof Collection) {
+		} else if (arguments instanceof Collection) {
+			// 如果参数是集合类型，则转换为数组返回
 			return ((Collection<?>) arguments).toArray();
-		}
-		else if (arguments != null) {
-			// Assume a single argument object.
-			return new Object[] {arguments};
-		}
-		else {
+		} else if (arguments != null) {
+			// 如果参数不为空，则假设为单个参数对象，封装为数组返回
+			return new Object[]{arguments};
+		} else {
+			// 如果参数为空，则返回 null
 			return null;
 		}
 	}
 
 	/**
-	 * Write the message to the page.
-	 * <p>Can be overridden in subclasses, e.g. for testing purposes.
-	 * @param msg the message to write
-	 * @throws IOException if writing failed
+	 * 将消息写入页面。
+	 * <p>可以在子类中进行重写，例如用于测试目的。
+	 *
+	 * @param msg 要写入的消息
+	 * @throws IOException 如果写入失败
 	 */
 	protected void writeMessage(String msg) throws IOException {
 		this.pageContext.getOut().write(msg);
 	}
 
 	/**
-	 * Use the current RequestContext's application context as MessageSource.
+	 * 使用当前 RequestContext 的应用程序上下文作为 MessageSource。
 	 */
 	protected MessageSource getMessageSource() {
 		return getRequestContext().getMessageSource();
 	}
 
 	/**
-	 * Return default exception message.
+	 * 返回默认的异常消息。
 	 */
 	protected String getNoSuchMessageExceptionDescription(NoSuchMessageException ex) {
 		return ex.getMessage();
