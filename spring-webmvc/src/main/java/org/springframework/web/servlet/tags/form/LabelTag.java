@@ -16,27 +16,26 @@
 
 package org.springframework.web.servlet.tags.form;
 
-import javax.servlet.jsp.JspException;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.jsp.JspException;
+
 /**
- * The {@code <label>} tag renders a form field label in an HTML 'label' tag.
+ * {@code <label>} 标签在 HTML 'label' 标签中呈现表单字段标签。
  *
- * <p>See the "formTags" showcase application that ships with the
- * full Spring distribution for an example of this class in action.
+ * <p>请参阅随完整 Spring 发行版一起提供的 "formTags" 演示应用程序，了解此类的示例。
  *
  * <p>
  * <table>
- * <caption>Attribute Summary</caption>
+ * <caption>属性摘要</caption>
  * <thead>
  * <tr>
- * <th class="colFirst">Attribute</th>
- * <th class="colOne">Required?</th>
- * <th class="colOne">Runtime Expression?</th>
- * <th class="colLast">Description</th>
+ * <th class="colFirst">属性</th>
+ * <th class="colOne">是否必需？</th>
+ * <th class="colOne">运行时表达式？</th>
+ * <th class="colLast">描述</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -44,127 +43,127 @@ import org.springframework.util.StringUtils;
  * <td><p>cssClass</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Optional Attribute.</p></td>
+ * <td><p>HTML 可选属性。</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>cssErrorClass</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Optional Attribute. Used only when errors are present.</p></td>
+ * <td><p>HTML 可选属性。仅在存在错误时使用。</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>cssStyle</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Optional Attribute</p></td>
+ * <td><p>HTML 可选属性</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>dir</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Standard Attribute</p></td>
+ * <td><p>HTML 标准属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>for</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Standard Attribute</p></td>
+ * <td><p>HTML 标准属性</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>htmlEscape</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>Enable/disable HTML escaping of rendered values.</p></td>
+ * <td><p>启用/禁用呈现值的 HTML 转义。</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>id</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Standard Attribute</p></td>
+ * <td><p>HTML 标准属性</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>lang</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Standard Attribute</p></td>
+ * <td><p>HTML 标准属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>onclick</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>ondblclick</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>onkeydown</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>onkeypress</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>onkeyup</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>onmousedown</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>onmousemove</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>onmouseout</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>onmouseover</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>onmouseup</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Event Attribute</p></td>
+ * <td><p>HTML 事件属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>path</p></td>
  * <td><p>true</p></td>
  * <td><p>true</p></td>
- * <td><p>Path to errors object for data binding</p></td>
+ * <td><p>数据绑定的错误对象路径</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>tabindex</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Standard Attribute</p></td>
+ * <td><p>HTML 标准属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>title</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Standard Attribute</p></td>
+ * <td><p>HTML 标准属性</p></td>
  * </tr>
  * </tbody>
  * </table>
@@ -177,41 +176,41 @@ import org.springframework.util.StringUtils;
 public class LabelTag extends AbstractHtmlElementTag {
 
 	/**
-	 * The HTML '{@code label}' tag.
+	 * HTML '{@code label}' 标签。
 	 */
 	private static final String LABEL_TAG = "label";
 
 	/**
-	 * The name of the '{@code for}' attribute.
+	 * '{@code for}' 属性的名称。
 	 */
 	private static final String FOR_ATTRIBUTE = "for";
 
 
 	/**
-	 * The {@link TagWriter} instance being used.
-	 * <p>Stored so we can close the tag on {@link #doEndTag()}.
+	 * 正在使用的 {@link TagWriter} 实例。
+	 * <p>存储以便在 {@link #doEndTag()} 中关闭标签。
 	 */
 	@Nullable
 	private TagWriter tagWriter;
 
 	/**
-	 * The value of the '{@code for}' attribute.
+	 * '{@code for}' 属性的值。
 	 */
 	@Nullable
 	private String forId;
 
 
 	/**
-	 * Set the value of the '{@code for}' attribute.
-	 * <p>Defaults to the value of {@link #getPath}; may be a runtime expression.
+	 * 设置 '{@code for}' 属性的值。
+	 * <p>默认为 {@link #getPath} 的值；可能是运行时表达式。
 	 */
 	public void setFor(String forId) {
 		this.forId = forId;
 	}
 
 	/**
-	 * Get the value of the '{@code id}' attribute.
-	 * <p>May be a runtime expression.
+	 * 获取 '{@code id}' 属性的值。
+	 * <p>可能是运行时表达式。
 	 */
 	@Nullable
 	protected String getFor() {
@@ -220,59 +219,65 @@ public class LabelTag extends AbstractHtmlElementTag {
 
 
 	/**
-	 * Writes the opening '{@code label}' tag and forces a block tag so
-	 * that body content is written correctly.
+	 * 写入开头的 '{@code label}' 标签并强制块标记，以便正确写入正文内容。
+	 *
 	 * @return {@link javax.servlet.jsp.tagext.Tag#EVAL_BODY_INCLUDE}
 	 */
 	@Override
 	protected int writeTagContent(TagWriter tagWriter) throws JspException {
+		// 开始标签标签
 		tagWriter.startTag(LABEL_TAG);
+		// 写入 for 属性
 		tagWriter.writeAttribute(FOR_ATTRIBUTE, resolveFor());
+		// 写入默认属性
 		writeDefaultAttributes(tagWriter);
+		// 强制标签闭合
 		tagWriter.forceBlock();
+		// 设置标签写入器
 		this.tagWriter = tagWriter;
+		// 返回评估正文的结果
 		return EVAL_BODY_INCLUDE;
 	}
 
 	/**
-	 * Overrides {@code #getName()} to always return {@code null},
-	 * because the '{@code name}' attribute is not supported by the
-	 * '{@code label}' tag.
-	 * @return the value for the HTML '{@code name}' attribute
+	 * 重写 {@code #getName()}，始终返回 {@code null}，因为 '{@code name}' 属性不受 '{@code label}' 标签支持。
+	 *
+	 * @return HTML '{@code name}' 属性的值
 	 */
 	@Override
 	@Nullable
 	protected String getName() throws JspException {
-		// This also suppresses the 'id' attribute (which is okay for a <label/>)
+		// 这也会抑制 'id' 属性（对于 <label/> 来说没问题）
 		return null;
 	}
 
 	/**
-	 * Determine the '{@code for}' attribute value for this tag,
-	 * autogenerating one if none specified.
+	 * 确定此标签的 '{@code for}' 属性值，如果未指定则自动生成一个。
+	 *
 	 * @see #getFor()
 	 * @see #autogenerateFor()
 	 */
 	protected String resolveFor() throws JspException {
+		// 如果 forId 不为空且包含文本
 		if (StringUtils.hasText(this.forId)) {
+			// 返回评估后的 forId
 			return getDisplayString(evaluate(FOR_ATTRIBUTE, this.forId));
-		}
-		else {
+		} else {
+			// 否则自动生成 forId
 			return autogenerateFor();
 		}
 	}
 
 	/**
-	 * Autogenerate the '{@code for}' attribute value for this tag.
-	 * <p>The default implementation delegates to {@link #getPropertyPath()},
-	 * deleting invalid characters (such as "[" or "]").
+	 * 为此标签自动生成 '{@code for}' 属性值。
+	 * <p>默认实现委托给 {@link #getPropertyPath()}，删除无效字符（例如 "[" 或 "]"）。
 	 */
 	protected String autogenerateFor() throws JspException {
 		return StringUtils.deleteAny(getPropertyPath(), "[]");
 	}
 
 	/**
-	 * Close the '{@code label}' tag.
+	 * 关闭 '{@code label}' 标签。
 	 */
 	@Override
 	public int doEndTag() throws JspException {
@@ -282,7 +287,7 @@ public class LabelTag extends AbstractHtmlElementTag {
 	}
 
 	/**
-	 * Disposes of the {@link TagWriter} instance.
+	 * 处理 {@link TagWriter} 实例。
 	 */
 	@Override
 	public void doFinally() {

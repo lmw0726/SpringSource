@@ -16,15 +16,13 @@
 
 package org.springframework.web.servlet.tags.form;
 
-import javax.servlet.jsp.JspException;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import javax.servlet.jsp.JspException;
+
 /**
- * Abstract base class to provide common methods for implementing databinding-aware
- * JSP tags for rendering a <i>single</i> HTML '{@code input}' element with a
- * '{@code type}' of '{@code checkbox}' or '{@code radio}'.
+ * 抽象基类，提供用于实现数据绑定感知的 JSP 标签的常用方法，用于渲染一个带有类型为 '{@code checkbox}' 或 '{@code radio}' 的单个 HTML '{@code input}' 元素。
  *
  * @author Juergen Hoeller
  * @since 2.5.2
@@ -33,28 +31,28 @@ import org.springframework.util.Assert;
 public abstract class AbstractSingleCheckedElementTag extends AbstractCheckedElementTag {
 
 	/**
-	 * The value of the '{@code value}' attribute.
+	 * '{@code value}' 属性的值。
 	 */
 	@Nullable
 	private Object value;
 
 	/**
-	 * The value of the '{@code label}' attribute.
+	 * '{@code label}' 属性的值。
 	 */
 	@Nullable
 	private Object label;
 
 
 	/**
-	 * Set the value of the '{@code value}' attribute.
-	 * May be a runtime expression.
+	 * 设置 '{@code value}' 属性的值。
+	 * 可能是运行时表达式。
 	 */
 	public void setValue(Object value) {
 		this.value = value;
 	}
 
 	/**
-	 * Get the value of the '{@code value}' attribute.
+	 * 获取 '{@code value}' 属性的值。
 	 */
 	@Nullable
 	protected Object getValue() {
@@ -62,15 +60,15 @@ public abstract class AbstractSingleCheckedElementTag extends AbstractCheckedEle
 	}
 
 	/**
-	 * Set the value of the '{@code label}' attribute.
-	 * May be a runtime expression.
+	 * 设置 '{@code label}' 属性的值。
+	 * 可能是运行时表达式。
 	 */
 	public void setLabel(Object label) {
 		this.label = label;
 	}
 
 	/**
-	 * Get the value of the '{@code label}' attribute.
+	 * 获取 '{@code label}' 属性的值。
 	 */
 	@Nullable
 	protected Object getLabel() {
@@ -79,35 +77,52 @@ public abstract class AbstractSingleCheckedElementTag extends AbstractCheckedEle
 
 
 	/**
-	 * Renders the '{@code input(radio)}' element with the configured
-	 * {@link #setValue(Object) value}. Marks the element as checked if the
-	 * value matches the {@link #getValue bound value}.
+	 * 使用配置的 {@link #setValue(Object) value} 渲染 '{@code input(radio)}' 元素。
+	 * 如果值与 {@link #getValue 绑定值} 匹配，则标记元素为已选中。
 	 */
 	@Override
 	protected int writeTagContent(TagWriter tagWriter) throws JspException {
+		// 开始输入标签
 		tagWriter.startTag("input");
+
+		// 解析并设置id属性
 		String id = resolveId();
 		writeOptionalAttribute(tagWriter, "id", id);
+
+		// 设置name属性
 		writeOptionalAttribute(tagWriter, "name", getName());
+
+		// 写入可选属性
 		writeOptionalAttributes(tagWriter);
+
+		// 写入标签的详细内容
 		writeTagDetails(tagWriter);
+
+		// 结束输入标签
 		tagWriter.endTag();
 
+		// 解析并设置标签的label属性
 		Object resolvedLabel = evaluate("label", getLabel());
 		if (resolvedLabel != null) {
+			// 确保id属性已设置
 			Assert.state(id != null, "Label id is required");
+			// 开始label标签
 			tagWriter.startTag("label");
+			// 设置for属性
 			tagWriter.writeAttribute("for", id);
+			// 添加标签文本
 			tagWriter.appendValue(convertToDisplayString(resolvedLabel));
+			// 结束label标签
 			tagWriter.endTag();
 		}
 
+		// 跳过标签主体
 		return SKIP_BODY;
 	}
 
 	/**
-	 * Write the details for the given primary tag:
-	 * i.e. special attributes and the tag's value.
+	 * 为给定的主标签写入详细信息：
+	 * 即特殊属性和标签的值。
 	 */
 	protected abstract void writeTagDetails(TagWriter tagWriter) throws JspException;
 

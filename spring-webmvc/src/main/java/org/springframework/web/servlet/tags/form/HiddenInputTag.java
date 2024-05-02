@@ -19,23 +19,22 @@ package org.springframework.web.servlet.tags.form;
 import javax.servlet.jsp.JspException;
 
 /**
- * The {@code <hidden>} tag renders an HTML 'input' tag with type 'hidden' using
- * the bound value.
+ * {@code <hidden>} 标签使用绑定的值渲染 HTML 'input' 标签，类型为 'hidden'。
  *
- * <p>Example (binding to 'name' property of form backing object):
+ * <p>示例（绑定到表单后备对象的 'name' 属性）：
  * <pre class="code">
  * &lt;form:hidden path=&quot;name&quot;/&gt;
  * </pre>
  *
  * <p>
  * <table>
- * <caption>Attribute Summary</caption>
+ * <caption>属性摘要</caption>
  * <thead>
  * <tr>
- * <th class="colFirst">Attribute</th>
- * <th class="colOne">Required?</th>
- * <th class="colOne">Runtime Expression?</th>
- * <th class="colLast">Description</th>
+ * <th class="colFirst">属性</th>
+ * <th class="colOne">是否必需？</th>
+ * <th class="colOne">运行时表达式？</th>
+ * <th class="colLast">描述</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -43,19 +42,19 @@ import javax.servlet.jsp.JspException;
  * <td><p>htmlEscape</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>Enable/disable HTML escaping of rendered values.</p></td>
+ * <td><p>启用/禁用渲染值的 HTML 转义。</p></td>
  * </tr>
  * <tr class="rowColor">
  * <td><p>id</p></td>
  * <td><p>false</p></td>
  * <td><p>true</p></td>
- * <td><p>HTML Standard Attribute</p></td>
+ * <td><p>HTML 标准属性</p></td>
  * </tr>
  * <tr class="altColor">
  * <td><p>path</p></td>
  * <td><p>true</p></td>
  * <td><p>true</p></td>
- * <td><p>Path to property for data binding</p></td>
+ * <td><p>数据绑定的属性路径</p></td>
  * </tr>
  * </tbody>
  * </table>
@@ -69,23 +68,26 @@ import javax.servlet.jsp.JspException;
 public class HiddenInputTag extends AbstractHtmlElementTag {
 
 	/**
-	 * The name of the '{@code disabled}' attribute.
+	 * '{@code disabled}' 属性的名称。
 	 */
 	public static final String DISABLED_ATTRIBUTE = "disabled";
 
+	/**
+	 * 是否禁止输入
+	 */
 	private boolean disabled;
 
 
 	/**
-	 * Set the value of the '{@code disabled}' attribute.
-	 * May be a runtime expression.
+	 * 设置 '{@code disabled}' 属性的值。
+	 * 可能是运行时表达式。
 	 */
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 	}
 
 	/**
-	 * Get the value of the '{@code disabled}' attribute.
+	 * 获取 '{@code disabled}' 属性的值。
 	 */
 	public boolean isDisabled() {
 		return this.disabled;
@@ -93,7 +95,7 @@ public class HiddenInputTag extends AbstractHtmlElementTag {
 
 
 	/**
-	 * Flags "type" as an illegal dynamic attribute.
+	 * 将 "type" 标记为非法动态属性。
 	 */
 	@Override
 	protected boolean isValidDynamicAttribute(String localName, Object value) {
@@ -101,22 +103,31 @@ public class HiddenInputTag extends AbstractHtmlElementTag {
 	}
 
 	/**
-	 * Writes the HTML '{@code input}' tag to the supplied {@link TagWriter} including the
-	 * databound value.
+	 * 将 HTML '{@code input}' 标签写入提供的 {@link TagWriter}，包括数据绑定的值。
+	 *
 	 * @see #writeDefaultAttributes(TagWriter)
 	 * @see #getBoundValue()
 	 */
 	@Override
 	protected int writeTagContent(TagWriter tagWriter) throws JspException {
+		// 开始 input 标签
 		tagWriter.startTag("input");
+		// 写入默认属性
 		writeDefaultAttributes(tagWriter);
+		// 写入 type 属性
 		tagWriter.writeAttribute("type", "hidden");
+		// 如果字段被禁用
 		if (isDisabled()) {
+			// 写入 disabled 属性
 			tagWriter.writeAttribute(DISABLED_ATTRIBUTE, "disabled");
 		}
+		// 获取绑定值并处理为字符串
 		String value = getDisplayString(getBoundValue(), getPropertyEditor());
+		// 写入 value 属性
 		tagWriter.writeAttribute("value", processFieldValue(getName(), value, "hidden"));
+		// 结束 input 标签
 		tagWriter.endTag();
+		// 返回跳过正文
 		return SKIP_BODY;
 	}
 
