@@ -39,11 +39,9 @@ import java.util.Map;
 import java.util.TimeZone;
 
 /**
- * Utility class for easy access to request-specific state which has been
- * set by the {@link org.springframework.web.servlet.DispatcherServlet}.
+ * 用于轻松访问由 {@link org.springframework.web.servlet.DispatcherServlet} 设置的请求特定状态的实用程序类。
  *
- * <p>Supports lookup of current WebApplicationContext, LocaleResolver,
- * Locale, ThemeResolver, Theme, and MultipartResolver.
+ * <p>支持查找当前的 WebApplicationContext、LocaleResolver、Locale、ThemeResolver、Theme 和 MultipartResolver。
  *
  * @author Juergen Hoeller
  * @author Rossen Stoyanchev
@@ -54,8 +52,7 @@ import java.util.TimeZone;
 public abstract class RequestContextUtils {
 
 	/**
-	 * The name of the bean to use to determine if an implementation of
-	 * {@link RequestDataValueProcessor} has been configured.
+	 * 用于确定是否已配置 {@link RequestDataValueProcessor} 实现的 Bean 的名称。
 	 *
 	 * @since 4.2.1
 	 */
@@ -63,17 +60,14 @@ public abstract class RequestContextUtils {
 
 
 	/**
-	 * Look for the WebApplicationContext associated with the DispatcherServlet
-	 * that has initiated request processing, and for the global context if none
-	 * was found associated with the current request. The global context will
-	 * be found via the ServletContext or via ContextLoader's current context.
-	 * <p>NOTE: This variant remains compatible with Servlet 2.5, explicitly
-	 * checking a given ServletContext instead of deriving it from the request.
+	 * 查找启动请求处理的 DispatcherServlet 关联的 WebApplicationContext，
+	 * 如果没有与当前请求关联的 WebApplicationContext，则查找全局上下文。全局上下文将
+	 * 通过 ServletContext 或 ContextLoader 的当前上下文找到。
+	 * <p>注意: 此变体保持与 Servlet 2.5 的兼容性，明确检查给定的 ServletContext 而不是从请求中派生它。
 	 *
-	 * @param request        current HTTP request
-	 * @param servletContext current servlet context
-	 * @return the request-specific WebApplicationContext, or the global one
-	 * if no request-specific context has been found, or {@code null} if none
+	 * @param request        当前 HTTP 请求
+	 * @param servletContext 当前 Servlet 上下文
+	 * @return 请求特定的 WebApplicationContext，如果未找到请求特定的上下文，则为全局上下文，如果没有，则为 {@code null}
 	 * @see DispatcherServlet#WEB_APPLICATION_CONTEXT_ATTRIBUTE
 	 * @see WebApplicationContextUtils#getWebApplicationContext(ServletContext)
 	 * @see ContextLoader#getCurrentWebApplicationContext()
@@ -83,30 +77,33 @@ public abstract class RequestContextUtils {
 	public static WebApplicationContext findWebApplicationContext(
 			HttpServletRequest request, @Nullable ServletContext servletContext) {
 
+		// 从请求属性中获取 Web应用上下文
 		WebApplicationContext webApplicationContext = (WebApplicationContext) request.getAttribute(
 				DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+
+		// 如果获取不到的 Web应用上下文
 		if (webApplicationContext == null) {
+			// 如果 Servlet上下文 存在，则尝试从 Servlet上下文 中获取 Web应用上下文
 			if (servletContext != null) {
 				webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
 			}
+			// 如果仍然获取不到的 Web应用上下文，则尝试从当前的 ContextLoader 中获取
 			if (webApplicationContext == null) {
 				webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
 			}
 		}
+
+		// 返回获取到的WebApplicationContext
 		return webApplicationContext;
 	}
 
 	/**
-	 * Look for the WebApplicationContext associated with the DispatcherServlet
-	 * that has initiated request processing, and for the global context if none
-	 * was found associated with the current request. The global context will
-	 * be found via the ServletContext or via ContextLoader's current context.
-	 * <p>NOTE: This variant requires Servlet 3.0+ and is generally recommended
-	 * for forward-looking custom user code.
+	 * 查找启动请求处理的 DispatcherServlet 关联的 WebApplicationContext，
+	 * 如果没有与当前请求关联的 WebApplicationContext，则查找全局上下文。全局上下文将通过 ServletContext 或 ContextLoader 的当前上下文找到。
+	 * <p>注意: 此变体要求 Servlet 3.0+，通常建议用于前瞻性的自定义用户代码。
 	 *
-	 * @param request current HTTP request
-	 * @return the request-specific WebApplicationContext, or the global one
-	 * if no request-specific context has been found, or {@code null} if none
+	 * @param request 当前 HTTP 请求
+	 * @return 请求特定的 WebApplicationContext，如果未找到请求特定的上下文，则为全局上下文，如果没有，则为 {@code null}
 	 * @see #findWebApplicationContext(HttpServletRequest, ServletContext)
 	 * @see ServletRequest#getServletContext()
 	 * @see ContextLoader#getCurrentWebApplicationContext()
@@ -118,11 +115,10 @@ public abstract class RequestContextUtils {
 	}
 
 	/**
-	 * Return the {@link LocaleResolver} that has been bound to the request by the
-	 * {@link DispatcherServlet}.
+	 * 返回已由 {@link DispatcherServlet} 绑定到请求的 {@link LocaleResolver}。
 	 *
-	 * @param request current HTTP request
-	 * @return the current {@code LocaleResolver}, or {@code null} if not found
+	 * @param request 当前 HTTP 请求
+	 * @return 当前的 {@code LocaleResolver}，如果未找到则为 {@code null}
 	 */
 	@Nullable
 	public static LocaleResolver getLocaleResolver(HttpServletRequest request) {
@@ -130,64 +126,57 @@ public abstract class RequestContextUtils {
 	}
 
 	/**
-	 * Retrieve the current locale from the given request, using the
-	 * {@link LocaleResolver} bound to the request by the {@link DispatcherServlet}
-	 * (if available), falling back to the request's locale based on the
-	 * {@code Accept-Language} header or the default locale for the server.
-	 * <p>This method serves as a straightforward alternative to the standard
-	 * Servlet {@link javax.servlet.http.HttpServletRequest#getLocale()} method,
-	 * falling back to the latter if no more specific locale has been found.
-	 * <p>Consider using {@link org.springframework.context.i18n.LocaleContextHolder#getLocale()}
-	 * which will normally be populated with the same Locale.
+	 * 从给定请求中检索当前区域设置，使用由 {@link DispatcherServlet} 绑定到请求的 {@link LocaleResolver}（如果可用），如果未找到则根据 {@code Accept-Language} 头或服务器的默认区域设置回退到请求的区域设置。
+	 * <p>此方法是标准 Servlet {@link javax.servlet.http.HttpServletRequest#getLocale()} 方法的简单替代方法，如果未找到更具体的区域设置，则会回退到后者。
+	 * <p>考虑使用 {@link org.springframework.context.i18n.LocaleContextHolder#getLocale()}，它通常将填充相同的区域设置。
 	 *
-	 * @param request current HTTP request
-	 * @return the current locale for the given request, either from the
-	 * LocaleResolver or from the plain request itself
+	 * @param request 当前 HTTP 请求
+	 * @return 给定请求的当前区域设置，从 LocaleResolver 或请求本身获取
 	 * @see #getLocaleResolver
 	 * @see org.springframework.context.i18n.LocaleContextHolder#getLocale()
 	 */
 	public static Locale getLocale(HttpServletRequest request) {
+		// 获取LocaleResolver
 		LocaleResolver localeResolver = getLocaleResolver(request);
+		// 如果获取到的LocaleResolver不为null，则使用它来解析Locale；否则从请求中获取Locale
 		return (localeResolver != null ? localeResolver.resolveLocale(request) : request.getLocale());
 	}
 
 	/**
-	 * Retrieve the current time zone from the given request, using the
-	 * {@link TimeZoneAwareLocaleContext} in the {@link LocaleResolver} bound to
-	 * the request by the {@link DispatcherServlet} (if available).
-	 * <p>Note: This method returns {@code null} if no specific time zone can be
-	 * resolved for the given request. This is in contrast to {@link #getLocale}
-	 * where it is always possible to fall back to the request's locale based on the
-	 * {@code Accept-Language} header or the default locale for the server.
-	 * <p>Consider using {@link org.springframework.context.i18n.LocaleContextHolder#getTimeZone()}
-	 * which will normally be populated with the same {@code TimeZone}: that method only
-	 * differs in terms of its fallback to the system time zone if the {@code LocaleResolver}
-	 * hasn't provided a specific time zone (instead of this method's {@code null}).
+	 * 从给定请求中检索当前时区，使用由 DispatcherServlet 绑定到请求的 LocaleResolver 中的 TimeZoneAwareLocaleContext。
+	 * <p>注意: 如果无法为给定请求解析特定时区，则此方法返回 {@code null}。这与 {@link #getLocale} 相反，在此方法中，始终可以根据请求的“Accept-Language”头或服务器的默认区域设置回退到请求的区域设置。
+	 * <p>考虑使用 {@link org.springframework.context.i18n.LocaleContextHolder#getTimeZone()}，通常将填充相同的 {@code TimeZone}：该方法仅在没有提供特定时区的 {@code LocaleResolver} 的情况下与此方法的 {@code null} 不同。
 	 *
-	 * @param request current HTTP request
-	 * @return the current time zone for the given request, either from the
-	 * {@code TimeZoneAwareLocaleContext} or {@code null} if none associated
+	 * @param request 当前 HTTP 请求
+	 * @return 给定请求的当前时区，从 {@code TimeZoneAwareLocaleContext} 或 {@code null} 中获取
 	 * @see #getLocaleResolver
 	 * @see org.springframework.context.i18n.LocaleContextHolder#getTimeZone()
 	 */
 	@Nullable
 	public static TimeZone getTimeZone(HttpServletRequest request) {
+		// 获取LocaleResolver
 		LocaleResolver localeResolver = getLocaleResolver(request);
+
+		// 如果LocaleResolver是LocaleContextResolver的实例
 		if (localeResolver instanceof LocaleContextResolver) {
+			// 解析LocaleContext
 			LocaleContext localeContext = ((LocaleContextResolver) localeResolver).resolveLocaleContext(request);
+			// 如果LocaleContext是TimeZoneAwareLocaleContext的实例
 			if (localeContext instanceof TimeZoneAwareLocaleContext) {
+				// 返回TimeZone
 				return ((TimeZoneAwareLocaleContext) localeContext).getTimeZone();
 			}
 		}
+
+		// 如果无法获取到TimeZone，则返回null
 		return null;
 	}
 
 	/**
-	 * Return the ThemeResolver that has been bound to the request by the
-	 * DispatcherServlet.
+	 * 返回已由 DispatcherServlet 绑定到请求的 ThemeResolver。
 	 *
-	 * @param request current HTTP request
-	 * @return the current ThemeResolver, or {@code null} if not found
+	 * @param request 当前 HTTP 请求
+	 * @return 当前的 ThemeResolver，如果未找到，则为 {@code null}
 	 */
 	@Nullable
 	public static ThemeResolver getThemeResolver(HttpServletRequest request) {
@@ -195,11 +184,10 @@ public abstract class RequestContextUtils {
 	}
 
 	/**
-	 * Return the ThemeSource that has been bound to the request by the
-	 * DispatcherServlet.
+	 * 返回已由 DispatcherServlet 绑定到请求的 ThemeSource。
 	 *
-	 * @param request current HTTP request
-	 * @return the current ThemeSource
+	 * @param request 当前 HTTP 请求
+	 * @return 当前的 ThemeSource
 	 */
 	@Nullable
 	public static ThemeSource getThemeSource(HttpServletRequest request) {
@@ -207,21 +195,26 @@ public abstract class RequestContextUtils {
 	}
 
 	/**
-	 * Retrieve the current theme from the given request, using the ThemeResolver
-	 * and ThemeSource bound to the request by the DispatcherServlet.
+	 * 从给定请求中检索当前主题，使用由 DispatcherServlet 绑定到请求的 ThemeResolver 和 ThemeSource。
 	 *
-	 * @param request current HTTP request
-	 * @return the current theme, or {@code null} if not found
+	 * @param request 当前 HTTP 请求
+	 * @return 当前主题，如果未找到则为 {@code null}
 	 * @see #getThemeResolver
 	 */
 	@Nullable
 	public static Theme getTheme(HttpServletRequest request) {
+		// 获取ThemeResolver和ThemeSource
 		ThemeResolver themeResolver = getThemeResolver(request);
 		ThemeSource themeSource = getThemeSource(request);
+
+		// 如果ThemeResolver和ThemeSource都不为null
 		if (themeResolver != null && themeSource != null) {
+			// 解析主题名称
 			String themeName = themeResolver.resolveThemeName(request);
+			// 返回对应的主题
 			return themeSource.getTheme(themeName);
 		} else {
+			// 如果其中一个为null，则返回null
 			return null;
 		}
 	}
