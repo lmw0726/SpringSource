@@ -16,24 +16,17 @@
 
 package org.springframework.web.servlet.support;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.lang.Nullable;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
+
 /**
- * A contract for inspecting and potentially modifying request data values such
- * as URL query parameters or form field values before they are rendered by a
- * view or before a redirect.
+ * 用于检查和可能修改请求数据值的契约，例如 URL 查询参数或表单字段值，在它们被视图渲染之前或重定向之前。
  *
- * <p>Implementations may use this contract for example as part of a solution
- * to provide data integrity, confidentiality, protection against cross-site
- * request forgery (CSRF), and others or for other tasks such as automatically
- * adding a hidden field to all forms and URLs.
+ * <p>实现可以使用此契约作为解决方案的一部分，以提供数据完整性、保密性、防止跨站请求伪造 (CSRF) 等保护措施，或用于其他任务，例如自动向所有表单和 URL 添加隐藏字段。
  *
- * <p>View technologies that support this contract can obtain an instance to
- * delegate to via {@link RequestContext#getRequestDataValueProcessor()}.
+ * <p>支持此契约的视图技术可以通过 {@link RequestContext#getRequestDataValueProcessor()} 获取一个实例来委托。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
@@ -41,37 +34,41 @@ import org.springframework.lang.Nullable;
 public interface RequestDataValueProcessor {
 
 	/**
-	 * Invoked when a new form action is rendered.
-	 * @param request the current request
-	 * @param action the form action
-	 * @param httpMethod the form HTTP method
-	 * @return the action to use, possibly modified
+	 * 在渲染新表单操作时调用。
+	 *
+	 * @param request    当前请求
+	 * @param action     表单操作
+	 * @param httpMethod 表单的 HTTP 方法
+	 * @return 要使用的操作，可能已修改
 	 */
 	String processAction(HttpServletRequest request, String action, String httpMethod);
 
 	/**
-	 * Invoked when a form field value is rendered.
-	 * @param request the current request
-	 * @param name the form field name (if any)
-	 * @param value the form field value
-	 * @param type the form field type ("text", "hidden", etc.)
-	 * @return the form field value to use, possibly modified
+	 * 在渲染表单字段值时调用。
+	 *
+	 * @param request 当前请求
+	 * @param name    表单字段名称（如果有）
+	 * @param value   表单字段值
+	 * @param type    表单字段类型（"text"、"hidden" 等）
+	 * @return 要使用的表单字段值，可能已修改
 	 */
 	String processFormFieldValue(HttpServletRequest request, @Nullable String name, String value, String type);
 
 	/**
-	 * Invoked after all form fields have been rendered.
-	 * @param request the current request
-	 * @return additional hidden form fields to be added, or {@code null} if none
+	 * 在所有表单字段都已渲染之后调用。
+	 *
+	 * @param request 当前请求
+	 * @return 要添加的额外隐藏表单字段，如果没有，则为 {@code null}
 	 */
 	@Nullable
 	Map<String, String> getExtraHiddenFields(HttpServletRequest request);
 
 	/**
-	 * Invoked when a URL is about to be rendered or redirected to.
-	 * @param request the current request
-	 * @param url the URL value
-	 * @return the URL to use, possibly modified
+	 * 在要渲染或重定向到 URL 之前调用。
+	 *
+	 * @param request 当前请求
+	 * @param url     URL 值
+	 * @return 要使用的 URL，可能已修改
 	 */
 	String processUrl(HttpServletRequest request, String url);
 
