@@ -16,48 +16,47 @@
 
 package org.springframework.web.servlet.support;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import org.springframework.lang.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.jstl.core.Config;
-
-import org.springframework.lang.Nullable;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 /**
- * JSP-aware (and JSTL-aware) subclass of RequestContext, allowing for
- * population of the context from a {@code javax.servlet.jsp.PageContext}.
+ * JSP-aware（和 JSTL-aware）的 RequestContext 的子类，允许从 {@code javax.servlet.jsp.PageContext} 填充上下文。
  *
- * <p>This context will detect a JSTL locale attribute in page/request/session/application
- * scope, in addition to the fallback locale strategy provided by the base class.
+ * <p>此上下文将检测页面/请求/会话/应用程序范围内的 JSTL 区域设置属性，除了基类提供的回退区域设置策略。
  *
  * @author Juergen Hoeller
- * @since 1.1.4
  * @see #getFallbackLocale
+ * @since 1.1.4
  */
 public class JspAwareRequestContext extends RequestContext {
 
+	/**
+	 * 页面上下文
+	 */
 	private PageContext pageContext;
 
 
 	/**
-	 * Create a new JspAwareRequestContext for the given page context,
-	 * using the request attributes for Errors retrieval.
-	 * @param pageContext current JSP page context
+	 * 为给定的页面上下文创建一个新的 JspAwareRequestContext，使用请求属性进行错误检索。
+	 *
+	 * @param pageContext 当前 JSP 页面上下文
 	 */
 	public JspAwareRequestContext(PageContext pageContext) {
 		this(pageContext, null);
 	}
 
 	/**
-	 * Create a new JspAwareRequestContext for the given page context,
-	 * using the given model attributes for Errors retrieval.
-	 * @param pageContext current JSP page context
-	 * @param model the model attributes for the current view
-	 * (can be {@code null}, using the request attributes for Errors retrieval)
+	 * 为给定的页面上下文创建一个新的 JspAwareRequestContext，使用给定的模型属性进行错误检索。
+	 *
+	 * @param pageContext 当前 JSP 页面上下文
+	 * @param model       当前视图的模型属性（可以为 {@code null}，使用请求属性进行错误检索）
 	 */
 	public JspAwareRequestContext(PageContext pageContext, @Nullable Map<String, Object> model) {
 		super((HttpServletRequest) pageContext.getRequest(), (HttpServletResponse) pageContext.getResponse(),
@@ -67,60 +66,69 @@ public class JspAwareRequestContext extends RequestContext {
 
 
 	/**
-	 * Return the underlying PageContext.
-	 * Only intended for cooperating classes in this package.
+	 * 返回底层的 PageContext。
+	 * 仅供此包中的协作类使用。
 	 */
 	protected final PageContext getPageContext() {
 		return this.pageContext;
 	}
 
 	/**
-	 * This implementation checks for a JSTL locale attribute in page,
-	 * request, session or application scope; if not found, returns the
-	 * {@code HttpServletRequest.getLocale()}.
+	 * 此实现在页面、请求、会话或应用程序范围内检查 JSTL 区域设置属性；如果找不到，则返回 {@code HttpServletRequest.getLocale()}。
 	 */
 	@Override
 	protected Locale getFallbackLocale() {
 		if (jstlPresent) {
+			// 如果存在JSTL，通过JSTL页面区域设置解析器解析当前页面的区域设置
 			Locale locale = JstlPageLocaleResolver.getJstlLocale(getPageContext());
 			if (locale != null) {
+				// 如果区域设置不为空，则返回该区域设置
 				return locale;
 			}
 		}
+		// 否则，返回请求中的区域设置
 		return getRequest().getLocale();
 	}
 
 	/**
-	 * This implementation checks for a JSTL time zone attribute in page,
-	 * request, session or application scope; if not found, returns {@code null}.
+	 * 此实现在页面、请求、会话或应用程序范围内检查 JSTL 时区属性；如果找不到，则返回 {@code null}。
 	 */
 	@Override
 	protected TimeZone getFallbackTimeZone() {
 		if (jstlPresent) {
+			// 如果存在JSTL，通过JSTL页面区域设置解析器解析当前页面的时区
 			TimeZone timeZone = JstlPageLocaleResolver.getJstlTimeZone(getPageContext());
 			if (timeZone != null) {
+				// 时区存在，则返回该时区
 				return timeZone;
 			}
 		}
+		// 否则，返回null
 		return null;
 	}
 
 
 	/**
-	 * Inner class that isolates the JSTL dependency.
-	 * Just called to resolve the fallback locale if the JSTL API is present.
+	 * 内部类，隔离了 JSTL 依赖项。
+	 * 如果 JSTL API 存在，则仅在解析回退区域设置时调用。
 	 */
 	private static class JstlPageLocaleResolver {
 
 		@Nullable
 		public static Locale getJstlLocale(PageContext pageContext) {
+			// 查找页面上下文中的Locale对象
 			Object localeObject = Config.find(pageContext, Config.FMT_LOCALE);
+
+			// 如果找到的LocaleObject是Locale类型，则直接返回；否则返回null
 			return (localeObject instanceof Locale ? (Locale) localeObject : null);
 		}
 
 		@Nullable
 		public static TimeZone getJstlTimeZone(PageContext pageContext) {
+			// 查找页面上下文中的时区对象
 			Object timeZoneObject = Config.find(pageContext, Config.FMT_TIME_ZONE);
+
+			// 如果找到的timeZoneObject是TimeZone类型，则直接返回；否则返回null
 			return (timeZoneObject instanceof TimeZone ? (TimeZone) timeZoneObject : null);
 		}
 	}
