@@ -16,22 +16,21 @@
 
 package org.springframework.web.servlet.tags.form;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.PageContext;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
 /**
- * Utility class for writing HTML content to a {@link Writer} instance.
+ * 用于向 {@link Writer} 实例写入 HTML 内容的实用工具类。
  *
- * <p>Intended to support output from JSP tag libraries.
+ * <p>旨在支持 JSP 标签库的输出。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -40,20 +39,20 @@ import org.springframework.util.StringUtils;
 public class TagWriter {
 
 	/**
-	 * The {@link SafeWriter} to write to.
+	 * 要写入的 {@link SafeWriter}。
 	 */
 	private final SafeWriter writer;
 
 	/**
-	 * Stores {@link TagStateEntry tag state}. Stack model naturally supports tag nesting.
+	 * 存储 {@link TagStateEntry 标签状态}。栈模型自然支持标签嵌套。
 	 */
 	private final Deque<TagStateEntry> tagState = new ArrayDeque<>();
 
 
 	/**
-	 * Create a new instance of the {@link TagWriter} class that writes to
-	 * the supplied {@link PageContext}.
-	 * @param pageContext the JSP PageContext to obtain the {@link Writer} from
+	 * 创建一个新的 {@link TagWriter} 类的实例，该实例将写入到提供的 {@link PageContext} 中。
+	 *
+	 * @param pageContext 用于获取 {@link Writer} 的 JSP PageContext
 	 */
 	public TagWriter(PageContext pageContext) {
 		Assert.notNull(pageContext, "PageContext must not be null");
@@ -61,9 +60,9 @@ public class TagWriter {
 	}
 
 	/**
-	 * Create a new instance of the {@link TagWriter} class that writes to
-	 * the supplied {@link Writer}.
-	 * @param writer the {@link Writer} to write tag content to
+	 * 创建一个新的 {@link TagWriter} 类的实例，该实例将写入到提供的 {@link Writer} 中。
+	 *
+	 * @param writer 要写入标签内容的 {@link Writer}
 	 */
 	public TagWriter(Writer writer) {
 		Assert.notNull(writer, "Writer must not be null");
@@ -72,23 +71,27 @@ public class TagWriter {
 
 
 	/**
-	 * Start a new tag with the supplied name. Leaves the tag open so
-	 * that attributes, inner text or nested tags can be written into it.
+	 * 使用提供的名称开始一个新的标签。保留标签打开状态，以便可以在其中编写属性、内部文本或嵌套标签。
+	 *
 	 * @see #endTag()
 	 */
 	public void startTag(String tagName) throws JspException {
+		// 如果已经在标签中，则关闭当前标签并标记为块级标签
 		if (inTag()) {
 			closeTagAndMarkAsBlock();
 		}
+
+		// 压入新的标签名称
 		push(tagName);
+		// 写入新标签的起始部分
 		this.writer.append("<").append(tagName);
 	}
 
 	/**
-	 * Write an HTML attribute with the specified name and value.
-	 * <p>Be sure to write all attributes <strong>before</strong> writing
-	 * any inner text or nested tags.
-	 * @throws IllegalStateException if the opening tag is closed
+	 * 使用指定的名称和值写入 HTML 属性。
+	 * <p>确保在写入任何内部文本或嵌套标签<strong>之前</strong>写入所有属性。
+	 *
+	 * @throws IllegalStateException 如果开放标签已关闭
 	 */
 	public void writeAttribute(String attributeName, String attributeValue) throws JspException {
 		if (currentState().isBlockTag()) {
@@ -99,8 +102,8 @@ public class TagWriter {
 	}
 
 	/**
-	 * Variant of {@link #writeAttribute(String, String)} for writing empty HTML
-	 * attributes without a value such as {@code required}.
+	 * {@link #writeAttribute(String, String)} 的变体，用于写入空的 HTML 属性，例如 {@code required}。
+	 *
 	 * @since 5.3.14
 	 */
 	public void writeAttribute(String attributeName) throws JspException {
@@ -111,8 +114,8 @@ public class TagWriter {
 	}
 
 	/**
-	 * Write an HTML attribute if the supplied value is not {@code null}
-	 * or zero length.
+	 * 如果提供的值不为 {@code null} 或零长度，则写入 HTML 属性。
+	 *
 	 * @see #writeAttribute(String, String)
 	 */
 	public void writeOptionalAttributeValue(String attributeName, @Nullable String attributeValue) throws JspException {
@@ -122,9 +125,9 @@ public class TagWriter {
 	}
 
 	/**
-	 * Close the current opening tag (if necessary) and appends the
-	 * supplied value as inner text.
-	 * @throws IllegalStateException if no tag is open
+	 * 关闭当前打开的标签（如果需要），并将提供的值附加为内部文本。
+	 *
+	 * @throws IllegalStateException 如果没有打开的标签
 	 */
 	public void appendValue(String value) throws JspException {
 		if (!inTag()) {
@@ -136,69 +139,80 @@ public class TagWriter {
 
 
 	/**
-	 * Indicate that the currently open tag should be closed and marked
-	 * as a block level element.
-	 * <p>Useful when you plan to write additional content in the body
-	 * outside the context of the current {@link TagWriter}.
+	 * 表示当前打开的标签应关闭，并标记为块级元素。
+	 * <p>当您计划在当前 {@link TagWriter} 上下文之外的正文中编写其他内容时有用。
 	 */
 	public void forceBlock() throws JspException {
 		if (currentState().isBlockTag()) {
-			return; // just ignore since we are already in the block
+			// 只需忽略，因为我们已经在块中了
+			return;
 		}
+		// 关闭标记并标记为块
 		closeTagAndMarkAsBlock();
 	}
 
 	/**
-	 * Close the current tag.
-	 * <p>Correctly writes an empty tag if no inner text or nested tags
-	 * have been written.
+	 * 关闭当前标签。
+	 * <p>如果没有编写任何内部文本或嵌套标签，则正确地写入空标签。
 	 */
 	public void endTag() throws JspException {
 		endTag(false);
 	}
 
 	/**
-	 * Close the current tag, allowing to enforce a full closing tag.
-	 * <p>Correctly writes an empty tag if no inner text or nested tags
-	 * have been written.
-	 * @param enforceClosingTag whether a full closing tag should be
-	 * rendered in any case, even in case of a non-block tag
+	 * 关闭当前标签，允许强制完整关闭标签。
+	 * <p>如果没有编写任何内部文本或嵌套标签，则正确地写入空标签。
+	 *
+	 * @param enforceClosingTag 是否应强制在任何情况下渲染完整的闭合标签，即使在非块标签的情况下也是如此
 	 */
 	public void endTag(boolean enforceClosingTag) throws JspException {
+		// 如果没有打开的标签可用，则抛出异常
 		if (!inTag()) {
 			throw new IllegalStateException("Cannot write end of tag. No open tag available.");
 		}
+
+		// 默认渲染结束标签
 		boolean renderClosingTag = true;
+
+		// 如果当前状态不是块级标签
 		if (!currentState().isBlockTag()) {
-			// Opening tag still needs to be closed...
+			// 对于非块级标签，仍然需要关闭...
 			if (enforceClosingTag) {
+				// 如果需要强制关闭标签，则写入">"
 				this.writer.append(">");
-			}
-			else {
+			} else {
+				// 否则，写入自闭合标签
 				this.writer.append("/>");
 				renderClosingTag = false;
 			}
 		}
+
+		// 如果需要渲染结束标签
 		if (renderClosingTag) {
+			// 写入结束标签
 			this.writer.append("</").append(currentState().getTagName()).append(">");
 		}
+
+		// 弹出当前标签状态
 		this.tagState.pop();
 	}
 
 
 	/**
-	 * Adds the supplied tag name to the {@link #tagState tag state}.
+	 * 将提供的标签名称添加到 {@link #tagState 标签状态}。
 	 */
 	private void push(String tagName) {
 		this.tagState.push(new TagStateEntry(tagName));
 	}
 
 	/**
-	 * Closes the current opening tag and marks it as a block tag.
+	 * 关闭当前打开的标签，并将其标记为块级标签。
 	 */
 	private void closeTagAndMarkAsBlock() throws JspException {
 		if (!currentState().isBlockTag()) {
+			// 如果当前标签不是块标签，将当前状态设置为块标签
 			currentState().markAsBlockTag();
+			// 添加 ">" 结束标签
 			this.writer.append(">");
 		}
 	}
@@ -213,12 +227,18 @@ public class TagWriter {
 
 
 	/**
-	 * Holds state about a tag and its rendered behavior.
+	 * 存储有关标签及其呈现行为的状态。
 	 */
 	private static class TagStateEntry {
 
+		/**
+		 * 标签名称
+		 */
 		private final String tagName;
 
+		/**
+		 * 是否是块标签
+		 */
 		private boolean blockTag;
 
 		public TagStateEntry(String tagName) {
@@ -240,14 +260,20 @@ public class TagWriter {
 
 
 	/**
-	 * Simple {@link Writer} wrapper that wraps all
-	 * {@link IOException IOExceptions} in {@link JspException JspExceptions}.
+	 * 将所有 {@link IOException IOExceptions} 包装在
+	 * {@link JspException JspExceptions} 中的简单 {@link Writer} 包装器。
 	 */
 	private static final class SafeWriter {
 
+		/**
+		 * 页面上下文
+		 */
 		@Nullable
 		private PageContext pageContext;
 
+		/**
+		 * 写入器
+		 */
 		@Nullable
 		private Writer writer;
 
@@ -263,13 +289,13 @@ public class TagWriter {
 			try {
 				getWriterToUse().write(String.valueOf(value));
 				return this;
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				throw new JspException("Unable to write to JspWriter", ex);
 			}
 		}
 
 		private Writer getWriterToUse() {
+			// 获取写入器
 			Writer writer = (this.pageContext != null ? this.pageContext.getOut() : this.writer);
 			Assert.state(writer != null, "No Writer available");
 			return writer;

@@ -16,22 +16,18 @@
 
 package org.springframework.web.servlet.tags.form;
 
-import java.beans.PropertyEditor;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.HtmlUtils;
 
+import java.beans.PropertyEditor;
+
 /**
- * Package-visible helper class for formatting values for rendering via a form tag.
- * Supports two styles of formatting: plain and {@link PropertyEditor}-aware.
+ * 用于通过表单标签渲染值的包可见辅助类。支持两种格式化样式：普通样式和 {@link PropertyEditor} 感知样式。
  *
- * <p>Plain formatting simply prevents the string '{@code null}' from appearing,
- * replacing it with an empty String, and adds HTML escaping as required.
+ * <p>普通样式简单地防止字符串 '{@code null}' 出现，将其替换为空字符串，并根据需要添加 HTML 转义。
  *
- * <p>{@link PropertyEditor}-aware formatting will attempt to use the supplied
- * {@link PropertyEditor} to render any non-String value before applying the
- * default rules of plain formatting.
+ * <p>{@link PropertyEditor} 感知样式将尝试使用提供的 {@link PropertyEditor} 在应用普通格式化规则之前，渲染任何非字符串值。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -40,37 +36,42 @@ import org.springframework.web.util.HtmlUtils;
 abstract class ValueFormatter {
 
 	/**
-	 * Build the display value of the supplied {@code Object}, HTML escaped
-	 * as required. This version is <strong>not</strong> {@link PropertyEditor}-aware.
+	 * 构建提供的 {@code Object} 的显示值，根据需要进行 HTML 转义。此版本不是 {@link PropertyEditor} 感知的。
+	 *
 	 * @see #getDisplayString(Object, java.beans.PropertyEditor, boolean)
 	 */
 	public static String getDisplayString(@Nullable Object value, boolean htmlEscape) {
+		// 获取展示值
 		String displayValue = ObjectUtils.getDisplayString(value);
+		// 如果需要HTML转义，则进行转义
 		return (htmlEscape ? HtmlUtils.htmlEscape(displayValue) : displayValue);
 	}
 
 	/**
-	 * Build the display value of the supplied {@code Object}, HTML escaped
-	 * as required. If the supplied value is not a {@link String} and the supplied
-	 * {@link PropertyEditor} is not null then the {@link PropertyEditor} is used
-	 * to obtain the display value.
+	 * 构建提供的 {@code Object} 的显示值，根据需要进行 HTML 转义。如果提供的值不是 {@link String}，并且提供的
+	 * {@link PropertyEditor} 不为空，则 {@link PropertyEditor} 用于获取显示值。
+	 *
 	 * @see #getDisplayString(Object, boolean)
 	 */
 	public static String getDisplayString(
 			@Nullable Object value, @Nullable PropertyEditor propertyEditor, boolean htmlEscape) {
 
 		if (propertyEditor != null && !(value instanceof String)) {
+			// 如果属性编辑器存在，并且值不是字符串类型
 			try {
+				// 设置属性编辑器中的值为当前值
 				propertyEditor.setValue(value);
+				// 获取该值的文本形式
 				String text = propertyEditor.getAsText();
 				if (text != null) {
+					// 如果文本值存在，则获取展示值
 					return getDisplayString(text, htmlEscape);
 				}
-			}
-			catch (Throwable ex) {
-				// The PropertyEditor might not support this value... pass through.
+			} catch (Throwable ex) {
+				// PropertyEditor 可能不支持此值... 传递。
 			}
 		}
+		// 直接返回其展示值
 		return getDisplayString(value, htmlEscape);
 	}
 

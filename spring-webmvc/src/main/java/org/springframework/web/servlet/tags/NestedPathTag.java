@@ -16,33 +16,30 @@
 
 package org.springframework.web.servlet.tags;
 
+import org.springframework.beans.PropertyAccessor;
+import org.springframework.lang.Nullable;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.tagext.TryCatchFinally;
 
-import org.springframework.beans.PropertyAccessor;
-import org.springframework.lang.Nullable;
-
 /**
- * <p>The {@code <nestedPath>} tag supports and assists with nested beans or
- * bean properties in the model. Exports a "nestedPath" variable of type String
- * in request scope, visible to the current page and also included pages, if any.
+ * <p>{@code <nestedPath>} 标签支持和辅助模型中的嵌套 bean 或 bean 属性。
+ * 在请求范围内导出一个类型为 String 的 "nestedPath" 变量，对当前页面和包含的页面（如果有）可见。
  *
- * <p>The BindTag will auto-detect the current nested path and automatically
- * prepend it to its own path to form a complete path to the bean or bean property.
+ * <p>BindTag 将自动检测当前的嵌套路径，并自动将其前置到自身路径之前，形成对 bean 或 bean 属性的完整路径。
  *
- * <p>This tag will also prepend any existing nested path that is currently set.
- * Thus, you can nest multiple nested-path tags.
+ * <p>此标签还将前置当前设置的任何现有嵌套路径。因此，您可以嵌套多个 nested-path 标签。
  *
  * <table>
- * <caption>Attribute Summary</caption>
+ * <caption>属性摘要</caption>
  * <thead>
  * <tr>
- * <th>Attribute</th>
- * <th>Required?</th>
- * <th>Runtime Expression?</th>
- * <th>Description</th>
+ * <th>属性</th>
+ * <th>是否必需</th>
+ * <th>运行时表达式</th>
+ * <th>描述</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -50,8 +47,7 @@ import org.springframework.lang.Nullable;
  * <td>path</td>
  * <td>true</td>
  * <td>true</td>
- * <td>Set the path that this tag should apply. E.g. 'customer' to allow bind
- * paths like 'address.street' rather than 'customer.address.street'.</td>
+ * <td>设置此标签应用的路径。例如，'customer' 以允许绑定路径 'address.street' 而不是 'customer.address.street'。</td>
  * </tr>
  * </tbody>
  * </table>
@@ -63,37 +59,47 @@ import org.springframework.lang.Nullable;
 public class NestedPathTag extends TagSupport implements TryCatchFinally {
 
 	/**
-	 * Name of the exposed variable within the scope of this tag: "nestedPath".
+	 * 此标签作用域内的公开变量的名称: "nestedPath"。
 	 */
 	public static final String NESTED_PATH_VARIABLE_NAME = "nestedPath";
 
-
+	/**
+	 * 当前路径
+	 */
 	@Nullable
 	private String path;
 
-	/** Caching a previous nested path, so that it may be reset. */
+	/**
+	 * 缓存先前的嵌套路径，以便可以重置它。
+	 */
 	@Nullable
 	private String previousNestedPath;
 
 
 	/**
-	 * Set the path that this tag should apply.
-	 * <p>E.g. "customer" to allow bind paths like "address.street"
-	 * rather than "customer.address.street".
+	 * 设置此标签应用的路径。
+	 * <p>例如，"customer" 以允许绑定路径 "address.street" 而不是 "customer.address.street"。
+	 *
 	 * @see BindTag#setPath
 	 */
 	public void setPath(@Nullable String path) {
+		// 如果路径为空，则将其设置为空字符串。
 		if (path == null) {
 			path = "";
 		}
+
+		// 如果路径的长度大于零且不以 PropertyAccessor.NESTED_PROPERTY_SEPARATOR 结尾
 		if (path.length() > 0 && !path.endsWith(PropertyAccessor.NESTED_PROPERTY_SEPARATOR)) {
+			// 则添加 PropertyAccessor.NESTED_PROPERTY_SEPARATOR 到路径末尾。
 			path += PropertyAccessor.NESTED_PROPERTY_SEPARATOR;
 		}
+
+		// 将路径设置为已处理的路径。
 		this.path = path;
 	}
 
 	/**
-	 * Return the path that this tag applies to.
+	 * 返回此标签应用的路径。
 	 */
 	@Nullable
 	public String getPath() {
@@ -103,28 +109,31 @@ public class NestedPathTag extends TagSupport implements TryCatchFinally {
 
 	@Override
 	public int doStartTag() throws JspException {
-		// Save previous nestedPath value, build and expose current nestedPath value.
-		// Use request scope to expose nestedPath to included pages too.
-		this.previousNestedPath =
-				(String) this.pageContext.getAttribute(NESTED_PATH_VARIABLE_NAME, PageContext.REQUEST_SCOPE);
-		String nestedPath =
-				(this.previousNestedPath != null ? this.previousNestedPath + getPath() : getPath());
+		// 保存先前的 nestedPath 值，构建并暴露当前的 nestedPath 值。
+		// 使用请求范围将 nestedPath 暴露给包含的页面。
+		// 获取之前的嵌套路径。
+		this.previousNestedPath = (String) this.pageContext.getAttribute(NESTED_PATH_VARIABLE_NAME, PageContext.REQUEST_SCOPE);
+
+		// 如果之前的嵌套路径不为 null，则将当前路径与之前的嵌套路径相结合，否则将当前路径作为新的嵌套路径。
+		String nestedPath = (this.previousNestedPath != null ? this.previousNestedPath + getPath() : getPath());
+
+		// 将新的嵌套路径设置到请求范围的页面上下文属性中。
 		this.pageContext.setAttribute(NESTED_PATH_VARIABLE_NAME, nestedPath, PageContext.REQUEST_SCOPE);
 
+		// 返回 包含标签体内容的页面。
 		return EVAL_BODY_INCLUDE;
 	}
 
 	/**
-	 * Reset any previous nestedPath value.
+	 * 重置任何先前的 nestedPath 值。
 	 */
 	@Override
 	public int doEndTag() {
 		if (this.previousNestedPath != null) {
-			// Expose previous nestedPath value.
+			// 暴露先前的 nestedPath 值。
 			this.pageContext.setAttribute(NESTED_PATH_VARIABLE_NAME, this.previousNestedPath, PageContext.REQUEST_SCOPE);
-		}
-		else {
-			// Remove exposed nestedPath value.
+		} else {
+			// 删除暴露的 nestedPath 值。
 			this.pageContext.removeAttribute(NESTED_PATH_VARIABLE_NAME, PageContext.REQUEST_SCOPE);
 		}
 

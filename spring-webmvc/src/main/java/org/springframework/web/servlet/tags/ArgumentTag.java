@@ -16,25 +16,25 @@
 
 package org.springframework.web.servlet.tags;
 
+import org.springframework.lang.Nullable;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
-import org.springframework.lang.Nullable;
-
 /**
- * The {@code <argument>} tag is based on the JSTL {@code fmt:param} tag.
- * The purpose is to support arguments inside the message and theme tags.
+ * {@code <argument>} 标签基于 JSTL 的 {@code fmt:param} 标签。
+ * 其目的是支持消息和主题标签中的参数。
  *
- * <p>This tag must be nested under an argument aware tag.
+ * <p>此标签必须嵌套在一个支持参数的标签下。
  *
  * <table>
- * <caption>Attribute Summary</caption>
+ * <caption>属性摘要</caption>
  * <thead>
  * <tr>
- * <th>Attribute</th>
- * <th>Required?</th>
- * <th>Runtime Expression?</th>
- * <th>Description</th>
+ * <th>属性</th>
+ * <th>是否必需</th>
+ * <th>运行时表达式</th>
+ * <th>描述</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -42,29 +42,36 @@ import org.springframework.lang.Nullable;
  * <td>value</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The value of the argument.</td>
+ * <td>参数的值。</td>
  * </tr>
  * </tbody>
  * </table>
  *
  * @author Nicholas Williams
- * @since 4.0
  * @see MessageTag
  * @see ThemeTag
+ * @since 4.0
  */
 @SuppressWarnings("serial")
 public class ArgumentTag extends BodyTagSupport {
 
+	/**
+	 * 属性值
+	 */
 	@Nullable
 	private Object value;
 
+	/**
+	 * 是否设置属性
+	 */
 	private boolean valueSet;
 
 
 	/**
-	 * Set the value of the argument (optional).
-	 * If not set, the tag's body content will get evaluated.
-	 * @param value the parameter value
+	 * 设置参数的值（可选）。
+	 * 如果未设置，则将评估标签的正文内容。
+	 *
+	 * @param value 参数值
 	 */
 	public void setValue(Object value) {
 		this.value = value;
@@ -76,18 +83,19 @@ public class ArgumentTag extends BodyTagSupport {
 	public int doEndTag() throws JspException {
 		Object argument = null;
 		if (this.valueSet) {
+			// 如果设置了属性，参数值则是属性值
 			argument = this.value;
-		}
-		else if (getBodyContent() != null) {
-			// Get the value from the tag body
+		} else if (getBodyContent() != null) {
+			// 从标签正文获取值
 			argument = getBodyContent().getString().trim();
 		}
 
-		// Find a param-aware ancestor
+		// 查找支持参数的祖先
 		ArgumentAware argumentAwareTag = (ArgumentAware) findAncestorWithClass(this, ArgumentAware.class);
 		if (argumentAwareTag == null) {
 			throw new JspException("The argument tag must be a descendant of a tag that supports arguments");
 		}
+		//将属性值添加到属性值意识器标签中
 		argumentAwareTag.addArgument(argument);
 
 		return EVAL_PAGE;
