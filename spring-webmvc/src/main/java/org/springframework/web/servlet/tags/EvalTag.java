@@ -16,21 +16,11 @@
 
 package org.springframework.web.servlet.tags;
 
-import java.io.IOException;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.expression.EnvironmentAccessor;
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.expression.AccessException;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.PropertyAccessor;
-import org.springframework.expression.TypedValue;
+import org.springframework.expression.*;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.expression.spel.support.StandardTypeConverter;
@@ -39,19 +29,21 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.JavaScriptUtils;
 import org.springframework.web.util.TagUtils;
 
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.PageContext;
+import java.io.IOException;
+
 /**
- * The {@code <eval>} tag evaluates a Spring expression (SpEL) and either prints
- * the result or assigns it to a variable. Supports the standard JSP evaluation
- * context consisting of implicit variables and scoped attributes.
+ * {@code <eval>} 标签用于评估一个 Spring 表达式（SpEL），并打印结果或将其分配给变量。支持标准的 JSP 评估上下文，包括隐式变量和作用域属性。
  *
  * <table>
- * <caption>Attribute Summary</caption>
+ * <caption>属性摘要</caption>
  * <thead>
  * <tr>
- * <th>Attribute</th>
- * <th>Required?</th>
- * <th>Runtime Expression?</th>
- * <th>Description</th>
+ * <th>属性</th>
+ * <th>是否必需？</th>
+ * <th>运行时表达式？</th>
+ * <th>描述</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -59,37 +51,31 @@ import org.springframework.web.util.TagUtils;
  * <td>expression</td>
  * <td>true</td>
  * <td>true</td>
- * <td>The expression to evaluate.</td>
+ * <td>要评估的表达式。</td>
  * </tr>
  * <tr>
  * <td>htmlEscape</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set HTML escaping for this tag, as a boolean value.
- * Overrides the default HTML escaping setting for the current page.</td>
+ * <td>为此标签设置 HTML 转义，作为布尔值。覆盖当前页面的默认 HTML 转义设置。</td>
  * </tr>
  * <tr>
  * <td>javaScriptEscape</td>
  * <td>false</td>
  * <td>true</td>
- * <td>Set JavaScript escaping for this tag, as a boolean value.
- * Default is false.</td>
+ * <td>为此标签设置 JavaScript 转义，作为布尔值。默认值为 false。</td>
  * </tr>
  * <tr>
  * <td>scope</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The scope for the var. 'application', 'session', 'request' and 'page'
- * scopes are supported. Defaults to page scope. This attribute has no effect
- * unless the var attribute is also defined.</td>
+ * <td>变量的作用域。支持 'application'、'session'、'request' 和 'page' 作用域。默认为 'page' 作用域。除非也定义了 var 属性，否则此属性无效。</td>
  * </tr>
  * <tr>
  * <td>var</td>
  * <td>false</td>
  * <td>true</td>
- * <td>The name of the variable to export the evaluation result to.
- * If not specified the evaluation result is converted to a String and written
- * as output.</td>
+ * <td>要导出评估结果的变量名称。如果未指定，评估结果将转换为字符串并写入输出。</td>
  * </tr>
  * </tbody>
  * </table>
@@ -102,52 +88,63 @@ import org.springframework.web.util.TagUtils;
 public class EvalTag extends HtmlEscapingAwareTag {
 
 	/**
-	 * {@link javax.servlet.jsp.PageContext} attribute for the
-	 * page-level {@link EvaluationContext} instance.
+	 * {@link javax.servlet.jsp.PageContext} 属性，用于页面级别的 {@link EvaluationContext} 实例。
 	 */
 	private static final String EVALUATION_CONTEXT_PAGE_ATTRIBUTE =
 			"org.springframework.web.servlet.tags.EVALUATION_CONTEXT";
 
-
+	/**
+	 * SpEL 表达式解析器。
+	 */
 	private final ExpressionParser expressionParser = new SpelExpressionParser();
 
+	/**
+	 * 表达式
+	 */
 	@Nullable
 	private Expression expression;
 
+	/**
+	 * 变量值
+	 */
 	@Nullable
 	private String var;
 
+	/**
+	 * 范围
+	 */
 	private int scope = PageContext.PAGE_SCOPE;
 
+	/**
+	 * 是否对JavaScript进行转义
+	 */
 	private boolean javaScriptEscape = false;
 
 
 	/**
-	 * Set the expression to evaluate.
+	 * 设置要评估的表达式。
 	 */
 	public void setExpression(String expression) {
 		this.expression = this.expressionParser.parseExpression(expression);
 	}
 
 	/**
-	 * Set the variable name to expose the evaluation result under.
-	 * Defaults to rendering the result to the current JspWriter.
+	 * 设置要公开评估结果的变量名称。默认为将结果呈现到当前的 JspWriter。
 	 */
 	public void setVar(String var) {
 		this.var = var;
 	}
 
 	/**
-	 * Set the scope to export the evaluation result to.
-	 * This attribute has no meaning unless var is also defined.
+	 * 设置要将评估结果导出到的作用域。
+	 * 只有在也定义了 var 时，此属性才有意义。
 	 */
 	public void setScope(String scope) {
 		this.scope = TagUtils.getScope(scope);
 	}
 
 	/**
-	 * Set JavaScript escaping for this tag, as boolean value.
-	 * Default is "false".
+	 * 设置 JavaScript 转义，作为布尔值。默认值为 "false"。
 	 */
 	public void setJavaScriptEscape(boolean javaScriptEscape) throws JspException {
 		this.javaScriptEscape = javaScriptEscape;
@@ -161,42 +158,59 @@ public class EvalTag extends HtmlEscapingAwareTag {
 
 	@Override
 	public int doEndTag() throws JspException {
+		// 获取页面上下文中的评估上下文。
 		EvaluationContext evaluationContext =
 				(EvaluationContext) this.pageContext.getAttribute(EVALUATION_CONTEXT_PAGE_ATTRIBUTE);
 		if (evaluationContext == null) {
+			// 如果评估上下文为空，则创建一个新的评估上下文。
 			evaluationContext = createEvaluationContext(this.pageContext);
+			// 将新创建的评估上下文存储在页面上下文中。
 			this.pageContext.setAttribute(EVALUATION_CONTEXT_PAGE_ATTRIBUTE, evaluationContext);
 		}
 		if (this.var != null) {
+			// 如果有 var 属性，则评估表达式
 			Object result = (this.expression != null ? this.expression.getValue(evaluationContext) : null);
+			// 将结果存储在页面上下文中指定的作用域中。
 			this.pageContext.setAttribute(this.var, result, this.scope);
-		}
-		else {
+		} else {
 			try {
+				// 如果没有 var 属性，如果表达式存在，评估表达式获取结果值
 				String result = (this.expression != null ?
 						this.expression.getValue(evaluationContext, String.class) : null);
+				// 将结果转换为字符串表示。
 				result = ObjectUtils.getDisplayString(result);
+				// 对结果进行 HTML 转义。
 				result = htmlEscape(result);
+				// 如果启用了 JavaScript 转义，则对结果进行 JavaScript 转义。
 				result = (this.javaScriptEscape ? JavaScriptUtils.javaScriptEscape(result) : result);
+				// 将结果输出到页面输出流。
 				this.pageContext.getOut().print(result);
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
+				// 处理 IO 异常。
 				throw new JspException(ex);
 			}
 		}
+		// 返回继续处理页面的指令。
 		return EVAL_PAGE;
 	}
 
 	private EvaluationContext createEvaluationContext(PageContext pageContext) {
+		// 创建标准评估上下文。
 		StandardEvaluationContext context = new StandardEvaluationContext();
+		// 添加 JSP 属性访问器，使评估上下文能够访问页面上下文中的属性。
 		context.addPropertyAccessor(new JspPropertyAccessor(pageContext));
+		// 添加 Map 访问器，使评估上下文能够访问 Map 中的属性。
 		context.addPropertyAccessor(new MapAccessor());
+		// 添加环境访问器，使评估上下文能够访问环境中的属性。
 		context.addPropertyAccessor(new EnvironmentAccessor());
+		// 设置 Bean 解析器，以解析 Bean 工厂中的 bean。
 		context.setBeanResolver(new BeanFactoryResolver(getRequestContext().getWebApplicationContext()));
+		// 获取转换服务，如果存在则设置类型转换器。
 		ConversionService conversionService = getConversionService(pageContext);
 		if (conversionService != null) {
 			context.setTypeConverter(new StandardTypeConverter(conversionService));
 		}
+		// 返回配置完成的评估上下文。
 		return context;
 	}
 
@@ -209,6 +223,9 @@ public class EvalTag extends HtmlEscapingAwareTag {
 	@SuppressWarnings("deprecation")
 	private static class JspPropertyAccessor implements PropertyAccessor {
 
+		/**
+		 * 页面上下文
+		 */
 		private final PageContext pageContext;
 
 		@Nullable
@@ -233,10 +250,13 @@ public class EvalTag extends HtmlEscapingAwareTag {
 
 		@Override
 		public TypedValue read(EvaluationContext context, @Nullable Object target, String name) throws AccessException {
+			// 解析隐式变量。
 			Object implicitVar = resolveImplicitVariable(name);
+			// 如果隐式变量不为 null，则返回包含隐式变量的 TypedValue。
 			if (implicitVar != null) {
 				return new TypedValue(implicitVar);
 			}
+			// 否则，返回从页面上下文中查找到的名为 name 的属性对应的 TypedValue。
 			return new TypedValue(this.pageContext.findAttribute(name));
 		}
 
@@ -253,12 +273,13 @@ public class EvalTag extends HtmlEscapingAwareTag {
 		@Nullable
 		private Object resolveImplicitVariable(String name) throws AccessException {
 			if (this.variableResolver == null) {
+				// 如果变量解析器不存在，返回null。
 				return null;
 			}
 			try {
+				// 解析变量名称
 				return this.variableResolver.resolveVariable(name);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				throw new AccessException(
 						"Unexpected exception occurred accessing '" + name + "' as an implicit variable", ex);
 			}

@@ -16,38 +16,41 @@
 
 package org.springframework.web.servlet.tags;
 
-import javax.servlet.jsp.JspException;
-
 import org.springframework.lang.Nullable;
 import org.springframework.web.util.HtmlUtils;
 
+import javax.servlet.jsp.JspException;
+
 /**
- * Superclass for tags that output content that might get HTML-escaped.
+ * 用于输出可能需要进行 HTML 转义的内容的标签的超类。
  *
- * <p>Provides a "htmlEscape" property for explicitly specifying whether to
- * apply HTML escaping. If not set, a page-level default (e.g. from the
- * HtmlEscapeTag) or an application-wide default (the "defaultHtmlEscape"
- * context-param in {@code web.xml}) is used.
+ * <p>提供了一个 "htmlEscape" 属性，用于显式指定是否应用 HTML 转义。如果未设置，
+ * 则使用页面级别的默认值（例如来自 HtmlEscapeTag）或应用程序范围的默认值
+ * （在 {@code web.xml} 中的 "defaultHtmlEscape" 上下文参数）。
  *
  * @author Juergen Hoeller
  * @author Brian Clozel
- * @since 1.1
  * @see #setHtmlEscape
  * @see HtmlEscapeTag
  * @see org.springframework.web.servlet.support.RequestContext#isDefaultHtmlEscape
  * @see org.springframework.web.util.WebUtils#getDefaultHtmlEscape
  * @see org.springframework.web.util.WebUtils#getResponseEncodedHtmlEscape
+ * @since 1.1
  */
 @SuppressWarnings("serial")
 public abstract class HtmlEscapingAwareTag extends RequestContextAwareTag {
 
+	/**
+	 * 是否对HTML进行转义
+	 */
 	@Nullable
 	private Boolean htmlEscape;
 
 
 	/**
-	 * Set HTML escaping for this tag, as boolean value.
-	 * Overrides the default HTML escaping setting for the current page.
+	 * 设置此标签的 HTML 转义，作为布尔值。
+	 * 覆盖当前页面的默认 HTML 转义设置。
+	 *
 	 * @see HtmlEscapeTag#setDefaultHtmlEscape
 	 */
 	public void setHtmlEscape(boolean htmlEscape) throws JspException {
@@ -55,23 +58,24 @@ public abstract class HtmlEscapingAwareTag extends RequestContextAwareTag {
 	}
 
 	/**
-	 * Return the HTML escaping setting for this tag,
-	 * or the default setting if not overridden.
+	 * 返回此标签的 HTML 转义设置，如果没有被覆盖，则返回默认设置。
+	 *
 	 * @see #isDefaultHtmlEscape()
 	 */
 	protected boolean isHtmlEscape() {
 		if (this.htmlEscape != null) {
+			// 如果已经设置了 Html转义 属性，则返回其值
 			return this.htmlEscape.booleanValue();
-		}
-		else {
+		} else {
+			// 否则，返回默认的 HTML 转义设置
 			return isDefaultHtmlEscape();
 		}
 	}
 
 	/**
-	 * Return the applicable default HTML escape setting for this tag.
-	 * <p>The default implementation checks the RequestContext's setting,
-	 * falling back to {@code false} in case of no explicit default given.
+	 * 返回此标签的适用默认 HTML 转义设置。
+	 * <p>默认实现检查 RequestContext 的设置，如果没有明确给出默认值，则返回 {@code false}。
+	 *
 	 * @see #getRequestContext()
 	 */
 	protected boolean isDefaultHtmlEscape() {
@@ -79,34 +83,36 @@ public abstract class HtmlEscapingAwareTag extends RequestContextAwareTag {
 	}
 
 	/**
-	 * Return the applicable default for the use of response encoding with
-	 * HTML escaping for this tag.
-	 * <p>The default implementation checks the RequestContext's setting,
-	 * falling back to {@code false} in case of no explicit default given.
-	 * @since 4.1.2
+	 * 返回用于此标签是否使用响应编码的 HTML 转义的适用默认值。
+	 * <p>默认实现检查 RequestContext 的设置，如果没有明确给出默认值，则返回 {@code false}。
+	 *
 	 * @see #getRequestContext()
+	 * @since 4.1.2
 	 */
 	protected boolean isResponseEncodedHtmlEscape() {
 		return getRequestContext().isResponseEncodedHtmlEscape();
 	}
 
 	/**
-	 * HTML-encodes the given String, only if the "htmlEscape" setting is enabled.
-	 * <p>The response encoding will be taken into account if the
-	 * "responseEncodedHtmlEscape" setting is enabled as well.
-	 * @param content the String to escape
-	 * @return the escaped String
-	 * @since 4.1.2
+	 * 如果启用了 "htmlEscape" 设置，则对给定的字符串进行 HTML 转义。
+	 * <p>如果也启用了 "responseEncodedHtmlEscape" 设置，则会考虑响应编码。
+	 *
+	 * @param content 要转义的字符串
+	 * @return 转义后的字符串
 	 * @see #isHtmlEscape()
 	 * @see #isResponseEncodedHtmlEscape()
+	 * @since 4.1.2
 	 */
 	protected String htmlEscape(String content) {
 		String out = content;
+		// 检查是否需要进行 HTML 转义
 		if (isHtmlEscape()) {
+			// 检查是否使用了响应编码的 HTML 转义
 			if (isResponseEncodedHtmlEscape()) {
+				// 使用响应的字符编码进行 HTML 转义
 				out = HtmlUtils.htmlEscape(content, this.pageContext.getResponse().getCharacterEncoding());
-			}
-			else {
+			} else {
+				// 使用默认的字符编码进行 HTML 转义
 				out = HtmlUtils.htmlEscape(content);
 			}
 		}
