@@ -16,16 +16,15 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
 /**
- * A contract for invoking a chain of {@link ResourceResolver ResourceResolvers} where each resolver
- * is given a reference to the chain allowing it to delegate when necessary.
+ * 用于调用一系列 {@link ResourceResolver ResourceResolvers} 链的契约，其中每个解析器
+ * 都被给予链的引用，以便在必要时委托。
  *
  * @author Jeremy Grelle
  * @author Rossen Stoyanchev
@@ -35,25 +34,24 @@ import org.springframework.lang.Nullable;
 public interface ResourceResolverChain {
 
 	/**
-	 * Resolve the supplied request and request path to a {@link Resource} that
-	 * exists under one of the given resource locations.
-	 * @param request the current request
-	 * @param requestPath the portion of the request path to use
-	 * @param locations the locations to search in when looking up resources
-	 * @return the resolved resource, or {@code null} if unresolved
+	 * 将提供的请求和请求路径解析为存在于给定资源位置之一下的 {@link Resource}。
+	 *
+	 * @param request     当前请求
+	 * @param requestPath 要使用的请求路径部分
+	 * @param locations   查找资源时要搜索的位置
+	 * @return 已解析的资源，如果未解析则返回 {@code null}
 	 */
 	@Nullable
 	Resource resolveResource(
 			@Nullable HttpServletRequest request, String requestPath, List<? extends Resource> locations);
 
 	/**
-	 * Resolve the externally facing <em>public</em> URL path for clients to use
-	 * to access the resource that is located at the given <em>internal</em>
-	 * resource path.
-	 * <p>This is useful when rendering URL links to clients.
-	 * @param resourcePath the internal resource path
-	 * @param locations the locations to search in when looking up resources
-	 * @return the resolved public URL path, or {@code null} if unresolved
+	 * 解析外部公共 URL 路径，以便客户端访问位于给定内部资源路径的资源。
+	 * <p>在向客户端呈现 URL 链接时很有用。
+	 *
+	 * @param resourcePath 内部资源路径
+	 * @param locations    查找资源时要搜索的位置
+	 * @return 已解析的公共 URL 路径，如果未解析则返回 {@code null}
 	 */
 	@Nullable
 	String resolveUrlPath(String resourcePath, List<? extends Resource> locations);
