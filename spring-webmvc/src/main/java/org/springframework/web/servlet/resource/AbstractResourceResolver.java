@@ -16,25 +16,25 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
 /**
- * Base class for {@link org.springframework.web.servlet.resource.ResourceResolver}
- * implementations. Provides consistent logging.
+ * {@link org.springframework.web.servlet.resource.ResourceResolver} 实现的基类。提供一致的日志记录。
  *
  * @author Rossen Stoyanchev
  * @since 4.1
  */
 public abstract class AbstractResourceResolver implements ResourceResolver {
 
+	/**
+	 * 日志记录器
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 

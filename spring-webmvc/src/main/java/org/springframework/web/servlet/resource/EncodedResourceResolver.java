@@ -31,17 +31,14 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Resolver that delegates to the chain, and if a resource is found, it then
- * attempts to find an encoded (e.g. gzip, brotli) variant that is acceptable
- * based on the "Accept-Encoding" request header.
+ * 解析器委托给链，如果找到资源，然后尝试查找可接受的编码（例如 gzip、brotli）变体，
+ * 这是基于 "Accept-Encoding" 请求头进行的。
  *
- * <p>The list of supported {@link #setContentCodings(List) contentCodings} can
- * be configured, in order of preference, and each coding must be associated
- * with {@link #setExtensions(Map) extensions}.
+ * <p>可以配置支持的 {@link #setContentCodings(List) contentCodings} 列表，按优先顺序排列，
+ * 每个编码必须与 {@link #setExtensions(Map) extensions} 相关联。
  *
- * <p>Note that this resolver must be ordered ahead of a
- * {@link VersionResourceResolver} with a content-based, version strategy to
- * ensure the version calculation is not impacted by the encoding.
+ * <p>请注意，此解析器必须在基于内容的版本策略的 {@link VersionResourceResolver} 之前有序，
+ * 以确保版本计算不受编码的影响。
  *
  * @author Rossen Stoyanchev
  * @since 5.1
@@ -49,13 +46,18 @@ import java.util.*;
 public class EncodedResourceResolver extends AbstractResourceResolver {
 
 	/**
-	 * The default content codings.
+	 * 默认的内容编码列表。
 	 */
 	public static final List<String> DEFAULT_CODINGS = Arrays.asList("br", "gzip");
 
-
+	/**
+	 * 内容编码列表
+	 */
 	private final List<String> contentCodings = new ArrayList<>(DEFAULT_CODINGS);
 
+	/**
+	 * 扩展名 和 带有.的扩展名映射
+	 */
 	private final Map<String, String> extensions = new LinkedHashMap<>();
 
 
@@ -66,18 +68,14 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 
 
 	/**
-	 * Configure the supported content codings in order of preference. The first
-	 * coding that is present in the {@literal "Accept-Encoding"} header for a
-	 * given request, and that has a file present with the associated extension,
-	 * is used.
-	 * <p><strong>Note:</strong> Each coding must be associated with a file
-	 * extension via {@link #registerExtension} or {@link #setExtensions}. Also
-	 * customizations to the list of codings here should be matched by
-	 * customizations to the same list in {@link CachingResourceResolver} to
-	 * ensure encoded variants of a resource are cached under separate keys.
-	 * <p>By default this property is set to {@literal ["br", "gzip"]}.
+	 * 配置支持的内容编码列表，按优先顺序排列。对于给定的请求，{@literal "Accept-Encoding"} 头中存在的
+	 * 第一个编码，且具有与关联扩展名的文件存在的编码，将被使用。
+	 * <p><strong>注意：</strong>每个编码必须通过 {@link #registerExtension} 或 {@link #setExtensions}
+	 * 关联到文件扩展名。此处对编码列表的自定义应与 {@link CachingResourceResolver} 中相同列表的自定义匹配，
+	 * 以确保资源的编码变体被缓存在不同的键下。
+	 * <p>默认情况下，此属性设置为 {@literal ["br", "gzip"]}。
 	 *
-	 * @param codings one or more supported content codings
+	 * @param codings 支持的一个或多个内容编码
 	 */
 	public void setContentCodings(List<String> codings) {
 		Assert.notEmpty(codings, "At least one content coding expected");
@@ -86,19 +84,17 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 	}
 
 	/**
-	 * Return a read-only list with the supported content codings.
+	 * 返回支持的内容编码的只读列表。
 	 */
 	public List<String> getContentCodings() {
 		return Collections.unmodifiableList(this.contentCodings);
 	}
 
 	/**
-	 * Configure mappings from content codings to file extensions. A dot "."
-	 * will be prepended in front of the extension value if not present.
-	 * <p>By default this is configured with {@literal ["br" -> ".br"]} and
-	 * {@literal ["gzip" -> ".gz"]}.
+	 * 配置内容编码到文件扩展名的映射。如果扩展名不存在，则会在扩展名值前面添加一个点 "."。
+	 * <p>默认情况下，这是配置的 {@literal ["br" -> ".br"]} 和 {@literal ["gzip" -> ".gz"]}。
 	 *
-	 * @param extensions the extensions to use.
+	 * @param extensions 要使用的扩展名
 	 * @see #registerExtension(String, String)
 	 */
 	public void setExtensions(Map<String, String> extensions) {
@@ -106,17 +102,17 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 	}
 
 	/**
-	 * Return a read-only map with coding-to-extension mappings.
+	 * 返回编码到扩展名的只读映射。
 	 */
 	public Map<String, String> getExtensions() {
 		return Collections.unmodifiableMap(this.extensions);
 	}
 
 	/**
-	 * Java config friendly alternative to {@link #setExtensions(Map)}.
+	 * {@link #setExtensions(Map)} 的 Java 配置友好的替代方法。
 	 *
-	 * @param coding    the content coding
-	 * @param extension the associated file extension
+	 * @param coding    内容编码
+	 * @param extension 关联的文件扩展名
 	 */
 	public void registerExtension(String coding, String extension) {
 		this.extensions.put(coding, (extension.startsWith(".") ? extension : "." + extension));
@@ -127,25 +123,35 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 	protected Resource resolveResourceInternal(@Nullable HttpServletRequest request, String requestPath,
 											   List<? extends Resource> locations, ResourceResolverChain chain) {
 
+		// 解析资源
 		Resource resource = chain.resolveResource(request, requestPath, locations);
+		// 如果资源为空或请求为空，则直接返回资源
 		if (resource == null || request == null) {
 			return resource;
 		}
 
+		// 获取请求中的 Accept-Encoding 头部信息
 		String acceptEncoding = getAcceptEncoding(request);
+		// 如果 Accept-Encoding 为空，则直接返回资源
 		if (acceptEncoding == null) {
 			return resource;
 		}
 
+		// 遍历所有的编码方式
 		for (String coding : this.contentCodings) {
+			// 如果请求中包含当前编码方式
 			if (acceptEncoding.contains(coding)) {
 				try {
+					// 获取编码方式对应的文件扩展名
 					String extension = getExtension(coding);
+					// 创建编码后的资源
 					Resource encoded = new EncodedResource(resource, coding, extension);
+					// 如果编码后的资源存在，则返回该资源
 					if (encoded.exists()) {
 						return encoded;
 					}
 				} catch (IOException ex) {
+					// 如果发生异常，则记录日志，继续遍历下一个编码方式
 					if (logger.isTraceEnabled()) {
 						logger.trace("No " + coding + " resource for [" + resource.getFilename() + "]", ex);
 					}
@@ -153,12 +159,15 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 			}
 		}
 
+		// 如果未找到符合条件的编码资源，则直接返回原始资源
 		return resource;
 	}
 
 	@Nullable
 	private String getAcceptEncoding(HttpServletRequest request) {
+		// 获取请求中的 Accept-Encoding 头部信息
 		String header = request.getHeader(HttpHeaders.ACCEPT_ENCODING);
+		// 转换为小写字母形式返回
 		return (header != null ? header.toLowerCase() : null);
 	}
 

@@ -16,50 +16,47 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
 /**
- * A strategy for resolving a request to a server-side resource.
+ * 用于解析服务器端资源请求的策略。
  *
- * <p>Provides mechanisms for resolving an incoming request to an actual
- * {@link org.springframework.core.io.Resource} and for obtaining the
- * public URL path that clients should use when requesting the resource.
+ * <p>提供了解析传入请求到实际 {@link org.springframework.core.io.Resource} 的机制，
+ * 以及获取客户端在请求资源时应使用的公共 URL 路径的机制。
  *
  * @author Jeremy Grelle
  * @author Rossen Stoyanchev
  * @author Sam Brannen
- * @since 4.1
  * @see org.springframework.web.servlet.resource.ResourceResolverChain
+ * @since 4.1
  */
 public interface ResourceResolver {
 
 	/**
-	 * Resolve the supplied request and request path to a {@link Resource} that
-	 * exists under one of the given resource locations.
-	 * @param request the current request (may not be present in some calls)
-	 * @param requestPath the portion of the request path to use
-	 * @param locations the locations to search in when looking up resources
-	 * @param chain the chain of remaining resolvers to delegate to
-	 * @return the resolved resource, or {@code null} if unresolved
+	 * 将提供的请求和请求路径解析为存在于给定资源位置之一下的 {@link Resource}。
+	 *
+	 * @param request     当前请求（在某些调用中可能不存在）
+	 * @param requestPath 请求路径的部分
+	 * @param locations   在查找资源时要搜索的位置
+	 * @param chain       剩余解析器链用于委托
+	 * @return 解析的资源，如果未解析则为 {@code null}
 	 */
 	@Nullable
 	Resource resolveResource(@Nullable HttpServletRequest request, String requestPath,
-			List<? extends Resource> locations, ResourceResolverChain chain);
+							 List<? extends Resource> locations, ResourceResolverChain chain);
 
 	/**
-	 * Resolve the externally facing <em>public</em> URL path for clients to use
-	 * to access the resource that is located at the given <em>internal</em>
-	 * resource path.
-	 * <p>This is useful when rendering URL links to clients.
-	 * @param resourcePath the internal resource path
-	 * @param locations the locations to search in when looking up resources
-	 * @param chain the chain of resolvers to delegate to
-	 * @return the resolved public URL path, or {@code null} if unresolved
+	 * 解析外部公共 URL 路径，以供客户端访问位于给定的内部资源路径的资源时使用。
+	 * <p>在向客户端渲染 URL 链接时，这很有用。
+	 *
+	 * @param resourcePath 内部资源路径
+	 * @param locations    在查找资源时要搜索的位置
+	 * @param chain        解析器链用于委托
+	 * @return 已解析的公共 URL 路径，如果未解析则为 {@code null}
 	 */
 	@Nullable
 	String resolveUrlPath(String resourcePath, List<? extends Resource> locations, ResourceResolverChain chain);

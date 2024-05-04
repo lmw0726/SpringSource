@@ -16,33 +16,28 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.webjars.WebJarAssetLocator;
-
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
+import org.webjars.WebJarAssetLocator;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
- * A {@code ResourceResolver} that delegates to the chain to locate a resource and then
- * attempts to find a matching versioned resource contained in a WebJar JAR file.
+ * 一个 {@code ResourceResolver}，委托给链来定位资源，然后尝试查找包含在 WebJar JAR 文件中的匹配版本化资源。
  *
- * <p>This allows WebJars.org users to write version agnostic paths in their templates,
- * like {@code <script src="/jquery/jquery.min.js"/>}.
- * This path will be resolved to the unique version {@code <script src="/jquery/1.2.0/jquery.min.js"/>},
- * which is a better fit for HTTP caching and version management in applications.
+ * <p>这允许 WebJars.org 用户在模板中编写版本不可知的路径，例如 {@code <script src="/jquery/jquery.min.js"/>}。
+ * 此路径将解析为唯一版本 {@code <script src="/jquery/1.2.0/jquery.min.js"/>}，
+ * 这更适合于应用程序中的 HTTP 缓存和版本管理。
  *
- * <p>This also resolves resources for version agnostic HTTP requests {@code "GET /jquery/jquery.min.js"}.
+ * <p>这还解析版本不可知的 HTTP 请求的资源 {@code "GET /jquery/jquery.min.js"}。
  *
- * <p>This resolver requires the {@code org.webjars:webjars-locator-core} library
- * on the classpath and is automatically registered if that library is present.
+ * <p>此解析器需要类路径上的 {@code org.webjars:webjars-locator-core} 库，并且如果存在该库，则会自动注册。
  *
  * @author Brian Clozel
- * @since 4.2
  * @see org.springframework.web.servlet.config.annotation.ResourceChainRegistration
  * @see <a href="https://www.webjars.org">webjars.org</a>
+ * @since 4.2
  */
 public class WebJarsResourceResolver extends AbstractResourceResolver {
 
@@ -50,20 +45,23 @@ public class WebJarsResourceResolver extends AbstractResourceResolver {
 
 	private static final int WEBJARS_LOCATION_LENGTH = WEBJARS_LOCATION.length();
 
-
+	/**
+	 * Web Jar资产定位器
+	 */
 	private final WebJarAssetLocator webJarAssetLocator;
 
 
 	/**
-	 * Create a {@code WebJarsResourceResolver} with a default {@code WebJarAssetLocator} instance.
+	 * 使用默认的 {@code WebJarAssetLocator} 实例创建一个 {@code WebJarsResourceResolver}。
 	 */
 	public WebJarsResourceResolver() {
 		this(new WebJarAssetLocator());
 	}
 
 	/**
-	 * Create a {@code WebJarsResourceResolver} with a custom {@code WebJarAssetLocator} instance,
-	 * e.g. with a custom index.
+	 * 使用自定义的 {@code WebJarAssetLocator} 实例创建一个 {@code WebJarsResourceResolver}，
+	 * 例如具有自定义索引。
+	 *
 	 * @since 4.3
 	 */
 	public WebJarsResourceResolver(WebJarAssetLocator webJarAssetLocator) {
@@ -73,44 +71,65 @@ public class WebJarsResourceResolver extends AbstractResourceResolver {
 
 	@Override
 	protected Resource resolveResourceInternal(@Nullable HttpServletRequest request, String requestPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+											   List<? extends Resource> locations, ResourceResolverChain chain) {
 
+		// 尝试解析资源
 		Resource resolved = chain.resolveResource(request, requestPath, locations);
+		// 如果解析不到资源
 		if (resolved == null) {
+			// 查找WebJar资源路径
 			String webJarResourcePath = findWebJarResourcePath(requestPath);
+			// 如果找到了WebJar资源路径
 			if (webJarResourcePath != null) {
+				// 再次尝试解析资源
 				return chain.resolveResource(request, webJarResourcePath, locations);
 			}
 		}
+		// 返回解析的资源
 		return resolved;
 	}
 
 	@Override
 	protected String resolveUrlPathInternal(String resourceUrlPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+											List<? extends Resource> locations, ResourceResolverChain chain) {
 
+		// 解析资源路径
 		String path = chain.resolveUrlPath(resourceUrlPath, locations);
+		// 如果解析不到的路径
 		if (path == null) {
+			// 查找WebJar资源路径
 			String webJarResourcePath = findWebJarResourcePath(resourceUrlPath);
+			// 如果找到了WebJar资源路径
 			if (webJarResourcePath != null) {
+				// 再次尝试解析资源路径
 				return chain.resolveUrlPath(webJarResourcePath, locations);
 			}
 		}
+		// 返回解析的路径
 		return path;
 	}
 
 	@Nullable
 	protected String findWebJarResourcePath(String path) {
+		// 计算起始偏移量
 		int startOffset = (path.startsWith("/") ? 1 : 0);
+		// 计算结束偏移量
 		int endOffset = path.indexOf('/', 1);
+		// 如果存在结束偏移量
 		if (endOffset != -1) {
+			// 获取WebJar名称
 			String webjar = path.substring(startOffset, endOffset);
+			// 获取部分路径
 			String partialPath = path.substring(endOffset + 1);
+			// 获取WebJar资源完整路径
 			String webJarPath = this.webJarAssetLocator.getFullPathExact(webjar, partialPath);
+			// 如果找到了WebJar资源路径
 			if (webJarPath != null) {
+				// 返回相对路径
 				return webJarPath.substring(WEBJARS_LOCATION_LENGTH);
 			}
 		}
+		// 如果未找到WebJar资源路径，返回null
 		return null;
 	}
 

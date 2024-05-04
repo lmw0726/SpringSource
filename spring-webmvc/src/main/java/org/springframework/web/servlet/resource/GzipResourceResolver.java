@@ -30,44 +30,53 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * A {@code ResourceResolver} that delegates to the chain to locate a resource
- * and then attempts to find a variation with the ".gz" extension.
+ * 一个 {@code ResourceResolver}，委托给链来定位一个资源，然后尝试找到一个具有“.gz”扩展名的变体。
  *
- * <p>The resolver gets involved only if the "Accept-Encoding" request header
- * contains the value "gzip" indicating the client accepts gzipped responses.
+ * <p>只有当“Accept-Encoding”请求头包含值“gzip”时，指示客户端接受gzip响应时，解析器才会介入。
  *
  * @author Jeremy Grelle
  * @author Rossen Stoyanchev
  * @author Sam Brannen
  * @since 4.1
- * @deprecated as of 5.1, in favor of using {@link EncodedResourceResolver}
+ * @deprecated 自5.1起，建议使用 {@link EncodedResourceResolver}
  */
 @Deprecated
 public class GzipResourceResolver extends AbstractResourceResolver {
+
 
 	@Override
 	protected Resource resolveResourceInternal(@Nullable HttpServletRequest request, String requestPath,
 											   List<? extends Resource> locations, ResourceResolverChain chain) {
 
+		// 解析资源
 		Resource resource = chain.resolveResource(request, requestPath, locations);
+
+		// 如果资源为null，或者请求不支持gzip压缩，则直接返回资源
 		if (resource == null || (request != null && !isGzipAccepted(request))) {
 			return resource;
 		}
 
 		try {
+			// 尝试获取gzip压缩后的资源
 			Resource gzipped = new GzippedResource(resource);
+			// 如果gzip压缩后的资源存在，则返回gzip压缩后的资源
 			if (gzipped.exists()) {
 				return gzipped;
 			}
 		} catch (IOException ex) {
+			// 记录日志，但不影响流程
 			logger.trace("No gzip resource for [" + resource.getFilename() + "]", ex);
 		}
 
+		// 返回原始资源
 		return resource;
 	}
 
 	private boolean isGzipAccepted(HttpServletRequest request) {
+		// 获取请求头中的Accept-Encoding字段的值
 		String value = request.getHeader("Accept-Encoding");
+
+		// 检查值是否不为null，且包含"gzip"（不区分大小写）
 		return (value != null && value.toLowerCase().contains("gzip"));
 	}
 
