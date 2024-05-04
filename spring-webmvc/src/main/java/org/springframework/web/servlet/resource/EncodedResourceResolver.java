@@ -16,25 +16,19 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
 
 /**
  * Resolver that delegates to the chain, and if a resource is found, it then
@@ -82,6 +76,7 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 	 * customizations to the same list in {@link CachingResourceResolver} to
 	 * ensure encoded variants of a resource are cached under separate keys.
 	 * <p>By default this property is set to {@literal ["br", "gzip"]}.
+	 *
 	 * @param codings one or more supported content codings
 	 */
 	public void setContentCodings(List<String> codings) {
@@ -102,6 +97,7 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 	 * will be prepended in front of the extension value if not present.
 	 * <p>By default this is configured with {@literal ["br" -> ".br"]} and
 	 * {@literal ["gzip" -> ".gz"]}.
+	 *
 	 * @param extensions the extensions to use.
 	 * @see #registerExtension(String, String)
 	 */
@@ -118,7 +114,8 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 
 	/**
 	 * Java config friendly alternative to {@link #setExtensions(Map)}.
-	 * @param coding the content coding
+	 *
+	 * @param coding    the content coding
 	 * @param extension the associated file extension
 	 */
 	public void registerExtension(String coding, String extension) {
@@ -128,7 +125,7 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 
 	@Override
 	protected Resource resolveResourceInternal(@Nullable HttpServletRequest request, String requestPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+											   List<? extends Resource> locations, ResourceResolverChain chain) {
 
 		Resource resource = chain.resolveResource(request, requestPath, locations);
 		if (resource == null || request == null) {
@@ -148,8 +145,7 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 					if (encoded.exists()) {
 						return encoded;
 					}
-				}
-				catch (IOException ex) {
+				} catch (IOException ex) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("No " + coding + " resource for [" + resource.getFilename() + "]", ex);
 					}
@@ -176,29 +172,45 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 
 	@Override
 	protected String resolveUrlPathInternal(String resourceUrlPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+											List<? extends Resource> locations, ResourceResolverChain chain) {
 
 		return chain.resolveUrlPath(resourceUrlPath, locations);
 	}
 
 
 	/**
-	 * An encoded {@link HttpResource}.
+	 * 编码过的 {@link HttpResource}。
 	 */
 	static final class EncodedResource extends AbstractResource implements HttpResource {
 
+		/**
+		 * 原始资源
+		 */
 		private final Resource original;
 
+		/**
+		 * 编码方式
+		 */
 		private final String coding;
 
+		/**
+		 * 经过编码后的资源
+		 */
 		private final Resource encoded;
 
+		/**
+		 * 构造一个新的EncodedResource实例。
+		 *
+		 * @param original  原始资源
+		 * @param coding    编码方式
+		 * @param extension 扩展名
+		 * @throws IOException 如果创建资源失败
+		 */
 		EncodedResource(Resource original, String coding, String extension) throws IOException {
 			this.original = original;
 			this.coding = coding;
 			this.encoded = original.createRelative(original.getFilename() + extension);
 		}
-
 
 		@Override
 		public InputStream getInputStream() throws IOException {
@@ -268,15 +280,21 @@ public class EncodedResourceResolver extends AbstractResourceResolver {
 
 		@Override
 		public HttpHeaders getResponseHeaders() {
+			// 创建HttpHeaders对象
 			HttpHeaders headers;
 			if (this.original instanceof HttpResource) {
+				// 如果原始对象是HttpResource，则获取其响应头部
 				headers = ((HttpResource) this.original).getResponseHeaders();
-			}
-			else {
+			} else {
+				// 否则创建一个空的HttpHeaders对象
 				headers = new HttpHeaders();
 			}
+			// 添加Content-Encoding头部，值为当前的编码方式
 			headers.add(HttpHeaders.CONTENT_ENCODING, this.coding);
+			// 添加Vary头部，值为 Accept-Encoding
 			headers.add(HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING);
+
+			// 返回构建好的HttpHeaders对象
 			return headers;
 		}
 	}

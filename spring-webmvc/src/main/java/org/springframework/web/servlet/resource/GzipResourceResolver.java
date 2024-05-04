@@ -16,19 +16,18 @@
 
 package org.springframework.web.servlet.resource;
 
+import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.lang.Nullable;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.core.io.AbstractResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.lang.Nullable;
 
 /**
  * A {@code ResourceResolver} that delegates to the chain to locate a resource
@@ -48,7 +47,7 @@ public class GzipResourceResolver extends AbstractResourceResolver {
 
 	@Override
 	protected Resource resolveResourceInternal(@Nullable HttpServletRequest request, String requestPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+											   List<? extends Resource> locations, ResourceResolverChain chain) {
 
 		Resource resource = chain.resolveResource(request, requestPath, locations);
 		if (resource == null || (request != null && !isGzipAccepted(request))) {
@@ -60,8 +59,7 @@ public class GzipResourceResolver extends AbstractResourceResolver {
 			if (gzipped.exists()) {
 				return gzipped;
 			}
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			logger.trace("No gzip resource for [" + resource.getFilename() + "]", ex);
 		}
 
@@ -75,21 +73,33 @@ public class GzipResourceResolver extends AbstractResourceResolver {
 
 	@Override
 	protected String resolveUrlPathInternal(String resourceUrlPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+											List<? extends Resource> locations, ResourceResolverChain chain) {
 
 		return chain.resolveUrlPath(resourceUrlPath, locations);
 	}
 
 
 	/**
-	 * A gzipped {@link HttpResource}.
+	 * 一个经过gzip压缩的 {@link HttpResource}。
 	 */
 	static final class GzippedResource extends AbstractResource implements HttpResource {
 
+		/**
+		 * 原始资源
+		 */
 		private final Resource original;
 
+		/**
+		 * 经过Gzip压缩后的资源
+		 */
 		private final Resource gzipped;
 
+		/**
+		 * 构造一个新的GzippedResource实例。
+		 *
+		 * @param original 原始资源
+		 * @throws IOException 如果创建资源失败
+		 */
 		public GzippedResource(Resource original) throws IOException {
 			this.original = original;
 			this.gzipped = original.createRelative(original.getFilename() + ".gz");
@@ -163,10 +173,16 @@ public class GzipResourceResolver extends AbstractResourceResolver {
 
 		@Override
 		public HttpHeaders getResponseHeaders() {
+			// 创建HttpHeaders对象
 			HttpHeaders headers = (this.original instanceof HttpResource ?
+					// 如果原始对象是HttpResource，则获取其响应头部；否则创建一个空的HttpHeaders对象
 					((HttpResource) this.original).getResponseHeaders() : new HttpHeaders());
+			// 添加Content-Encoding头部，值为gzip
 			headers.add(HttpHeaders.CONTENT_ENCODING, "gzip");
+			// 添加Vary头部，值为Accept-Encoding
 			headers.add(HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING);
+
+			// 返回构建好的HttpHeaders对象
 			return headers;
 		}
 	}

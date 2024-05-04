@@ -16,20 +16,6 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -37,6 +23,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
 
 /**
  * Resolves request paths containing a version string that can be used as part
@@ -60,14 +54,16 @@ import org.springframework.util.StringUtils;
  *
  * @author Brian Clozel
  * @author Rossen Stoyanchev
- * @since 4.1
  * @see VersionStrategy
+ * @since 4.1
  */
 public class VersionResourceResolver extends AbstractResourceResolver {
 
 	private AntPathMatcher pathMatcher = new AntPathMatcher();
 
-	/** Map from path pattern -> VersionStrategy. */
+	/**
+	 * Map from path pattern -> VersionStrategy.
+	 */
 	private final Map<String, VersionStrategy> versionStrategyMap = new LinkedHashMap<>();
 
 
@@ -75,6 +71,7 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 	 * Set a Map with URL paths as keys and {@code VersionStrategy} as values.
 	 * <p>Supports direct URL matches and Ant-style pattern matches. For syntax
 	 * details, see the {@link org.springframework.util.AntPathMatcher} javadoc.
+	 *
 	 * @param map a map with URLs as keys and version strategies as values
 	 */
 	public void setStrategyMap(Map<String, VersionStrategy> map) {
@@ -96,8 +93,9 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 	 * default strategy to use except when it cannot be, for example when using
 	 * JavaScript module loaders, use {@link #addFixedVersionStrategy} instead
 	 * for serving JavaScript files.
+	 *
 	 * @param pathPatterns one or more resource URL path patterns,
-	 * relative to the pattern configured with the resource handler
+	 *                     relative to the pattern configured with the resource handler
 	 * @return the current instance for chained method invocation
 	 * @see ContentVersionStrategy
 	 */
@@ -118,9 +116,10 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 	 * the {@code version} will be also configured. For example, adding a {@code "/js/**"} path pattern
 	 * will also cofigure automatically a {@code "/v1.0.0/js/**"} with {@code "v1.0.0"} the
 	 * {@code version} String given as an argument.
-	 * @param version a version string
+	 *
+	 * @param version      a version string
 	 * @param pathPatterns one or more resource URL path patterns,
-	 * relative to the pattern configured with the resource handler
+	 *                     relative to the pattern configured with the resource handler
 	 * @return the current instance for chained method invocation
 	 * @see FixedVersionStrategy
 	 */
@@ -140,9 +139,10 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 	/**
 	 * Register a custom VersionStrategy to apply to resource URLs that match the
 	 * given path patterns.
-	 * @param strategy the custom strategy
+	 *
+	 * @param strategy     the custom strategy
 	 * @param pathPatterns one or more resource URL path patterns,
-	 * relative to the pattern configured with the resource handler
+	 *                     relative to the pattern configured with the resource handler
 	 * @return the current instance for chained method invocation
 	 * @see VersionStrategy
 	 */
@@ -156,7 +156,7 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 
 	@Override
 	protected Resource resolveResourceInternal(@Nullable HttpServletRequest request, String requestPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+											   List<? extends Resource> locations, ResourceResolverChain chain) {
 
 		Resource resolved = chain.resolveResource(request, requestPath, locations);
 		if (resolved != null) {
@@ -182,8 +182,7 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 		String actualVersion = versionStrategy.getResourceVersion(baseResource);
 		if (candidateVersion.equals(actualVersion)) {
 			return new FileNameVersionedResource(baseResource, candidateVersion);
-		}
-		else {
+		} else {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Found resource for \"" + requestPath + "\", but version [" +
 						candidateVersion + "] does not match");
@@ -194,7 +193,7 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 
 	@Override
 	protected String resolveUrlPathInternal(String resourceUrlPath,
-			List<? extends Resource> locations, ResourceResolverChain chain) {
+											List<? extends Resource> locations, ResourceResolverChain chain) {
 
 		String baseUrl = chain.resolveUrlPath(resourceUrlPath, locations);
 		if (StringUtils.hasText(baseUrl)) {
@@ -212,6 +211,7 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 
 	/**
 	 * Find a {@code VersionStrategy} for the request path of the requested resource.
+	 *
 	 * @return an instance of a {@code VersionStrategy} or null if none matches that request path
 	 */
 	@Nullable
@@ -234,8 +234,14 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 
 	private static class FileNameVersionedResource extends AbstractResource implements HttpResource {
 
+		/**
+		 * 原始资源
+		 */
 		private final Resource original;
 
+		/**
+		 * 资源的版本号
+		 */
 		private final String version;
 
 		public FileNameVersionedResource(Resource original, String version) {
@@ -311,9 +317,14 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 
 		@Override
 		public HttpHeaders getResponseHeaders() {
+			// 创建HttpHeaders对象
 			HttpHeaders headers = (this.original instanceof HttpResource ?
+					// 如果原始对象是HttpResource，则获取其响应头部；否则创建一个空的HttpHeaders对象
 					((HttpResource) this.original).getResponseHeaders() : new HttpHeaders());
+			// 设置ETag头部，值为"W/" + 版本号 + ""
 			headers.setETag("W/\"" + this.version + "\"");
+
+			// 返回构建好的HttpHeaders对象
 			return headers;
 		}
 	}

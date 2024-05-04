@@ -20,8 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 
 /**
- * Extended interface for a {@link Resource} to be written to an
- * HTTP response.
+ * 用于将 {@link Resource} 写入 HTTP 响应的扩展接口。
  *
  * @author Brian Clozel
  * @since 5.0
@@ -29,9 +28,8 @@ import org.springframework.http.HttpHeaders;
 public interface HttpResource extends Resource {
 
 	/**
-	 * The HTTP headers to be contributed to the HTTP response
-	 * that serves the current resource.
-	 * @return the HTTP response headers
+	 * 用于服务当前资源的 HTTP 响应中贡献的 HTTP 标头。
+	 * @return HTTP 响应标头
 	 */
 	HttpHeaders getResponseHeaders();
 
