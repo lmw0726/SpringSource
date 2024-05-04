@@ -16,21 +16,20 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.io.IOException;
-
 import org.springframework.core.io.Resource;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.FileCopyUtils;
 
+import java.io.IOException;
+
 /**
- * A {@code VersionStrategy} that calculates an Hex MD5 hashes from the content
- * of the resource and appends it to the file name, e.g.
- * {@code "styles/main-e36d2e05253c6c7085a91522ce43a0b4.css"}.
+ * 从资源内容计算出一个十六进制的MD5哈希，并将其附加到文件名中的{@code VersionStrategy}。
+ * 例如{@code "styles/main-e36d2e05253c6c7085a91522ce43a0b4.css"}。
  *
  * @author Brian Clozel
  * @author Rossen Stoyanchev
- * @since 4.1
  * @see VersionResourceResolver
+ * @since 4.1
  */
 public class ContentVersionStrategy extends AbstractVersionStrategy {
 
@@ -41,10 +40,12 @@ public class ContentVersionStrategy extends AbstractVersionStrategy {
 	@Override
 	public String getResourceVersion(Resource resource) {
 		try {
+			// 将资源内容复制到字节数组中
 			byte[] content = FileCopyUtils.copyToByteArray(resource.getInputStream());
+			// 使用MD5算法计算字节数组的哈希值，并以十六进制字符串形式返回
 			return DigestUtils.md5DigestAsHex(content);
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
+			// 捕获IO异常并抛出状态异常，说明计算哈希值失败
 			throw new IllegalStateException("Failed to calculate hash for " + resource, ex);
 		}
 	}
