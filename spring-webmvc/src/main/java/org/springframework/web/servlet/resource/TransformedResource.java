@@ -16,16 +16,14 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.io.IOException;
-
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+
 /**
- * An extension of {@link ByteArrayResource} that a {@link ResourceTransformer}
- * can use to represent an original resource preserving all other information
- * except the content.
+ * {@link ByteArrayResource}的扩展，用于表示原始资源，保留除内容之外的所有其他信息，以便由{@link ResourceTransformer}使用。
  *
  * @author Jeremy Grelle
  * @author Rossen Stoyanchev
@@ -33,9 +31,15 @@ import org.springframework.lang.Nullable;
  */
 public class TransformedResource extends ByteArrayResource {
 
+	/**
+	 * 文件名
+	 */
 	@Nullable
 	private final String filename;
 
+	/**
+	 * 最后更新的时间戳
+	 */
 	private final long lastModified;
 
 
@@ -44,9 +48,8 @@ public class TransformedResource extends ByteArrayResource {
 		this.filename = original.getFilename();
 		try {
 			this.lastModified = original.lastModified();
-		}
-		catch (IOException ex) {
-			// should never happen
+		} catch (IOException ex) {
+			// 永远不应该发生
 			throw new IllegalArgumentException(ex);
 		}
 	}
