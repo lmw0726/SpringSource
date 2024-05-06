@@ -325,8 +325,10 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	 */
 	public void setMediaTypes(Map<String, MediaType> mediaTypes) {
 		if (this.mediaTypes == null) {
+			// 如果媒体类型为空，初始化为空的哈希映射
 			this.mediaTypes = new HashMap<>(mediaTypes.size());
 		}
+		// 将媒体类型映射的键按照区域设置转小写后，添加到媒体类型映射中
 		mediaTypes.forEach((ext, type) ->
 				this.mediaTypes.put(ext.toLowerCase(Locale.ENGLISH), type));
 	}
@@ -343,15 +345,19 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		// 解析资源位置
 		resolveResourceLocations();
 
 		if (this.resourceResolvers.isEmpty()) {
+			// 如果资源解析器为空，添加一个默认的路径资源解析器
 			this.resourceResolvers.add(new PathResourceResolver());
 		}
 
+		// 初始化允许的资源位置
 		initAllowedLocations();
 
 		if (getResourceHttpMessageWriter() == null) {
+			// 如果资源 HTTP 消息写入器为空，创建一个新的资源 HTTP 消息写入器
 			this.resourceHttpMessageWriter = new ResourceHttpMessageWriter();
 		}
 
@@ -361,22 +367,29 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	private void resolveResourceLocations() {
+		// 创建一个新的资源列表，用于存储资源位置
 		List<Resource> result = new ArrayList<>(this.locationResources);
 
+		// 如果配置了字符串形式的资源位置
 		if (!this.locationValues.isEmpty()) {
-			Assert.notNull(this.resourceLoader,
-					"ResourceLoader is required when \"locationValues\" are configured.");
+			// 确保资源加载器不为空
+			Assert.notNull(this.resourceLoader, "ResourceLoader is required when \"locationValues\" are configured.");
+			// 确保资源位置列表为空
 			Assert.isTrue(CollectionUtils.isEmpty(this.locationResources), "Please set " +
 					"either Resource-based \"locations\" or String-based \"locationValues\", but not both.");
+			// 遍历每个字符串形式的资源位置，将其转换为 Resource 对象，并添加到结果列表中
 			for (String location : this.locationValues) {
 				result.add(this.resourceLoader.getResource(location));
 			}
 		}
 
+		// 如果启用了优化资源位置
 		if (isOptimizeLocations()) {
+			// 过滤不存在的资源，并重新构建结果列表
 			result = result.stream().filter(Resource::exists).collect(Collectors.toList());
 		}
 
+		// 清空原始的资源位置列表，将结果列表添加到使用的资源位置列表中
 		this.locationsToUse.clear();
 		this.locationsToUse.addAll(result);
 	}
@@ -385,15 +398,21 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	 * 查找在配置的位置列表中设置其{@code allowedLocations}属性（如果为空）的{@code PathResourceResolver}。
 	 */
 	protected void initAllowedLocations() {
+		// 如果资源位置列表为空，则直接返回
 		if (CollectionUtils.isEmpty(getLocations())) {
 			return;
 		}
+		// 倒序遍历资源解析器列表
 		for (int i = getResourceResolvers().size() - 1; i >= 0; i--) {
+			// 如果当前解析器是 PathResourceResolver
 			if (getResourceResolvers().get(i) instanceof PathResourceResolver) {
+				// 将当前解析器转换为 PathResourceResolver 类型
 				PathResourceResolver resolver = (PathResourceResolver) getResourceResolvers().get(i);
+				// 如果解析器的允许位置列表为空，则设置允许位置为资源位置列表
 				if (ObjectUtils.isEmpty(resolver.getAllowedLocations())) {
 					resolver.setAllowedLocations(getLocations().toArray(new Resource[0]));
 				}
+				// 找到第一个 PathResourceResolver 后即结束循环
 				break;
 			}
 		}
@@ -413,33 +432,37 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	@Override
 	public Mono<Void> handle(ServerWebExchange exchange) {
 		return getResource(exchange)
+				// 如果资源不存在，则返回 404
 				.switchIfEmpty(Mono.defer(() -> {
 					logger.debug(exchange.getLogPrefix() + "Resource not found");
 					return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND));
 				}))
 				.flatMap(resource -> {
 					try {
+						// 如果是 OPTIONS 请求，则添加 Allow 头部，并返回空结果
 						if (HttpMethod.OPTIONS.matches(exchange.getRequest().getMethodValue())) {
 							exchange.getResponse().getHeaders().add("Allow", "GET,HEAD,OPTIONS");
 							return Mono.empty();
 						}
 
-						// 支持的方法和所需的会话
+						// 检查请求方法是否受支持
 						HttpMethod httpMethod = exchange.getRequest().getMethod();
 						if (!SUPPORTED_METHODS.contains(httpMethod)) {
+							// 如果不是Get和Head请求，则抛出方法不允许异常
 							return Mono.error(new MethodNotAllowedException(
 									exchange.getRequest().getMethodValue(), SUPPORTED_METHODS));
 						}
 
-						// 头部阶段
+						// 如果启用了最后修改时间，且资源未修改，则返回空结果
 						if (isUseLastModified() && exchange.checkNotModified(Instant.ofEpochMilli(resource.lastModified()))) {
 							logger.trace(exchange.getLogPrefix() + "Resource not modified");
 							return Mono.empty();
 						}
 
-						// 应用缓存设置（如果有）
+						// 设置缓存控制头部
 						CacheControl cacheControl = getCacheControl();
 						if (cacheControl != null) {
+							// 设置缓存控制响应头部
 							exchange.getResponse().getHeaders().setCacheControl(cacheControl);
 						}
 
@@ -447,7 +470,7 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 						MediaType mediaType = getMediaType(resource);
 						setHeaders(exchange, resource, mediaType);
 
-						// 内容阶段
+						// 写入资源内容
 						ResourceHttpMessageWriter writer = getResourceHttpMessageWriter();
 						Assert.state(writer != null, "No ResourceHttpMessageWriter");
 						return writer.write(Mono.just(resource),
@@ -462,19 +485,26 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 
 	protected Mono<Resource> getResource(ServerWebExchange exchange) {
 		String name = HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE;
+		// 获取处理器内部路径容器
 		PathContainer pathWithinHandler = exchange.getRequiredAttribute(name);
 
+		// 处理路径
 		String path = processPath(pathWithinHandler.value());
+
+		// 如果路径为空或无效，则返回空结果
 		if (!StringUtils.hasText(path) || isInvalidPath(path)) {
 			return Mono.empty();
 		}
+		// 如果路径包含了无效的转义字符，返回空结果
 		if (isInvalidEncodedPath(path)) {
 			return Mono.empty();
 		}
 
+		// 确保 ResourceResolverChain 和 ResourceTransformerChain 已初始化
 		Assert.state(this.resolverChain != null, "ResourceResolverChain not initialized");
 		Assert.state(this.transformerChain != null, "ResourceTransformerChain not initialized");
 
+		// 解析资源并进行转换
 		return this.resolverChain.resolveResource(exchange, path, getLocations())
 				.flatMap(resource -> this.transformerChain.transform(exchange, resource));
 	}
@@ -492,45 +522,65 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	 * @since 3.2.12
 	 */
 	protected String processPath(String path) {
+		// 将\替换为/
 		path = StringUtils.replace(path, "\\", "/");
+		// 清除重复的斜杠
 		path = cleanDuplicateSlashes(path);
+		// 清除开头的斜杠
 		return cleanLeadingSlash(path);
 	}
 
 	private String cleanDuplicateSlashes(String path) {
+		// 创建一个 StringBuilder 对象来构建结果字符串
 		StringBuilder sb = null;
+		// 用于保存前一个字符的变量
 		char prev = 0;
+		// 遍历路径中的每个字符
 		for (int i = 0; i < path.length(); i++) {
+			// 获取当前字符
 			char curr = path.charAt(i);
 			try {
+				// 如果当前字符和前一个字符都是斜杠，则跳过
 				if (curr == '/' && prev == '/') {
+					// 如果 StringBuilder 对象还没有创建，则创建一个并拷贝之前的字符
 					if (sb == null) {
 						sb = new StringBuilder(path.substring(0, i));
 					}
+					// 继续下一次循环
 					continue;
 				}
+				// 如果 StringBuilder 对象已经创建，则将当前字符添加到其中
 				if (sb != null) {
 					sb.append(path.charAt(i));
 				}
 			} finally {
+				// 更新 prev 为当前字符，以备下一次循环使用
 				prev = curr;
 			}
 		}
+		// 返回处理后的路径，如果没有重复的斜杠则直接返回原始路径
 		return (sb != null ? sb.toString() : path);
 	}
 
 	private String cleanLeadingSlash(String path) {
+		// 用于标记是否出现过斜杠
 		boolean slash = false;
+		// 遍历路径中的每个字符
 		for (int i = 0; i < path.length(); i++) {
+			// 如果当前字符是斜杠，则将 slash 标记为 true
 			if (path.charAt(i) == '/') {
 				slash = true;
 			} else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
+				// 如果当前字符不是空格且不是控制字符，则判断是否需要在路径前添加斜杠
 				if (i == 0 || (i == 1 && slash)) {
+					// 如果当前字符是路径的开始或者是路径的第二个字符且前面出现过斜杠，则直接返回原始路径
 					return path;
 				}
+				// 如果前面出现过斜杠，则在当前字符前面添加斜杠并返回路径的子串
 				return (slash ? "/" + path.substring(i) : path.substring(i));
 			}
 		}
+		// 如果路径中有斜杠，则返回单独的斜杠，否则返回空字符串
 		return (slash ? "/" : "");
 	}
 
@@ -542,14 +592,18 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	 */
 	private boolean isInvalidEncodedPath(String path) {
 		if (path.contains("%")) {
+			// 如果路径包含百分号
 			try {
 				// 使用URLDecoder（而不是UriUtils）以保留可能已解码的UTF-8字符
 				String decodedPath = URLDecoder.decode(path, "UTF-8");
 				if (isInvalidPath(decodedPath)) {
+					// 如果解码后的路径是无效的路径，返回true
 					return true;
 				}
+				// 处理路径
 				decodedPath = processPath(decodedPath);
 				if (isInvalidPath(decodedPath)) {
+					// 如果处理后的路径是无效的路径，返回true
 					return true;
 				}
 			} catch (IllegalArgumentException ex) {
@@ -575,6 +629,7 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	 * @return 如果路径无效则返回 {@code true}，否则返回 {@code false}
 	 */
 	protected boolean isInvalidPath(String path) {
+		// 如果路径包含 "WEB-INF" 或 "META-INF"，则记录警告并返回 true
 		if (path.contains("WEB-INF") || path.contains("META-INF")) {
 			if (logger.isWarnEnabled()) {
 				logger.warn(LogFormatUtils.formatValue(
@@ -582,16 +637,23 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 			}
 			return true;
 		}
+
+		// 如果路径包含 ":/"
 		if (path.contains(":/")) {
+			// 获取相关路径：如果是是以/开头，则获取/后的路径；否则就获取原路径。
 			String relativePath = (path.charAt(0) == '/' ? path.substring(1) : path);
 			if (ResourceUtils.isUrl(relativePath) || relativePath.startsWith("url:")) {
+				// 如果相关路径是一个资源URL或者是以url:
 				if (logger.isWarnEnabled()) {
 					logger.warn(LogFormatUtils.formatValue(
 							"Path represents URL or has \"url:\" prefix: [" + path + "]", -1, true));
 				}
+				// 返回true
 				return true;
 			}
 		}
+
+		// 如果路径包含 ".." 并且是规范化后的路径仍然包含../，则记录警告并返回 true
 		if (path.contains("..") && StringUtils.cleanPath(path).contains("../")) {
 			if (logger.isWarnEnabled()) {
 				logger.warn(LogFormatUtils.formatValue(
@@ -599,25 +661,42 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 			}
 			return true;
 		}
+
+		// 如果以上条件都不满足，则返回 false
 		return false;
 	}
 
 	@Nullable
 	private MediaType getMediaType(Resource resource) {
+		// 初始化媒体类型为 null
 		MediaType mediaType = null;
+
+		// 获取资源的文件名
 		String filename = resource.getFilename();
+
+		// 如果媒体类型映射不为空
 		if (!CollectionUtils.isEmpty(this.mediaTypes)) {
+			// 获取文件名的扩展名
 			String ext = StringUtils.getFilenameExtension(filename);
+			// 如果扩展名不为空
 			if (ext != null) {
+				// 从媒体类型映射中获取对应扩展名的媒体类型
 				mediaType = this.mediaTypes.get(ext.toLowerCase(Locale.ENGLISH));
 			}
 		}
+
+		// 如果媒体类型仍为 null
 		if (mediaType == null) {
+			// 获取文件名的媒体类型列表
 			List<MediaType> mediaTypes = MediaTypeFactory.getMediaTypes(filename);
+			// 如果媒体类型列表不为空
 			if (!CollectionUtils.isEmpty(mediaTypes)) {
+				// 取第一个媒体类型作为最终媒体类型
 				mediaType = mediaTypes.get(0);
 			}
 		}
+
+		// 返回媒体类型
 		return mediaType;
 	}
 
@@ -631,17 +710,25 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	protected void setHeaders(ServerWebExchange exchange, Resource resource, @Nullable MediaType mediaType)
 			throws IOException {
 
+		// 获取响应头
 		HttpHeaders headers = exchange.getResponse().getHeaders();
 
+		// 获取资源的长度
 		long length = resource.contentLength();
+		// 设置内容长度到响应头
 		headers.setContentLength(length);
 
+		// 如果媒体类型不为空
 		if (mediaType != null) {
+			// 设置媒体类型到响应头
 			headers.setContentType(mediaType);
 		}
 
+		// 如果资源是 HttpResource 类型
 		if (resource instanceof HttpResource) {
+			// 获取资源的响应头
 			HttpHeaders resourceHeaders = ((HttpResource) resource).getResponseHeaders();
+			// 将资源的响应头添加到交换响应的头部
 			exchange.getResponse().getHeaders().putAll(resourceHeaders);
 		}
 	}
