@@ -16,73 +16,47 @@
 
 package org.springframework.web.reactive.resource;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import reactor.core.publisher.Mono;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.codec.Hints;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.log.LogFormatUtils;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
+import org.springframework.http.*;
 import org.springframework.http.codec.ResourceHttpMessageWriter;
 import org.springframework.http.server.PathContainer;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ResourceUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.*;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebHandler;
+import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * {@code HttpRequestHandler} that serves static resources in an optimized way
- * according to the guidelines of Page Speed, YSlow, etc.
+ * {@code HttpRequestHandler}用于根据Page Speed、YSlow等指南以优化的方式提供静态资源。
  *
- * <p>The {@linkplain #setLocations "locations"} property takes a list of Spring
- * {@link Resource} locations from which static resources are allowed to
- * be served by this handler. Resources could be served from a classpath location,
- * e.g. "classpath:/META-INF/public-web-resources/", allowing convenient packaging
- * and serving of resources such as .js, .css, and others in jar files.
+ * <p>{@linkplain #setLocations "locations"}属性接受一个Spring {@link Resource}位置的列表，
+ * 允许此处理程序提供静态资源。资源可以从类路径位置提供，例如 "classpath:/META-INF/public-web-resources/"，
+ * 允许在jar文件中方便地打包和提供资源，例如 .js、.css等。
  *
- * <p>This request handler may also be configured with a
- * {@link #setResourceResolvers(List) resourcesResolver} and
- * {@link #setResourceTransformers(List) resourceTransformer} chains to support
- * arbitrary resolution and transformation of resources being served. By default
- * a {@link PathResourceResolver} simply finds resources based on the configured
- * "locations". An application can configure additional resolvers and
- * transformers such as the {@link VersionResourceResolver} which can resolve
- * and prepare URLs for resources with a version in the URL.
+ * <p>此请求处理程序还可以配置{@link #setResourceResolvers(List) resourcesResolver}和
+ * {@link #setResourceTransformers(List) resourceTransformer}链，以支持正在提供的资源的任意解析和转换。
+ * 默认情况下，{@link PathResourceResolver}仅基于配置的 "locations" 查找资源。
+ * 应用程序可以配置其他解析器和转换器，例如 {@link VersionResourceResolver}，它可以解析和准备带有URL版本的资源的URL。
  *
- * <p>This handler also properly evaluates the {@code Last-Modified} header (if
- * present) so that a {@code 304} status code will be returned as appropriate,
- * avoiding unnecessary overhead for resources that are already cached by the
- * client.
+ * <p>此处理程序还正确评估{@code Last-Modified}标头（如果存在），以便根据需要返回{@code 304}状态代码，
+ * 避免由客户端已缓存的资源造成的不必要开销。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
@@ -91,46 +65,92 @@ import org.springframework.web.server.WebHandler;
  */
 public class ResourceWebHandler implements WebHandler, InitializingBean {
 
+	/**
+	 * 支持的方法列表
+	 */
 	private static final Set<HttpMethod> SUPPORTED_METHODS = EnumSet.of(HttpMethod.GET, HttpMethod.HEAD);
 
+	/**
+	 * 日志记录器
+	 */
 	private static final Log logger = LogFactory.getLog(ResourceWebHandler.class);
 
-
+	/**
+	 * 资源加载器
+	 */
 	@Nullable
 	private ResourceLoader resourceLoader;
 
+	/**
+	 * 资源位置列表
+	 */
 	private final List<String> locationValues = new ArrayList<>(4);
 
+	/**
+	 * 静态资源列表
+	 */
 	private final List<Resource> locationResources = new ArrayList<>(4);
 
+	/**
+	 * 已解析的资源列表
+	 */
 	private final List<Resource> locationsToUse = new ArrayList<>(4);
 
+	/**
+	 * 资源解析器列表
+	 */
 	private final List<ResourceResolver> resourceResolvers = new ArrayList<>(4);
 
+	/**
+	 * 资源转换器列表
+	 */
 	private final List<ResourceTransformer> resourceTransformers = new ArrayList<>(4);
 
+	/**
+	 * 资源解析器链
+	 */
 	@Nullable
 	private ResourceResolverChain resolverChain;
 
+	/**
+	 * 资源转换器链
+	 */
 	@Nullable
 	private ResourceTransformerChain transformerChain;
 
+	/**
+	 * 缓存控制
+	 */
 	@Nullable
 	private CacheControl cacheControl;
 
+	/**
+	 * 资源消息写入器
+	 */
 	@Nullable
 	private ResourceHttpMessageWriter resourceHttpMessageWriter;
 
+	/**
+	 * 文件扩展名 - 媒体类型映射
+	 */
 	@Nullable
 	private Map<String, MediaType> mediaTypes;
 
+	/**
+	 * 是否使用Last-Modified标头
+	 */
 	private boolean useLastModified = true;
 
+	/**
+	 * 是否通过在启动时对存在性检查以优化指定位置，
+	 * 过滤掉非存在目录，从而无需在每次资源访问时检查它们。
+	 */
 	private boolean optimizeLocations = false;
 
 
 	/**
-	 * Provide the ResourceLoader to load {@link #setLocationValues location values} with.
+	 * 提供用于加载{@link #setLocationValues location values}的ResourceLoader。
+	 *
 	 * @since 5.1
 	 */
 	public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -138,8 +158,8 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Accepts a list of String-based location values to be resolved into
-	 * {@link Resource} locations.
+	 * 接受要解析为{@link Resource}位置的String类型的位置值列表。
+	 *
 	 * @since 5.1
 	 */
 	public void setLocationValues(List<String> locationValues) {
@@ -149,7 +169,8 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Return the configured location values.
+	 * 返回配置的位置值。
+	 *
 	 * @since 5.1
 	 */
 	public List<String> getLocationValues() {
@@ -157,8 +178,7 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Set the {@code List} of {@code Resource} paths to use as sources
-	 * for serving static resources.
+	 * 设置用于作为静态资源源的{@code List} {@code Resource}路径。
 	 */
 	public void setLocations(@Nullable List<Resource> locations) {
 		this.locationResources.clear();
@@ -168,29 +188,28 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Return the {@code List} of {@code Resource} paths to use as sources
-	 * for serving static resources.
-	 * <p>Note that if {@link #setLocationValues(List) locationValues} are provided,
-	 * instead of loaded Resource-based locations, this method will return
-	 * empty until after initialization via {@link #afterPropertiesSet()}.
-	 * <p><strong>Note:</strong> As of 5.3.11 the list of locations may be filtered to
-	 * exclude those that don't actually exist and therefore the list returned from this
-	 * method may be a subset of all given locations. See {@link #setOptimizeLocations}.
+	 * 返回用于作为静态资源源的{@code List} {@code Resource}路径。
+	 * <p>请注意，如果提供了{@link #setLocationValues(List) locationValues}，
+	 * 而不是加载的基于Resource的位置，此方法将返回空，直到通过{@link #afterPropertiesSet()}初始化。
+	 * <p><strong>注意:</strong> 从5.3.11开始，位置列表可能被过滤，
+	 * 以排除那些实际上不存在的位置，因此从此方法返回的列表可能是所有给定位置的子集。
+	 * 请参阅{@link #setOptimizeLocations}。
+	 *
 	 * @see #setLocationValues
 	 * @see #setLocations
 	 */
 	public List<Resource> getLocations() {
 		if (this.locationsToUse.isEmpty()) {
-			// Possibly not yet initialized, return only what we have so far
+			// 可能尚未初始化，只返回已有的内容
 			return this.locationResources;
 		}
 		return this.locationsToUse;
 	}
 
 	/**
-	 * Configure the list of {@link ResourceResolver ResourceResolvers} to use.
-	 * <p>By default {@link PathResourceResolver} is configured. If using this property,
-	 * it is recommended to add {@link PathResourceResolver} as the last resolver.
+	 * 配置要使用的{@link ResourceResolver ResourceResolvers}列表。
+	 * <p>默认情况下配置了{@link PathResourceResolver}。如果使用此属性，
+	 * 建议将{@link PathResourceResolver}添加为最后一个解析器。
 	 */
 	public void setResourceResolvers(@Nullable List<ResourceResolver> resourceResolvers) {
 		this.resourceResolvers.clear();
@@ -200,15 +219,15 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Return the list of configured resource resolvers.
+	 * 返回已配置的资源解析器列表。
 	 */
 	public List<ResourceResolver> getResourceResolvers() {
 		return this.resourceResolvers;
 	}
 
 	/**
-	 * Configure the list of {@link ResourceTransformer ResourceTransformers} to use.
-	 * <p>By default no transformers are configured for use.
+	 * 配置要使用的{@link ResourceTransformer ResourceTransformers}列表。
+	 * <p>默认情况下未配置任何转换器以供使用。
 	 */
 	public void setResourceTransformers(@Nullable List<ResourceTransformer> resourceTransformers) {
 		this.resourceTransformers.clear();
@@ -218,22 +237,22 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Return the list of configured resource transformers.
+	 * 返回配置的资源转换器列表。
 	 */
 	public List<ResourceTransformer> getResourceTransformers() {
 		return this.resourceTransformers;
 	}
 
 	/**
-	 * Configure the {@link ResourceHttpMessageWriter} to use.
-	 * <p>By default a {@link ResourceHttpMessageWriter} will be configured.
+	 * 配置要使用的{@link ResourceHttpMessageWriter}。
+	 * <p>默认情况下将配置一个{@link ResourceHttpMessageWriter}。
 	 */
 	public void setResourceHttpMessageWriter(@Nullable ResourceHttpMessageWriter httpMessageWriter) {
 		this.resourceHttpMessageWriter = httpMessageWriter;
 	}
 
 	/**
-	 * Return the configured resource message writer.
+	 * 返回配置的资源消息写入器。
 	 */
 	@Nullable
 	public ResourceHttpMessageWriter getResourceHttpMessageWriter() {
@@ -241,16 +260,14 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Set the {@link org.springframework.http.CacheControl} instance to build
-	 * the Cache-Control HTTP response header.
+	 * 设置用于构建Cache-Control HTTP响应头的{@link org.springframework.http.CacheControl}实例。
 	 */
 	public void setCacheControl(@Nullable CacheControl cacheControl) {
 		this.cacheControl = cacheControl;
 	}
 
 	/**
-	 * Return the {@link org.springframework.http.CacheControl} instance to build
-	 * the Cache-Control HTTP response header.
+	 * 返回用于构建Cache-Control HTTP响应头的{@link org.springframework.http.CacheControl}实例。
 	 */
 	@Nullable
 	public CacheControl getCacheControl() {
@@ -258,11 +275,10 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Set whether we should look at the {@link Resource#lastModified()}
-	 * when serving resources and use this information to drive {@code "Last-Modified"}
-	 * HTTP response headers.
-	 * <p>This option is enabled by default and should be turned off if the metadata of
-	 * the static files should be ignored.
+	 * 设置是否在提供静态资源时查看{@link Resource#lastModified()}，
+	 * 并使用此信息驱动{@code "Last-Modified"} HTTP响应头。
+	 * <p>默认情况下启用此选项，如果应忽略静态文件的元数据，则应将其关闭。
+	 *
 	 * @since 5.3
 	 */
 	public void setUseLastModified(boolean useLastModified) {
@@ -270,8 +286,8 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Return whether the {@link Resource#lastModified()} information is used
-	 * to drive HTTP responses when serving static resources.
+	 * 返回在提供静态资源时是否使用{@link Resource#lastModified()}信息驱动HTTP响应的标志。
+	 *
 	 * @since 5.3
 	 */
 	public boolean isUseLastModified() {
@@ -279,13 +295,11 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Set whether to optimize the specified locations through an existence
-	 * check on startup, filtering non-existing directories upfront so that
-	 * they do not have to be checked on every resource access.
-	 * <p>The default is {@code false}, for defensiveness against zip files
-	 * without directory entries which are unable to expose the existence of
-	 * a directory upfront. Switch this flag to {@code true} for optimized
-	 * access in case of a consistent jar layout with directory entries.
+	 * 设置是否通过在启动时对存在性检查以优化指定位置，
+	 * 过滤掉非存在目录，从而无需在每次资源访问时检查它们。
+	 * <p>默认值为{@code false}，以防御性地对没有目录条目的zip文件进行过滤，
+	 * 这些文件无法提前公开目录的存在性。将此标志切换为{@code true}以获得一致的jar布局和目录条目的优化访问。
+	 *
 	 * @since 5.3.13
 	 */
 	public void setOptimizeLocations(boolean optimizeLocations) {
@@ -293,9 +307,9 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Return whether to optimize the specified locations through an existence
-	 * check on startup, filtering non-existing directories upfront so that
-	 * they do not have to be checked on every resource access.
+	 * 返回是否通过在启动时对存在性检查以优化指定位置，
+	 * 过滤掉非存在目录，从而无需在每次资源访问时检查它们。
+	 *
 	 * @since 5.3.13
 	 */
 	public boolean isOptimizeLocations() {
@@ -303,11 +317,10 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Add mappings between file extensions extracted from the filename of static
-	 * {@link Resource}s and the media types to use for the response.
-	 * <p>Use of this method is typically not necessary since mappings can be
-	 * also determined via {@link MediaTypeFactory#getMediaType(Resource)}.
-	 * @param mediaTypes media type mappings
+	 * 添加从静态{@link Resource}的文件名中提取的文件扩展名到媒体类型的映射。
+	 * <p>通常不需要使用此方法，因为可以通过{@link MediaTypeFactory#getMediaType(Resource)}确定映射。
+	 *
+	 * @param mediaTypes 媒体类型映射
 	 * @since 5.3.2
 	 */
 	public void setMediaTypes(Map<String, MediaType> mediaTypes) {
@@ -319,7 +332,8 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Return the {@link #setMediaTypes(Map) configured} media type mappings.
+	 * 返回{@link #setMediaTypes(Map) 配置的}媒体类型映射。
+	 *
 	 * @since 5.3.2
 	 */
 	public Map<String, MediaType> getMediaTypes() {
@@ -341,7 +355,7 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 			this.resourceHttpMessageWriter = new ResourceHttpMessageWriter();
 		}
 
-		// Initialize immutable resolver and transformer chains
+		// 初始化不可变的解析器和转换器链
 		this.resolverChain = new DefaultResourceResolverChain(this.resourceResolvers);
 		this.transformerChain = new DefaultResourceTransformerChain(this.resolverChain, this.resourceTransformers);
 	}
@@ -368,9 +382,7 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Look for a {@code PathResourceResolver} among the configured resource
-	 * resolvers and set its {@code allowedLocations} property (if empty) to
-	 * match the {@link #setLocations locations} configured on this class.
+	 * 查找在配置的位置列表中设置其{@code allowedLocations}属性（如果为空）的{@code PathResourceResolver}。
 	 */
 	protected void initAllowedLocations() {
 		if (CollectionUtils.isEmpty(getLocations())) {
@@ -389,16 +401,14 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 
 
 	/**
-	 * Processes a resource request.
-	 * <p>Checks for the existence of the requested resource in the configured list of locations.
-	 * If the resource does not exist, a {@code 404} response will be returned to the client.
-	 * If the resource exists, the request will be checked for the presence of the
-	 * {@code Last-Modified} header, and its value will be compared against the last-modified
-	 * timestamp of the given resource, returning a {@code 304} status code if the
-	 * {@code Last-Modified} value  is greater. If the resource is newer than the
-	 * {@code Last-Modified} value, or the header is not present, the content resource
-	 * of the resource will be written to the response with caching headers
-	 * set to expire one year in the future.
+	 * 处理资源请求。
+	 * <p>检查配置的位置列表中请求的资源是否存在。
+	 * 如果资源不存在，将向客户端返回{@code 404}响应。
+	 * 如果资源存在，则将检查请求是否存在{@code Last-Modified}标头，
+	 * 并将其值与给定资源的上次修改时间戳进行比较，
+	 * 如果{@code Last-Modified}值大于{@code 304}状态代码，则返回。
+	 * 如果资源比{@code Last-Modified}值新，或者标头不存在，则将资源的内容写入响应，
+	 * 并将缓存头设置为在未来一年过期。
 	 */
 	@Override
 	public Mono<Void> handle(ServerWebExchange exchange) {
@@ -414,38 +424,37 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 							return Mono.empty();
 						}
 
-						// Supported methods and required session
+						// 支持的方法和所需的会话
 						HttpMethod httpMethod = exchange.getRequest().getMethod();
 						if (!SUPPORTED_METHODS.contains(httpMethod)) {
 							return Mono.error(new MethodNotAllowedException(
 									exchange.getRequest().getMethodValue(), SUPPORTED_METHODS));
 						}
 
-						// Header phase
+						// 头部阶段
 						if (isUseLastModified() && exchange.checkNotModified(Instant.ofEpochMilli(resource.lastModified()))) {
 							logger.trace(exchange.getLogPrefix() + "Resource not modified");
 							return Mono.empty();
 						}
 
-						// Apply cache settings, if any
+						// 应用缓存设置（如果有）
 						CacheControl cacheControl = getCacheControl();
 						if (cacheControl != null) {
 							exchange.getResponse().getHeaders().setCacheControl(cacheControl);
 						}
 
-						// Check the media type for the resource
+						// 检查资源的媒体类型
 						MediaType mediaType = getMediaType(resource);
 						setHeaders(exchange, resource, mediaType);
 
-						// Content phase
+						// 内容阶段
 						ResourceHttpMessageWriter writer = getResourceHttpMessageWriter();
 						Assert.state(writer != null, "No ResourceHttpMessageWriter");
 						return writer.write(Mono.just(resource),
 								null, ResolvableType.forClass(Resource.class), mediaType,
 								exchange.getRequest(), exchange.getResponse(),
 								Hints.from(Hints.LOG_PREFIX_HINT, exchange.getLogPrefix()));
-					}
-					catch (IOException ex) {
+					} catch (IOException ex) {
 						return Mono.error(ex);
 					}
 				});
@@ -471,15 +480,15 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Process the given resource path.
-	 * <p>The default implementation replaces:
+	 * 处理给定的资源路径。
+	 * <p>默认实现替换：
 	 * <ul>
-	 * <li>Backslash with forward slash.
-	 * <li>Duplicate occurrences of slash with a single slash.
-	 * <li>Any combination of leading slash and control characters (00-1F and 7F)
-	 * with a single "/" or "". For example {@code "  / // foo/bar"}
-	 * becomes {@code "/foo/bar"}.
+	 * <li>反斜杠为正斜杠。
+	 * <li>斜杠的重复为单个斜杠。
+	 * <li>带有"./"的当前目录引用。
+	 * <li>移除以".."开头的父目录引用，直到路径不再包含这样的引用。
 	 * </ul>
+	 *
 	 * @since 3.2.12
 	 */
 	protected String processPath(String path) {
@@ -503,8 +512,7 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 				if (sb != null) {
 					sb.append(path.charAt(i));
 				}
-			}
-			finally {
+			} finally {
 				prev = curr;
 			}
 		}
@@ -516,8 +524,7 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 		for (int i = 0; i < path.length(); i++) {
 			if (path.charAt(i) == '/') {
 				slash = true;
-			}
-			else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
+			} else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
 				if (i == 0 || (i == 1 && slash)) {
 					return path;
 				}
@@ -528,14 +535,15 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Check whether the given path contains invalid escape sequences.
-	 * @param path the path to validate
-	 * @return {@code true} if the path is invalid, {@code false} otherwise
+	 * 检查给定路径是否包含无效的转义序列。
+	 *
+	 * @param path 要验证的路径
+	 * @return 如果路径无效则返回 {@code true}，否则返回 {@code false}
 	 */
 	private boolean isInvalidEncodedPath(String path) {
 		if (path.contains("%")) {
 			try {
-				// Use URLDecoder (vs UriUtils) to preserve potentially decoded UTF-8 chars
+				// 使用URLDecoder（而不是UriUtils）以保留可能已解码的UTF-8字符
 				String decodedPath = URLDecoder.decode(path, "UTF-8");
 				if (isInvalidPath(decodedPath)) {
 					return true;
@@ -544,31 +552,27 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 				if (isInvalidPath(decodedPath)) {
 					return true;
 				}
-			}
-			catch (IllegalArgumentException ex) {
-				// May not be possible to decode...
-			}
-			catch (UnsupportedEncodingException ex) {
-				// Should never happen...
+			} catch (IllegalArgumentException ex) {
+				// 可能无法解码...
+			} catch (UnsupportedEncodingException ex) {
+				// 不应该发生...
 			}
 		}
 		return false;
 	}
 
 	/**
-	 * Identifies invalid resource paths. By default rejects:
+	 * 标识无效的资源路径。默认情况下拒绝：
 	 * <ul>
-	 * <li>Paths that contain "WEB-INF" or "META-INF"
-	 * <li>Paths that contain "../" after a call to
-	 * {@link StringUtils#cleanPath}.
-	 * <li>Paths that represent a {@link ResourceUtils#isUrl
-	 * valid URL} or would represent one after the leading slash is removed.
+	 * <li>包含 "WEB-INF" 或 "META-INF" 的路径
+	 * <li>调用 {@link StringUtils#cleanPath} 后包含 "../" 的路径
+	 * <li>表示 {@link ResourceUtils#isUrl 有效URL} 的路径或在移除前导斜杠后将表示有效URL的路径。
 	 * </ul>
-	 * <p><strong>Note:</strong> this method assumes that leading, duplicate '/'
-	 * or control characters (e.g. white space) have been trimmed so that the
-	 * path starts predictably with a single '/' or does not have one.
-	 * @param path the path to validate
-	 * @return {@code true} if the path is invalid, {@code false} otherwise
+	 * <p><strong>注意：</strong>此方法假设前导、重复的 '/' 或控制字符（例如空格）已被修剪，
+	 * 以便路径可预测地以单个 '/' 开头或不包含斜杠。
+	 *
+	 * @param path 要验证的路径
+	 * @return 如果路径无效则返回 {@code true}，否则返回 {@code false}
 	 */
 	protected boolean isInvalidPath(String path) {
 		if (path.contains("WEB-INF") || path.contains("META-INF")) {
@@ -618,10 +622,11 @@ public class ResourceWebHandler implements WebHandler, InitializingBean {
 	}
 
 	/**
-	 * Set headers on the response. Called for both GET and HEAD requests.
-	 * @param exchange current exchange
-	 * @param resource the identified resource (never {@code null})
-	 * @param mediaType the resource's media type (never {@code null})
+	 * 在响应中设置头信息。用于 GET 和 HEAD 请求。
+	 *
+	 * @param exchange  当前交换对象
+	 * @param resource  已识别的资源（永不为 {@code null}）
+	 * @param mediaType 资源的媒体类型（永不为 {@code null}）
 	 */
 	protected void setHeaders(ServerWebExchange exchange, Resource resource, @Nullable MediaType mediaType)
 			throws IOException {
