@@ -16,19 +16,18 @@
 
 package org.springframework.web.servlet.mvc.annotation;
 
-import java.lang.reflect.Method;
-
 import org.springframework.lang.Nullable;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.lang.reflect.Method;
+
 /**
- * SPI for resolving custom return values from a specific handler method.
- * Typically implemented to detect special return types, resolving
- * well-known result values for them.
+ * SPI（Service Provider Interface）用于从特定的处理器方法中解析自定义返回值。
+ * 通常实现此接口以检测特殊的返回类型，并为它们解析已知的结果值。
  *
- * <p>A typical implementation could look like as follows:
+ * <p>一个典型的实现可能如下所示：
  *
  * <pre class="code">
  * public class MyModelAndViewResolver implements ModelAndViewResolver {
@@ -48,12 +47,21 @@ import org.springframework.web.servlet.ModelAndView;
 public interface ModelAndViewResolver {
 
 	/**
-	 * Marker to be returned when the resolver does not know how to handle the given method parameter.
+	 * 当解析器不知道如何处理给定的方法参数时返回的标记。
 	 */
 	ModelAndView UNRESOLVED = new ModelAndView();
 
-
+	/**
+	 * 解析模型和视图的方法。
+	 *
+	 * @param handlerMethod 处理器方法
+	 * @param handlerType   处理器类型
+	 * @param returnValue   返回值
+	 * @param implicitModel 隐式模型
+	 * @param webRequest    网络请求
+	 * @return 解析后的模型和视图，如果无法解析则返回UNRESOLVED
+	 */
 	ModelAndView resolveModelAndView(Method handlerMethod, Class<?> handlerType,
-			@Nullable Object returnValue, ExtendedModelMap implicitModel, NativeWebRequest webRequest);
+									 @Nullable Object returnValue, ExtendedModelMap implicitModel, NativeWebRequest webRequest);
 
 }
