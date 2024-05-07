@@ -16,46 +16,21 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.log.LogFormatUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpRange;
-import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
+import org.springframework.http.*;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.ResourceRegionHttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ResourceUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.util.StringValueResolver;
+import org.springframework.util.*;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -66,29 +41,28 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.WebContentGenerator;
 import org.springframework.web.util.UrlPathHelper;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
- * {@code HttpRequestHandler} that serves static resources in an optimized way
- * according to the guidelines of Page Speed, YSlow, etc.
+ * {@code HttpRequestHandler}，根据Page Speed、YSlow等指南以优化方式提供静态资源。
  *
- * <p>The properties {@linkplain #setLocations "locations"} and
- * {@linkplain #setLocationValues "locationValues"} accept locations from which
- * static resources can be served by this handler. This can be relative to the
- * root of the web application, or from the classpath, e.g.
- * "classpath:/META-INF/public-web-resources/", allowing convenient packaging
- * and serving of resources such as .js, .css, and others in jar files.
+ * <p>{@linkplain #setLocations "locations"}和{@linkplain #setLocationValues "locationValues"}属性接受此处理程序可以提供静态资源的位置。
+ * 这可以是相对于Web应用程序的根，也可以是类路径，例如“classpath:/META-INF/public-web-resources/”，允许在jar文件中方便地打包和提供资源，如 .js、.css 等。
  *
- * <p>This request handler may also be configured with a
- * {@link #setResourceResolvers(List) resourcesResolver} and
- * {@link #setResourceTransformers(List) resourceTransformer} chains to support
- * arbitrary resolution and transformation of resources being served. By default
- * a {@link PathResourceResolver} simply finds resources based on the configured
- * "locations". An application can configure additional resolvers and transformers
- * such as the {@link VersionResourceResolver} which can resolve and prepare URLs
- * for resources with a version in the URL.
+ * <p>此请求处理程序还可以配置{@link #setResourceResolvers(List) resourcesResolver}和{@link #setResourceTransformers(List) resourceTransformer}链，
+ * 以支持正在提供的资源的任意解析和转换。默认情况下，{@link PathResourceResolver}仅基于配置的“locations”查找资源。
+ * 应用程序可以配置其他解析器和转换器，例如{@link VersionResourceResolver}，它可以解析并准备带有URL版本的资源的URL。
  *
- * <p>This handler also properly evaluates the {@code Last-Modified} header
- * (if present) so that a {@code 304} status code will be returned as appropriate,
- * avoiding unnecessary overhead for resources that are already cached by the client.
+ * <p>此处理程序还正确评估{@code Last-Modified}标头（如果存在），以便根据需要返回{@code 304}状态码，从而避免不必要的开销，
+ * 因为客户端已经缓存了资源。
  *
  * @author Keith Donald
  * @author Jeremy Grelle
@@ -155,19 +129,14 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 
 
 	/**
-	 * Configure String-based locations to serve resources from.
-	 * <p>For example, {{@code "/"}, {@code "classpath:/META-INF/public-web-resources/"}}
-	 * allows resources to be served both from the web application root and
-	 * from any JAR on the classpath that contains a
-	 * {@code /META-INF/public-web-resources/} directory, with resources in the
-	 * web application root taking precedence.
-	 * <p>For {@link org.springframework.core.io.UrlResource URL-based resources}
-	 * (e.g. files, HTTP URLs, etc) this method supports a special prefix to
-	 * indicate the charset associated with the URL so that relative paths
-	 * appended to it can be encoded correctly, for example
-	 * {@code "[charset=Windows-31J]https://example.org/path"}.
-	 * @since 4.3.13
+	 * 配置用于提供资源的基于字符串的位置。
+	 * <p>例如，{{@code "/"}、{@code "classpath:/META-INF/public-web-resources/"}} 允许从 Web 应用程序根目录和
+	 * 类路径上的任何包含 {@code /META-INF/public-web-resources/} 目录的 JAR 中提供资源，其中 Web 应用程序根目录中的资源优先。
+	 * <p>对于 {@link org.springframework.core.io.UrlResource URL-based 资源}（例如文件、HTTP URL 等），
+	 * 此方法支持特殊前缀来指示与 URL 相关联的字符集，以便可以正确编码附加到它的相对路径，例如 {@code "[charset=Windows-31J]https://example.org/path"}。
+	 *
 	 * @see #setLocations(List)
+	 * @since 4.3.13
 	 */
 	public void setLocationValues(List<String> locations) {
 		Assert.notNull(locations, "Locations list must not be null");
@@ -176,7 +145,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Configure locations to serve resources from as pre-resourced Resource's.
+	 * 配置用于提供资源的位置为预先解析的 Resource。
+	 *
 	 * @see #setLocationValues(List)
 	 */
 	public void setLocations(List<Resource> locations) {
@@ -186,30 +156,26 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return the configured {@code List} of {@code Resource} locations including
-	 * both String-based locations provided via
-	 * {@link #setLocationValues(List) setLocationValues} and pre-resolved
-	 * {@code Resource} locations provided via {@link #setLocations(List) setLocations}.
-	 * <p>Note that the returned list is fully initialized only after
-	 * initialization via {@link #afterPropertiesSet()}.
-	 * <p><strong>Note:</strong> As of 5.3.11 the list of locations may be filtered to
-	 * exclude those that don't actually exist and therefore the list returned from this
-	 * method may be a subset of all given locations. See {@link #setOptimizeLocations}.
+	 * 返回已配置的 {@code Resource} 位置的 {@code List}，包括通过 {@link #setLocationValues(List) setLocationValues} 提供的基于字符串的位置
+	 * 和通过 {@link #setLocations(List) setLocations} 提供的预先解析的 {@code Resource} 位置。
+	 * <p>请注意，在通过 {@link #afterPropertiesSet()} 进行初始化之后，返回的列表才完全初始化。
+	 * <p><strong>注意:</strong> 从 5.3.11 开始，位置列表可能会被过滤，以排除那些实际不存在的位置，
+	 * 因此从此方法返回的列表可能是所有给定位置的子集。参见 {@link #setOptimizeLocations}。
+	 *
 	 * @see #setLocationValues
 	 * @see #setLocations
 	 */
 	public List<Resource> getLocations() {
 		if (this.locationsToUse.isEmpty()) {
-			// Possibly not yet initialized, return only what we have so far
+			// 可能尚未初始化，仅返回到目前为止的内容
 			return this.locationResources;
 		}
 		return this.locationsToUse;
 	}
 
 	/**
-	 * Configure the list of {@link ResourceResolver ResourceResolvers} to use.
-	 * <p>By default {@link PathResourceResolver} is configured. If using this property,
-	 * it is recommended to add {@link PathResourceResolver} as the last resolver.
+	 * 配置要使用的 {@link ResourceResolver ResourceResolvers} 列表。
+	 * <p>默认情况下，配置了 {@link PathResourceResolver}。如果使用此属性，建议将 {@link PathResourceResolver} 添加为最后一个解析器。
 	 */
 	public void setResourceResolvers(@Nullable List<ResourceResolver> resourceResolvers) {
 		this.resourceResolvers.clear();
@@ -219,15 +185,15 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return the list of configured resource resolvers.
+	 * 返回配置的资源解析器列表。
 	 */
 	public List<ResourceResolver> getResourceResolvers() {
 		return this.resourceResolvers;
 	}
 
 	/**
-	 * Configure the list of {@link ResourceTransformer ResourceTransformers} to use.
-	 * <p>By default no transformers are configured for use.
+	 * 配置要使用的 {@link ResourceTransformer ResourceTransformers} 列表。
+	 * <p>默认情况下，不配置使用任何转换器。
 	 */
 	public void setResourceTransformers(@Nullable List<ResourceTransformer> resourceTransformers) {
 		this.resourceTransformers.clear();
@@ -237,15 +203,16 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return the list of configured resource transformers.
+	 * 返回配置的资源转换器列表。
 	 */
 	public List<ResourceTransformer> getResourceTransformers() {
 		return this.resourceTransformers;
 	}
 
 	/**
-	 * Configure the {@link ResourceHttpMessageConverter} to use.
-	 * <p>By default a {@link ResourceHttpMessageConverter} will be configured.
+	 * 配置要使用的 {@link ResourceHttpMessageConverter}。
+	 * <p>默认情况下，将配置一个 {@link ResourceHttpMessageConverter}。
+	 *
 	 * @since 4.3
 	 */
 	public void setResourceHttpMessageConverter(@Nullable ResourceHttpMessageConverter messageConverter) {
@@ -253,7 +220,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return the configured resource converter.
+	 * 返回配置的资源转换器。
+	 *
 	 * @since 4.3
 	 */
 	@Nullable
@@ -262,8 +230,9 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Configure the {@link ResourceRegionHttpMessageConverter} to use.
-	 * <p>By default a {@link ResourceRegionHttpMessageConverter} will be configured.
+	 * 配置要使用的 {@link ResourceRegionHttpMessageConverter}。
+	 * <p>默认情况下，将配置一个 {@link ResourceRegionHttpMessageConverter}。
+	 *
 	 * @since 4.3
 	 */
 	public void setResourceRegionHttpMessageConverter(@Nullable ResourceRegionHttpMessageConverter messageConverter) {
@@ -271,7 +240,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return the configured resource region converter.
+	 * 返回配置的资源区域转换器。
+	 *
 	 * @since 4.3
 	 */
 	@Nullable
@@ -280,13 +250,12 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Configure a {@code ContentNegotiationManager} to help determine the
-	 * media types for resources being served. If the manager contains a path
-	 * extension strategy it will be checked for registered file extension.
+	 * 配置一个 {@code ContentNegotiationManager}，以帮助确定正在提供的资源的媒体类型。
+	 * 如果管理器包含路径扩展策略，则会检查已注册的文件扩展名。
+	 *
 	 * @since 4.3
-	 * @deprecated as of 5.2.4 in favor of using {@link #setMediaTypes(Map)}
-	 * with mappings possibly obtained from
-	 * {@link ContentNegotiationManager#getMediaTypeMappings()}.
+	 * @deprecated 自 5.2.4 起弃用，建议使用 {@link #setMediaTypes(Map)}，
+	 * 其中的映射可能是通过 {@link ContentNegotiationManager#getMediaTypeMappings()} 获取的。
 	 */
 	@Deprecated
 	public void setContentNegotiationManager(@Nullable ContentNegotiationManager contentNegotiationManager) {
@@ -294,9 +263,10 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return the configured content negotiation manager.
+	 * 返回配置的内容协商管理器。
+	 *
 	 * @since 4.3
-	 * @deprecated as of 5.2.4
+	 * @deprecated 自 5.2.4 起弃用
 	 */
 	@Nullable
 	@Deprecated
@@ -305,14 +275,12 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Add mappings between file extensions, extracted from the filename of a
-	 * static {@link Resource}, and corresponding media type to set on the
-	 * response.
-	 * <p>Use of this method is typically not necessary since mappings are
-	 * otherwise determined via
-	 * {@link javax.servlet.ServletContext#getMimeType(String)} or via
-	 * {@link MediaTypeFactory#getMediaType(Resource)}.
-	 * @param mediaTypes media type mappings
+	 * 添加从静态 {@link Resource} 的文件名中提取的文件扩展名与要设置在响应中的相应媒体类型之间的映射关系。
+	 * <p>通常情况下不需要使用此方法，因为映射通常通过
+	 * {@link javax.servlet.ServletContext#getMimeType(String)} 或者
+	 * {@link MediaTypeFactory#getMediaType(Resource)} 确定。
+	 *
+	 * @param mediaTypes 媒体类型映射
 	 * @since 5.2.4
 	 */
 	public void setMediaTypes(Map<String, MediaType> mediaTypes) {
@@ -321,7 +289,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return the {@link #setMediaTypes(Map) configured} media types.
+	 * 返回 {@link #setMediaTypes(Map) 配置的} 媒体类型。
+	 *
 	 * @since 5.2.4
 	 */
 	public Map<String, MediaType> getMediaTypes() {
@@ -329,15 +298,15 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Specify the CORS configuration for resources served by this handler.
-	 * <p>By default this is not set in which allows cross-origin requests.
+	 * 指定为此处理程序提供资源的 CORS 配置。
+	 * <p>默认情况下，未设置此配置，从而允许跨域请求。
 	 */
 	public void setCorsConfiguration(CorsConfiguration corsConfiguration) {
 		this.corsConfiguration = corsConfiguration;
 	}
 
 	/**
-	 * Return the specified CORS configuration.
+	 * 返回指定的 CORS 配置。
 	 */
 	@Override
 	@Nullable
@@ -346,9 +315,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Provide a reference to the {@link UrlPathHelper} used to map requests to
-	 * static resources. This helps to derive information about the lookup path
-	 * such as whether it is decoded or not.
+	 * 提供对用于将请求映射到静态资源的 {@link UrlPathHelper} 的引用。这有助于获取有关查找路径的信息，例如它是否已解码。
+	 *
 	 * @since 4.3.13
 	 */
 	public void setUrlPathHelper(@Nullable UrlPathHelper urlPathHelper) {
@@ -356,7 +324,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * The configured {@link UrlPathHelper}.
+	 * 已配置的 {@link UrlPathHelper}。
+	 *
 	 * @since 4.3.13
 	 */
 	@Nullable
@@ -365,11 +334,9 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Set whether we should look at the {@link Resource#lastModified()} when
-	 * serving resources and use this information to drive {@code "Last-Modified"}
-	 * HTTP response headers.
-	 * <p>This option is enabled by default and should be turned off if the metadata
-	 * of the static files should be ignored.
+	 * 设置是否在提供资源时查看 {@link Resource#lastModified()}，并使用此信息来驱动 {@code "Last-Modified"} HTTP 响应头。
+	 * <p>默认情况下启用此选项，如果要忽略静态文件的元数据，则应将其关闭。
+	 *
 	 * @since 5.3
 	 */
 	public void setUseLastModified(boolean useLastModified) {
@@ -377,8 +344,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return whether the {@link Resource#lastModified()} information is used
-	 * to drive HTTP responses when serving static resources.
+	 * 返回是否在提供静态资源时使用 {@link Resource#lastModified()} 信息来驱动 HTTP 响应。
+	 *
 	 * @since 5.3
 	 */
 	public boolean isUseLastModified() {
@@ -386,13 +353,9 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Set whether to optimize the specified locations through an existence
-	 * check on startup, filtering non-existing directories upfront so that
-	 * they do not have to be checked on every resource access.
-	 * <p>The default is {@code false}, for defensiveness against zip files
-	 * without directory entries which are unable to expose the existence of
-	 * a directory upfront. Switch this flag to {@code true} for optimized
-	 * access in case of a consistent jar layout with directory entries.
+	 * 设置是否通过在启动时对指定的位置进行存在性检查来优化它们，从而提前过滤掉不存在的目录，以便不必在每次资源访问时检查它们。
+	 * <p>默认值为 {@code false}，用于对抗没有目录条目的 zip 文件，无法提前暴露目录的存在性。在一致的 jar 布局且具有目录条目的情况下，将此标志切换为 {@code true} 以实现优化的访问。
+	 *
 	 * @since 5.3.13
 	 */
 	public void setOptimizeLocations(boolean optimizeLocations) {
@@ -400,9 +363,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Return whether to optimize the specified locations through an existence
-	 * check on startup, filtering non-existing directories upfront so that
-	 * they do not have to be checked on every resource access.
+	 * 返回是否通过在启动时对指定的位置进行存在性检查来优化它们，从而提前过滤掉不存在的目录，以便不必在每次资源访问时检查它们。
+	 *
 	 * @since 5.3.13
 	 */
 	public boolean isOptimizeLocations() {
@@ -476,8 +438,8 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 				if (location.equals("/") && !(resource instanceof ServletContextResource)) {
 					throw new IllegalStateException(
 							"The String-based location \"/\" should be relative to the web application root " +
-							"but resolved to a Resource of type: " + resource.getClass() + ". " +
-							"If this is intentional, please pass it as a pre-configured Resource via setLocations.");
+									"but resolved to a Resource of type: " + resource.getClass() + ". " +
+									"If this is intentional, please pass it as a pre-configured Resource via setLocations.");
 				}
 				result.add(resource);
 				if (charset != null) {
@@ -499,9 +461,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Look for a {@code PathResourceResolver} among the configured resource
-	 * resolvers and set its {@code allowedLocations} property (if empty) to
-	 * match the {@link #setLocations locations} configured on this class.
+	 * 在配置的资源解析器中查找 {@code PathResourceResolver}，并设置其 {@code allowedLocations} 属性（如果为空）以匹配此类配置的 {@link #setLocations 位置}。
 	 */
 	protected void initAllowedLocations() {
 		if (CollectionUtils.isEmpty(getLocations())) {
@@ -523,12 +483,9 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Initialize the strategy to use to determine the media type for a resource.
-	 * @deprecated as of 5.2.4 this method returns {@code null}, and if a
-	 * sub-class returns an actual instance,the instance is used only as a
-	 * source of media type mappings, if it contains any. Please, use
-	 * {@link #setMediaTypes(Map)} instead, or if you need to change behavior,
-	 * you can override {@link #getMediaType(HttpServletRequest, Resource)}.
+	 * 初始化用于确定资源的媒体类型的策略。
+	 *
+	 * @deprecated 自 5.2.4 版本起，此方法返回 {@code null}，如果子类返回实际实例，则该实例仅用作媒体类型映射的源（如果包含任何）。请改用 {@link #setMediaTypes(Map)}，或者如果需要更改行为，则可以覆盖 {@link #getMediaType(HttpServletRequest, Resource)}。
 	 */
 	@Nullable
 	@Deprecated
@@ -539,16 +496,10 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 
 
 	/**
-	 * Processes a resource request.
-	 * <p>Checks for the existence of the requested resource in the configured list of locations.
-	 * If the resource does not exist, a {@code 404} response will be returned to the client.
-	 * If the resource exists, the request will be checked for the presence of the
-	 * {@code Last-Modified} header, and its value will be compared against the last-modified
-	 * timestamp of the given resource, returning a {@code 304} status code if the
-	 * {@code Last-Modified} value  is greater. If the resource is newer than the
-	 * {@code Last-Modified} value, or the header is not present, the content resource
-	 * of the resource will be written to the response with caching headers
-	 * set to expire one year in the future.
+	 * 处理资源请求。
+	 * <p>检查请求的资源是否存在于配置的位置列表中。如果资源不存在，则将返回 {@code 404} 响应给客户端。
+	 * 如果资源存在，则将检查请求中是否存在 {@code Last-Modified} 标头，如果存在，则将其值与给定资源的最后修改时间戳进行比较，如果 {@code Last-Modified} 值大于资源的最后修改时间戳，则返回 {@code 304} 状态码。
+	 * 如果资源新于 {@code Last-Modified} 值，或者标头不存在，则将资源的内容写入响应，并将缓存头设置为在将来的一年内过期。
 	 */
 	@Override
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
@@ -588,8 +539,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 		if (request.getHeader(HttpHeaders.RANGE) == null) {
 			Assert.state(this.resourceHttpMessageConverter != null, "Not initialized");
 			this.resourceHttpMessageConverter.write(resource, mediaType, outputMessage);
-		}
-		else {
+		} else {
 			Assert.state(this.resourceRegionHttpMessageConverter != null, "Not initialized");
 			ServletServerHttpRequest inputMessage = new ServletServerHttpRequest(request);
 			try {
@@ -597,8 +547,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 				this.resourceRegionHttpMessageConverter.write(
 						HttpRange.toResourceRegions(httpRanges, resource), mediaType, outputMessage);
-			}
-			catch (IllegalArgumentException ex) {
+			} catch (IllegalArgumentException ex) {
 				response.setHeader(HttpHeaders.CONTENT_RANGE, "bytes */" + resource.contentLength());
 				response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
 			}
@@ -632,15 +581,14 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Process the given resource path.
-	 * <p>The default implementation replaces:
+	 * 处理给定的资源路径。
+	 * <p>默认实现替换：
 	 * <ul>
-	 * <li>Backslash with forward slash.
-	 * <li>Duplicate occurrences of slash with a single slash.
-	 * <li>Any combination of leading slash and control characters (00-1F and 7F)
-	 * with a single "/" or "". For example {@code "  / // foo/bar"}
-	 * becomes {@code "/foo/bar"}.
+	 * <li>反斜杠为正斜杠。
+	 * <li>斜杠的重复出现为单个斜杠。
+	 * <li>以及前导斜杠和控制字符（00-1F 和 7F）的任何组合为单个 "/" 或 ""。例如 {@code "  / // foo/bar"} 变成 {@code "/foo/bar"}。
 	 * </ul>
+	 *
 	 * @since 3.2.12
 	 */
 	protected String processPath(String path) {
@@ -664,8 +612,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 				if (sb != null) {
 					sb.append(path.charAt(i));
 				}
-			}
-			finally {
+			} finally {
 				prev = curr;
 			}
 		}
@@ -677,8 +624,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 		for (int i = 0; i < path.length(); i++) {
 			if (path.charAt(i) == '/') {
 				slash = true;
-			}
-			else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
+			} else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
 				if (i == 0 || (i == 1 && slash)) {
 					return path;
 				}
@@ -689,14 +635,15 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Check whether the given path contains invalid escape sequences.
-	 * @param path the path to validate
-	 * @return {@code true} if the path is invalid, {@code false} otherwise
+	 * 检查给定路径是否包含无效的转义序列。
+	 *
+	 * @param path 要验证的路径
+	 * @return 如果路径无效，则返回 {@code true}，否则返回 {@code false}
 	 */
 	private boolean isInvalidEncodedPath(String path) {
 		if (path.contains("%")) {
 			try {
-				// Use URLDecoder (vs UriUtils) to preserve potentially decoded UTF-8 chars
+				// 使用 URLDecoder（而不是 UriUtils）以保留可能已解码的 UTF-8 字符
 				String decodedPath = URLDecoder.decode(path, "UTF-8");
 				if (isInvalidPath(decodedPath)) {
 					return true;
@@ -705,31 +652,27 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 				if (isInvalidPath(decodedPath)) {
 					return true;
 				}
-			}
-			catch (IllegalArgumentException ex) {
-				// May not be possible to decode...
-			}
-			catch (UnsupportedEncodingException ex) {
-				// Should never happen...
+			} catch (IllegalArgumentException ex) {
+				// 可能无法解码...
+			} catch (UnsupportedEncodingException ex) {
+				// 不应该发生...
 			}
 		}
 		return false;
 	}
 
 	/**
-	 * Identifies invalid resource paths. By default rejects:
+	 * 识别无效的资源路径。默认情况下拒绝：
 	 * <ul>
-	 * <li>Paths that contain "WEB-INF" or "META-INF"
-	 * <li>Paths that contain "../" after a call to
-	 * {@link org.springframework.util.StringUtils#cleanPath}.
-	 * <li>Paths that represent a {@link org.springframework.util.ResourceUtils#isUrl
-	 * valid URL} or would represent one after the leading slash is removed.
+	 * <li>包含 "WEB-INF" 或 "META-INF" 的路径
+	 * <li>{@link org.springframework.util.StringUtils#cleanPath} 调用后包含 "../" 的路径
+	 * <li>表示 {@link org.springframework.util.ResourceUtils#isUrl 有效 URL} 或在移除前导斜杠后将表示有效 URL 的路径
 	 * </ul>
-	 * <p><strong>Note:</strong> this method assumes that leading, duplicate '/'
-	 * or control characters (e.g. white space) have been trimmed so that the
-	 * path starts predictably with a single '/' or does not have one.
-	 * @param path the path to validate
-	 * @return {@code true} if the path is invalid, {@code false} otherwise
+	 * <p><strong>注意：</strong>此方法假定前导、重复的 '/' 或控制字符（例如空白字符）已被修剪，
+	 * 以便路径可预测地以单个 '/' 开头或不以 '/' 开头。
+	 *
+	 * @param path 要验证的路径
+	 * @return 如果路径无效，则返回 {@code true}，否则返回 {@code false}
 	 * @since 3.0.6
 	 */
 	protected boolean isInvalidPath(String path) {
@@ -761,18 +704,16 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Determine the media type for the given request and the resource matched
-	 * to it. This implementation tries to determine the MediaType using one of
-	 * the following lookups based on the resource filename and its path
-	 * extension:
+	 * 确定请求和匹配到的资源的媒体类型。此实现尝试使用以下查找之一来确定 MediaType：
 	 * <ol>
 	 * <li>{@link javax.servlet.ServletContext#getMimeType(String)}
 	 * <li>{@link #getMediaTypes()}
-	 * <li>{@link MediaTypeFactory#getMediaType(String)}
+	 * <li>{@link MediaTypeFactory#getMediaTypes(String)}
 	 * </ol>
-	 * @param request the current request
-	 * @param resource the resource to check
-	 * @return the corresponding media type, or {@code null} if none found
+	 *
+	 * @param request  当前请求
+	 * @param resource 要检查的资源
+	 * @return 对应的媒体类型；如果未找到，则返回 {@code null}
 	 */
 	@Nullable
 	protected MediaType getMediaType(HttpServletRequest request, Resource resource) {
@@ -802,12 +743,13 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 	}
 
 	/**
-	 * Set headers on the given servlet response.
-	 * Called for GET requests as well as HEAD requests.
-	 * @param response current servlet response
-	 * @param resource the identified resource (never {@code null})
-	 * @param mediaType the resource's media type (never {@code null})
-	 * @throws IOException in case of errors while setting the headers
+	 * 在给定的 Servlet 响应上设置头信息。
+	 * 用于处理 GET 请求和 HEAD 请求。
+	 *
+	 * @param response  当前的 Servlet 响应
+	 * @param resource  已识别的资源（永远不会为 {@code null}）
+	 * @param mediaType 资源的媒体类型（永远不会为 {@code null}）
+	 * @throws IOException 在设置头信息时出现错误时抛出
 	 */
 	protected void setHeaders(HttpServletResponse response, Resource resource, @Nullable MediaType mediaType)
 			throws IOException {
@@ -823,8 +765,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 				for (String headerValue : headerValues) {
 					if (first) {
 						response.setHeader(headerName, headerValue);
-					}
-					else {
+					} else {
 						response.addHeader(headerName, headerValue);
 					}
 					first = false;
