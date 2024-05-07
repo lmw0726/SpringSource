@@ -16,14 +16,13 @@
 
 package org.springframework.web.servlet.resource;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.io.Resource;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
 /**
- * An abstraction for transforming the content of a resource.
+ * 用于转换资源内容的抽象。
  *
  * @author Jeremy Grelle
  * @author Rossen Stoyanchev
@@ -33,12 +32,12 @@ import org.springframework.core.io.Resource;
 public interface ResourceTransformer {
 
 	/**
-	 * Transform the given resource.
-	 * @param request the current request
-	 * @param resource the resource to transform
-	 * @param transformerChain the chain of remaining transformers to delegate to
-	 * @return the transformed resource (never {@code null})
-	 * @throws IOException if the transformation fails
+	 * 转换给定的资源。
+	 * @param request 当前请求
+	 * @param resource 要转换的资源
+	 * @param transformerChain 剩余转换器链以委托
+	 * @return 转换后的资源（永远不会为 {@code null}）
+	 * @throws IOException 如果转换失败
 	 */
 	Resource transform(HttpServletRequest request, Resource resource, ResourceTransformerChain transformerChain)
 			throws IOException;
