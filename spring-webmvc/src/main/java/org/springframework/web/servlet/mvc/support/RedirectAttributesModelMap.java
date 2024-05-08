@@ -16,18 +16,16 @@
 
 package org.springframework.web.servlet.mvc.support;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.springframework.lang.Nullable;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.DataBinder;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
- * A {@link ModelMap} implementation of {@link RedirectAttributes} that formats
- * values as Strings using a {@link DataBinder}. Also provides a place to store
- * flash attributes so they can survive a redirect without the need to be
- * embedded in the redirect URL.
+ * {@link ModelMap} 的 {@link RedirectAttributes} 实现，使用 {@link DataBinder} 将值格式化为字符串。
+ * 同时提供了一个存储 Flash 属性的位置，以便它们可以在重定向时幸存，而不需要嵌入重定向 URL。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
@@ -35,23 +33,30 @@ import org.springframework.validation.DataBinder;
 @SuppressWarnings("serial")
 public class RedirectAttributesModelMap extends ModelMap implements RedirectAttributes {
 
+	/**
+	 * 数据绑定
+	 */
 	@Nullable
 	private final DataBinder dataBinder;
 
+	/**
+	 * 闪存属性映射
+	 */
 	private final ModelMap flashAttributes = new ModelMap();
 
 
 	/**
-	 * Default constructor without a DataBinder.
-	 * Attribute values are converted to String via {@link #toString()}.
+	 * 默认构造函数，不带 DataBinder。
+	 * 属性值通过 {@link #toString()} 转换为字符串。
 	 */
 	public RedirectAttributesModelMap() {
 		this(null);
 	}
 
 	/**
-	 * Constructor with a DataBinder.
-	 * @param dataBinder used to format attribute values as Strings
+	 * 构造函数，带 DataBinder。
+	 *
+	 * @param dataBinder 用于将属性值格式化为字符串
 	 */
 	public RedirectAttributesModelMap(@Nullable DataBinder dataBinder) {
 		this.dataBinder = dataBinder;
@@ -59,7 +64,7 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 
 
 	/**
-	 * Return the attributes candidate for flash storage or an empty Map.
+	 * 返回用于 Flash 存储的属性候选项或空 Map。
 	 */
 	@Override
 	public Map<String, ?> getFlashAttributes() {
@@ -68,7 +73,7 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Formats the attribute value as a String before adding it.
+	 * <p>在添加之前将属性值格式化为字符串。
 	 */
 	@Override
 	public RedirectAttributesModelMap addAttribute(String attributeName, @Nullable Object attributeValue) {
@@ -78,15 +83,18 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 
 	@Nullable
 	private String formatValue(@Nullable Object value) {
+		// 如果值为 null，则直接返回 null
 		if (value == null) {
 			return null;
 		}
+		// 如果数据绑定器不为 null，则使用数据绑定器将值转换为字符串；
+		// 否则直接调用值的 toString 方法
 		return (this.dataBinder != null ? this.dataBinder.convertIfNecessary(value, String.class) : value.toString());
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Formats the attribute value as a String before adding it.
+	 * <p>在添加之前将属性值格式化为字符串。
 	 */
 	@Override
 	public RedirectAttributesModelMap addAttribute(Object attributeValue) {
@@ -96,7 +104,7 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Each attribute value is formatted as a String before being added.
+	 * <p>在添加之前将每个属性值格式化为字符串。
 	 */
 	@Override
 	public RedirectAttributesModelMap addAllAttributes(@Nullable Collection<?> attributeValues) {
@@ -106,11 +114,12 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Each attribute value is formatted as a String before being added.
+	 * <p>在添加之前将每个属性值格式化为字符串。
 	 */
 	@Override
 	public RedirectAttributesModelMap addAllAttributes(@Nullable Map<String, ?> attributes) {
 		if (attributes != null) {
+			// 循环调用添加属性的方法
 			attributes.forEach(this::addAttribute);
 		}
 		return this;
@@ -118,13 +127,16 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Each attribute value is formatted as a String before being merged.
+	 * <p>在合并之前将每个属性值格式化为字符串。
 	 */
 	@Override
 	public RedirectAttributesModelMap mergeAttributes(@Nullable Map<String, ?> attributes) {
 		if (attributes != null) {
+			// 如果属性不为空
+			// 遍历每对映射
 			attributes.forEach((key, attribute) -> {
 				if (!containsKey(key)) {
+					// 如果不包含key，则添加键和属性
 					addAttribute(key, attribute);
 				}
 			});
@@ -139,7 +151,7 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 
 	/**
 	 * {@inheritDoc}
-	 * <p>The value is formatted as a String before being added.
+	 * <p>在添加之前将属性值格式化为字符串。
 	 */
 	@Override
 	public Object put(String key, @Nullable Object value) {
@@ -148,7 +160,7 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 
 	/**
 	 * {@inheritDoc}
-	 * <p>Each value is formatted as a String before being added.
+	 * <p>在添加之前将每个属性值格式化为字符串。
 	 */
 	@Override
 	public void putAll(@Nullable Map<? extends String, ? extends Object> map) {
