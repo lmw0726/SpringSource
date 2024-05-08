@@ -16,9 +16,6 @@
 
 package org.springframework.web.servlet.mvc;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
@@ -26,10 +23,11 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
- * Trivial controller that always returns a pre-configured view and optionally
- * sets the response status code. The view and status can be configured using
- * the provided configuration properties.
+ * 一个简单的控制器，总是返回预先配置的视图，并可选择设置响应状态码。可以使用提供的配置属性配置视图和状态。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -38,41 +36,49 @@ import org.springframework.web.servlet.support.RequestContextUtils;
  */
 public class ParameterizableViewController extends AbstractController {
 
+	/**
+	 * 视图对象
+	 */
 	@Nullable
 	private Object view;
 
+	/**
+	 * Http状态码
+	 */
 	@Nullable
 	private HttpStatus statusCode;
 
+	/**
+	 * 此属性用于指示请求是否在控制器中完全处理，并且不应使用视图进行渲染。
+	 */
 	private boolean statusOnly;
 
 
 	public ParameterizableViewController() {
 		super(false);
+		// 设置支持的方法为Get、Head方法
 		setSupportedMethods(HttpMethod.GET.name(), HttpMethod.HEAD.name());
 	}
 
 	/**
-	 * Set a view name for the ModelAndView to return, to be resolved by the
-	 * DispatcherServlet via a ViewResolver. Will override any pre-existing
-	 * view name or View.
+	 * 设置 ModelAndView 要返回的视图名称，由 DispatcherServlet 通过 ViewResolver 解析。将覆盖任何现有的视图名称或 View。
 	 */
 	public void setViewName(@Nullable String viewName) {
 		this.view = viewName;
 	}
 
 	/**
-	 * Return the name of the view to delegate to, or {@code null} if using a
-	 * View instance.
+	 * 返回要委托的视图的名称，如果使用 View 实例，则返回 {@code null}。
 	 */
 	@Nullable
 	public String getViewName() {
 		if (this.view instanceof String) {
+			// 如果视图对象是字符串类型
 			String viewName = (String) this.view;
 			if (getStatusCode() != null && getStatusCode().is3xxRedirection()) {
+				// 如果状态码是 3xx 重定向，并且视图名称以 "redirect:" 开头，则直接返回视图名称，否则加上 "redirect:" 前缀
 				return viewName.startsWith("redirect:") ? viewName : "redirect:" + viewName;
-			}
-			else {
+			} else {
 				return viewName;
 			}
 		}
@@ -80,8 +86,8 @@ public class ParameterizableViewController extends AbstractController {
 	}
 
 	/**
-	 * Set a View object for the ModelAndView to return.
-	 * Will override any pre-existing view name or View.
+	 * 设置 ModelAndView 要返回的 View 对象。将覆盖任何现有的视图名称或 View。
+	 *
 	 * @since 4.1
 	 */
 	public void setView(View view) {
@@ -89,8 +95,8 @@ public class ParameterizableViewController extends AbstractController {
 	}
 
 	/**
-	 * Return the View object, or {@code null} if we are using a view name
-	 * to be resolved by the DispatcherServlet via a ViewResolver.
+	 * 返回 View 对象，如果使用视图名称，则返回 {@code null}。
+	 *
 	 * @since 4.1
 	 */
 	@Nullable
@@ -99,14 +105,12 @@ public class ParameterizableViewController extends AbstractController {
 	}
 
 	/**
-	 * Configure the HTTP status code that this controller should set on the
-	 * response.
-	 * <p>When a "redirect:" prefixed view name is configured, there is no need
-	 * to set this property since RedirectView will do that. However this property
-	 * may still be used to override the 3xx status code of {@code RedirectView}.
-	 * For full control over redirecting provide a {@code RedirectView} instance.
-	 * <p>If the status code is 204 and no view is configured, the request is
-	 * fully handled within the controller.
+	 * 配置此控制器应在响应上设置的 HTTP 状态码。
+	 * <p>
+	 * 当配置了以 "redirect:" 前缀的视图名称时，就不需要设置此属性，因为 RedirectView 将会处理。然而，此属性仍可用于重写 {@code RedirectView} 的 3xx 状态码。要完全控制重定向，请提供 {@code RedirectView} 实例。
+	 * <p>
+	 * 如果状态码是 204，并且没有配置视图，则请求将在控制器中完全处理。
+	 *
 	 * @since 4.1
 	 */
 	public void setStatusCode(@Nullable HttpStatus statusCode) {
@@ -114,7 +118,8 @@ public class ParameterizableViewController extends AbstractController {
 	}
 
 	/**
-	 * Return the configured HTTP status code or {@code null}.
+	 * 返回已配置的 HTTP 状态码，或 {@code null}。
+	 *
 	 * @since 4.1
 	 */
 	@Nullable
@@ -124,10 +129,10 @@ public class ParameterizableViewController extends AbstractController {
 
 
 	/**
-	 * The property can be used to indicate the request is considered fully
-	 * handled within the controller and that no view should be used for rendering.
-	 * Useful in combination with {@link #setStatusCode}.
-	 * <p>By default this is set to {@code false}.
+	 * 此属性用于指示请求是否在控制器中完全处理，并且不应使用视图进行渲染。与 {@link #setStatusCode} 结合使用时很有用。
+	 * <p>
+	 * 默认设置为 {@code false}。
+	 *
 	 * @since 4.1
 	 */
 	public void setStatusOnly(boolean statusOnly) {
@@ -135,7 +140,7 @@ public class ParameterizableViewController extends AbstractController {
 	}
 
 	/**
-	 * Whether the request is fully handled within the controller.
+	 * 请求是否在控制器中完全处理。
 	 */
 	public boolean isStatusOnly() {
 		return this.statusOnly;
@@ -143,39 +148,46 @@ public class ParameterizableViewController extends AbstractController {
 
 
 	/**
-	 * Return a ModelAndView object with the specified view name.
-	 * <p>The content of the {@link RequestContextUtils#getInputFlashMap
-	 * "input" FlashMap} is also added to the model.
+	 * 返回指定视图名称的 ModelAndView 对象。
+	 * <p>
+	 * {@link RequestContextUtils#getInputFlashMap "input" FlashMap} 的内容也将添加到模型中。
+	 *
 	 * @see #getViewName()
 	 */
 	@Override
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+		// 获取视图名称
 		String viewName = getViewName();
 
 		if (getStatusCode() != null) {
+			// 如果状态码不为空
 			if (getStatusCode().is3xxRedirection()) {
+				// 如果状态码是 3xx 重定向，则将状态码设置为响应属性
 				request.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, getStatusCode());
-			}
-			else {
+			} else {
+				// 设置响应状态码
 				response.setStatus(getStatusCode().value());
+				// 如果状态码是 204（No Content），且视图名称为空，则直接返回 null
 				if (getStatusCode().equals(HttpStatus.NO_CONTENT) && viewName == null) {
 					return null;
 				}
 			}
 		}
 
+		// 如果仅返回状态码，则直接返回 null
 		if (isStatusOnly()) {
 			return null;
 		}
 
+		// 创建 ModelAndView 对象，并添加请求的“输入”闪存映射
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.addAllObjects(RequestContextUtils.getInputFlashMap(request));
 		if (viewName != null) {
+			// 如果视图名称存在，则设置视图名称
 			modelAndView.setViewName(viewName);
-		}
-		else {
+		} else {
+			// 否则设置视图对象
 			modelAndView.setView(getView());
 		}
 		return modelAndView;

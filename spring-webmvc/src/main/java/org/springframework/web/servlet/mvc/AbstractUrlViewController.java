@@ -16,37 +16,38 @@
 
 package org.springframework.web.servlet.mvc;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.UrlPathHelper;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
- * Abstract base class for {@code Controllers} that return a view name
- * based on the request URL.
+ * 基于请求 URL 返回视图名称的 {@code Controllers} 的抽象基类。
  *
- * <p>Provides infrastructure for determining view names from URLs and configurable
- * URL lookup. For information on the latter, see {@code alwaysUseFullPath}
- * and {@code urlDecode} properties.
+ * <p>提供了从 URL 中确定视图名称的基础设施，并可配置的 URL 查找。
+ * 有关后者的信息，请参见 {@code alwaysUseFullPath} 和 {@code urlDecode} 属性。
  *
  * @author Juergen Hoeller
- * @since 1.2.6
  * @see #setAlwaysUseFullPath
  * @see #setUrlDecode
+ * @since 1.2.6
  */
 public abstract class AbstractUrlViewController extends AbstractController {
 
+	/**
+	 * URL路径助手
+	 */
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
 
 	/**
-	 * Set if URL lookup should always use full path within current servlet
-	 * context. Else, the path within the current servlet mapping is used
-	 * if applicable (i.e. in the case of a ".../*" servlet mapping in web.xml).
-	 * Default is "false".
+	 * 设置是否 URL 查找应始终使用当前 Servlet 上下文中的完整路径。
+	 * 否则，如果适用，则使用当前 Servlet 映射中的路径（即在 web.xml 中的 ".../*" Servlet 映射的情况下）。
+	 * 默认为 "false"。
+	 *
 	 * @see org.springframework.web.util.UrlPathHelper#setAlwaysUseFullPath
 	 */
 	public void setAlwaysUseFullPath(boolean alwaysUseFullPath) {
@@ -54,11 +55,10 @@ public abstract class AbstractUrlViewController extends AbstractController {
 	}
 
 	/**
-	 * Set if context path and request URI should be URL-decoded.
-	 * Both are returned <i>undecoded</i> by the Servlet API,
-	 * in contrast to the servlet path.
-	 * <p>Uses either the request encoding or the default encoding according
-	 * to the Servlet spec (ISO-8859-1).
+	 * 设置是否应对上下文路径和请求 URI 进行 URL 解码。
+	 * Servlet API 返回它们 <i>未解码</i>，与 Servlet 路径相反。
+	 * <p>使用请求编码或 Servlet 规范（ISO-8859-1）中的默认编码。
+	 *
 	 * @see org.springframework.web.util.UrlPathHelper#setUrlDecode
 	 */
 	public void setUrlDecode(boolean urlDecode) {
@@ -66,7 +66,8 @@ public abstract class AbstractUrlViewController extends AbstractController {
 	}
 
 	/**
-	 * Set if ";" (semicolon) content should be stripped from the request URI.
+	 * 设置是否应从请求 URI 中删除 ";"（分号）内容。
+	 *
 	 * @see org.springframework.web.util.UrlPathHelper#setRemoveSemicolonContent(boolean)
 	 */
 	public void setRemoveSemicolonContent(boolean removeSemicolonContent) {
@@ -74,10 +75,10 @@ public abstract class AbstractUrlViewController extends AbstractController {
 	}
 
 	/**
-	 * Set the UrlPathHelper to use for the resolution of lookup paths.
-	 * <p>Use this to override the default UrlPathHelper with a custom subclass,
-	 * or to share common UrlPathHelper settings across multiple MethodNameResolvers
-	 * and HandlerMappings.
+	 * 设置要用于查找路径解析的 URL路径助手。
+	 * <p>使用此方法可以使用自定义子类重写默认的 URL路径助手，
+	 * 或者在多个 方法名解析器 和 处理器映射 中共享公共 URL路径助手 设置。
+	 *
 	 * @see org.springframework.web.servlet.handler.AbstractUrlHandlerMapping#setUrlPathHelper
 	 */
 	public void setUrlPathHelper(UrlPathHelper urlPathHelper) {
@@ -86,7 +87,7 @@ public abstract class AbstractUrlViewController extends AbstractController {
 	}
 
 	/**
-	 * Return the UrlPathHelper to use for the resolution of lookup paths.
+	 * 返回用于解析查找路径的 URL路径助手。
 	 */
 	protected UrlPathHelper getUrlPathHelper() {
 		return this.urlPathHelper;
@@ -94,24 +95,25 @@ public abstract class AbstractUrlViewController extends AbstractController {
 
 
 	/**
-	 * Retrieves the URL path to use for lookup and delegates to
-	 * {@link #getViewNameForRequest}. Also adds the content of
-	 * {@link RequestContextUtils#getInputFlashMap} to the model.
+	 * 检索要用于查找的 URL 路径，并委托给 {@link #getViewNameForRequest}。
+	 * 还将 {@link RequestContextUtils#getInputFlashMap} 的内容添加到模型中。
 	 */
 	@Override
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) {
+		// 获取视图名称
 		String viewName = getViewNameForRequest(request);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Returning view name '" + viewName + "'");
 		}
+		// 获取输入闪存映射和视图名称，构建模型和视图对象
 		return new ModelAndView(viewName, RequestContextUtils.getInputFlashMap(request));
 	}
 
 	/**
-	 * Return the name of the view to render for this request, based on the
-	 * given lookup path. Called by {@link #handleRequestInternal}.
-	 * @param request current HTTP request
-	 * @return a view name for this request (never {@code null})
+	 * 根据给定的查找路径返回此请求的要渲染的视图名称。由 {@link #handleRequestInternal} 调用。
+	 *
+	 * @param request 当前 HTTP 请求
+	 * @return 此请求的视图名称（永远不会是 {@code null}）
 	 * @see #handleRequestInternal
 	 * @see #setAlwaysUseFullPath
 	 * @see #setUrlDecode

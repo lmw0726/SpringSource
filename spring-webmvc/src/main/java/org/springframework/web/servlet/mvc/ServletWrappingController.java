@@ -16,15 +16,6 @@
 
 package org.springframework.web.servlet.mvc;
 
-import java.util.Enumeration;
-import java.util.Properties;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,23 +24,27 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Enumeration;
+import java.util.Properties;
+
 /**
- * Spring Controller implementation that wraps a servlet instance which it manages
- * internally. Such a wrapped servlet is not known outside of this controller;
- * its entire lifecycle is covered here (in contrast to {@link ServletForwardingController}).
+ * Spring 控制器实现，它包装了一个它内部管理的 servlet 实例。这样包装的 servlet 在此控制器之外是不可知的；
+ * 其整个生命周期都在这里进行管理（与 ServletForwardingController 相反）。
  *
- * <p>Useful to invoke an existing servlet via Spring's dispatching infrastructure,
- * for example to apply Spring HandlerInterceptors to its requests.
+ * <p>通过 Spring 的调度基础结构来调用现有的 servlet 是很有用的，例如应用 Spring HandlerInterceptors 到其请求。
  *
- * <p>Note that Struts has a special requirement in that it parses {@code web.xml}
- * to find its servlet mapping. Therefore, you need to specify the DispatcherServlet's
- * servlet name as "servletName" on this controller, so that Struts finds the
- * DispatcherServlet's mapping (thinking that it refers to the ActionServlet).
+ * <p>请注意，Struts 有一个特殊要求，即它会解析 {@code web.xml} 来查找其 servlet 映射。
+ * 因此，您需要在此控制器上指定 DispatcherServlet 的 servlet 名称为 "servletName"，
+ * 这样 Struts 才能找到 DispatcherServlet 的映射（认为它是指向 ActionServlet）。
  *
- * <p><b>Example:</b> a DispatcherServlet XML context, forwarding "*.do" to the Struts
- * ActionServlet wrapped by a ServletWrappingController. All such requests will go
- * through the configured HandlerInterceptor chain (e.g. an OpenSessionInViewInterceptor).
- * From the Struts point of view, everything will work as usual.
+ * <p><b>示例：</b> DispatcherServlet XML 上下文，将 "*.do" 转发给由 ServletWrappingController 包装的 Struts
+ * ActionServlet。所有这样的请求都将通过配置的 HandlerInterceptor 链（例如 OpenSessionInViewInterceptor）。
+ * 从 Struts 的角度来看，一切都和往常一样工作。
  *
  * <pre class="code">
  * &lt;bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping"&gt;
@@ -80,23 +75,38 @@ import org.springframework.web.servlet.ModelAndView;
  * &lt;/bean&gt;</pre>
  *
  * @author Juergen Hoeller
- * @since 1.1.1
  * @see ServletForwardingController
+ * @since 1.1.1
  */
 public class ServletWrappingController extends AbstractController
 		implements BeanNameAware, InitializingBean, DisposableBean {
 
+	/**
+	 * Servlet类型
+	 */
 	@Nullable
 	private Class<? extends Servlet> servletClass;
 
+	/**
+	 * Servlet名称
+	 */
 	@Nullable
 	private String servletName;
 
+	/**
+	 * 初始化参数
+	 */
 	private Properties initParameters = new Properties();
 
+	/**
+	 * bean名称
+	 */
 	@Nullable
 	private String beanName;
 
+	/**
+	 * Servlet实例
+	 */
 	@Nullable
 	private Servlet servletInstance;
 
@@ -107,8 +117,9 @@ public class ServletWrappingController extends AbstractController
 
 
 	/**
-	 * Set the class of the servlet to wrap.
-	 * Needs to implement {@code javax.servlet.Servlet}.
+	 * 设置要包装的 servlet 的类。
+	 * 必须实现 {@code javax.servlet.Servlet}。
+	 *
 	 * @see javax.servlet.Servlet
 	 */
 	public void setServletClass(Class<? extends Servlet> servletClass) {
@@ -116,16 +127,15 @@ public class ServletWrappingController extends AbstractController
 	}
 
 	/**
-	 * Set the name of the servlet to wrap.
-	 * Default is the bean name of this controller.
+	 * 设置要包装的 servlet 的名称。
+	 * 默认是此控制器的 bean 名称。
 	 */
 	public void setServletName(String servletName) {
 		this.servletName = servletName;
 	}
 
 	/**
-	 * Specify init parameters for the servlet to wrap,
-	 * as name-value pairs.
+	 * 指定要包装的 servlet 的初始化参数，作为名称-值对。
 	 */
 	public void setInitParameters(Properties initParameters) {
 		this.initParameters = initParameters;
@@ -138,24 +148,32 @@ public class ServletWrappingController extends AbstractController
 
 
 	/**
-	 * Initialize the wrapped Servlet instance.
+	 * 初始化包装的 Servlet 实例。
+	 *
 	 * @see javax.servlet.Servlet#init(javax.servlet.ServletConfig)
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		// 检查是否设置了 Servlet类型
 		if (this.servletClass == null) {
 			throw new IllegalArgumentException("'servletClass' is required");
 		}
+
+		// 如果未设置 Servlet名称，则使用 bean名称
 		if (this.servletName == null) {
 			this.servletName = this.beanName;
 		}
+
+		// 使用反射创建 Servlet 实例，
 		this.servletInstance = ReflectionUtils.accessibleConstructor(this.servletClass).newInstance();
+		// 调用Servlet初始化方法
 		this.servletInstance.init(new DelegatingServletConfig());
 	}
 
 
 	/**
-	 * Invoke the wrapped Servlet instance.
+	 * 调用包装的 Servlet 实例。
+	 *
 	 * @see javax.servlet.Servlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
 	 */
 	@Override
@@ -163,27 +181,29 @@ public class ServletWrappingController extends AbstractController
 			throws Exception {
 
 		Assert.state(this.servletInstance != null, "No Servlet instance");
+		// 调用Servlet的服务方法
 		this.servletInstance.service(request, response);
 		return null;
 	}
 
 
 	/**
-	 * Destroy the wrapped Servlet instance.
+	 * 销毁包装的 Servlet 实例。
+	 *
 	 * @see javax.servlet.Servlet#destroy()
 	 */
 	@Override
 	public void destroy() {
 		if (this.servletInstance != null) {
+			// Servlet实例存在，则调用它的销毁方法
 			this.servletInstance.destroy();
 		}
 	}
 
 
 	/**
-	 * Internal implementation of the ServletConfig interface, to be passed
-	 * to the wrapped servlet. Delegates to ServletWrappingController fields
-	 * and methods to provide init parameters and other environment info.
+	 * ServletConfig 接口的内部实现，传递给包装的 servlet。委托给 ServletWrappingController 字段和方法，
+	 * 以提供初始化参数和其他环境信息。
 	 */
 	private class DelegatingServletConfig implements ServletConfig {
 
