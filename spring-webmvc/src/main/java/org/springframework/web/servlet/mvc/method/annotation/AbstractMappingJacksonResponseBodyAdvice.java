@@ -26,9 +26,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 
 /**
- * A convenient base class for {@code ResponseBodyAdvice} implementations
- * that customize the response before JSON serialization with
- * {@link AbstractJackson2HttpMessageConverter}'s concrete subclasses.
+ * {@code ResponseBodyAdvice}实现的方便基类，
+ * 用于在JSON序列化之前使用{@link AbstractJackson2HttpMessageConverter}的具体子类自定义响应。
  *
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
@@ -38,35 +37,38 @@ public abstract class AbstractMappingJacksonResponseBodyAdvice implements Respon
 
 	@Override
 	public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+		// 检查converterType是否是AbstractJackson2HttpMessageConverter的子类或实现类
 		return AbstractJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
 	}
 
 	@Override
 	@Nullable
 	public final Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType,
-			MediaType contentType, Class<? extends HttpMessageConverter<?>> converterType,
-			ServerHttpRequest request, ServerHttpResponse response) {
+										MediaType contentType, Class<? extends HttpMessageConverter<?>> converterType,
+										ServerHttpRequest request, ServerHttpResponse response) {
 
 		if (body == null) {
 			return null;
 		}
+		// 获取或创建MappingJacksonValue容器
 		MappingJacksonValue container = getOrCreateContainer(body);
+		// 在序列化之前进行自定义处理
 		beforeBodyWriteInternal(container, contentType, returnType, request, response);
 		return container;
 	}
 
 	/**
-	 * Wrap the body in a {@link MappingJacksonValue} value container (for providing
-	 * additional serialization instructions) or simply cast it if already wrapped.
+	 * 包装响应体在{@link MappingJacksonValue}值容器中（用于提供额外的序列化指令），
+	 * 或者如果已经包装则直接转换。
 	 */
 	protected MappingJacksonValue getOrCreateContainer(Object body) {
 		return (body instanceof MappingJacksonValue ? (MappingJacksonValue) body : new MappingJacksonValue(body));
 	}
 
 	/**
-	 * Invoked only if the converter type is {@code MappingJackson2HttpMessageConverter}.
+	 * 只有当converterType是{@code MappingJackson2HttpMessageConverter}时才调用。
 	 */
 	protected abstract void beforeBodyWriteInternal(MappingJacksonValue bodyContainer, MediaType contentType,
-			MethodParameter returnType, ServerHttpRequest request, ServerHttpResponse response);
+													MethodParameter returnType, ServerHttpRequest request, ServerHttpResponse response);
 
 }

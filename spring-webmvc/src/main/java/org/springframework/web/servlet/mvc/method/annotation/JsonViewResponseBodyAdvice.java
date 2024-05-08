@@ -27,17 +27,15 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.util.Assert;
 
 /**
- * A {@link ResponseBodyAdvice} implementation that adds support for Jackson's
- * {@code @JsonView} annotation declared on a Spring MVC {@code @RequestMapping}
- * or {@code @ExceptionHandler} method.
+ * {@link ResponseBodyAdvice} 实现，支持在 Spring MVC 的 {@code @RequestMapping}
+ * 或 {@code @ExceptionHandler} 方法上声明的 Jackson 的 {@code @JsonView} 注解。
  *
- * <p>The serialization view specified in the annotation will be passed in to the
- * {@link org.springframework.http.converter.json.MappingJackson2HttpMessageConverter}
- * which will then use it to serialize the response body.
+ * <p>注解中指定的序列化视图将传递给
+ * {@link org.springframework.http.converter.json.MappingJackson2HttpMessageConverter}，
+ * 该转换器将用它来序列化响应体。
  *
- * <p>Note that despite {@code @JsonView} allowing for more than one class to
- * be specified, the use for a response body advice is only supported with
- * exactly one class argument. Consider the use of a composite interface.
+ * <p>请注意，尽管 {@code @JsonView} 允许指定多个类，但响应体建议的用法仅支持一个类参数。
+ * 考虑使用复合接口。
  *
  * @author Rossen Stoyanchev
  * @since 4.1
@@ -53,17 +51,20 @@ public class JsonViewResponseBodyAdvice extends AbstractMappingJacksonResponseBo
 
 	@Override
 	protected void beforeBodyWriteInternal(MappingJacksonValue bodyContainer, MediaType contentType,
-			MethodParameter returnType, ServerHttpRequest request, ServerHttpResponse response) {
+										   MethodParameter returnType, ServerHttpRequest request, ServerHttpResponse response) {
 
 		JsonView ann = returnType.getMethodAnnotation(JsonView.class);
+		// 检查是否存在@JsonView注解
 		Assert.state(ann != null, "No JsonView annotation");
 
 		Class<?>[] classes = ann.value();
 		if (classes.length != 1) {
+			// 如果@JsonView注解的值不止一个类，则抛出异常
 			throw new IllegalArgumentException(
 					"@JsonView only supported for response body advice with exactly 1 class argument: " + returnType);
 		}
 
+		// 设置序列化视图
 		bodyContainer.setSerializationView(classes[0]);
 	}
 
