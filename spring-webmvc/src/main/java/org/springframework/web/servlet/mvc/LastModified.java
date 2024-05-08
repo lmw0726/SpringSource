@@ -19,18 +19,15 @@ package org.springframework.web.servlet.mvc;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Supports last-modified HTTP requests to facilitate content caching.
- * Same contract as for the Servlet API's {@code getLastModified} method.
+ * 支持上次修改的 HTTP 请求以便实现内容缓存。
+ * 与 Servlet API 的 {@code getLastModified} 方法具有相同的合同。
  *
- * <p>Delegated to by a {@link org.springframework.web.servlet.HandlerAdapter#getLastModified}
- * implementation. By default, any Controller or HttpRequestHandler within Spring's
- * default framework can implement this interface to enable last-modified checking.
+ * <p>由 {@link org.springframework.web.servlet.HandlerAdapter#getLastModified} 实现委托。
+ * 默认情况下，Spring 默认框架中的任何 Controller 或 HttpRequestHandler 都可以实现此接口以启用上次修改的检查。
  *
- * <p><b>Note:</b> Alternative handler implementation approaches have different
- * last-modified handling styles. For example, Spring 2.5's annotated controller
- * approach (using {@code @RequestMapping}) provides last-modified support
- * through the {@link org.springframework.web.context.request.WebRequest#checkNotModified}
- * method, allowing for last-modified checking within the main handler method.
+ * <p><b>注意:</b> 替代的处理程序实现方法具有不同的上次修改处理风格。例如，Spring 2.5 的注解控制器方法（使用 {@code @RequestMapping}）
+ * 通过 {@link org.springframework.web.context.request.WebRequest#checkNotModified} 方法提供了上次修改的支持，
+ * 允许在主处理程序方法中进行上次修改的检查。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -39,24 +36,19 @@ import javax.servlet.http.HttpServletRequest;
  * @see SimpleControllerHandlerAdapter
  * @see org.springframework.web.HttpRequestHandler
  * @see HttpRequestHandlerAdapter
- * @deprecated as of 5.3.9 in favor of using the {@code checkNotModified} methods
- * in {@link org.springframework.web.context.request.WebRequest}, or from an
- * annotated controller method, returning a
- * {@link org.springframework.http.ResponseEntity} with an "ETag" and/or
- * "Last-Modified" headers set.
+ * @deprecated 自 5.3.9 起，建议使用 {@link org.springframework.web.context.request.WebRequest} 中的 {@code checkNotModified} 方法，
+ * 或者从注解控制器方法返回设置了 "ETag" 和/或 "Last-Modified" 标头的 {@link org.springframework.http.ResponseEntity}。
  */
 @Deprecated
 public interface LastModified {
 
 	/**
-	 * Same contract as for HttpServlet's {@code getLastModified} method.
-	 * Invoked <b>before</b> request processing.
-	 * <p>The return value will be sent to the HTTP client as Last-Modified header,
-	 * and compared with If-Modified-Since headers that the client sends back.
-	 * The content will only get regenerated if there has been a modification.
-	 * @param request current HTTP request
-	 * @return the time the underlying resource was last modified, or -1
-	 * meaning that the content must always be regenerated
+	 * 与 HttpServlet 的 {@code getLastModified} 方法具有相同的合同。
+	 * 在请求处理之前调用。
+	 * <p>返回值将作为 Last-Modified 标头发送给 HTTP 客户端，并与客户端发送回来的 If-Modified-Since 标头进行比较。
+	 * 只有在发生修改时内容才会重新生成。
+	 * @param request 当前 HTTP 请求
+	 * @return 底层资源上次修改的时间，或 -1 表示内容必须始终重新生成
 	 * @see org.springframework.web.servlet.HandlerAdapter#getLastModified
 	 * @see javax.servlet.http.HttpServlet#getLastModified
 	 */
