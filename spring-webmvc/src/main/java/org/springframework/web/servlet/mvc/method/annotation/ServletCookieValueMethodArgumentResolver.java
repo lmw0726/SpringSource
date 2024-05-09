@@ -16,9 +16,6 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
@@ -28,15 +25,20 @@ import org.springframework.web.method.annotation.AbstractCookieValueMethodArgume
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * An {@link org.springframework.web.method.annotation.AbstractCookieValueMethodArgumentResolver}
- * that resolves cookie values from an {@link HttpServletRequest}.
+ * 从 {@link HttpServletRequest} 中解析 cookie 值的 {@link org.springframework.web.method.annotation.AbstractCookieValueMethodArgumentResolver}。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
  */
 public class ServletCookieValueMethodArgumentResolver extends AbstractCookieValueMethodArgumentResolver {
 
+	/**
+	 * URL路径助手
+	 */
 	private UrlPathHelper urlPathHelper = UrlPathHelper.defaultInstance;
 
 
@@ -53,19 +55,22 @@ public class ServletCookieValueMethodArgumentResolver extends AbstractCookieValu
 	@Override
 	@Nullable
 	protected Object resolveName(String cookieName, MethodParameter parameter,
-			NativeWebRequest webRequest) throws Exception {
+								 NativeWebRequest webRequest) throws Exception {
 
+		// 获取原生的HttpServletRequest对象
 		HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 		Assert.state(servletRequest != null, "No HttpServletRequest");
 
+		// 从请求中获取指定名称的Cookie对象
 		Cookie cookieValue = WebUtils.getCookie(servletRequest, cookieName);
+		// 如果参数的嵌套类型是Cookie，则直接返回Cookie对象
 		if (Cookie.class.isAssignableFrom(parameter.getNestedParameterType())) {
 			return cookieValue;
-		}
-		else if (cookieValue != null) {
+		} else if (cookieValue != null) {
+			// 如果Cookie值不为空，则解码并返回其值
 			return this.urlPathHelper.decodeRequestString(servletRequest, cookieValue.getValue());
-		}
-		else {
+		} else {
+			// 否则，返回null
 			return null;
 		}
 	}

@@ -16,8 +16,6 @@
 
 package org.springframework.web.method.annotation;
 
-import java.util.Map;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -27,13 +25,12 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.Map;
+
 /**
- * Resolves {@link Map} method arguments and handles {@link Map} return values.
+ * 解析 {@link Map} 方法参数并处理 {@link Map} 返回值。
  *
- * <p>A Map return value can be interpreted in more than one ways depending
- * on the presence of annotations like {@code @ModelAttribute} or
- * {@code @ResponseBody}. As of 5.2 this resolver returns false if the
- * parameter is annotated.
+ * <p>根据是否存在诸如 {@code @ModelAttribute} 或 {@code @ResponseBody} 等注解，Map 返回值可以有多种解释方式。从 5.2 版本开始，如果参数被注解，此解析器将返回 false。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
@@ -42,6 +39,7 @@ public class MapMethodProcessor implements HandlerMethodArgumentResolver, Handle
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 检查参数类型是否是Map的子类或实现类，并且参数上没有注解
 		return (Map.class.isAssignableFrom(parameter.getParameterType()) &&
 				parameter.getParameterAnnotations().length == 0);
 	}
@@ -49,27 +47,29 @@ public class MapMethodProcessor implements HandlerMethodArgumentResolver, Handle
 	@Override
 	@Nullable
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+								  NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
 		Assert.state(mavContainer != null, "ModelAndViewContainer is required for model exposure");
+		// 获取模型数据
 		return mavContainer.getModel();
 	}
 
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
+		// 检查返回类型是否是Map的子类或实现类
 		return Map.class.isAssignableFrom(returnType.getParameterType());
 	}
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
-			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+								  ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
-		if (returnValue instanceof Map){
+		if (returnValue instanceof Map) {
+			// 如果返回值是Map类型，则将其添加到模型中
 			mavContainer.addAllAttributes((Map) returnValue);
-		}
-		else if (returnValue != null) {
-			// should not happen
+		} else if (returnValue != null) {
+			// 如果返回值不为空，但不是Map类型，则抛出异常
 			throw new UnsupportedOperationException("Unexpected return type [" +
 					returnType.getParameterType().getName() + "] in method: " + returnType.getMethod());
 		}

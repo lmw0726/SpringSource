@@ -16,8 +16,6 @@
 
 package org.springframework.web.method.annotation;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
@@ -28,17 +26,15 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import java.util.Map;
+
 /**
- * Resolves method arguments annotated with {@code @RequestHeader} except for
- * {@link Map} arguments. See {@link RequestHeaderMapMethodArgumentResolver} for
- * details on {@link Map} arguments annotated with {@code @RequestHeader}.
- *
- * <p>An {@code @RequestHeader} is a named value resolved from a request header.
- * It has a required flag and a default value to fall back on when the request
- * header does not exist.
- *
- * <p>A {@link WebDataBinder} is invoked to apply type conversion to resolved
- * request header values that don't yet match the method parameter type.
+ * 解析使用 {@code @RequestHeader} 注解的方法参数，但不包括 {@link Map} 类型的参数。
+ * 有关使用 {@code @RequestHeader} 注解的 {@link Map} 参数的详细信息，请参阅 {@link RequestHeaderMapMethodArgumentResolver}。
+ * <p>
+ * {@code @RequestHeader} 是从请求头中解析的命名值。它具有一个必需标志和一个默认值，在请求头不存在时可以返回。
+ * <p>
+ * 将调用 {@link WebDataBinder} 来对尚未与方法参数类型匹配的解析请求头值进行类型转换。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -47,10 +43,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 public class RequestHeaderMethodArgumentResolver extends AbstractNamedValueMethodArgumentResolver {
 
 	/**
-	 * Create a new {@link RequestHeaderMethodArgumentResolver} instance.
-	 * @param beanFactory a bean factory to use for resolving  ${...}
-	 * placeholder and #{...} SpEL expressions in default values;
-	 * or {@code null} if default values are not expected to have expressions
+	 * 创建一个新的 {@link RequestHeaderMethodArgumentResolver} 实例。
+	 *
+	 * @param beanFactory 用于解析默认值中的 ${...} 占位符和 #{...} SpEL 表达式的 bean 工厂；
+	 *                    如果默认值不包含表达式，则为 {@code null}
 	 */
 	public RequestHeaderMethodArgumentResolver(@Nullable ConfigurableBeanFactory beanFactory) {
 		super(beanFactory);
@@ -59,25 +55,30 @@ public class RequestHeaderMethodArgumentResolver extends AbstractNamedValueMetho
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 检查参数是否带有@RequestHeader注解，并且参数的嵌套类型不是Map或Map的子类
 		return (parameter.hasParameterAnnotation(RequestHeader.class) &&
 				!Map.class.isAssignableFrom(parameter.nestedIfOptional().getNestedParameterType()));
 	}
 
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
+		// 获取方法参数上的@RequestHeader注解
 		RequestHeader ann = parameter.getParameterAnnotation(RequestHeader.class);
 		Assert.state(ann != null, "No RequestHeader annotation");
+		// 使用@RequestHeader注解构建 RequestHeaderNamedValueInfo
 		return new RequestHeaderNamedValueInfo(ann);
 	}
 
 	@Override
 	@Nullable
 	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
+		// 获取请求中指定名称的头信息值数组
 		String[] headerValues = request.getHeaderValues(name);
 		if (headerValues != null) {
+			// 如果头信息值数组不为空，则返回单个值或整个数组
 			return (headerValues.length == 1 ? headerValues[0] : headerValues);
-		}
-		else {
+		} else {
+			// 如果头信息值数组为空，则返回null
 			return null;
 		}
 	}

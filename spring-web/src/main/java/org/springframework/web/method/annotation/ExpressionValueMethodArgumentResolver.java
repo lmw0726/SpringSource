@@ -16,8 +16,6 @@
 
 package org.springframework.web.method.annotation;
 
-import javax.servlet.ServletException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.core.MethodParameter;
@@ -26,15 +24,15 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import javax.servlet.ServletException;
+
 /**
- * Resolves method arguments annotated with {@code @Value}.
+ * 解析带有 {@code @Value} 注解的方法参数。
  *
- * <p>An {@code @Value} does not have a name but gets resolved from the default
- * value string, which may contain ${...} placeholder or Spring Expression
- * Language #{...} expressions.
+ * <p>{@code @Value} 没有名称，但从默认值字符串中解析，该字符串可能包含 ${...} 占位符或 Spring 表达式
+ * 语言 #{...} 表达式。
  *
- * <p>A {@link WebDataBinder} may be invoked to apply type conversion to
- * resolved argument value.
+ * <p>可能会调用 {@link WebDataBinder} 来对解析的参数值进行类型转换。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
@@ -42,10 +40,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 public class ExpressionValueMethodArgumentResolver extends AbstractNamedValueMethodArgumentResolver {
 
 	/**
-	 * Create a new {@link ExpressionValueMethodArgumentResolver} instance.
-	 * @param beanFactory a bean factory to use for resolving  ${...}
-	 * placeholder and #{...} SpEL expressions in default values;
-	 * or {@code null} if default values are not expected to contain expressions
+	 * 创建一个新的 {@link ExpressionValueMethodArgumentResolver} 实例。
+	 *
+	 * @param beanFactory 用于解析默认值中的 ${...} 占位符和 #{...} SpEL 表达式的 bean 工厂；
+	 *                    或 {@code null}，如果不期望默认值包含表达式
 	 */
 	public ExpressionValueMethodArgumentResolver(@Nullable ConfigurableBeanFactory beanFactory) {
 		super(beanFactory);
@@ -54,20 +52,23 @@ public class ExpressionValueMethodArgumentResolver extends AbstractNamedValueMet
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 检查方法参数上是否有@Value注解
 		return parameter.hasParameterAnnotation(Value.class);
 	}
 
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
-		Value ann = parameter.getParameterAnnotation(Value.class);
-		Assert.state(ann != null, "No Value annotation");
-		return new ExpressionValueNamedValueInfo(ann);
+		// 获取方法参数上的@Value注解
+		Value annotation = parameter.getParameterAnnotation(Value.class);
+		Assert.state(annotation != null, "No Value annotation");
+		// 使用@Value注解创建 ExpressionValueNamedValueInfo
+		return new ExpressionValueNamedValueInfo(annotation);
 	}
 
 	@Override
 	@Nullable
 	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest webRequest) throws Exception {
-		// No name to resolve
+		// 没有要解析的名称
 		return null;
 	}
 

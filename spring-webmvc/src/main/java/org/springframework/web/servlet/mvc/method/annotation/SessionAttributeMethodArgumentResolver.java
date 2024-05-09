@@ -16,8 +16,6 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import javax.servlet.ServletException;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -28,8 +26,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver;
 
+import javax.servlet.ServletException;
+
 /**
- * Resolves method arguments annotated with an @{@link SessionAttribute}.
+ * 解析带有 @{@link SessionAttribute} 注解的方法参数。
  *
  * @author Rossen Stoyanchev
  * @since 4.3
@@ -38,13 +38,16 @@ public class SessionAttributeMethodArgumentResolver extends AbstractNamedValueMe
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 检查方法参数上是否有@SessionAttribute注解
 		return parameter.hasParameterAnnotation(SessionAttribute.class);
 	}
 
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
+		// 获取方法参数上的@SessionAttribute注解
 		SessionAttribute ann = parameter.getParameterAnnotation(SessionAttribute.class);
 		Assert.state(ann != null, "No SessionAttribute annotation");
+		// 使用@SessionAttribute的信息创建 NamedValueInfo
 		return new NamedValueInfo(ann.name(), ann.required(), ValueConstants.DEFAULT_NONE);
 	}
 

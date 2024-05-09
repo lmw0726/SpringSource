@@ -41,13 +41,14 @@ public class ModelMethodProcessor implements HandlerMethodArgumentResolver, Hand
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 检查方法参数是否是Model及其实现类
 		return Model.class.isAssignableFrom(parameter.getParameterType());
 	}
 
 	@Override
 	@Nullable
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+								  NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
 		Assert.state(mavContainer != null, "ModelAndViewContainer is required for model exposure");
 		return mavContainer.getModel();
@@ -60,16 +61,17 @@ public class ModelMethodProcessor implements HandlerMethodArgumentResolver, Hand
 
 	@Override
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
-			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+								  ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
+		// 如果返回值为空，则直接返回
 		if (returnValue == null) {
 			return;
-		}
-		else if (returnValue instanceof Model) {
+		} else if (returnValue instanceof Model) {
+			// 如果返回值是Model类型，则将其属性添加到ModelAndViewContainer中
 			mavContainer.addAllAttributes(((Model) returnValue).asMap());
-		}
-		else {
-			// should not happen
+		} else {
+			// 不应该发生
+			// 否则，抛出不支持的操作异常
 			throw new UnsupportedOperationException("Unexpected return type [" +
 					returnType.getParameterType().getName() + "] in method: " + returnType.getMethod());
 		}

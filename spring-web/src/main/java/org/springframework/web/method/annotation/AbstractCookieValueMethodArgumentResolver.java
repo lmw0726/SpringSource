@@ -27,15 +27,12 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * A base abstract class to resolve method arguments annotated with
- * {@code @CookieValue}. Subclasses extract the cookie value from the request.
+ * 一个用于解析带有 {@code @CookieValue} 注解的方法参数的基础抽象类。子类从请求中提取 cookie 值。
  *
- * <p>An {@code @CookieValue} is a named value that is resolved from a cookie.
- * It has a required flag and a default value to fall back on when the cookie
- * does not exist.
+ * <p>{@code @CookieValue} 是一个命名值，从 cookie 中解析。它具有一个 required 标志和一个默认值，
+ * 当 cookie 不存在时可以回退到默认值。
  *
- * <p>A {@link WebDataBinder} may be invoked to apply type conversion to the
- * resolved cookie value.
+ * <p>可能会调用 {@link WebDataBinder} 来对解析的 cookie 值应用类型转换。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -44,10 +41,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 public abstract class AbstractCookieValueMethodArgumentResolver extends AbstractNamedValueMethodArgumentResolver {
 
 	/**
-	 * Crate a new {@link AbstractCookieValueMethodArgumentResolver} instance.
-	 * @param beanFactory a bean factory to use for resolving  ${...}
-	 * placeholder and #{...} SpEL expressions in default values;
-	 * or {@code null} if default values are not expected to contain expressions
+	 * 创建一个新的 {@link AbstractCookieValueMethodArgumentResolver} 实例。
+	 *
+	 * @param beanFactory 用于解析默认值中的 ${...} 占位符和 #{...} SpEL 表达式的 Bean 工厂；
+	 *                    如果不希望默认值包含表达式，则为 {@code null}。
 	 */
 	public AbstractCookieValueMethodArgumentResolver(@Nullable ConfigurableBeanFactory beanFactory) {
 		super(beanFactory);
@@ -56,13 +53,16 @@ public abstract class AbstractCookieValueMethodArgumentResolver extends Abstract
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 检查是否含有@CookieValue注解
 		return parameter.hasParameterAnnotation(CookieValue.class);
 	}
 
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
+		// 获取方法参数上的@CookieValue注解
 		CookieValue annotation = parameter.getParameterAnnotation(CookieValue.class);
 		Assert.state(annotation != null, "No CookieValue annotation");
+		// 构建 CookieValueNamedValueInfo
 		return new CookieValueNamedValueInfo(annotation);
 	}
 

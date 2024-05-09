@@ -16,8 +16,6 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import javax.servlet.ServletException;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -28,8 +26,12 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver;
 
+import javax.servlet.ServletException;
+
 /**
- * Resolves method arguments annotated with an @{@link RequestAttribute}.
+ * 解析使用 @{@link RequestAttribute} 注解的方法参数。
+ *
+ * 该解析器用于解析带有 @{@link RequestAttribute} 注解的方法参数。
  *
  * @author Rossen Stoyanchev
  * @since 4.3
@@ -38,19 +40,23 @@ public class RequestAttributeMethodArgumentResolver extends AbstractNamedValueMe
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 检查参数是否带有@RequestAttribute注解
 		return parameter.hasParameterAnnotation(RequestAttribute.class);
 	}
 
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
+		// 获取参数上的@RequestAttribute注解
 		RequestAttribute ann = parameter.getParameterAnnotation(RequestAttribute.class);
+		// 确保@RequestAttribute注解不为空
 		Assert.state(ann != null, "No RequestAttribute annotation");
+		// 返回一个新的命名值信息对象，其中包含@RequestAttribute注解的属性信息
 		return new NamedValueInfo(ann.name(), ann.required(), ValueConstants.DEFAULT_NONE);
 	}
 
 	@Override
 	@Nullable
-	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request){
+	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) {
 		return request.getAttribute(name, RequestAttributes.SCOPE_REQUEST);
 	}
 

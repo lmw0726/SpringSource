@@ -29,12 +29,10 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Resolves {@link Errors} method arguments.
+ * 解析 {@link Errors} 方法参数。
  *
- * <p>An {@code Errors} method argument is expected to appear immediately after
- * the model attribute in the method signature. It is resolved by expecting the
- * last two attributes added to the model to be the model attribute and its
- * {@link BindingResult}.
+ * <p>预期在方法签名中的模型属性后立即出现一个 {@code Errors} 方法参数。通过期望添加到模型中的最后两个属性来解析它们，
+ * 分别是模型属性和其 {@link BindingResult}。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -44,25 +42,29 @@ public class ErrorsMethodArgumentResolver implements HandlerMethodArgumentResolv
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 获取参数类型
 		Class<?> paramType = parameter.getParameterType();
+		// 检查参数类型是否是Errors的子类或实现类
 		return Errors.class.isAssignableFrom(paramType);
 	}
 
 	@Override
 	@Nullable
 	public Object resolveArgument(MethodParameter parameter,
-			@Nullable ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
-			@Nullable WebDataBinderFactory binderFactory) throws Exception {
+								  @Nullable ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
+								  @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
 		Assert.state(mavContainer != null,
 				"Errors/BindingResult argument only supported on regular handler methods");
-
+		// 获取模型
 		ModelMap model = mavContainer.getModel();
+		// 获取模型中的最后一个键
 		String lastKey = CollectionUtils.lastElement(model.keySet());
 		if (lastKey != null && lastKey.startsWith(BindingResult.MODEL_KEY_PREFIX)) {
+			// 如果最后一个键以BindingResult.MODEL_KEY_PREFIX开头，则返回相应的值
 			return model.get(lastKey);
 		}
-
+		// 如果不符合条件，则抛出异常
 		throw new IllegalStateException(
 				"An Errors/BindingResult argument is expected to be declared immediately after " +
 				"the model attribute, the @RequestBody or the @RequestPart arguments " +

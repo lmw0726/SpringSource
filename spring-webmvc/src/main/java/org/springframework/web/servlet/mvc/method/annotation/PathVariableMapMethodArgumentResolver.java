@@ -16,10 +16,6 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
@@ -32,40 +28,46 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.HandlerMapping;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
- * Resolves {@link Map} method arguments annotated with an @{@link PathVariable}
- * where the annotation does not specify a path variable name. The created
- * {@link Map} contains all URI template name/value pairs.
+ * 解析使用 @{@link PathVariable} 注解但注解未指定路径变量名称的 {@link Map} 方法参数。
+ * 创建的 {@link Map} 包含所有 URI 模板名称/值对。
  *
  * @author Rossen Stoyanchev
- * @since 3.2
  * @see PathVariableMethodArgumentResolver
+ * @since 3.2
  */
 public class PathVariableMapMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 获取方法参数上的@PathVariable注解
 		PathVariable ann = parameter.getParameterAnnotation(PathVariable.class);
+		// 检查是否存在@PathVariable注解，并且参数类型是Map的子类或实现类，并且@PathVariable注解的值不为空
 		return (ann != null && Map.class.isAssignableFrom(parameter.getParameterType()) &&
 				!StringUtils.hasText(ann.value()));
 	}
 
 	/**
-	 * Return a Map with all URI template variables or an empty map.
+	 * 返回一个包含所有 URI 模板变量的 Map，或者返回一个空 Map。
 	 */
 	@Override
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
-
+								  NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+		// 从原始请求中获取URL模板变量
 		@SuppressWarnings("unchecked")
 		Map<String, String> uriTemplateVars =
 				(Map<String, String>) webRequest.getAttribute(
 						HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
 
 		if (!CollectionUtils.isEmpty(uriTemplateVars)) {
+			// 如果URI模板变量不为空，则返回一个新的LinkedHashMap
 			return new LinkedHashMap<>(uriTemplateVars);
-		}
-		else {
+		} else {
+			// 如果URI模板变量为空，则返回一个空的Map
 			return Collections.emptyMap();
 		}
 	}
