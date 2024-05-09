@@ -16,11 +16,7 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-
 import com.fasterxml.jackson.annotation.JsonView;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -28,47 +24,51 @@ import org.springframework.http.converter.json.AbstractJackson2HttpMessageConver
 import org.springframework.http.converter.json.MappingJacksonInputMessage;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+
 /**
- * A {@link RequestBodyAdvice} implementation that adds support for Jackson's
- * {@code @JsonView} annotation declared on a Spring MVC {@code @HttpEntity}
- * or {@code @RequestBody} method parameter.
+ * {@link RequestBodyAdvice} 的实现，为 Spring MVC {@code @HttpEntity} 或 {@code @RequestBody}
+ * 方法参数添加对 Jackson 的 {@code @JsonView} 注解的支持。
  *
- * <p>The deserialization view specified in the annotation will be passed in to the
- * {@link org.springframework.http.converter.json.MappingJackson2HttpMessageConverter}
- * which will then use it to deserialize the request body with.
+ * <p>注解中指定的反序列化视图将传递给 {@link org.springframework.http.converter.json.MappingJackson2HttpMessageConverter}，
+ * 然后用它来反序列化请求体。
  *
- * <p>Note that despite {@code @JsonView} allowing for more than one class to
- * be specified, the use for a request body advice is only supported with
- * exactly one class argument. Consider the use of a composite interface.
+ * <p>请注意，尽管 {@code @JsonView} 允许指定多个类，但请求体建议仅支持一个类参数。考虑使用复合接口。
  *
  * @author Sebastien Deleuze
- * @since 4.2
  * @see com.fasterxml.jackson.annotation.JsonView
  * @see com.fasterxml.jackson.databind.ObjectMapper#readerWithView(Class)
+ * @since 4.2
  */
 public class JsonViewRequestBodyAdvice extends RequestBodyAdviceAdapter {
 
 	@Override
 	public boolean supports(MethodParameter methodParameter, Type targetType,
-			Class<? extends HttpMessageConverter<?>> converterType) {
+							Class<? extends HttpMessageConverter<?>> converterType) {
 
+		// 检查converterType是否是AbstractJackson2HttpMessageConverter的子类或实现类，
+		// 并且methodParameter参数上是否存在@JsonView注解
 		return (AbstractJackson2HttpMessageConverter.class.isAssignableFrom(converterType) &&
 				methodParameter.getParameterAnnotation(JsonView.class) != null);
 	}
 
 	@Override
 	public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter methodParameter,
-			Type targetType, Class<? extends HttpMessageConverter<?>> selectedConverterType) throws IOException {
-
+										   Type targetType, Class<? extends HttpMessageConverter<?>> selectedConverterType) throws IOException {
+		// 获取方法参数上的@JsonView注解
 		JsonView ann = methodParameter.getParameterAnnotation(JsonView.class);
+		// 检查是否存在@JsonView注解
 		Assert.state(ann != null, "No JsonView annotation");
 
 		Class<?>[] classes = ann.value();
 		if (classes.length != 1) {
+			// 如果@JsonView注解的值不止一个类，则抛出异常
 			throw new IllegalArgumentException(
 					"@JsonView only supported for request body advice with exactly 1 class argument: " + methodParameter);
 		}
 
+		// 返回新的MappingJacksonInputMessage对象
 		return new MappingJacksonInputMessage(inputMessage.getBody(), inputMessage.getHeaders(), classes[0]);
 	}
 

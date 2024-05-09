@@ -16,21 +16,18 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+
 /**
- * A convenient starting point for implementing
- * {@link org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice
- * RequestBodyAdvice} with default method implementations.
+ * 用于实现 {@link org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice RequestBodyAdvice} 的方便起点，具有默认的方法实现。
  *
- * <p>Subclasses are required to implement {@link #supports} to return true
- * depending on when the advice applies.
+ * <p>子类需要实现 {@link #supports} 方法，根据建议适用的情况返回 true。
  *
  * @author Rossen Stoyanchev
  * @since 4.2
@@ -38,32 +35,32 @@ import org.springframework.lang.Nullable;
 public abstract class RequestBodyAdviceAdapter implements RequestBodyAdvice {
 
 	/**
-	 * The default implementation returns the InputMessage that was passed in.
+	 * 默认实现返回传入的 InputMessage。
 	 */
 	@Override
 	public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter parameter,
-			Type targetType, Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
+										   Type targetType, Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
 
 		return inputMessage;
 	}
 
 	/**
-	 * The default implementation returns the body that was passed in.
+	 * 默认实现返回传入的 body。
 	 */
 	@Override
 	public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter,
-			Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
+								Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
 
 		return body;
 	}
 
 	/**
-	 * The default implementation returns the body that was passed in.
+	 * 默认实现返回传入的 body。
 	 */
 	@Override
 	@Nullable
 	public Object handleEmptyBody(@Nullable Object body, HttpInputMessage inputMessage, MethodParameter parameter,
-			Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
+								  Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
 
 		return body;
 	}
