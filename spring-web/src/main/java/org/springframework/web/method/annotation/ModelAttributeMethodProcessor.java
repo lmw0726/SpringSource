@@ -403,10 +403,15 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	 * @see SmartValidator#validate(Object, Errors, Object...)
 	 */
 	protected void validateIfApplicable(WebDataBinder binder, MethodParameter parameter) {
+		// 遍历方法参数的所有注解
 		for (Annotation ann : parameter.getParameterAnnotations()) {
+			// 确定验证提示
 			Object[] validationHints = ValidationAnnotationUtils.determineValidationHints(ann);
+			// 如果验证提示不为空
 			if (validationHints != null) {
+				// 使用验证提示对数据绑定器进行验证
 				binder.validate(validationHints);
+				// 跳出循环
 				break;
 			}
 		}
@@ -429,12 +434,18 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	protected void validateValueIfApplicable(WebDataBinder binder, MethodParameter parameter,
 											 Class<?> targetType, String fieldName, @Nullable Object value) {
 
+		// 遍历方法参数的所有注解
 		for (Annotation ann : parameter.getParameterAnnotations()) {
+			// 确定验证提示
 			Object[] validationHints = ValidationAnnotationUtils.determineValidationHints(ann);
+			// 如果验证提示不为空
 			if (validationHints != null) {
+				// 遍历数据绑定器中的验证器
 				for (Validator validator : binder.getValidators()) {
+					// 如果验证器是智能验证器
 					if (validator instanceof SmartValidator) {
 						try {
+							// 对目标类型、字段名、值进行验证，传入数据绑定结果和验证提示
 							((SmartValidator) validator).validateValue(targetType, fieldName, value,
 									binder.getBindingResult(), validationHints);
 						} catch (IllegalArgumentException ex) {
@@ -442,6 +453,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 						}
 					}
 				}
+				// 跳出循环
 				break;
 			}
 		}
@@ -468,9 +480,13 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	 * @since 5.0
 	 */
 	protected boolean isBindExceptionRequired(MethodParameter parameter) {
+		// 获取方法参数的索引
 		int i = parameter.getParameterIndex();
+		// 获取方法参数类型数组
 		Class<?>[] paramTypes = parameter.getExecutable().getParameterTypes();
+		// 判断是否有绑定结果参数
 		boolean hasBindingResult = (paramTypes.length > (i + 1) && Errors.class.isAssignableFrom(paramTypes[i + 1]));
+		// 返回是否不需要抛出致命的绑定异常
 		return !hasBindingResult;
 	}
 
@@ -479,7 +495,9 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	 */
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
+		// 检查是否有@ModelAttribute注解
 		return (returnType.hasMethodAnnotation(ModelAttribute.class) ||
+				// 或者将非简单方法参数和返回值视为模型属性，并且返回值类型不是简单类型
 				(this.annotationNotRequired && !BeanUtils.isSimpleProperty(returnType.getParameterType())));
 	}
 
@@ -491,7 +509,9 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 								  ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
 		if (returnValue != null) {
+			//如果有返回值，获取返回值名称
 			String name = ModelFactory.getNameForReturnValue(returnValue, returnType);
+			// 将名称和返回值，添加进 模型与视图容器 中
 			mavContainer.addAttribute(name, returnValue);
 		}
 	}
@@ -504,8 +524,14 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	 */
 	private static class FieldAwareConstructorParameter extends MethodParameter {
 
+		/**
+		 * 参数名称
+		 */
 		private final String parameterName;
 
+		/**
+		 * 组合注解
+		 */
 		@Nullable
 		private volatile Annotation[] combinedAnnotations;
 
@@ -516,16 +542,26 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 
 		@Override
 		public Annotation[] getParameterAnnotations() {
+			// 获取已合并的注解数组
 			Annotation[] anns = this.combinedAnnotations;
+			// 如果尚未合并
 			if (anns == null) {
+				// 获取方法参数的所有注解
 				anns = super.getParameterAnnotations();
 				try {
+					// 获取声明当前参数的类的声明的字段
 					Field field = getDeclaringClass().getDeclaredField(this.parameterName);
+					// 获取字段的所有注解
 					Annotation[] fieldAnns = field.getAnnotations();
+					// 如果字段有注解
 					if (fieldAnns.length > 0) {
+						// 创建一个新的列表，长度为已有注解数组和字段注解数组长度之和
 						List<Annotation> merged = new ArrayList<>(anns.length + fieldAnns.length);
+						// 将已有注解数组添加到新列表中
 						merged.addAll(Arrays.asList(anns));
+						// 遍历字段的注解数组
 						for (Annotation fieldAnn : fieldAnns) {
+							// 检查是否已经存在相同类型的注解
 							boolean existingType = false;
 							for (Annotation ann : anns) {
 								if (ann.annotationType() == fieldAnn.annotationType()) {
@@ -533,17 +569,21 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 									break;
 								}
 							}
+							// 如果不存在相同类型的注解，则将该注解添加到新列表中
 							if (!existingType) {
 								merged.add(fieldAnn);
 							}
 						}
+						// 将新列表转换为注解数组
 						anns = merged.toArray(new Annotation[0]);
 					}
 				} catch (NoSuchFieldException | SecurityException ex) {
-					// 忽略
+					// 忽略异常
 				}
+				// 缓存合并后的注解数组
 				this.combinedAnnotations = anns;
 			}
+			// 返回合并后的注解数组
 			return anns;
 		}
 
