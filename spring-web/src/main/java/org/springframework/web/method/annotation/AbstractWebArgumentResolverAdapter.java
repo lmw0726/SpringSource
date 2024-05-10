@@ -30,18 +30,13 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * An abstract base class adapting a {@link WebArgumentResolver} to the
- * {@link HandlerMethodArgumentResolver} contract.
+ * 将 {@link WebArgumentResolver} 适配到 {@link HandlerMethodArgumentResolver} 合同的抽象基类。
  *
- * <p><strong>Note:</strong> This class is provided for backwards compatibility.
- * However it is recommended to re-write a {@code WebArgumentResolver} as
- * {@code HandlerMethodArgumentResolver}. Since {@link #supportsParameter}
- * can only be implemented by actually resolving the value and then checking
- * the result is not {@code WebArgumentResolver#UNRESOLVED} any exceptions
- * raised must be absorbed and ignored since it's not clear whether the adapter
- * doesn't support the parameter or whether it failed for an internal reason.
- * The {@code HandlerMethodArgumentResolver} contract also provides access to
- * model attributes and to {@code WebDataBinderFactory} (for type conversion).
+ * <p><strong>注意：</strong>此类提供了向后兼容性。
+ * 但是建议将 {@code WebArgumentResolver} 重写为 {@code HandlerMethodArgumentResolver}。
+ * 由于 {@link #supportsParameter} 只能通过实际解析值然后检查结果不是 {@code WebArgumentResolver#UNRESOLVED} 来实现，
+ * 所以引发的任何异常都必须被吸收和忽略，因为不清楚适配器是否不支持参数还是由于内部原因而失败。
+ * {@code HandlerMethodArgumentResolver} 合同还提供了访问模型属性和 {@code WebDataBinderFactory}（用于类型转换）。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -49,13 +44,19 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  */
 public abstract class AbstractWebArgumentResolverAdapter implements HandlerMethodArgumentResolver {
 
+	/**
+	 * 日志记录器
+	 */
 	private final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * Web参数解析器
+	 */
 	private final WebArgumentResolver adaptee;
 
 
 	/**
-	 * Create a new instance.
+	 * 创建一个新实例。
 	 */
 	public AbstractWebArgumentResolverAdapter(WebArgumentResolver adaptee) {
 		Assert.notNull(adaptee, "'adaptee' must not be null");
@@ -64,23 +65,24 @@ public abstract class AbstractWebArgumentResolverAdapter implements HandlerMetho
 
 
 	/**
-	 * Actually resolve the value and check the resolved value is not
-	 * {@link WebArgumentResolver#UNRESOLVED} absorbing _any_ exceptions.
+	 * 实际解析值并检查解析的值不是 {@link WebArgumentResolver#UNRESOLVED}，吸收 _任何_ 异常。
 	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		try {
+			// 获取原生的 Web请求
 			NativeWebRequest webRequest = getWebRequest();
+			// 解析参数值
 			Object result = this.adaptee.resolveArgument(parameter, webRequest);
+			// 如果解析结果为未解析，则返回 false
 			if (result == WebArgumentResolver.UNRESOLVED) {
 				return false;
-			}
-			else {
+			} else {
+				// 检查解析结果是否可以分配给参数类型
 				return ClassUtils.isAssignableValue(parameter.getParameterType(), result);
 			}
-		}
-		catch (Exception ex) {
-			// ignore (see class-level doc)
+		} catch (Exception ex) {
+			// 忽略异常，并返回 false
 			if (logger.isDebugEnabled()) {
 				logger.debug("Error in checking support for parameter [" + parameter + "]: " + ex.getMessage());
 			}
@@ -89,29 +91,31 @@ public abstract class AbstractWebArgumentResolverAdapter implements HandlerMetho
 	}
 
 	/**
-	 * Delegate to the {@link WebArgumentResolver} instance.
-	 * @throws IllegalStateException if the resolved value is not assignable
-	 * to the method parameter.
+	 * 委托给 {@link WebArgumentResolver} 实例。
+	 *
+	 * @throws IllegalStateException 如果解析的值不能分配给方法参数。
 	 */
 	@Override
 	@Nullable
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+								  NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
 		Class<?> paramType = parameter.getParameterType();
+		// 解析参数值
 		Object result = this.adaptee.resolveArgument(parameter, webRequest);
 		if (result == WebArgumentResolver.UNRESOLVED || !ClassUtils.isAssignableValue(paramType, result)) {
+			// 如果解析结果为未解析或解析结果无法分配给参数类型，则抛出异常
 			throw new IllegalStateException(
 					"Standard argument type [" + paramType.getName() + "] in method " + parameter.getMethod() +
-					"resolved to incompatible value of type [" + (result != null ? result.getClass() : null) +
-					"]. Consider declaring the argument type in a less specific fashion.");
+							"resolved to incompatible value of type [" + (result != null ? result.getClass() : null) +
+							"]. Consider declaring the argument type in a less specific fashion.");
 		}
 		return result;
 	}
 
 
 	/**
-	 * Required for access to NativeWebRequest in {@link #supportsParameter}.
+	 * 需要访问 {@link #supportsParameter} 中的 NativeWebRequest。
 	 */
 	protected abstract NativeWebRequest getWebRequest();
 

@@ -24,7 +24,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * No-op resolver for method arguments of type {@link kotlin.coroutines.Continuation}.
+ * 用于类型为 {@link kotlin.coroutines.Continuation} 的方法参数的无操作解析器。
  *
  * @author Sebastien Deleuze
  * @since 5.3
@@ -38,7 +38,7 @@ public class ContinuationHandlerMethodArgumentResolver implements HandlerMethodA
 
 	@Override
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+								  NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
 		return null;
 	}

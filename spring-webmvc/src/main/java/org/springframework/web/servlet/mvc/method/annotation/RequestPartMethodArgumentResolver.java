@@ -16,12 +16,6 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -43,29 +37,27 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.multipart.support.MultipartResolutionDelegate;
 import org.springframework.web.multipart.support.RequestPartServletServerHttpRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
 /**
- * Resolves the following method arguments:
+ * 解析以下方法参数：
  * <ul>
- * <li>Annotated with @{@link RequestPart}
- * <li>Of type {@link MultipartFile} in conjunction with Spring's {@link MultipartResolver} abstraction
- * <li>Of type {@code javax.servlet.http.Part} in conjunction with Servlet 3.0 multipart requests
+ * <li>带有 @{@link RequestPart} 注解的参数
+ * <li>与 Spring 的 {@link MultipartResolver} 抽象一起使用的 {@link MultipartFile} 类型的参数
+ * <li>与 Servlet 3.0 多部分请求一起使用的 {@code javax.servlet.http.Part} 类型的参数
  * </ul>
  *
- * <p>When a parameter is annotated with {@code @RequestPart}, the content of the part is
- * passed through an {@link HttpMessageConverter} to resolve the method argument with the
- * 'Content-Type' of the request part in mind. This is analogous to what @{@link RequestBody}
- * does to resolve an argument based on the content of a regular request.
+ * <p>当参数带有 {@code @RequestPart} 注解时，部分的内容将通过 {@link HttpMessageConverter} 传递，
+ * 以便根据请求部分的 'Content-Type' 解析方法参数。这类似于 @{@link RequestBody} 根据常规请求的内容解析参数的做法。
  *
- * <p>When a parameter is not annotated with {@code @RequestPart} or the name of
- * the part is not specified, the request part's name is derived from the name of
- * the method argument.
+ * <p>当参数没有带有 {@code @RequestPart} 注解或未指定部分的名称时，请求部分的名称将从方法参数的名称派生而来。
  *
- * <p>Automatic validation may be applied if the argument is annotated with any
- * {@linkplain org.springframework.validation.annotation.ValidationAnnotationUtils#determineValidationHints
- * annotations that trigger validation}. In case of validation failure, a
- * {@link MethodArgumentNotValidException} is raised and a 400 response status code returned if the
- * {@link org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver}
- * is configured.
+ * <p>如果参数带有任何触发验证的 {@linkplain org.springframework.validation.annotation.ValidationAnnotationUtils#determineValidationHints 注解}，
+ * 则可以应用自动验证。在验证失败的情况下，将引发 {@link MethodArgumentNotValidException}，并且如果配置了 {@link org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver}，
+ * 则返回 400 响应状态码。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
@@ -75,42 +67,42 @@ import org.springframework.web.multipart.support.RequestPartServletServerHttpReq
 public class RequestPartMethodArgumentResolver extends AbstractMessageConverterMethodArgumentResolver {
 
 	/**
-	 * Basic constructor with converters only.
+	 * 仅使用转换器的基本构造函数。
 	 */
 	public RequestPartMethodArgumentResolver(List<HttpMessageConverter<?>> messageConverters) {
 		super(messageConverters);
 	}
 
 	/**
-	 * Constructor with converters and {@code RequestBodyAdvice} and
-	 * {@code ResponseBodyAdvice}.
+	 * 带有转换器和 {@code RequestBodyAdvice} 和
+	 * {@code ResponseBodyAdvice} 的构造函数。
 	 */
 	public RequestPartMethodArgumentResolver(List<HttpMessageConverter<?>> messageConverters,
-			List<Object> requestResponseBodyAdvice) {
+											 List<Object> requestResponseBodyAdvice) {
 
 		super(messageConverters, requestResponseBodyAdvice);
 	}
 
 
 	/**
-	 * Whether the given {@linkplain MethodParameter method parameter} is
-	 * supported as multi-part. Supports the following method parameters:
+	 * 是否支持给定的 {@linkplain MethodParameter 方法参数} 作为多部分。支持以下方法参数：
 	 * <ul>
-	 * <li>annotated with {@code @RequestPart}
-	 * <li>of type {@link MultipartFile} unless annotated with {@code @RequestParam}
-	 * <li>of type {@code javax.servlet.http.Part} unless annotated with
-	 * {@code @RequestParam}
+	 * <li>带有 {@code @RequestPart} 注解
+	 * <li>除非带有 {@code @RequestParam} 注解，否则类型为 {@link MultipartFile} 的参数
+	 * <li>除非带有 {@code @RequestParam} 注解，否则类型为 {@code javax.servlet.http.Part} 的参数
 	 * </ul>
 	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 如果参数被 @RequestPart 注解修饰，则返回 true
 		if (parameter.hasParameterAnnotation(RequestPart.class)) {
 			return true;
-		}
-		else {
+		} else {
+			// 如果参数被 @RequestParam 注解修饰，则返回 false
 			if (parameter.hasParameterAnnotation(RequestParam.class)) {
 				return false;
 			}
+			// 否则，检查参数是否为多部分请求参数
 			return MultipartResolutionDelegate.isMultipartArgument(parameter.nestedIfOptional());
 		}
 	}
@@ -118,61 +110,81 @@ public class RequestPartMethodArgumentResolver extends AbstractMessageConverterM
 	@Override
 	@Nullable
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-			NativeWebRequest request, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+								  NativeWebRequest request, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
+		// 从请求中获取 HttpServletRequest 对象。
 		HttpServletRequest servletRequest = request.getNativeRequest(HttpServletRequest.class);
+		// 断言 servletRequest 不为空，否则抛出异常。
 		Assert.state(servletRequest != null, "No HttpServletRequest");
 
+		// 获取方法参数上的 @RequestPart 注解。
 		RequestPart requestPart = parameter.getParameterAnnotation(RequestPart.class);
+		// 确定是否为必填参数。
 		boolean isRequired = ((requestPart == null || requestPart.required()) && !parameter.isOptional());
 
+		// 获取请求部分的名称。
 		String name = getPartName(parameter, requestPart);
+		// 如果参数为可选参数，则将其转换为内部参数。
 		parameter = parameter.nestedIfOptional();
+		// 初始化参数对象。
 		Object arg = null;
 
+		// 尝试解析多部分请求中的参数。
 		Object mpArg = MultipartResolutionDelegate.resolveMultipartArgument(name, parameter, servletRequest);
+		// 如果成功解析，则使用解析结果。
 		if (mpArg != MultipartResolutionDelegate.UNRESOLVABLE) {
 			arg = mpArg;
-		}
-		else {
+		} else {
 			try {
+				// 创建请求部分的 ServletServerHttpRequest 对象
 				HttpInputMessage inputMessage = new RequestPartServletServerHttpRequest(servletRequest, name);
+				// 使用消息转换器读取参数。
 				arg = readWithMessageConverters(inputMessage, parameter, parameter.getNestedGenericParameterType());
 				if (binderFactory != null) {
+					// 如果存在数据绑定工厂，则对参数进行数据绑定。
 					WebDataBinder binder = binderFactory.createBinder(request, arg, name);
 					if (arg != null) {
+						// 如果参数不为空，则验证参数是否适用
 						validateIfApplicable(binder, parameter);
+						// 如果绑定结果存在错误且需要抛出绑定异常，则抛出异常。
 						if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
 							throw new MethodArgumentNotValidException(parameter, binder.getBindingResult());
 						}
 					}
+					// 将绑定结果添加到 ModelAndViewContainer 中。
 					if (mavContainer != null) {
 						mavContainer.addAttribute(BindingResult.MODEL_KEY_PREFIX + name, binder.getBindingResult());
 					}
 				}
-			}
-			catch (MissingServletRequestPartException | MultipartException ex) {
+			} catch (MissingServletRequestPartException | MultipartException ex) {
+				// 如果参数为必填且请求参数缺失，则抛出异常。
 				if (isRequired) {
 					throw ex;
 				}
 			}
 		}
 
+		// 如果参数为空且为必填，则抛出相应的异常。
 		if (arg == null && isRequired) {
+			// 如果当前请求不是多部分请求，则抛出多部分异常；否则抛出缺失请求部分异常。
 			if (!MultipartResolutionDelegate.isMultipartRequest(servletRequest)) {
 				throw new MultipartException("Current request is not a multipart request");
-			}
-			else {
+			} else {
 				throw new MissingServletRequestPartException(name);
 			}
 		}
+		// 返回适当调整的参数对象。
 		return adaptArgumentIfNecessary(arg, parameter);
 	}
 
 	private String getPartName(MethodParameter methodParam, @Nullable RequestPart requestPart) {
+		// 如果 @RequestPart 不为空，则使用 @RequestPart 注解中的名称；否则使用空字符串。
 		String partName = (requestPart != null ? requestPart.name() : "");
+		// 如果 部分名称 为空，则尝试从方法参数中获取参数名称。
 		if (partName.isEmpty()) {
+			// 获取参数u名称作为 部分名称
 			partName = methodParam.getParameterName();
+			// 如果无法从方法参数中获取参数名称，则抛出异常。
 			if (partName == null) {
 				throw new IllegalArgumentException("Request part name for argument type [" +
 						methodParam.getNestedParameterType().getName() +
@@ -184,14 +196,12 @@ public class RequestPartMethodArgumentResolver extends AbstractMessageConverterM
 
 	@Override
 	void closeStreamIfNecessary(InputStream body) {
-		// RequestPartServletServerHttpRequest exposes individual part streams,
-		// potentially from temporary files -> explicit close call after resolution
-		// in order to prevent file descriptor leaks.
+		// RequestPartServletServerHttpRequest 暴露了各个部分的流，
+		// 可能来自临时文件 -> 在解析后明确调用 close 方法以防止文件描述符泄漏。
 		try {
 			body.close();
-		}
-		catch (IOException ex) {
-			// ignore
+		} catch (IOException ex) {
+			// 忽略
 		}
 	}
 
