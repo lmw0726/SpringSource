@@ -26,15 +26,12 @@ import org.springframework.web.servlet.SmartView;
 import org.springframework.web.servlet.View;
 
 /**
- * Handles return values that are of type {@link View}.
+ * 处理返回类型为 {@link View} 的返回值。
  *
- * <p>A {@code null} return value is left as-is leaving it to the configured
- * {@link RequestToViewNameTranslator} to select a view name by convention.
+ * <p>{@code null} 返回值保持不变，由配置的 {@link RequestToViewNameTranslator} 按约定选择视图名称。
  *
- * <p>A {@link View} return type has a set purpose. Therefore this handler
- * should be configured ahead of handlers that support any return value type
- * annotated with {@code @ModelAttribute} or {@code @ResponseBody} to ensure
- * they don't take over.
+ * <p>{@link View} 返回类型具有固定的目的。因此，此处理器应该配置在支持任何带有 {@code @ModelAttribute} 或 {@code @ResponseBody} 注解的返回值类型的处理器之前，
+ * 以确保它们不会接管。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
@@ -43,22 +40,25 @@ public class ViewMethodReturnValueHandler implements HandlerMethodReturnValueHan
 
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
+		// 检查返回值类型是否是View及其子类
 		return View.class.isAssignableFrom(returnType.getParameterType());
 	}
 
 	@Override
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
-			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+								  ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
 		if (returnValue instanceof View) {
+			// 如果返回值是 View 类型
 			View view = (View) returnValue;
+			// 向模型和视图容器设置视图
 			mavContainer.setView(view);
 			if (view instanceof SmartView && ((SmartView) view).isRedirectView()) {
+				// 如果视图是 SmartView 类型且为重定向视图，则设置重定向模型场景为 true
 				mavContainer.setRedirectModelScenario(true);
 			}
-		}
-		else if (returnValue != null) {
-			// should not happen
+		} else if (returnValue != null) {
+			// 不应该发生的情况
 			throw new UnsupportedOperationException("Unexpected return type: " +
 					returnType.getParameterType().getName() + " in method: " + returnType.getMethod());
 		}

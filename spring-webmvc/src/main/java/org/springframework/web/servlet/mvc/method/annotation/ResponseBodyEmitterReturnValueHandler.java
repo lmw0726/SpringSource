@@ -16,15 +16,6 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.core.ResolvableType;
@@ -47,29 +38,39 @@ import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
- * Handler for return values of type {@link ResponseBodyEmitter} and sub-classes
- * such as {@link SseEmitter} including the same types wrapped with
- * {@link ResponseEntity}.
+ * 处理类型为 {@link ResponseBodyEmitter} 及其子类（如 {@link SseEmitter}）的返回值。
+ * 同时支持包装在 {@link ResponseEntity} 中的相同类型。
  *
- * <p>As of 5.0 also supports reactive return value types for any reactive
- * library with registered adapters in {@link ReactiveAdapterRegistry}.
+ * <p>从 5.0 开始，还支持任何具有在 {@link ReactiveAdapterRegistry} 中注册的适配器的反应式返回值类型。
  *
  * @author Rossen Stoyanchev
  * @since 4.2
  */
 public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodReturnValueHandler {
 
+	/**
+	 * SSE事件消息转换器列表
+	 */
 	private final List<HttpMessageConverter<?>> sseMessageConverters;
 
+	/**
+	 * 响应式类型处理器
+	 */
 	private final ReactiveTypeHandler reactiveHandler;
 
 
 	/**
-	 * Simple constructor with reactive type support based on a default instance of
-	 * {@link ReactiveAdapterRegistry},
-	 * {@link org.springframework.core.task.SyncTaskExecutor}, and
-	 * {@link ContentNegotiationManager} with an Accept header strategy.
+	 * 使用默认的 {@link ReactiveAdapterRegistry} 实例、{@link org.springframework.core.task.SyncTaskExecutor} 和
+	 * {@link ContentNegotiationManager}（带有 Accept 标头策略）的构造函数，以支持反应式类型。
 	 */
 	public ResponseBodyEmitterReturnValueHandler(List<HttpMessageConverter<?>> messageConverters) {
 		Assert.notEmpty(messageConverters, "HttpMessageConverter List must not be empty");
@@ -78,15 +79,16 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 	}
 
 	/**
-	 * Complete constructor with pluggable "reactive" type support.
-	 * @param messageConverters converters to write emitted objects with
-	 * @param registry for reactive return value type support
-	 * @param executor for blocking I/O writes of items emitted from reactive types
-	 * @param manager for detecting streaming media types
+	 * 完整构造函数，支持可插入的 "反应式" 类型支持。
+	 *
+	 * @param messageConverters 用于写入发出对象的转换器
+	 * @param registry          用于反应式返回值类型支持
+	 * @param executor          用于从反应式类型发出的项目的阻塞 I/O 写入
+	 * @param manager           用于检测流式传输媒体类型
 	 * @since 5.0
 	 */
 	public ResponseBodyEmitterReturnValueHandler(List<HttpMessageConverter<?>> messageConverters,
-			ReactiveAdapterRegistry registry, TaskExecutor executor, ContentNegotiationManager manager) {
+												 ReactiveAdapterRegistry registry, TaskExecutor executor, ContentNegotiationManager manager) {
 
 		Assert.notEmpty(messageConverters, "HttpMessageConverter List must not be empty");
 		this.sseMessageConverters = initSseConverters(messageConverters);
@@ -94,24 +96,38 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 	}
 
 	private static List<HttpMessageConverter<?>> initSseConverters(List<HttpMessageConverter<?>> converters) {
+		// 遍历所有的 HttpMessageConverter
 		for (HttpMessageConverter<?> converter : converters) {
+			// 如果存在能够将 文本消息 写入 String 类型的转换器，直接返回
 			if (converter.canWrite(String.class, MediaType.TEXT_PLAIN)) {
 				return converters;
 			}
 		}
+
+		// 如果没有能够将 文本消息 写入 String 类型的转换器，则新建一个列表用于存放转换器
 		List<HttpMessageConverter<?>> result = new ArrayList<>(converters.size() + 1);
+
+		// 将默认的 StringHttpMessageConverter 添加到列表中，并设置字符集为 UTF-8
 		result.add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
+
+		// 将原来的转换器列表中的所有转换器添加到新的列表中
 		result.addAll(converters);
+
+		// 返回新的列表
 		return result;
 	}
 
 
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
+		// 检查返回值类型是否是 ResponseEntity
 		Class<?> bodyType = ResponseEntity.class.isAssignableFrom(returnType.getParameterType()) ?
+				// 如果是 ResponseEntity，则获取其泛型参数类型
 				ResolvableType.forMethodParameter(returnType).getGeneric().resolve() :
+				// 如果不是 ResponseEntity，则直接获取返回值类型
 				returnType.getParameterType();
 
+		// 返回结果，判断是否是 ResponseBodyEmitter 或者响应式处理器支持的类型
 		return (bodyType != null && (ResponseBodyEmitter.class.isAssignableFrom(bodyType) ||
 				this.reactiveHandler.isReactiveType(bodyType)));
 	}
@@ -119,41 +135,56 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 	@Override
 	@SuppressWarnings("resource")
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
-			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+								  ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
 		if (returnValue == null) {
+			// 如果返回值为空，则设置请求已处理
 			mavContainer.setRequestHandled(true);
+			// 结束程序
 			return;
 		}
 
+		// 获取 HttpServletResponse 对象，用于写入响应
 		HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
 		Assert.state(response != null, "No HttpServletResponse");
+		// 创建 ServerHttpResponse 对象
 		ServerHttpResponse outputMessage = new ServletServerHttpResponse(response);
 
 		if (returnValue instanceof ResponseEntity) {
+			// 如果返回值是 ResponseEntity
 			ResponseEntity<?> responseEntity = (ResponseEntity<?>) returnValue;
+			// 设置响应状态码
 			response.setStatus(responseEntity.getStatusCodeValue());
+			// 将响应头部信息放入输出消息中
 			outputMessage.getHeaders().putAll(responseEntity.getHeaders());
+			// 获取返回主体
 			returnValue = responseEntity.getBody();
+			// 获取嵌套的返回类型
 			returnType = returnType.nested();
 			if (returnValue == null) {
+				// 如果返回主体为空，则设置请求已处理
 				mavContainer.setRequestHandled(true);
+				// 刷新响应
 				outputMessage.flush();
 				return;
 			}
 		}
-
+		// 返回值是 ResponseBodyEmitter类型 或者 响应式类型
+		// 获取 ServletRequest 对象
 		ServletRequest request = webRequest.getNativeRequest(ServletRequest.class);
 		Assert.state(request != null, "No ServletRequest");
 
+		// 定义 ResponseBodyEmitter 对象，用于处理流式传输
 		ResponseBodyEmitter emitter;
 		if (returnValue instanceof ResponseBodyEmitter) {
+			// 如果是 ResponseBodyEmitter 类型，强转为 ResponseBodyEmitter 返回
 			emitter = (ResponseBodyEmitter) returnValue;
-		}
-		else {
+		} else {
+			// 如果不是 ResponseBodyEmitter 类型，则交给响应式处理器处理
 			emitter = this.reactiveHandler.handleValue(returnValue, returnType, mavContainer, webRequest);
+			// 如果处理器返回为空，表示不支持流式传输，则直接写入头部信息并返回
 			if (emitter == null) {
-				// Not streaming: write headers without committing response..
+				// 非流式：写入头部而不提交响应。
 				outputMessage.getHeaders().forEach((headerName, headerValues) -> {
 					for (String headerValue : headerValues) {
 						response.addHeader(headerName, headerValue);
@@ -162,37 +193,49 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 				return;
 			}
 		}
+		// 扩展响应对象
 		emitter.extendResponse(outputMessage);
 
-		// At this point we know we're streaming..
+		// 禁用缓存
 		ShallowEtagHeaderFilter.disableContentCaching(request);
 
-		// Wrap the response to ignore further header changes
-		// Headers will be flushed at the first write
+		// 包装响应以忽略进一步的头部更改
+		// 头部将在首次写入时刷新
 		outputMessage = new StreamingServletServerHttpResponse(outputMessage);
 
+		// 定义 HttpMessageConvertingHandler 对象，用于处理 HTTP 消息的转换
 		HttpMessageConvertingHandler handler;
 		try {
+			// 创建 DeferredResult 对象，用于异步处理结果
 			DeferredResult<?> deferredResult = new DeferredResult<>(emitter.getTimeout());
+			// 启动 DeferredResult 异步处理
 			WebAsyncUtils.getAsyncManager(webRequest).startDeferredResultProcessing(deferredResult, mavContainer);
+			// 创建 HttpMessageConvertingHandler 对象
 			handler = new HttpMessageConvertingHandler(outputMessage, deferredResult);
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
+			// 初始化响应体为错误
 			emitter.initializeWithError(ex);
 			throw ex;
 		}
 
+		// 初始化 ResponseBodyEmitter
 		emitter.initialize(handler);
 	}
 
 
 	/**
-	 * ResponseBodyEmitter.Handler that writes with HttpMessageConverter's.
+	 * ResponseBodyEmitter.Handler，使用 HttpMessageConverter 写入。
 	 */
 	private class HttpMessageConvertingHandler implements ResponseBodyEmitter.Handler {
 
+		/**
+		 * 输出流
+		 */
 		private final ServerHttpResponse outputMessage;
 
+		/**
+		 * 延迟结果
+		 */
 		private final DeferredResult<?> deferredResult;
 
 		public HttpMessageConvertingHandler(ServerHttpResponse outputMessage, DeferredResult<?> deferredResult) {
@@ -207,23 +250,30 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 
 		@SuppressWarnings("unchecked")
 		private <T> void sendInternal(T data, @Nullable MediaType mediaType) throws IOException {
+			// 遍历 SSE 消息转换器列表
 			for (HttpMessageConverter<?> converter : ResponseBodyEmitterReturnValueHandler.this.sseMessageConverters) {
+				// 如果当前转换器支持写入指定的数据类型和媒体类型
 				if (converter.canWrite(data.getClass(), mediaType)) {
+					// 使用转换器将数据写入输出消息中
 					((HttpMessageConverter<T>) converter).write(data, mediaType, this.outputMessage);
+					// 刷新输出流
 					this.outputMessage.flush();
 					return;
 				}
 			}
+			// 如果没有合适的转换器，则抛出异常
 			throw new IllegalArgumentException("No suitable converter for " + data.getClass());
 		}
 
 		@Override
 		public void complete() {
 			try {
+				// 刷新输出消息，将缓冲区数据写入底层流中
 				this.outputMessage.flush();
+				// 设置延迟结果为null，表示成功完成
 				this.deferredResult.setResult(null);
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
+				// 如果在刷新输出消息时发生IO异常，则将延迟结果设置为异常结果
 				this.deferredResult.setErrorResult(ex);
 			}
 		}
@@ -251,11 +301,13 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 
 
 	/**
-	 * Wrap to silently ignore header changes HttpMessageConverter's that would
-	 * otherwise cause HttpHeaders to raise exceptions.
+	 * 包装器以在 HttpMessageConverter 引起的头部更改时静默忽略它们，
+	 * 否则会导致 HttpHeaders 抛出异常。
 	 */
 	private static class StreamingServletServerHttpResponse extends DelegatingServerHttpResponse {
-
+		/**
+		 * 可变请求头
+		 */
 		private final HttpHeaders mutableHeaders = new HttpHeaders();
 
 		public StreamingServletServerHttpResponse(ServerHttpResponse delegate) {

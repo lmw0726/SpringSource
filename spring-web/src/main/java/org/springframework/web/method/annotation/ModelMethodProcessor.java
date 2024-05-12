@@ -55,6 +55,7 @@ public class ModelMethodProcessor implements HandlerMethodArgumentResolver, Hand
 
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
+		// 检查返回值类型是否是Model接口及其子类
 		return Model.class.isAssignableFrom(returnType.getParameterType());
 	}
 
