@@ -16,39 +16,33 @@
 
 package org.springframework.web.servlet.mvc.method.annotation;
 
-import java.util.Map;
-
-import javax.servlet.ServletRequest;
-
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.servlet.HandlerMapping;
 
+import javax.servlet.ServletRequest;
+import java.util.Map;
+
 /**
- * Subclass of {@link ServletRequestDataBinder} that adds URI template variables
- * to the values used for data binding.
+ * {@link ServletRequestDataBinder} 的子类，将 URI 模板变量添加到用于数据绑定的值中。
  *
- * <p><strong>WARNING</strong>: Data binding can lead to security issues by exposing
- * parts of the object graph that are not meant to be accessed or modified by
- * external clients. Therefore the design and use of data binding should be considered
- * carefully with regard to security. For more details, please refer to the dedicated
- * sections on data binding for
- * <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-initbinder-model-design">Spring Web MVC</a> and
+ * <p><strong>警告</strong>：数据绑定可能会通过公开不应由外部客户端访问或修改的对象图的部分而导致安全问题。因此，应该仔细考虑数据绑定的设计和使用，特别是在考虑安全性方面。有关详细信息，请参阅参考手册中关于
+ * <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-initbinder-model-design">Spring Web MVC</a> 和
  * <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#webflux-ann-initbinder-model-design">Spring WebFlux</a>
- * in the reference manual.
+ * 的数据绑定专用部分。
  *
  * @author Rossen Stoyanchev
- * @since 3.1
  * @see ServletRequestDataBinder
  * @see HandlerMapping#URI_TEMPLATE_VARIABLES_ATTRIBUTE
+ * @since 3.1
  */
 public class ExtendedServletRequestDataBinder extends ServletRequestDataBinder {
 
 	/**
-	 * Create a new instance, with default object name.
-	 * @param target the target object to bind onto (or {@code null}
-	 * if the binder is just used to convert a plain parameter value)
+	 * 创建一个新实例，使用默认对象名称。
+	 *
+	 * @param target 要绑定到的目标对象（如果绑定器仅用于转换普通参数值，则为 {@code null}）
 	 * @see #DEFAULT_OBJECT_NAME
 	 */
 	public ExtendedServletRequestDataBinder(@Nullable Object target) {
@@ -56,10 +50,10 @@ public class ExtendedServletRequestDataBinder extends ServletRequestDataBinder {
 	}
 
 	/**
-	 * Create a new instance.
-	 * @param target the target object to bind onto (or {@code null}
-	 * if the binder is just used to convert a plain parameter value)
-	 * @param objectName the name of the target object
+	 * 创建一个新实例。
+	 *
+	 * @param target     要绑定到的目标对象（如果绑定器仅用于转换普通参数值，则为 {@code null}）
+	 * @param objectName 目标对象的名称
 	 * @see #DEFAULT_OBJECT_NAME
 	 */
 	public ExtendedServletRequestDataBinder(@Nullable Object target, String objectName) {
@@ -68,21 +62,27 @@ public class ExtendedServletRequestDataBinder extends ServletRequestDataBinder {
 
 
 	/**
-	 * Merge URI variables into the property values to use for data binding.
+	 * 将 URI 变量合并到用于数据绑定的属性值中。
 	 */
 	@Override
 	protected void addBindValues(MutablePropertyValues mpvs, ServletRequest request) {
+		// 获取 URI 模板变量的属性名称
 		String attr = HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE;
+		// 从请求中获取 URI 模板变量的映射
 		@SuppressWarnings("unchecked")
 		Map<String, String> uriVars = (Map<String, String>) request.getAttribute(attr);
+		// 如果 URI 模板变量映射不为空
 		if (uriVars != null) {
+			// 遍历 URI 模板变量映射
 			uriVars.forEach((name, value) -> {
+				// 如果数据绑定参数列表中包含当前 URI 模板变量的名称
 				if (mpvs.contains(name)) {
+					// 如果日志记录级别为调试，则记录 URI 变量已被请求绑定值覆盖的调试消息
 					if (logger.isDebugEnabled()) {
 						logger.debug("URI variable '" + name + "' overridden by request bind value.");
 					}
-				}
-				else {
+				} else {
+					// 否则，将 URI 模板变量的名称和值添加到数据绑定参数列表中
 					mpvs.addPropertyValue(name, value);
 				}
 			});
