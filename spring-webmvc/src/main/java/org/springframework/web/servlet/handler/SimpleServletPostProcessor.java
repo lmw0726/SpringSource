@@ -16,14 +16,6 @@
 
 package org.springframework.web.servlet.handler;
 
-import java.util.Collections;
-import java.util.Enumeration;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
@@ -31,58 +23,64 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.ServletConfigAware;
 import org.springframework.web.context.ServletContextAware;
 
+import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import java.util.Collections;
+import java.util.Enumeration;
+
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor}
- * that applies initialization and destruction callbacks to beans that
- * implement the {@link javax.servlet.Servlet} interface.
+ * {@link org.springframework.beans.factory.config.BeanPostProcessor}，将初始化和销毁回调应用于实现了
+ * {@link javax.servlet.Servlet} 接口的bean。
  *
- * <p>After initialization of the bean instance, the Servlet {@code init}
- * method will be called with a ServletConfig that contains the bean name
- * of the Servlet and the ServletContext that it is running in.
+ * <p>在 bean 实例初始化之后，将调用 Servlet 的 {@code init} 方法，并提供一个包含 Servlet 名称和它所在的
+ * ServletContext 的 ServletConfig。
  *
- * <p>Before destruction of the bean instance, the Servlet {@code destroy}
- * will be called.
+ * <p>在 bean 实例销毁之前，将调用 Servlet 的 {@code destroy} 方法。
  *
- * <p><b>Note that this post-processor does not support Servlet initialization
- * parameters.</b> Bean instances that implement the Servlet interface are
- * supposed to be configured like any other Spring bean, that is, through
- * constructor arguments or bean properties.
+ * <p><b>请注意，此后处理器不支持 Servlet 初始化参数。</b> 实现 Servlet 接口的 Bean 实例应该像任何其他
+ * Spring Bean 一样进行配置，即通过构造函数参数或 Bean 属性。
  *
- * <p>For reuse of a Servlet implementation in a plain Servlet container
- * and as a bean in a Spring context, consider deriving from Spring's
- * {@link org.springframework.web.servlet.HttpServletBean} base class that
- * applies Servlet initialization parameters as bean properties, supporting
- * both the standard Servlet and the Spring bean initialization style.
+ * <p>对于在普通 Servlet 容器中重用 Servlet 实现以及在 Spring 上下文中作为 Bean 使用，请考虑从 Spring 的
+ * {@link org.springframework.web.servlet.HttpServletBean} 基类派生，该基类将 Servlet 初始化参数
+ * 应用为 Bean 属性，支持标准 Servlet 和 Spring Bean 初始化风格。
  *
- * <p><b>Alternatively, consider wrapping a Servlet with Spring's
- * {@link org.springframework.web.servlet.mvc.ServletWrappingController}.</b>
- * This is particularly appropriate for existing Servlet classes,
- * allowing to specify Servlet initialization parameters etc.
+ * <p><b>或者，考虑使用 Spring 的 {@link org.springframework.web.servlet.mvc.ServletWrappingController}
+ * 对 Servlet 进行包装。</b> 这对于现有 Servlet 类特别合适，允许指定 Servlet 初始化参数等。
  *
  * @author Juergen Hoeller
- * @since 1.1.5
  * @see javax.servlet.Servlet#init(javax.servlet.ServletConfig)
  * @see javax.servlet.Servlet#destroy()
  * @see SimpleServletHandlerAdapter
+ * @since 1.1.5
  */
 public class SimpleServletPostProcessor implements
 		DestructionAwareBeanPostProcessor, ServletContextAware, ServletConfigAware {
 
+	/**
+	 * 设置是否使用通过 {@code setServletConfig} 传入的共享 ServletConfig 对象（如果可用）。
+	 */
 	private boolean useSharedServletConfig = true;
 
+	/**
+	 * Servlet 上下文
+	 */
 	@Nullable
 	private ServletContext servletContext;
 
+	/**
+	 * Servlet 配置
+	 */
 	@Nullable
 	private ServletConfig servletConfig;
 
 
 	/**
-	 * Set whether to use the shared ServletConfig object passed in
-	 * through {@code setServletConfig}, if available.
-	 * <p>Default is "true". Turn this setting to "false" to pass in
-	 * a mock ServletConfig object with the bean name as servlet name,
-	 * holding the current ServletContext.
+	 * 设置是否使用通过 {@code setServletConfig} 传入的共享 ServletConfig 对象（如果可用）。
+	 * <p>默认为 "true"。将此设置为 "false"，以传入一个模拟的 ServletConfig 对象，其中包含 bean 名称作为
+	 * Servlet 名称，持有当前的 ServletContext。
+	 *
 	 * @see #setServletConfig
 	 */
 	public void setUseSharedServletConfig(boolean useSharedServletConfig) {
@@ -114,8 +112,7 @@ public class SimpleServletPostProcessor implements
 			}
 			try {
 				((Servlet) bean).init(config);
-			}
-			catch (ServletException ex) {
+			} catch (ServletException ex) {
 				throw new BeanInitializationException("Servlet.init threw exception", ex);
 			}
 		}
@@ -136,8 +133,7 @@ public class SimpleServletPostProcessor implements
 
 
 	/**
-	 * Internal implementation of the {@link ServletConfig} interface,
-	 * to be passed to the wrapped servlet.
+	 * ServletConfig 接口的内部实现，传递给包装的 Servlet。
 	 */
 	private static class DelegatingServletConfig implements ServletConfig {
 
