@@ -16,14 +16,6 @@
 
 package org.springframework.web.servlet.mvc.condition;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
@@ -36,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.servlet.mvc.condition.HeadersRequestCondition.HeaderExpression;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * A logical disjunction (' || ') request condition to match a request's 'Accept' header
@@ -346,7 +341,7 @@ public final class ProducesRequestCondition extends AbstractRequestCondition<Pro
 
 
 	/**
-	 * Parses and matches a single media type expression to a request's 'Accept' header.
+	 * 解析并匹配单个媒体类型表达式到请求的 'Accept' 头部。
 	 */
 	static class ProduceMediaTypeExpression extends AbstractMediaTypeExpression {
 
@@ -358,28 +353,50 @@ public final class ProducesRequestCondition extends AbstractRequestCondition<Pro
 			super(expression);
 		}
 
+		/**
+		 * 检查表达式是否与提供的接受媒体类型列表匹配。
+		 * @param acceptedMediaTypes 请求的接受媒体类型列表
+		 * @return 如果匹配返回 true；否则返回 false
+		 */
 		public final boolean match(List<MediaType> acceptedMediaTypes) {
 			boolean match = matchMediaType(acceptedMediaTypes);
 			return !isNegated() == match;
 		}
 
+		/**
+		 * 检查表达式的媒体类型是否与提供的接受媒体类型列表中的任意一个兼容。
+		 * @param acceptedMediaTypes 请求的接受媒体类型列表
+		 * @return 如果有兼容的媒体类型返回 true；否则返回 false
+		 */
 		private boolean matchMediaType(List<MediaType> acceptedMediaTypes) {
+			// 遍历所有接受的媒体类型
 			for (MediaType acceptedMediaType : acceptedMediaTypes) {
+				// 如果当前媒体类型与接受的媒体类型兼容并且参数匹配
 				if (getMediaType().isCompatibleWith(acceptedMediaType) && matchParameters(acceptedMediaType)) {
-					return true;
+					return true; // 返回 true 表示匹配成功
 				}
 			}
+			// 如果没有任何兼容的媒体类型，则返回 false
 			return false;
 		}
 
+		/**
+		 * 检查表达式的媒体类型参数是否与提供的接受媒体类型的参数匹配。
+		 * @param acceptedMediaType 请求的接受媒体类型
+		 * @return 如果参数匹配返回 true；否则返回 false
+		 */
 		private boolean matchParameters(MediaType acceptedMediaType) {
+			// 遍历当前媒体类型的所有参数名称
 			for (String name : getMediaType().getParameters().keySet()) {
+				// 获取当前媒体类型和接受的媒体类型中的参数值
 				String s1 = getMediaType().getParameter(name);
 				String s2 = acceptedMediaType.getParameter(name);
+				// 如果两个参数值都存在且不相等，则返回 false
 				if (StringUtils.hasText(s1) && StringUtils.hasText(s2) && !s1.equalsIgnoreCase(s2)) {
 					return false;
 				}
 			}
+			// 如果所有参数都匹配，则返回 true
 			return true;
 		}
 	}
