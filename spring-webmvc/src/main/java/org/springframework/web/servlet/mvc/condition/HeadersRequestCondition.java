@@ -28,12 +28,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * A logical conjunction ({@code ' && '}) request condition that matches a request against
- * a set of header expressions with syntax defined in {@link RequestMapping#headers()}.
+ * 逻辑与（{@code ' && ' }）请求条件，将请求与使用{@link RequestMapping#headers()}中定义的语法的一组标头表达式进行匹配。
  *
- * <p>Expressions passed to the constructor with header names 'Accept' or
- * 'Content-Type' are ignored. See {@link ConsumesRequestCondition} and
- * {@link ProducesRequestCondition} for those.
+ * <p>通过头部名称为'Accept'或'Content-Type'的表达式传递给构造函数的表达式将被忽略。
+ * 有关这些表达式，请参见{@link ConsumesRequestCondition}和{@link ProducesRequestCondition}。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -41,35 +39,49 @@ import java.util.Set;
  */
 public final class HeadersRequestCondition extends AbstractRequestCondition<HeadersRequestCondition> {
 
+	/**
+	 * 预检请求头条件匹配
+	 */
 	private static final HeadersRequestCondition PRE_FLIGHT_MATCH = new HeadersRequestCondition();
 
-
+	/**
+	 * 请求头表达式集合
+	 */
 	private final Set<HeaderExpression> expressions;
 
 
 	/**
-	 * Create a new instance from the given header expressions. Expressions with
-	 * header names 'Accept' or 'Content-Type' are ignored. See {@link ConsumesRequestCondition}
-	 * and {@link ProducesRequestCondition} for those.
-	 * @param headers media type expressions with syntax defined in {@link RequestMapping#headers()};
-	 * if 0, the condition will match to every request
+	 * 从给定的头部表达式创建一个新实例。带有头部名称为'Accept'或'Content-Type'的表达式将被忽略。
+	 * 有关这些表达式，请参见{@link ConsumesRequestCondition}和{@link ProducesRequestCondition}。
+	 *
+	 * @param headers 使用{@link RequestMapping#headers()}中定义的语法的媒体类型表达式；
+	 *                如果为0，条件将匹配所有请求
 	 */
 	public HeadersRequestCondition(String... headers) {
 		this.expressions = parseExpressions(headers);
 	}
 
 	private static Set<HeaderExpression> parseExpressions(String... headers) {
+		// 创建一个用于存储头部表达式的集合
 		Set<HeaderExpression> result = null;
+		// 如果头部数组不为空
 		if (!ObjectUtils.isEmpty(headers)) {
+			// 遍历头部数组
 			for (String header : headers) {
+				// 解析头部表达式
 				HeaderExpression expr = new HeaderExpression(header);
+				// 如果头部名称是 "Accept" 或 "Content-Type"，则跳过
 				if ("Accept".equalsIgnoreCase(expr.name) || "Content-Type".equalsIgnoreCase(expr.name)) {
 					continue;
 				}
+				// 如果结果集合不为空，则将当前表达式添加到集合中；
+				// 如果结果集合为空，则创建一个新的集合
 				result = (result != null ? result : new LinkedHashSet<>(headers.length));
+				// 将当前表达式添加到其中
 				result.add(expr);
 			}
 		}
+		// 如果结果集合不为空，则返回结果集合；如果结果集合为空，则返回空集合
 		return (result != null ? result : Collections.emptySet());
 	}
 
@@ -79,7 +91,7 @@ public final class HeadersRequestCondition extends AbstractRequestCondition<Head
 
 
 	/**
-	 * Return the contained request header expressions.
+	 * 返回包含的请求头表达式。
 	 */
 	public Set<NameValueExpression<String>> getExpressions() {
 		return new LinkedHashSet<>(this.expressions);
@@ -96,70 +108,80 @@ public final class HeadersRequestCondition extends AbstractRequestCondition<Head
 	}
 
 	/**
-	 * Returns a new instance with the union of the header expressions
-	 * from "this" and the "other" instance.
+	 * 返回包含“this”和“other”实例中的头部表达式的并集的新实例。
 	 */
 	@Override
 	public HeadersRequestCondition combine(HeadersRequestCondition other) {
+		// 如果当前对象和另一个对象的条件均为空，则返回当前对象
 		if (isEmpty() && other.isEmpty()) {
 			return this;
-		}
-		else if (other.isEmpty()) {
+		} else if (other.isEmpty()) {
+			// 如果另一个对象的条件为空，则返回当前对象
 			return this;
-		}
-		else if (isEmpty()) {
+		} else if (isEmpty()) {
+			// 如果当前对象的条件为空，则返回另一个对象
 			return other;
 		}
+		// 创建一个新的集合，将当前对象和另一个对象的条件都添加到该集合中
 		Set<HeaderExpression> set = new LinkedHashSet<>(this.expressions);
 		set.addAll(other.expressions);
+		// 返回一个新的 HeadersRequestCondition 对象，其中包含了合并后的条件集合
 		return new HeadersRequestCondition(set);
 	}
 
 	/**
-	 * Returns "this" instance if the request matches all expressions;
-	 * or {@code null} otherwise.
+	 * 如果请求匹配所有表达式，则返回“this”实例；否则返回{@code null}。
 	 */
 	@Override
 	@Nullable
 	public HeadersRequestCondition getMatchingCondition(HttpServletRequest request) {
+		// 如果是预检请求，则返回预检请求匹配
 		if (CorsUtils.isPreFlightRequest(request)) {
 			return PRE_FLIGHT_MATCH;
 		}
+		// 遍历当前对象的条件集合
 		for (HeaderExpression expression : this.expressions) {
+			// 如果当前请求与某个条件不匹配，则返回空
 			if (!expression.match(request)) {
 				return null;
 			}
 		}
+		// 如果所有条件都匹配，则返回当前对象
 		return this;
 	}
 
 	/**
-	 * Compare to another condition based on header expressions. A condition
-	 * is considered to be a more specific match, if it has:
+	 * 根据头部表达式比较另一个条件。如果条件具有以下条件，则认为条件匹配更具体：
 	 * <ol>
-	 * <li>A greater number of expressions.
-	 * <li>A greater number of non-negated expressions with a concrete value.
+	 * <li>较多的表达式数量。
+	 * <li>具有具体值的非否定表达式数量较多。
 	 * </ol>
-	 * <p>It is assumed that both instances have been obtained via
-	 * {@link #getMatchingCondition(HttpServletRequest)} and each instance
-	 * contains the matching header expression only or is otherwise empty.
+	 * <p>假定两个实例都是通过{@link #getMatchingCondition(HttpServletRequest)}获得的，
+	 * 每个实例只包含匹配的头部表达式或为空。
 	 */
 	@Override
 	public int compareTo(HeadersRequestCondition other, HttpServletRequest request) {
+		// 比较另一个对象和当前对象的条件集合大小差异
 		int result = other.expressions.size() - this.expressions.size();
+		// 如果大小不同，则直接返回差异值
 		if (result != 0) {
 			return result;
 		}
+		// 否则，比较另一个对象和当前对象的条件集合中值的匹配数量
 		return (int) (getValueMatchCount(other.expressions) - getValueMatchCount(this.expressions));
 	}
 
 	private long getValueMatchCount(Set<HeaderExpression> expressions) {
+		// 初始化计数器
 		long count = 0;
+		// 遍历当前对象的条件集合
 		for (HeaderExpression e : expressions) {
+			// 如果条件的值不为空且未被否定，则计数器加一
 			if (e.getValue() != null && !e.isNegated()) {
 				count++;
 			}
 		}
+		// 返回计数器值
 		return count;
 	}
 

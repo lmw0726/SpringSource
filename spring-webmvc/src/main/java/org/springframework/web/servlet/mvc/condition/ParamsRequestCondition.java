@@ -25,36 +25,43 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
- * A logical conjunction ({@code ' && '}) request condition that matches a request against
- * a set parameter expressions with syntax defined in {@link RequestMapping#params()}.
+ * 逻辑“与”（' && '）的请求条件，用于匹配请求与在{@link RequestMapping#params()}中定义的参数表达式集合。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @since 3.1
  */
 public final class ParamsRequestCondition extends AbstractRequestCondition<ParamsRequestCondition> {
-
+	/**
+	 * 参数表达式集合
+	 */
 	private final Set<ParamExpression> expressions;
 
 
 	/**
-	 * Create a new instance from the given param expressions.
+	 * 创建一个新实例，从给定的参数表达式中。
 	 *
-	 * @param params expressions with syntax defined in {@link RequestMapping#params()};
-	 *               if 0, the condition will match to every request.
+	 * @param params 在{@link RequestMapping#params()}中定义的语法表达式；如果为0，则条件将匹配每个请求。
 	 */
 	public ParamsRequestCondition(String... params) {
 		this.expressions = parseExpressions(params);
 	}
 
 	private static Set<ParamExpression> parseExpressions(String... params) {
+		// 如果参数数组为空，则返回空集合
 		if (ObjectUtils.isEmpty(params)) {
 			return Collections.emptySet();
 		}
+
+		// 初始化参数表达式集合
 		Set<ParamExpression> expressions = new LinkedHashSet<>(params.length);
+
+		// 遍历参数数组，将每个参数转换为参数表达式，并添加到集合中
 		for (String param : params) {
 			expressions.add(new ParamExpression(param));
 		}
+
+		// 返回参数表达式集合
 		return expressions;
 	}
 
@@ -64,7 +71,7 @@ public final class ParamsRequestCondition extends AbstractRequestCondition<Param
 
 
 	/**
-	 * Return the contained request parameter expressions.
+	 * 返回包含的请求参数表达式。
 	 */
 	public Set<NameValueExpression<String>> getExpressions() {
 		return new LinkedHashSet<>(this.expressions);
@@ -81,65 +88,86 @@ public final class ParamsRequestCondition extends AbstractRequestCondition<Param
 	}
 
 	/**
-	 * Returns a new instance with the union of the param expressions
-	 * from "this" and the "other" instance.
+	 * 返回一个新实例，其中包含来自“此”和“其他”实例的参数表达式的并集。
 	 */
 	@Override
 	public ParamsRequestCondition combine(ParamsRequestCondition other) {
+		// 如果当前对象和另一个对象都为空，则返回当前对象
 		if (isEmpty() && other.isEmpty()) {
 			return this;
 		} else if (other.isEmpty()) {
+			// 如果另一个对象为空，则返回当前对象
 			return this;
 		} else if (isEmpty()) {
+			// 如果当前对象为空，则返回另一个对象
 			return other;
 		}
+
+		// 初始化参数表达式集合
 		Set<ParamExpression> set = new LinkedHashSet<>(this.expressions);
+
+		// 将另一个对象的参数表达式集合添加到当前集合中
 		set.addAll(other.expressions);
+
+		// 返回新的参数请求条件对象
 		return new ParamsRequestCondition(set);
 	}
 
 	/**
-	 * Returns "this" instance if the request matches all param expressions;
-	 * or {@code null} otherwise.
+	 * 如果请求匹配所有参数表达式，则返回“此”实例；否则返回{@code null}。
 	 */
 	@Override
 	@Nullable
 	public ParamsRequestCondition getMatchingCondition(HttpServletRequest request) {
+		// 遍历当前对象的参数表达式集合
 		for (ParamExpression expression : this.expressions) {
+			// 如果有任何一个参数表达式不匹配当前请求，则返回空
 			if (!expression.match(request)) {
 				return null;
 			}
 		}
+
+		// 如果所有参数表达式都匹配当前请求，则返回当前对象
 		return this;
 	}
 
 	/**
-	 * Compare to another condition based on parameter expressions. A condition
-	 * is considered to be a more specific match, if it has:
+	 * 基于参数表达式与另一个条件进行比较。如果条件具有以下更多的表达式，则认为条件是更具体的匹配：
 	 * <ol>
-	 * <li>A greater number of expressions.
-	 * <li>A greater number of non-negated expressions with a concrete value.
+	 * <li>更多的表达式。
+	 * <li>更多具体值的非否定表达式。
 	 * </ol>
-	 * <p>It is assumed that both instances have been obtained via
-	 * {@link #getMatchingCondition(HttpServletRequest)} and each instance
-	 * contains the matching parameter expressions only or is otherwise empty.
+	 * 假定两个实例都是通过{@link #getMatchingCondition(HttpServletRequest)}获得的，
+	 * 每个实例仅包含匹配的参数表达式，否则为空。
 	 */
 	@Override
 	public int compareTo(ParamsRequestCondition other, HttpServletRequest request) {
+		// 计算其他请求条件中参数表达式集合大小与当前请求条件中参数表达式集合大小的差值
 		int result = other.expressions.size() - this.expressions.size();
+
+		// 如果差值不为0，则返回差值作为比较结果
 		if (result != 0) {
 			return result;
 		}
+
+		// 如果差值为0，则比较其他请求条件中参数表达式集合与当前请求条件中参数表达式集合的匹配参数值数量
+		// 并返回两者匹配参数值数量之差
 		return (int) (getValueMatchCount(other.expressions) - getValueMatchCount(this.expressions));
 	}
 
 	private long getValueMatchCount(Set<ParamExpression> expressions) {
+		// 初始化计数器
 		long count = 0;
+
+		// 遍历参数表达式集合
 		for (ParamExpression e : expressions) {
+			// 如果参数值不为空且不是否定的，则增加计数器
 			if (e.getValue() != null && !e.isNegated()) {
 				count++;
 			}
 		}
+
+		// 返回计数结果
 		return count;
 	}
 

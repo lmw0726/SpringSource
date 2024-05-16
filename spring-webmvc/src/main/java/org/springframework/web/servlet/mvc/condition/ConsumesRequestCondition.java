@@ -31,12 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
- * A logical disjunction (' || ') request condition to match a request's
- * 'Content-Type' header to a list of media type expressions. Two kinds of
- * media type expressions are supported, which are described in
- * {@link RequestMapping#consumes()} and {@link RequestMapping#headers()}
- * where the header name is 'Content-Type'. Regardless of which syntax is
- * used, the semantics are the same.
+ * 逻辑或（{@code ' || ' }）请求条件，将请求的'Content-Type'头与媒体类型表达式列表进行匹配。支持两种类型的媒体类型表达式，
+ * 这些表达式在{@link RequestMapping#consumes()}和{@link RequestMapping#headers()}中描述，其中头部名称为'Content-Type'。
+ * 无论使用哪种语法，语义都是相同的。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -44,33 +41,37 @@ import java.util.*;
  */
 public final class ConsumesRequestCondition extends AbstractRequestCondition<ConsumesRequestCondition> {
 
+	/**
+	 * 空条件
+	 */
 	private static final ConsumesRequestCondition EMPTY_CONDITION = new ConsumesRequestCondition();
 
-
+	/**
+	 * 包含消费媒体类型表达式的列表。
+	 */
 	private final List<ConsumeMediaTypeExpression> expressions;
 
+	/**
+	 * 是否需要请求体的标志，默认为true。
+	 */
 	private boolean bodyRequired = true;
 
 
 	/**
-	 * Creates a new instance from 0 or more "consumes" expressions.
+	 * 从0个或更多个“consumes”表达式创建一个新实例。
 	 *
-	 * @param consumes expressions with the syntax described in
-	 *                 {@link RequestMapping#consumes()}; if 0 expressions are provided,
-	 *                 the condition will match to every request
+	 * @param consumes 使用{@link RequestMapping#consumes()}中描述的语法；如果提供了0个表达式，则条件将匹配到每个请求
 	 */
 	public ConsumesRequestCondition(String... consumes) {
 		this(consumes, null);
 	}
 
 	/**
-	 * Creates a new instance with "consumes" and "header" expressions.
-	 * "Header" expressions where the header name is not 'Content-Type' or have
-	 * no header value defined are ignored. If 0 expressions are provided in
-	 * total, the condition will match to every request
+	 * 使用“consumes”和“header”表达式创建一个新实例。如果提供的总表达式数量为0，则条件将匹配每个请求。
+	 * 忽略头部名称不是'Content-Type'或没有定义头部值的“Header”表达式。
 	 *
-	 * @param consumes as described in {@link RequestMapping#consumes()}
-	 * @param headers  as described in {@link RequestMapping#headers()}
+	 * @param consumes 如{@link RequestMapping#consumes()}中描述的方式
+	 * @param headers  如{@link RequestMapping#headers()}中描述的方式
 	 */
 	public ConsumesRequestCondition(String[] consumes, @Nullable String[] headers) {
 		this.expressions = parseExpressions(consumes, headers);
@@ -80,30 +81,42 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 	}
 
 	private static List<ConsumeMediaTypeExpression> parseExpressions(String[] consumes, @Nullable String[] headers) {
+		// 初始化结果集合
 		Set<ConsumeMediaTypeExpression> result = null;
+		// 如果请求头不为空，则遍历请求头
 		if (!ObjectUtils.isEmpty(headers)) {
 			for (String header : headers) {
+				// 解析请求头表达式
 				HeaderExpression expr = new HeaderExpression(header);
+				// 如果请求头为 "Content-Type" 且值不为空
 				if ("Content-Type".equalsIgnoreCase(expr.name) && expr.value != null) {
+					// 初始化结果集合（如果为空）
 					result = (result != null ? result : new LinkedHashSet<>());
+					// 解析请求头中的媒体类型并添加到结果集合
 					for (MediaType mediaType : MediaType.parseMediaTypes(expr.value)) {
 						result.add(new ConsumeMediaTypeExpression(mediaType, expr.isNegated));
 					}
 				}
 			}
 		}
+		// 如果consumes不为空，则遍历consumes
 		if (!ObjectUtils.isEmpty(consumes)) {
+			// 初始化结果集合（如果为空）
 			result = (result != null ? result : new LinkedHashSet<>());
+			// 将consumes中的媒体类型添加到结果集合
 			for (String consume : consumes) {
 				result.add(new ConsumeMediaTypeExpression(consume));
 			}
 		}
+		// 将结果集合转换为列表返回（如果结果集合不为空），否则返回空列表
 		return (result != null ? new ArrayList<>(result) : Collections.emptyList());
 	}
 
 	/**
-	 * Private constructor for internal when creating matching conditions.
-	 * Note the expressions List is neither sorted nor deep copied.
+	 * 用于在创建匹配条件时的私有构造函数。
+	 * 注意，表达式列表既不排序也不深度复制。
+	 *
+	 * @param expressions 匹配条件的媒体类型表达式列表
 	 */
 	private ConsumesRequestCondition(List<ConsumeMediaTypeExpression> expressions) {
 		this.expressions = expressions;
@@ -111,27 +124,31 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 
 
 	/**
-	 * Return the contained MediaType expressions.
+	 * 返回包含的MediaType表达式。
 	 */
 	public Set<MediaTypeExpression> getExpressions() {
 		return new LinkedHashSet<>(this.expressions);
 	}
 
 	/**
-	 * Returns the media types for this condition excluding negated expressions.
+	 * 返回此条件的可消费媒体类型，不包括否定表达式。
 	 */
 	public Set<MediaType> getConsumableMediaTypes() {
+		// 初始化结果集合
 		Set<MediaType> result = new LinkedHashSet<>();
+		// 遍历表达式集合
 		for (ConsumeMediaTypeExpression expression : this.expressions) {
+			// 如果表达式未被否定，则将其媒体类型添加到结果集合
 			if (!expression.isNegated()) {
 				result.add(expression.getMediaType());
 			}
 		}
+		// 返回结果集合
 		return result;
 	}
 
 	/**
-	 * Whether the condition has any media type expressions.
+	 * 是否具有任何媒体类型表达式的条件。
 	 */
 	@Override
 	public boolean isEmpty() {
@@ -149,14 +166,11 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 	}
 
 	/**
-	 * Whether this condition should expect requests to have a body.
-	 * <p>By default this is set to {@code true} in which case it is assumed a
-	 * request body is required and this condition matches to the "Content-Type"
-	 * header or falls back on "Content-Type: application/octet-stream".
-	 * <p>If set to {@code false}, and the request does not have a body, then this
-	 * condition matches automatically, i.e. without checking expressions.
+	 * 此条件是否期望请求具有正文。
+	 * 默认情况下，假设请求正文是必需的，并且此条件匹配“Content-Type”头，或者回退到“Content-Type: application/octet-stream”。
+	 * 如果设置为{@code false}，并且请求没有正文，则此条件将自动匹配，即无需检查表达式。
 	 *
-	 * @param bodyRequired whether requests are expected to have a body
+	 * @param bodyRequired 是否期望请求具有正文
 	 * @since 5.2
 	 */
 	public void setBodyRequired(boolean bodyRequired) {
@@ -164,7 +178,7 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 	}
 
 	/**
-	 * Return the setting for {@link #setBodyRequired(boolean)}.
+	 * 返回{@link #setBodyRequired(boolean)}的设置。
 	 *
 	 * @since 5.2
 	 */
@@ -174,9 +188,8 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 
 
 	/**
-	 * Returns the "other" instance if it has any expressions; returns "this"
-	 * instance otherwise. Practically that means a method-level "consumes"
-	 * overrides a type-level "consumes" condition.
+	 * 如果“other”实例具有任何表达式，则返回“other”实例；否则返回“this”实例。
+	 * 在实践中，这意味着方法级别的“consumes”将覆盖类型级别的“consumes”条件。
 	 */
 	@Override
 	public ConsumesRequestCondition combine(ConsumesRequestCondition other) {
@@ -184,31 +197,31 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 	}
 
 	/**
-	 * Checks if any of the contained media type expressions match the given
-	 * request 'Content-Type' header and returns an instance that is guaranteed
-	 * to contain matching expressions only. The match is performed via
-	 * {@link MediaType#includes(MediaType)}.
+	 * 检查是否有任何包含的媒体类型表达式与给定的请求“Content-Type”头匹配，并返回一个保证只包含匹配表达式的实例。
+	 * 匹配是通过{@link MediaType#includes(MediaType)}进行的。
 	 *
-	 * @param request the current request
-	 * @return the same instance if the condition contains no expressions;
-	 * or a new condition with matching expressions only;
-	 * or {@code null} if no expressions match
+	 * @param request 当前请求
+	 * @return 如果条件不包含任何表达式，则返回相同的实例；或者仅包含匹配表达式的新实例；如果没有表达式匹配，则返回{@code null}
 	 */
 	@Override
 	@Nullable
 	public ConsumesRequestCondition getMatchingCondition(HttpServletRequest request) {
+		// 检查是否是预检请求，如果是，返回一个空条件
 		if (CorsUtils.isPreFlightRequest(request)) {
 			return EMPTY_CONDITION;
 		}
+
+		// 如果当前条件为空，则返回当前条件
 		if (isEmpty()) {
 			return this;
 		}
+
+		// 如果请求没有主体，并且主体不是必需的，则返回一个空条件
 		if (!hasBody(request) && !this.bodyRequired) {
 			return EMPTY_CONDITION;
 		}
-
-		// Common media types are cached at the level of MimeTypeUtils
-
+		// 通用的媒体类型被缓存在MimeTypeUtils的级别上
+		// 尝试解析请求的内容类型，如果无法解析，则返回null
 		MediaType contentType;
 		try {
 			contentType = StringUtils.hasLength(request.getContentType()) ?
@@ -218,39 +231,52 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
 			return null;
 		}
 
+		// 获取与请求内容类型匹配的表达式列表
 		List<ConsumeMediaTypeExpression> result = getMatchingExpressions(contentType);
+
+		// 如果匹配的表达式列表不为空，则返回一个新的消费条件
 		return !CollectionUtils.isEmpty(result) ? new ConsumesRequestCondition(result) : null;
 	}
 
 	private boolean hasBody(HttpServletRequest request) {
+		// 获取请求头中的 Content-Length 和 Transfer-Encoding
 		String contentLength = request.getHeader(HttpHeaders.CONTENT_LENGTH);
 		String transferEncoding = request.getHeader(HttpHeaders.TRANSFER_ENCODING);
+
+		// 如果 Transfer-Encoding 存在，或者 Content-Length 存在且不是 "0"，则返回 true
 		return StringUtils.hasText(transferEncoding) ||
 				(StringUtils.hasText(contentLength) && !contentLength.trim().equals("0"));
 	}
 
 	@Nullable
 	private List<ConsumeMediaTypeExpression> getMatchingExpressions(MediaType contentType) {
+		// 初始化结果列表
 		List<ConsumeMediaTypeExpression> result = null;
+
+		// 遍历当前请求条件中的媒体类型表达式
 		for (ConsumeMediaTypeExpression expression : this.expressions) {
+			// 如果当前媒体类型表达式匹配请求的内容类型
 			if (expression.match(contentType)) {
+				// 如果结果列表为 null，则初始化
 				result = result != null ? result : new ArrayList<>();
+				// 将匹配的媒体类型表达式添加到结果列表中
 				result.add(expression);
 			}
 		}
+
+		// 返回结果列表
 		return result;
 	}
 
 	/**
-	 * Returns:
+	 * 返回：
 	 * <ul>
-	 * <li>0 if the two conditions have the same number of expressions
-	 * <li>Less than 0 if "this" has more or more specific media type expressions
-	 * <li>Greater than 0 if "other" has more or more specific media type expressions
+	 * <li>如果两个条件具有相同数量的表达式，则返回0
+	 * <li>如果“this”具有更多或更具体的媒体类型表达式，则返回小于0
+	 * <li>如果“other”具有更多或更具体的媒体类型表达式，则返回大于0
 	 * </ul>
-	 * <p>It is assumed that both instances have been obtained via
-	 * {@link #getMatchingCondition(HttpServletRequest)} and each instance contains
-	 * the matching consumable media type expression only or is otherwise empty.
+	 * <p>假设两个实例都是通过{@link #getMatchingCondition(HttpServletRequest)}获得的，
+	 * 每个实例只包含匹配的可消费媒体类型表达式或为空。
 	 */
 	@Override
 	public int compareTo(ConsumesRequestCondition other, HttpServletRequest request) {
