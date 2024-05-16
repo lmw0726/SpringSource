@@ -16,45 +16,58 @@
 
 package org.springframework.web.servlet.handler;
 
-import java.util.Map;
-
 import org.springframework.http.server.PathContainer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.util.pattern.PathPattern;
 
+import java.util.Map;
+
 /**
- * Container for the result from request pattern matching via
- * {@link MatchableHandlerMapping} with a method to further extract
- * URI template variables from the pattern.
+ * 包含通过{@link MatchableHandlerMapping}进行请求模式匹配的结果的容器，以及进一步从模式中提取URI模板变量的方法。
  *
  * @author Rossen Stoyanchev
  * @since 4.3.1
  */
 public class RequestMatchResult {
 
+	/**
+	 * 匹配的{@code PathPattern}。
+	 */
 	@Nullable
 	private final PathPattern pathPattern;
 
+	/**
+	 * 查找路径的容器。
+	 */
 	@Nullable
 	private final PathContainer lookupPathContainer;
 
-
+	/**
+	 * 匹配的模式。
+	 */
 	@Nullable
 	private final String pattern;
 
+	/**
+	 * 查找路径。
+	 */
 	@Nullable
 	private final String lookupPath;
 
+	/**
+	 * 用于匹配的PathMatcher实例。
+	 */
 	@Nullable
 	private final PathMatcher pathMatcher;
 
 
 	/**
-	 * Create an instance with the matched {@code PathPattern}.
-	 * @param pathPattern the pattern that was matched
-	 * @param lookupPath the mapping path
+	 * 使用匹配的{@code PathPattern}创建一个实例。
+	 *
+	 * @param pathPattern 匹配的模式
+	 * @param lookupPath  映射路径
 	 * @since 5.3
 	 */
 	public RequestMatchResult(PathPattern pathPattern, PathContainer lookupPath) {
@@ -71,10 +84,11 @@ public class RequestMatchResult {
 	}
 
 	/**
-	 * Create an instance with the matched String pattern.
-	 * @param pattern the pattern that was matched, possibly with a '/' appended
-	 * @param lookupPath the mapping path
-	 * @param pathMatcher the PathMatcher instance used for the match
+	 * 使用匹配的String模式创建一个实例。
+	 *
+	 * @param pattern     匹配的模式，可能附带'/'后缀
+	 * @param lookupPath  映射路径
+	 * @param pathMatcher 用于匹配的PathMatcher实例
 	 */
 	public RequestMatchResult(String pattern, String lookupPath, PathMatcher pathMatcher) {
 		Assert.hasText(pattern, "'matchingPattern' is required");
@@ -90,12 +104,14 @@ public class RequestMatchResult {
 	}
 
 	/**
-	 * Extract URI template variables from the matching pattern as defined in
-	 * {@link PathMatcher#extractUriTemplateVariables}.
-	 * @return a map with URI template variables
+	 * 从匹配模式中提取URI模板变量，如{@link PathMatcher#extractUriTemplateVariables}中所定义的。
+	 *
+	 * @return 包含URI模板变量的映射
 	 */
 	@SuppressWarnings("ConstantConditions")
 	public Map<String, String> extractUriTemplateVariables() {
+		// 如果路径模式不为空，则使用路径模式匹配并提取URI变量
+		// 否则，使用路径匹配器提取URI模板变量
 		return (this.pathPattern != null ?
 				this.pathPattern.matchAndExtract(this.lookupPathContainer).getUriVariables() :
 				this.pathMatcher.extractUriTemplateVariables(this.pattern, this.lookupPath));
