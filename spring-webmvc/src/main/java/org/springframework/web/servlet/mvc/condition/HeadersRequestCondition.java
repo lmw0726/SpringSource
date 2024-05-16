@@ -16,17 +16,16 @@
 
 package org.springframework.web.servlet.mvc.condition;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.cors.CorsUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A logical conjunction ({@code ' && '}) request condition that matches a request against
@@ -166,7 +165,7 @@ public final class HeadersRequestCondition extends AbstractRequestCondition<Head
 
 
 	/**
-	 * Parses and matches a single header expression to a request.
+	 * 解析并将单个头表达式与请求匹配。
 	 */
 	static class HeaderExpression extends AbstractNameValueExpression<String> {
 

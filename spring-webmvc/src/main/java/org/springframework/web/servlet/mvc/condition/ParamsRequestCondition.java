@@ -16,18 +16,13 @@
 
 package org.springframework.web.servlet.mvc.condition;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.WebUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * A logical conjunction ({@code ' && '}) request condition that matches a request against
@@ -44,8 +39,9 @@ public final class ParamsRequestCondition extends AbstractRequestCondition<Param
 
 	/**
 	 * Create a new instance from the given param expressions.
+	 *
 	 * @param params expressions with syntax defined in {@link RequestMapping#params()};
-	 * 	if 0, the condition will match to every request.
+	 *               if 0, the condition will match to every request.
 	 */
 	public ParamsRequestCondition(String... params) {
 		this.expressions = parseExpressions(params);
@@ -92,11 +88,9 @@ public final class ParamsRequestCondition extends AbstractRequestCondition<Param
 	public ParamsRequestCondition combine(ParamsRequestCondition other) {
 		if (isEmpty() && other.isEmpty()) {
 			return this;
-		}
-		else if (other.isEmpty()) {
+		} else if (other.isEmpty()) {
 			return this;
-		}
-		else if (isEmpty()) {
+		} else if (isEmpty()) {
 			return other;
 		}
 		Set<ParamExpression> set = new LinkedHashSet<>(this.expressions);
@@ -151,17 +145,28 @@ public final class ParamsRequestCondition extends AbstractRequestCondition<Param
 
 
 	/**
-	 * Parses and matches a single param expression to a request.
+	 * 解析并匹配请求中的单个参数表达式。
 	 */
 	static class ParamExpression extends AbstractNameValueExpression<String> {
 
+		/**
+		 * 要匹配的名称集合
+		 */
 		private final Set<String> namesToMatch = new HashSet<>(WebUtils.SUBMIT_IMAGE_SUFFIXES.length + 1);
 
-
+		/**
+		 * 构造函数，解析表达式并初始化字段。
+		 *
+		 * @param expression 参数表达式字符串
+		 */
 		ParamExpression(String expression) {
+			// 调用父类构造函数，并传入表达式
 			super(expression);
+			// 将名称添加到 要匹配的名称集合 中
 			this.namesToMatch.add(getName());
+			// 遍历 WebUtils.SUBMIT_IMAGE_SUFFIXES 中的每个后缀
 			for (String suffix : WebUtils.SUBMIT_IMAGE_SUFFIXES) {
+				// 将名称加上后缀添加到 要匹配的名称集合 中
 				this.namesToMatch.add(getName() + suffix);
 			}
 		}
@@ -178,11 +183,14 @@ public final class ParamsRequestCondition extends AbstractRequestCondition<Param
 
 		@Override
 		protected boolean matchName(HttpServletRequest request) {
+			// 遍历 要匹配的名称集合 列表中的每个名称
 			for (String current : this.namesToMatch) {
+				// 如果请求的参数映射中包含当前名称，则返回 true
 				if (request.getParameterMap().get(current) != null) {
 					return true;
 				}
 			}
+			// 如果 要匹配的名称集合 列表中没有匹配的名称，则检查请求的参数映射中是否包含 名称
 			return request.getParameterMap().containsKey(this.name);
 		}
 

@@ -16,41 +16,60 @@
 
 package org.springframework.web.servlet.mvc.condition;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * Supports "name=value" style expressions as described in:
- * {@link org.springframework.web.bind.annotation.RequestMapping#params()} and
- * {@link org.springframework.web.bind.annotation.RequestMapping#headers()}.
+ * 支持 "name=value" 风格表达式的抽象类，如：
+ * {@link org.springframework.web.bind.annotation.RequestMapping#params()} 和
+ * {@link org.springframework.web.bind.annotation.RequestMapping#headers()} 中描述的那样。
  *
+ * @param <T> 值的类型
  * @author Rossen Stoyanchev
  * @author Arjen Poutsma
  * @since 3.1
- * @param <T> the value type
  */
 abstract class AbstractNameValueExpression<T> implements NameValueExpression<T> {
-
+	/**
+	 * 名称
+	 */
 	protected final String name;
 
+	/**
+	 * 值
+	 */
 	@Nullable
 	protected final T value;
 
+	/**
+	 * 是否取反
+	 */
 	protected final boolean isNegated;
 
-
+	/**
+	 * 构造函数，解析表达式并初始化字段。
+	 *
+	 * @param expression 表达式字符串
+	 */
 	AbstractNameValueExpression(String expression) {
+		// 找到表达式中等号的位置
 		int separator = expression.indexOf('=');
+		// 如果表达式中没有等号
 		if (separator == -1) {
+			// 判断是否以 "!" 开头，并设置 是否取反
 			this.isNegated = expression.startsWith("!");
+			// 根据是否以 "!" 开头，设置 名称
 			this.name = (this.isNegated ? expression.substring(1) : expression);
+			// 没有等号时，值为 null
 			this.value = null;
-		}
-		else {
+		} else {
+			// 判断等号前一个字符是否为 "!" 并设置 是否取反
 			this.isNegated = (separator > 0) && (expression.charAt(separator - 1) == '!');
+			// 根据是否以 "!" 结束等号前的部分，设置 名称
 			this.name = (this.isNegated ? expression.substring(0, separator - 1) : expression.substring(0, separator));
+			// 解析等号后面的部分，并设置 值
 			this.value = parseValue(expression.substring(separator + 1));
 		}
 	}
@@ -72,17 +91,25 @@ abstract class AbstractNameValueExpression<T> implements NameValueExpression<T> 
 		return this.isNegated;
 	}
 
+	/**
+	 * 检查表达式是否与请求匹配。
+	 *
+	 * @param request HttpServletRequest 请求对象
+	 * @return 如果匹配返回 true；否则返回 false
+	 */
 	public final boolean match(HttpServletRequest request) {
+		// 定义是否匹配的布尔变量
 		boolean isMatch;
+		// 如果有 值，则调用 matchValue 方法进行匹配
 		if (this.value != null) {
 			isMatch = matchValue(request);
-		}
-		else {
+		} else {
+			// 否则，调用 matchName 方法进行匹配
 			isMatch = matchName(request);
 		}
+		// 返回是否匹配的结果，考虑 取反 标志
 		return this.isNegated != isMatch;
 	}
-
 
 	protected abstract boolean isCaseSensitiveName();
 
@@ -124,8 +151,7 @@ abstract class AbstractNameValueExpression<T> implements NameValueExpression<T> 
 			}
 			builder.append('=');
 			builder.append(this.value);
-		}
-		else {
+		} else {
 			if (this.isNegated) {
 				builder.append('!');
 			}
