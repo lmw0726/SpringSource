@@ -20,22 +20,36 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * A contract for {@code "name!=value"} style expression used to specify request
- * parameters and request header conditions in {@code @RequestMapping}.
+ * 用于指定 {@code @RequestMapping} 中请求参数和请求头条件的 {@code "name!=value"} 样式表达式的合同。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
- * @param <T> the value type
+ * @param  <T> 值的类型
  * @see RequestMapping#params()
  * @see RequestMapping#headers()
  */
 public interface NameValueExpression<T> {
 
+	/**
+	 * 获取表达式中的名称。
+	 *
+	 * @return 名称
+	 */
 	String getName();
 
+	/**
+	 * 获取表达式中的值。
+	 *
+	 * @return 值，如果没有则返回 {@code null}
+	 */
 	@Nullable
 	T getValue();
 
+	/**
+	 * 检查表达式是否是否定的。
+	 *
+	 * @return 如果是否定的则返回 true，否则返回 false
+	 */
 	boolean isNegated();
 
 }

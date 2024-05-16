@@ -20,20 +20,29 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * A contract for media type expressions (e.g. "text/plain", "!text/plain") as
- * defined in the {@code @RequestMapping} annotation for "consumes" and
- * "produces" conditions.
+ * 媒体类型表达式（例如 "text/plain", "!text/plain"）的合同，
+ * 这些表达式在 {@code @RequestMapping} 注解中的 "consumes" 和 "produces" 条件中定义。
  *
- * @author Rossen Stoyanchev
- * @since 3.1
+ * @作者 Rossen Stoyanchev
+ * @自 3.1 以来
  *
  * @see RequestMapping#consumes()
  * @see RequestMapping#produces()
  */
 public interface MediaTypeExpression {
 
+	/**
+	 * 获取表达式中的媒体类型。
+	 *
+	 * @return 媒体类型
+	 */
 	MediaType getMediaType();
 
+	/**
+	 * 检查表达式是否是否定的。
+	 *
+	 * @return 如果是否定的则返回 true，否则返回 false
+	 */
 	boolean isNegated();
 
 }

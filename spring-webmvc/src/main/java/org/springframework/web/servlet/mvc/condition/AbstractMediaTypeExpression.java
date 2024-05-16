@@ -21,8 +21,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * Supports media type expressions as described in:
- * {@link RequestMapping#consumes()} and {@link RequestMapping#produces()}.
+ * 支持 {@link RequestMapping#consumes()} 和 {@link RequestMapping#produces()} 中描述的媒体类型表达式。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -30,19 +29,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 abstract class AbstractMediaTypeExpression implements MediaTypeExpression, Comparable<AbstractMediaTypeExpression> {
 
+	/**
+	 * 媒体类型
+	 */
 	private final MediaType mediaType;
 
+	/**
+	 * 是否是取反的
+	 */
 	private final boolean isNegated;
 
 
 	AbstractMediaTypeExpression(String expression) {
+		// 如果表达式以 "!" 开头
 		if (expression.startsWith("!")) {
+			// 设置 isNegated 为 true
 			this.isNegated = true;
+			// 去除表达式中的 "!" 符号
 			expression = expression.substring(1);
-		}
-		else {
+		} else {
+			// 否则，设置 isNegated 为 false
 			this.isNegated = false;
 		}
+		// 解析表达式为 MediaType 对象
 		this.mediaType = MediaType.parseMediaType(expression);
 	}
 
