@@ -16,6 +16,11 @@
 
 package org.springframework.web.servlet.function;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -25,23 +30,23 @@ import java.net.URL;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
-
 /**
- * Resource-based implementation of {@link HandlerFunction}.
+ * 基于资源的 {@link HandlerFunction} 实现。
  *
  * @author Arjen Poutsma
  * @since 5.2
  */
 class ResourceHandlerFunction implements HandlerFunction<ServerResponse> {
 
+	/**
+	 * 支持的Http方法集合
+	 */
 	private static final Set<HttpMethod> SUPPORTED_METHODS =
 			EnumSet.of(HttpMethod.GET, HttpMethod.HEAD, HttpMethod.OPTIONS);
 
-
+	/**
+	 * 资源
+	 */
 	private final Resource resource;
 
 
@@ -52,28 +57,42 @@ class ResourceHandlerFunction implements HandlerFunction<ServerResponse> {
 
 	@Override
 	public ServerResponse handle(ServerRequest request) {
+		// 获取请求的HTTP方法
 		HttpMethod method = request.method();
 		if (method != null) {
+			// 根据请求方法进行不同的处理
 			switch (method) {
 				case GET:
+					// 如果是GET请求，返回包含资源对象的响应
 					return EntityResponse.fromObject(this.resource).build();
 				case HEAD:
+					// 如果是HEAD请求，创建一个HeadMethodResource对象，并返回包含该对象的响应
 					Resource headResource = new HeadMethodResource(this.resource);
 					return EntityResponse.fromObject(headResource).build();
 				case OPTIONS:
+					// 如果是OPTIONS请求，返回允许的HTTP方法的响应
 					return ServerResponse.ok()
 							.allow(SUPPORTED_METHODS).build();
 			}
 		}
+		// 如果请求方法不是GET、HEAD或OPTIONS，返回HTTP 405 Method Not Allowed响应，并指明允许的HTTP方法
 		return ServerResponse.status(HttpStatus.METHOD_NOT_ALLOWED)
 				.allow(SUPPORTED_METHODS).build();
 	}
 
-
+	/**
+	 * 用于处理 HEAD 请求的方法资源实现。
+	 */
 	private static class HeadMethodResource implements Resource {
 
+		/**
+		 * 空的字节数组
+		 */
 		private static final byte[] EMPTY = new byte[0];
 
+		/**
+		 * 代理的资源
+		 */
 		private final Resource delegate;
 
 		public HeadMethodResource(Resource delegate) {
@@ -85,7 +104,7 @@ class ResourceHandlerFunction implements HandlerFunction<ServerResponse> {
 			return new ByteArrayInputStream(EMPTY);
 		}
 
-		// delegation
+		// 委托方法
 
 		@Override
 		public boolean exists() {

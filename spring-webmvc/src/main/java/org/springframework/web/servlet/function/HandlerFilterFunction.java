@@ -16,54 +16,57 @@
 
 package org.springframework.web.servlet.function;
 
+import org.springframework.util.Assert;
+
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.springframework.util.Assert;
-
 /**
- * Represents a function that filters a {@linkplain HandlerFunction handler function}.
+ * 表示过滤 {@linkplain HandlerFunction 处理函数} 的函数。
  *
+ * @param <T> 要过滤的 {@linkplain HandlerFunction 处理函数} 的类型
+ * @param <R> 函数响应的类型
  * @author Arjen Poutsma
- * @since 5.2
- * @param <T> the type of the {@linkplain HandlerFunction handler function} to filter
- * @param <R> the type of the response of the function
  * @see RouterFunction#filter(HandlerFilterFunction)
+ * @since 5.2
  */
 @FunctionalInterface
 public interface HandlerFilterFunction<T extends ServerResponse, R extends ServerResponse> {
 
 	/**
-	 * Apply this filter to the given handler function. The given
-	 * {@linkplain HandlerFunction handler function} represents the next entity in the chain,
-	 * and can be {@linkplain HandlerFunction#handle(ServerRequest) invoked} in order to
-	 * proceed to this entity, or not invoked to block the chain.
-	 * @param request the request
-	 * @param next the next handler or filter function in the chain
-	 * @return the filtered response
+	 * 将此过滤器应用于给定的处理函数。给定的 {@linkplain HandlerFunction 处理函数} 表示链中的下一个实体，
+	 * 可以通过 {@linkplain HandlerFunction#handle(ServerRequest) 调用} 以继续到该实体，或者不调用以阻塞该链。
+	 *
+	 * @param request 请求
+	 * @param next    链中的下一个处理程序或过滤器函数
+	 * @return 过滤后的响应
+	 * @throws Exception 如果过滤过程中发生异常
 	 */
 	R filter(ServerRequest request, HandlerFunction<T> next) throws Exception;
 
 	/**
-	 * Return a composed filter function that first applies this filter, and then applies the
-	 * {@code after} filter.
-	 * @param after the filter to apply after this filter is applied
-	 * @return a composed filter that first applies this function and then applies the
-	 * {@code after} function
+	 * 返回一个组合的过滤器函数，首先应用此过滤器，然后应用 {@code after} 过滤器。
+	 *
+	 * @param after 在应用此过滤器后要应用的过滤器
+	 * @return 一个组合的过滤器，首先应用此函数，然后应用 {@code after} 函数
 	 */
 	default HandlerFilterFunction<T, R> andThen(HandlerFilterFunction<T, T> after) {
 		Assert.notNull(after, "HandlerFilterFunction must not be null");
+		// 返回一个过滤器函数
 		return (request, next) -> {
+			// 创建一个新的处理程序函数，该函数在原始处理程序函数后面执行过滤器
 			HandlerFunction<T> nextHandler = handlerRequest -> after.filter(handlerRequest, next);
+			// 调用当前过滤器的 filter 方法，传入请求和新的处理程序函数
 			return filter(request, nextHandler);
 		};
 	}
 
 	/**
-	 * Apply this filter to the given handler function, resulting in a filtered handler function.
-	 * @param handler the handler function to filter
-	 * @return the filtered handler function
+	 * 将此过滤器应用于给定的处理函数，从而产生一个经过过滤的处理函数。
+	 *
+	 * @param handler 要过滤的处理函数
+	 * @return 过滤后的处理函数
 	 */
 	default HandlerFunction<R> apply(HandlerFunction<T> handler) {
 		Assert.notNull(handler, "HandlerFunction must not be null");
@@ -71,10 +74,10 @@ public interface HandlerFilterFunction<T extends ServerResponse, R extends Serve
 	}
 
 	/**
-	 * Adapt the given request processor function to a filter function that only operates
-	 * on the {@code ServerRequest}.
-	 * @param requestProcessor the request processor
-	 * @return the filter adaptation of the request processor
+	 * 将给定的请求处理函数适配为仅在 {@code ServerRequest} 上操作的过滤器函数。
+	 *
+	 * @param requestProcessor 请求处理函数
+	 * @return 请求处理函数的过滤器适配
 	 */
 	static <T extends ServerResponse> HandlerFilterFunction<T, T>
 	ofRequestProcessor(Function<ServerRequest, ServerRequest> requestProcessor) {
@@ -84,10 +87,10 @@ public interface HandlerFilterFunction<T extends ServerResponse, R extends Serve
 	}
 
 	/**
-	 * Adapt the given response processor function to a filter function that only operates
-	 * on the {@code ServerResponse}.
-	 * @param responseProcessor the response processor
-	 * @return the filter adaptation of the request processor
+	 * 将给定的响应处理函数适配为仅在 {@code ServerResponse} 上操作的过滤器函数。
+	 *
+	 * @param responseProcessor 响应处理函数
+	 * @return 响应处理函数的过滤器适配
 	 */
 	static <T extends ServerResponse, R extends ServerResponse> HandlerFilterFunction<T, R>
 	ofResponseProcessor(BiFunction<ServerRequest, T, R> responseProcessor) {
@@ -97,11 +100,11 @@ public interface HandlerFilterFunction<T extends ServerResponse, R extends Serve
 	}
 
 	/**
-	 * Adapt the given predicate and response provider function to a filter function that returns
-	 * a {@code ServerResponse} on a given exception.
-	 * @param predicate the predicate to match an exception
-	 * @param errorHandler the response provider
-	 * @return the filter adaption of the error handler
+	 * 将给定的谓词和响应提供函数适配为在给定异常上返回 {@code ServerResponse} 的过滤器函数。
+	 *
+	 * @param predicate    要匹配异常的谓词
+	 * @param errorHandler 响应提供函数
+	 * @return 错误处理程序的过滤器适配
 	 */
 	static <T extends ServerResponse> HandlerFilterFunction<T, T>
 	ofErrorHandler(Predicate<Throwable> predicate, BiFunction<Throwable, ServerRequest, T> errorHandler) {
@@ -109,19 +112,26 @@ public interface HandlerFilterFunction<T extends ServerResponse, R extends Serve
 		Assert.notNull(predicate, "Predicate must not be null");
 		Assert.notNull(errorHandler, "ErrorHandler must not be null");
 
+		// 返回一个处理程序函数
 		return (request, next) -> {
 			try {
+				// 调用下一个处理程序函数处理请求
 				T t = next.handle(request);
+				// 如果处理程序函数返回的对象是 ErrorHandlingServerResponse 类型
 				if (t instanceof ErrorHandlingServerResponse) {
+					// 将当前错误处理程序添加到 ErrorHandlingServerResponse 对象中
 					((ErrorHandlingServerResponse) t).addErrorHandler(predicate, errorHandler);
 				}
+				// 返回处理结果
 				return t;
-			}
-			catch (Throwable throwable) {
+			} catch (Throwable throwable) {
+				// 如果捕获到异常
+				// 如果异常满足条件
 				if (predicate.test(throwable)) {
+					// 调用错误处理函数处理异常
 					return errorHandler.apply(throwable, request);
-				}
-				else {
+				} else {
+					// 如果异常不满足条件，则重新抛出异常
 					throw throwable;
 				}
 			}
