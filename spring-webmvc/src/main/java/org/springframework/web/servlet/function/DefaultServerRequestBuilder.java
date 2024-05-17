@@ -16,31 +16,6 @@
 
 package org.springframework.web.servlet.function;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import javax.servlet.ReadListener;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -56,33 +31,80 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.ReadListener;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.Principal;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 /**
- * Default {@link ServerRequest.Builder} implementation.
+ * 默认的{@link ServerRequest.Builder}实现
  *
  * @author Arjen Poutsma
  * @since 5.2
  */
 class DefaultServerRequestBuilder implements ServerRequest.Builder {
-
+	/**
+	 * Servlet请求
+	 */
 	private final HttpServletRequest servletRequest;
 
+	/**
+	 * 消息转换器列表
+	 */
 	private final List<HttpMessageConverter<?>> messageConverters;
-
+	/**
+	 * 方法名
+	 */
 	private String methodName;
 
+	/**
+	 * 请求URI
+	 */
 	private URI uri;
 
+	/**
+	 * 请求头
+	 */
 	private final HttpHeaders headers = new HttpHeaders();
 
+	/**
+	 * Cookie
+	 */
 	private final MultiValueMap<String, Cookie> cookies = new LinkedMultiValueMap<>();
 
+	/**
+	 * 属性值
+	 */
 	private final Map<String, Object> attributes = new LinkedHashMap<>();
 
+	/**
+	 * 参数值
+	 */
 	private final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 
+	/**
+	 * 远程地址
+	 */
 	@Nullable
 	private InetSocketAddress remoteAddress;
 
+	/**
+	 * 请求体
+	 */
 	private byte[] body = new byte[0];
 
 
@@ -194,32 +216,61 @@ class DefaultServerRequestBuilder implements ServerRequest.Builder {
 
 
 	private static class BuiltServerRequest implements ServerRequest {
-
+		/**
+		 * 方法名称
+		 */
 		private final String methodName;
 
+		/**
+		 * 请求URI
+		 */
 		private final URI uri;
 
+		/**
+		 * 请求头
+		 */
 		private final HttpHeaders headers;
 
+		/**
+		 * Servlet请求
+		 */
 		private final HttpServletRequest servletRequest;
 
+		/**
+		 * Cookie值
+		 */
 		private final MultiValueMap<String, Cookie> cookies;
 
+		/**
+		 * 属性值
+		 */
 		private final Map<String, Object> attributes;
 
+		/**
+		 * 请求体
+		 */
 		private final byte[] body;
 
+		/**
+		 * 消息转换器列表
+		 */
 		private final List<HttpMessageConverter<?>> messageConverters;
 
+		/**
+		 * 参数值
+		 */
 		private final MultiValueMap<String, String> params;
 
+		/**
+		 * 远程地址
+		 */
 		@Nullable
 		private final InetSocketAddress remoteAddress;
 
 		public BuiltServerRequest(HttpServletRequest servletRequest, String methodName, URI uri,
-				HttpHeaders headers, MultiValueMap<String, Cookie> cookies,
-				Map<String, Object> attributes, MultiValueMap<String, String> params,
-				@Nullable InetSocketAddress remoteAddress, byte[] body, List<HttpMessageConverter<?>> messageConverters) {
+								  HttpHeaders headers, MultiValueMap<String, Cookie> cookies,
+								  Map<String, Object> attributes, MultiValueMap<String, String> params,
+								  @Nullable InetSocketAddress remoteAddress, byte[] body, List<HttpMessageConverter<?>> messageConverters) {
 
 			this.servletRequest = servletRequest;
 			this.methodName = methodName;
@@ -240,10 +291,16 @@ class DefaultServerRequestBuilder implements ServerRequest.Builder {
 
 		@Override
 		public MultiValueMap<String, Part> multipartData() throws IOException, ServletException {
+			// 使用流对请求的所有Part进行分组，以Part的名称为键，值为相应的Part列表
 			return servletRequest().getParts().stream()
-					.collect(Collectors.groupingBy(Part::getName,
+					.collect(Collectors.groupingBy(
+							// 以Part的名称为键
+							Part::getName,
+							// 使用LinkedMultiValueMap收集值，保持顺序
 							LinkedMultiValueMap::new,
+							// 将相同名称的Part收集到列表中
 							Collectors.toList()));
+
 		}
 
 		@Override
@@ -283,30 +340,43 @@ class DefaultServerRequestBuilder implements ServerRequest.Builder {
 
 		@Override
 		public <T> T body(ParameterizedTypeReference<T> bodyType) throws IOException, ServletException {
+			// 获取请求体类型
 			Type type = bodyType.getType();
+			// 根据请求体类型获取请求体类
 			return bodyInternal(type, DefaultServerRequest.bodyClass(type));
 		}
 
 		@SuppressWarnings("unchecked")
 		private <T> T bodyInternal(Type bodyType, Class<?> bodyClass) throws ServletException, IOException {
+			// 创建一个内置的HttpInputMessage
 			HttpInputMessage inputMessage = new BuiltInputMessage();
+
+			// 获取请求的Content-Type，默认为APPLICATION_OCTET_STREAM
 			MediaType contentType = headers().contentType().orElse(MediaType.APPLICATION_OCTET_STREAM);
 
+			// 遍历消息转换器列表，尝试使用每个消息转换器读取请求体
 			for (HttpMessageConverter<?> messageConverter : this.messageConverters) {
+				// 如果消息转换器是泛型消息转换器
 				if (messageConverter instanceof GenericHttpMessageConverter) {
 					GenericHttpMessageConverter<T> genericMessageConverter =
 							(GenericHttpMessageConverter<T>) messageConverter;
+					// 如果泛型消息转换器支持读取给定的bodyType、bodyClass和contentType
 					if (genericMessageConverter.canRead(bodyType, bodyClass, contentType)) {
+						// 使用泛型消息转换器读取请求体并返回
 						return genericMessageConverter.read(bodyType, bodyClass, inputMessage);
 					}
 				}
+				// 如果消息转换器支持读取给定的bodyClass和contentType
 				if (messageConverter.canRead(bodyClass, contentType)) {
+					// 使用消息转换器读取请求体并返回
 					HttpMessageConverter<T> theConverter =
 							(HttpMessageConverter<T>) messageConverter;
 					Class<? extends T> clazz = (Class<? extends T>) bodyClass;
 					return theConverter.read(clazz, inputMessage);
 				}
 			}
+
+			// 如果没有匹配的消息转换器，则抛出HttpMediaTypeNotSupportedException异常
 			throw new HttpMediaTypeNotSupportedException(contentType, Collections.emptyList());
 		}
 
@@ -325,10 +395,11 @@ class DefaultServerRequestBuilder implements ServerRequest.Builder {
 			@SuppressWarnings("unchecked")
 			Map<String, String> pathVariables = (Map<String, String>) attributes()
 					.get(RouterFunctions.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+			// 如果路径变量不为null，则返回路径变量；
 			if (pathVariables != null) {
 				return pathVariables;
-			}
-			else {
+			} else {
+				// 否则返回空的Map
 				return Collections.emptyMap();
 			}
 		}
@@ -365,7 +436,9 @@ class DefaultServerRequestBuilder implements ServerRequest.Builder {
 
 
 	private static class BodyInputStream extends ServletInputStream {
-
+		/**
+		 * 输入流
+		 */
 		private final InputStream delegate;
 
 		public BodyInputStream(byte[] body) {
