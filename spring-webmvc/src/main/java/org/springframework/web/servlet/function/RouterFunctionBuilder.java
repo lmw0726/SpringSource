@@ -16,33 +16,38 @@
 
 package org.springframework.web.servlet.function;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.*;
+import java.util.stream.Stream;
+
 /**
- * Default implementation of {@link RouterFunctions.Builder}.
+ * {@link RouterFunctions.Builder} 的默认实现。
  *
  * @author Arjen Poutsma
  * @since 5.2
  */
 class RouterFunctionBuilder implements RouterFunctions.Builder {
 
+	/**
+	 * 存储路由函数的列表。
+	 */
 	private final List<RouterFunction<ServerResponse>> routerFunctions = new ArrayList<>();
 
+	/**
+	 * 存储过滤器函数的列表。
+	 */
 	private final List<HandlerFilterFunction<ServerResponse, ServerResponse>> filterFunctions = new ArrayList<>();
 
+	/**
+	 * 存储错误处理器函数的列表。
+	 */
 	private final List<HandlerFilterFunction<ServerResponse, ServerResponse>> errorHandlers = new ArrayList<>();
 
 
@@ -77,7 +82,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder GET(String pattern, RequestPredicate predicate,
-			HandlerFunction<ServerResponse> handlerFunction) {
+									   HandlerFunction<ServerResponse> handlerFunction) {
 
 		return add(RequestPredicates.GET(pattern).and(predicate), handlerFunction);
 	}
@@ -101,7 +106,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder HEAD(String pattern, RequestPredicate predicate,
-			HandlerFunction<ServerResponse> handlerFunction) {
+										HandlerFunction<ServerResponse> handlerFunction) {
 
 		return add(RequestPredicates.HEAD(pattern).and(predicate), handlerFunction);
 	}
@@ -125,7 +130,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder POST(String pattern, RequestPredicate predicate,
-			HandlerFunction<ServerResponse> handlerFunction) {
+										HandlerFunction<ServerResponse> handlerFunction) {
 
 		return add(RequestPredicates.POST(pattern).and(predicate), handlerFunction);
 	}
@@ -149,7 +154,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder PUT(String pattern, RequestPredicate predicate,
-			HandlerFunction<ServerResponse> handlerFunction) {
+									   HandlerFunction<ServerResponse> handlerFunction) {
 
 		return add(RequestPredicates.PUT(pattern).and(predicate), handlerFunction);
 	}
@@ -173,7 +178,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder PATCH(String pattern, RequestPredicate predicate,
-			HandlerFunction<ServerResponse> handlerFunction) {
+										 HandlerFunction<ServerResponse> handlerFunction) {
 
 		return add(RequestPredicates.PATCH(pattern).and(predicate), handlerFunction);
 	}
@@ -197,7 +202,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder DELETE(String pattern, RequestPredicate predicate,
-			HandlerFunction<ServerResponse> handlerFunction) {
+										  HandlerFunction<ServerResponse> handlerFunction) {
 
 		return add(RequestPredicates.DELETE(pattern).and(predicate), handlerFunction);
 	}
@@ -221,7 +226,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder OPTIONS(String pattern, RequestPredicate predicate,
-			HandlerFunction<ServerResponse> handlerFunction) {
+										   HandlerFunction<ServerResponse> handlerFunction) {
 
 		return add(RequestPredicates.OPTIONS(pattern).and(predicate), handlerFunction);
 	}
@@ -230,7 +235,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder route(RequestPredicate predicate,
-			HandlerFunction<ServerResponse> handlerFunction) {
+										 HandlerFunction<ServerResponse> handlerFunction) {
 		return add(RouterFunctions.route(predicate, handlerFunction));
 	}
 
@@ -246,38 +251,46 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder nest(RequestPredicate predicate,
-			Consumer<RouterFunctions.Builder> builderConsumer) {
+										Consumer<RouterFunctions.Builder> builderConsumer) {
 
+		// 断言消费者不为空
 		Assert.notNull(builderConsumer, "Consumer must not be null");
 
+		// 创建一个嵌套的路由构建器
 		RouterFunctionBuilder nestedBuilder = new RouterFunctionBuilder();
+		// 接受消费者对嵌套构建器的操作
 		builderConsumer.accept(nestedBuilder);
+		// 构建嵌套的路由函数
 		RouterFunction<ServerResponse> nestedRoute = nestedBuilder.build();
+		// 将嵌套的路由函数添加到路由函数列表中
 		this.routerFunctions.add(RouterFunctions.nest(predicate, nestedRoute));
 		return this;
 	}
 
 	@Override
 	public RouterFunctions.Builder nest(RequestPredicate predicate,
-			Supplier<RouterFunction<ServerResponse>> routerFunctionSupplier) {
+										Supplier<RouterFunction<ServerResponse>> routerFunctionSupplier) {
 
+		// 断言路由函数供应者不为空
 		Assert.notNull(routerFunctionSupplier, "RouterFunction Supplier must not be null");
 
+		// 获取嵌套的路由函数
 		RouterFunction<ServerResponse> nestedRoute = routerFunctionSupplier.get();
+		// 将嵌套的路由函数添加到路由函数列表中
 		this.routerFunctions.add(RouterFunctions.nest(predicate, nestedRoute));
 		return this;
 	}
 
 	@Override
 	public RouterFunctions.Builder path(String pattern,
-			Consumer<RouterFunctions.Builder> builderConsumer) {
+										Consumer<RouterFunctions.Builder> builderConsumer) {
 
 		return nest(RequestPredicates.path(pattern), builderConsumer);
 	}
 
 	@Override
 	public RouterFunctions.Builder path(String pattern,
-			Supplier<RouterFunction<ServerResponse>> routerFunctionSupplier) {
+										Supplier<RouterFunction<ServerResponse>> routerFunctionSupplier) {
 
 		return nest(RequestPredicates.path(pattern), routerFunctionSupplier);
 	}
@@ -306,7 +319,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder onError(Predicate<Throwable> predicate,
-			BiFunction<Throwable, ServerRequest, ServerResponse> responseProvider) {
+										   BiFunction<Throwable, ServerRequest, ServerResponse> responseProvider) {
 
 		Assert.notNull(predicate, "Predicate must not be null");
 		Assert.notNull(responseProvider, "ResponseProvider must not be null");
@@ -317,7 +330,7 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder onError(Class<? extends Throwable> exceptionType,
-			BiFunction<Throwable, ServerRequest, ServerResponse> responseProvider) {
+										   BiFunction<Throwable, ServerRequest, ServerResponse> responseProvider) {
 		Assert.notNull(exceptionType, "ExceptionType must not be null");
 		Assert.notNull(responseProvider, "ResponseProvider must not be null");
 
@@ -326,44 +339,61 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 	@Override
 	public RouterFunctions.Builder withAttribute(String name, Object value) {
+		// 断言名称不为空
 		Assert.hasLength(name, "Name must not be empty");
+		// 断言值不为空
 		Assert.notNull(value, "Value must not be null");
 
+		// 如果路由函数列表为空，则抛出异常
 		if (this.routerFunctions.isEmpty()) {
 			throw new IllegalStateException("attributes can only be called after any other method (GET, path, etc.)");
 		}
+
+		// 获取最后一个路由函数的索引
 		int lastIdx = this.routerFunctions.size() - 1;
+		// 获取具有属性的路由函数
 		RouterFunction<ServerResponse> attributed = this.routerFunctions.get(lastIdx)
 				.withAttribute(name, value);
+		// 替换最后一个路由函数为具有属性的路由函数
 		this.routerFunctions.set(lastIdx, attributed);
 		return this;
 	}
 
 	@Override
 	public RouterFunctions.Builder withAttributes(Consumer<Map<String, Object>> attributesConsumer) {
+		// 断言属性消费者不为空
 		Assert.notNull(attributesConsumer, "AttributesConsumer must not be null");
 
+		// 如果路由函数列表为空，则抛出异常
 		if (this.routerFunctions.isEmpty()) {
 			throw new IllegalStateException("attributes can only be called after any other method (GET, path, etc.)");
 		}
+
+		// 获取最后一个路由函数的索引
 		int lastIdx = this.routerFunctions.size() - 1;
+		// 获取具有属性的路由函数
 		RouterFunction<ServerResponse> attributed = this.routerFunctions.get(lastIdx)
 				.withAttributes(attributesConsumer);
+		// 替换最后一个路由函数为具有属性的路由函数
 		this.routerFunctions.set(lastIdx, attributed);
 		return this;
 	}
 
 	@Override
 	public RouterFunction<ServerResponse> build() {
+		// 如果路由函数列表为空，则抛出异常
 		if (this.routerFunctions.isEmpty()) {
 			throw new IllegalStateException("No routes registered. Register a route with GET(), POST(), etc.");
 		}
+
+		// 构建路由函数
 		RouterFunction<ServerResponse> result = new BuiltRouterFunction(this.routerFunctions);
 
+		// 如果过滤器函数列表和错误处理函数列表都为空，则返回结果
 		if (this.filterFunctions.isEmpty() && this.errorHandlers.isEmpty()) {
 			return result;
-		}
-		else {
+		} else {
+			// 合并过滤器函数和错误处理函数，然后返回结果
 			HandlerFilterFunction<ServerResponse, ServerResponse> filter =
 					Stream.concat(this.filterFunctions.stream(), this.errorHandlers.stream())
 							.reduce(HandlerFilterFunction::andThen)
@@ -375,10 +405,12 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 
 	/**
-	 * Router function returned by {@link #build()} that simply iterates over the registered routes.
+	 * 由 {@link #build()} 返回的路由函数，简单地遍历注册的路由。
 	 */
 	private static class BuiltRouterFunction extends RouterFunctions.AbstractRouterFunction<ServerResponse> {
-
+		/**
+		 * 存储路由函数的列表
+		 */
 		private final List<RouterFunction<ServerResponse>> routerFunctions;
 
 		public BuiltRouterFunction(List<RouterFunction<ServerResponse>> routerFunctions) {
@@ -388,12 +420,16 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 		@Override
 		public Optional<HandlerFunction<ServerResponse>> route(ServerRequest request) {
+			// 遍历路由函数列表
 			for (RouterFunction<ServerResponse> routerFunction : this.routerFunctions) {
+				// 尝试匹配当前请求
 				Optional<HandlerFunction<ServerResponse>> result = routerFunction.route(request);
+				// 如果匹配成功，则返回结果
 				if (result.isPresent()) {
 					return result;
 				}
 			}
+			// 如果没有匹配的结果，则返回空
 			return Optional.empty();
 		}
 

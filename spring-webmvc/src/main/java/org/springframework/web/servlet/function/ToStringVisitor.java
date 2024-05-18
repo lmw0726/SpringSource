@@ -16,25 +16,28 @@
 
 package org.springframework.web.servlet.function;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpMethod;
-
 /**
- * Implementation of {@link RouterFunctions.Visitor} that creates a formatted
- * string representation of router functions.
+ * 实现{@link RouterFunctions.Visitor}，用于创建路由函数的格式化字符串表示。
  *
  * @author Arjen Poutsma
  * @since 5.2
  */
 class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visitor {
-
+	/**
+	 * 字符串构建器
+	 */
 	private final StringBuilder builder = new StringBuilder();
-
+	/**
+	 * 缩进数量
+	 */
 	private int indent = 0;
 
 
@@ -42,30 +45,43 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 
 	@Override
 	public void startNested(RequestPredicate predicate) {
+		// 缩进代码块
 		indent();
+		// 调用谓词对象的accept方法，将当前对象传递给它
 		predicate.accept(this);
+		// 在生成器中添加字符串 " => {\n"
 		this.builder.append(" => {\n");
+		// 增加缩进层级
 		this.indent++;
 	}
 
 	@Override
 	public void endNested(RequestPredicate predicate) {
+		// 减少缩进层级
 		this.indent--;
+		// 缩进代码块
 		indent();
+		// 在生成器中添加字符串 "}\n"
 		this.builder.append("}\n");
 	}
 
 	@Override
 	public void route(RequestPredicate predicate, HandlerFunction<?> handlerFunction) {
+		// 缩进代码块
 		indent();
+		// 访问谓词
 		predicate.accept(this);
+		// 在生成器中添加字符串 " -> "
 		this.builder.append(" -> ");
+		// 将处理函数添加到生成器中，并在结尾添加换行符
 		this.builder.append(handlerFunction).append('\n');
 	}
 
 	@Override
 	public void resources(Function<ServerRequest, Optional<Resource>> lookupFunction) {
+		// 缩进代码块
 		indent();
+		// 在生成器中添加查找函数，并在结尾添加换行符
 		this.builder.append(lookupFunction).append('\n');
 	}
 
@@ -75,7 +91,9 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 
 	@Override
 	public void unknown(RouterFunction<?> routerFunction) {
+		// 缩进代码块
 		indent();
+		// 在生成器中添加路由函数
 		this.builder.append(routerFunction);
 	}
 
@@ -90,10 +108,11 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 
 	@Override
 	public void method(Set<HttpMethod> methods) {
+		// 如果方法集合中只有一个方法，则直接添加该方法
 		if (methods.size() == 1) {
 			this.builder.append(methods.iterator().next());
-		}
-		else {
+		} else {
+			// 否则将方法集合作为字符串添加到生成器中
 			this.builder.append(methods);
 		}
 	}
@@ -141,7 +160,6 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 	@Override
 	public void or() {
 		this.builder.append(" || ");
-
 	}
 
 	@Override
@@ -166,7 +184,9 @@ class ToStringVisitor implements RouterFunctions.Visitor, RequestPredicates.Visi
 
 	@Override
 	public String toString() {
+		// 将生成器内容转换为字符串
 		String result = this.builder.toString();
+		// 如果字符串末尾有换行符，则去除末尾的换行符
 		if (result.endsWith("\n")) {
 			result = result.substring(0, result.length() - 1);
 		}
