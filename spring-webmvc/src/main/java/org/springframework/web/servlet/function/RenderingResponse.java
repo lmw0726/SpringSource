@@ -28,7 +28,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 
 /**
- * Rendering-specific subtype of {@link ServerResponse} that exposes model and template data.
+ * {@link ServerResponse}的渲染特定子类型，暴露模型和模板数据。
  *
  * @author Arjen Poutsma
  * @since 5.2
@@ -36,12 +36,12 @@ import org.springframework.util.MultiValueMap;
 public interface RenderingResponse extends ServerResponse {
 
 	/**
-	 * Return the name of the template to be rendered.
+	 * 返回要呈现的模板的名称。
 	 */
 	String name();
 
 	/**
-	 * Return the unmodifiable model map.
+	 * 返回不可修改的模型映射。
 	 */
 	Map<String, Object> model();
 
@@ -49,18 +49,20 @@ public interface RenderingResponse extends ServerResponse {
 	// Builder
 
 	/**
-	 * Create a builder with the template name, status code, headers and model of the given response.
-	 * @param other the response to copy the values from
-	 * @return the created builder
+	 * 使用给定响应的模板名称、状态码、标头和模型创建一个构建器。
+	 *
+	 * @param other 要从中复制值的响应
+	 * @return 创建的构建器
 	 */
 	static Builder from(RenderingResponse other) {
 		return new DefaultRenderingResponseBuilder(other);
 	}
 
 	/**
-	 * Create a builder with the given template name.
-	 * @param name the name of the template to render
-	 * @return the created builder
+	 * 使用给定模板名称创建一个构建器。
+	 *
+	 * @param name 要呈现的模板的名称
+	 * @return 创建的构建器
 	 */
 	static Builder create(String name) {
 		return new DefaultRenderingResponseBuilder(name);
@@ -68,103 +70,104 @@ public interface RenderingResponse extends ServerResponse {
 
 
 	/**
-	 * Defines a builder for {@code RenderingResponse}.
+	 * 定义用于{@code RenderingResponse}的构建器。
 	 */
 	interface Builder {
 
 		/**
-		 * Add the supplied attribute to the model using a
-		 * {@linkplain org.springframework.core.Conventions#getVariableName generated name}.
-		 * <p><em>Note: Empty {@link Collection Collections} are not added to
-		 * the model when using this method because we cannot correctly determine
-		 * the true convention name. View code should check for {@code null} rather
-		 * than for empty collections.</em>
-		 * @param attribute the model attribute value (never {@code null})
+		 * 使用{@linkplain org.springframework.core.Conventions#getVariableName 生成的名称}将提供的属性添加到模型中。
+		 * <p><em>注意：当使用此方法时，空的{@link Collection 集合}不会添加到模型中，因为我们无法正确确定真实的约定名称。
+		 * 视图代码应该检查{@code null}而不是空集合。</em>
+		 *
+		 * @param attribute 模型属性值（永不为{@code null}）
 		 */
 		Builder modelAttribute(Object attribute);
 
 		/**
-		 * Add the supplied attribute value under the supplied name.
-		 * @param name the name of the model attribute (never {@code null})
-		 * @param value the model attribute value (can be {@code null})
+		 * 使用提供的名称将提供的属性值添加到模型中。
+		 *
+		 * @param name  模型属性的名称（永不为{@code null}）
+		 * @param value 模型属性值（可以为{@code null}）
 		 */
 		Builder modelAttribute(String name, @Nullable Object value);
 
 		/**
-		 * Copy all attributes in the supplied array into the model,
-		 * using attribute name generation for each element.
+		 * 将提供的数组中的所有属性复制到模型中，对每个元素使用属性名称生成。
+		 *
 		 * @see #modelAttribute(Object)
 		 */
 		Builder modelAttributes(Object... attributes);
 
 		/**
-		 * Copy all attributes in the supplied {@code Collection} into the model,
-		 * using attribute name generation for each element.
+		 * 将提供的{@code Collection}中的所有属性复制到模型中，对每个元素使用属性名称生成。
+		 *
 		 * @see #modelAttribute(Object)
 		 */
 		Builder modelAttributes(Collection<?> attributes);
 
 		/**
-		 * Copy all attributes in the supplied {@code Map} into the model.
+		 * 将提供的{@code Map}中的所有属性复制到模型中。
+		 *
 		 * @see #modelAttribute(String, Object)
 		 */
 		Builder modelAttributes(Map<String, ?> attributes);
 
 		/**
-		 * Add the given header value(s) under the given name.
-		 * @param headerName the header name
-		 * @param headerValues the header value(s)
-		 * @return this builder
+		 * 将给定的头值添加到给定名称下。
+		 *
+		 * @param headerName   头名称
+		 * @param headerValues 头值
+		 * @return 此构建器
 		 * @see HttpHeaders#add(String, String)
 		 */
 		Builder header(String headerName, String... headerValues);
 
 		/**
-		 * Manipulate this response's headers with the given consumer. The
-		 * headers provided to the consumer are "live", so that the consumer can be used to
-		 * {@linkplain HttpHeaders#set(String, String) overwrite} existing header values,
-		 * {@linkplain HttpHeaders#remove(Object) remove} values, or use any of the other
-		 * {@link HttpHeaders} methods.
-		 * @param headersConsumer a function that consumes the {@code HttpHeaders}
-		 * @return this builder
+		 * 使用给定的消费者操作此响应的标头。提供给消费者的标头是“实时”的，因此消费者可以用于{@linkplain HttpHeaders#set(String, String)覆盖}现有标头值，
+		 * {@linkplain HttpHeaders#remove(Object)删除}值，或使用任何其他{@link HttpHeaders}方法。
+		 *
+		 * @param headersConsumer 消费{@code HttpHeaders}的函数
+		 * @return 此构建器
 		 */
 		Builder headers(Consumer<HttpHeaders> headersConsumer);
 
 		/**
-		 * Set the HTTP status.
-		 * @param status the response status
-		 * @return this builder
+		 * 设置HTTP状态。
+		 *
+		 * @param status 响应状态
+		 * @return 此构建器
 		 */
 		Builder status(HttpStatus status);
 
 		/**
-		 * Set the HTTP status.
-		 * @param status the response status
-		 * @return this builder
+		 * 设置HTTP状态。
+		 *
+		 * @param status 响应状态
+		 * @return 此构建器
 		 */
 		Builder status(int status);
 
 		/**
-		 * Add the given cookie to the response.
-		 * @param cookie the cookie to add
-		 * @return this builder
+		 * 将给定的Cookie添加到响应中。
+		 *
+		 * @param cookie 要添加的Cookie
+		 * @return 此构建器
 		 */
 		Builder cookie(Cookie cookie);
 
 		/**
-		 * Manipulate this response's cookies with the given consumer. The
-		 * cookies provided to the consumer are "live", so that the consumer can be used to
-		 * {@linkplain MultiValueMap#set(Object, Object) overwrite} existing cookies,
-		 * {@linkplain MultiValueMap#remove(Object) remove} cookies, or use any of the other
-		 * {@link MultiValueMap} methods.
-		 * @param cookiesConsumer a function that consumes the cookies
-		 * @return this builder
+		 * 使用给定的消费者操作此响应的Cookie。提供给消费者的Cookie是“实时”的，因此消费者可以用于{@linkplain MultiValueMap#set(Object, Object)覆盖}现有Cookie，
+		 * {@linkplain MultiValueMap#remove(Object)删除}Cookie，或使用任何其他{@link MultiValueMap}方法。
+		 *
+		 * @param cookiesConsumer 消费Cookie的函数
+		 * @return 此构建器
 		 */
 		Builder cookies(Consumer<MultiValueMap<String, Cookie>> cookiesConsumer);
 
 		/**
-		 * Build the response.
-		 * @return the built response
+		 * 构建响应。
+		 *
+		 * @return 构建的响应
 		 */
 		RenderingResponse build();
 	}

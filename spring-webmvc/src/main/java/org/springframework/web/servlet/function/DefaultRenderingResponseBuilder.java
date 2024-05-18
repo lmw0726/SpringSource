@@ -16,17 +16,6 @@
 
 package org.springframework.web.servlet.function;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.core.Conventions;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,22 +25,43 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
+import java.util.function.Consumer;
+
 /**
- * Default {@link RenderingResponse.Builder} implementation.
+ * 默认的{@link RenderingResponse.Builder}实现。
  *
  * @author Arjen Poutsma
  * @since 5.1
  */
 final class DefaultRenderingResponseBuilder implements RenderingResponse.Builder {
 
+	/**
+	 * 模板名称
+	 */
 	private final String name;
 
+	/**
+	 * Http状态码，默认为200
+	 */
 	private int status = HttpStatus.OK.value();
 
+	/**
+	 * 响应标头
+	 */
 	private final HttpHeaders headers = new HttpHeaders();
 
+	/**
+	 * Cookie
+	 */
 	private final MultiValueMap<String, Cookie> cookies = new LinkedMultiValueMap<>();
 
+	/**
+	 * 模型数据
+	 */
 	private final Map<String, Object> model = new LinkedHashMap<>();
 
 
@@ -151,13 +161,18 @@ final class DefaultRenderingResponseBuilder implements RenderingResponse.Builder
 
 
 	private static final class DefaultRenderingResponse extends AbstractServerResponse implements RenderingResponse {
-
+		/**
+		 * 模型名称
+		 */
 		private final String name;
 
+		/**
+		 * 模型数据
+		 */
 		private final Map<String, Object> model;
 
 		public DefaultRenderingResponse(int statusCode, HttpHeaders headers,
-				MultiValueMap<String, Cookie> cookies, String name, Map<String, Object> model) {
+										MultiValueMap<String, Cookie> cookies, String name, Map<String, Object> model) {
 
 			super(statusCode, headers, cookies);
 			this.name = name;
@@ -176,16 +191,19 @@ final class DefaultRenderingResponseBuilder implements RenderingResponse.Builder
 
 		@Override
 		protected ModelAndView writeToInternal(HttpServletRequest request,
-				HttpServletResponse response, Context context) {
+											   HttpServletResponse response, Context context) {
 
+			// 解析状态码
 			HttpStatus status = HttpStatus.resolve(this.statusCode);
 			ModelAndView mav;
 			if (status != null) {
+				// 如果状态码不为null，则创建带有状态码的ModelAndView
 				mav = new ModelAndView(this.name, status);
-			}
-			else {
+			} else {
+				// 否则创建普通的ModelAndView
 				mav = new ModelAndView(this.name);
 			}
+			// 添加所有的model对象到ModelAndView中
 			mav.addAllObjects(this.model);
 			return mav;
 		}
