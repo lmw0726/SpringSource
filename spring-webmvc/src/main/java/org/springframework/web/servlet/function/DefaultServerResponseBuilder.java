@@ -16,6 +16,16 @@
 
 package org.springframework.web.servlet.function;
 
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
+import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -26,33 +36,26 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.util.Assert;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.servlet.ModelAndView;
-
 /**
- * Default {@link ServerResponse.BodyBuilder} implementation.
+ * 默认的 {@link ServerResponse.BodyBuilder} 实现。
  *
  * @author Arjen Poutsma
  * @since 5.2
  */
 class DefaultServerResponseBuilder implements ServerResponse.BodyBuilder {
-
+	/**
+	 * 状态码
+	 */
 	private final int statusCode;
 
+	/**
+	 * Http响应标头
+	 */
 	private final HttpHeaders headers = new HttpHeaders();
 
+	/**
+	 * Cookie
+	 */
 	private final MultiValueMap<String, Cookie> cookies = new LinkedMultiValueMap<>();
 
 
@@ -75,9 +78,12 @@ class DefaultServerResponseBuilder implements ServerResponse.BodyBuilder {
 
 	@Override
 	public ServerResponse.BodyBuilder header(String headerName, String... headerValues) {
+		// 遍历 标头值 中的每个值
 		for (String headerValue : headerValues) {
+			// 将 标头名称 和 标头值 添加到 响应标头 中
 			this.headers.add(headerName, headerValue);
 		}
+		// 返回当前对象
 		return this;
 	}
 
@@ -126,13 +132,17 @@ class DefaultServerResponseBuilder implements ServerResponse.BodyBuilder {
 
 	@Override
 	public ServerResponse.BodyBuilder eTag(String etag) {
+		// 如果 etag 不以双引号或"W/"开头，则在其前面添加双引号
 		if (!etag.startsWith("\"") && !etag.startsWith("W/\"")) {
 			etag = "\"" + etag;
 		}
+		// 如果 etag 不以双引号结尾，则在其末尾添加双引号
 		if (!etag.endsWith("\"")) {
 			etag = etag + "\"";
 		}
+		// 设置 ETag 头字段为 etag
 		this.headers.setETag(etag);
+		// 返回当前对象
 		return this;
 	}
 
@@ -181,48 +191,69 @@ class DefaultServerResponseBuilder implements ServerResponse.BodyBuilder {
 	@Override
 	public ServerResponse body(Object body) {
 		return DefaultEntityResponseBuilder.fromObject(body)
+				// 设置状态码
 				.status(this.statusCode)
+				// 添加所有头字段
 				.headers(headers -> headers.putAll(this.headers))
+				// 添加所有 Cookie
 				.cookies(cookies -> cookies.addAll(this.cookies))
+				// 构建并返回实体响应
 				.build();
 	}
 
 	@Override
 	public <T> ServerResponse body(T body, ParameterizedTypeReference<T> bodyType) {
 		return DefaultEntityResponseBuilder.fromObject(body, bodyType)
+				// 设置状态码
 				.status(this.statusCode)
+				// 添加所有头字段
 				.headers(headers -> headers.putAll(this.headers))
+				// 添加所有 Cookie
 				.cookies(cookies -> cookies.addAll(this.cookies))
+				// 构建并返回实体响应
 				.build();
 	}
 
 	@Override
 	public ServerResponse render(String name, Object... modelAttributes) {
 		return new DefaultRenderingResponseBuilder(name)
+				// 设置状态码
 				.status(this.statusCode)
+				// 添加所有头字段
 				.headers(headers -> headers.putAll(this.headers))
+				// 添加所有 Cookie
 				.cookies(cookies -> cookies.addAll(this.cookies))
+				// 设置模型属性
 				.modelAttributes(modelAttributes)
+				// 构建并返回渲染响应
 				.build();
 	}
 
 	@Override
 	public ServerResponse render(String name, Map<String, ?> model) {
 		return new DefaultRenderingResponseBuilder(name)
+				// 设置状态码
 				.status(this.statusCode)
+				// 添加所有头字段
 				.headers(headers -> headers.putAll(this.headers))
+				// 添加所有 Cookie
 				.cookies(cookies -> cookies.addAll(this.cookies))
+				// 设置模型
 				.modelAttributes(model)
+				// 构建并返回渲染响应
 				.build();
 	}
 
 
 	private static class WriterFunctionResponse extends AbstractServerResponse {
 
+		/**
+		 * 将 Servlet请求 和 Servlet响应 转为 模型和视图
+		 */
 		private final BiFunction<HttpServletRequest, HttpServletResponse, ModelAndView> writeFunction;
 
 		public WriterFunctionResponse(int statusCode, HttpHeaders headers, MultiValueMap<String, Cookie> cookies,
-				BiFunction<HttpServletRequest, HttpServletResponse, ModelAndView> writeFunction) {
+									  BiFunction<HttpServletRequest, HttpServletResponse, ModelAndView> writeFunction) {
 
 			super(statusCode, headers, cookies);
 			Assert.notNull(writeFunction, "WriteFunction must not be null");

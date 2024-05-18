@@ -16,37 +16,42 @@
 
 package org.springframework.web.servlet.function;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.web.servlet.ModelAndView;
-
 /**
- * Base class for {@link ServerResponse} implementations with error handling.
+ * 具有错误处理功能的{@link ServerResponse}实现的基类。
+ *
  * @author Arjen Poutsma
  * @since 5.3
  */
 abstract class ErrorHandlingServerResponse implements ServerResponse {
 
+	/**
+	 * 日志记录器
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 错误处理器
+	 */
 	private final List<ErrorHandler<?>> errorHandlers = new ArrayList<>();
 
 
 	protected final <T extends ServerResponse> void addErrorHandler(Predicate<Throwable> predicate,
-			BiFunction<Throwable, ServerRequest, T> errorHandler) {
+																	BiFunction<Throwable, ServerRequest, T> errorHandler) {
 
 		Assert.notNull(predicate, "Predicate must not be null");
 		Assert.notNull(errorHandler, "ErrorHandler must not be null");
@@ -55,39 +60,50 @@ abstract class ErrorHandlingServerResponse implements ServerResponse {
 
 	@Nullable
 	protected final ModelAndView handleError(Throwable t, HttpServletRequest servletRequest,
-			HttpServletResponse servletResponse, Context context) throws ServletException, IOException {
+											 HttpServletResponse servletResponse, Context context) throws ServletException, IOException {
 
+		// 获取错误响应对象
 		ServerResponse serverResponse = errorResponse(t, servletRequest);
+		// 如果错误响应对象不为空，则将其写入响应中
 		if (serverResponse != null) {
 			return serverResponse.writeTo(servletRequest, servletResponse, context);
-		}
-		else if (t instanceof ServletException) {
+		} else if (t instanceof ServletException) {
+			// 如果异常是 ServletException 类型，则直接抛出
 			throw (ServletException) t;
-		}
-		else if (t instanceof IOException) {
+		} else if (t instanceof IOException) {
+			// 如果异常是 IOException 类型，则直接抛出
 			throw (IOException) t;
-		}
-		else {
+		} else {
+			// 其他类型的异常包装成 ServletException 并抛出
 			throw new ServletException(t);
 		}
 	}
 
 	@Nullable
 	protected final ServerResponse errorResponse(Throwable t, HttpServletRequest servletRequest) {
+		// 遍历所有错误处理器
 		for (ErrorHandler<?> errorHandler : this.errorHandlers) {
+			// 检查当前错误处理器是否适用于当前异常
 			if (errorHandler.test(t)) {
+				// 从 servletRequest 中获取 ServerRequest 对象
 				ServerRequest serverRequest = (ServerRequest)
 						servletRequest.getAttribute(RouterFunctions.REQUEST_ATTRIBUTE);
+				// 使用错误处理器处理异常并返回结果
 				return errorHandler.handle(t, serverRequest);
 			}
 		}
+		// 如果没有找到合适的错误处理器，则返回 null
 		return null;
 	}
 
 	private static class ErrorHandler<T extends ServerResponse> {
-
+		/**
+		 * 错误断言
+		 */
 		private final Predicate<Throwable> predicate;
-
+		/**
+		 * 将错误、请求转为其他类型的提供者
+		 */
 		private final BiFunction<Throwable, ServerRequest, T> responseProvider;
 
 		public ErrorHandler(Predicate<Throwable> predicate, BiFunction<Throwable, ServerRequest, T> responseProvider) {
