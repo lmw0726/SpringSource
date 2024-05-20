@@ -16,22 +16,21 @@
 
 package org.springframework.web.servlet.config;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.w3c.dom.Element;
-
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Parse the <code>&lt;mvc:script-template-configurer&gt;</code> MVC namespace element and
- * register a {@code ScriptTemplateConfigurer} bean.
+ * 解析 <code>&lt;mvc:script-template-configurer&gt;</code> MVC 命名空间元素并
+ * 注册 {@code ScriptTemplateConfigurer} bean。
  *
  * @author Sebastien Deleuze
  * @since 4.2
@@ -39,7 +38,7 @@ import org.springframework.util.xml.DomUtils;
 public class ScriptTemplateConfigurerBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
 	/**
-	 * The bean name used for the {@code ScriptTemplateConfigurer}.
+	 * 用于 {@code ScriptTemplateConfigurer} 的 bean 名称。
 	 */
 	public static final String BEAN_NAME = "mvcScriptTemplateConfigurer";
 
@@ -56,37 +55,64 @@ public class ScriptTemplateConfigurerBeanDefinitionParser extends AbstractSimple
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// 获取元素中名为 "script" 的子元素列表
 		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "script");
+		// 如果 "script" 子元素列表不为空
 		if (!childElements.isEmpty()) {
+			// 创建一个列表用于存储位置
 			List<String> locations = new ArrayList<>(childElements.size());
+			// 遍历子元素并添加每个子元素的 "location" 属性值到列表中
 			for (Element childElement : childElements) {
 				locations.add(childElement.getAttribute("location"));
 			}
+			// 将 "scripts" 属性添加到构建器的属性值中
 			builder.addPropertyValue("scripts", StringUtils.toStringArray(locations));
 		}
+
+		// 将 "engineName" 属性添加到构建器的属性值中
 		builder.addPropertyValue("engineName", element.getAttribute("engine-name"));
+
+		// 如果元素具有 "render-object" 属性
 		if (element.hasAttribute("render-object")) {
+			// 将 "renderObject" 属性添加到构建器的属性值中
 			builder.addPropertyValue("renderObject", element.getAttribute("render-object"));
 		}
+
+		// 如果元素具有 "render-function" 属性
 		if (element.hasAttribute("render-function")) {
+			// 将 "renderFunction" 属性添加到构建器的属性值中
 			builder.addPropertyValue("renderFunction", element.getAttribute("render-function"));
 		}
+
+		// 如果元素具有 "content-type" 属性
 		if (element.hasAttribute("content-type")) {
+			// 将 "contentType" 属性添加到构建器的属性值中
 			builder.addPropertyValue("contentType", element.getAttribute("content-type"));
 		}
+
+		// 如果元素具有 "charset" 属性
 		if (element.hasAttribute("charset")) {
+			// 将 "charset" 属性添加到构建器的属性值中
 			builder.addPropertyValue("charset", Charset.forName(element.getAttribute("charset")));
 		}
+
+		// 如果元素具有 "resource-loader-path" 属性
 		if (element.hasAttribute("resource-loader-path")) {
+			// 将 "resourceLoaderPath" 属性添加到构建器的属性值中
 			builder.addPropertyValue("resourceLoaderPath", element.getAttribute("resource-loader-path"));
 		}
+
+		// 如果元素具有 "shared-engine" 属性
 		if (element.hasAttribute("shared-engine")) {
+			// 将 "sharedEngine" 属性添加到构建器的属性值中
 			builder.addPropertyValue("sharedEngine", element.getAttribute("shared-engine"));
 		}
 	}
 
 	@Override
 	protected boolean isEligibleAttribute(String name) {
+		// 返回 true 如果 name 是以下任意一个值："engine-name", "scripts", "render-object",
+		// "render-function", "content-type", "charset", 或 "resource-loader-path"
 		return (name.equals("engine-name") || name.equals("scripts") || name.equals("render-object") ||
 				name.equals("render-function") || name.equals("content-type") ||
 				name.equals("charset") || name.equals("resource-loader-path"));

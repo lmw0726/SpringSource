@@ -16,21 +16,19 @@
 
 package org.springframework.web.servlet.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.w3c.dom.Element;
-
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Parse the <code>&lt;mvc:freemarker-configurer&gt;</code> MVC namespace element and
- * register {@code FreeMarkerConfigurer} bean.
+ * 解析 <code>&lt;mvc:freemarker-configurer&gt;</code> MVC 命名空间元素并注册 {@code FreeMarkerConfigurer} bean。
  *
  * @author Rossen Stoyanchev
  * @since 4.1
@@ -38,10 +36,9 @@ import org.springframework.util.xml.DomUtils;
 public class FreeMarkerConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	/**
-	 * The bean name used for the {@code FreeMarkerConfigurer}.
+	 * {@code FreeMarkerConfigurer} 使用的 bean 名称。
 	 */
 	public static final String BEAN_NAME = "mvcFreeMarkerConfigurer";
-
 
 	@Override
 	protected String getBeanClassName(Element element) {
@@ -55,12 +52,21 @@ public class FreeMarkerConfigurerBeanDefinitionParser extends AbstractSingleBean
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// 获取所有名为 "template-loader-path" 的子元素
 		List<Element> childElements = DomUtils.getChildElementsByTagName(element, "template-loader-path");
+
+		// 如果子元素列表不为空
 		if (!childElements.isEmpty()) {
+			// 创建一个列表来存储位置字符串
 			List<String> locations = new ArrayList<>(childElements.size());
+
+			// 遍历每个子元素
 			for (Element childElement : childElements) {
+				// 获取子元素的 "location" 属性并添加到位置列表中
 				locations.add(childElement.getAttribute("location"));
 			}
+
+			// 将位置列表转换为数组并添加到构建器的属性值中
 			builder.addPropertyValue("templateLoaderPaths", StringUtils.toStringArray(locations));
 		}
 	}
