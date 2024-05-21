@@ -25,8 +25,7 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Import;
 
 /**
- * Adding this annotation to an {@code @Configuration} class imports the Spring MVC
- * configuration from {@link WebMvcConfigurationSupport}, e.g.:
+ * 将此注解添加到一个 {@code @Configuration} 类中，可以从 {@link WebMvcConfigurationSupport} 导入 Spring MVC 配置，例如：
  *
  * <pre class="code">
  * &#064;Configuration
@@ -36,8 +35,7 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * <p>To customize the imported configuration, implement the interface
- * {@link WebMvcConfigurer} and override individual methods, e.g.:
+ * <p>要自定义导入的配置，请实现 {@link WebMvcConfigurer} 接口并覆盖各个方法，例如：
  *
  * <pre class="code">
  * &#064;Configuration
@@ -58,16 +56,9 @@ import org.springframework.context.annotation.Import;
  * }
  * </pre>
  *
- * <p><strong>Note:</strong> only one {@code @Configuration} class may have the
- * {@code @EnableWebMvc} annotation to import the Spring Web MVC
- * configuration. There can however be multiple {@code @Configuration} classes
- * implementing {@code WebMvcConfigurer} in order to customize the provided
- * configuration.
+ * <p><strong>注意：</strong> 只有一个 {@code @Configuration} 类可以具有 {@code @EnableWebMvc} 注解以导入 Spring Web MVC 配置。然而，可以有多个 {@code @Configuration} 类实现 {@code WebMvcConfigurer} 以自定义提供的配置。
  *
- * <p>If {@link WebMvcConfigurer} does not expose some more advanced setting that
- * needs to be configured, consider removing the {@code @EnableWebMvc}
- * annotation and extending directly from {@link WebMvcConfigurationSupport}
- * or {@link DelegatingWebMvcConfiguration}, e.g.:
+ * <p>如果 {@link WebMvcConfigurer} 没有暴露一些需要配置的更高级设置，请考虑移除 {@code @EnableWebMvc} 注解并直接继承自 {@link WebMvcConfigurationSupport} 或 {@link DelegatingWebMvcConfiguration}，例如：
  *
  * <pre class="code">
  * &#064;Configuration
@@ -81,8 +72,7 @@ import org.springframework.context.annotation.Import;
  *
  *     &#064;Bean
  *     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
- *         // Create or delegate to "super" to create and
- *         // customize properties of RequestMappingHandlerAdapter
+ *         // 创建或委托给“super”以创建并自定义 RequestMappingHandlerAdapter 的属性
  *     }
  * }
  * </pre>

@@ -16,8 +16,6 @@
 
 package org.springframework.web.servlet.config.annotation;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -30,11 +28,12 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import java.util.List;
+
 /**
- * A subclass of {@code WebMvcConfigurationSupport} that detects and delegates
- * to all beans of type {@link WebMvcConfigurer} allowing them to customize the
- * configuration provided by {@code WebMvcConfigurationSupport}. This is the
- * class actually imported by {@link EnableWebMvc @EnableWebMvc}.
+ * {@code WebMvcConfigurationSupport} 的子类，它检测并委托给所有 {@link WebMvcConfigurer} 类型的 Bean，
+ * 允许它们自定义 {@code WebMvcConfigurationSupport} 提供的配置。
+ * 这是由 {@link EnableWebMvc @EnableWebMvc} 实际导入的类。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
@@ -42,6 +41,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @Configuration(proxyBeanMethods = false)
 public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 
+	/**
+	 * WebMvc合成配置
+	 */
 	private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
 
 
