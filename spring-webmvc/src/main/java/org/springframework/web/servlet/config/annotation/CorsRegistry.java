@@ -16,50 +16,55 @@
 
 package org.springframework.web.servlet.config.annotation;
 
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.cors.CorsConfiguration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.cors.CorsConfiguration;
-
 /**
- * Assists with the registration of global, URL pattern based
- * {@link CorsConfiguration} mappings.
+ * 辅助注册全局的基于URL模式的 {@link CorsConfiguration} 映射。
  *
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
- * @since 4.2
  * @see CorsRegistration
+ * @since 4.2
  */
 public class CorsRegistry {
-
+	/**
+	 * 跨域注册列表
+	 */
 	private final List<CorsRegistration> registrations = new ArrayList<>();
 
 
 	/**
-	 * Enable cross-origin request handling for the specified path pattern.
-	 * <p>Exact path mapping URIs (such as {@code "/admin"}) are supported as
-	 * well as Ant-style path patterns (such as {@code "/admin/**"}).
-	 * <p>By default, the {@code CorsConfiguration} for this mapping is
-	 * initialized with default values as described in
-	 * {@link CorsConfiguration#applyPermitDefaultValues()}.
+	 * 为指定的路径模式启用跨源请求处理。
+	 * <p>支持精确路径映射URI（例如 {@code "/admin"}）以及Ant风格的路径模式（例如 {@code "/admin/**"}）。
+	 * <p>默认情况下，此映射的 {@code CorsConfiguration} 使用默认值初始化，如
+	 * {@link CorsConfiguration#applyPermitDefaultValues()} 中所述。
 	 */
 	public CorsRegistration addMapping(String pathPattern) {
+		// 创建跨域注册
 		CorsRegistration registration = new CorsRegistration(pathPattern);
+		// 将注册添加到注册列表中
 		this.registrations.add(registration);
+		// 返回注册
 		return registration;
 	}
 
 	/**
-	 * Return the registered {@link CorsConfiguration} objects,
-	 * keyed by path pattern.
+	 * 返回按路径模式键入的注册的 {@link CorsConfiguration} 对象。
 	 */
 	protected Map<String, CorsConfiguration> getCorsConfigurations() {
+		// 创建一个 LinkedHashMap，用于存储跨域配置
 		Map<String, CorsConfiguration> configs = CollectionUtils.newLinkedHashMap(this.registrations.size());
+		// 遍历所有的注册
 		for (CorsRegistration registration : this.registrations) {
+			// 将路径模式和对应的跨域配置添加到 configs 中
 			configs.put(registration.getPathPattern(), registration.getCorsConfiguration());
 		}
+		// 返回跨域配置映射
 		return configs;
 	}
 
