@@ -16,8 +16,6 @@
 
 package org.springframework.web.servlet.config.annotation;
 
-import java.util.List;
-
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.lang.Nullable;
@@ -27,15 +25,15 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import java.util.List;
+
 /**
- * An implementation of {@link WebMvcConfigurer} with empty methods allowing
- * subclasses to override only the methods they're interested in.
+ * {@link WebMvcConfigurer} 的实现，具有空方法，允许子类仅覆盖它们感兴趣的方法。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
- * @deprecated as of 5.0 {@link WebMvcConfigurer} has default methods (made
- * possible by a Java 8 baseline) and can be implemented directly without the
- * need for this adapter
+ * @deprecated 自 5.0 {@link WebMvcConfigurer} 已具有默认方法（这由 Java 8 基线实现），
+ * 可以直接实现此接口而无需此适配器
  */
 @Deprecated
 public abstract class WebMvcConfigurerAdapter implements WebMvcConfigurer {

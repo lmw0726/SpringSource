@@ -16,9 +16,6 @@
 
 package org.springframework.web.servlet.config.annotation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.lang.Nullable;
@@ -29,14 +26,20 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * A {@link WebMvcConfigurer} that delegates to one or more others.
+ * 一个 {@link WebMvcConfigurer}，它委托给一个或多个其他 {@link WebMvcConfigurer}。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
  */
 class WebMvcConfigurerComposite implements WebMvcConfigurer {
 
+	/**
+	 * WebMvc配置列表
+	 */
 	private final List<WebMvcConfigurer> delegates = new ArrayList<>();
 
 
@@ -161,34 +164,50 @@ class WebMvcConfigurerComposite implements WebMvcConfigurer {
 
 	@Override
 	public Validator getValidator() {
+		// 初始化一个变量用于存储选定的 校验器
 		Validator selected = null;
+		// 遍历所有WebMvcConfigurer的委托对象
 		for (WebMvcConfigurer configurer : this.delegates) {
+			// 获取当前configurer的 校验器
 			Validator validator = configurer.getValidator();
+			// 如果当前configurer有 校验器
 			if (validator != null) {
+				// 如果之前已经选定了一个Validator
 				if (selected != null) {
+					// 抛出异常，说明找到多个 校验器，无法确定唯一的 校验器
 					throw new IllegalStateException("No unique Validator found: {" +
 							selected + ", " + validator + "}");
 				}
+				// 记录当前选定的 校验器
 				selected = validator;
 			}
 		}
+		// 返回选定的校验器，如果没有找到则返回null
 		return selected;
 	}
 
 	@Override
 	@Nullable
 	public MessageCodesResolver getMessageCodesResolver() {
+		// 初始化一个变量用于存储选定的 消息代码解析器
 		MessageCodesResolver selected = null;
+		// 遍历所有WebMvcConfigurer的委托对象
 		for (WebMvcConfigurer configurer : this.delegates) {
+			// 获取当前configurer的 消息代码解析器
 			MessageCodesResolver messageCodesResolver = configurer.getMessageCodesResolver();
+			// 如果当前configurer有 消息代码解析器
 			if (messageCodesResolver != null) {
+				// 如果之前已经选定了一个 消息代码解析器
 				if (selected != null) {
+					// 抛出异常，说明找到多个 消息代码解析器，无法确定唯一的 消息代码解析器
 					throw new IllegalStateException("No unique MessageCodesResolver found: {" +
 							selected + ", " + messageCodesResolver + "}");
 				}
+				// 记录当前选定的 消息代码解析器
 				selected = messageCodesResolver;
 			}
 		}
+		// 返回选定的M 消息代码解析器，如果没有找到则返回null
 		return selected;
 	}
 
