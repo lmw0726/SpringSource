@@ -16,19 +16,19 @@
 
 package org.springframework.web.servlet.config.annotation;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.core.OrderComparator;
 import org.springframework.core.Ordered;
 import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.WebRequestHandlerInterceptorAdapter;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
- * Helps with configuring a list of mapped interceptors.
+ * 帮助配置映射拦截器列表。
  *
  * @author Rossen Stoyanchev
  * @author Keith Donald
@@ -36,14 +36,17 @@ import org.springframework.web.servlet.handler.WebRequestHandlerInterceptorAdapt
  */
 public class InterceptorRegistry {
 
+	/**
+	 * 拦截器注册列表
+	 */
 	private final List<InterceptorRegistration> registrations = new ArrayList<>();
 
 
 	/**
-	 * Adds the provided {@link HandlerInterceptor}.
-	 * @param interceptor the interceptor to add
-	 * @return an {@link InterceptorRegistration} that allows you optionally configure the
-	 * registered interceptor further for example adding URL patterns it should apply to.
+	 * 添加提供的 {@link HandlerInterceptor}。
+	 *
+	 * @param interceptor 要添加的拦截器
+	 * @return 一个 {@link InterceptorRegistration}，允许您进一步配置已注册的拦截器，例如添加应应用的 URL 模式。
 	 */
 	public InterceptorRegistration addInterceptor(HandlerInterceptor interceptor) {
 		InterceptorRegistration registration = new InterceptorRegistration(interceptor);
@@ -52,20 +55,24 @@ public class InterceptorRegistry {
 	}
 
 	/**
-	 * Adds the provided {@link WebRequestInterceptor}.
-	 * @param interceptor the interceptor to add
-	 * @return an {@link InterceptorRegistration} that allows you optionally configure the
-	 * registered interceptor further for example adding URL patterns it should apply to.
+	 * 添加提供的 {@link WebRequestInterceptor}。
+	 *
+	 * @param interceptor 要添加的拦截器
+	 * @return 一个 {@link InterceptorRegistration}，允许您进一步配置已注册的拦截器，例如添加应应用的 URL 模式。
 	 */
 	public InterceptorRegistration addWebRequestInterceptor(WebRequestInterceptor interceptor) {
+		// 创建 Web 请求处理器拦截器适配器
 		WebRequestHandlerInterceptorAdapter adapted = new WebRequestHandlerInterceptorAdapter(interceptor);
+		// 创建拦截器注册
 		InterceptorRegistration registration = new InterceptorRegistration(adapted);
+		// 将注册添加到注册列表中
 		this.registrations.add(registration);
+		// 返回拦截器注册
 		return registration;
 	}
 
 	/**
-	 * Return all registered interceptors.
+	 * 返回所有已注册的拦截器。
 	 */
 	protected List<Object> getInterceptors() {
 		return this.registrations.stream()
@@ -76,10 +83,14 @@ public class InterceptorRegistry {
 
 
 	private static final Comparator<Object> INTERCEPTOR_ORDER_COMPARATOR =
+			// 使用 OrderComparator 实例进行排序比较
 			OrderComparator.INSTANCE.withSourceProvider(object -> {
+				// 如果对象是 InterceptorRegistration 的实例
 				if (object instanceof InterceptorRegistration) {
+					// 返回 Ordered 实例，通过 InterceptorRegistration 的 getOrder 方法获取顺序
 					return (Ordered) ((InterceptorRegistration) object)::getOrder;
 				}
+				// 否则返回空
 				return null;
 			});
 
