@@ -16,12 +16,12 @@
 
 package org.springframework.web.servlet.config.annotation;
 
-import java.util.Map;
-
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import java.util.Map;
+
 /**
- * Assist with configuring a {@link org.springframework.web.servlet.view.UrlBasedViewResolver}.
+ * 辅助配置 {@link org.springframework.web.servlet.view.UrlBasedViewResolver}。
  *
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
@@ -29,6 +29,9 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
  */
 public class UrlBasedViewResolverRegistration {
 
+	/**
+	 * URL基础视图解析器
+	 */
 	protected final UrlBasedViewResolver viewResolver;
 
 
@@ -42,7 +45,8 @@ public class UrlBasedViewResolverRegistration {
 	}
 
 	/**
-	 * Set the prefix that gets prepended to view names when building a URL.
+	 * 设置在构建 URL 时添加到视图名称前的前缀。
+	 *
 	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setPrefix
 	 */
 	public UrlBasedViewResolverRegistration prefix(String prefix) {
@@ -51,7 +55,8 @@ public class UrlBasedViewResolverRegistration {
 	}
 
 	/**
-	 * Set the suffix that gets appended to view names when building a URL.
+	 * 设置在构建 URL 时添加到视图名称后的后缀。
+	 *
 	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setSuffix
 	 */
 	public UrlBasedViewResolverRegistration suffix(String suffix) {
@@ -60,7 +65,8 @@ public class UrlBasedViewResolverRegistration {
 	}
 
 	/**
-	 * Set the view class that should be used to create views.
+	 * 设置用于创建视图的视图类。
+	 *
 	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setViewClass
 	 */
 	public UrlBasedViewResolverRegistration viewClass(Class<?> viewClass) {
@@ -69,9 +75,9 @@ public class UrlBasedViewResolverRegistration {
 	}
 
 	/**
-	 * Set the view names (or name patterns) that can be handled by this view
-	 * resolver. View names can contain simple wildcards such that 'my*', '*Report'
-	 * and '*Repo*' will all match the view name 'myReport'.
+	 * 设置此视图解析器可以处理的视图名称（或名称模式）。
+	 * 视图名称可以包含简单的通配符，例如 'my*'、'*Report' 和 '*Repo*' 都将匹配视图名称 'myReport'。
+	 *
 	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setViewNames
 	 */
 	public UrlBasedViewResolverRegistration viewNames(String... viewNames) {
@@ -80,9 +86,9 @@ public class UrlBasedViewResolverRegistration {
 	}
 
 	/**
-	 * Set static attributes to be added to the model of every request for all
-	 * views resolved by this view resolver. This allows for setting any kind of
-	 * attribute values, for example bean references.
+	 * 设置要添加到此视图解析器解析的所有请求的模型中的静态属性。
+	 * 这允许设置任何类型的属性值，例如 bean 引用。
+	 *
 	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setAttributesMap
 	 */
 	public UrlBasedViewResolverRegistration attributes(Map<String, ?> attributes) {
@@ -91,9 +97,10 @@ public class UrlBasedViewResolverRegistration {
 	}
 
 	/**
-	 * Specify the maximum number of entries for the view cache.
-	 * Default is 1024.
-	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setCache(boolean)
+	 * 指定视图缓存的最大条目数。
+	 * 默认值是 1024。
+	 *
+	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setCacheLimit
 	 */
 	public UrlBasedViewResolverRegistration cacheLimit(int cacheLimit) {
 		this.viewResolver.setCacheLimit(cacheLimit);
@@ -101,12 +108,12 @@ public class UrlBasedViewResolverRegistration {
 	}
 
 	/**
-	 * Enable or disable caching.
-	 * <p>This is equivalent to setting the {@link #cacheLimit "cacheLimit"}
-	 * property to the default limit (1024) or to 0, respectively.
-	 * <p>Default is "true": caching is enabled.
-	 * Disable this only for debugging and development.
-	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setCache(boolean)
+	 * 启用或禁用缓存。
+	 * <p>这相当于将 {@link #cacheLimit "cacheLimit"} 属性分别设置为默认限制（1024）或 0。
+	 * <p>默认值是 "true"：启用缓存。
+	 * 仅在调试和开发时禁用此功能。
+	 *
+	 * @see org.springframework.web.servlet.view.UrlBasedViewResolver#setCache
 	 */
 	public UrlBasedViewResolverRegistration cache(boolean cache) {
 		this.viewResolver.setCache(cache);
