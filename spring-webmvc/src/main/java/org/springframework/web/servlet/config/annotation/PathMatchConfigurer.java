@@ -16,10 +16,6 @@
 
 package org.springframework.web.servlet.config.annotation;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Predicate;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -29,8 +25,12 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Predicate;
+
 /**
- * Configure path matching options. The options are applied to the following:
+ * 配置路径匹配选项。这些选项应用于以下内容：
  * <ul>
  * <li>{@link WebMvcConfigurationSupport#requestMappingHandlerMapping}</li>
  * <li>{@link WebMvcConfigurationSupport#viewControllerHandlerMapping}</li>
@@ -42,45 +42,75 @@ import org.springframework.web.util.pattern.PathPatternParser;
  */
 public class PathMatchConfigurer {
 
+	/**
+	 * 路径模式解析器
+	 */
 	@Nullable
 	private PathPatternParser patternParser;
 
+	/**
+	 * 是否启用后缀模式匹配
+	 */
 	@Nullable
 	private Boolean trailingSlashMatch;
 
+	/**
+	 * 路径前缀 - 断言映射
+	 */
 	@Nullable
 	private Map<String, Predicate<Class<?>>> pathPrefixes;
 
+	/**
+	 * 是否启用后缀模式匹配
+	 */
 	@Nullable
 	private Boolean suffixPatternMatch;
 
+	/**
+	 * 是否启用已注册的后缀模式匹配
+	 */
 	@Nullable
 	private Boolean registeredSuffixPatternMatch;
 
+	/**
+	 * URL路径助手
+	 */
 	@Nullable
 	private UrlPathHelper urlPathHelper;
 
+	/**
+	 * 路径匹配器
+	 */
 	@Nullable
 	private PathMatcher pathMatcher;
 
+	/**
+	 * 默认路径模式解析器
+	 */
 	@Nullable
 	private PathPatternParser defaultPatternParser;
 
+	/**
+	 * 默认路径模式解析器
+	 */
 	@Nullable
 	private UrlPathHelper defaultUrlPathHelper;
 
+	/**
+	 * 默认路径模式解析器
+	 */
 	@Nullable
 	private PathMatcher defaultPathMatcher;
 
 
 	/**
-	 * Enable use of parsed {@link PathPattern}s as described in
-	 * {@link AbstractHandlerMapping#setPatternParser(PathPatternParser)}.
-	 * <p><strong>Note:</strong> This is mutually exclusive with use of
-	 * {@link #setUrlPathHelper(UrlPathHelper)} and
-	 * {@link #setPathMatcher(PathMatcher)}.
-	 * <p>By default this is not enabled.
-	 * @param patternParser the parser to pre-parse patterns with
+	 * 启用解析后的 {@link PathPattern}，如
+	 * {@link AbstractHandlerMapping#setPatternParser(PathPatternParser)} 中所述。
+	 * <p><strong>注意：</strong>这与使用 {@link #setUrlPathHelper(UrlPathHelper)}
+	 * 和 {@link #setPathMatcher(PathMatcher)} 互斥。
+	 * <p>默认情况下不启用此功能。
+	 *
+	 * @param patternParser 用于预解析模式的解析器
 	 * @since 5.3
 	 */
 	public PathMatchConfigurer setPatternParser(PathPatternParser patternParser) {
@@ -89,9 +119,9 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Whether to match to URLs irrespective of the presence of a trailing slash.
-	 * If enabled a method mapped to "/users" also matches to "/users/".
-	 * <p>The default value is {@code true}.
+	 * 是否匹配 URL，而不管是否存在尾部斜杠。
+	 * 如果启用，则映射到 "/users" 的方法也匹配 "/users/"。
+	 * <p>默认值是 {@code true}。
 	 */
 	public PathMatchConfigurer setUseTrailingSlashMatch(Boolean trailingSlashMatch) {
 		this.trailingSlashMatch = trailingSlashMatch;
@@ -99,14 +129,14 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Configure a path prefix to apply to matching controller methods.
-	 * <p>Prefixes are used to enrich the mappings of every {@code @RequestMapping}
-	 * method whose controller type is matched by the corresponding
-	 * {@code Predicate}. The prefix for the first matching predicate is used.
-	 * <p>Consider using {@link org.springframework.web.method.HandlerTypePredicate
-	 * HandlerTypePredicate} to group controllers.
-	 * @param prefix the prefix to apply
-	 * @param predicate a predicate for matching controller types
+	 * 配置路径前缀以应用于匹配的控制器方法。
+	 * <p>前缀用于丰富每个 {@code @RequestMapping} 方法的映射，
+	 * 其控制器类型由相应的 {@code Predicate} 匹配。使用第一个匹配的谓词的前缀。
+	 * <p>考虑使用 {@link org.springframework.web.method.HandlerTypePredicate
+	 * HandlerTypePredicate} 来分组控制器。
+	 *
+	 * @param prefix    要应用的前缀
+	 * @param predicate 用于匹配控制器类型的谓词
 	 * @since 5.1
 	 */
 	public PathMatchConfigurer addPathPrefix(String prefix, Predicate<Class<?>> predicate) {
@@ -118,16 +148,15 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Whether to use suffix pattern match (".*") when matching patterns to
-	 * requests. If enabled a method mapped to "/users" also matches to "/users.*".
-	 * <p>By default this is set to {@code false}.
-	 * <p><strong>Note:</strong> This property is mutually exclusive with and
-	 * ignored when {@link #setPatternParser(PathPatternParser)} is set.
-	 * @deprecated as of 5.2.4. See class-level note in
-	 * {@link RequestMappingHandlerMapping} on the deprecation of path extension
-	 * config options. As there is no replacement for this method, in 5.2.x it is
-	 * necessary to set it to {@code false}. In 5.3 the default changes to
-	 * {@code false} and use of this property becomes unnecessary.
+	 * 是否在匹配模式与请求时使用后缀模式匹配（".*"）。
+	 * 如果启用，则映射到 "/users" 的方法也匹配 "/users.*"。
+	 * <p>默认情况下此设置为 {@code false}。
+	 * <p><strong>注意：</strong>当设置了 {@link #setPatternParser(PathPatternParser)} 时，
+	 * 此属性互斥且被忽略。
+	 *
+	 * @deprecated 自 5.2.4 起。请参阅 {@link RequestMappingHandlerMapping} 中关于路径扩展
+	 * 配置选项的类级注释。由于此方法没有替代方法，在 5.2.x 中有必要将其设置为 {@code false}。
+	 * 在 5.3 中，默认值更改为 {@code false}，并且不再需要使用此属性。
 	 */
 	@Deprecated
 	public PathMatchConfigurer setUseSuffixPatternMatch(Boolean suffixPatternMatch) {
@@ -136,17 +165,14 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Whether suffix pattern matching should work only against path extensions
-	 * explicitly registered when you
-	 * {@link WebMvcConfigurer#configureContentNegotiation configure content
-	 * negotiation}. This is generally recommended to reduce ambiguity and to
-	 * avoid issues such as when a "." appears in the path for other reasons.
-	 * <p>By default this is set to "false".
-	 * <p><strong>Note:</strong> This property is mutually exclusive with and
-	 * ignored when {@link #setPatternParser(PathPatternParser)} is set.
-	 * @deprecated as of 5.2.4. See class-level note in
-	 * {@link RequestMappingHandlerMapping} on the deprecation of path extension
-	 * config options.
+	 * 是否仅针对在配置内容协商时显式注册的路径扩展使用后缀模式匹配。
+	 * 通常建议这样做以减少歧义并避免在路径中由于其他原因出现 "." 时出现问题。
+	 * <p>默认情况下此设置为 "false"。
+	 * <p><strong>注意：</strong>当设置了 {@link #setPatternParser(PathPatternParser)} 时，
+	 * 此属性互斥且被忽略。
+	 *
+	 * @deprecated 自 5.2.4 起。请参阅 {@link RequestMappingHandlerMapping} 中关于路径扩展
+	 * 配置选项的类级注释。
 	 */
 	@Deprecated
 	public PathMatchConfigurer setUseRegisteredSuffixPatternMatch(Boolean registeredSuffixPatternMatch) {
@@ -155,9 +181,9 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Set the UrlPathHelper to use to resolve the mapping path for the application.
-	 * <p><strong>Note:</strong> This property is mutually exclusive with and
-	 * ignored when {@link #setPatternParser(PathPatternParser)} is set.
+	 * 设置用于解析应用程序映射路径的 UrlPathHelper。
+	 * <p><strong>注意：</strong>当设置了 {@link #setPatternParser(PathPatternParser)} 时，
+	 * 此属性互斥且被忽略。
 	 */
 	public PathMatchConfigurer setUrlPathHelper(UrlPathHelper urlPathHelper) {
 		this.urlPathHelper = urlPathHelper;
@@ -165,10 +191,10 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Set the PathMatcher to use for String pattern matching.
-	 * <p>By default this is {@link AntPathMatcher}.
-	 * <p><strong>Note:</strong> This property is mutually exclusive with and
-	 * ignored when {@link #setPatternParser(PathPatternParser)} is set.
+	 * 设置用于字符串模式匹配的 PathMatcher。
+	 * <p>默认情况下这是 {@link AntPathMatcher}。
+	 * <p><strong>注意：</strong>当设置了 {@link #setPatternParser(PathPatternParser)} 时，
+	 * 此属性互斥且被忽略。
 	 */
 	public PathMatchConfigurer setPathMatcher(PathMatcher pathMatcher) {
 		this.pathMatcher = pathMatcher;
@@ -177,7 +203,8 @@ public class PathMatchConfigurer {
 
 
 	/**
-	 * Return the {@link PathPatternParser} to use, if configured.
+	 * 返回要使用的 {@link PathPatternParser}，如果已配置。
+	 *
 	 * @since 5.3
 	 */
 	@Nullable
@@ -197,9 +224,9 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Whether to use registered suffixes for pattern matching.
-	 * @deprecated as of 5.2.4, see deprecation note on
-	 * {@link #setUseRegisteredSuffixPatternMatch(Boolean)}.
+	 * 是否使用注册的后缀进行模式匹配。
+	 *
+	 * @deprecated 自 5.2.4 起，请参阅 {@link #setUseRegisteredSuffixPatternMatch(Boolean)} 上的弃用说明。
 	 */
 	@Nullable
 	@Deprecated
@@ -208,9 +235,9 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Whether to use registered suffixes for pattern matching.
-	 * @deprecated as of 5.2.4, see deprecation note on
-	 * {@link #setUseSuffixPatternMatch(Boolean)}.
+	 * 是否使用后缀模式匹配。
+	 *
+	 * @deprecated 自 5.2.4 起，请参阅 {@link #setUseSuffixPatternMatch(Boolean)} 上的弃用说明。
 	 */
 	@Nullable
 	@Deprecated
@@ -229,44 +256,62 @@ public class PathMatchConfigurer {
 	}
 
 	/**
-	 * Return the configured UrlPathHelper or a default, shared instance otherwise.
+	 * 返回已配置的 UrlPathHelper，否则返回默认的共享实例。
+	 *
 	 * @since 5.3
 	 */
 	protected UrlPathHelper getUrlPathHelperOrDefault() {
+		// 如果 URL 路径帮助器不为空
 		if (this.urlPathHelper != null) {
+			// 返回 URL 路径帮助器
 			return this.urlPathHelper;
 		}
+		// 如果默认 URL 路径帮助器为空
 		if (this.defaultUrlPathHelper == null) {
+			// 创建默认 URL 路径帮助器
 			this.defaultUrlPathHelper = new UrlPathHelper();
 		}
+		// 返回默认 URL 路径帮助器
 		return this.defaultUrlPathHelper;
 	}
 
 	/**
-	 * Return the configured PathMatcher or a default, shared instance otherwise.
+	 * 返回已配置的 PathMatcher，否则返回默认的共享实例。
+	 *
 	 * @since 5.3
 	 */
 	protected PathMatcher getPathMatcherOrDefault() {
+		// 如果路径匹配器不为空
 		if (this.pathMatcher != null) {
+			// 返回路径匹配器
 			return this.pathMatcher;
 		}
+		// 如果默认路径匹配器为空
 		if (this.defaultPathMatcher == null) {
+			// 创建默认路径匹配器
 			this.defaultPathMatcher = new AntPathMatcher();
 		}
+		// 返回默认路径匹配器
 		return this.defaultPathMatcher;
 	}
 
 	/**
-	 * Return the configured PathPatternParser or a default, shared instance otherwise.
+	 * 返回已配置的 PathPatternParser，否则返回默认的共享实例。
+	 *
 	 * @since 5.3.4
 	 */
 	public PathPatternParser getPatternParserOrDefault() {
+		// 如果路径模式解析器不为空
 		if (this.patternParser != null) {
+			// 返回路径模式解析器
 			return this.patternParser;
 		}
+		// 如果默认路径模式解析器为空
 		if (this.defaultPatternParser == null) {
+			// 创建默认路径模式解析器
 			this.defaultPatternParser = new PathPatternParser();
 		}
+		// 返回默认路径模式解析器
 		return this.defaultPatternParser;
 	}
 }
