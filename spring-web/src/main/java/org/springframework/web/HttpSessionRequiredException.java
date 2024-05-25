@@ -16,26 +16,28 @@
 
 package org.springframework.web;
 
-import javax.servlet.ServletException;
-
 import org.springframework.lang.Nullable;
 
+import javax.servlet.ServletException;
+
 /**
- * Exception thrown when an HTTP request handler requires a pre-existing session.
+ * 当 HTTP 请求处理程序需要预先存在的会话时抛出的异常。
  *
  * @author Juergen Hoeller
  * @since 2.0
  */
 @SuppressWarnings("serial")
 public class HttpSessionRequiredException extends ServletException {
-
+	/**
+	 * 预期会话属性的名称
+	 */
 	@Nullable
 	private final String expectedAttribute;
 
 
 	/**
-	 * Create a new HttpSessionRequiredException.
-	 * @param msg the detail message
+	 * 创建一个新的 HttpSessionRequiredException。
+	 * @param msg 详细消息
 	 */
 	public HttpSessionRequiredException(String msg) {
 		super(msg);
@@ -43,9 +45,9 @@ public class HttpSessionRequiredException extends ServletException {
 	}
 
 	/**
-	 * Create a new HttpSessionRequiredException.
-	 * @param msg the detail message
-	 * @param expectedAttribute the name of the expected session attribute
+	 * 创建一个新的 HttpSessionRequiredException。
+	 * @param msg                详细消息
+	 * @param expectedAttribute 预期会话属性的名称
 	 * @since 4.3
 	 */
 	public HttpSessionRequiredException(String msg, String expectedAttribute) {
@@ -55,7 +57,7 @@ public class HttpSessionRequiredException extends ServletException {
 
 
 	/**
-	 * Return the name of the expected session attribute, if any.
+	 * 返回预期会话属性的名称（如果有）。
 	 * @since 4.3
 	 */
 	@Nullable

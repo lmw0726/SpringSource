@@ -16,21 +16,15 @@
 
 package org.springframework.web;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.ServletException;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.ServletException;
+import java.util.*;
+
 /**
- * Exception thrown when a request handler does not support a
- * specific request method.
+ * 当请求处理程序不支持特定请求方法时抛出的异常。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -38,52 +32,63 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public class HttpRequestMethodNotSupportedException extends ServletException {
 
+	/**
+	 * 不支持的 HTTP 请求方法
+	 */
 	private final String method;
 
+	/**
+	 * 实际支持的 HTTP 方法
+	 */
 	@Nullable
 	private final String[] supportedMethods;
 
 
 	/**
-	 * Create a new HttpRequestMethodNotSupportedException.
-	 * @param method the unsupported HTTP request method
+	 * 创建一个新的 HttpRequestMethodNotSupportedException。
+	 *
+	 * @param method 不支持的 HTTP 请求方法
 	 */
 	public HttpRequestMethodNotSupportedException(String method) {
 		this(method, (String[]) null);
 	}
 
 	/**
-	 * Create a new HttpRequestMethodNotSupportedException.
-	 * @param method the unsupported HTTP request method
-	 * @param msg the detail message
+	 * 创建一个新的 HttpRequestMethodNotSupportedException。
+	 *
+	 * @param method 不支持的 HTTP 请求方法
+	 * @param msg    详细消息
 	 */
 	public HttpRequestMethodNotSupportedException(String method, String msg) {
 		this(method, null, msg);
 	}
 
 	/**
-	 * Create a new HttpRequestMethodNotSupportedException.
-	 * @param method the unsupported HTTP request method
-	 * @param supportedMethods the actually supported HTTP methods (may be {@code null})
+	 * 创建一个新的 HttpRequestMethodNotSupportedException。
+	 *
+	 * @param method           不支持的 HTTP 请求方法
+	 * @param supportedMethods 实际支持的 HTTP 方法（可以为 {@code null}）
 	 */
 	public HttpRequestMethodNotSupportedException(String method, @Nullable Collection<String> supportedMethods) {
 		this(method, (supportedMethods != null ? StringUtils.toStringArray(supportedMethods) : null));
 	}
 
 	/**
-	 * Create a new HttpRequestMethodNotSupportedException.
-	 * @param method the unsupported HTTP request method
-	 * @param supportedMethods the actually supported HTTP methods (may be {@code null})
+	 * 创建一个新的 HttpRequestMethodNotSupportedException。
+	 *
+	 * @param method           不支持的 HTTP 请求方法
+	 * @param supportedMethods 实际支持的 HTTP 方法（可以为 {@code null}）
 	 */
 	public HttpRequestMethodNotSupportedException(String method, @Nullable String[] supportedMethods) {
 		this(method, supportedMethods, "Request method '" + method + "' not supported");
 	}
 
 	/**
-	 * Create a new HttpRequestMethodNotSupportedException.
-	 * @param method the unsupported HTTP request method
-	 * @param supportedMethods the actually supported HTTP methods
-	 * @param msg the detail message
+	 * 创建一个新的 HttpRequestMethodNotSupportedException。
+	 *
+	 * @param method           不支持的 HTTP 请求方法
+	 * @param supportedMethods 实际支持的 HTTP 方法
+	 * @param msg              详细消息
 	 */
 	public HttpRequestMethodNotSupportedException(String method, @Nullable String[] supportedMethods, String msg) {
 		super(msg);
@@ -93,14 +98,14 @@ public class HttpRequestMethodNotSupportedException extends ServletException {
 
 
 	/**
-	 * Return the HTTP request method that caused the failure.
+	 * 返回导致失败的 HTTP 请求方法。
 	 */
 	public String getMethod() {
 		return this.method;
 	}
 
 	/**
-	 * Return the actually supported HTTP methods, or {@code null} if not known.
+	 * 返回实际支持的 HTTP 方法，如果未知则返回 {@code null}。
 	 */
 	@Nullable
 	public String[] getSupportedMethods() {
@@ -108,22 +113,31 @@ public class HttpRequestMethodNotSupportedException extends ServletException {
 	}
 
 	/**
-	 * Return the actually supported HTTP methods as {@link HttpMethod} instances,
-	 * or {@code null} if not known.
+	 * 返回实际支持的 HTTP 方法作为 {@link HttpMethod} 实例，如果未知则返回 {@code null}。
+	 *
 	 * @since 3.2
 	 */
 	@Nullable
 	public Set<HttpMethod> getSupportedHttpMethods() {
+		// 如果支持的方法为null，则返回null
 		if (this.supportedMethods == null) {
 			return null;
 		}
+
+		// 创建一个支持的方法列表
 		List<HttpMethod> supportedMethods = new ArrayList<>(this.supportedMethods.length);
+
+		// 遍历支持的方法数组
 		for (String value : this.supportedMethods) {
+			// 尝试解析HTTP方法
 			HttpMethod resolved = HttpMethod.resolve(value);
+			// 如果解析成功，将其添加到列表中
 			if (resolved != null) {
 				supportedMethods.add(resolved);
 			}
 		}
+
+		// 返回支持方法的枚举集合
 		return EnumSet.copyOf(supportedMethods);
 	}
 

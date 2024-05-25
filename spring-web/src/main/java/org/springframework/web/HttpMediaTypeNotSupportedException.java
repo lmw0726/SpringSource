@@ -16,28 +16,30 @@
 
 package org.springframework.web;
 
-import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
+import java.util.List;
+
 /**
- * Exception thrown when a client POSTs, PUTs, or PATCHes content of a type
- * not supported by request handler.
+ * 当客户端以请求处理程序不支持的类型发布、放置或修补内容时抛出的异常。
  *
  * @author Arjen Poutsma
  * @since 3.0
  */
 @SuppressWarnings("serial")
 public class HttpMediaTypeNotSupportedException extends HttpMediaTypeException {
-
+	/**
+	 * 不受支持的内容类型
+	 */
 	@Nullable
 	private final MediaType contentType;
 
 
 	/**
-	 * Create a new HttpMediaTypeNotSupportedException.
-	 * @param message the exception message
+	 * 创建一个新的 HttpMediaTypeNotSupportedException。
+	 *
+	 * @param message 异常消息
 	 */
 	public HttpMediaTypeNotSupportedException(String message) {
 		super(message);
@@ -45,9 +47,10 @@ public class HttpMediaTypeNotSupportedException extends HttpMediaTypeException {
 	}
 
 	/**
-	 * Create a new HttpMediaTypeNotSupportedException.
-	 * @param contentType the unsupported content type
-	 * @param supportedMediaTypes the list of supported media types
+	 * 创建一个新的 HttpMediaTypeNotSupportedException。
+	 *
+	 * @param contentType         不受支持的内容类型
+	 * @param supportedMediaTypes 支持的媒体类型列表
 	 */
 	public HttpMediaTypeNotSupportedException(@Nullable MediaType contentType, List<MediaType> supportedMediaTypes) {
 		this(contentType, supportedMediaTypes, "Content type '" +
@@ -55,13 +58,14 @@ public class HttpMediaTypeNotSupportedException extends HttpMediaTypeException {
 	}
 
 	/**
-	 * Create a new HttpMediaTypeNotSupportedException.
-	 * @param contentType the unsupported content type
-	 * @param supportedMediaTypes the list of supported media types
-	 * @param msg the detail message
+	 * 创建一个新的 HttpMediaTypeNotSupportedException。
+	 *
+	 * @param contentType         不受支持的内容类型
+	 * @param supportedMediaTypes 支持的媒体类型列表
+	 * @param msg                 详细消息
 	 */
 	public HttpMediaTypeNotSupportedException(@Nullable MediaType contentType,
-			List<MediaType> supportedMediaTypes, String msg) {
+											  List<MediaType> supportedMediaTypes, String msg) {
 
 		super(msg, supportedMediaTypes);
 		this.contentType = contentType;
@@ -69,7 +73,7 @@ public class HttpMediaTypeNotSupportedException extends HttpMediaTypeException {
 
 
 	/**
-	 * Return the HTTP request content type method that caused the failure.
+	 * 返回导致失败的 HTTP 请求内容类型方法。
 	 */
 	@Nullable
 	public MediaType getContentType() {
