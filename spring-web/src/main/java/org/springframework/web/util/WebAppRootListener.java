@@ -20,32 +20,27 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 /**
- * Listener that sets a system property to the web application root directory.
- * The key of the system property can be defined with the "webAppRootKey" init
- * parameter at the servlet context level (i.e. context-param in web.xml),
- * the default key is "webapp.root".
+ * 监听器，将系统属性设置为 Web 应用程序根目录。
+ * 可以使用servlet上下文级别的“webAppRootKey”init参数（即web.xml中的context-param）定义系统属性的键，
+ * 默认键是“webapp.root”。
  *
- * <p>Can be used for toolkits that support substitution with system properties
- * (i.e. System.getProperty values), like log4j's "${key}" syntax within log
- * file locations.
+ * <p>可以用于支持使用系统属性进行替换的工具包（即System.getProperty值），
+ * 例如 log4j 在日志文件位置中的 "${key}" 语法。
  *
- * <p>Note: This listener should be placed before ContextLoaderListener in {@code web.xml},
- * at least when used for log4j. Log4jConfigListener sets the system property
- * implicitly, so there's no need for this listener in addition to it.
+ * <p>注意：此监听器应该放置在 web.xml 中的 ContextLoaderListener 之前，
+ * 至少在用于 log4j 时是这样。Log4jConfigListener 隐式地设置系统属性，
+ * 因此除此之外不需要此监听器。
  *
- * <p><b>WARNING</b>: Some containers, e.g. Tomcat, do NOT keep system properties separate
- * per web app. You have to use unique "webAppRootKey" context-params per web app
- * then, to avoid clashes. Other containers like Resin do isolate each web app's
- * system properties: Here you can use the default key (i.e. no "webAppRootKey"
- * context-param at all) without worrying.
+ * <p><b>警告</b>：一些容器，例如 Tomcat，<b>不会</b>将系统属性分开处理每个 Web 应用程序。
+ * 您必须为每个 Web 应用程序使用唯一的“webAppRootKey”context-param，以避免冲突。
+ * 其他容器如 Resin 则会隔离每个 Web 应用程序的系统属性：在这种情况下，
+ * 您可以使用默认键（即没有“webAppRootKey”context-param）而不必担心。
  *
- * <p><b>WARNING</b>: The WAR file containing the web application needs to be expanded
- * to allow for setting the web app root system property. This is by default not
- * the case when a WAR file gets deployed to WebLogic, for example. Do not use
- * this listener in such an environment!
+ * <p><b>警告</b>：包含 Web 应用程序的 WAR 文件需要展开才能设置 Web 应用程序根系统属性。
+ * 当 WAR 文件被部署到 WebLogic 时，默认情况下不会发生这种情况。不要在这种环境中使用此监听器！
  *
  * @author Juergen Hoeller
- * @since 18.04.2003
+ * @since 2003-04-18
  * @see WebUtils#setWebAppRootSystemProperty
  * @see System#getProperty
  */
