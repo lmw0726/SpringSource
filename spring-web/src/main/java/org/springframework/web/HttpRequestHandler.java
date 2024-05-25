@@ -16,52 +16,37 @@
 
 package org.springframework.web;
 
-import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
- * Plain handler interface for components that process HTTP requests,
- * analogous to a Servlet. Only declares {@link javax.servlet.ServletException}
- * and {@link java.io.IOException}, to allow for usage within any
- * {@link javax.servlet.http.HttpServlet}. This interface is essentially the
- * direct equivalent of an HttpServlet, reduced to a central handle method.
+ * 处理 HTTP 请求的简单处理器接口，类似于 Servlet。仅声明 {@link javax.servlet.ServletException}
+ * 和 {@link java.io.IOException}，以便在任何 {@link javax.servlet.http.HttpServlet} 中使用。
+ * 此接口本质上是 HttpServlet 的直接等价物，简化为一个中央的处理方法。
  *
- * <p>The easiest way to expose an HttpRequestHandler bean in Spring style
- * is to define it in Spring's root web application context and define
- * an {@link org.springframework.web.context.support.HttpRequestHandlerServlet}
- * in {@code web.xml}, pointing to the target HttpRequestHandler bean
- * through its {@code servlet-name} which needs to match the target bean name.
+ * <p>以 Spring 风格公开 HttpRequestHandler bean 最简单的方法是在 Spring 的根 Web 应用程序上下文中定义它，
+ * 并在 {@code web.xml} 中定义一个 {@link org.springframework.web.context.support.HttpRequestHandlerServlet}，
+ * 通过其 {@code servlet-name} 指向目标 HttpRequestHandler bean，该名称需要与目标 bean 名称匹配。
  *
- * <p>Supported as a handler type within Spring's
- * {@link org.springframework.web.servlet.DispatcherServlet}, being able
- * to interact with the dispatcher's advanced mapping and interception
- * facilities. This is the recommended way of exposing an HttpRequestHandler,
- * while keeping the handler implementations free of direct dependencies
- * on a DispatcherServlet environment.
+ * <p>在 Spring 的 {@link org.springframework.web.servlet.DispatcherServlet} 中作为处理器类型支持，
+ * 能够与调度程序的高级映射和拦截功能进行交互。这是推荐的公开 HttpRequestHandler 的方式，
+ * 同时保持处理器实现没有对 DispatcherServlet 环境的直接依赖。
  *
- * <p>Typically implemented to generate binary responses directly,
- * with no separate view resource involved. This differentiates it from a
- * {@link org.springframework.web.servlet.mvc.Controller} within Spring's Web MVC
- * framework. The lack of a {@link org.springframework.web.servlet.ModelAndView}
- * return value gives a clearer signature to callers other than the
- * DispatcherServlet, indicating that there will never be a view to render.
+ * <p>通常实现为直接生成二进制响应，没有涉及单独的视图资源。这使它区别于 Spring Web MVC 框架中的
+ * {@link org.springframework.web.servlet.mvc.Controller}。缺少 {@link org.springframework.web.servlet.ModelAndView}
+ * 返回值为调度程序以外的调用者提供了更清晰的签名，表明将永远不会有视图需要渲染。
  *
- * <p>As of Spring 2.0, Spring's HTTP-based remote exporters, such as
+ * <p>从 Spring 2.0 开始，Spring 基于 HTTP 的远程导出器，例如
  * {@link org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter}
- * and {@link org.springframework.remoting.caucho.HessianServiceExporter},
- * implement this interface rather than the more extensive Controller interface,
- * for minimal dependencies on Spring-specific web infrastructure.
+ * 和 {@link org.springframework.remoting.caucho.HessianServiceExporter}，
+ * 实现了此接口而不是更广泛的 Controller 接口，以尽量减少对 Spring 特定 Web 基础设施的依赖。
  *
- * <p>Note that HttpRequestHandlers may optionally implement the
- * {@link org.springframework.web.servlet.mvc.LastModified} interface,
- * just like Controllers can, <i>provided that they run within Spring's
- * DispatcherServlet</i>. However, this is usually not necessary, since
- * HttpRequestHandlers typically only support POST requests to begin with.
- * Alternatively, a handler may implement the "If-Modified-Since" HTTP
- * header processing manually within its {@code handle} method.
+ * <p>请注意，HttpRequestHandlers 可以选择性地实现 {@link org.springframework.web.servlet.mvc.LastModified} 接口，
+ * 就像 Controllers 一样，<i>前提是它们运行在 Spring 的 DispatcherServlet 中</i>。
+ * 然而，这通常不是必须的，因为 HttpRequestHandlers 通常只支持 POST 请求。
+ * 或者，处理器可以在其 {@code handle} 方法中手动实现 "If-Modified-Since" HTTP 头处理。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -78,11 +63,12 @@ import javax.servlet.http.HttpServletResponse;
 public interface HttpRequestHandler {
 
 	/**
-	 * Process the given request, generating a response.
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @throws ServletException in case of general errors
-	 * @throws IOException in case of I/O errors
+	 * 处理给定的请求，生成响应。
+	 *
+	 * @param request  当前的 HTTP 请求
+	 * @param response 当前的 HTTP 响应
+	 * @throws ServletException 在发生一般错误时
+	 * @throws IOException      在发生 I/O 错误时
 	 */
 	void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException;

@@ -16,20 +16,8 @@
 
 package org.springframework.web.socket.server.support;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.context.Lifecycle;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -46,27 +34,50 @@ import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.HandshakeHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * A {@link HttpRequestHandler} for processing WebSocket handshake requests.
+ * 用于处理 WebSocket 握手请求的 {@link HttpRequestHandler}。
  *
- * <p>This is the main class to use when configuring a server WebSocket at a specific URL.
- * It is a very thin wrapper around a {@link WebSocketHandler} and a {@link HandshakeHandler},
- * also adapting the {@link HttpServletRequest} and {@link HttpServletResponse} to
- * {@link ServerHttpRequest} and {@link ServerHttpResponse}, respectively.
+ * <p>这是在特定 URL 配置服务器 WebSocket 时使用的主要类。
+ * 它是一个非常薄的包装器，包装了一个 {@link WebSocketHandler} 和一个 {@link HandshakeHandler}，
+ * 同时将 {@link HttpServletRequest} 和 {@link HttpServletResponse} 适配为
+ * {@link ServerHttpRequest} 和 {@link ServerHttpResponse}。
  *
  * @author Rossen Stoyanchev
  * @since 4.0
  */
 public class WebSocketHttpRequestHandler implements HttpRequestHandler, Lifecycle, ServletContextAware {
-
+	/**
+	 * 日志记录器
+	 */
 	private static final Log logger = LogFactory.getLog(WebSocketHttpRequestHandler.class);
-
+	/**
+	 * WebSocket处理器
+	 */
 	private final WebSocketHandler wsHandler;
 
+	/**
+	 * 握手处理器
+	 */
 	private final HandshakeHandler handshakeHandler;
 
+	/**
+	 * 握手拦截器列表
+	 */
 	private final List<HandshakeInterceptor> interceptors = new ArrayList<>();
 
+	/**
+	 * WebSocket是否启动
+	 */
 	private volatile boolean running;
 
 
@@ -82,9 +93,10 @@ public class WebSocketHttpRequestHandler implements HttpRequestHandler, Lifecycl
 	}
 
 	/**
-	 * Decorate the {@code WebSocketHandler} passed into the constructor.
-	 * <p>By default, {@link LoggingWebSocketHandlerDecorator} and
-	 * {@link ExceptionWebSocketHandlerDecorator} are added.
+	 * 装饰传入构造函数的 {@code WebSocketHandler}。
+	 * <p>默认情况下，添加了 {@link LoggingWebSocketHandlerDecorator} 和
+	 * {@link ExceptionWebSocketHandlerDecorator}。
+	 *
 	 * @since 5.2.2
 	 */
 	protected WebSocketHandler decorate(WebSocketHandler handler) {
@@ -93,31 +105,33 @@ public class WebSocketHttpRequestHandler implements HttpRequestHandler, Lifecycl
 
 
 	/**
-	 * Return the WebSocketHandler.
+	 * 返回 WebSocketHandler。
 	 */
 	public WebSocketHandler getWebSocketHandler() {
 		return this.wsHandler;
 	}
 
 	/**
-	 * Return the HandshakeHandler.
+	 * 返回 HandshakeHandler。
 	 */
 	public HandshakeHandler getHandshakeHandler() {
 		return this.handshakeHandler;
 	}
 
 	/**
-	 * Configure one or more WebSocket handshake request interceptors.
+	 * 配置一个或多个 WebSocket 握手请求拦截器。
 	 */
 	public void setHandshakeInterceptors(@Nullable List<HandshakeInterceptor> interceptors) {
+		// 清空现有的拦截器
 		this.interceptors.clear();
 		if (interceptors != null) {
+			// 添加新的拦截器
 			this.interceptors.addAll(interceptors);
 		}
 	}
 
 	/**
-	 * Return the configured WebSocket handshake request interceptors.
+	 * 返回配置的 WebSocket 握手请求拦截器。
 	 */
 	public List<HandshakeInterceptor> getHandshakeInterceptors() {
 		return this.interceptors;
@@ -126,6 +140,7 @@ public class WebSocketHttpRequestHandler implements HttpRequestHandler, Lifecycl
 	@Override
 	public void setServletContext(ServletContext servletContext) {
 		if (this.handshakeHandler instanceof ServletContextAware) {
+			// 如果握手处理器是 ServletContextAware 类型，设置Servlet上下文
 			((ServletContextAware) this.handshakeHandler).setServletContext(servletContext);
 		}
 	}
@@ -133,9 +148,13 @@ public class WebSocketHttpRequestHandler implements HttpRequestHandler, Lifecycl
 
 	@Override
 	public void start() {
+		// 如果WebSocket服务尚未运行
 		if (!isRunning()) {
+			// 设置运行状态为true
 			this.running = true;
+			// 如果握手处理程序实现了Lifecycle接口
 			if (this.handshakeHandler instanceof Lifecycle) {
+				// 启动握手处理程序
 				((Lifecycle) this.handshakeHandler).start();
 			}
 		}
@@ -143,9 +162,13 @@ public class WebSocketHttpRequestHandler implements HttpRequestHandler, Lifecycl
 
 	@Override
 	public void stop() {
+		// 如果WebSocket服务正在运行
 		if (isRunning()) {
+			// 设置运行状态为false
 			this.running = false;
+			// 如果握手处理程序实现了Lifecycle接口
 			if (this.handshakeHandler instanceof Lifecycle) {
+				// 停止握手处理程序
 				((Lifecycle) this.handshakeHandler).stop();
 			}
 		}
@@ -161,35 +184,50 @@ public class WebSocketHttpRequestHandler implements HttpRequestHandler, Lifecycl
 	public void handleRequest(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
 			throws ServletException, IOException {
 
+		// 创建ServletServerHttpRequest对象
 		ServerHttpRequest request = new ServletServerHttpRequest(servletRequest);
+// 创建ServletServerHttpResponse对象
 		ServerHttpResponse response = new ServletServerHttpResponse(servletResponse);
 
+// 创建握手拦截器链
 		HandshakeInterceptorChain chain = new HandshakeInterceptorChain(this.interceptors, this.wsHandler);
+// 握手失败异常
 		HandshakeFailureException failure = null;
 
 		try {
+			// 如果日志级别为DEBUG
 			if (logger.isDebugEnabled()) {
+				// 记录请求方法和请求URI
 				logger.debug(servletRequest.getMethod() + " " + servletRequest.getRequestURI());
 			}
+			// 创建一个空的属性Map
 			Map<String, Object> attributes = new HashMap<>();
+			// 如果握手之前的拦截器链应用成功
 			if (!chain.applyBeforeHandshake(request, response, attributes)) {
+				// 返回
 				return;
 			}
+			// 进行握手
 			this.handshakeHandler.doHandshake(request, response, this.wsHandler, attributes);
+			// 应用握手之后的拦截器链
 			chain.applyAfterHandshake(request, response, null);
-		}
-		catch (HandshakeFailureException ex) {
+		} catch (HandshakeFailureException ex) {
+			// 捕获握手失败异常
 			failure = ex;
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
+			// 捕获其他异常
 			failure = new HandshakeFailureException("Uncaught failure for request " + request.getURI(), ex);
-		}
-		finally {
+		} finally {
+			// 如果发生了握手失败
 			if (failure != null) {
+				// 应用握手之后的拦截器链
 				chain.applyAfterHandshake(request, response, failure);
+				// 关闭响应
 				response.close();
+				// 抛出握手失败异常
 				throw failure;
 			}
+			// 关闭响应
 			response.close();
 		}
 	}

@@ -16,56 +16,58 @@
 
 package org.springframework.remoting.caucho;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.util.NestedServletException;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 /**
- * Servlet-API-based HTTP request handler that exports the specified service bean
- * as Hessian service endpoint, accessible via a Hessian proxy.
+ * 基于 Servlet API 的 HTTP 请求处理程序，将指定的服务 bean 导出为 Hessian 服务端点，可通过 Hessian 代理访问。
  *
- * <p>Hessian is a slim, binary RPC protocol.
- * For information on Hessian, see the
- * <a href="http://hessian.caucho.com">Hessian website</a>.
- * <b>Note: As of Spring 4.0, this exporter requires Hessian 4.0 or above.</b>
+ * <p>Hessian 是一种轻量级的二进制 RPC 协议。
+ * 有关 Hessian 的信息，请参阅
+ * <a href="http://hessian.caucho.com">Hessian 网站</a>。
+ * <b>注意：从 Spring 4.0 开始，此导出器需要 Hessian 4.0 或更高版本。</b>
  *
- * <p>Hessian services exported with this class can be accessed by
- * any Hessian client, as there isn't any special handling involved.
+ * <p>通过此类导出的 Hessian 服务可由任何 Hessian 客户端访问，因为没有涉及任何特殊处理。
  *
  * @author Juergen Hoeller
- * @since 13.05.2003
  * @see HessianClientInterceptor
  * @see HessianProxyFactoryBean
  * @see org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter
  * @see org.springframework.remoting.rmi.RmiServiceExporter
+ * @since 13.05.2003
  * @deprecated as of 5.3 (phasing out serialization-based remoting)
  */
 @Deprecated
 public class HessianServiceExporter extends HessianExporter implements HttpRequestHandler {
 
 	/**
-	 * Processes the incoming Hessian request and creates a Hessian response.
+	 * 处理传入的 Hessian 请求并创建 Hessian 响应。
 	 */
 	@Override
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// 如果请求方法不是POST
 		if (!"POST".equals(request.getMethod())) {
+			// 抛出不支持的HTTP请求方法异常
 			throw new HttpRequestMethodNotSupportedException(request.getMethod(),
 					new String[] {"POST"}, "HessianServiceExporter only supports POST requests");
 		}
 
+		// 设置响应内容类型为Hessian
 		response.setContentType(CONTENT_TYPE_HESSIAN);
+
 		try {
+			// 调用Hessian服务
 			invoke(request.getInputStream(), response.getOutputStream());
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
+			// 捕获异常并抛出NestedServletException
 			throw new NestedServletException("Hessian skeleton invocation failed", ex);
 		}
 	}
