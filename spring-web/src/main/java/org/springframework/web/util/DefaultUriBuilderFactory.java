@@ -16,17 +16,13 @@
 
 package org.springframework.web.util;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.net.URI;
+import java.util.*;
 
 /**
  * {@code UriBuilderFactory} that relies on {@link UriComponentsBuilder} for
@@ -36,8 +32,8 @@ import org.springframework.util.StringUtils;
  * base URI, alternative encoding mode strategies, among others.
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see UriComponentsBuilder
+ * @since 5.0
  */
 public class DefaultUriBuilderFactory implements UriBuilderFactory {
 
@@ -66,6 +62,7 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 	 * to every UriBuilder via {@link UriComponentsBuilder#uriComponents} unless
 	 * the UriBuilder itself was created with a URI template that already has a
 	 * target address.
+	 *
 	 * @param baseUriTemplate the URI template to use a base URL
 	 */
 	public DefaultUriBuilderFactory(String baseUriTemplate) {
@@ -89,6 +86,7 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 	 * {@link EncodingMode#URI_COMPONENT EncodingMode.URI_COMPONENT}
 	 * therefore the {@code WebClient} {@code RestTemplate} have switched their
 	 * default behavior.
+	 *
 	 * @param encodingMode the encoding mode to use
 	 */
 	public void setEncodingMode(EncodingMode encodingMode) {
@@ -105,6 +103,7 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 	/**
 	 * Provide default URI variable values to use when expanding URI templates
 	 * with a Map of variables.
+	 *
 	 * @param defaultUriVariables default URI variable values
 	 */
 	public void setDefaultUriVariables(@Nullable Map<String, ?> defaultUriVariables) {
@@ -127,6 +126,7 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 	 * which ensures that URI variables in the path are encoded according to
 	 * path segment rules and for example a '/' is encoded.
 	 * <p>By default this is set to {@code true}.
+	 *
 	 * @param parsePath whether to parse the path into path segments
 	 */
 	public void setParsePath(boolean parsePath) {
@@ -176,6 +176,7 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 	 * <li>{@link #URI_COMPONENT}
 	 * <li>{@link #NONE}
 	 * </ul>
+	 *
 	 * @see #setEncodingMode
 	 */
 	public enum EncodingMode {
@@ -193,8 +194,9 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 		 * result because in treats URI variables as opaque data to be fully
 		 * encoded, while {@link #URI_COMPONENT} by comparison is useful only
 		 * if intentionally expanding URI variables with reserved characters.
-		 * @since 5.0.8
+		 *
 		 * @see UriComponentsBuilder#encode()
+		 * @since 5.0.8
 		 */
 		TEMPLATE_AND_VALUES,
 
@@ -202,6 +204,7 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 		 * Does not encode the URI template and instead applies strict encoding
 		 * to URI variables via {@link UriUtils#encodeUriVariables} prior to
 		 * expanding them into the template.
+		 *
 		 * @see UriUtils#encodeUriVariables(Object...)
 		 * @see UriUtils#encodeUriVariables(Map)
 		 */
@@ -212,6 +215,7 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 		 * component values, replacing <em>only</em> non-ASCII and illegal
 		 * (within a given URI component type) characters, but not characters
 		 * with reserved meaning.
+		 *
 		 * @see UriComponents#encode()
 		 */
 		URI_COMPONENT,
@@ -224,10 +228,12 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 
 
 	/**
-	 * {@link DefaultUriBuilderFactory} specific implementation of UriBuilder.
+	 * {@link DefaultUriBuilderFactory}特定的UriBuilder实现。
 	 */
 	private class DefaultUriBuilder implements UriBuilder {
-
+		/**
+		 * URI组件构建器
+		 */
 		private final UriComponentsBuilder uriComponentsBuilder;
 
 		public DefaultUriBuilder(String uriTemplate) {
@@ -235,33 +241,48 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 		}
 
 		private UriComponentsBuilder initUriComponentsBuilder(String uriTemplate) {
+			// 创建一个 URI组件构建器 对象
 			UriComponentsBuilder result;
+			// 如果 URI 模板为空
 			if (!StringUtils.hasLength(uriTemplate)) {
+				// 如果存在基础 URI，则克隆基础 URI 的构建器；否则创建一个新的构建器
 				result = (baseUri != null ? baseUri.cloneBuilder() : UriComponentsBuilder.newInstance());
-			}
-			else if (baseUri != null) {
+			} else if (baseUri != null) {
+				// 如果 URI 模板不为空且存在基础 URI
+				// 使用 URI 模板创建一个 URI组件构建器 对象
 				UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriTemplate);
 				UriComponents uri = builder.build();
+				// 如果 URI 中的主机名为空，则克隆基础 URI 的构建器，并设置 URI 组件
 				result = (uri.getHost() == null ? baseUri.cloneBuilder().uriComponents(uri) : builder);
-			}
-			else {
+			} else {
+				// 如果 URI 模板不为空且不存在基础 URI
+				// 使用 URI 模板创建一个 URI组件构建器 对象
 				result = UriComponentsBuilder.fromUriString(uriTemplate);
 			}
+			// 如果编码模式为 TEMPLATE_AND_VALUES，则对 URI 进行编码
 			if (encodingMode.equals(EncodingMode.TEMPLATE_AND_VALUES)) {
 				result.encode();
 			}
+			// 解析路径（如果需要）
 			parsePathIfNecessary(result);
+			// 返回构建的 URI组件构建器 对象
 			return result;
 		}
 
 		private void parsePathIfNecessary(UriComponentsBuilder result) {
+			// 如果需要解析路径，并且编码模式为 URI组件
 			if (parsePath && encodingMode.equals(EncodingMode.URI_COMPONENT)) {
+				// 构建 URI组件 对象
 				UriComponents uric = result.build();
+				// 获取 URI 的路径
 				String path = uric.getPath();
+				// 清除当前路径
 				result.replacePath(null);
+				// 将路径中的每个段添加到新的 URI组件构建器 中
 				for (String segment : uric.getPathSegments()) {
 					result.pathSegment(segment);
 				}
+				// 如果原始路径不为空且以斜杠结尾，则在新的路径中添加斜杠
 				if (path != null && path.endsWith("/")) {
 					result.path("/");
 				}
@@ -379,35 +400,48 @@ public class DefaultUriBuilderFactory implements UriBuilderFactory {
 
 		@Override
 		public URI build(Map<String, ?> uriVars) {
+			// 如果默认的 URI 变量不为空
 			if (!defaultUriVariables.isEmpty()) {
+				// 创建一个新的映射，将默认 URI 变量和当前 URI 变量合并
 				Map<String, Object> map = new HashMap<>();
 				map.putAll(defaultUriVariables);
 				map.putAll(uriVars);
+				// 将当前 URI 变量更新为合并后的映射
 				uriVars = map;
 			}
 			if (encodingMode.equals(EncodingMode.VALUES_ONLY)) {
+				// 如果编码模式为 仅对值编码，则对 URI 变量进行编码
 				uriVars = UriUtils.encodeUriVariables(uriVars);
 			}
+			// 使用 URI 组件构建器构建 URI组件，并使用 URI 变量扩展它
 			UriComponents uric = this.uriComponentsBuilder.build().expand(uriVars);
+			// 创建 URI
 			return createUri(uric);
 		}
 
 		@Override
 		public URI build(Object... uriVars) {
+			// 如果 URI 变量为空且默认 URI 变量不为空
 			if (ObjectUtils.isEmpty(uriVars) && !defaultUriVariables.isEmpty()) {
+				// 使用空映射构建 URI
 				return build(Collections.emptyMap());
 			}
 			if (encodingMode.equals(EncodingMode.VALUES_ONLY)) {
+				// 如果编码模式为 仅对值编码，则对 URI 变量进行编码
 				uriVars = UriUtils.encodeUriVariables(uriVars);
 			}
+			// 使用 URI 组件构建器构建 UriComponents，并使用 URI 变量扩展它
 			UriComponents uric = this.uriComponentsBuilder.build().expand(uriVars);
+			// 创建 URI
 			return createUri(uric);
 		}
 
 		private URI createUri(UriComponents uric) {
 			if (encodingMode.equals(EncodingMode.URI_COMPONENT)) {
+				// 如果编码模式为 URI组件模式，则对 URI 进行编码
 				uric = uric.encode();
 			}
+			// 创建 URI 对象
 			return URI.create(uric.toString());
 		}
 	}

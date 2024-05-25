@@ -16,257 +16,235 @@
 
 package org.springframework.web.util;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.MultiValueMap;
-
 /**
- * Builder-style methods to prepare and expand a URI template with variables.
+ * 以构建器风格的方法来准备和扩展带有变量的 URI 模板。
  *
- * <p>Effectively a generalization of {@link UriComponentsBuilder} but with
- * shortcuts to expand directly into {@link URI} rather than
- * {@link UriComponents} and also leaving common concerns such as encoding
- * preferences, a base URI, and others as implementation concerns.
+ * <p>实际上是 {@link UriComponentsBuilder} 的泛化，但可以直接扩展为 {@link URI} 而不是
+ * {@link UriComponents}，同时将编码偏好、基础 URI 等常见问题留作实现考虑。
  *
- * <p>Typically obtained via {@link UriBuilderFactory} which serves as a central
- * component configured once and used to create many URLs.
+ * <p>通常通过 {@link UriBuilderFactory} 获取，它作为一个中央组件，配置一次后用于创建许多 URL。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see UriBuilderFactory
  * @see UriComponentsBuilder
+ * @since 5.0
  */
 public interface UriBuilder {
 
 	/**
-	 * Set the URI scheme which may contain URI template variables,
-	 * and may also be {@code null} to clear the scheme of this builder.
-	 * @param scheme the URI scheme
+	 * 设置 URI 方案，可以包含 URI 模板变量，也可以为 {@code null} 以清除此构建器的方案。
+	 *
+	 * @param scheme URI 方案
 	 */
 	UriBuilder scheme(@Nullable String scheme);
 
 	/**
-	 * Set the URI user info which may contain URI template variables, and
-	 * may also be {@code null} to clear the user info of this builder.
-	 * @param userInfo the URI user info
+	 * 设置 URI 用户信息，可以包含 URI 模板变量，也可以为 {@code null} 以清除此构建器的用户信息。
+	 *
+	 * @param userInfo URI 用户信息
 	 */
 	UriBuilder userInfo(@Nullable String userInfo);
 
 	/**
-	 * Set the URI host which may contain URI template variables, and may also
-	 * be {@code null} to clear the host of this builder.
-	 * @param host the URI host
+	 * 设置 URI 主机，可以包含 URI 模板变量，也可以为 {@code null} 以清除此构建器的主机。
+	 *
+	 * @param host URI 主机
 	 */
 	UriBuilder host(@Nullable String host);
 
 	/**
-	 * Set the URI port. Passing {@code -1} will clear the port of this builder.
-	 * @param port the URI port
+	 * 设置 URI 端口。传递 {@code -1} 将清除此构建器的端口。
+	 *
+	 * @param port URI 端口
 	 */
 	UriBuilder port(int port);
 
 	/**
-	 * Set the URI port . Use this method only when the port needs to be
-	 * parameterized with a URI variable. Otherwise use {@link #port(int)}.
-	 * Passing {@code null} will clear the port of this builder.
-	 * @param port the URI port
+	 * 设置 URI 端口。仅在端口需要用 URI 变量参数化时使用此方法。否则请使用 {@link #port(int)}。
+	 * 传递 {@code null} 将清除此构建器的端口。
+	 *
+	 * @param port URI 端口
 	 */
 	UriBuilder port(@Nullable String port);
 
 	/**
-	 * Append to the path of this builder.
-	 * <p>The given value is appended as-is to previous {@link #path(String) path}
-	 * values without inserting any additional slashes. For example:
+	 * 向此构建器的路径追加内容。
+	 * <p>给定的值按原样追加到之前的 {@link #path(String) path} 值后面，不插入任何额外的斜杠。例如：
 	 * <pre class="code">
 	 *
 	 * builder.path("/first-").path("value/").path("/{id}").build("123")
 	 *
-	 * // Results is "/first-value/123"
+	 * // 结果是 "/first-value/123"
 	 * </pre>
-	 * <p>By contrast {@link #pathSegment(String...) pathSegment} does insert
-	 * slashes between individual path segments. For example:
+	 * <p>相比之下，{@link #pathSegment(String...) pathSegment} 会在各个路径段之间插入斜杠。例如：
 	 * <pre class="code">
 	 *
 	 * builder.pathSegment("first-value", "second-value").path("/")
 	 *
-	 * // Results is "/first-value/second-value/"
+	 * // 结果是 "/first-value/second-value/"
 	 * </pre>
-	 * <p>The resulting full path is normalized to eliminate duplicate slashes.
-	 * <p><strong>Note:</strong> When inserting a URI variable value that
-	 * contains slashes in a {@link #path(String) path}, whether those are
-	 * encoded depends on the configured encoding mode. For more details, see
-	 * {@link UriComponentsBuilder#encode()}, or otherwise if building URIs
-	 * indirectly via {@code WebClient} or {@code RestTemplate}, see its
-	 * {@link DefaultUriBuilderFactory#setEncodingMode encodingMode}.
-	 * Also see the <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#web-uri-encoding">
-	 * URI Encoding</a> section of the reference docs.
-	 * @param path the URI path
+	 * <p>生成的完整路径将被规范化以消除重复的斜杠。
+	 * <p><strong>注意：</strong> 在 {@link #path(String) path} 中插入包含斜杠的 URI 变量值时，这些斜杠是否被编码取决于配置的编码模式。有关详细信息，请参阅
+	 * {@link UriComponentsBuilder#encode()}，或如果通过 {@code WebClient} 或 {@code RestTemplate} 间接构建 URI，请参阅其
+	 * {@link DefaultUriBuilderFactory#setEncodingMode encodingMode}。还可以参阅参考文档的
+	 * <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#web-uri-encoding">URI 编码</a> 部分。
+	 *
+	 * @param path URI 路径
 	 */
 	UriBuilder path(String path);
 
 	/**
-	 * Override the current path.
-	 * @param path the URI path, or {@code null} for an empty path
+	 * 覆盖当前路径。
+	 *
+	 * @param path URI 路径，或 {@code null} 表示空路径
 	 */
 	UriBuilder replacePath(@Nullable String path);
 
 	/**
-	 * Append to the path using path segments. For example:
+	 * 使用路径段追加到路径。例如：
 	 * <pre class="code">
 	 *
 	 * builder.pathSegment("first-value", "second-value", "{id}").build("123")
 	 *
-	 * // Results is "/first-value/second-value/123"
+	 * // 结果是 "/first-value/second-value/123"
 	 * </pre>
-	 * <p>If slashes are present in a path segment, they are encoded:
+	 * <p>如果路径段中存在斜杠，则会进行编码：
 	 * <pre class="code">
 	 *
 	 * builder.pathSegment("ba/z", "{id}").build("a/b")
 	 *
-	 * // Results is "/ba%2Fz/a%2Fb"
+	 * // 结果是 "/ba%2Fz/a%2Fb"
 	 * </pre>
-	 * To insert a trailing slash, use the {@link #path} builder method:
+	 * 若要插入尾部斜杠，请使用 {@link #path} 构建方法：
 	 * <pre class="code">
 	 *
 	 * builder.pathSegment("first-value", "second-value").path("/")
 	 *
-	 * // Results is "/first-value/second-value/"
+	 * // 结果是 "/first-value/second-value/"
 	 * </pre>
-	 * <p>Empty path segments are ignored and therefore duplicate slashes do not
-	 * appear in the resulting full path.
-	 * @param pathSegments the URI path segments
+	 * <p>空路径段将被忽略，因此结果完整路径中不会出现重复的斜杠。
+	 *
+	 * @param pathSegments URI 路径段
 	 */
 	UriBuilder pathSegment(String... pathSegments) throws IllegalArgumentException;
 
 	/**
-	 * Parse the given query string into query parameters where parameters are
-	 * separated with {@code '&'} and their values, if any, with {@code '='}.
-	 * The query may contain URI template variables.
-	 * <p><strong>Note: </strong> please, review the Javadoc of
-	 * {@link #queryParam(String, Object...)} for further notes on the treatment
-	 * and encoding of individual query parameters.
-	 * @param query the query string
+	 * 将给定的查询字符串解析为查询参数，其中参数由 {@code '&'} 分隔，其值（如果有）由 {@code '='} 分隔。
+	 * 查询字符串可以包含 URI 模板变量。
+	 * <p><strong>注意：</strong> 请查看 {@link #queryParam(String, Object...)} 的 Javadoc，以了解有关单个查询参数的处理和编码的更多说明。
+	 *
+	 * @param query 查询字符串
 	 */
 	UriBuilder query(String query);
 
 	/**
-	 * Clear existing query parameters and then delegate to {@link #query(String)}.
-	 * <p><strong>Note: </strong> please, review the Javadoc of
-	 * {@link #queryParam(String, Object...)} for further notes on the treatment
-	 * and encoding of individual query parameters.
-	 * @param query the query string; a {@code null} value removes all query parameters.
+	 * 清除现有的查询参数，然后委托给 {@link #query(String)}。
+	 * <p><strong>注意：</strong> 请查看 {@link #queryParam(String, Object...)} 的 Javadoc，以了解有关单个查询参数的处理和编码的更多说明。
+	 *
+	 * @param query 查询字符串；{@code null} 值将移除所有查询参数。
 	 */
 	UriBuilder replaceQuery(@Nullable String query);
 
 	/**
-	 * Append the given query parameter. Both the parameter name and values may
-	 * contain URI template variables to be expanded later from values. If no
-	 * values are given, the resulting URI will contain the query parameter name
-	 * only, e.g. {@code "?foo"} instead of {@code "?foo=bar"}.
-	 * <p><strong>Note:</strong> encoding, if applied, will only encode characters
-	 * that are illegal in a query parameter name or value such as {@code "="}
-	 * or {@code "&"}. All others that are legal as per syntax rules in
-	 * <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a> are not
-	 * encoded. This includes {@code "+"} which sometimes needs to be encoded
-	 * to avoid its interpretation as an encoded space. Stricter encoding may
-	 * be applied by using a URI template variable along with stricter encoding
-	 * on variable values. For more details please read the
-	 * <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#web-uri-encoding">"URI Encoding"</a>
-	 * section of the Spring Framework reference.
-	 * @param name the query parameter name
-	 * @param values the query parameter values
+	 * 追加给定的查询参数。参数名称和值都可以包含 URI 模板变量，以便稍后从值中扩展。如果没有给定值，生成的 URI 将仅包含查询参数名称，
+	 * 例如 {@code "?foo"} 而不是 {@code "?foo=bar"}。
+	 * <p><strong>注意：</strong> 编码（如果应用的话）只会编码在查询参数名称或值中非法的字符，如 {@code "="} 或 {@code "&"}。所有其他符号根据
+	 * <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a> 的语法规则是合法的，不会被编码。这包括 {@code "+"}，有时需要对其进行编码以避免
+	 * 其被解释为编码的空格。可以通过使用 URI 模板变量和对变量值进行更严格的编码来应用更严格的编码。有关更多详细信息，请阅读 Spring Framework 参考文档的
+	 * <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#web-uri-encoding">"URI 编码"</a> 部分。
+	 *
+	 * @param name   查询参数名称
+	 * @param values 查询参数值
 	 * @see #queryParam(String, Collection)
 	 */
 	UriBuilder queryParam(String name, Object... values);
 
 	/**
-	 * Variant of {@link #queryParam(String, Object...)} with a Collection.
-	 * <p><strong>Note: </strong> please, review the Javadoc of
-	 * {@link #queryParam(String, Object...)} for further notes on the treatment
-	 * and encoding of individual query parameters.
-	 * @param name the query parameter name
-	 * @param values the query parameter values
-	 * @since 5.2
+	 * {@link #queryParam(String, Object...)} 的变体，使用集合。
+	 * <p><strong>注意：</strong> 请查看 {@link #queryParam(String, Object...)} 的 Javadoc，以了解有关单个查询参数的处理和编码的更多说明。
+	 *
+	 * @param name   查询参数名称
+	 * @param values 查询参数值
 	 * @see #queryParam(String, Object...)
+	 * @since 5.2
 	 */
 	UriBuilder queryParam(String name, @Nullable Collection<?> values);
 
 	/**
-	 * Delegates to either {@link #queryParam(String, Object...)} or
-	 * {@link #queryParam(String, Collection)} if the given {@link Optional} has
-	 * a value, or else if it is empty, no query parameter is added at all.
-	 * @param name the query parameter name
-	 * @param value an Optional, either empty or holding the query parameter value.
+	 * 委托给 {@link #queryParam(String, Object...)} 或 {@link #queryParam(String, Collection)}，
+	 * 如果给定的 {@link Optional} 有值，则添加查询参数，否则如果它为空，则不添加任何查询参数。
+	 *
+	 * @param name  查询参数名称
+	 * @param value 一个 Optional，可以为空或持有查询参数值。
 	 * @since 5.3
 	 */
 	UriBuilder queryParamIfPresent(String name, Optional<?> value);
 
 	/**
-	 * Add multiple query parameters and values.
-	 * <p><strong>Note: </strong> please, review the Javadoc of
-	 * {@link #queryParam(String, Object...)} for further notes on the treatment
-	 * and encoding of individual query parameters.
-	 * @param params the params
+	 * 添加多个查询参数和值。
+	 * <p><strong>注意：</strong> 请查看 {@link #queryParam(String, Object...)} 的 Javadoc，以了解有关单个查询参数的处理和编码的更多说明。
+	 *
+	 * @param params 查询参数
 	 */
 	UriBuilder queryParams(MultiValueMap<String, String> params);
 
 	/**
-	 * Set the query parameter values replacing existing values, or if no
-	 * values are given, the query parameter is removed.
-	 * <p><strong>Note: </strong> please, review the Javadoc of
-	 * {@link #queryParam(String, Object...)} for further notes on the treatment
-	 * and encoding of individual query parameters.
-	 * @param name the query parameter name
-	 * @param values the query parameter values
+	 * 设置查询参数值，替换现有值，如果没有给定值，则删除查询参数。
+	 * <p><strong>注意：</strong> 请查看 {@link #queryParam(String, Object...)} 的 Javadoc，以了解有关单个查询参数的处理和编码的更多说明。
+	 *
+	 * @param name   查询参数名称
+	 * @param values 查询参数值
 	 * @see #replaceQueryParam(String, Collection)
 	 */
 	UriBuilder replaceQueryParam(String name, Object... values);
 
 	/**
-	 * Variant of {@link #replaceQueryParam(String, Object...)} with a Collection.
-	 * <p><strong>Note: </strong> please, review the Javadoc of
-	 * {@link #queryParam(String, Object...)} for further notes on the treatment
-	 * and encoding of individual query parameters.
-	 * @param name the query parameter name
-	 * @param values the query parameter values
+	 * {@link #replaceQueryParam(String, Object...)} 的变体，使用集合。
+	 * <p><strong>注意：</strong> 请查看 {@link #queryParam(String, Object...)} 的 Javadoc，以了解有关单个查询参数的处理和编码的更多说明。
+	 *
+	 * @param name   查询参数名称
+	 * @param values 查询参数值
 	 * @since 5.2
 	 * @see #replaceQueryParam(String, Object...)
 	 */
 	UriBuilder replaceQueryParam(String name, @Nullable Collection<?> values);
 
 	/**
-	 * Set the query parameter values after removing all existing ones.
-	 * <p><strong>Note: </strong> please, review the Javadoc of
-	 * {@link #queryParam(String, Object...)} for further notes on the treatment
-	 * and encoding of individual query parameters.
-	 * @param params the query parameter name
+	 * 在删除所有现有查询参数后设置查询参数值。
+	 * <p><strong>注意：</strong> 请查看 {@link #queryParam(String, Object...)} 的 Javadoc，以了解有关单个查询参数的处理和编码的更多说明。
+	 *
+	 * @param params 查询参数
 	 */
 	UriBuilder replaceQueryParams(MultiValueMap<String, String> params);
 
 	/**
-	 * Set the URI fragment. The given fragment may contain URI template variables,
-	 * and may also be {@code null} to clear the fragment of this builder.
-	 * @param fragment the URI fragment
+	 * 设置 URI 片段。给定的片段可以包含 URI 模板变量，也可以为 {@code null} 以清除此构建器的片段。
+	 *
+	 * @param fragment URI 片段
 	 */
 	UriBuilder fragment(@Nullable String fragment);
 
 	/**
-	 * Build a {@link URI} instance and replaces URI template variables
-	 * with the values from an array.
-	 * @param uriVariables the map of URI variables
-	 * @return the URI
+	 * 构建一个 {@link URI} 实例，并使用数组中的值替换 URI 模板变量。
+	 *
+	 * @param uriVariables URI 变量的数组
+	 * @return URI 实例
 	 */
 	URI build(Object... uriVariables);
 
 	/**
-	 * Build a {@link URI} instance and replaces URI template variables
-	 * with the values from a map.
-	 * @param uriVariables the map of URI variables
-	 * @return the URI
+	 * 构建一个 {@link URI} 实例，并使用映射中的值替换 URI 模板变量。
+	 *
+	 * @param uriVariables URI 变量的映射
+	 * @return URI 实例
 	 */
 	URI build(Map<String, ?> uriVariables);
 
