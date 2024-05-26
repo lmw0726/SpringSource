@@ -16,31 +16,25 @@
 
 package org.springframework.web.util;
 
-import java.io.Serializable;
-
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import java.io.Serializable;
 
 /**
- * Servlet HttpSessionListener that automatically exposes the session mutex
- * when an HttpSession gets created. To be registered as a listener in
- * {@code web.xml}.
+ * Servlet HttpSessionListener，当 HttpSession 被创建时自动公开会话互斥锁。
+ * 应在 {@code web.xml} 中注册为监听器。
  *
- * <p>The session mutex is guaranteed to be the same object during
- * the entire lifetime of the session, available under the key defined
- * by the {@code SESSION_MUTEX_ATTRIBUTE} constant. It serves as a
- * safe reference to synchronize on for locking on the current session.
+ * <p>会话互斥锁在整个会话的生命周期内保证是相同的对象，可在由 {@code SESSION_MUTEX_ATTRIBUTE} 常量定义的键下使用。
+ * 它作为一个安全的引用，用于在当前会话上进行锁定。
  *
- * <p>In many cases, the HttpSession reference itself is a safe mutex
- * as well, since it will always be the same object reference for the
- * same active logical session. However, this is not guaranteed across
- * different servlet containers; the only 100% safe way is a session mutex.
+ * <p>在许多情况下，HttpSession 引用本身也是一个安全的互斥锁，因为对于相同的活动逻辑会话，它始终是相同的对象引用。
+ * 但是，这不能在不同的servlet容器之间保证；唯一100%安全的方法是会话互斥锁。
  *
  * @author Juergen Hoeller
- * @since 1.2.7
  * @see WebUtils#SESSION_MUTEX_ATTRIBUTE
  * @see WebUtils#getSessionMutex(javax.servlet.http.HttpSession)
  * @see org.springframework.web.servlet.mvc.AbstractController#setSynchronizeOnSession
+ * @since 1.2.7
  */
 public class HttpSessionMutexListener implements HttpSessionListener {
 
@@ -56,9 +50,8 @@ public class HttpSessionMutexListener implements HttpSessionListener {
 
 
 	/**
-	 * The mutex to be registered.
-	 * Doesn't need to be anything but a plain Object to synchronize on.
-	 * Should be serializable to allow for HttpSession persistence.
+	 * 要注册的互斥锁。只需要是一个普通的对象，用于同步。
+	 * 应该是可序列化的，以允许 HttpSession 的持久化。
 	 */
 	@SuppressWarnings("serial")
 	private static class Mutex implements Serializable {

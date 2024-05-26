@@ -16,63 +16,70 @@
 
 package org.springframework.web.util;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-
-import org.springframework.http.HttpMethod;
-import org.springframework.lang.Nullable;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URLEncoder;
+import java.util.*;
 
 /**
- * {@link javax.servlet.http.HttpServletRequest} wrapper that caches all content read from
- * the {@linkplain #getInputStream() input stream} and {@linkplain #getReader() reader},
- * and allows this content to be retrieved via a {@link #getContentAsByteArray() byte array}.
+ * 将从{@linkplain #getInputStream()输入流}和{@linkplain #getReader()读取器}中读取的所有内容缓存起来，
+ * 并允许通过{@link #getContentAsByteArray()}字节数组检索此内容的{@link HttpServletRequest}包装器。
  *
- * <p>This class acts as an interceptor that only caches content as it is being
- * read but otherwise does not cause content to be read. That means if the request
- * content is not consumed, then the content is not cached, and cannot be
- * retrieved via {@link #getContentAsByteArray()}.
+ * <p>此类作为一个拦截器，只在内容被读取时缓存内容，但不会导致内容被读取。这意味着如果请求内容没有被消耗，
+ * 则不会缓存内容，也无法通过{@link #getContentAsByteArray()}检索到内容。
  *
- * <p>Used e.g. by {@link org.springframework.web.filter.AbstractRequestLoggingFilter}.
- * Note: As of Spring Framework 5.0, this wrapper is built on the Servlet 3.1 API.
+ * <p>例如，被{@link org.springframework.web.filter.AbstractRequestLoggingFilter}使用。
+ * 注意：从Spring Framework 5.0开始，此包装器建立在Servlet 3.1 API之上。
  *
  * @author Juergen Hoeller
  * @author Brian Clozel
- * @since 4.1.3
  * @see ContentCachingResponseWrapper
+ * @since 4.1.3
  */
 public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 
+	/**
+	 * 表示表单内容类型的常量。
+	 */
 	private static final String FORM_CONTENT_TYPE = "application/x-www-form-urlencoded";
 
-
+	/**
+	 * 缓存请求内容的字节数组输出流。
+	 */
 	private final ByteArrayOutputStream cachedContent;
 
+	/**
+	 * 内容缓存限制的最大字节数。
+	 */
 	@Nullable
 	private final Integer contentCacheLimit;
 
+	/**
+	 * 请求的Servlet输入流。
+	 */
 	@Nullable
 	private ServletInputStream inputStream;
 
+	/**
+	 * 请求的缓冲读取器。
+	 */
 	@Nullable
 	private BufferedReader reader;
 
 
 	/**
-	 * Create a new ContentCachingRequestWrapper for the given servlet request.
-	 * @param request the original servlet request
+	 * 为给定的servlet请求创建一个新的ContentCachingRequestWrapper。
+	 *
+	 * @param request 原始servlet请求
 	 */
 	public ContentCachingRequestWrapper(HttpServletRequest request) {
 		super(request);
@@ -82,11 +89,12 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	/**
-	 * Create a new ContentCachingRequestWrapper for the given servlet request.
-	 * @param request the original servlet request
-	 * @param contentCacheLimit the maximum number of bytes to cache per request
-	 * @since 4.3.6
+	 * 为给定的servlet请求创建一个新的ContentCachingRequestWrapper。
+	 *
+	 * @param request           原始servlet请求
+	 * @param contentCacheLimit 每个请求最大缓存字节数
 	 * @see #handleContentOverflow(int)
+	 * @since 4.3.6
 	 */
 	public ContentCachingRequestWrapper(HttpServletRequest request, int contentCacheLimit) {
 		super(request);
@@ -97,102 +105,132 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
+		// 如果输入流为空，则初始化输入流为 ContentCachingInputStream
 		if (this.inputStream == null) {
 			this.inputStream = new ContentCachingInputStream(getRequest().getInputStream());
 		}
+		// 返回输入流
 		return this.inputStream;
 	}
 
 	@Override
 	public String getCharacterEncoding() {
+		// 调用父类的 getCharacterEncoding() 方法获取字符编码
 		String enc = super.getCharacterEncoding();
+		// 如果字符编码不为 null，则返回字符编码；否则返回默认字符编码
 		return (enc != null ? enc : WebUtils.DEFAULT_CHARACTER_ENCODING);
 	}
 
 	@Override
 	public BufferedReader getReader() throws IOException {
+		// 如果读取器为空，则初始化读取器
 		if (this.reader == null) {
+			// 使用请求的输入流和字符编码初始化 BufferedReader
 			this.reader = new BufferedReader(new InputStreamReader(getInputStream(), getCharacterEncoding()));
 		}
+		// 返回读取器
 		return this.reader;
 	}
 
 	@Override
 	public String getParameter(String name) {
+		// 如果缓存的内容大小为 0 并且是表单提交
 		if (this.cachedContent.size() == 0 && isFormPost()) {
+			// 将请求参数写入缓存的内容
 			writeRequestParametersToCachedContent();
 		}
+		// 调用父类的 getParameter(name) 方法获取参数值
 		return super.getParameter(name);
 	}
 
 	@Override
 	public Map<String, String[]> getParameterMap() {
+		// 如果缓存的内容大小为 0 并且是表单提交
 		if (this.cachedContent.size() == 0 && isFormPost()) {
+			// 将请求参数写入缓存的内容
 			writeRequestParametersToCachedContent();
 		}
+		// 调用父类的 getParameterMap() 方法获取参数映射
 		return super.getParameterMap();
 	}
 
 	@Override
 	public Enumeration<String> getParameterNames() {
+		// 如果缓存的内容大小为 0 并且是表单提交
 		if (this.cachedContent.size() == 0 && isFormPost()) {
+			// 将请求参数写入缓存的内容
 			writeRequestParametersToCachedContent();
 		}
+		// 调用父类的 getParameterNames() 方法获取参数名枚举
 		return super.getParameterNames();
 	}
 
 	@Override
 	public String[] getParameterValues(String name) {
+		// 如果缓存的内容大小为 0 并且是表单提交
 		if (this.cachedContent.size() == 0 && isFormPost()) {
+			// 将请求参数写入缓存的内容
 			writeRequestParametersToCachedContent();
 		}
+		// 调用父类的 getParameterValues(name) 方法获取参数值数组
 		return super.getParameterValues(name);
 	}
 
 
 	private boolean isFormPost() {
+		// 获取请求的内容类型
 		String contentType = getContentType();
+		// 返回是否为表单提交（内容类型不为空且包含表单类型且请求方法为 POST）
 		return (contentType != null && contentType.contains(FORM_CONTENT_TYPE) &&
 				HttpMethod.POST.matches(getMethod()));
 	}
 
 	private void writeRequestParametersToCachedContent() {
 		try {
+			// 如果缓存的内容大小为 0
 			if (this.cachedContent.size() == 0) {
+				// 获取请求的字符编码
 				String requestEncoding = getCharacterEncoding();
+				// 获取请求参数映射
 				Map<String, String[]> form = super.getParameterMap();
+				// 遍历请求参数映射
 				for (Iterator<String> nameIterator = form.keySet().iterator(); nameIterator.hasNext(); ) {
 					String name = nameIterator.next();
 					List<String> values = Arrays.asList(form.get(name));
+					// 遍历参数值列表
 					for (Iterator<String> valueIterator = values.iterator(); valueIterator.hasNext(); ) {
 						String value = valueIterator.next();
+						// 将参数名进行 URL 编码写入缓存内容
 						this.cachedContent.write(URLEncoder.encode(name, requestEncoding).getBytes());
+						// 如果参数值不为空
 						if (value != null) {
 							this.cachedContent.write('=');
+							// 将参数值进行 URL 编码写入缓存内容
 							this.cachedContent.write(URLEncoder.encode(value, requestEncoding).getBytes());
+							// 如果还有下一个参数值，则写入 '&'
 							if (valueIterator.hasNext()) {
 								this.cachedContent.write('&');
 							}
 						}
 					}
+					// 如果还有下一个参数名，则写入 '&'
 					if (nameIterator.hasNext()) {
 						this.cachedContent.write('&');
 					}
 				}
 			}
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
+			// 如果发生 IO 异常，则抛出 IllegalStateException 异常
 			throw new IllegalStateException("Failed to write request parameters to cached content", ex);
 		}
 	}
 
 	/**
-	 * Return the cached request content as a byte array.
-	 * <p>The returned array will never be larger than the content cache limit.
-	 * <p><strong>Note:</strong> The byte array returned from this method
-	 * reflects the amount of content that has has been read at the time when it
-	 * is called. If the application does not read the content, this method
-	 * returns an empty array.
+	 * 将缓存的请求内容作为字节数组返回。
+	 * <p>返回的数组大小永远不会超过内容缓存限制。
+	 * <p><strong>注意：</strong>从该方法返回的字节数组反映了在调用时已读取的内容量。
+	 * 如果应用程序未读取内容，则此方法将返回一个空数组。
+	 *
 	 * @see #ContentCachingRequestWrapper(HttpServletRequest, int)
 	 */
 	public byte[] getContentAsByteArray() {
@@ -200,23 +238,26 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	/**
-	 * Template method for handling a content overflow: specifically, a request
-	 * body being read that exceeds the specified content cache limit.
-	 * <p>The default implementation is empty. Subclasses may override this to
-	 * throw a payload-too-large exception or the like.
-	 * @param contentCacheLimit the maximum number of bytes to cache per request
-	 * which has just been exceeded
-	 * @since 4.3.6
+	 * 处理内容溢出的模板方法：特别是，读取超过指定内容缓存限制的请求体。
+	 * <p>默认实现为空。子类可以重写此方法以抛出负载过大异常或类似异常。
+	 *
+	 * @param contentCacheLimit 刚刚超过的每个请求的最大缓存字节数
 	 * @see #ContentCachingRequestWrapper(HttpServletRequest, int)
+	 * @since 4.3.6
 	 */
 	protected void handleContentOverflow(int contentCacheLimit) {
 	}
 
 
 	private class ContentCachingInputStream extends ServletInputStream {
-
+		/**
+		 * Servlet输入流
+		 */
 		private final ServletInputStream is;
 
+		/**
+		 * 是否溢出
+		 */
 		private boolean overflow = false;
 
 		public ContentCachingInputStream(ServletInputStream is) {
@@ -225,50 +266,71 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 
 		@Override
 		public int read() throws IOException {
+			// 从输入流中读取一个字节
 			int ch = this.is.read();
+			// 如果读取到的字节不为 -1 并且未发生溢出
 			if (ch != -1 && !this.overflow) {
+				// 如果设置了内容缓存限制并且缓存的内容大小达到了限制
 				if (contentCacheLimit != null && cachedContent.size() == contentCacheLimit) {
+					// 标记发生溢出
 					this.overflow = true;
+					// 处理内容溢出
 					handleContentOverflow(contentCacheLimit);
-				}
-				else {
+				} else {
+					// 将读取到的字节写入缓存内容
 					cachedContent.write(ch);
 				}
 			}
+			// 返回读取到的字节
 			return ch;
 		}
 
 		@Override
 		public int read(byte[] b) throws IOException {
+			// 从输入流中读取到缓冲区 b 中，返回读取的字节数
 			int count = this.is.read(b);
+			// 将读取到的内容写入缓存
 			writeToCache(b, 0, count);
+			// 返回读取的字节数
 			return count;
 		}
 
 		private void writeToCache(final byte[] b, final int off, int count) {
+			// 如果未发生溢出且读取的字节数大于 0
 			if (!this.overflow && count > 0) {
+				// 如果设置了内容缓存限制，并且读取的内容加上已有内容的大小大于限制
 				if (contentCacheLimit != null &&
 						count + cachedContent.size() > contentCacheLimit) {
+					// 标记发生溢出
 					this.overflow = true;
+					// 将缓冲区中的内容写入缓存，保证缓存的内容大小不超过限制
 					cachedContent.write(b, off, contentCacheLimit - cachedContent.size());
+					// 处理内容溢出
 					handleContentOverflow(contentCacheLimit);
 					return;
 				}
+				// 将缓冲区中的内容写入缓存
 				cachedContent.write(b, off, count);
 			}
 		}
 
 		@Override
 		public int read(final byte[] b, final int off, final int len) throws IOException {
+			// 从输入流中读取到缓冲区 b 中，从 off 索引开始，最多读取 len 个字节，返回读取的字节数
 			int count = this.is.read(b, off, len);
+			// 将读取到的内容写入缓存
 			writeToCache(b, off, count);
+			// 返回读取的字节数
 			return count;
 		}
 
 		@Override
 		public int readLine(final byte[] b, final int off, final int len) throws IOException {
+			// 从输入流中读取一行数据到缓冲区 b 中，从 off 索引开始，最多读取 len 个字节，返回读取的字节数
 			int count = this.is.readLine(b, off, len);
+			// 将读取到的内容写入缓存
 			writeToCache(b, off, count);
+			// 返回读取的字节数
 			return count;
 		}
 

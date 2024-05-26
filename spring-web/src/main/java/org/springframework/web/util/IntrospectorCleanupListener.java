@@ -16,52 +16,38 @@
 
 package org.springframework.web.util;
 
-import java.beans.Introspector;
+import org.springframework.beans.CachedIntrospectionResults;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import org.springframework.beans.CachedIntrospectionResults;
+import java.beans.Introspector;
 
 /**
- * Listener that flushes the JDK's {@link java.beans.Introspector JavaBeans Introspector}
- * cache on web app shutdown. Register this listener in your {@code web.xml} to
- * guarantee proper release of the web application class loader and its loaded classes.
+ * 监听器，用于在Web应用关闭时刷新JDK的{@link java.beans.Introspector JavaBeans Introspector}缓存。
+ * 在您的{@code web.xml}中注册此监听器，以确保正确释放Web应用程序类加载器及其加载的类。
  *
- * <p><b>If the JavaBeans Introspector has been used to analyze application classes,
- * the system-level Introspector cache will hold a hard reference to those classes.
- * Consequently, those classes and the web application class loader will not be
- * garbage-collected on web app shutdown!</b> This listener performs proper cleanup,
- * to allow for garbage collection to take effect.
+ * <p><b>如果JavaBeans Introspector已用于分析应用程序类，则系统级别的Introspector缓存将持有对这些类的硬引用。
+ * 因此，在Web应用关闭时，这些类和Web应用程序类加载器将不会被垃圾回收！</b> 此监听器执行正确的清理操作，
+ * 以允许垃圾回收生效。
  *
- * <p>Unfortunately, the only way to clean up the Introspector is to flush
- * the entire cache, as there is no way to specifically determine the
- * application's classes referenced there. This will remove cached
- * introspection results for all other applications in the server too.
+ * <p>不幸的是，清理Introspector的唯一方法是刷新整个缓存，因为没有办法特别确定引用了应用程序的类。
+ * 这将同时删除服务器中所有其他应用程序的缓存的内省结果。
  *
- * <p>Note that this listener is <i>not</i> necessary when using Spring's beans
- * infrastructure within the application, as Spring's own introspection results
- * cache will immediately flush an analyzed class from the JavaBeans Introspector
- * cache and only hold a cache within the application's own ClassLoader.
+ * <p>请注意，在应用程序中使用Spring的bean基础设施时，不需要此监听器，
+ * 因为Spring自身的内省结果缓存将立即从JavaBeans Introspector缓存中删除分析的类，
+ * 并且仅在应用程序自己的ClassLoader中保持缓存。
  *
- * <b>Although Spring itself does not create JDK Introspector leaks, note that this
- * listener should nevertheless be used in scenarios where the Spring framework classes
- * themselves reside in a 'common' ClassLoader (such as the system ClassLoader).</b>
- * In such a scenario, this listener will properly clean up Spring's introspection cache.
+ * <b>尽管Spring本身不会创建JDK Introspector泄漏，但请注意，在Spring框架类本身位于“共享”ClassLoader（例如系统ClassLoader）的场景中，
+ * 仍然应使用此监听器。</b> 在这种情况下，此监听器将正确清理Spring的内省缓存。
  *
- * <p>Application classes hardly ever need to use the JavaBeans Introspector
- * directly, so are normally not the cause of Introspector resource leaks.
- * Rather, many libraries and frameworks do not clean up the Introspector:
- * e.g. Struts and Quartz.
+ * <p>应用程序类几乎不需要直接使用JavaBeans Introspector，因此通常不是Introspector资源泄漏的原因。
+ * 相反，许多库和框架没有清理Introspector：例如Struts和Quartz。
  *
- * <p>Note that a single such Introspector leak will cause the entire web
- * app class loader to not get garbage collected! This has the consequence that
- * you will see all the application's static class resources (like singletons)
- * around after web app shutdown, which is not the fault of those classes!
+ * <p>请注意，单个此类Introspector泄漏将导致整个Web应用程序类加载器无法被垃圾回收！
+ * 这意味着您将在Web应用程序关闭后看到所有应用程序的静态类资源（如单例），这不是这些类的错！
  *
- * <p><b>This listener should be registered as the first one in {@code web.xml},
- * before any application listeners such as Spring's ContextLoaderListener.</b>
- * This allows the listener to take full effect at the right time of the lifecycle.
+ * <p><b>此监听器应该在{@code web.xml}中注册为第一个监听器，位于任何应用程序监听器之前，例如Spring的ContextLoaderListener。</b>
+ * 这允许监听器在生命周期的正确时间完全生效。
  *
  * @author Juergen Hoeller
  * @since 1.1
@@ -73,12 +59,15 @@ public class IntrospectorCleanupListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
+		// 接受当前线程的上下文类加载器
 		CachedIntrospectionResults.acceptClassLoader(Thread.currentThread().getContextClassLoader());
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
+		// 清除当前线程的上下文类加载器
 		CachedIntrospectionResults.clearClassLoader(Thread.currentThread().getContextClassLoader());
+		// 刷新内省器的缓存
 		Introspector.flushCaches();
 	}
 

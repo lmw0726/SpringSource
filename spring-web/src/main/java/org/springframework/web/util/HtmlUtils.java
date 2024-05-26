@@ -19,19 +19,17 @@ package org.springframework.web.util;
 import org.springframework.util.Assert;
 
 /**
- * Utility class for HTML escaping.
+ * HTML转义的实用工具类。
  *
- * <p>Escapes and unescapes based on the W3C HTML 4.01 recommendation, handling
- * character entity references.
+ * <p>根据W3C HTML 4.01建议进行转义和反转义，处理字符实体引用。
  *
- * <p>Reference:
+ * <p>参考：
  * <a href="https://www.w3.org/TR/html4/charset.html">https://www.w3.org/TR/html4/charset.html</a>
  *
- * <p>For a comprehensive set of String escaping utilities, consider
+ * <p>对于一套全面的字符串转义实用工具，请考虑使用
  * <a href="https://commons.apache.org/proper/commons-text/">Apache Commons Text</a>
- * and its {@code StringEscapeUtils} class. We do not use that class here in order
- * to avoid a runtime dependency on Commons Text just for HTML escaping. Furthermore,
- * Spring's HTML escaping is more flexible and 100% HTML 4.0 compliant.
+ * 及其 {@code StringEscapeUtils} 类。我们这里没有使用该类，以避免在仅用于HTML转义时对 Commons Text 进行运行时依赖。
+ * 此外，Spring的HTML转义更加灵活，而且完全符合HTML 4.0规范。
  *
  * @author Juergen Hoeller
  * @author Martin Kersten
@@ -41,179 +39,189 @@ import org.springframework.util.Assert;
 public abstract class HtmlUtils {
 
 	/**
-	 * Shared instance of pre-parsed HTML character entity references.
+	 * 预解析的HTML字符实体引用的共享实例。
 	 */
 	private static final HtmlCharacterEntityReferences characterEntityReferences =
 			new HtmlCharacterEntityReferences();
 
 
 	/**
-	 * Turn special characters into HTML character references.
-	 * <p>Handles the complete character set defined in the HTML 4.01 recommendation.
-	 * <p>Escapes all special characters to their corresponding
-	 * entity reference (e.g. {@code &lt;}).
-	 * <p>Reference:
+	 * 将特殊字符转换为HTML字符引用。
+	 * <p>处理HTML 4.01建议中定义的完整字符集。
+	 * <p>将所有特殊字符转义为其对应的实体引用（例如 {@code &lt;}）。
+	 * <p>参考：
 	 * <a href="https://www.w3.org/TR/html4/sgml/entities.html">
 	 * https://www.w3.org/TR/html4/sgml/entities.html
 	 * </a>
-	 * @param input the (unescaped) input string
-	 * @return the escaped string
+	 *
+	 * @param input 输入字符串（未转义）
+	 * @return 转义后的字符串
 	 */
 	public static String htmlEscape(String input) {
 		return htmlEscape(input, WebUtils.DEFAULT_CHARACTER_ENCODING);
 	}
 
 	/**
-	 * Turn special characters into HTML character references.
-	 * <p>Handles the complete character set defined in the HTML 4.01 recommendation.
-	 * <p>Escapes all special characters to their corresponding
-	 * entity reference (e.g. {@code &lt;}) at least as required by the
-	 * specified encoding. In other words, if a special character does
-	 * not have to be escaped for the given encoding, it may not be.
-	 * <p>Reference:
+	 * 将特殊字符转换为HTML字符引用。
+	 * <p>处理HTML 4.01建议中定义的完整字符集。
+	 * <p>至少根据指定的编码要求，将所有特殊字符转义为其对应的实体引用（例如 {@code &lt;}）。
+	 * <p>参考：
 	 * <a href="https://www.w3.org/TR/html4/sgml/entities.html">
 	 * https://www.w3.org/TR/html4/sgml/entities.html
 	 * </a>
-	 * @param input the (unescaped) input string
-	 * @param encoding the name of a supported {@link java.nio.charset.Charset charset}
-	 * @return the escaped string
+	 *
+	 * @param input    输入字符串（未转义）
+	 * @param encoding 支持的 {@link java.nio.charset.Charset charset} 的名称
+	 * @return 转义后的字符串
 	 * @since 4.1.2
 	 */
 	public static String htmlEscape(String input, String encoding) {
 		Assert.notNull(input, "Input is required");
 		Assert.notNull(encoding, "Encoding is required");
+		// 创建一个 StringBuilder，其初始容量为输入长度的两倍
 		StringBuilder escaped = new StringBuilder(input.length() * 2);
+		// 遍历输入的每个字符
 		for (int i = 0; i < input.length(); i++) {
 			char character = input.charAt(i);
+			// 将字符转换为字符实体引用
 			String reference = characterEntityReferences.convertToReference(character, encoding);
+			// 如果字符实体引用不为空，则追加到 StringBuilder 中
 			if (reference != null) {
 				escaped.append(reference);
-			}
-			else {
+			} else {
+				// 否则直接追加字符
 				escaped.append(character);
 			}
 		}
+		// 返回转义后的字符串
 		return escaped.toString();
 	}
 
 	/**
-	 * Turn special characters into HTML character references.
-	 * <p>Handles the complete character set defined in the HTML 4.01 recommendation.
-	 * <p>Escapes all special characters to their corresponding numeric
-	 * reference in decimal format (&amp;#<i>Decimal</i>;).
-	 * <p>Reference:
+	 * 将特殊字符转换为HTML字符引用。
+	 * <p>处理HTML 4.01建议中定义的完整字符集。
+	 * <p>将所有特殊字符转义为其对应的十进制数引用（例如 {@code &amp;#68;}）。
+	 * <p>参考：
 	 * <a href="https://www.w3.org/TR/html4/sgml/entities.html">
 	 * https://www.w3.org/TR/html4/sgml/entities.html
 	 * </a>
-	 * @param input the (unescaped) input string
-	 * @return the escaped string
+	 *
+	 * @param input 输入字符串（未转义）
+	 * @return 转义后的字符串
 	 */
 	public static String htmlEscapeDecimal(String input) {
 		return htmlEscapeDecimal(input, WebUtils.DEFAULT_CHARACTER_ENCODING);
 	}
 
 	/**
-	 * Turn special characters into HTML character references.
-	 * <p>Handles the complete character set defined in the HTML 4.01 recommendation.
-	 * <p>Escapes all special characters to their corresponding numeric
-	 * reference in decimal format (&amp;#<i>Decimal</i>;) at least as required by the
-	 * specified encoding. In other words, if a special character does
-	 * not have to be escaped for the given encoding, it may not be.
-	 * <p>Reference:
+	 * 将特殊字符转换为HTML字符引用。
+	 * <p>处理HTML 4.01建议中定义的完整字符集。
+	 * <p>至少根据指定的编码要求，将所有特殊字符转义为其对应的十进制数引用（例如 {@code &amp;#68;}）。
+	 * <p>参考：
 	 * <a href="https://www.w3.org/TR/html4/sgml/entities.html">
 	 * https://www.w3.org/TR/html4/sgml/entities.html
 	 * </a>
-	 * @param input the (unescaped) input string
-	 * @param encoding the name of a supported {@link java.nio.charset.Charset charset}
-	 * @return the escaped string
+	 *
+	 * @param input    输入字符串（未转义）
+	 * @param encoding 支持的 {@link java.nio.charset.Charset charset} 的名称
+	 * @return 转义后的字符串
 	 * @since 4.1.2
 	 */
 	public static String htmlEscapeDecimal(String input, String encoding) {
 		Assert.notNull(input, "Input is required");
 		Assert.notNull(encoding, "Encoding is required");
+		// 创建一个 StringBuilder，其初始容量为输入长度的两倍
 		StringBuilder escaped = new StringBuilder(input.length() * 2);
+		// 遍历输入的每个字符
 		for (int i = 0; i < input.length(); i++) {
 			char character = input.charAt(i);
+			// 如果字符能映射到字符实体引用
 			if (characterEntityReferences.isMappedToReference(character, encoding)) {
+				// 将字符转换为十进制字符实体引用
 				escaped.append(HtmlCharacterEntityReferences.DECIMAL_REFERENCE_START);
+				// 添加当前字符
 				escaped.append((int) character);
 				escaped.append(HtmlCharacterEntityReferences.REFERENCE_END);
-			}
-			else {
+			} else {
+				// 否则直接追加字符
 				escaped.append(character);
 			}
 		}
+		// 返回转义后的字符串
 		return escaped.toString();
 	}
 
 	/**
-	 * Turn special characters into HTML character references.
-	 * <p>Handles the complete character set defined in the HTML 4.01 recommendation.
-	 * <p>Escapes all special characters to their corresponding numeric
-	 * reference in hex format (&amp;#x<i>Hex</i>;).
-	 * <p>Reference:
+	 * 将特殊字符转换为HTML字符引用。
+	 * <p>处理HTML 4.01建议中定义的完整字符集。
+	 * <p>将所有特殊字符转义为其对应的十六进制数引用（例如 {@code &amp;#x<i>Hex</i>;}）。
+	 * <p>参考：
 	 * <a href="https://www.w3.org/TR/html4/sgml/entities.html">
 	 * https://www.w3.org/TR/html4/sgml/entities.html
 	 * </a>
-	 * @param input the (unescaped) input string
-	 * @return the escaped string
+	 *
+	 * @param input 输入字符串（未转义）
+	 * @return 转义后的字符串
 	 */
 	public static String htmlEscapeHex(String input) {
 		return htmlEscapeHex(input, WebUtils.DEFAULT_CHARACTER_ENCODING);
 	}
 
 	/**
-	 * Turn special characters into HTML character references.
-	 * <p>Handles the complete character set defined in the HTML 4.01 recommendation.
-	 * <p>Escapes all special characters to their corresponding numeric
-	 * reference in hex format (&amp;#x<i>Hex</i>;) at least as required by the
-	 * specified encoding. In other words, if a special character does
-	 * not have to be escaped for the given encoding, it may not be.
-	 * <p>Reference:
+	 * 将特殊字符转换为HTML字符引用。
+	 * <p>处理HTML 4.01建议中定义的完整字符集。
+	 * <p>至少根据指定的编码要求，将所有特殊字符转义为其对应的十六进制数引用（例如 {@code &amp;#x<i>Hex</i>;}）。
+	 * <p>参考：
 	 * <a href="https://www.w3.org/TR/html4/sgml/entities.html">
 	 * https://www.w3.org/TR/html4/sgml/entities.html
 	 * </a>
-	 * @param input the (unescaped) input string
-	 * @param encoding the name of a supported {@link java.nio.charset.Charset charset}
-	 * @return the escaped string
+	 *
+	 * @param input    输入字符串（未转义）
+	 * @param encoding 支持的 {@link java.nio.charset.Charset charset} 的名称
+	 * @return 转义后的字符串
 	 * @since 4.1.2
 	 */
 	public static String htmlEscapeHex(String input, String encoding) {
 		Assert.notNull(input, "Input is required");
 		Assert.notNull(encoding, "Encoding is required");
+		// 创建一个 StringBuilder，其初始容量为输入长度的两倍
 		StringBuilder escaped = new StringBuilder(input.length() * 2);
+		// 遍历输入的每个字符
 		for (int i = 0; i < input.length(); i++) {
 			char character = input.charAt(i);
+			// 如果字符能映射到字符实体引用
 			if (characterEntityReferences.isMappedToReference(character, encoding)) {
+				// 将字符转换为十六进制字符实体引用
 				escaped.append(HtmlCharacterEntityReferences.HEX_REFERENCE_START);
+				// 将当前字符转为十六进制，并添加到StringBuilder中
 				escaped.append(Integer.toString(character, 16));
 				escaped.append(HtmlCharacterEntityReferences.REFERENCE_END);
-			}
-			else {
+			} else {
+				// 否则直接追加字符
 				escaped.append(character);
 			}
 		}
+		// 返回转义后的字符串
 		return escaped.toString();
 	}
 
 	/**
-	 * Turn HTML character references into their plain text UNICODE equivalent.
-	 * <p>Handles complete character set defined in HTML 4.01 recommendation
-	 * and all reference types (decimal, hex, and entity).
-	 * <p>Correctly converts the following formats:
+	 * 将HTML字符引用转换为其纯文本UNICODE等效形式。
+	 * <p>处理HTML 4.01建议中定义的完整字符集和所有引用类型（十进制、十六进制和实体）。
+	 * <p>正确转换以下格式：
 	 * <blockquote>
-	 * &amp;#<i>Entity</i>; - <i>(Example: &amp;amp;) case sensitive</i>
-	 * &amp;#<i>Decimal</i>; - <i>(Example: &amp;#68;)</i><br>
-	 * &amp;#x<i>Hex</i>; - <i>(Example: &amp;#xE5;) case insensitive</i><br>
+	 * &amp;#<i>Entity</i>; - <i>（示例：&amp;amp;）区分大小写</i>
+	 * &amp;#<i>Decimal</i>; - <i>（示例：&amp;#68;）</i><br>
+	 * &amp;#x<i>Hex</i>; - <i>（示例：&amp;#xE5;）不区分大小写</i><br>
 	 * </blockquote>
-	 * <p>Gracefully handles malformed character references by copying original
-	 * characters as is when encountered.
-	 * <p>Reference:
+	 * <p>通过将原始字符复制为遇到时的原样，优雅地处理格式不正确的字符引用。
+	 * <p>参考：
 	 * <a href="https://www.w3.org/TR/html4/sgml/entities.html">
 	 * https://www.w3.org/TR/html4/sgml/entities.html
 	 * </a>
-	 * @param input the (escaped) input string
-	 * @return the unescaped string
+	 *
+	 * @param input 输入字符串（已转义）
+	 * @return 未转义的字符串
 	 */
 	public static String htmlUnescape(String input) {
 		return new HtmlCharacterEntityDecoder(characterEntityReferences, input).decode();

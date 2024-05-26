@@ -16,56 +16,56 @@
 
 package org.springframework.web.util;
 
-import javax.servlet.ServletException;
-
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.ServletException;
+
 /**
- * Subclass of {@link ServletException} that properly handles a root cause in terms
- * of message and stacktrace, just like NestedChecked/RuntimeException does.
+ * {@link ServletException} 的子类，以与 NestedChecked/RuntimeException 相同的方式处理根本原因的消息和堆栈跟踪。
  *
- * <p>Note that the plain ServletException doesn't expose its root cause at all,
- * neither in the exception message nor in printed stack traces! While this might
- * be fixed in later Servlet API variants (which even differ per vendor for the
- * same API version), it is not reliably available on Servlet 2.4 (the minimum
- * version required by Spring 3.x), which is why we need to do it ourselves.
+ * <p>请注意，普通的 ServletException 根本不公开其根本原因，无论是在异常消息中还是在打印的堆栈跟踪中！
+ * 虽然这可能在后续的 Servlet API 变体中得到修复（甚至对于相同的 API 版本，不同供应商的行为也有所不同），
+ * 但在 Servlet 2.4（Spring 3.x 所需的最低版本）中不可靠地可用，这就是为什么我们需要自己来处理的原因。
  *
- * <p>The similarity between this class and the NestedChecked/RuntimeException
- * class is unavoidable, as this class needs to derive from ServletException.
+ * <p>这个类与 NestedChecked/RuntimeException 类之间的相似性是不可避免的，因为这个类需要派生自 ServletException。
  *
  * @author Juergen Hoeller
- * @since 1.2.5
  * @see #getMessage
  * @see #printStackTrace
  * @see org.springframework.core.NestedCheckedException
  * @see org.springframework.core.NestedRuntimeException
+ * @since 1.2.5
  */
 public class NestedServletException extends ServletException {
 
-	/** Use serialVersionUID from Spring 1.2 for interoperability. */
+	/**
+	 * 从 Spring 1.2 中使用 serialVersionUID 实现互操作性。
+	 */
 	private static final long serialVersionUID = -5292377985529381145L;
 
 	static {
-		// Eagerly load the NestedExceptionUtils class to avoid classloader deadlock
-		// issues on OSGi when calling getMessage(). Reported by Don Brown; SPR-5607.
+		// 急切地加载 NestedExceptionUtils 类，
+		// 以避免在调用 getMessage() 时在 OSGi 上出现类加载器死锁问题。
+		// Don Brown 报告的；SPR-5607。
 		NestedExceptionUtils.class.getName();
 	}
 
 
 	/**
-	 * Construct a {@code NestedServletException} with the specified detail message.
-	 * @param msg the detail message
+	 * 使用指定的详细消息构造 {@code NestedServletException}。
+	 *
+	 * @param msg 详细消息
 	 */
 	public NestedServletException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Construct a {@code NestedServletException} with the specified detail message
-	 * and nested exception.
-	 * @param msg the detail message
-	 * @param cause the nested exception
+	 * 使用指定的详细消息和嵌套异常构造 {@code NestedServletException}。
+	 *
+	 * @param msg   详细消息
+	 * @param cause 嵌套异常
 	 */
 	public NestedServletException(@Nullable String msg, @Nullable Throwable cause) {
 		super(msg, cause);
@@ -73,8 +73,7 @@ public class NestedServletException extends ServletException {
 
 
 	/**
-	 * Return the detail message, including the message from the nested exception
-	 * if there is one.
+	 * 返回详细消息，包括嵌套异常的消息（如果有）。
 	 */
 	@Override
 	@Nullable
