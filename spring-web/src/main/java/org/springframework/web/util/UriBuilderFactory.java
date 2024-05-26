@@ -17,26 +17,26 @@
 package org.springframework.web.util;
 
 /**
- * Factory to create {@link UriBuilder} instances with shared configuration
- * such as a base URI, an encoding mode strategy, and others across all URI
- * builder instances created through a factory.
+ * 工厂类，用于创建{@link UriBuilder}实例，通过工厂创建的所有URI构建器实例都共享配置，例如基本URI、编码模式策略等。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see DefaultUriBuilderFactory
+ * @since 5.0
  */
 public interface UriBuilderFactory extends UriTemplateHandler {
 
 	/**
-	 * Initialize a builder with the given URI template.
-	 * @param uriTemplate the URI template to use
-	 * @return the builder instance
+	 * 使用给定的URI模板初始化一个构建器。
+	 *
+	 * @param uriTemplate 要使用的URI模板
+	 * @return 构建器实例
 	 */
 	UriBuilder uriString(String uriTemplate);
 
 	/**
-	 * Create a URI builder with default settings.
-	 * @return the builder instance
+	 * 使用默认设置创建一个URI构建器。
+	 *
+	 * @return 构建器实例
 	 */
 	UriBuilder builder();
 

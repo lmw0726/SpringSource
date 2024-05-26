@@ -20,27 +20,29 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * Defines methods for expanding a URI template with variables.
+ * 定义了使用变量扩展URI模板的方法。
  *
  * @author Rossen Stoyanchev
- * @since 4.2
  * @see org.springframework.web.client.RestTemplate#setUriTemplateHandler(UriTemplateHandler)
+ * @since 4.2
  */
 public interface UriTemplateHandler {
 
 	/**
-	 * Expand the given URI template with a map of URI variables.
-	 * @param uriTemplate the URI template
-	 * @param uriVariables variable values
-	 * @return the created URI instance
+	 * 使用URI变量的映射扩展给定的URI模板。
+	 *
+	 * @param uriTemplate  URI模板
+	 * @param uriVariables 变量值
+	 * @return 创建的URI实例
 	 */
 	URI expand(String uriTemplate, Map<String, ?> uriVariables);
 
 	/**
-	 * Expand the given URI template with an array of URI variables.
-	 * @param uriTemplate the URI template
-	 * @param uriVariables variable values
-	 * @return the created URI instance
+	 * 使用URI变量的数组扩展给定的URI模板。
+	 *
+	 * @param uriTemplate  URI模板
+	 * @param uriVariables 变量值
+	 * @return 创建的URI实例
 	 */
 	URI expand(String uriTemplate, Object... uriVariables);
 
