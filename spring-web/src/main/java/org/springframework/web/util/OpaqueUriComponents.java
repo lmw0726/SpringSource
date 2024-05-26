@@ -16,30 +16,35 @@
 
 package org.springframework.web.util;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.ObjectUtils;
-
 /**
- * Extension of {@link UriComponents} for opaque URIs.
+ * {@link UriComponents}的不透明URI扩展。
  *
  * @author Arjen Poutsma
  * @author Phillip Webb
+ * @see <a href="https://tools.ietf.org/html/rfc3986#section-1.2.3">层次化 vs 不透明URI</a>
  * @since 3.2
- * @see <a href="https://tools.ietf.org/html/rfc3986#section-1.2.3">Hierarchical vs Opaque URIs</a>
  */
 @SuppressWarnings("serial")
 final class OpaqueUriComponents extends UriComponents {
-
+	/**
+	 * 空的查询参数
+	 */
 	private static final MultiValueMap<String, String> QUERY_PARAMS_NONE = new LinkedMultiValueMap<>();
 
+	/**
+	 * URI的方案特定部分，方案后的部分（Scheme-Specific Part）
+	 */
 	@Nullable
 	private final String ssp;
 
@@ -102,9 +107,13 @@ final class OpaqueUriComponents extends UriComponents {
 
 	@Override
 	protected UriComponents expandInternal(UriTemplateVariables uriVariables) {
+		// 扩展URI组件中的 方案部分
 		String expandedScheme = expandUriComponent(getScheme(), uriVariables);
+		// 扩展URI组件中的方案后部分
 		String expandedSsp = expandUriComponent(getSchemeSpecificPart(), uriVariables);
+		// 扩展URI组件中的片段部分
 		String expandedFragment = expandUriComponent(getFragment(), uriVariables);
+		// 创建一个不透明的URI组件并返回
 		return new OpaqueUriComponents(expandedScheme, expandedSsp, expandedFragment);
 	}
 
@@ -115,20 +124,27 @@ final class OpaqueUriComponents extends UriComponents {
 
 	@Override
 	public String toUriString() {
+		// 创建一个StringBuilder对象用于构建URI
 		StringBuilder uriBuilder = new StringBuilder();
 
 		if (getScheme() != null) {
+			// 如果存在方案，则添加到URI中
 			uriBuilder.append(getScheme());
 			uriBuilder.append(':');
 		}
+
 		if (this.ssp != null) {
+			// 如果存在方案后部分，则添加到URI中
 			uriBuilder.append(this.ssp);
 		}
+
 		if (getFragment() != null) {
+			// 如果存在片段，则添加到URI中
 			uriBuilder.append('#');
 			uriBuilder.append(getFragment());
 		}
 
+		// 返回构建好的URI字符串
 		return uriBuilder.toString();
 	}
 
@@ -136,21 +152,26 @@ final class OpaqueUriComponents extends UriComponents {
 	public URI toUri() {
 		try {
 			return new URI(getScheme(), this.ssp, getFragment());
-		}
-		catch (URISyntaxException ex) {
+		} catch (URISyntaxException ex) {
 			throw new IllegalStateException("Could not create URI object: " + ex.getMessage(), ex);
 		}
 	}
 
 	@Override
 	protected void copyToUriComponentsBuilder(UriComponentsBuilder builder) {
+		// 如果 URL 中的协议部分不为空
 		if (getScheme() != null) {
+			// 将协议部分添加到构建器中
 			builder.scheme(getScheme());
 		}
+		// 如果 URL 中的协议特定部分不为空
 		if (getSchemeSpecificPart() != null) {
+			// 将协议特定部分添加到构建器中
 			builder.schemeSpecificPart(getSchemeSpecificPart());
 		}
+		// 如果 URL 中的片段部分不为空
 		if (getFragment() != null) {
+			// 将片段部分添加到构建器中
 			builder.fragment(getFragment());
 		}
 	}

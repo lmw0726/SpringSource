@@ -159,7 +159,7 @@ public class UriComponentsBuilder implements UriBuilder, Cloneable {
 	private String scheme;
 
 	/**
-	 * URI的方案特定部分。
+	 * URI的方案特定部分，即方案后的部分（Scheme-Specific Part）
 	 */
 	@Nullable
 	private String ssp;
