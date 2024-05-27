@@ -19,7 +19,7 @@ package org.springframework.web.util.pattern;
 import java.text.MessageFormat;
 
 /**
- * Exception that is thrown when there is a problem with the pattern being parsed.
+ * 在解析模式时出现问题时抛出的异常。
  *
  * @author Andy Clement
  * @since 5.0
@@ -27,12 +27,24 @@ import java.text.MessageFormat;
 @SuppressWarnings("serial")
 public class PatternParseException extends IllegalArgumentException {
 
+	/**
+	 * 解析异常发生的位置。
+	 */
 	private final int position;
 
+	/**
+	 * 引发解析异常的模式。
+	 */
 	private final char[] pattern;
 
+	/**
+	 * 解析异常的消息类型。
+	 */
 	private final PatternMessage messageType;
 
+	/**
+	 * 用于格式化异常消息的插入项。
+	 */
 	private final Object[] inserts;
 
 
@@ -54,7 +66,7 @@ public class PatternParseException extends IllegalArgumentException {
 
 
 	/**
-	 * Return a formatted message with inserts applied.
+	 * 返回带有插入项应用的格式化消息。
 	 */
 	@Override
 	public String getMessage() {
@@ -62,17 +74,22 @@ public class PatternParseException extends IllegalArgumentException {
 	}
 
 	/**
-	 * Return a detailed message that includes the original pattern text
-	 * with a pointer to the error position, as well as the error message.
+	 * 返回包含原始模式文本以及指向错误位置的指针的详细消息，
+	 * 以及错误消息。
 	 */
 	public String toDetailedString() {
+		// 创建一个 StringBuilder 对象
 		StringBuilder sb = new StringBuilder();
+		// 将模式添加到 StringBuilder 中，并添加换行符
 		sb.append(this.pattern).append('\n');
+		// 添加空格和 '^' 符号，指示匹配位置
 		for (int i = 0; i < this.position; i++) {
 			sb.append(' ');
 		}
 		sb.append("^\n");
+		// 添加异常消息
 		sb.append(getMessage());
+		// 返回 StringBuilder 对象转换为字符串后的结果
 		return sb.toString();
 	}
 
@@ -90,7 +107,7 @@ public class PatternParseException extends IllegalArgumentException {
 
 
 	/**
-	 * The messages that can be included in a {@link PatternParseException} when there is a parse failure.
+	 * 在解析失败时可以包含在{@link PatternParseException}中的消息。
 	 */
 	public enum PatternMessage {
 

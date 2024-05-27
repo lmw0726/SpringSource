@@ -16,43 +16,50 @@
 
 package org.springframework.web.util.pattern;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.http.server.PathContainer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.RouteMatcher;
 
+import java.util.Comparator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * {@code RouteMatcher} built on {@link PathPatternParser} that uses
- * {@link PathContainer} and {@link PathPattern} as parsed representations of
- * routes and patterns.
+ * 基于 {@link PathPatternParser} 构建的 {@code RouteMatcher}，使用 {@link PathContainer} 和 {@link PathPattern}
+ * 作为路由和模式的解析表示。
  *
  * @author Rossen Stoyanchev
  * @since 5.2
  */
 public class PathPatternRouteMatcher implements RouteMatcher {
 
+	/**
+	 * 用于解析路径模式的解析器。
+	 */
 	private final PathPatternParser parser;
 
+	/**
+	 * 缓存路径模式的映射。键为路径模式字符串，值为对应的 PathPattern 实例。
+	 */
 	private final Map<String, PathPattern> pathPatternCache = new ConcurrentHashMap<>();
 
 
 	/**
-	 * Default constructor with {@link PathPatternParser} customized for
-	 * {@link org.springframework.http.server.PathContainer.Options#MESSAGE_ROUTE MESSAGE_ROUTE}
-	 * and without matching of trailing separator.
+	 * 默认构造函数，使用自定义的 {@link PathPatternParser} 用于 {@link org.springframework.http.server.PathContainer.Options#MESSAGE_ROUTE}
+	 * 并且不匹配尾部分隔符。
 	 */
 	public PathPatternRouteMatcher() {
+		// 创建一个 PathPatternParser 对象
 		this.parser = new PathPatternParser();
+		// 设置路径选项为 消息路由 模式
 		this.parser.setPathOptions(PathContainer.Options.MESSAGE_ROUTE);
+		// 设置是否匹配可选的尾部分隔符为 false
 		this.parser.setMatchOptionalTrailingSeparator(false);
 	}
 
 	/**
-	 * Constructor with given {@link PathPatternParser}.
+	 * 使用给定的 {@link PathPatternParser} 构造函数。
 	 */
 	public PathPatternRouteMatcher(PathPatternParser parser) {
 		Assert.notNull(parser, "PathPatternParser must not be null");
@@ -83,7 +90,9 @@ public class PathPatternRouteMatcher implements RouteMatcher {
 	@Override
 	@Nullable
 	public Map<String, String> matchAndExtract(String pattern, Route route) {
+		// 获取路径模式的 PathPattern 对象，然后对路由的路径进行匹配和提取
 		PathPattern.PathMatchInfo info = getPathPattern(pattern).matchAndExtract(getPathContainer(route));
+		// 如果匹配信息不为空，则返回匹配的URI变量；否则返回 null
 		return info != null ? info.getUriVariables() : null;
 	}
 
@@ -103,7 +112,9 @@ public class PathPatternRouteMatcher implements RouteMatcher {
 
 
 	private static class PathContainerRoute implements Route {
-
+		/**
+		 * 路径容器
+		 */
 		private final PathContainer pathContainer;
 
 
