@@ -16,29 +16,30 @@
 
 package org.springframework.web.server;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Exception for errors that fit response status 415 (unsupported media type).
+ * 在适合响应状态 415（不支持的媒体类型）的错误的情况下使用的异常。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
- * @deprecated in favor of {@link UnsupportedMediaTypeStatusException},
- * with this class never thrown by Spring code and to be removed in 6.0
+ * @deprecated 改用 {@link UnsupportedMediaTypeStatusException}，此类从未由 Spring 代码抛出，并将在 6.0 版本中删除
  */
 @Deprecated
 @SuppressWarnings("serial")
 public class MediaTypeNotSupportedStatusException extends ResponseStatusException {
-
+	/**
+	 * 支持的媒体类型列表
+	 */
 	private final List<MediaType> supportedMediaTypes;
 
 
 	/**
-	 * Constructor for when the Content-Type is invalid.
+	 * 当内容类型无效时的构造方法。
 	 */
 	public MediaTypeNotSupportedStatusException(String reason) {
 		super(HttpStatus.UNSUPPORTED_MEDIA_TYPE, reason);
@@ -46,7 +47,7 @@ public class MediaTypeNotSupportedStatusException extends ResponseStatusExceptio
 	}
 
 	/**
-	 * Constructor for when the Content-Type is not supported.
+	 * 当内容类型不受支持时的构造方法。
 	 */
 	public MediaTypeNotSupportedStatusException(List<MediaType> supportedMediaTypes) {
 		super(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported media type", null);
@@ -55,8 +56,7 @@ public class MediaTypeNotSupportedStatusException extends ResponseStatusExceptio
 
 
 	/**
-	 * Return the list of supported content types in cases when the Accept
-	 * header is parsed but not supported, or an empty list otherwise.
+	 * 在解析但不支持 Accept 标头时返回受支持的内容类型列表，否则返回空列表。
 	 */
 	public List<MediaType> getSupportedMediaTypes() {
 		return this.supportedMediaTypes;

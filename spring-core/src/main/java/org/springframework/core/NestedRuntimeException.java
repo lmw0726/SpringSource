@@ -19,16 +19,14 @@ package org.springframework.core;
 import org.springframework.lang.Nullable;
 
 /**
- * Handy class for wrapping runtime {@code Exceptions} with a root cause.
+ * 便捷的类，用于将运行时 {@code Exceptions} 包装为根本原因。
  *
- * <p>This class is {@code abstract} to force the programmer to extend
- * the class. {@code getMessage} will include nested exception
- * information; {@code printStackTrace} and other like methods will
- * delegate to the wrapped exception, if any.
+ * <p>这个类是 {@code abstract} 的，强制程序员扩展该类。
+ * {@code getMessage} 将包含嵌套异常信息；
+ * {@code printStackTrace} 和其他类似的方法将委托给被包装的异常（如果有）。
  *
- * <p>The similarity between this class and the {@link NestedCheckedException}
- * class is unavoidable, as Java forces these two classes to have different
- * superclasses (ah, the inflexibility of concrete inheritance!).
+ * <p>这个类与 {@link NestedCheckedException} 类的相似之处是无法避免的，
+ * 因为 Java 强制这两个类有不同的超类（啊，具体继承的不灵活性！）。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -38,29 +36,31 @@ import org.springframework.lang.Nullable;
  */
 public abstract class NestedRuntimeException extends RuntimeException {
 
-	/** Use serialVersionUID from Spring 1.2 for interoperability. */
+	/**
+	 * 使用 Spring 1.2 的 serialVersionUID 以实现互操作性。
+	 */
 	private static final long serialVersionUID = 5439915454935047936L;
 
 	static {
-		// Eagerly load the NestedExceptionUtils class to avoid classloader deadlock
-		// issues on OSGi when calling getMessage(). Reported by Don Brown; SPR-5607.
+		// 热切加载 NestedExceptionUtils 类以避免在 OSGi 上调用 getMessage() 时出现类加载器死锁问题。由 Don Brown 报告；SPR-5607。
 		NestedExceptionUtils.class.getName();
 	}
 
 
 	/**
-	 * Construct a {@code NestedRuntimeException} with the specified detail message.
-	 * @param msg the detail message
+	 * 使用指定的详细消息构造一个 {@code NestedRuntimeException}。
+	 *
+	 * @param msg 详细消息
 	 */
 	public NestedRuntimeException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Construct a {@code NestedRuntimeException} with the specified detail message
-	 * and nested exception.
-	 * @param msg the detail message
-	 * @param cause the nested exception
+	 * 使用指定的详细消息和嵌套异常构造一个 {@code NestedRuntimeException}。
+	 *
+	 * @param msg   详细消息
+	 * @param cause 嵌套异常
 	 */
 	public NestedRuntimeException(@Nullable String msg, @Nullable Throwable cause) {
 		super(msg, cause);
@@ -68,8 +68,7 @@ public abstract class NestedRuntimeException extends RuntimeException {
 
 
 	/**
-	 * Return the detail message, including the message from the nested exception
-	 * if there is one.
+	 * 返回详细消息，包括嵌套异常的消息（如果有）。
 	 */
 	@Override
 	@Nullable
@@ -79,8 +78,9 @@ public abstract class NestedRuntimeException extends RuntimeException {
 
 
 	/**
-	 * Retrieve the innermost cause of this exception, if any.
-	 * @return the innermost exception, or {@code null} if none
+	 * 检索此异常的最内层原因（如果有）。
+	 *
+	 * @return 最内层异常，如果没有则为 {@code null}
 	 * @since 2.0
 	 */
 	@Nullable
@@ -89,49 +89,60 @@ public abstract class NestedRuntimeException extends RuntimeException {
 	}
 
 	/**
-	 * Retrieve the most specific cause of this exception, that is,
-	 * either the innermost cause (root cause) or this exception itself.
-	 * <p>Differs from {@link #getRootCause()} in that it falls back
-	 * to the present exception if there is no root cause.
-	 * @return the most specific cause (never {@code null})
+	 * 检索此异常的最具体原因，即最内层原因（根本原因）或此异常本身。
+	 * <p>与 {@link #getRootCause()} 不同之处在于，如果没有根本原因，则回退到当前异常。
+	 *
+	 * @return 最具体的原因（永远不会为 {@code null}）
 	 * @since 2.0.3
 	 */
 	public Throwable getMostSpecificCause() {
+		// 获取根本原因
 		Throwable rootCause = getRootCause();
+		// 如果没有根本原因，则返回当前异常
 		return (rootCause != null ? rootCause : this);
 	}
 
 	/**
-	 * Check whether this exception contains an exception of the given type:
-	 * either it is of the given class itself or it contains a nested cause
-	 * of the given type.
-	 * @param exType the exception type to look for
-	 * @return whether there is a nested exception of the specified type
+	 * 检查此异常是否包含指定类型的异常：
+	 * 它要么是给定类的实例，要么包含给定类型的嵌套原因。
+	 *
+	 * @param exType 要查找的异常类型
+	 * @return 是否存在指定类型的嵌套异常
 	 */
 	public boolean contains(@Nullable Class<?> exType) {
+		// 如果异常类型为空，则返回 false
 		if (exType == null) {
 			return false;
 		}
+		// 如果异常类型是当前实例的类型，则返回 true
 		if (exType.isInstance(this)) {
 			return true;
 		}
+		// 获取当前异常的原因
 		Throwable cause = getCause();
+		// 如果原因是当前异常本身，则返回 false
 		if (cause == this) {
 			return false;
 		}
+		// 如果原因是 NestedRuntimeException 类型的异常
 		if (cause instanceof NestedRuntimeException) {
+			// 递归调用 contains 方法检查原因是否包含指定的异常类型
 			return ((NestedRuntimeException) cause).contains(exType);
-		}
-		else {
+		} else {
+			// 遍历异常的原因链，直到找到指定类型的异常或者到达原因链的末尾
 			while (cause != null) {
+				// 如果找到指定类型的异常，则返回 true
 				if (exType.isInstance(cause)) {
 					return true;
 				}
+				// 如果原因的原因是原因本身，则跳出循环
 				if (cause.getCause() == cause) {
 					break;
 				}
+				// 获取下一个原因
 				cause = cause.getCause();
 			}
+			// 如果未找到指定类型的异常，则返回 false
 			return false;
 		}
 	}

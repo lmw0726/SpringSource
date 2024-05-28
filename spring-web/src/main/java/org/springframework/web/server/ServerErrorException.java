@@ -16,32 +16,36 @@
 
 package org.springframework.web.server;
 
-import java.lang.reflect.Method;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 
+import java.lang.reflect.Method;
+
 /**
- * Exception for an {@link HttpStatus#INTERNAL_SERVER_ERROR} that exposes extra
- * information about a controller method that failed, or a controller method
- * argument that could not be resolved.
+ * 用于表示 {@link HttpStatus#INTERNAL_SERVER_ERROR} 的异常，该异常提供有关失败的控制器方法或无法解析的控制器方法参数的额外信息。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 @SuppressWarnings("serial")
 public class ServerErrorException extends ResponseStatusException {
-
+	/**
+	 * 处理方法
+	 */
 	@Nullable
 	private final Method handlerMethod;
 
+	/**
+	 * 方法参数
+	 */
 	@Nullable
 	private final MethodParameter parameter;
 
 
 	/**
-	 * Constructor for a 500 error with a reason and an optional cause.
+	 * 带有原因和可选原因的 500 错误的构造函数。
+	 *
 	 * @since 5.0.5
 	 */
 	public ServerErrorException(String reason, @Nullable Throwable cause) {
@@ -51,7 +55,8 @@ public class ServerErrorException extends ResponseStatusException {
 	}
 
 	/**
-	 * Constructor for a 500 error with a handler {@link Method} and an optional cause.
+	 * 带有处理程序 {@link Method} 和可选原因的 500 错误的构造函数。
+	 *
 	 * @since 5.0.5
 	 */
 	public ServerErrorException(String reason, Method handlerMethod, @Nullable Throwable cause) {
@@ -61,7 +66,7 @@ public class ServerErrorException extends ResponseStatusException {
 	}
 
 	/**
-	 * Constructor for a 500 error with a {@link MethodParameter} and an optional cause.
+	 * 带有 {@link MethodParameter} 和可选原因的 500 错误的构造函数。
 	 */
 	public ServerErrorException(String reason, MethodParameter parameter, @Nullable Throwable cause) {
 		super(HttpStatus.INTERNAL_SERVER_ERROR, reason, cause);
@@ -70,8 +75,9 @@ public class ServerErrorException extends ResponseStatusException {
 	}
 
 	/**
-	 * Constructor for a 500 error linked to a specific {@code MethodParameter}.
-	 * @deprecated in favor of {@link #ServerErrorException(String, MethodParameter, Throwable)}
+	 * 与特定 {@code MethodParameter} 关联的 500 错误的构造函数。
+	 *
+	 * @deprecated 优先使用 {@link #ServerErrorException(String, MethodParameter, Throwable)}
 	 */
 	@Deprecated
 	public ServerErrorException(String reason, MethodParameter parameter) {
@@ -79,8 +85,9 @@ public class ServerErrorException extends ResponseStatusException {
 	}
 
 	/**
-	 * Constructor for a 500 error with a reason only.
-	 * @deprecated in favor of {@link #ServerErrorException(String, Throwable)}
+	 * 仅带有原因的 500 错误的构造函数。
+	 *
+	 * @deprecated 优先使用 {@link #ServerErrorException(String, Throwable)}
 	 */
 	@Deprecated
 	public ServerErrorException(String reason) {
@@ -91,7 +98,8 @@ public class ServerErrorException extends ResponseStatusException {
 
 
 	/**
-	 * Return the handler method associated with the error, if any.
+	 * 返回与错误关联的处理程序方法（如果有）。
+	 *
 	 * @since 5.0.5
 	 */
 	@Nullable
@@ -100,7 +108,7 @@ public class ServerErrorException extends ResponseStatusException {
 	}
 
 	/**
-	 * Return the specific method parameter associated with the error, if any.
+	 * 返回与错误关联的特定方法参数（如果有）。
 	 */
 	@Nullable
 	public MethodParameter getMethodParameter() {

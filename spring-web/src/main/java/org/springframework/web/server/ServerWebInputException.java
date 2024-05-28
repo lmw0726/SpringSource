@@ -21,36 +21,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 
 /**
- * Exception for errors that fit response status 400 (bad request) for use in
- * Spring Web applications. The exception provides additional fields (e.g.
- * an optional {@link MethodParameter} if related to the error).
+ * 用于表示适用于 Spring Web 应用程序的响应状态为 400（错误的请求）的错误的异常。该异常提供了附加字段（例如，如果与错误相关，则提供一个可选的 {@link MethodParameter}）。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 @SuppressWarnings("serial")
 public class ServerWebInputException extends ResponseStatusException {
-
+	/**
+	 * 方法参数
+	 */
 	@Nullable
 	private final MethodParameter parameter;
 
 
 	/**
-	 * Constructor with an explanation only.
+	 * 仅带有解释的构造函数。
 	 */
 	public ServerWebInputException(String reason) {
 		this(reason, null, null);
 	}
 
 	/**
-	 * Constructor for a 400 error linked to a specific {@code MethodParameter}.
+	 * 与特定 {@code MethodParameter} 关联的 400 错误的构造函数。
 	 */
 	public ServerWebInputException(String reason, @Nullable MethodParameter parameter) {
 		this(reason, parameter, null);
 	}
 
 	/**
-	 * Constructor for a 400 error with a root cause.
+	 * 带有根原因的 400 错误的构造函数。
 	 */
 	public ServerWebInputException(String reason, @Nullable MethodParameter parameter, @Nullable Throwable cause) {
 		super(HttpStatus.BAD_REQUEST, reason, cause);
@@ -59,7 +59,7 @@ public class ServerWebInputException extends ResponseStatusException {
 
 
 	/**
-	 * Return the {@code MethodParameter} associated with this error, if any.
+	 * 返回与此错误相关联的 {@code MethodParameter}，如果有的话。
 	 */
 	@Nullable
 	public MethodParameter getMethodParameter() {

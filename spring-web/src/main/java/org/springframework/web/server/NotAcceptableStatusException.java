@@ -16,29 +16,31 @@
 
 package org.springframework.web.server;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 /**
- * Exception for errors that fit response status 406 (not acceptable).
+ * 适合响应状态 406（不可接受）的错误的异常。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 @SuppressWarnings("serial")
 public class NotAcceptableStatusException extends ResponseStatusException {
-
+	/**
+	 * 支持的媒体类型列表
+	 */
 	private final List<MediaType> supportedMediaTypes;
 
 
 	/**
-	 * Constructor for when the requested Content-Type is invalid.
+	 * 当请求的 Content-Type 无效时的构造函数。
 	 */
 	public NotAcceptableStatusException(String reason) {
 		super(HttpStatus.NOT_ACCEPTABLE, reason);
@@ -46,7 +48,7 @@ public class NotAcceptableStatusException extends ResponseStatusException {
 	}
 
 	/**
-	 * Constructor for when the requested Content-Type is not supported.
+	 * 当请求的 Content-Type 不受支持时的构造函数。
 	 */
 	public NotAcceptableStatusException(List<MediaType> supportedMediaTypes) {
 		super(HttpStatus.NOT_ACCEPTABLE, "Could not find acceptable representation");
@@ -55,7 +57,8 @@ public class NotAcceptableStatusException extends ResponseStatusException {
 
 
 	/**
-	 * Return a Map with an "Accept" header.
+	 * 返回带有 "Accept" 头的映射。
+	 *
 	 * @since 5.1.11
 	 */
 	@SuppressWarnings("deprecation")
@@ -65,22 +68,27 @@ public class NotAcceptableStatusException extends ResponseStatusException {
 	}
 
 	/**
-	 * Return HttpHeaders with an "Accept" header, or an empty instance.
+	 * 返回带有 "Accept" 头的 HttpHeaders 实例，如果为空则返回空实例。
+	 *
 	 * @since 5.1.13
 	 */
 	@Override
 	public HttpHeaders getResponseHeaders() {
+		// 如果支持的媒体类型集合为空
 		if (CollectionUtils.isEmpty(this.supportedMediaTypes)) {
+			// 返回空的 HttpHeaders
 			return HttpHeaders.EMPTY;
 		}
+		// 创建新的 HttpHeaders
 		HttpHeaders headers = new HttpHeaders();
+		// 设置 Accept 头部字段为支持的媒体类型集合
 		headers.setAccept(this.supportedMediaTypes);
+		// 返回 HttpHeaders
 		return headers;
 	}
 
 	/**
-	 * Return the list of supported content types in cases when the Accept
-	 * header is parsed but not supported, or an empty list otherwise.
+	 * 在 Accept 头被解析但不受支持时返回受支持的内容类型列表，否则返回空列表。
 	 */
 	public List<MediaType> getSupportedMediaTypes() {
 		return this.supportedMediaTypes;

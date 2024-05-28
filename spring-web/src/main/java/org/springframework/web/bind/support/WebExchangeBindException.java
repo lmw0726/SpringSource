@@ -16,33 +16,29 @@
 
 package org.springframework.web.bind.support;
 
-import java.beans.PropertyEditor;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.*;
 import org.springframework.web.server.ServerWebInputException;
 
+import java.beans.PropertyEditor;
+import java.util.List;
+import java.util.Map;
+
 /**
- * A specialization of {@link ServerWebInputException} thrown when after data
- * binding and validation failure. Implements {@link BindingResult} (and its
- * super-interface {@link Errors}) to allow for direct analysis of binding and
- * validation errors.
+ * {@link ServerWebInputException} 的一个特殊化，当数据绑定和验证失败时抛出。
+ * 实现 {@link BindingResult}（及其超接口 {@link Errors}）以允许直接分析绑定和验证错误。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 @SuppressWarnings("serial")
 public class WebExchangeBindException extends ServerWebInputException implements BindingResult {
-
+	/**
+	 * 绑定结果
+	 */
 	private final BindingResult bindingResult;
 
 
@@ -53,8 +49,9 @@ public class WebExchangeBindException extends ServerWebInputException implements
 
 
 	/**
-	 * Return the BindingResult that this BindException wraps.
-	 * Will typically be a BeanPropertyBindingResult.
+	 * 返回此 BindException 包装的 BindingResult。
+	 * 通常会是一个 BeanPropertyBindingResult。
+	 *
 	 * @see BeanPropertyBindingResult
 	 */
 	public final BindingResult getBindingResult() {
@@ -278,17 +275,24 @@ public class WebExchangeBindException extends ServerWebInputException implements
 
 
 	/**
-	 * Returns diagnostic information about the errors held in this object.
+	 * 返回关于此对象中保存的错误的诊断信息。
 	 */
 	@Override
 	public String getMessage() {
+		// 获取方法参数
 		MethodParameter parameter = getMethodParameter();
 		Assert.state(parameter != null, "No MethodParameter");
+		// 构建错误消息字符串
 		StringBuilder sb = new StringBuilder("Validation failed for argument at index ")
-				.append(parameter.getParameterIndex()).append(" in method: ")
+				.append(parameter.getParameterIndex())
+				.append(" in method: ")
 				.append(parameter.getExecutable().toGenericString())
-				.append(", with ").append(this.bindingResult.getErrorCount()).append(" error(s): ");
+				.append(", with ")
+				.append(this.bindingResult.getErrorCount())
+				.append(" error(s): ");
+		// 遍历所有错误
 		for (ObjectError error : this.bindingResult.getAllErrors()) {
+			// 将错误信息添加到字符串中
 			sb.append('[').append(error).append("] ");
 		}
 		return sb.toString();
