@@ -21,9 +21,8 @@ import org.springframework.http.server.PathContainer.Element;
 import org.springframework.web.util.pattern.PathPattern.MatchingContext;
 
 /**
- * A wildcard path element. In the pattern '/foo/&ast;/goo' the * is
- * represented by a WildcardPathElement. Within a path it matches at least
- * one character but at the end of a path it can match zero characters.
+ * 通配符路径元素。在模式 '/foo/*goo' 中，* 由 WildcardPathElement 表示。
+ * 在路径内，它至少匹配一个字符，但在路径的末尾它可以匹配零个字符。
  *
  * @author Andy Clement
  * @since 5.0
@@ -36,47 +35,53 @@ class WildcardPathElement extends PathElement {
 
 
 	/**
-	 * Matching on a WildcardPathElement is quite straight forward. Scan the
-	 * candidate from the candidateIndex onwards for the next separator or the end of the
-	 * candidate.
+	 * 匹配 WildcardPathElement 相当简单。从 candidateIndex 开始扫描 candidate，直到找到下一个分隔符或候选路径的结尾。
 	 */
 	@Override
 	public boolean matches(int pathIndex, MatchingContext matchingContext) {
 		String segmentData = null;
-		// Assert if it exists it is a segment
+		// 如果存在，则断言它是一个段
 		if (pathIndex < matchingContext.pathLength) {
+			// 如果路径索引小于路径长，获取当前的路径元素
 			Element element = matchingContext.pathElements.get(pathIndex);
 			if (!(element instanceof PathContainer.PathSegment)) {
-				// Should not match a separator
+				// 如果当前的路径元素不是 路径段类型，则返回false。
+				// 不应匹配分隔符
 				return false;
 			}
-			segmentData = ((PathContainer.PathSegment)element).valueToMatch();
+			// 获取路径段的值
+			segmentData = ((PathContainer.PathSegment) element).valueToMatch();
+			// 路径索引+1
 			pathIndex++;
 		}
 
 		if (isNoMorePattern()) {
+			// 如果没有更多的元素
 			if (matchingContext.determineRemainingPath) {
+				// 如果需要确定剩余路径。，则将剩余路径索引设置为当前的路径索引
 				matchingContext.remainingPathIndex = pathIndex;
 				return true;
-			}
-			else {
+			} else {
 				if (pathIndex == matchingContext.pathLength) {
-					// and the path data has run out too
+					// 并且路径数据也已经用完
 					return true;
-				}
-				else {
-					return (matchingContext.isMatchOptionalTrailingSeparator() &&  // if optional slash is on...
-							segmentData != null && segmentData.length() > 0 &&  // and there is at least one character to match the *...
-							(pathIndex + 1) == matchingContext.pathLength &&   // and the next path element is the end of the candidate...
-							matchingContext.isSeparator(pathIndex));  // and the final element is a separator
+				} else {
+					// 如果可选斜杠打开...
+					// 并且有至少一个字符匹配 *...
+					// 并且下一个路径元素是候选的结尾...
+					// 并且最后一个元素是分隔符
+					return (matchingContext.isMatchOptionalTrailingSeparator() &&
+							segmentData != null && segmentData.length() > 0 &&
+							(pathIndex + 1) == matchingContext.pathLength &&
+							matchingContext.isSeparator(pathIndex));
 				}
 			}
-		}
-		else {
-			// Within a path (e.g. /aa/*/bb) there must be at least one character to match the wildcard
+		} else {
+			// 在路径内（例如 /aa/*/bb）必须至少有一个字符与通配符匹配
 			if (segmentData == null || segmentData.length() == 0) {
 				return false;
 			}
+			// 递归匹配下一个路径元素
 			return (this.next != null && this.next.matches(pathIndex, matchingContext));
 		}
 	}
@@ -88,7 +93,7 @@ class WildcardPathElement extends PathElement {
 
 	@Override
 	public char[] getChars() {
-		return new char[] {'*'};
+		return new char[]{'*'};
 	}
 
 	@Override

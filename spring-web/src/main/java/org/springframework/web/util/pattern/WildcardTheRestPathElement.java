@@ -17,8 +17,7 @@
 package org.springframework.web.util.pattern;
 
 /**
- * A path element representing wildcarding the rest of a path. In the pattern
- * '/foo/**' the /** is represented as a {@link WildcardTheRestPathElement}.
+ * 表示通配路径剩余部分的路径元素。在模式 '/foo/**' 中，/** 表示为 WildcardTheRestPathElement。
  *
  * @author Andy Clement
  * @since 5.0
@@ -32,13 +31,16 @@ class WildcardTheRestPathElement extends PathElement {
 
 	@Override
 	public boolean matches(int pathIndex, PathPattern.MatchingContext matchingContext) {
-		// If there is more data, it must start with the separator
+		// 如果还有更多数据，则必须以分隔符开头
 		if (pathIndex < matchingContext.pathLength && !matchingContext.isSeparator(pathIndex)) {
+			// 如果路径索引小于匹配上下文的路径长度，且匹配上下文中的路径索引处不是分隔符，则返回false
 			return false;
 		}
 		if (matchingContext.determineRemainingPath) {
+			// 如果需要确定剩余路径，则将剩余路径索引设置为匹配上下文的路径长度
 			matchingContext.remainingPathIndex = matchingContext.pathLength;
 		}
+		// 返回true
 		return true;
 	}
 

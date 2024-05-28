@@ -19,9 +19,7 @@ package org.springframework.web.util.pattern;
 import org.springframework.web.util.pattern.PathPattern.MatchingContext;
 
 /**
- * A separator path element. In the pattern '/foo/bar' the two occurrences
- * of '/' will be represented by a SeparatorPathElement (if the default
- * separator of '/' is being used).
+ * 分隔符路径元素。在模式 '/foo/bar' 中，两个 '/' 的出现将由 SeparatorPathElement 表示（如果使用默认的 '/' 分隔符）。
  *
  * @author Andy Clement
  * @since 5.0
@@ -34,26 +32,30 @@ class SeparatorPathElement extends PathElement {
 
 
 	/**
-	 * Matching a separator is easy, basically the character at candidateIndex
-	 * must be the separator.
+	 * 匹配分隔符很容易，基本上 candidateIndex 处的字符必须是分隔符。
 	 */
 	@Override
 	public boolean matches(int pathIndex, MatchingContext matchingContext) {
+		// 如果路径索引小于匹配上下文的路径长度，且匹配上下文中的路径索引处是分隔符
 		if (pathIndex < matchingContext.pathLength && matchingContext.isSeparator(pathIndex)) {
+			// 如果没有更多的模式
 			if (isNoMorePattern()) {
+				// 如果确定需要确定剩余路径
 				if (matchingContext.determineRemainingPath) {
+					// 设置剩余路径索引为当前路径索引加1，并返回true
 					matchingContext.remainingPathIndex = pathIndex + 1;
 					return true;
-				}
-				else {
+				} else {
+					// 否则，返回当前路径索引加1是否等于匹配上下文的路径长度
 					return (pathIndex + 1 == matchingContext.pathLength);
 				}
-			}
-			else {
+			} else {
+				// 否则，将路径索引加1，并继续匹配下一个元素
 				pathIndex++;
 				return (this.next != null && this.next.matches(pathIndex, matchingContext));
 			}
 		}
+		// 如果路径索引处不是分隔符，则返回false
 		return false;
 	}
 
@@ -64,7 +66,7 @@ class SeparatorPathElement extends PathElement {
 
 	@Override
 	public char[] getChars() {
-		return new char[] {this.separator};
+		return new char[]{this.separator};
 	}
 
 
