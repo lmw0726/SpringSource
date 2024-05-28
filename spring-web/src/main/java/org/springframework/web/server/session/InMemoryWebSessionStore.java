@@ -16,6 +16,13 @@
 
 package org.springframework.web.server.session;
 
+import org.springframework.util.Assert;
+import org.springframework.util.IdGenerator;
+import org.springframework.util.JdkIdGenerator;
+import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,14 +34,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
-
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import org.springframework.util.Assert;
-import org.springframework.util.IdGenerator;
-import org.springframework.util.JdkIdGenerator;
-import org.springframework.web.server.WebSession;
 
 /**
  * Simple Map-based storage for {@link WebSession} instances.
@@ -62,6 +61,7 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	 * reached, any attempt to store an additional session will result in an
 	 * {@link IllegalStateException}.
 	 * <p>By default set to 10000.
+	 *
 	 * @param maxSessions the maximum number of sessions
 	 * @since 5.0.8
 	 */
@@ -71,6 +71,7 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 
 	/**
 	 * Return the maximum number of sessions that can be stored.
+	 *
 	 * @since 5.0.8
 	 */
 	public int getMaxSessions() {
@@ -84,6 +85,7 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	 * back in a test, e.g. {@code Clock.offset(clock, Duration.ofMinutes(-31))}
 	 * in order to simulate session expiration.
 	 * <p>By default this is {@code Clock.system(ZoneId.of("GMT"))}.
+	 *
 	 * @param clock the clock to use
 	 */
 	public void setClock(Clock clock) {
@@ -103,6 +105,7 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	 * Return the map of sessions with an {@link Collections#unmodifiableMap
 	 * unmodifiable} wrapper. This could be used for management purposes, to
 	 * list active sessions, invalidate expired ones, etc.
+	 *
 	 * @since 5.0.8
 	 */
 	public Map<String, WebSession> getSessions() {
@@ -129,12 +132,10 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 		InMemoryWebSession session = this.sessions.get(id);
 		if (session == null) {
 			return Mono.empty();
-		}
-		else if (session.isExpired(now)) {
+		} else if (session.isExpired(now)) {
 			this.sessions.remove(id);
 			return Mono.empty();
-		}
-		else {
+		} else {
 			session.updateLastAccessTime(now);
 			return Mono.just(session);
 		}
@@ -160,6 +161,7 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	 * kicked off lazily during calls to {@link #createWebSession() create} or
 	 * {@link #retrieveSession retrieve}, no less than 60 seconds apart.
 	 * This method can be called to force a check at a specific time.
+	 *
 	 * @since 5.0.8
 	 */
 	public void removeExpiredSessions() {
@@ -168,20 +170,42 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 
 
 	private class InMemoryWebSession implements WebSession {
-
+		/**
+		 * 生成的会话ID
+		 */
 		private final AtomicReference<String> id = new AtomicReference<>(String.valueOf(idGenerator.generateId()));
 
+		/**
+		 * 属性
+		 */
 		private final Map<String, Object> attributes = new ConcurrentHashMap<>();
 
+		/**
+		 * 创建时间
+		 */
 		private final Instant creationTime;
 
+		/**
+		 * 最后进入时间
+		 */
 		private volatile Instant lastAccessTime;
 
+		/**
+		 * 最大空闲时间，默认为30分钟
+		 */
 		private volatile Duration maxIdleTime = Duration.ofMinutes(30);
 
+		/**
+		 * 状态
+		 */
 		private final AtomicReference<State> state = new AtomicReference<>(State.NEW);
 
 
+		/**
+		 * 创建一个内存中的 Web 会话。
+		 *
+		 * @param creationTime 会话创建时间
+		 */
 		public InMemoryWebSession(Instant creationTime) {
 			this.creationTime = creationTime;
 			this.lastAccessTime = this.creationTime;
@@ -229,39 +253,52 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 
 		@Override
 		public Mono<Void> changeSessionId() {
+			// 获取当前会话的ID
 			String currentId = this.id.get();
+			// 从内存中移除当前会话
 			InMemoryWebSessionStore.this.sessions.remove(currentId);
+			// 生成新的会话ID
 			String newId = String.valueOf(idGenerator.generateId());
+			// 设置新的会话ID
 			this.id.set(newId);
+			// 将当前会话存储到内存中
 			InMemoryWebSessionStore.this.sessions.put(this.getId(), this);
+			// 返回一个空的Mono
 			return Mono.empty();
 		}
 
 		@Override
 		public Mono<Void> invalidate() {
+			// 设置会话状态为已过期
 			this.state.set(State.EXPIRED);
+			// 清空会话属性
 			getAttributes().clear();
+			// 从内存中移除该会话
 			InMemoryWebSessionStore.this.sessions.remove(this.id.get());
+			// 返回一个空的Mono
 			return Mono.empty();
 		}
 
 		@Override
 		public Mono<Void> save() {
 
+			// 检查最大会话限制
 			checkMaxSessionsLimit();
 
-			// Implicitly started session..
+			// 隐式启动的会话..
 			if (!getAttributes().isEmpty()) {
 				this.state.compareAndSet(State.NEW, State.STARTED);
 			}
 
 			if (isStarted()) {
-				// Save
+				// 保存
 				InMemoryWebSessionStore.this.sessions.put(this.getId(), this);
 
-				// Unless it was invalidated
+				// 除非它已被使无效
 				if (this.state.get().equals(State.EXPIRED)) {
+					// 移除会话编号
 					InMemoryWebSessionStore.this.sessions.remove(this.getId());
+					// 返回异常
 					return Mono.error(new IllegalStateException("Session was invalidated"));
 				}
 			}
@@ -269,10 +306,17 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 			return Mono.empty();
 		}
 
+		/**
+		 * 检查最大会话限制。
+		 */
 		private void checkMaxSessionsLimit() {
+			// 如果当前会话数达到最大会话数限制
 			if (sessions.size() >= maxSessions) {
+				// 移除过期的会话
 				expiredSessionChecker.removeExpiredSessions(clock.instant());
+				// 再次检查当前会话数是否达到最大会话数限制
 				if (sessions.size() >= maxSessions) {
+					// 如果是，则抛出异常
 					throw new IllegalStateException("Max sessions limit reached: " + sessions.size());
 				}
 			}
@@ -283,22 +327,42 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 			return isExpired(clock.instant());
 		}
 
+		/**
+		 * 检查会话是否已过期。
+		 *
+		 * @param now 当前时间
+		 * @return 如果会话已过期，则返回 {@code true}，否则返回 {@code false}
+		 */
 		private boolean isExpired(Instant now) {
+			// 如果会话状态为已过期，则返回true
 			if (this.state.get().equals(State.EXPIRED)) {
 				return true;
 			}
 			if (checkExpired(now)) {
+				// 如果检查会话是否过期并且已过期，则设置会话状态为已过期，并返回true
 				this.state.set(State.EXPIRED);
 				return true;
 			}
+			// 否则，返回false
 			return false;
 		}
 
+		/**
+		 * 检查会话是否已过期。
+		 *
+		 * @param currentTime 当前时间
+		 * @return 如果会话已过期，则返回 {@code true}，否则返回 {@code false}
+		 */
 		private boolean checkExpired(Instant currentTime) {
 			return isStarted() && !this.maxIdleTime.isNegative() &&
 					currentTime.minus(this.maxIdleTime).isAfter(this.lastAccessTime);
 		}
 
+		/**
+		 * 更新最后访问时间。
+		 *
+		 * @param currentTime 当前时间
+		 */
 		private void updateLastAccessTime(Instant currentTime) {
 			this.lastAccessTime = currentTime;
 		}
@@ -307,7 +371,9 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 
 	private class ExpiredSessionChecker {
 
-		/** Max time between expiration checks. */
+		/**
+		 * Max time between expiration checks.
+		 */
 		private static final int CHECK_PERIOD = 60 * 1000;
 
 
@@ -336,8 +402,7 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 							session.invalidate();
 						}
 					}
-				}
-				finally {
+				} finally {
 					this.checkTime = now.plus(CHECK_PERIOD, ChronoUnit.MILLIS);
 					this.lock.unlock();
 				}
@@ -346,6 +411,6 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	}
 
 
-	private enum State { NEW, STARTED, EXPIRED }
+	private enum State {NEW, STARTED, EXPIRED}
 
 }
