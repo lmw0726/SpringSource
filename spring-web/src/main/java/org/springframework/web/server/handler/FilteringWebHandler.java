@@ -16,29 +16,30 @@
 
 package org.springframework.web.server.handler;
 
-import java.util.List;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebHandler;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
- * {@link WebHandlerDecorator} that invokes a chain of {@link WebFilter WebFilters}
- * before invoking the delegate {@link WebHandler}.
+ * {@link WebHandlerDecorator} 调用委托 {@link WebHandler} 前，调用一系列 {@link WebFilter WebFilters} 的装饰器。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class FilteringWebHandler extends WebHandlerDecorator {
-
+	/**
+	 * 默认的Web过滤器链
+	 */
 	private final DefaultWebFilterChain chain;
 
 
 	/**
-	 * Constructor.
-	 * @param filters the chain of filters
+	 * 构造方法。
+	 * @param handler 要处理的 WebHandler
+	 * @param filters 过滤器链
 	 */
 	public FilteringWebHandler(WebHandler handler, List<WebFilter> filters) {
 		super(handler);
@@ -47,7 +48,7 @@ public class FilteringWebHandler extends WebHandlerDecorator {
 
 
 	/**
-	 * Return a read-only list of the configured filters.
+	 * 返回配置的过滤器的只读列表。
 	 */
 	public List<WebFilter> getFilters() {
 		return this.chain.getFilters();

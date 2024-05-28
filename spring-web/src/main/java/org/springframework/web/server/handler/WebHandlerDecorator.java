@@ -23,19 +23,22 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebHandler;
 
 /**
- * {@link WebHandler} that decorates and delegates to another {@code WebHandler}.
+ * {@link WebHandler} 的装饰器，用于装饰和委托给另一个 {@code WebHandler}。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class WebHandlerDecorator implements WebHandler {
-
+	/**
+	 * 处理Web请求的代理类
+	 */
 	private final WebHandler delegate;
 
 
 	/**
-	 * Create a {@code WebHandlerDecorator} for the given delegate.
-	 * @param delegate the WebHandler delegate
+	 * 创建给定委托的 {@code WebHandlerDecorator}。
+	 *
+	 * @param delegate WebHandler 委托
 	 */
 	public WebHandlerDecorator(WebHandler delegate) {
 		Assert.notNull(delegate, "'delegate' must not be null");
@@ -44,7 +47,7 @@ public class WebHandlerDecorator implements WebHandler {
 
 
 	/**
-	 * Return the wrapped delegate.
+	 * 返回包装的委托。
 	 */
 	public WebHandler getDelegate() {
 		return this.delegate;
