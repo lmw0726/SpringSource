@@ -30,29 +30,31 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebExceptionHandler;
 
 /**
- * Handle {@link ResponseStatusException} by setting the response status.
+ * 通过设置响应状态码来处理 {@link ResponseStatusException}。
  *
- * <p>By default exception stack traces are not shown for successfully resolved
- * exceptions. Use {@link #setWarnLogCategory(String)} to enable logging with
- * stack traces.
+ * <p>默认情况下，成功解析的异常不会显示堆栈跟踪。
+ * 使用 {@link #setWarnLogCategory(String)} 来启用带有堆栈跟踪的日志记录。
  *
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
  * @since 5.0
  */
 public class ResponseStatusExceptionHandler implements WebExceptionHandler {
-
+	/**
+	 * 日志记录器
+	 */
 	private static final Log logger = LogFactory.getLog(ResponseStatusExceptionHandler.class);
 
-
+	/**
+	 * 警告日志记录器
+	 */
 	@Nullable
 	private Log warnLogger;
 
 
 	/**
-	 * Set the log category for warn logging.
-	 * <p>Default is no warn logging. Specify this setting to activate warn
-	 * logging into a specific category.
+	 * 设置警告日志记录器的日志类别。
+	 * <p>默认为没有警告日志记录。指定此设置以激活特定类别的警告日志记录。
 	 *
 	 * @see org.apache.commons.logging.LogFactory#getLog(String)
 	 * @see java.util.logging.Logger#getLogger(String)
@@ -66,58 +68,76 @@ public class ResponseStatusExceptionHandler implements WebExceptionHandler {
 	@Override
 	public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
 		if (!updateResponse(exchange.getResponse(), ex)) {
+			// 如果无法更新响应，直接返回异常 Mono
 			return Mono.error(ex);
 		}
 
-		// Mirrors AbstractHandlerExceptionResolver in spring-webmvc...
+		// 在spring-webmvc中镜像AbstractHandlerExceptionResolver...
 		String logPrefix = exchange.getLogPrefix();
 		if (this.warnLogger != null && this.warnLogger.isWarnEnabled()) {
+			// 检查 警告日志记录器 是否可用，如果可用且 警告 级别启用，则记录警告日志
 			this.warnLogger.warn(logPrefix + formatError(ex, exchange.getRequest()));
 		} else if (logger.isDebugEnabled()) {
+			// 否则记录调试日志
 			logger.debug(logPrefix + formatError(ex, exchange.getRequest()));
 		}
 
+		// 完成响应，返回一个空的 Mono
 		return exchange.getResponse().setComplete();
 	}
 
 
 	private String formatError(Throwable ex, ServerHttpRequest request) {
+		// 获取异常类的简单名称和消息
 		String className = ex.getClass().getSimpleName();
 		String message = LogFormatUtils.formatValue(ex.getMessage(), -1, true);
+		// 获取请求的路径
 		String path = request.getURI().getRawPath();
+		// 构建日志字符串，描述已解析的异常类型、消息和请求的 HTTP 方法及路径
 		return "Resolved [" + className + ": " + message + "] for HTTP " + request.getMethod() + " " + path;
 	}
 
 	private boolean updateResponse(ServerHttpResponse response, Throwable ex) {
+		// 初始化结果为 false
 		boolean result = false;
+		// 确定异常的 HTTP 状态码
 		HttpStatus httpStatus = determineStatus(ex);
+		// 获取异常的 HTTP 状态码，若不存在则使用异常原始状态码
 		int code = (httpStatus != null ? httpStatus.value() : determineRawStatusCode(ex));
+		// 如果状态码存在
 		if (code != -1) {
+			// 如果设置原始状态码成功
 			if (response.setRawStatusCode(code)) {
+				// 如果异常是 ResponseStatusException 类型
 				if (ex instanceof ResponseStatusException) {
+					// 将 ResponseStatusException 的响应头添加到响应中
 					((ResponseStatusException) ex).getResponseHeaders()
 							.forEach((name, values) ->
 									values.forEach(value -> response.getHeaders().add(name, value)));
 				}
+				// 更新结果为 true
 				result = true;
 			}
 		} else {
+			// 获取异常的原因
 			Throwable cause = ex.getCause();
+			// 如果原因不为空
 			if (cause != null) {
+				// 更新响应，递归处理原因
 				result = updateResponse(response, cause);
 			}
 		}
+		// 返回结果
 		return result;
 	}
 
 	/**
-	 * Determine the HTTP status for the given exception.
-	 * <p>As of 5.3 this method always returns {@code null} in which case
-	 * {@link #determineRawStatusCode(Throwable)} is used instead.
+	 * 确定给定异常的 HTTP 状态。
+	 * <p>从 5.3 开始，此方法始终返回 {@code null}，此时将使用 {@link #determineRawStatusCode(Throwable)}。
 	 *
-	 * @param ex the exception to check
-	 * @return the associated HTTP status, if any
-	 * @deprecated as of 5.3 in favor of {@link #determineRawStatusCode(Throwable)}.
+	 * @param ex 要检查的异常
+	 * @return 相关联的 HTTP 状态，如果没有则为 {@code null}
+	 * @deprecated 从 5.3 开始，建议使用 {@link #determineRawStatusCode(Throwable)}。
 	 */
 	@Nullable
 	@Deprecated

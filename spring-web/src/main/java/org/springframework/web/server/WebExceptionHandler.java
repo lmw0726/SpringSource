@@ -19,7 +19,7 @@ package org.springframework.web.server;
 import reactor.core.publisher.Mono;
 
 /**
- * Contract for handling exceptions during web server exchange processing.
+ * 处理 Web 服务器交换处理期间的异常的契约。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -27,12 +27,11 @@ import reactor.core.publisher.Mono;
 public interface WebExceptionHandler {
 
 	/**
-	 * Handle the given exception. A completion signal through the return value
-	 * indicates error handling is complete while an error signal indicates the
-	 * exception is still not handled.
-	 * @param exchange the current exchange
-	 * @param ex the exception to handle
-	 * @return {@code Mono<Void>} to indicate when exception handling is complete
+	 * 处理给定的异常。通过返回值的完成信号表示错误处理已完成，而错误信号表示异常仍未处理。
+	 *
+	 * @param exchange 当前的交换
+	 * @param ex       要处理的异常
+	 * @return {@code Mono<Void>} 以指示异常处理何时完成
 	 */
 	Mono<Void> handle(ServerWebExchange exchange, Throwable ex);
 
