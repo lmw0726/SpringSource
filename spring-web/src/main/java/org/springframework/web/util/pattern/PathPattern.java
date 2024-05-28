@@ -269,26 +269,35 @@ public class PathPattern implements Comparable<PathPattern> {
 	@Nullable
 	public PathRemainingMatchInfo matchStartOfPath(PathContainer pathContainer) {
 		if (this.head == null) {
+			// 如果头部为空，则返回一个包含空路径和路径容器的路径剩余匹配信息对象
 			return new PathRemainingMatchInfo(EMPTY_PATH, pathContainer);
 		} else if (!hasLength(pathContainer)) {
+			// 如果路径容器为空，则返回null
 			return null;
 		}
 
+		// 创建匹配上下文
 		MatchingContext matchingContext = new MatchingContext(pathContainer, true);
+		// 设置允许额外的路径匹配
 		matchingContext.setMatchAllowExtraPath();
+		// 使用头部路径元素进行匹配
 		boolean matches = this.head.matches(0, matchingContext);
 		if (!matches) {
+			// 如果不匹配，则返回null
 			return null;
 		} else {
 			PathContainer pathMatched;
 			PathContainer pathRemaining;
 			if (matchingContext.remainingPathIndex == pathContainer.elements().size()) {
+				// 如果匹配的索引等于路径容器的元素数量，则匹配的路径为整个路径容器，剩余路径为空
 				pathMatched = pathContainer;
 				pathRemaining = EMPTY_PATH;
 			} else {
+				// 否则，匹配的路径为从0到匹配索引的子路径，剩余路径为从匹配索引到结束的子路径
 				pathMatched = pathContainer.subPath(0, matchingContext.remainingPathIndex);
 				pathRemaining = pathContainer.subPath(matchingContext.remainingPathIndex);
 			}
+			// 返回路径剩余匹配信息对象
 			return new PathRemainingMatchInfo(pathMatched, pathRemaining, matchingContext.getPathMatchResult());
 		}
 	}
@@ -312,19 +321,28 @@ public class PathPattern implements Comparable<PathPattern> {
 	 * @return 由模式匹配的路径子集，如果没有由模式元素匹配的路径，则为 ""（空字符串）
 	 */
 	public PathContainer extractPathWithinPattern(PathContainer path) {
+		// 获取路径中的元素列表
 		List<Element> pathElements = path.elements();
+		// 路径元素的数量
 		int pathElementsCount = pathElements.size();
 
+		// 起始索引初始化为0
 		int startIndex = 0;
 		// 查找第一个不是分隔符或字面值的路径元素（即第一个基于模式的元素）
+		// 初始化 路径元素 为链表头部
 		PathElement elem = this.head;
+		// 遍历链表
 		while (elem != null) {
+			// 如果当前元素具有通配符或捕获计数，则跳出循环
 			if (elem.getWildcardCount() != 0 || elem.getCaptureCount() != 0) {
 				break;
 			}
+			// 移动到下一个元素并更新起始索引
 			elem = elem.next;
+			// 起始索引位置+1
 			startIndex++;
 		}
+		// 如果没有找到模式片段，则返回一个空的路径容器
 		if (elem == null) {
 			// 没有模式片段
 			return PathContainer.parsePath("");
@@ -332,41 +350,60 @@ public class PathPattern implements Comparable<PathPattern> {
 
 		// 跳过在结果中的前导分隔符
 		while (startIndex < pathElementsCount && (pathElements.get(startIndex) instanceof Separator)) {
+			// 在起始索引小于路径元素数量，且起始索引处的元素是分隔符时
+			// 起始索引位置+1
 			startIndex++;
 		}
 
+		// 结束索引初始化为路径元素的数量
 		int endIndex = pathElements.size();
 		// 跳过在结果中的尾随分隔符
 		while (endIndex > 0 && (pathElements.get(endIndex - 1) instanceof Separator)) {
+			// 在结束索引大于0且结束索引减一处的元素是分隔符时
+			// 结束索引位置-1
 			endIndex--;
 		}
 
+		// 检查是否存在多个相邻的分隔符
 		boolean multipleAdjacentSeparators = false;
+		// 遍历起始索引到结束索引之间的元素
 		for (int i = startIndex; i < (endIndex - 1); i++) {
 			if ((pathElements.get(i) instanceof Separator) && (pathElements.get(i + 1) instanceof Separator)) {
+				// 如果当前元素及下一个元素都是分隔符，则将布尔值设置为true，并跳出循环
 				multipleAdjacentSeparators = true;
 				break;
 			}
 		}
 
 		PathContainer resultPath = null;
+		// 如果存在多个相邻的分隔符
 		if (multipleAdjacentSeparators) {
-			// 需要重建路径，去除重复的相邻分隔符
+			// 重建路径，去除重复的相邻分隔符
+			// 创建一个StringBuilder对象，用于构建新的路径字符串
 			StringBuilder sb = new StringBuilder();
+			// 初始化索引为起始索引
 			int i = startIndex;
+			// 遍历起始索引到结束索引之间的元素
 			while (i < endIndex) {
+				// 获取当前索引处的元素
 				Element e = pathElements.get(i++);
+				// 将元素的值添加到StringBuilder中
 				sb.append(e.value());
+				// 如果当前元素是分隔符
 				if (e instanceof Separator) {
+					// 继续向后查找，直到找到不是分隔符的元素或达到结束索引
 					while (i < endIndex && (pathElements.get(i) instanceof Separator)) {
 						i++;
 					}
 				}
 			}
+			// 解析新构建的路径字符串为路径容器
 			resultPath = PathContainer.parsePath(sb.toString(), this.pathOptions);
 		} else if (startIndex >= endIndex) {
+			// 如果起始索引大于等于结束索引，则返回一个空路径容器
 			resultPath = PathContainer.parsePath("");
 		} else {
+			// 否则，返回路径的子路径
 			resultPath = path.subPath(startIndex, endIndex);
 		}
 		return resultPath;
@@ -389,15 +426,20 @@ public class PathPattern implements Comparable<PathPattern> {
 	public PathPattern combine(PathPattern pattern2string) {
 		// 如果其中一个为空，则结果为另一个。如果两者都为空，则结果为 ""
 		if (!StringUtils.hasLength(this.patternString)) {
+			// 如果当前模式字符串为空
 			if (!StringUtils.hasLength(pattern2string.patternString)) {
+				// 并且参数模式字符串也为空，则返回解析空字符串后的结果
 				return this.parser.parse("");
 			} else {
+				// 如果参数模式字符串不为空，则直接返回参数模式
 				return pattern2string;
 			}
 		} else if (!StringUtils.hasLength(pattern2string.patternString)) {
+			// 如果参数模式字符串为空，则返回当前模式
 			return this;
 		}
 
+		// 处理特殊情况的模式组合
 		// /* + /hotel => /hotel
 		// /*.* + /*.html => /*.html
 		// 但是：
@@ -405,12 +447,16 @@ public class PathPattern implements Comparable<PathPattern> {
 		// /{foo} + /bar => /{foo}/bar
 		if (!this.patternString.equals(pattern2string.patternString) && this.capturedVariableCount == 0 &&
 				matches(PathContainer.parsePath(pattern2string.patternString))) {
+			// 如果当前模式字符串与参数模式字符串不相等，并且当前模式没有捕获变量
+			// 并且与参数模式匹配，则返回参数模式
 			return pattern2string;
 		}
+
 
 		// /hotels/* + /booking => /hotels/booking
 		// /hotels/* + booking => /hotels/booking
 		if (this.endsWithSeparatorWildcard) {
+			// 如果当前模式以分隔符通配符结尾，则将当前模式字符串的倒数第二个字符（即分隔符通配符）替换为参数模式字符串
 			return this.parser.parse(concat(
 					this.patternString.substring(0, this.patternString.length() - 2),
 					pattern2string.patternString));
@@ -418,24 +464,37 @@ public class PathPattern implements Comparable<PathPattern> {
 
 		// /hotels + /booking => /hotels/booking
 		// /hotels + booking => /hotels/booking
-		int starDotPos1 = this.patternString.indexOf("*.");  // 是否有文件前缀/后缀需要考虑？
+		// 是否有文件前缀/后缀需要考虑？
+		int starDotPos1 = this.patternString.indexOf("*.");
+		// 如果当前模式具有捕获变量，或者不包含通配符"*."，或者分隔符为"."
 		if (this.capturedVariableCount != 0 || starDotPos1 == -1 || getSeparator() == '.') {
+			// 直接将两个模式字符串连接起来
 			return this.parser.parse(concat(this.patternString, pattern2string.patternString));
 		}
 
+		// 处理带有文件扩展名的情况
 		// /*.html + /hotel => /hotel.html
 		// /*.html + /hotel.* => /hotel.html
-		String firstExtension = this.patternString.substring(starDotPos1 + 1);  // 查找第一个扩展名
+		// 查找当前模式字符串中的第一个文件扩展名
+		String firstExtension = this.patternString.substring(starDotPos1 + 1);
+		// 获取参数模式字符串中的文件名及扩展名
 		String p2string = pattern2string.patternString;
+		// 查找参数模式字符串中的第一个"."的位置
 		int dotPos2 = p2string.indexOf('.');
+		// 如果参数模式字符串中不包含"."，则文件名为整个参数模式字符串，扩展名为空字符串；
+		// 否则，文件名为"."之前的部分，扩展名为"."之后的部分
 		String file2 = (dotPos2 == -1 ? p2string : p2string.substring(0, dotPos2));
 		String secondExtension = (dotPos2 == -1 ? "" : p2string.substring(dotPos2));
+		// 判断当前模式字符串的扩展名是否为通配符（".*"或空字符串），以及参数模式字符串的扩展名是否为通配符
 		boolean firstExtensionWild = (firstExtension.equals(".*") || firstExtension.isEmpty());
 		boolean secondExtensionWild = (secondExtension.equals(".*") || secondExtension.isEmpty());
+
 		if (!firstExtensionWild && !secondExtensionWild) {
+			// 如果两个模式字符串都包含文件扩展名，则抛出异常
 			throw new IllegalArgumentException(
 					"Cannot combine patterns: " + this.patternString + " and " + pattern2string);
 		}
+		// 返回处理后的模式
 		return this.parser.parse(file2 + (firstExtensionWild ? secondExtension : firstExtension));
 	}
 
@@ -488,12 +547,16 @@ public class PathPattern implements Comparable<PathPattern> {
 	}
 
 	String toChainString() {
+		// 创建一个StringJoiner对象，用于将路径元素连接成一个字符串，以空格为分隔符
 		StringJoiner stringJoiner = new StringJoiner(" ");
 		PathElement pe = this.head;
+		// 从链表头部开始遍历链表
 		while (pe != null) {
+			// 将每个路径元素的字符串表示添加到StringJoiner中
 			stringJoiner.add(pe.toString());
 			pe = pe.next;
 		}
+		// 返回连接后的字符串表示
 		return stringJoiner.toString();
 	}
 
@@ -503,12 +566,16 @@ public class PathPattern implements Comparable<PathPattern> {
 	 * @return 模式的字符串形式
 	 */
 	String computePatternString() {
+		// 创建一个StringBuilder对象，用于构建路径元素的字符表示的字符串
 		StringBuilder sb = new StringBuilder();
 		PathElement pe = this.head;
+		// 从链表头部开始遍历链表
 		while (pe != null) {
+			// 将每个路径元素的字符表示添加到StringBuilder中
 			sb.append(pe.getChars());
 			pe = pe.next;
 		}
+		// 返回构建的字符串
 		return sb.toString();
 	}
 
@@ -531,13 +598,20 @@ public class PathPattern implements Comparable<PathPattern> {
 	 * @return 连接的路径，如果需要则包括分隔符
 	 */
 	private String concat(String path1, String path2) {
+		// 检查路径1是否以分隔符结尾
 		boolean path1EndsWithSeparator = (path1.charAt(path1.length() - 1) == getSeparator());
+		// 检查路径2是否以分隔符开头
 		boolean path2StartsWithSeparator = (path2.charAt(0) == getSeparator());
+
 		if (path1EndsWithSeparator && path2StartsWithSeparator) {
+			// 如果路径1以分隔符结尾，且路径2以分隔符开头
+			// 则将路径1和路径2拼接起来，但只保留路径2的第一个分隔符之后的部分
 			return path1 + path2.substring(1);
 		} else if (path1EndsWithSeparator || path2StartsWithSeparator) {
+			// 如果路径1或路径2其中一个以分隔符结尾或以分隔符开头，则直接将两个路径拼接起来
 			return path1 + path2;
 		} else {
+			// 如果两个路径都不以分隔符结尾或以分隔符开头，则在路径1和路径2之间添加一个分隔符，并将它们拼接起来
 			return path1 + getSeparator() + path2;
 		}
 	}
@@ -738,23 +812,30 @@ public class PathPattern implements Comparable<PathPattern> {
 		}
 
 		public void set(String key, String value, MultiValueMap<String, String> parameters) {
+			// 如果提取的URI变量映射为空，则创建一个新的HashMap对象
 			if (this.extractedUriVariables == null) {
 				this.extractedUriVariables = new HashMap<>();
 			}
+			// 将提取的键值对添加到提取的URI变量映射中
 			this.extractedUriVariables.put(key, value);
 
+			// 如果参数不为空
 			if (!parameters.isEmpty()) {
+				// 如果提取的矩阵变量映射为空，则创建一个新的HashMap对象
 				if (this.extractedMatrixVariables == null) {
 					this.extractedMatrixVariables = new HashMap<>();
 				}
+				// 将参数键值对添加到提取的矩阵变量映射中，使用不可修改的多值映射进行包装
 				this.extractedMatrixVariables.put(key, CollectionUtils.unmodifiableMultiValueMap(parameters));
 			}
 		}
 
 		public PathMatchInfo getPathMatchResult() {
+			// 如果提取的URI变量映射为空，则返回空的路径匹配信息
 			if (this.extractedUriVariables == null) {
 				return PathMatchInfo.EMPTY;
 			} else {
+				// 否则，返回包含提取的URI变量映射和提取的矩阵变量映射的路径匹配信息对象
 				return new PathMatchInfo(this.extractedUriVariables, this.extractedMatrixVariables);
 			}
 		}
@@ -776,10 +857,13 @@ public class PathPattern implements Comparable<PathPattern> {
 		 * @return 解码后的值
 		 */
 		String pathElementValue(int pathIndex) {
+			// 获取路径索引处的路径元素，如果路径索引小于路径长度，则获取对应的元素，否则设为null
 			Element element = (pathIndex < this.pathLength) ? this.pathElements.get(pathIndex) : null;
+			// 如果元素是路径段对象，则返回其值以匹配
 			if (element instanceof PathContainer.PathSegment) {
 				return ((PathContainer.PathSegment) element).valueToMatch();
 			}
+			// 否则返回空字符串
 			return "";
 		}
 	}
