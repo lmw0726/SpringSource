@@ -24,24 +24,23 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
 /**
- * WebFilter that handles pre-flight requests through a
- * {@link PreFlightRequestHandler} and bypasses the rest of the chain.
+ * 处理预检请求的 WebFilter，通过 {@link PreFlightRequestHandler} 处理，并绕过其余的链。
  *
- * <p>A WebFlux application can simply inject PreFlightRequestHandler and use
- * it to create an instance of this WebFilter since {@code @EnableWebFlux}
- * declares {@code DispatcherHandler} as a bean and that is a
- * PreFlightRequestHandler.
+ * <p>WebFlux 应用程序可以简单地注入 PreFlightRequestHandler 并使用它来创建此 WebFilter 的实例，
+ * 因为 {@code @EnableWebFlux} 声明 {@code DispatcherHandler} 为一个 bean，它就是一个 PreFlightRequestHandler。
  *
  * @author Rossen Stoyanchev
  * @since 5.3.7
  */
 public class PreFlightRequestWebFilter implements WebFilter {
-
+	/**
+	 * 预检请求处理器
+	 */
 	private final PreFlightRequestHandler handler;
 
 
 	/**
-	 * Create an instance that will delegate to the given handler.
+	 * 创建一个实例，将委托给给定的处理程序。
 	 */
 	public PreFlightRequestWebFilter(PreFlightRequestHandler handler) {
 		Assert.notNull(handler, "PreFlightRequestHandler is required");
@@ -52,7 +51,10 @@ public class PreFlightRequestWebFilter implements WebFilter {
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 		return (CorsUtils.isPreFlightRequest(exchange.getRequest()) ?
-				this.handler.handlePreFlight(exchange) : chain.filter(exchange));
+				// 如果是预检请求，则调用处理预检请求的方法
+				this.handler.handlePreFlight(exchange) :
+				// 否则，将请求传递给下一个过滤器链处理
+				chain.filter(exchange));
 	}
 
 }

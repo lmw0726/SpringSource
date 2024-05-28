@@ -25,22 +25,18 @@ import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.server.adapter.ForwardedHeaderTransformer;
 
 /**
- * Extract values from "Forwarded" and "X-Forwarded-*" headers to override the
- * request URI (i.e. {@link ServerHttpRequest#getURI()}) so it reflects the
- * client-originated protocol and address.
+ * 从 "Forwarded" 和 "X-Forwarded-*" 标头中提取值，以覆盖请求 URI（即 {@link ServerHttpRequest#getURI()}），
+ * 使其反映客户端发起的协议和地址。
  *
- * <p>Alternatively if {@link #setRemoveOnly removeOnly} is set to "true", then
- * "Forwarded" and "X-Forwarded-*" headers are only removed and not used.
+ * <p>或者，如果 {@link #setRemoveOnly removeOnly} 设置为 "true"，则只会删除 "Forwarded" 和 "X-Forwarded-*" 标头，而不会使用它们。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see <a href="https://tools.ietf.org/html/rfc7239">https://tools.ietf.org/html/rfc7239</a>
- * @deprecated as of 5.1 this filter is deprecated in favor of using
- * {@link ForwardedHeaderTransformer} which can be declared as a bean with the
- * name "forwardedHeaderTransformer" or registered explicitly in
- * {@link org.springframework.web.server.adapter.WebHttpHandlerBuilder
- * WebHttpHandlerBuilder}.
+ * @since 5.0
+ * @deprecated 自 5.1 起，此过滤器已弃用，建议改用 {@link ForwardedHeaderTransformer}，
+ * 可将其声明为名为 "forwardedHeaderTransformer" 的 bean，
+ * 或在 {@link org.springframework.web.server.adapter.WebHttpHandlerBuilder WebHttpHandlerBuilder} 中显式注册。
  */
 @Deprecated
 public class ForwardedHeaderFilter extends ForwardedHeaderTransformer implements WebFilter {
@@ -49,8 +45,10 @@ public class ForwardedHeaderFilter extends ForwardedHeaderTransformer implements
 	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 		ServerHttpRequest request = exchange.getRequest();
 		if (hasForwardedHeaders(request)) {
+			// 如果请求中包含转发头部信息，则将转发头部信息应用到交换对象中
 			exchange = exchange.mutate().request(apply(request)).build();
 		}
+		// 将请求传递给下一个过滤器链处理
 		return chain.filter(exchange);
 	}
 

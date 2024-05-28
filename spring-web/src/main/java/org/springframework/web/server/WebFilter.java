@@ -19,9 +19,7 @@ package org.springframework.web.server;
 import reactor.core.publisher.Mono;
 
 /**
- * Contract for interception-style, chained processing of Web requests that may
- * be used to implement cross-cutting, application-agnostic requirements such
- * as security, timeouts, and others.
+ * 用于拦截式、链式处理 Web 请求的契约，可用于实现跨应用程序、与应用程序无关的需求，如安全性、超时等。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -29,11 +27,11 @@ import reactor.core.publisher.Mono;
 public interface WebFilter {
 
 	/**
-	 * Process the Web request and (optionally) delegate to the next
-	 * {@code WebFilter} through the given {@link WebFilterChain}.
-	 * @param exchange the current server exchange
-	 * @param chain provides a way to delegate to the next filter
-	 * @return {@code Mono<Void>} to indicate when request processing is complete
+	 * 处理 Web 请求并（可选地）通过给定的 {@link WebFilterChain} 委派给下一个 {@code WebFilter}。
+	 *
+	 * @param exchange 当前的服务器交换
+	 * @param chain    提供一种委派给下一个过滤器的方式
+	 * @return {@code Mono<Void>}，指示请求处理何时完成
 	 */
 	Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain);
 

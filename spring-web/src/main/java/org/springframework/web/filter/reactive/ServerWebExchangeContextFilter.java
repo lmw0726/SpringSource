@@ -16,30 +16,29 @@
 
 package org.springframework.web.filter.reactive;
 
-import java.util.Optional;
-
-import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
-
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
+
+import java.util.Optional;
 
 /**
- * Inserts an attribute in the Reactor {@link Context} that makes the current
- * {@link ServerWebExchange} available under the attribute name
- * {@link #EXCHANGE_CONTEXT_ATTRIBUTE}. This is useful for access to the
- * exchange without explicitly passing it to components that participate in
- * request processing.
+ * 在 Reactor {@link Context} 中插入一个属性，使得当前 {@link ServerWebExchange}
+ * 可以在属性名称 {@link #EXCHANGE_CONTEXT_ATTRIBUTE} 下使用。
+ * 这对于在参与请求处理的组件中访问交换机而不需要显式传递它是有用的。
  *
- * <p>The convenience method {@link #get(Context)} looks up the exchange.
+ * <p>方便的方法 {@link #get(Context)} 用于查找交换机。
  *
  * @author Rossen Stoyanchev
  * @since 5.2
  */
 public class ServerWebExchangeContextFilter implements WebFilter {
 
-	/** Attribute name under which the exchange is saved in the context. */
+	/**
+	 * 保存交换机的上下文中的属性名称。
+	 */
 	public static final String EXCHANGE_CONTEXT_ATTRIBUTE =
 			ServerWebExchangeContextFilter.class.getName() + ".EXCHANGE_CONTEXT";
 
@@ -47,16 +46,18 @@ public class ServerWebExchangeContextFilter implements WebFilter {
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 		return chain.filter(exchange)
+				// 将当前交换对象作为上下文属性放入上下文，并将上下文写回
 				.contextWrite(cxt -> cxt.put(EXCHANGE_CONTEXT_ATTRIBUTE, exchange));
 	}
 
 
 	/**
-	 * Access the {@link ServerWebExchange} from the Reactor Context, if available,
-	 * which is if {@link ServerWebExchangeContextFilter} is configured for use
-	 * and the give context was obtained from a request processing chain.
-	 * @param context the context in which to access the exchange
-	 * @return the exchange
+	 * 如果可用，从 Reactor Context 中访问 {@link ServerWebExchange}，
+	 * 这在 {@link ServerWebExchangeContextFilter} 配置为使用时，
+	 * 并且给定的上下文是从请求处理链获取时有效。
+	 *
+	 * @param context 要访问交换机的上下文
+	 * @return 交换机
 	 */
 	public static Optional<ServerWebExchange> get(Context context) {
 		return context.getOrEmpty(EXCHANGE_CONTEXT_ATTRIBUTE);
