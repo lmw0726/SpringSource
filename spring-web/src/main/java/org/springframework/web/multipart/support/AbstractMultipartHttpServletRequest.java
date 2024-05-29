@@ -16,15 +16,6 @@
 
 package org.springframework.web.multipart.support;
 
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
@@ -33,9 +24,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.util.*;
+
 /**
- * Abstract base implementation of the MultipartHttpServletRequest interface.
- * Provides management of pre-generated MultipartFile instances.
+ * MultipartHttpServletRequest 接口的抽象基础实现。提供预生成 MultipartFile 实例的管理。
  *
  * @author Juergen Hoeller
  * @author Arjen Poutsma
@@ -43,14 +37,17 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
  */
 public abstract class AbstractMultipartHttpServletRequest extends HttpServletRequestWrapper
 		implements MultipartHttpServletRequest {
-
+	/**
+	 * 参数名称 —— 多部分文件映射
+	 */
 	@Nullable
 	private MultiValueMap<String, MultipartFile> multipartFiles;
 
 
 	/**
-	 * Wrap the given HttpServletRequest in a MultipartHttpServletRequest.
-	 * @param request the request to wrap
+	 * 使用给定的 HttpServletRequest 包装一个 MultipartHttpServletRequest。
+	 *
+	 * @param request 要包装的请求
 	 */
 	protected AbstractMultipartHttpServletRequest(HttpServletRequest request) {
 		super(request);
@@ -69,12 +66,17 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 
 	@Override
 	public HttpHeaders getRequestHeaders() {
+		// 创建一个HttpHeaders对象来存储所有的头部信息
 		HttpHeaders headers = new HttpHeaders();
+		// 获取所有头部名的枚举
 		Enumeration<String> headerNames = getHeaderNames();
+		// 遍历枚举中的每个头部名
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
+			// 将头部名及其对应的值列表添加到HttpHeaders对象中
 			headers.put(headerName, Collections.list(getHeaders(headerName)));
 		}
+		// 返回存储头部信息的HttpHeaders对象
 		return headers;
 	}
 
@@ -90,11 +92,13 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 
 	@Override
 	public List<MultipartFile> getFiles(String name) {
+		// 根据名称获取多部分文件列表
 		List<MultipartFile> multipartFiles = getMultipartFiles().get(name);
 		if (multipartFiles != null) {
+			// 如果多部分文件列表不为空，则返回该列表
 			return multipartFiles;
-		}
-		else {
+		} else {
+			// 否则，返回一个空的列表
 			return Collections.emptyList();
 		}
 	}
@@ -110,12 +114,11 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 	}
 
 	/**
-	 * Determine whether the underlying multipart request has been resolved.
-	 * @return {@code true} when eagerly initialized or lazily triggered,
-	 * {@code false} in case of a lazy-resolution request that got aborted
-	 * before any parameters or multipart files have been accessed
-	 * @since 4.3.15
+	 * 确定底层多部分请求是否已解析。
+	 *
+	 * @return {@code true} 表示已急切地初始化或在首次访问参数或多部分文件之前已中止的惰性解析请求时，{@code false}
 	 * @see #getMultipartFiles()
+	 * @since 4.3.15
 	 */
 	public boolean isResolved() {
 		return (this.multipartFiles != null);
@@ -123,8 +126,7 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 
 
 	/**
-	 * Set a Map with parameter names as keys and list of MultipartFile objects as values.
-	 * To be invoked by subclasses on initialization.
+	 * 设置参数名称作为键和 MultipartFile 对象列表作为值的映射。由子类在初始化时调用。
 	 */
 	protected final void setMultipartFiles(MultiValueMap<String, MultipartFile> multipartFiles) {
 		this.multipartFiles =
@@ -132,20 +134,21 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 	}
 
 	/**
-	 * Obtain the MultipartFile Map for retrieval,
-	 * lazily initializing it if necessary.
+	 * 获取 MultipartFile 映射以进行检索，如有必要则延迟初始化。
+	 *
 	 * @see #initializeMultipart()
 	 */
 	protected MultiValueMap<String, MultipartFile> getMultipartFiles() {
 		if (this.multipartFiles == null) {
+			// 如果多部分文件列表为空，则初始化多部分内容
 			initializeMultipart();
 		}
+		// 返回多部分文件列表
 		return this.multipartFiles;
 	}
 
 	/**
-	 * Lazily initialize the multipart request, if possible.
-	 * Only called if not already eagerly initialized.
+	 * 如果可能，延迟初始化多部分请求。仅在尚未急切初始化时调用。
 	 */
 	protected void initializeMultipart() {
 		throw new IllegalStateException("Multipart request not initialized");

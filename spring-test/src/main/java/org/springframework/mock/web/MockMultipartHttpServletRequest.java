@@ -16,18 +16,6 @@
 
 package org.springframework.mock.web;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
@@ -38,29 +26,36 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.Part;
+import java.io.IOException;
+import java.util.*;
+
 /**
- * Mock implementation of the
- * {@link org.springframework.web.multipart.MultipartHttpServletRequest} interface.
+ * {@link org.springframework.web.multipart.MultipartHttpServletRequest} 接口的模拟实现。
  *
- * <p>As of Spring 5.0, this set of mocks is designed on a Servlet 4.0 baseline.
+ * <p>从 Spring 5.0 开始，这组模拟是基于 Servlet 4.0 的基线设计的。
  *
- * <p>Useful for testing application controllers that access multipart uploads.
- * {@link MockMultipartFile} can be used to populate these mock requests with files.
+ * <p>用于测试访问多部分上传的应用程序控制器。
+ * {@link MockMultipartFile} 可用于使用文件填充这些模拟请求。
  *
  * @author Juergen Hoeller
  * @author Eric Crampton
  * @author Arjen Poutsma
- * @since 2.0
  * @see MockMultipartFile
+ * @since 2.0
  */
 public class MockMultipartHttpServletRequest extends MockHttpServletRequest implements MultipartHttpServletRequest {
-
+	/**
+	 * 文件名称 —— 多部分文件映射
+	 */
 	private final MultiValueMap<String, MultipartFile> multipartFiles = new LinkedMultiValueMap<>();
 
 
 	/**
-	 * Create a new {@code MockMultipartHttpServletRequest} with a default
-	 * {@link MockServletContext}.
+	 * 使用默认的 {@link MockServletContext} 创建一个新的 {@code MockMultipartHttpServletRequest}。
+	 *
 	 * @see #MockMultipartHttpServletRequest(ServletContext)
 	 */
 	public MockMultipartHttpServletRequest() {
@@ -68,9 +63,9 @@ public class MockMultipartHttpServletRequest extends MockHttpServletRequest impl
 	}
 
 	/**
-	 * Create a new {@code MockMultipartHttpServletRequest} with the supplied {@link ServletContext}.
-	 * @param servletContext the ServletContext that the request runs in
-	 * (may be {@code null} to use a default {@link MockServletContext})
+	 * 使用提供的 {@link ServletContext} 创建一个新的 {@code MockMultipartHttpServletRequest}。
+	 *
+	 * @param servletContext 请求运行的 ServletContext（可以为 {@code null} 以使用默认的 {@link MockServletContext}）
 	 */
 	public MockMultipartHttpServletRequest(@Nullable ServletContext servletContext) {
 		super(servletContext);
@@ -80,9 +75,9 @@ public class MockMultipartHttpServletRequest extends MockHttpServletRequest impl
 
 
 	/**
-	 * Add a file to this request. The parameter name from the multipart
-	 * form is taken from the {@link MultipartFile#getName()}.
-	 * @param file multipart file to be added
+	 * 向此请求添加文件。从 multipart 表单中获取参数名称。
+	 *
+	 * @param file 要添加的多部分文件
 	 */
 	public void addFile(MultipartFile file) {
 		Assert.notNull(file, "MultipartFile must not be null");
@@ -103,9 +98,10 @@ public class MockMultipartHttpServletRequest extends MockHttpServletRequest impl
 	public List<MultipartFile> getFiles(String name) {
 		List<MultipartFile> multipartFiles = this.multipartFiles.get(name);
 		if (multipartFiles != null) {
+			// 如果多部分文件列表不为空，则返回该列表
 			return multipartFiles;
-		}
-		else {
+		} else {
+			// 否则，返回一个空的列表
 			return Collections.emptyList();
 		}
 	}
@@ -124,18 +120,21 @@ public class MockMultipartHttpServletRequest extends MockHttpServletRequest impl
 	public String getMultipartContentType(String paramOrFileName) {
 		MultipartFile file = getFile(paramOrFileName);
 		if (file != null) {
+			// 如果文件不为空，则返回文件的内容类型
 			return file.getContentType();
 		}
 		try {
+			// 尝试获取指定参数名的Part对象
 			Part part = getPart(paramOrFileName);
 			if (part != null) {
+				// 如果Part对象不为空，则返回Part对象的内容类型
 				return part.getContentType();
 			}
-		}
-		catch (ServletException | IOException ex) {
-			// Should never happen (we're not actually parsing)
+		} catch (ServletException | IOException ex) {
+			// 捕获异常并抛出IllegalStateException异常
 			throw new IllegalStateException(ex);
 		}
+		// 如果无法获取到文件或Part对象，则返回null
 		return null;
 	}
 
@@ -146,12 +145,17 @@ public class MockMultipartHttpServletRequest extends MockHttpServletRequest impl
 
 	@Override
 	public HttpHeaders getRequestHeaders() {
+		// 创建一个HttpHeaders对象来存储所有的头部信息
 		HttpHeaders headers = new HttpHeaders();
+		// 获取所有头部名的枚举
 		Enumeration<String> headerNames = getHeaderNames();
+		// 遍历枚举中的每个头部名
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
+			// 将头部名及其对应的值列表添加到HttpHeaders对象中
 			headers.put(headerName, Collections.list(getHeaders(headerName)));
 		}
+		// 返回存储头部信息的HttpHeaders对象
 		return headers;
 	}
 
@@ -159,6 +163,7 @@ public class MockMultipartHttpServletRequest extends MockHttpServletRequest impl
 	public HttpHeaders getMultipartHeaders(String paramOrFileName) {
 		MultipartFile file = getFile(paramOrFileName);
 		if (file != null) {
+			// 如果文件不为空，则构建包含Content-Type头部的HttpHeaders对象
 			HttpHeaders headers = new HttpHeaders();
 			if (file.getContentType() != null) {
 				headers.add(HttpHeaders.CONTENT_TYPE, file.getContentType());
@@ -166,18 +171,21 @@ public class MockMultipartHttpServletRequest extends MockHttpServletRequest impl
 			return headers;
 		}
 		try {
+			// 尝试获取指定参数名的Part对象
 			Part part = getPart(paramOrFileName);
 			if (part != null) {
+				// 如果Part对象不为空，则构建包含所有头部信息的HttpHeaders对象
 				HttpHeaders headers = new HttpHeaders();
 				for (String headerName : part.getHeaderNames()) {
 					headers.put(headerName, new ArrayList<>(part.getHeaders(headerName)));
 				}
 				return headers;
 			}
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
+			// 捕获异常并抛出MultipartException异常
 			throw new MultipartException("Could not access multipart servlet request", ex);
 		}
+		// 如果无法获取到文件或Part对象，则返回null
 		return null;
 	}
 

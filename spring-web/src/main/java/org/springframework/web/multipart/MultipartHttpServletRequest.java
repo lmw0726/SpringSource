@@ -16,28 +16,21 @@
 
 package org.springframework.web.multipart;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * Provides additional methods for dealing with multipart content within a
- * servlet request, allowing to access uploaded files.
- * Implementations also need to override the standard
- * {@link javax.servlet.ServletRequest} methods for parameter access, making
- * multipart parameters available.
+ * 在 servlet 请求中提供了处理多部分内容的附加方法，允许访问上传的文件。
+ * 实现还需要覆盖标准的 {@link javax.servlet.ServletRequest} 方法以进行参数访问，使多部分参数可用。
  *
- * <p>A concrete implementation is
- * {@link org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest}.
- * As an intermediate step,
- * {@link org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest}
- * can be subclassed.
+ * <p>具体的实现是 {@link org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest}。
+ * 作为中间步骤，可以继承 {@link org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest}。
  *
  * @author Juergen Hoeller
  * @author Trevor D. Cook
- * @since 29.09.2003
  * @see MultipartResolver
  * @see MultipartFile
  * @see javax.servlet.http.HttpServletRequest#getParameter
@@ -45,25 +38,25 @@ import org.springframework.lang.Nullable;
  * @see javax.servlet.http.HttpServletRequest#getParameterMap
  * @see org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
  * @see org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest
+ * @since 29.09.2003
  */
 public interface MultipartHttpServletRequest extends HttpServletRequest, MultipartRequest {
 
 	/**
-	 * Return this request's method as a convenient HttpMethod instance.
+	 * 以便利的 HttpMethod 实例返回此请求的方法。
 	 */
 	@Nullable
 	HttpMethod getRequestMethod();
 
 	/**
-	 * Return this request's headers as a convenient HttpHeaders instance.
+	 * 以便利的 HttpHeaders 实例返回此请求的头信息。
 	 */
 	HttpHeaders getRequestHeaders();
 
 	/**
-	 * Return the headers for the specified part of the multipart request.
-	 * <p>If the underlying implementation supports access to part headers,
-	 * then all headers are returned. Otherwise, e.g. for a file upload, the
-	 * returned headers may expose a 'Content-Type' if available.
+	 * 返回多部分请求的指定部分的头信息。
+	 * <p>如果底层实现支持访问部分头信息，则返回所有头信息。
+	 * 否则，例如对于文件上传，如果可用，返回的头信息可能会公开“Content-Type”。
 	 */
 	@Nullable
 	HttpHeaders getMultipartHeaders(String paramOrFileName);
