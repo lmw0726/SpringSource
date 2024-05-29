@@ -21,39 +21,34 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
- * Interface for web-based locale context resolution strategies that allows
- * for both locale context resolution via the request and locale context modification
- * via the HTTP exchange.
+ * 用于基于Web的区域设置上下文解析策略的接口，允许通过请求进行区域设置上下文解析和通过HTTP交换修改区域设置上下文。
  *
- * <p>The {@link org.springframework.context.i18n.LocaleContext} object can potentially
- * includes associated time zone and other locale related information.
+ * <p>{@link org.springframework.context.i18n.LocaleContext}对象可能包括关联的时区和其他区域设置相关信息。
  *
  * @author Sebastien Deleuze
- * @since 5.0
  * @see LocaleContext
+ * @since 5.0
  */
 public interface LocaleContextResolver {
 
 	/**
-	 * Resolve the current locale context via the given exchange.
-	 * <p>The returned context may be a
-	 * {@link org.springframework.context.i18n.TimeZoneAwareLocaleContext},
-	 * containing a locale with associated time zone information.
-	 * Simply apply an {@code instanceof} check and downcast accordingly.
-	 * <p>Custom resolver implementations may also return extra settings in
-	 * the returned context, which again can be accessed through downcasting.
-	 * @param exchange current server exchange
-	 * @return the current locale context (never {@code null})
+	 * 通过给定的交换解析当前的区域设置上下文。
+	 * <p>返回的上下文可以是{@link org.springframework.context.i18n.TimeZoneAwareLocaleContext}，
+	 * 包含具有关联时区信息的区域设置。只需应用{@code instanceof}检查并相应地向下转换。
+	 * <p>自定义解析器实现还可以在返回的上下文中返回额外的设置，再次可以通过向下转换进行访问。
+	 *
+	 * @param exchange 当前服务器交换
+	 * @return 当前的区域设置上下文（永远不会为{@code null}）
 	 */
 	LocaleContext resolveLocaleContext(ServerWebExchange exchange);
 
 	/**
-	 * Set the current locale context to the given one,
-	 * potentially including a locale with associated time zone information.
-	 * @param exchange current server exchange
-	 * @param localeContext the new locale context, or {@code null} to clear the locale
-	 * @throws UnsupportedOperationException if the LocaleResolver implementation
-	 * does not support dynamic changing of the locale or time zone
+	 * 将当前的区域设置上下文设置为给定的区域设置上下文，
+	 * 可能包括具有关联时区信息的区域设置。
+	 *
+	 * @param exchange      当前服务器交换
+	 * @param localeContext 新的区域设置上下文，或{@code null}以清除区域设置
+	 * @throws UnsupportedOperationException 如果LocaleResolver实现不支持动态更改区域设置或时区
 	 * @see org.springframework.context.i18n.SimpleLocaleContext
 	 * @see org.springframework.context.i18n.SimpleTimeZoneAwareLocaleContext
 	 */

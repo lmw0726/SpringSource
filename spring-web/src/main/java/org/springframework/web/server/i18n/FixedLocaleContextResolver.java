@@ -16,60 +16,63 @@
 
 package org.springframework.web.server.i18n;
 
-import java.util.Locale;
-import java.util.TimeZone;
-
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
 /**
- * {@link LocaleContextResolver} implementation that always returns a fixed locale
- * and optionally time zone. Default is the current JVM's default locale.
+ * 始终返回固定区域设置和可选时区的{@link LocaleContextResolver}实现。默认为当前JVM的默认区域设置。
  *
- * <p>Note: Does not support {@link #setLocaleContext}, as the fixed locale and
- * time zone cannot be changed.
+ * <p>注意：不支持{@link #setLocaleContext}，因为固定的区域设置和时区不能更改。
  *
  * @author Sebastien Deleuze
  * @since 5.0
  */
 public class FixedLocaleContextResolver implements LocaleContextResolver {
-
+	/**
+	 * 区域设置
+	 */
 	private final Locale locale;
 
+	/**
+	 * 时区
+	 */
 	@Nullable
 	private final TimeZone timeZone;
 
 
 	/**
-	 * Create a default FixedLocaleResolver, exposing a configured default
-	 * locale (or the JVM's default locale as fallback).
+	 * 创建一个默认的FixedLocaleResolver，公开配置的默认区域设置（或者作为回退的JVM的默认区域设置）。
 	 */
 	public FixedLocaleContextResolver() {
 		this(Locale.getDefault());
 	}
 
 	/**
-	 * Create a FixedLocaleResolver that exposes the given locale.
-	 * @param locale the locale to expose
+	 * 创建一个FixedLocaleResolver，公开给定的区域设置。
+	 *
+	 * @param locale 要公开的区域设置
 	 */
 	public FixedLocaleContextResolver(Locale locale) {
 		this(locale, null);
 	}
 
 	/**
-	 * Create a FixedLocaleResolver that exposes the given locale and time zone.
-	 * @param locale the locale to expose
-	 * @param timeZone the time zone to expose
+	 * 创建一个FixedLocaleResolver，公开给定的区域设置和时区。
+	 *
+	 * @param locale   要公开的区域设置
+	 * @param timeZone 要公开的时区
 	 */
 	public FixedLocaleContextResolver(Locale locale, @Nullable TimeZone timeZone) {
 		Assert.notNull(locale, "Locale must not be null");
 		this.locale = locale;
 		this.timeZone = timeZone;
 	}
-
 
 	@Override
 	public LocaleContext resolveLocaleContext(ServerWebExchange exchange) {
@@ -78,6 +81,7 @@ public class FixedLocaleContextResolver implements LocaleContextResolver {
 			public Locale getLocale() {
 				return locale;
 			}
+
 			@Override
 			@Nullable
 			public TimeZone getTimeZone() {
