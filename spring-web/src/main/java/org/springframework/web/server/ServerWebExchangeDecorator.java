@@ -16,13 +16,6 @@
 
 package org.springframework.web.server;
 
-import java.security.Principal;
-import java.time.Instant;
-import java.util.Map;
-import java.util.function.Function;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.http.codec.multipart.Part;
@@ -31,37 +24,48 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
+import reactor.core.publisher.Mono;
+
+import java.security.Principal;
+import java.time.Instant;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
- * A convenient base class for classes that need to wrap another
- * {@link ServerWebExchange}. Pre-implements all methods by delegating to the
- * wrapped instance.
+ * 一个方便的基类，用于需要包装另一个 {@link ServerWebExchange} 的类。
+ * 通过委托给包装的实例预先实现所有方法。
  *
- * <p><strong>Note:</strong> if the purpose for using a decorator is to override
- * properties like {@link #getPrincipal()}, consider using
- * {@link ServerWebExchange#mutate()} instead.
+ * <p><strong>注意：</strong>如果使用装饰器的目的是覆盖 {@link #getPrincipal()} 等属性，
+ * 请考虑使用 {@link ServerWebExchange#mutate()} 代替。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
- *
  * @see ServerWebExchange#mutate()
+ * @since 5.0
  */
 public class ServerWebExchangeDecorator implements ServerWebExchange {
 
 	private final ServerWebExchange delegate;
 
-
+	/**
+	 * 构造函数，接受一个 ServerWebExchange 对象作为委托。
+	 *
+	 * @param delegate 被包装的 ServerWebExchange 实例，不能为空
+	 */
 	protected ServerWebExchangeDecorator(ServerWebExchange delegate) {
 		Assert.notNull(delegate, "ServerWebExchange 'delegate' is required.");
 		this.delegate = delegate;
 	}
 
-
+	/**
+	 * 返回包装的 ServerWebExchange 实例。
+	 *
+	 * @return 被包装的 ServerWebExchange 实例
+	 */
 	public ServerWebExchange getDelegate() {
 		return this.delegate;
 	}
 
-	// ServerWebExchange delegation methods...
+	// ServerWebExchange 委托方法...
 
 	@Override
 	public ServerHttpRequest getRequest() {

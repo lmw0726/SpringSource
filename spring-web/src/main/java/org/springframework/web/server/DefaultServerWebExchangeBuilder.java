@@ -16,32 +16,43 @@
 
 package org.springframework.web.server;
 
-import java.security.Principal;
-import java.util.function.Consumer;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Mono;
+
+import java.security.Principal;
+import java.util.function.Consumer;
 
 /**
- * Package-private implementation of {@link ServerWebExchange.Builder}.
+ * 包私有的 {@link ServerWebExchange.Builder} 实现。
+ * <p>用于构建和修改 ServerWebExchange 实例。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 class DefaultServerWebExchangeBuilder implements ServerWebExchange.Builder {
-
+	/**
+	 * 服务器Web交换代理类
+	 */
 	private final ServerWebExchange delegate;
 
+	/**
+	 * 请求
+	 */
 	@Nullable
 	private ServerHttpRequest request;
 
+	/**
+	 * 响应
+	 */
 	@Nullable
 	private ServerHttpResponse response;
 
+	/**
+	 * 当前请求的认证用户
+	 */
 	@Nullable
 	private Mono<Principal> principalMono;
 
@@ -54,8 +65,11 @@ class DefaultServerWebExchangeBuilder implements ServerWebExchange.Builder {
 
 	@Override
 	public ServerWebExchange.Builder request(Consumer<ServerHttpRequest.Builder> consumer) {
+		// 获取当前请求的构建器
 		ServerHttpRequest.Builder builder = this.delegate.getRequest().mutate();
+		// 使用消费者对构建器进行修改
 		consumer.accept(builder);
+		// 构建新的请求并返回
 		return request(builder.build());
 	}
 
@@ -84,22 +98,29 @@ class DefaultServerWebExchangeBuilder implements ServerWebExchange.Builder {
 
 
 	/**
-	 * An immutable wrapper of an exchange returning property overrides -- given
-	 * to the constructor -- or original values otherwise.
+	 * 一个不可变的交换包装器，返回属性覆盖——传递给构造函数——否则返回原始值。
 	 */
 	private static class MutativeDecorator extends ServerWebExchangeDecorator {
-
+		/**
+		 * 请求
+		 */
 		@Nullable
 		private final ServerHttpRequest request;
 
+		/**
+		 * 响应
+		 */
 		@Nullable
 		private final ServerHttpResponse response;
 
+		/**
+		 *当前请求的认证用户
+		 */
 		@Nullable
 		private final Mono<Principal> principalMono;
 
 		public MutativeDecorator(ServerWebExchange delegate, @Nullable ServerHttpRequest request,
-				@Nullable ServerHttpResponse response, @Nullable Mono<Principal> principalMono) {
+								 @Nullable ServerHttpResponse response, @Nullable Mono<Principal> principalMono) {
 
 			super(delegate);
 			this.request = request;
@@ -125,4 +146,3 @@ class DefaultServerWebExchangeBuilder implements ServerWebExchange.Builder {
 	}
 
 }
-
