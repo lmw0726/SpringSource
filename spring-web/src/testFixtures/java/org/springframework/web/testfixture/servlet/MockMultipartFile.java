@@ -16,28 +16,26 @@
 
 package org.springframework.web.testfixture.servlet;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * Mock implementation of the {@link org.springframework.web.multipart.MultipartFile}
- * interface.
+ * {@link org.springframework.web.multipart.MultipartFile} 接口的模拟实现。
  *
- * <p>Useful in conjunction with a {@link MockMultipartHttpServletRequest}
- * for testing application controllers that access multipart uploads.
+ * <p>与 {@link MockMultipartHttpServletRequest} 结合使用，用于测试访问多部分上传的应用程序控制器。
  *
  * @author Juergen Hoeller
  * @author Eric Crampton
- * @since 2.0
  * @see MockMultipartHttpServletRequest
+ * @since 2.0
  */
 public class MockMultipartFile implements MultipartFile {
 
@@ -52,30 +50,33 @@ public class MockMultipartFile implements MultipartFile {
 
 
 	/**
-	 * Create a new MockMultipartFile with the given content.
-	 * @param name the name of the file
-	 * @param content the content of the file
+	 * 使用给定内容创建一个新的 MockMultipartFile。
+	 *
+	 * @param name    文件的名称
+	 * @param content 文件的内容
 	 */
 	public MockMultipartFile(String name, @Nullable byte[] content) {
 		this(name, "", null, content);
 	}
 
 	/**
-	 * Create a new MockMultipartFile with the given content.
-	 * @param name the name of the file
-	 * @param contentStream the content of the file as stream
-	 * @throws IOException if reading from the stream failed
+	 * 使用给定内容创建一个新的 MockMultipartFile。
+	 *
+	 * @param name          文件的名称
+	 * @param contentStream 文件内容的流
+	 * @throws IOException 如果从流中读取失败
 	 */
 	public MockMultipartFile(String name, InputStream contentStream) throws IOException {
 		this(name, "", null, FileCopyUtils.copyToByteArray(contentStream));
 	}
 
 	/**
-	 * Create a new MockMultipartFile with the given content.
-	 * @param name the name of the file
-	 * @param originalFilename the original filename (as on the client's machine)
-	 * @param contentType the content type (if known)
-	 * @param content the content of the file
+	 * 使用给定内容创建一个新的 MockMultipartFile。
+	 *
+	 * @param name             文件的名称
+	 * @param originalFilename 原始文件名（客户端机器上的文件名）
+	 * @param contentType      内容类型（如果已知）
+	 * @param content          文件的内容
 	 */
 	public MockMultipartFile(
 			String name, @Nullable String originalFilename, @Nullable String contentType, @Nullable byte[] content) {
@@ -88,12 +89,13 @@ public class MockMultipartFile implements MultipartFile {
 	}
 
 	/**
-	 * Create a new MockMultipartFile with the given content.
-	 * @param name the name of the file
-	 * @param originalFilename the original filename (as on the client's machine)
-	 * @param contentType the content type (if known)
-	 * @param contentStream the content of the file as stream
-	 * @throws IOException if reading from the stream failed
+	 * 使用给定内容创建一个新的 MockMultipartFile。
+	 *
+	 * @param name             文件的名称
+	 * @param originalFilename 原始文件名（客户端机器上的文件名）
+	 * @param contentType      内容类型（如果已知）
+	 * @param contentStream    文件内容的流
+	 * @throws IOException 如果从流中读取失败
 	 */
 	public MockMultipartFile(
 			String name, @Nullable String originalFilename, @Nullable String contentType, InputStream contentStream)

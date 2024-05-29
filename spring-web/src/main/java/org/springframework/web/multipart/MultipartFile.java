@@ -16,51 +16,48 @@
 
 package org.springframework.web.multipart;
 
+import org.springframework.core.io.InputStreamSource;
+import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
+import org.springframework.util.FileCopyUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.springframework.core.io.InputStreamSource;
-import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
-import org.springframework.util.FileCopyUtils;
-
 /**
- * A representation of an uploaded file received in a multipart request.
+ * 表示在多部分请求中接收到的上传文件的表示形式。
  *
- * <p>The file contents are either stored in memory or temporarily on disk.
- * In either case, the user is responsible for copying file contents to a
- * session-level or persistent store as and if desired. The temporary storage
- * will be cleared at the end of request processing.
+ * <p>文件内容可能存储在内存中，也可能暂时存储在磁盘上。
+ * 在任何情况下，用户都负责将文件内容复制到会话级或持久存储中（如果需要的话）。
+ * 临时存储将在请求处理结束时被清除。
  *
  * @author Juergen Hoeller
  * @author Trevor D. Cook
- * @since 29.09.2003
  * @see org.springframework.web.multipart.MultipartHttpServletRequest
  * @see org.springframework.web.multipart.MultipartResolver
+ * @since 29.09.2003
  */
 public interface MultipartFile extends InputStreamSource {
 
 	/**
-	 * Return the name of the parameter in the multipart form.
-	 * @return the name of the parameter (never {@code null} or empty)
+	 * 返回多部分表单中参数的名称。
+	 *
+	 * @return 参数的名称（永不为 {@code null} 或空）
 	 */
 	String getName();
 
 	/**
-	 * Return the original filename in the client's filesystem.
-	 * <p>This may contain path information depending on the browser used,
-	 * but it typically will not with any other than Opera.
-	 * <p><strong>Note:</strong> Please keep in mind this filename is supplied
-	 * by the client and should not be used blindly. In addition to not using
-	 * the directory portion, the file name could also contain characters such
-	 * as ".." and others that can be used maliciously. It is recommended to not
-	 * use this filename directly. Preferably generate a unique one and save
-	 * this one one somewhere for reference, if necessary.
-	 * @return the original filename, or the empty String if no file has been chosen
-	 * in the multipart form, or {@code null} if not defined or not available
+	 * 返回客户端文件系统中的原始文件名。
+	 * <p>这可能包含路径信息，这取决于所使用的浏览器，
+	 * 但除了 Opera 之外，通常不会包含路径信息。
+	 * <p><strong>注意：</strong> 请记住此文件名是由客户端提供的，不应盲目使用。
+	 * 除了不使用目录部分之外，文件名还可能包含诸如 ".." 等可被恶意使用的字符。
+	 * 建议不直接使用此文件名。最好生成一个唯一的文件名，并将此文件名保存在某处以供参考（如果需要）。
+	 *
+	 * @return 原始文件名；如果在多部分表单中未选择文件，则为空字符串；如果未定义或不可用，则为 {@code null}
 	 * @see org.apache.commons.fileupload.FileItem#getName()
 	 * @see org.springframework.web.multipart.commons.CommonsMultipartFile#setPreserveFilename
 	 * @see <a href="https://tools.ietf.org/html/rfc7578#section-4.2">RFC 7578, Section 4.2</a>
@@ -70,46 +67,48 @@ public interface MultipartFile extends InputStreamSource {
 	String getOriginalFilename();
 
 	/**
-	 * Return the content type of the file.
-	 * @return the content type, or {@code null} if not defined
-	 * (or no file has been chosen in the multipart form)
+	 * 返回文件的内容类型。
+	 *
+	 * @return 内容类型；如果未定义（或在多部分表单中未选择文件），则为 {@code null}
 	 */
 	@Nullable
 	String getContentType();
 
 	/**
-	 * Return whether the uploaded file is empty, that is, either no file has
-	 * been chosen in the multipart form or the chosen file has no content.
+	 * 返回上传的文件是否为空，即，要么在多部分表单中未选择文件，要么所选择的文件没有内容。
 	 */
 	boolean isEmpty();
 
 	/**
-	 * Return the size of the file in bytes.
-	 * @return the size of the file, or 0 if empty
+	 * 返回文件的大小（以字节为单位）。
+	 *
+	 * @return 文件的大小；如果为空，则为 0
 	 */
 	long getSize();
 
 	/**
-	 * Return the contents of the file as an array of bytes.
-	 * @return the contents of the file as bytes, or an empty byte array if empty
-	 * @throws IOException in case of access errors (if the temporary store fails)
+	 * 返回文件的内容作为字节数组。
+	 *
+	 * @return 文件的内容作为字节数组；如果为空，则为空字节数组
+	 * @throws IOException 如果出现访问错误（如果临时存储失败）
 	 */
 	byte[] getBytes() throws IOException;
 
 	/**
-	 * Return an InputStream to read the contents of the file from.
-	 * <p>The user is responsible for closing the returned stream.
-	 * @return the contents of the file as stream, or an empty stream if empty
-	 * @throws IOException in case of access errors (if the temporary store fails)
+	 * 返回用于从文件中读取内容的 InputStream。
+	 * <p>用户负责关闭返回的流。
+	 *
+	 * @return 文件的内容作为流；如果为空，则为空流
+	 * @throws IOException 如果出现访问错误（如果临时存储失败）
 	 */
 	@Override
 	InputStream getInputStream() throws IOException;
 
 	/**
-	 * Return a Resource representation of this MultipartFile. This can be used
-	 * as input to the {@code RestTemplate} or the {@code WebClient} to expose
-	 * content length and the filename along with the InputStream.
-	 * @return this MultipartFile adapted to the Resource contract
+	 * 返回此 MultipartFile 的 Resource 表示形式。
+	 * 这可用于将内容长度和文件名暴露给 {@code RestTemplate} 或 {@code WebClient}。
+	 *
+	 * @return 适用于 Resource 合约的此 MultipartFile
 	 * @since 5.1
 	 */
 	default Resource getResource() {
@@ -117,34 +116,30 @@ public interface MultipartFile extends InputStreamSource {
 	}
 
 	/**
-	 * Transfer the received file to the given destination file.
-	 * <p>This may either move the file in the filesystem, copy the file in the
-	 * filesystem, or save memory-held contents to the destination file. If the
-	 * destination file already exists, it will be deleted first.
-	 * <p>If the target file has been moved in the filesystem, this operation
-	 * cannot be invoked again afterwards. Therefore, call this method just once
-	 * in order to work with any storage mechanism.
-	 * <p><b>NOTE:</b> Depending on the underlying provider, temporary storage
-	 * may be container-dependent, including the base directory for relative
-	 * destinations specified here (e.g. with Servlet 3.0 multipart handling).
-	 * For absolute destinations, the target file may get renamed/moved from its
-	 * temporary location or newly copied, even if a temporary copy already exists.
-	 * @param dest the destination file (typically absolute)
-	 * @throws IOException in case of reading or writing errors
-	 * @throws IllegalStateException if the file has already been moved
-	 * in the filesystem and is not available anymore for another transfer
+	 * 将接收到的文件传输到给定的目标文件。
+	 * <p>这可以将文件移动到文件系统中，复制文件到文件系统中，或将内存中的内容保存到目标文件中。
+	 * 如果目标文件已经存在，将首先删除它。
+	 * <p>如果目标文件已在文件系统中移动，则无法再次调用此操作。
+	 * 因此，只能调用此方法一次以使用任何存储机制。
+	 * <p><b>注意：</b> 依赖于底层提供者，临时存储可能与容器相关，包括此处指定的相对目标的基目录（例如，使用 Servlet 3.0 多部分处理）。
+	 * 对于绝对目标，即使临时副本已存在，目标文件也可能被重命名/移动或新复制。
+	 *
+	 * @param dest 目标文件（通常是绝对的）
+	 * @throws IOException           如果读取或写入出现错误
+	 * @throws IllegalStateException 如果文件已在文件系统中移动，并且不再可用于另一个传输
 	 * @see org.apache.commons.fileupload.FileItem#write(File)
 	 * @see javax.servlet.http.Part#write(String)
 	 */
 	void transferTo(File dest) throws IOException, IllegalStateException;
 
 	/**
-	 * Transfer the received file to the given destination file.
-	 * <p>The default implementation simply copies the file input stream.
-	 * @since 5.1
+	 * 将接收到的文件传输到给定的目标文件。
+	 * <p>默认实现简单地复制文件输入流。
+	 *
 	 * @see #getInputStream()
 	 * @see #transferTo(File)
- 	 */
+	 * @since 5.1
+	 */
 	default void transferTo(Path dest) throws IOException, IllegalStateException {
 		FileCopyUtils.copy(getInputStream(), Files.newOutputStream(dest));
 	}
