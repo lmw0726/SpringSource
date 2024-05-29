@@ -16,31 +16,31 @@
 
 package org.springframework.web.multipart.support;
 
-import javax.servlet.ServletException;
-
 import org.springframework.web.multipart.MultipartResolver;
 
+import javax.servlet.ServletException;
+
 /**
- * Raised when the part of a "multipart/form-data" request identified by its
- * name cannot be found.
+ * 当无法找到以其名称标识的“multipart/form-data”请求的部分时引发。
  *
- * <p>This may be because the request is not a multipart/form-data request,
- * because the part is not present in the request, or because the web
- * application is not configured correctly for processing multipart requests,
- * e.g. no {@link MultipartResolver}.
+ * <p>这可能是因为请求不是 multipart/form-data 请求，因为请求中不存在该部分，
+ * 或者因为 Web 应用程序未正确配置以处理多部分请求，例如没有 {@link MultipartResolver}。
  *
  * @author Rossen Stoyanchev
  * @since 3.1
  */
 @SuppressWarnings("serial")
 public class MissingServletRequestPartException extends ServletException {
-
+	/**
+	 * 请求部分名称
+	 */
 	private final String requestPartName;
 
 
 	/**
-	 * Constructor for MissingServletRequestPartException.
-	 * @param requestPartName the name of the missing part of the multipart request
+	 * MissingServletRequestPartException 的构造方法。
+	 *
+	 * @param requestPartName multipart 请求中缺少的部分的名称
 	 */
 	public MissingServletRequestPartException(String requestPartName) {
 		super("Required request part '" + requestPartName + "' is not present");
@@ -49,7 +49,7 @@ public class MissingServletRequestPartException extends ServletException {
 
 
 	/**
-	 * Return the name of the offending part of the multipart request.
+	 * 返回多部分请求中有问题的部分的名称。
 	 */
 	public String getRequestPartName() {
 		return this.requestPartName;
