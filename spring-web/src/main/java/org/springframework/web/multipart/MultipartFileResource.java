@@ -16,21 +16,20 @@
 
 package org.springframework.web.multipart;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.core.io.AbstractResource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * Adapt {@link MultipartFile} to {@link org.springframework.core.io.Resource},
- * exposing the content as {@code InputStream} and also overriding
- * {@link #contentLength()} as well as {@link #getFilename()}.
+ * 将 {@link MultipartFile} 适配为 {@link org.springframework.core.io.Resource}，
+ * 将内容暴露为 {@code InputStream}，同时覆盖 {@link #contentLength()} 和 {@link #getFilename()}。
  *
  * @author Rossen Stoyanchev
- * @since 5.1
  * @see MultipartFile#getResource()
+ * @since 5.1
  */
 class MultipartFileResource extends AbstractResource {
 
@@ -44,7 +43,7 @@ class MultipartFileResource extends AbstractResource {
 
 
 	/**
-	 * This implementation always returns {@code true}.
+	 * 此实现始终返回 {@code true}。
 	 */
 	@Override
 	public boolean exists() {
@@ -52,7 +51,7 @@ class MultipartFileResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation always returns {@code true}.
+	 * 此实现始终返回 {@code true}。
 	 */
 	@Override
 	public boolean isOpen() {
@@ -70,8 +69,7 @@ class MultipartFileResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation throws IllegalStateException if attempting to
-	 * read the underlying stream multiple times.
+	 * 如果尝试多次读取底层流，则此实现将抛出 IllegalStateException。
 	 */
 	@Override
 	public InputStream getInputStream() throws IOException, IllegalStateException {
@@ -79,13 +77,12 @@ class MultipartFileResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation returns a description that has the Multipart name.
+	 * 此实现返回具有多部分名称的描述。
 	 */
 	@Override
 	public String getDescription() {
 		return "MultipartFile resource [" + this.multipartFile.getName() + "]";
 	}
-
 
 	@Override
 	public boolean equals(@Nullable Object other) {

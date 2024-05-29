@@ -33,12 +33,11 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
 /**
- * Convenience base class for {@link Resource} implementations,
- * pre-implementing typical behavior.
+ * {@link Resource} 实现的便利基类，预先实现了典型的行为。
  *
- * <p>The "exists" method will check whether a File or InputStream can
- * be opened; "isOpen" will always return false; "getURL" and "getFile"
- * throw an exception; and "toString" will return the description.
+ * <p>"exists" 方法将检查是否可以打开 File 或 InputStream；
+ * "isOpen" 将始终返回 false；"getURL" 和 "getFile" 将抛出异常；
+ * "toString" 将返回描述。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -46,11 +45,6 @@ import java.nio.channels.ReadableByteChannel;
  */
 public abstract class AbstractResource implements Resource {
 
-	/**
-	 * This implementation checks whether a File can be opened,
-	 * falling back to whether an InputStream can be opened.
-	 * <p>This will cover both directories and content resources.
-	 */
 	/**
 	 * 判断文件是否存在，若判断过程产生异常（因为会调用SecurityManager来判断），就关闭对应的流
 	 *
@@ -85,10 +79,6 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation always returns {@code true} for a resource
-	 * that {@link #exists() exists} (revised as of 5.1).
-	 */
-	/**
 	 * 根据文件是否存在判断是否可读。
 	 *
 	 * @return true表示可读
@@ -98,9 +88,6 @@ public abstract class AbstractResource implements Resource {
 		return exists();
 	}
 
-	/**
-	 * This implementation always returns {@code false}.
-	 */
 	/**
 	 * 返回false表示未被打开
 	 *
@@ -112,9 +99,6 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation always returns {@code false}.
-	 */
-	/**
 	 * 直接返回false，表示该资源不是文件
 	 *
 	 * @return true表示资源是一个文件
@@ -124,10 +108,6 @@ public abstract class AbstractResource implements Resource {
 		return false;
 	}
 
-	/**
-	 * This implementation throws a FileNotFoundException, assuming
-	 * that the resource cannot be resolved to a URL.
-	 */
 	/**
 	 * 抛出FileNotFoundException异常，交予子类实现
 	 *
@@ -139,10 +119,6 @@ public abstract class AbstractResource implements Resource {
 		throw new FileNotFoundException(getDescription() + " cannot be resolved to URL");
 	}
 
-	/**
-	 * This implementation builds a URI based on the URL returned
-	 * by {@link #getURL()}.
-	 */
 	/**
 	 * 基于getURL()返回的URL构建URI
 	 *
@@ -160,10 +136,6 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation throws a FileNotFoundException, assuming
-	 * that the resource cannot be resolved to an absolute file path.
-	 */
-	/**
 	 * 抛出FileNotFoundException异常，交由子类实现
 	 *
 	 * @return 文件对象
@@ -175,12 +147,6 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation returns {@link Channels#newChannel(InputStream)}
-	 * with the result of {@link #getInputStream()}.
-	 * <p>This is the same as in {@link Resource}'s corresponding default method
-	 * but mirrored here for efficient JVM-level dispatching in a class hierarchy.
-	 */
-	/**
 	 * 根据getInputStream()的结果构建ReadableByteChannel
 	 *
 	 * @return 可读通道
@@ -191,15 +157,6 @@ public abstract class AbstractResource implements Resource {
 		return Channels.newChannel(getInputStream());
 	}
 
-	/**
-	 * This method reads the entire InputStream to determine the content length.
-	 * <p>For a custom sub-class of {@code InputStreamResource}, we strongly
-	 * recommend overriding this method with a more optimal implementation, e.g.
-	 * checking File length, or possibly simply returning -1 if the stream can
-	 * only be read once.
-	 *
-	 * @see #getInputStream()
-	 */
 	/**
 	 * 获取资源的长度
 	 * 这个资源内容铲毒实际就是资源的字节长度，通过全部读取一遍来判断
@@ -232,12 +189,6 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation checks the timestamp of the underlying File,
-	 * if available.
-	 *
-	 * @see #getFileForLastModifiedCheck()
-	 */
-	/**
 	 * 返回资源最后修改时间
 	 *
 	 * @return 资源最后修改时间
@@ -255,22 +206,17 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * Determine the File to use for timestamp checking.
-	 * <p>The default implementation delegates to {@link #getFile()}.
+	 * 确定用于时间戳检查的文件。
+	 * <p>默认实现委托给{@link #getFile()}。
 	 *
-	 * @return the File to use for timestamp checking (never {@code null})
-	 * @throws FileNotFoundException if the resource cannot be resolved as
-	 *                               an absolute file path, i.e. is not available in a file system
-	 * @throws IOException           in case of general resolution/reading failures
+	 * @return 用于时间戳检查的文件（永不为{@code null}）
+	 * @throws FileNotFoundException 如果资源无法解析为绝对文件路径，即在文件系统中不可用
+	 * @throws IOException           如果存在一般的解析/读取失败
 	 */
 	protected File getFileForLastModifiedCheck() throws IOException {
 		return getFile();
 	}
 
-	/**
-	 * This implementation throws a FileNotFoundException, assuming
-	 * that relative resources cannot be created for this resource.
-	 */
 	/**
 	 * 抛出FileNotFoundException异常，交由子类海鲜
 	 *
@@ -284,10 +230,6 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation always returns {@code null},
-	 * assuming that this resource type does not have a filename.
-	 */
-	/**
 	 * 获取资源名称，默认返回null，交由子类实现
 	 *
 	 * @return 文件名
@@ -300,7 +242,7 @@ public abstract class AbstractResource implements Resource {
 
 
 	/**
-	 * This implementation compares description strings.
+	 * 此实现比较描述字符串。
 	 *
 	 * @see #getDescription()
 	 */
@@ -311,7 +253,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation returns the description's hash code.
+	 * 此实现返回描述的哈希码。
 	 *
 	 * @see #getDescription()
 	 */
@@ -320,11 +262,6 @@ public abstract class AbstractResource implements Resource {
 		return getDescription().hashCode();
 	}
 
-	/**
-	 * This implementation returns the description of this resource.
-	 *
-	 * @see #getDescription()
-	 */
 	/**
 	 * 返回资源的描述
 	 *
