@@ -16,15 +16,15 @@
 
 package org.springframework.web.server.session;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Request and response header-based {@link WebSessionIdResolver}.
+ * 基于请求和响应头的 {@link WebSessionIdResolver}。
  *
  * @author Greg Turnquist
  * @author Rob Winch
@@ -32,19 +32,23 @@ import org.springframework.web.server.ServerWebExchange;
  */
 public class HeaderWebSessionIdResolver implements WebSessionIdResolver {
 
-	/** Default value for {@link #setHeaderName(String)}. */
+	/**
+	 * {@link #setHeaderName(String)} 的默认值。
+	 */
 	public static final String DEFAULT_HEADER_NAME = "SESSION";
 
-
+	/**
+	 * 请求头名称
+	 */
 	private String headerName = DEFAULT_HEADER_NAME;
 
 
 	/**
-	 * Set the name of the session header to use for the session ID.
-	 * <p>The name is used to extract the session ID from the request headers as
-	 * well to set the session ID on the response headers.
-	 * <p>By default set to {@code DEFAULT_HEADER_NAME}
-	 * @param headerName the header name
+	 * 设置用于会话 ID 的会话头的名称。
+	 * <p>该名称用于从请求头中提取会话 ID，同时也用于在响应头中设置会话 ID。
+	 * <p>默认设置为 {@code DEFAULT_HEADER_NAME}
+	 *
+	 * @param headerName 头的名称
 	 */
 	public void setHeaderName(String headerName) {
 		Assert.hasText(headerName, "'headerName' must not be empty");
@@ -52,8 +56,9 @@ public class HeaderWebSessionIdResolver implements WebSessionIdResolver {
 	}
 
 	/**
-	 * Get the configured header name.
-	 * @return the configured header name
+	 * 获取配置的头名称。
+	 *
+	 * @return 配置的头名称
 	 */
 	public String getHeaderName() {
 		return this.headerName;
@@ -62,7 +67,9 @@ public class HeaderWebSessionIdResolver implements WebSessionIdResolver {
 
 	@Override
 	public List<String> resolveSessionIds(ServerWebExchange exchange) {
+		// 获取请求的HttpHeaders
 		HttpHeaders headers = exchange.getRequest().getHeaders();
+		// 返回指定名称的头部值列表，如果不存在则返回空列表
 		return headers.getOrDefault(getHeaderName(), Collections.emptyList());
 	}
 

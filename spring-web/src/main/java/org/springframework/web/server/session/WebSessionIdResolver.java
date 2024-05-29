@@ -16,39 +16,39 @@
 
 package org.springframework.web.server.session;
 
-import java.util.List;
-
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.List;
+
 /**
- * Contract for session ID resolution strategies. Allows for session ID
- * resolution through the request and for sending the session ID or expiring
- * the session through the response.
+ * 会话 ID 解析策略的契约。允许通过请求解析会话 ID，并通过响应发送会话 ID 或使会话过期。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see CookieWebSessionIdResolver
+ * @since 5.0
  */
 public interface WebSessionIdResolver {
 
 	/**
-	 * Resolve the session IDs associated with the request.
-	 * @param exchange the current exchange
-	 * @return the session IDs or an empty list
+	 * 解析与请求关联的会话 ID。
+	 *
+	 * @param exchange 当前的交换对象
+	 * @return 会话 ID 列表，如果没有则返回空列表
 	 */
 	List<String> resolveSessionIds(ServerWebExchange exchange);
 
 	/**
-	 * Send the given session ID to the client.
-	 * @param exchange the current exchange
-	 * @param sessionId the session ID
+	 * 将给定的会话 ID 发送给客户端。
+	 *
+	 * @param exchange  当前的交换对象
+	 * @param sessionId 会话 ID
 	 */
 	void setSessionId(ServerWebExchange exchange, String sessionId);
 
 	/**
-	 * Instruct the client to end the current session.
-	 * @param exchange the current exchange
+	 * 指示客户端结束当前会话。
+	 *
+	 * @param exchange 当前的交换对象
 	 */
 	void expireSession(ServerWebExchange exchange);
-
 }
