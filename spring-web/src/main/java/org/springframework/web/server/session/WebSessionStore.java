@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 import org.springframework.web.server.WebSession;
 
 /**
- * Strategy for {@link WebSession} persistence.
+ * 用于 {@link WebSession} 持久化的策略。
  *
  * @author Rossen Stoyanchev
  * @author Rob Winch
@@ -30,36 +30,38 @@ import org.springframework.web.server.WebSession;
 public interface WebSessionStore {
 
 	/**
-	 * Create a new WebSession.
-	 * <p>Note that this does nothing more than create a new instance.
-	 * The session can later be started explicitly via {@link WebSession#start()}
-	 * or implicitly by adding attributes -- and then persisted via
-	 * {@link WebSession#save()}.
-	 * @return the created session instance
+	 * 创建一个新的 WebSession。
+	 * <p>请注意，这只是创建一个新实例。
+	 * WebSession 可以通过 {@link WebSession#start()} 显式启动，或通过添加属性（然后通过
+	 * {@link WebSession#save()}）隐式启动。
+	 *
+	 * @return 创建的会话实例
 	 */
 	Mono<WebSession> createWebSession();
 
 	/**
-	 * Return the WebSession for the given id.
-	 * <p><strong>Note:</strong> This method should perform an expiration check,
-	 * and if it has expired remove the session and return empty. This method
-	 * should also update the lastAccessTime of retrieved sessions.
-	 * @param sessionId the session to load
-	 * @return the session, or an empty {@code Mono} .
+	 * 返回给定 ID 的 WebSession。
+	 * <p><strong>注意：</strong>此方法应执行过期检查，如果已过期，则删除会话并返回空。
+	 * 此方法还应更新检索到的会话的 lastAccessTime。
+	 *
+	 * @param sessionId 要加载的会话
+	 * @return 会话，或空的 {@code Mono}。
 	 */
 	Mono<WebSession> retrieveSession(String sessionId);
 
 	/**
-	 * Remove the WebSession for the specified id.
-	 * @param sessionId the id of the session to remove
-	 * @return a completion notification (success or error)
+	 * 删除指定 ID 的 WebSession。
+	 *
+	 * @param sessionId 要删除的会话的 ID
+	 * @return 完成通知（成功或错误）
 	 */
 	Mono<Void> removeSession(String sessionId);
 
 	/**
-	 * Update the last accessed timestamp to "now".
-	 * @param webSession the session to update
-	 * @return the session with the updated last access time
+	 * 将最后访问时间更新为“现在”。
+	 *
+	 * @param webSession 要更新的会话
+	 * @return 更新了最后访问时间的会话
 	 */
 	Mono<WebSession> updateLastAccessTime(WebSession webSession);
 

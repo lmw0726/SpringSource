@@ -36,33 +36,44 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Simple Map-based storage for {@link WebSession} instances.
+ * 基于Map的简单的{@link WebSession} 实例的存储。
  *
  * @author Rossen Stoyanchev
  * @author Rob Winch
  * @since 5.0
  */
 public class InMemoryWebSessionStore implements WebSessionStore {
-
+	/**
+	 * ID生成器
+	 */
 	private static final IdGenerator idGenerator = new JdkIdGenerator();
 
-
+	/**
+	 * 会话的最大数量
+	 */
 	private int maxSessions = 10000;
 
+	/**
+	 * 要使用的时钟
+	 */
 	private Clock clock = Clock.system(ZoneId.of("GMT"));
 
+	/**
+	 * 会话编号 —— 内存Web会话 映射
+	 */
 	private final Map<String, InMemoryWebSession> sessions = new ConcurrentHashMap<>();
 
+	/**
+	 * 过期会话检查器
+	 */
 	private final ExpiredSessionChecker expiredSessionChecker = new ExpiredSessionChecker();
 
 
 	/**
-	 * Set the maximum number of sessions that can be stored. Once the limit is
-	 * reached, any attempt to store an additional session will result in an
-	 * {@link IllegalStateException}.
-	 * <p>By default set to 10000.
+	 * 设置可以存储的会话的最大数量。一旦达到限制，任何尝试存储额外会话的操作都将导致{@link IllegalStateException}。
+	 * <p>默认设置为10000。
 	 *
-	 * @param maxSessions the maximum number of sessions
+	 * @param maxSessions 最大会话数
 	 * @since 5.0.8
 	 */
 	public void setMaxSessions(int maxSessions) {
@@ -70,7 +81,7 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	}
 
 	/**
-	 * Return the maximum number of sessions that can be stored.
+	 * 返回可以存储的会话的最大数量。
 	 *
 	 * @since 5.0.8
 	 */
@@ -79,14 +90,11 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	}
 
 	/**
-	 * Configure the {@link Clock} to use to set lastAccessTime on every created
-	 * session and to calculate if it is expired.
-	 * <p>This may be useful to align to different timezone or to set the clock
-	 * back in a test, e.g. {@code Clock.offset(clock, Duration.ofMinutes(-31))}
-	 * in order to simulate session expiration.
-	 * <p>By default this is {@code Clock.system(ZoneId.of("GMT"))}.
+	 * 配置用于设置每个创建的会话的lastAccessTime和计算其是否已过期的{@link Clock}。
+	 * <p>这可能对齐不同的时区或在测试中将时钟设置回去有用，例如{@code Clock.offset(clock, Duration.ofMinutes(-31))}，以模拟会话过期。
+	 * <p>默认为{@code Clock.system(ZoneId.of("GMT"))}。
 	 *
-	 * @param clock the clock to use
+	 * @param clock 要使用的时钟
 	 */
 	public void setClock(Clock clock) {
 		Assert.notNull(clock, "Clock is required");
@@ -95,16 +103,15 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	}
 
 	/**
-	 * Return the configured clock for session lastAccessTime calculations.
+	 * 返回用于会话lastAccessTime计算的配置时钟。
 	 */
 	public Clock getClock() {
 		return this.clock;
 	}
 
 	/**
-	 * Return the map of sessions with an {@link Collections#unmodifiableMap
-	 * unmodifiable} wrapper. This could be used for management purposes, to
-	 * list active sessions, invalidate expired ones, etc.
+	 * 返回具有{@link Collections#unmodifiableMap unmodifiable}包装器的会话映射。
+	 * 这可以用于管理目的，列出活动会话，使过期会话无效等。
 	 *
 	 * @since 5.0.8
 	 */
@@ -116,26 +123,34 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	@Override
 	public Mono<WebSession> createWebSession() {
 
-		// Opportunity to clean expired sessions
+		// 清理过期会话的机会
 		Instant now = this.clock.instant();
 		this.expiredSessionChecker.checkIfNecessary(now);
 
 		return Mono.<WebSession>fromSupplier(() -> new InMemoryWebSession(now))
+				// 在有界弹性调度器上执行
 				.subscribeOn(Schedulers.boundedElastic())
+				// 在并行调度器上发布
 				.publishOn(Schedulers.parallel());
 	}
 
 	@Override
 	public Mono<WebSession> retrieveSession(String id) {
+		// 获取当前时间
 		Instant now = this.clock.instant();
+		// 检查是否需要检查过期会话
 		this.expiredSessionChecker.checkIfNecessary(now);
+		// 从sessions中获取id对应的会话
 		InMemoryWebSession session = this.sessions.get(id);
 		if (session == null) {
+			// 如果会话为空，则返回一个空的Mono
 			return Mono.empty();
 		} else if (session.isExpired(now)) {
+			// 如果会话已经过期，则从sessions中移除该会话，并返回一个空的Mono
 			this.sessions.remove(id);
 			return Mono.empty();
 		} else {
+			// 更新会话的最后访问时间为当前时间，并返回一个包含该会话的Mono
 			session.updateLastAccessTime(now);
 			return Mono.just(session);
 		}
@@ -151,16 +166,16 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	public Mono<WebSession> updateLastAccessTime(WebSession session) {
 		return Mono.fromSupplier(() -> {
 			Assert.isInstanceOf(InMemoryWebSession.class, session);
+			// 更新会话的最后访问时间为当前时间
 			((InMemoryWebSession) session).updateLastAccessTime(this.clock.instant());
+			// 返回更新后的会话
 			return session;
 		});
 	}
 
 	/**
-	 * Check for expired sessions and remove them. Typically such checks are
-	 * kicked off lazily during calls to {@link #createWebSession() create} or
-	 * {@link #retrieveSession retrieve}, no less than 60 seconds apart.
-	 * This method can be called to force a check at a specific time.
+	 * 检查过期会话并移除它们。通常这样的检查在调用{@link #createWebSession() create}或{@link #retrieveSession retrieve}时被懒惰地启动，间隔不少于60秒。
+	 * 可以调用此方法在特定时间强制进行检查。
 	 *
 	 * @since 5.0.8
 	 */
@@ -372,37 +387,50 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 	private class ExpiredSessionChecker {
 
 		/**
-		 * Max time between expiration checks.
+		 * 到期检查之间的最长时间。
 		 */
 		private static final int CHECK_PERIOD = 60 * 1000;
 
-
+		/**
+		 * 会话锁
+		 */
 		private final ReentrantLock lock = new ReentrantLock();
 
+		/**
+		 * 检查时间
+		 */
 		private Instant checkTime = clock.instant().plus(CHECK_PERIOD, ChronoUnit.MILLIS);
 
 
 		public void checkIfNecessary(Instant now) {
 			if (this.checkTime.isBefore(now)) {
+				// 如果上次检查时间早于当前时间，则删除过期会话
 				removeExpiredSessions(now);
 			}
 		}
 
 		public void removeExpiredSessions(Instant now) {
+			// 如果会话列表为空，则直接返回
 			if (sessions.isEmpty()) {
 				return;
 			}
+
+			// 尝试获取锁，如果成功获取到锁，则执行过期会话的清理工作
 			if (this.lock.tryLock()) {
 				try {
+					// 使用迭代器遍历会话列表
 					Iterator<InMemoryWebSession> iterator = sessions.values().iterator();
 					while (iterator.hasNext()) {
 						InMemoryWebSession session = iterator.next();
 						if (session.isExpired(now)) {
+							// 如果会话过期，将其移除
 							iterator.remove();
+							// 使会话无效
 							session.invalidate();
 						}
 					}
 				} finally {
+					// 更新检查时间，并释放锁
 					this.checkTime = now.plus(CHECK_PERIOD, ChronoUnit.MILLIS);
 					this.lock.unlock();
 				}
