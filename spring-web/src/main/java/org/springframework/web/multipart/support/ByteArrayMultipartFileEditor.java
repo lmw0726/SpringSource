@@ -16,15 +16,14 @@
 
 package org.springframework.web.multipart.support;
 
-import java.io.IOException;
-
 import org.springframework.beans.propertyeditors.ByteArrayPropertyEditor;
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 /**
- * Custom {@link java.beans.PropertyEditor} for converting
- * {@link MultipartFile MultipartFiles} to byte arrays.
+ * 自定义 {@link java.beans.PropertyEditor}，用于将 {@link MultipartFile MultipartFiles} 转换为字节数组。
  *
  * @author Juergen Hoeller
  * @since 13.10.2003
@@ -34,25 +33,29 @@ public class ByteArrayMultipartFileEditor extends ByteArrayPropertyEditor {
 	@Override
 	public void setValue(@Nullable Object value) {
 		if (value instanceof MultipartFile) {
+			// 如果值是MultipartFile类型
 			MultipartFile multipartFile = (MultipartFile) value;
 			try {
+				// 尝试将MultipartFile的字节内容设置为值
 				super.setValue(multipartFile.getBytes());
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
+				// 捕获IO异常并抛出IllegalArgumentException异常
 				throw new IllegalArgumentException("Cannot read contents of multipart file", ex);
 			}
-		}
-		else if (value instanceof byte[]) {
+		} else if (value instanceof byte[]) {
+			// 如果值是byte数组类型，则直接设置为值
 			super.setValue(value);
-		}
-		else {
+		} else {
+			// 否则，将值转换为字符串并获取其字节内容后设置为值
 			super.setValue(value != null ? value.toString().getBytes() : null);
 		}
 	}
 
 	@Override
 	public String getAsText() {
+		// 从getValue方法获取byte数组类型的值
 		byte[] value = (byte[]) getValue();
+		// 如果值不为空，则将其转换为字符串并返回；否则，返回空字符串
 		return (value != null ? new String(value) : "");
 	}
 

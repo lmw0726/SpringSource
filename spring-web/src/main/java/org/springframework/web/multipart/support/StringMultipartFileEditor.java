@@ -16,43 +16,43 @@
 
 package org.springframework.web.multipart.support;
 
-import java.beans.PropertyEditorSupport;
-import java.io.IOException;
-
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.beans.PropertyEditorSupport;
+import java.io.IOException;
+
 /**
- * Custom {@link java.beans.PropertyEditor} for converting
- * {@link MultipartFile MultipartFiles} to Strings.
+ * 自定义 {@link java.beans.PropertyEditor}，用于将 {@link MultipartFile MultipartFiles} 转换为字符串。
  *
- * <p>Allows one to specify the charset to use.
+ * <p>允许指定要使用的字符集。
  *
- * @author Juergen Hoeller
+ * @autor Juergen Hoeller
  * @since 13.10.2003
  */
 public class StringMultipartFileEditor extends PropertyEditorSupport {
-
+	/**
+	 * 字符集名称
+	 */
 	@Nullable
 	private final String charsetName;
 
-
 	/**
-	 * Create a new {@link StringMultipartFileEditor}, using the default charset.
+	 * 创建一个使用默认字符集的 {@link StringMultipartFileEditor}。
 	 */
 	public StringMultipartFileEditor() {
 		this.charsetName = null;
 	}
 
 	/**
-	 * Create a new {@link StringMultipartFileEditor}, using the given charset.
-	 * @param charsetName valid charset name
-	 * @see java.lang.String#String(byte[],String)
+	 * 创建一个使用指定字符集的 {@link StringMultipartFileEditor}。
+	 *
+	 * @param charsetName 有效的字符集名称
+	 * @see java.lang.String#String(byte[], String)
 	 */
 	public StringMultipartFileEditor(String charsetName) {
 		this.charsetName = charsetName;
 	}
-
 
 	@Override
 	public void setAsText(String text) {
@@ -62,17 +62,20 @@ public class StringMultipartFileEditor extends PropertyEditorSupport {
 	@Override
 	public void setValue(Object value) {
 		if (value instanceof MultipartFile) {
+			// 如果值是MultipartFile类型
 			MultipartFile multipartFile = (MultipartFile) value;
 			try {
+				// 尝试将MultipartFile的字节内容转换为字符串并设置为值
+				// 如果charsetName不为空，则使用指定的字符集名称进行转换
 				super.setValue(this.charsetName != null ?
 						new String(multipartFile.getBytes(), this.charsetName) :
 						new String(multipartFile.getBytes()));
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
+				// 捕获IO异常并抛出IllegalArgumentException异常
 				throw new IllegalArgumentException("Cannot read contents of multipart file", ex);
 			}
-		}
-		else {
+		} else {
+			// 否则，直接设置值
 			super.setValue(value);
 		}
 	}
