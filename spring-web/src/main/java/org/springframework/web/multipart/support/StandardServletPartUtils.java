@@ -16,86 +16,99 @@
 
 package org.springframework.web.multipart.support;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
-
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Utility methods for standard Servlet {@link Part} handling.
+ * 用于标准 Servlet {@link Part} 处理的实用方法。
  *
- * @author Juergen Hoeller
- * @since 5.3
+ * @作者 Juergen Hoeller
+ * @自 5.3
  * @see HttpServletRequest#getParts()
  * @see StandardServletMultipartResolver
  */
 public abstract class StandardServletPartUtils {
 
 	/**
-	 * Retrieve all parts from the given servlet request.
-	 * @param request the servlet request
-	 * @return the parts in a MultiValueMap
-	 * @throws MultipartException in case of failures
+	 * 从给定的 servlet 请求中检索所有部分。
+	 *
+	 * @param request servlet 请求
+	 * @return MultiValueMap 中的部分
+	 * @throws MultipartException 如果失败
 	 */
 	public static MultiValueMap<String, Part> getParts(HttpServletRequest request) throws MultipartException {
 		try {
+			// 创建一个MultiValueMap用于存储请求的各个部分
 			MultiValueMap<String, Part> parts = new LinkedMultiValueMap<>();
+			// 遍历请求中的各个部分
 			for (Part part : request.getParts()) {
+				// 将每个部分添加到MultiValueMap中
 				parts.add(part.getName(), part);
 			}
+			// 返回包含请求各个部分的MultiValueMap
 			return parts;
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
+			// 如果获取请求部分时出现异常，抛出MultipartException
 			throw new MultipartException("Failed to get request parts", ex);
 		}
 	}
 
 	/**
-	 * Retrieve all parts with the given name from the given servlet request.
-	 * @param request the servlet request
-	 * @param name the name to look for
-	 * @return the parts in a MultiValueMap
-	 * @throws MultipartException in case of failures
+	 * 从给定的 servlet 请求中检索具有给定名称的所有部分。
+	 *
+	 * @param request servlet 请求
+	 * @param name    要查找的名称
+	 * @return MultiValueMap 中的部分
+	 * @throws MultipartException 如果失败
 	 */
 	public static List<Part> getParts(HttpServletRequest request, String name) throws MultipartException {
 		try {
+			// 创建一个列表用于存储指定名称的部分
 			List<Part> parts = new ArrayList<>(1);
+			// 遍历请求中的各个部分
 			for (Part part : request.getParts()) {
+				// 如果部分的名称与指定名称相匹配，则将其添加到列表中
 				if (part.getName().equals(name)) {
 					parts.add(part);
 				}
 			}
+			// 返回包含指定名称部分的列表
 			return parts;
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
+			// 如果获取请求部分时出现异常，抛出MultipartException
 			throw new MultipartException("Failed to get request parts", ex);
 		}
 	}
 
 	/**
-	 * Bind all parts from the given servlet request.
-	 * @param request the servlet request
-	 * @param mpvs the property values to bind to
-	 * @param bindEmpty whether to bind empty parts as well
-	 * @throws MultipartException in case of failures
+	 * 绑定给定 servlet 请求中的所有部分。
+	 *
+	 * @param request   servlet 请求
+	 * @param mpvs      要绑定的属性值
+	 * @param bindEmpty 是否绑定空部分
+	 * @throws MultipartException 如果失败
 	 */
 	public static void bindParts(HttpServletRequest request, MutablePropertyValues mpvs, boolean bindEmpty)
 			throws MultipartException {
 
+		// 获取请求中的各个部分，并对其进行处理
 		getParts(request).forEach((key, values) -> {
 			if (values.size() == 1) {
+				// 如果部分列表只包含一个部分
 				Part part = values.get(0);
 				if (bindEmpty || part.getSize() > 0) {
+					// 如果允许绑定空值或部分的大小大于0，则将部分添加到MultiValueMapPropertyValues中
 					mpvs.add(key, part);
 				}
-			}
-			else {
+			} else {
+				// 如果部分列表包含多个部分，则将其直接添加到MultiValueMapPropertyValues中
 				mpvs.add(key, values);
 			}
 		});
