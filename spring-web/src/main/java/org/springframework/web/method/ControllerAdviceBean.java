@@ -16,11 +16,6 @@
 
 package org.springframework.web.method;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -40,13 +35,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Encapsulates information about an {@link ControllerAdvice @ControllerAdvice}
- * Spring-managed bean without necessarily requiring it to be instantiated.
+ * 封装有关{@link ControllerAdvice @ControllerAdvice} Spring管理的bean的信息，而不一定需要实例化它。
  *
- * <p>The {@link #findAnnotatedBeans(ApplicationContext)} method can be used to
- * discover such beans. However, a {@code ControllerAdviceBean} may be created
- * from any object, including ones without an {@code @ControllerAdvice} annotation.
+ * <p>{@link #findAnnotatedBeans(ApplicationContext)}方法可用于发现这些bean。
+ * 然而，可以从任何对象创建{@code ControllerAdviceBean}，包括那些没有{@code @ControllerAdvice}注解的对象。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
@@ -57,66 +55,78 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 public class ControllerAdviceBean implements Ordered {
 
 	/**
-	 * Reference to the actual bean instance or a {@code String} representing
-	 * the bean name.
+	 * 对实际bean实例的引用或表示bean名称的{@code String}。
 	 */
 	private final Object beanOrName;
 
+	/**
+	 * 是否是单例
+	 */
 	private final boolean isSingleton;
 
 	/**
-	 * Reference to the resolved bean instance, potentially lazily retrieved
-	 * via the {@code BeanFactory}.
+	 * 对解析后的bean实例的引用，可能通过{@code BeanFactory}延迟检索。
 	 */
 	@Nullable
 	private Object resolvedBean;
 
+	/**
+	 * bean类型
+	 */
 	@Nullable
 	private final Class<?> beanType;
 
+	/**
+	 * bean类型断言
+	 */
 	private final HandlerTypePredicate beanTypePredicate;
 
+	/**
+	 * bean工厂
+	 */
 	@Nullable
 	private final BeanFactory beanFactory;
 
+	/**
+	 * 排序值
+	 */
 	@Nullable
 	private Integer order;
 
 
 	/**
-	 * Create a {@code ControllerAdviceBean} using the given bean instance.
-	 * @param bean the bean instance
+	 * 使用给定的bean实例创建一个{@code ControllerAdviceBean}。
+	 *
+	 * @param bean bean实例
 	 */
 	public ControllerAdviceBean(Object bean) {
 		Assert.notNull(bean, "Bean must not be null");
 		this.beanOrName = bean;
 		this.isSingleton = true;
 		this.resolvedBean = bean;
+		// 获取 bean 的实际类
 		this.beanType = ClassUtils.getUserClass(bean.getClass());
+		// 创建用于匹配 bean 类型的断言
 		this.beanTypePredicate = createBeanTypePredicate(this.beanType);
 		this.beanFactory = null;
 	}
 
 	/**
-	 * Create a {@code ControllerAdviceBean} using the given bean name and
-	 * {@code BeanFactory}.
-	 * @param beanName the name of the bean
-	 * @param beanFactory a {@code BeanFactory} to retrieve the bean type initially
-	 * and later to resolve the actual bean
+	 * 使用给定的bean名称和{@code BeanFactory}创建一个{@code ControllerAdviceBean}。
+	 *
+	 * @param beanName    bean的名称
+	 * @param beanFactory {@code BeanFactory}用于初步检索bean类型，后来用于解析实际bean
 	 */
 	public ControllerAdviceBean(String beanName, BeanFactory beanFactory) {
 		this(beanName, beanFactory, null);
 	}
 
 	/**
-	 * Create a {@code ControllerAdviceBean} using the given bean name,
-	 * {@code BeanFactory}, and {@link ControllerAdvice @ControllerAdvice}
-	 * annotation.
-	 * @param beanName the name of the bean
-	 * @param beanFactory a {@code BeanFactory} to retrieve the bean type initially
-	 * and later to resolve the actual bean
-	 * @param controllerAdvice the {@code @ControllerAdvice} annotation for the
-	 * bean, or {@code null} if not yet retrieved
+	 * 使用给定的bean名称、{@code BeanFactory}和{@link ControllerAdvice @ControllerAdvice}注解创建一个{@code ControllerAdviceBean}。
+	 *
+	 * @param beanName         bean的名称
+	 * @param beanFactory      {@code BeanFactory}用于初步检索bean类型，后来用于解析实际bean
+	 * @param controllerAdvice bean的{@code @ControllerAdvice}注解，如果尚未检索则为{@code null}
 	 * @since 5.2
 	 */
 	public ControllerAdviceBean(String beanName, BeanFactory beanFactory, @Nullable ControllerAdvice controllerAdvice) {
@@ -126,8 +136,11 @@ public class ControllerAdviceBean implements Ordered {
 				"] does not contain specified controller advice bean '" + beanName + "'");
 
 		this.beanOrName = beanName;
+		// 检查 bean 是否为单例
 		this.isSingleton = beanFactory.isSingleton(beanName);
+		// 获取 bean 的类型
 		this.beanType = getBeanType(beanName, beanFactory);
+		// 根据传入的 controllerAdvice 或 beanType 创建相应的类型谓词
 		this.beanTypePredicate = (controllerAdvice != null ? createBeanTypePredicate(controllerAdvice) :
 				createBeanTypePredicate(this.beanType));
 		this.beanFactory = beanFactory;
@@ -135,71 +148,77 @@ public class ControllerAdviceBean implements Ordered {
 
 
 	/**
-	 * Get the order value for the contained bean.
-	 * <p>As of Spring Framework 5.3, the order value is lazily retrieved using
-	 * the following algorithm and cached. Note, however, that a
-	 * {@link ControllerAdvice @ControllerAdvice} bean that is configured as a
-	 * scoped bean &mdash; for example, as a request-scoped or session-scoped
-	 * bean &mdash; will not be eagerly resolved. Consequently, {@link Ordered} is
-	 * not honored for scoped {@code @ControllerAdvice} beans.
+	 * 获取包含bean的排序值。
+	 * <p>从Spring Framework 5.3开始，排序值使用以下算法懒惰地检索并缓存。
+	 * 但是，需要注意的是，配置为作用域bean的{@link ControllerAdvice @ControllerAdvice} bean
+	 * ——例如，作为请求作用域或会话作用域bean——不会被急切解析。因此，对于作用域的
+	 * {@code @ControllerAdvice} beans，不会遵循{@link Ordered}。
 	 * <ul>
-	 * <li>If the {@linkplain #resolveBean resolved bean} implements {@link Ordered},
-	 * use the value returned by {@link Ordered#getOrder()}.</li>
-	 * <li>If the {@linkplain org.springframework.context.annotation.Bean factory method}
-	 * is known, use the value returned by {@link OrderUtils#getOrder(AnnotatedElement)}.
-	 * <li>If the {@linkplain #getBeanType() bean type} is known, use the value returned
-	 * by {@link OrderUtils#getOrder(Class, int)} with {@link Ordered#LOWEST_PRECEDENCE}
-	 * used as the default order value.</li>
-	 * <li>Otherwise use {@link Ordered#LOWEST_PRECEDENCE} as the default, fallback
-	 * order value.</li>
+	 * <li>如果{@linkplain #resolveBean 解析的bean}实现了{@link Ordered}，则使用
+	 * {@link Ordered#getOrder()}返回的值。</li>
+	 * <li>如果已知{@linkplain org.springframework.context.annotation.Bean 工厂方法}，
+	 * 则使用{@link OrderUtils#getOrder(AnnotatedElement)}返回的值。
+	 * <li>如果已知{@linkplain #getBeanType() bean类型}，则使用{@link OrderUtils#getOrder(Class, int)}
+	 * 返回的值，{@link Ordered#LOWEST_PRECEDENCE}用作默认排序值。</li>
+	 * <li>否则，使用{@link Ordered#LOWEST_PRECEDENCE}作为默认的后备排序值。</li>
 	 * </ul>
+	 *
 	 * @see #resolveBean()
 	 */
 	@Override
 	public int getOrder() {
 		if (this.order == null) {
+			// 如果排序值为空
 			String beanName = null;
 			Object resolvedBean = null;
 			if (this.beanFactory != null && this.beanOrName instanceof String) {
+				// 如果bean工厂不为空，并且bean实例或者bean名称是字符串类型
 				beanName = (String) this.beanOrName;
+				// 获取目标bean名称
 				String targetBeanName = ScopedProxyUtils.getTargetBeanName(beanName);
+				// 判断目标bean名称是否已被注册
 				boolean isScopedProxy = this.beanFactory.containsBean(targetBeanName);
-				// Avoid eager @ControllerAdvice bean resolution for scoped proxies,
-				// since attempting to do so during context initialization would result
-				// in an exception due to the current absence of the scope. For example,
-				// an HTTP request or session scope is not active during initialization.
+				// 避免对作用域代理的@ControllerAdvice bean进行急切解析，
+				// 因为在上下文初始化期间尝试这样做会由于当前缺少作用域而导致异常。
+				// 例如，在初始化期间HTTP请求或会话作用域未激活。
 				if (!isScopedProxy && !ScopedProxyUtils.isScopedTarget(beanName)) {
+					// 如果目标bean名称未被注册，并且不是作用域目标，解析bean
 					resolvedBean = resolveBean();
 				}
-			}
-			else {
+			} else {
+				// bean工厂不存在，或者beanOrName不是字符串类型，解析bean
 				resolvedBean = resolveBean();
 			}
 
 			if (resolvedBean instanceof Ordered) {
+				// 如果解析好的bean 实现了 Ordered 接口，则获取排序值
 				this.order = ((Ordered) resolvedBean).getOrder();
-			}
-			else {
+			} else {
 				if (beanName != null && this.beanFactory instanceof ConfigurableBeanFactory) {
+					// 如果bean名称不为空，并且bean工厂是可配置bean工厂
 					ConfigurableBeanFactory cbf = (ConfigurableBeanFactory) this.beanFactory;
 					try {
+						// 获取该bean名称的合并bean定义
 						BeanDefinition bd = cbf.getMergedBeanDefinition(beanName);
 						if (bd instanceof RootBeanDefinition) {
+							// 如果 bean定义 是根bean定义，获取解析好的工厂方法
 							Method factoryMethod = ((RootBeanDefinition) bd).getResolvedFactoryMethod();
 							if (factoryMethod != null) {
+								// 如果解析好的工厂方法存在，则通过OrderUtils获取排序值
 								this.order = OrderUtils.getOrder(factoryMethod);
 							}
 						}
-					}
-					catch (NoSuchBeanDefinitionException ex) {
-						// ignore -> probably a manually registered singleton
+					} catch (NoSuchBeanDefinitionException ex) {
+						// 忽略 -> 可能是手动注册的单例
 					}
 				}
 				if (this.order == null) {
+					// 如果排序值仍为空
 					if (this.beanType != null) {
+						// 如果bean类型存在，通过OrderUtils获取bean类型的排序值
 						this.order = OrderUtils.getOrder(this.beanType, Ordered.LOWEST_PRECEDENCE);
-					}
-					else {
+					} else {
+						// 否则将排序值设置为最低排序值
 						this.order = Ordered.LOWEST_PRECEDENCE;
 					}
 				}
@@ -209,9 +228,8 @@ public class ControllerAdviceBean implements Ordered {
 	}
 
 	/**
-	 * Return the type of the contained bean.
-	 * <p>If the bean type is a CGLIB-generated class, the original user-defined
-	 * class is returned.
+	 * 返回包含bean的类型。
+	 * <p>如果bean类型是CGLIB生成的类，则返回原始的用户定义类。
 	 */
 	@Nullable
 	public Class<?> getBeanType() {
@@ -219,19 +237,17 @@ public class ControllerAdviceBean implements Ordered {
 	}
 
 	/**
-	 * Get the bean instance for this {@code ControllerAdviceBean}, if necessary
-	 * resolving the bean name through the {@link BeanFactory}.
-	 * <p>As of Spring Framework 5.2, once the bean instance has been resolved it
-	 * will be cached if it is a singleton, thereby avoiding repeated lookups in
-	 * the {@code BeanFactory}.
+	 * 获取此{@code ControllerAdviceBean}的bean实例，如果需要，通过{@link BeanFactory}解析bean名称。
+	 * <p>从Spring Framework 5.2开始，一旦解析了bean实例，如果它是单例，将会缓存它，
+	 * 从而避免在{@code BeanFactory}中的重复查找。
 	 */
 	public Object resolveBean() {
 		if (this.resolvedBean == null) {
-			// this.beanOrName must be a String representing the bean name if
-			// this.resolvedBean is null.
+			// 如果this.resolvedBean为null，则this.beanOrName必须是表示bean名称的字符串。
 			Object resolvedBean = obtainBeanFactory().getBean((String) this.beanOrName);
-			// Don't cache non-singletons (e.g., prototypes).
+			// 不缓存非单例（例如，原型）。
 			if (!this.isSingleton) {
+				// 不是单例，则返回解析好的bean
 				return resolvedBean;
 			}
 			this.resolvedBean = resolvedBean;
@@ -245,11 +261,11 @@ public class ControllerAdviceBean implements Ordered {
 	}
 
 	/**
-	 * Check whether the given bean type should be advised by this
-	 * {@code ControllerAdviceBean}.
-	 * @param beanType the type of the bean to check
-	 * @since 4.0
+	 * 检查给定的bean类型是否应由此{@code ControllerAdviceBean}建议。
+	 *
+	 * @param beanType 要检查的bean类型
 	 * @see ControllerAdvice
+	 * @since 4.0
 	 */
 	public boolean isApplicableToBeanType(@Nullable Class<?> beanType) {
 		return this.beanTypePredicate.test(beanType);
@@ -280,50 +296,70 @@ public class ControllerAdviceBean implements Ordered {
 
 
 	/**
-	 * Find beans annotated with {@link ControllerAdvice @ControllerAdvice} in the
-	 * given {@link ApplicationContext} and wrap them as {@code ControllerAdviceBean}
-	 * instances.
-	 * <p>As of Spring Framework 5.2, the {@code ControllerAdviceBean} instances
-	 * in the returned list are sorted using {@link OrderComparator#sort(List)}.
+	 * 查找给定{@link ApplicationContext}中带有{@link ControllerAdvice @ControllerAdvice}注解的bean，
+	 * 并将它们包装为{@code ControllerAdviceBean}实例。
+	 * <p>自Spring Framework 5.2以来，返回列表中的{@code ControllerAdviceBean}实例
+	 * 使用{@link OrderComparator#sort(List)}进行排序。
+	 *
 	 * @see #getOrder()
 	 * @see OrderComparator
 	 * @see Ordered
 	 */
 	public static List<ControllerAdviceBean> findAnnotatedBeans(ApplicationContext context) {
+		// 如果上下文是 ConfigurableApplicationContext 类型，则使用其内部 BeanFactory
 		ListableBeanFactory beanFactory = context;
 		if (context instanceof ConfigurableApplicationContext) {
-			// Use internal BeanFactory for potential downcast to ConfigurableBeanFactory above
+			// 使用内部BeanFactory以便上面潜在地向下转换为ConfigurableBeanFactory
 			beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
 		}
+
+		// 初始化 ControllerAdviceBean 列表
 		List<ControllerAdviceBean> adviceBeans = new ArrayList<>();
+
+		// 遍历上下文中所有的 bean 名称
 		for (String name : BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Object.class)) {
+			// 如果不是作用域目标
 			if (!ScopedProxyUtils.isScopedTarget(name)) {
+				// 在 bean 上查找 ControllerAdvice 注解
 				ControllerAdvice controllerAdvice = beanFactory.findAnnotationOnBean(name, ControllerAdvice.class);
 				if (controllerAdvice != null) {
-					// Use the @ControllerAdvice annotation found by findAnnotationOnBean()
-					// in order to avoid a subsequent lookup of the same annotation.
+					// 使用findAnnotationOnBean()找到的@ControllerAdvice注解
+					// 以避免后续对相同注解的查找。
+					// 如果找到了 ControllerAdvice 注解，则将其封装成 ControllerAdviceBean 并添加到列表中
 					adviceBeans.add(new ControllerAdviceBean(name, beanFactory, controllerAdvice));
 				}
 			}
 		}
+
+		// 按照 OrderComparator 进行排序
 		OrderComparator.sort(adviceBeans);
+
+		// 返回排序后的 ControllerAdviceBean 列表
 		return adviceBeans;
 	}
 
 	@Nullable
 	private static Class<?> getBeanType(String beanName, BeanFactory beanFactory) {
+		// 获取 bean 的类型
 		Class<?> beanType = beanFactory.getType(beanName);
+
+		// 返回用户定义的类，如果无法获取则返回 null
 		return (beanType != null ? ClassUtils.getUserClass(beanType) : null);
 	}
 
 	private static HandlerTypePredicate createBeanTypePredicate(@Nullable Class<?> beanType) {
+		// 获取 ControllerAdvice 注解
 		ControllerAdvice controllerAdvice = (beanType != null ?
 				AnnotatedElementUtils.findMergedAnnotation(beanType, ControllerAdvice.class) : null);
+
+		// 创建 Bean 类型谓词
 		return createBeanTypePredicate(controllerAdvice);
 	}
 
 	private static HandlerTypePredicate createBeanTypePredicate(@Nullable ControllerAdvice controllerAdvice) {
+		// 如果存在 ControllerAdvice 注解
 		if (controllerAdvice != null) {
+			// 构建 HandlerTypePredicate
 			return HandlerTypePredicate.builder()
 					.basePackage(controllerAdvice.basePackages())
 					.basePackageClass(controllerAdvice.basePackageClasses())
@@ -331,6 +367,7 @@ public class ControllerAdviceBean implements Ordered {
 					.annotation(controllerAdvice.annotations())
 					.build();
 		}
+		// 否则返回任意 HandlerTypePredicate
 		return HandlerTypePredicate.forAnyHandlerType();
 	}
 

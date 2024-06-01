@@ -16,61 +16,45 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
+import java.lang.annotation.*;
+
 /**
- * Specialization of {@link Component @Component} for classes that declare
- * {@link ExceptionHandler @ExceptionHandler}, {@link InitBinder @InitBinder}, or
- * {@link ModelAttribute @ModelAttribute} methods to be shared across
- * multiple {@code @Controller} classes.
+ * 特化的{@link Component @Component}，用于声明{@link ExceptionHandler @ExceptionHandler}、
+ * {@link InitBinder @InitBinder}或{@link ModelAttribute @ModelAttribute}方法，以便在多个
+ * {@code @Controller}类之间共享。
  *
- * <p>Classes annotated with {@code @ControllerAdvice} can be declared explicitly
- * as Spring beans or auto-detected via classpath scanning. All such beans are
- * sorted based on {@link org.springframework.core.Ordered Ordered} semantics or
- * {@link org.springframework.core.annotation.Order @Order} /
- * {@link javax.annotation.Priority @Priority} declarations, with {@code Ordered}
- * semantics taking precedence over {@code @Order} / {@code @Priority} declarations.
- * {@code @ControllerAdvice} beans are then applied in that order at runtime.
- * Note, however, that {@code @ControllerAdvice} beans that implement
- * {@link org.springframework.core.PriorityOrdered PriorityOrdered} are <em>not</em>
- * given priority over {@code @ControllerAdvice} beans that implement {@code Ordered}.
- * In addition, {@code Ordered} is not honored for scoped {@code @ControllerAdvice}
- * beans &mdash; for example if such a bean has been configured as a request-scoped
- * or session-scoped bean.  For handling exceptions, an {@code @ExceptionHandler}
- * will be picked on the first advice with a matching exception handler method. For
- * model attributes and data binding initialization, {@code @ModelAttribute} and
- * {@code @InitBinder} methods will follow {@code @ControllerAdvice} order.
+ * <p>使用{@code @ControllerAdvice}注解的类可以显式声明为Spring bean，也可以通过类路径扫描自动检测。
+ * 所有这些bean都基于{@link org.springframework.core.Ordered Ordered}语义或
+ * {@link org.springframework.core.annotation.Order @Order} / {@link javax.annotation.Priority @Priority}声明进行排序，
+ * 其中{@code Ordered}语义优先于{@code @Order} / {@code @Priority}声明。
+ * 然后在运行时按此顺序应用{@code @ControllerAdvice} bean。
+ * 但需要注意的是，实现{@link org.springframework.core.PriorityOrdered PriorityOrdered}的
+ * {@code @ControllerAdvice} bean并不优先于实现{@code Ordered}的{@code @ControllerAdvice} bean。
+ * 此外，{@code Ordered}对于范围{@code @ControllerAdvice} bean（例如配置为请求范围或会话范围的bean）不起作用。
+ * 对于处理异常，首先匹配到的具有匹配异常处理方法的{@code @ExceptionHandler}将被选中。
+ * 对于模型属性和数据绑定初始化，{@code @ModelAttribute}和{@code @InitBinder}方法将遵循
+ * {@code @ControllerAdvice}顺序。
  *
- * <p>Note: For {@code @ExceptionHandler} methods, a root exception match will be
- * preferred to just matching a cause of the current exception, among the handler
- * methods of a particular advice bean. However, a cause match on a higher-priority
- * advice will still be preferred over any match (whether root or cause level)
- * on a lower-priority advice bean. As a consequence, please declare your primary
- * root exception mappings on a prioritized advice bean with a corresponding order.
+ * <p>注意：对于{@code @ExceptionHandler}方法，在特定的advice bean的处理方法中，
+ * 首选根异常匹配，而不是仅匹配当前异常的原因。
+ * 然而，高优先级advice上的原因匹配仍将优先于低优先级advice bean上的任何匹配（无论是根级别还是原因级别的匹配）。
+ * 因此，请在具有相应顺序的优先advice bean上声明主要的根异常映射。
  *
- * <p>By default, the methods in an {@code @ControllerAdvice} apply globally to
- * all controllers. Use selectors such as {@link #annotations},
- * {@link #basePackageClasses}, and {@link #basePackages} (or its alias
- * {@link #value}) to define a more narrow subset of targeted controllers.
- * If multiple selectors are declared, boolean {@code OR} logic is applied, meaning
- * selected controllers should match at least one selector. Note that selector checks
- * are performed at runtime, so adding many selectors may negatively impact
- * performance and add complexity.
+ * <p>默认情况下，{@code @ControllerAdvice}中的方法全局适用于所有控制器。
+ * 使用选择器，如{@link #annotations}、{@link #basePackageClasses}和{@link #basePackages}
+ * （或其别名{@link #value}）来定义更窄的目标控制器子集。
+ * 如果声明了多个选择器，则应用布尔“或”逻辑，这意味着选定的控制器应至少匹配一个选择器。
+ * 请注意，选择器检查是在运行时进行的，因此添加许多选择器可能会对性能产生负面影响并增加复杂性。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
  * @author Sam Brannen
- * @since 3.2
  * @see org.springframework.stereotype.Controller
  * @see RestControllerAdvice
+ * @since 3.2
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -79,55 +63,51 @@ import org.springframework.stereotype.Component;
 public @interface ControllerAdvice {
 
 	/**
-	 * Alias for the {@link #basePackages} attribute.
-	 * <p>Allows for more concise annotation declarations &mdash; for example,
-	 * {@code @ControllerAdvice("org.my.pkg")} is equivalent to
+	 * {@link #basePackages}属性的别名。
+	 * <p>允许更简洁的注解声明 — 例如，{@code @ControllerAdvice("org.my.pkg")}等同于
 	 * {@code @ControllerAdvice(basePackages = "org.my.pkg")}.
-	 * @since 4.0
+	 *
 	 * @see #basePackages
+	 * @since 4.0
 	 */
 	@AliasFor("basePackages")
 	String[] value() default {};
 
 	/**
-	 * Array of base packages.
-	 * <p>Controllers that belong to those base packages or sub-packages thereof
-	 * will be included &mdash; for example,
-	 * {@code @ControllerAdvice(basePackages = "org.my.pkg")} or
+	 * 基础包数组。
+	 * <p>属于这些基础包或其子包的控制器将被包含 — 例如，
+	 * {@code @ControllerAdvice(basePackages = "org.my.pkg")}或
 	 * {@code @ControllerAdvice(basePackages = {"org.my.pkg", "org.my.other.pkg"})}.
-	 * <p>{@link #value} is an alias for this attribute, simply allowing for
-	 * more concise use of the annotation.
-	 * <p>Also consider using {@link #basePackageClasses} as a type-safe
-	 * alternative to String-based package names.
+	 * <p>{@link #value}是此属性的别名，只是允许更简洁地使用注解。
+	 * <p>也可以考虑使用{@link #basePackageClasses}作为基于字符串的包名的类型安全替代方案。
+	 *
 	 * @since 4.0
 	 */
 	@AliasFor("value")
 	String[] basePackages() default {};
 
 	/**
-	 * Type-safe alternative to {@link #basePackages} for specifying the packages
-	 * in which to select controllers to be advised by the {@code @ControllerAdvice}
-	 * annotated class.
-	 * <p>Consider creating a special no-op marker class or interface in each package
-	 * that serves no purpose other than being referenced by this attribute.
+	 * {@link #basePackages}的类型安全替代方案，用于指定选择控制器的包，以便由
+	 * {@code @ControllerAdvice}注解类通知。
+	 * <p>考虑在每个包中创建一个特殊的无操作标记类或接口，其唯一目的是被此属性引用。
+	 *
 	 * @since 4.0
 	 */
 	Class<?>[] basePackageClasses() default {};
 
 	/**
-	 * Array of classes.
-	 * <p>Controllers that are assignable to at least one of the given types
-	 * will be advised by the {@code @ControllerAdvice} annotated class.
+	 * 类数组。
+	 * <p>分配给至少一个给定类型的控制器将由{@code @ControllerAdvice}注解类通知。
+	 *
 	 * @since 4.0
 	 */
 	Class<?>[] assignableTypes() default {};
 
 	/**
-	 * Array of annotation types.
-	 * <p>Controllers that are annotated with at least one of the supplied annotation
-	 * types will be advised by the {@code @ControllerAdvice} annotated class.
-	 * <p>Consider creating a custom composed annotation or use a predefined one,
-	 * like {@link RestController @RestController}.
+	 * 注解类型数组。
+	 * <p>带有至少一个提供的注解类型的控制器将由{@code @ControllerAdvice}注解类通知。
+	 * <p>考虑创建自定义组合注解或使用预定义的注解，如{@link RestController @RestController}。
+	 *
 	 * @since 4.0
 	 */
 	Class<? extends Annotation>[] annotations() default {};
