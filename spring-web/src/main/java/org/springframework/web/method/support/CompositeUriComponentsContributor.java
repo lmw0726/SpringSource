@@ -16,43 +16,38 @@
 
 package org.springframework.web.method.support;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.lang.Nullable;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.*;
+
 /**
- * A {@link UriComponentsContributor} containing a list of other contributors
- * to delegate to and also encapsulating a specific {@link ConversionService} to
- * use for formatting method argument values as Strings.
+ * 一个{@link UriComponentsContributor}，包含要委托的其他贡献者列表，并封装了用于将方法参数值格式化为字符串的特定{@link ConversionService}。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @since 4.0
  */
 public class CompositeUriComponentsContributor implements UriComponentsContributor {
-
+	/**
+	 * URL组件贡献者或处理器方法参数解析器列表集合
+	 */
 	private final List<Object> contributors;
 
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
 
 	/**
-	 * Create an instance from a collection of {@link UriComponentsContributor UriComponentsContributors} or
-	 * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}. Since both of these tend to be implemented
-	 * by the same class, the most convenient option is to obtain the configured
-	 * {@code HandlerMethodArgumentResolvers} in {@code RequestMappingHandlerAdapter}
-	 * and provide that to this constructor.
-	 * @param contributors a collection of {@link UriComponentsContributor}
-	 * or {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}
+	 * 从{@link UriComponentsContributor UriComponentsContributors}或{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}集合创建一个实例。
+	 * 由于这两者通常由相同的类实现，因此最方便的选项是获取{@code RequestMappingHandlerAdapter}中配置的{@code HandlerMethodArgumentResolvers}并将其提供给此构造函数。
+	 *
+	 * @param contributors 一组{@link UriComponentsContributor}或{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}
 	 */
 	public CompositeUriComponentsContributor(UriComponentsContributor... contributors) {
 		this.contributors = Arrays.asList((Object[]) contributors);
@@ -60,31 +55,22 @@ public class CompositeUriComponentsContributor implements UriComponentsContribut
 	}
 
 	/**
-	 * Create an instance from a collection of {@link UriComponentsContributor UriComponentsContributors} or
-	 * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}. Since both of these tend to be implemented
-	 * by the same class, the most convenient option is to obtain the configured
-	 * {@code HandlerMethodArgumentResolvers} in {@code RequestMappingHandlerAdapter}
-	 * and provide that to this constructor.
-	 * @param contributors a collection of {@link UriComponentsContributor}
-	 * or {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}
+	 * 从{@link UriComponentsContributor UriComponentsContributors}或{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}集合创建一个实例。
+	 * 由于这两者通常由相同的类实现，因此最方便的选项是获取{@code RequestMappingHandlerAdapter}中配置的{@code HandlerMethodArgumentResolvers}并将其提供给此构造函数。
+	 *
+	 * @param contributors 一组{@link UriComponentsContributor}或{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}
 	 */
 	public CompositeUriComponentsContributor(Collection<?> contributors) {
 		this(contributors, null);
 	}
 
 	/**
-	 * Create an instance from a collection of {@link UriComponentsContributor UriComponentsContributors} or
-	 * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}. Since both of these tend to be implemented
-	 * by the same class, the most convenient option is to obtain the configured
-	 * {@code HandlerMethodArgumentResolvers} in the {@code RequestMappingHandlerAdapter}
-	 * and provide that to this constructor.
-	 * <p>If the {@link ConversionService} argument is {@code null},
-	 * {@link org.springframework.format.support.DefaultFormattingConversionService}
-	 * will be used by default.
-	 * @param contributors a collection of {@link UriComponentsContributor}
-	 * or {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}
-	 * @param cs a ConversionService to use when method argument values
-	 * need to be formatted as Strings before being added to the URI
+	 * 从{@link UriComponentsContributor UriComponentsContributors}或{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}集合创建一个实例。
+	 * 由于这两者通常由相同的类实现，因此最方便的选项是获取{@code RequestMappingHandlerAdapter}中配置的{@code HandlerMethodArgumentResolvers}并将其提供给此构造函数。
+	 * <p>如果{@link ConversionService}参数为{@code null}，则默认使用{@link org.springframework.format.support.DefaultFormattingConversionService}。
+	 *
+	 * @param contributors 一组{@link UriComponentsContributor}或{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}
+	 * @param cs           用于在将方法参数值作为字符串添加到URI之前对其进行格式化的ConversionService
 	 */
 	public CompositeUriComponentsContributor(@Nullable Collection<?> contributors, @Nullable ConversionService cs) {
 		this.contributors = (contributors != null ? new ArrayList<>(contributors) : Collections.emptyList());
@@ -92,10 +78,9 @@ public class CompositeUriComponentsContributor implements UriComponentsContribut
 	}
 
 	/**
-	 * Determine if this {@code CompositeUriComponentsContributor} has any
-	 * contributors.
-	 * @return {@code true} if this {@code CompositeUriComponentsContributor}
-	 * was created with contributors to delegate to
+	 * 确定此{@code CompositeUriComponentsContributor}是否有任何贡献者。
+	 *
+	 * @return 如果此{@code CompositeUriComponentsContributor}是使用委托的贡献者创建的，则返回{@code true}
 	 */
 	public boolean hasContributors() {
 		return !this.contributors.isEmpty();
@@ -103,35 +88,46 @@ public class CompositeUriComponentsContributor implements UriComponentsContribut
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 遍历所有贡献者
 		for (Object contributor : this.contributors) {
+			// 如果贡献者是 UriComponentsContributor 类型
 			if (contributor instanceof UriComponentsContributor) {
 				if (((UriComponentsContributor) contributor).supportsParameter(parameter)) {
+					// 如果当前贡献者支持该参数，返回 true
 					return true;
 				}
-			}
-			else if (contributor instanceof HandlerMethodArgumentResolver) {
+			} else if (contributor instanceof HandlerMethodArgumentResolver) {
+				// 如果贡献者是 HandlerMethodArgumentResolver 类型
 				if (((HandlerMethodArgumentResolver) contributor).supportsParameter(parameter)) {
+					// 如果当前贡献者支持该参数，返回 false
 					return false;
 				}
 			}
 		}
+		// 如果没有找到支持该参数的贡献者，返回 false
 		return false;
 	}
 
 	@Override
 	public void contributeMethodArgument(MethodParameter parameter, Object value,
-			UriComponentsBuilder builder, Map<String, Object> uriVariables, ConversionService conversionService) {
+										 UriComponentsBuilder builder, Map<String, Object> uriVariables, ConversionService conversionService) {
 
+		// 遍历所有贡献者
 		for (Object contributor : this.contributors) {
+			// 如果贡献者是 UriComponentsContributor 的实例
 			if (contributor instanceof UriComponentsContributor) {
 				UriComponentsContributor ucc = (UriComponentsContributor) contributor;
+				// 如果贡献者支持该参数
 				if (ucc.supportsParameter(parameter)) {
+					// 贡献方法参数
 					ucc.contributeMethodArgument(parameter, value, builder, uriVariables, conversionService);
+					// 终止循环
 					break;
 				}
-			}
-			else if (contributor instanceof HandlerMethodArgumentResolver) {
+			} else if (contributor instanceof HandlerMethodArgumentResolver) {
+				// 如果贡献者是 HandlerMethodArgumentResolver 的实例并且支持该参数
 				if (((HandlerMethodArgumentResolver) contributor).supportsParameter(parameter)) {
+					// 终止循环
 					break;
 				}
 			}
@@ -139,10 +135,10 @@ public class CompositeUriComponentsContributor implements UriComponentsContribut
 	}
 
 	/**
-	 * An overloaded method that uses the ConversionService created at construction.
+	 * 使用在构造时创建的ConversionService的重载方法。
 	 */
 	public void contributeMethodArgument(MethodParameter parameter, Object value, UriComponentsBuilder builder,
-			Map<String, Object> uriVariables) {
+										 Map<String, Object> uriVariables) {
 
 		contributeMethodArgument(parameter, value, builder, uriVariables, this.conversionService);
 	}

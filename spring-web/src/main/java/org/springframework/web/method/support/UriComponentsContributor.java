@@ -16,17 +16,15 @@
 
 package org.springframework.web.method.support;
 
-import java.util.Map;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Map;
+
 /**
- * Strategy for contributing to the building of a {@link UriComponents} by
- * looking at a method parameter and an argument value and deciding what
- * part of the target URL should be updated.
+ * 通过查看方法参数和参数值并决定应更新目标URL的哪一部分，以贡献于构建{@link UriComponents}的策略。
  *
  * @author Oliver Gierke
  * @author Rossen Stoyanchev
@@ -35,21 +33,20 @@ import org.springframework.web.util.UriComponentsBuilder;
 public interface UriComponentsContributor {
 
 	/**
-	 * Whether this contributor supports the given method parameter.
+	 * 判断该贡献者是否支持给定的方法参数。
 	 */
 	boolean supportsParameter(MethodParameter parameter);
 
 	/**
-	 * Process the given method argument and either update the
-	 * {@link UriComponentsBuilder} or add to the map with URI variables
-	 * to use to expand the URI after all arguments are processed.
-	 * @param parameter the controller method parameter (never {@code null})
-	 * @param value the argument value (possibly {@code null})
-	 * @param builder the builder to update (never {@code null})
-	 * @param uriVariables a map to add URI variables to (never {@code null})
-	 * @param conversionService a ConversionService to format values as Strings
+	 * 处理给定的方法参数，并更新{@link UriComponentsBuilder}或添加到用于在所有参数处理后扩展URI的URI变量映射。
+	 *
+	 * @param parameter         控制器方法参数（从不为{@code null}）
+	 * @param value             参数值（可能为{@code null}）
+	 * @param builder           要更新的构建器（从不为{@code null}）
+	 * @param uriVariables      要添加URI变量的映射（从不为{@code null}）
+	 * @param conversionService 用于将值格式化为字符串的ConversionService
 	 */
 	void contributeMethodArgument(MethodParameter parameter, Object value, UriComponentsBuilder builder,
-			Map<String, Object> uriVariables, ConversionService conversionService);
+								  Map<String, Object> uriVariables, ConversionService conversionService);
 
 }
