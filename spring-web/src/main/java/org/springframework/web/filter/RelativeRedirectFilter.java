@@ -16,40 +16,37 @@
 
 package org.springframework.web.filter;
 
-import java.io.IOException;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.Assert;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.util.Assert;
+import java.io.IOException;
 
 /**
- * Overrides {@link HttpServletResponse#sendRedirect(String)} and handles it by
- * setting the HTTP status and "Location" headers, which keeps the Servlet
- * container from re-writing relative redirect URLs into absolute ones.
- * Servlet containers are required to do that but against the recommendation of
- * <a href="https://tools.ietf.org/html/rfc7231#section-7.1.2"> RFC 7231 Section 7.1.2</a>,
- * and furthermore not necessarily taking into account "X-Forwarded" headers.
+ * 重写了{@link HttpServletResponse#sendRedirect(String)}方法，并通过设置HTTP状态码和"Location"头来处理它，
+ * 从而防止Servlet容器将相对重定向URL重写为绝对URL。虽然Servlet容器要求这样做，但违反了
+ * <a href="https://tools.ietf.org/html/rfc7231#section-7.1.2">RFC 7231第7.1.2节</a>的建议，而且不一定考虑"X-Forwarded"头。
  *
- * <p><strong>Note:</strong> While relative redirects are recommended in the
- * RFC, under some configurations with reverse proxies they may not work.
+ * <p><strong>注意:</strong> 虽然RFC推荐使用相对重定向，但在某些配置下，使用反向代理可能不起作用。
  *
  * @author Rob Winch
  * @author Rossen Stoyanchev
  * @since 4.3.10
  */
 public class RelativeRedirectFilter extends OncePerRequestFilter {
-
+	/**
+	 * 重定向状态码
+	 */
 	private HttpStatus redirectStatus = HttpStatus.SEE_OTHER;
 
 
 	/**
-	 * Set the default HTTP Status to use for redirects.
-	 * <p>By default this is {@link HttpStatus#SEE_OTHER}.
-	 * @param status the 3xx redirect status to use
+	 * 设置重定向时使用的默认HTTP状态。
+	 * <p>默认为{@link HttpStatus#SEE_OTHER}。
+	 * @param status 3xx重定向状态
 	 */
 	public void setRedirectStatus(HttpStatus status) {
 		Assert.notNull(status, "Property 'redirectStatus' is required");
@@ -58,7 +55,7 @@ public class RelativeRedirectFilter extends OncePerRequestFilter {
 	}
 
 	/**
-	 * Return the configured redirect status.
+	 * 返回配置的重定向状态。
 	 */
 	public HttpStatus getRedirectStatus() {
 		return this.redirectStatus;
@@ -69,7 +66,10 @@ public class RelativeRedirectFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 			FilterChain filterChain) throws ServletException, IOException {
 
+		// 将响应对象包装成一个相对路径的重定向响应（如果需要）
 		response = RelativeRedirectResponseWrapper.wrapIfNecessary(response, this.redirectStatus);
+
+		// 继续调用过滤器链的下一个过滤器
 		filterChain.doFilter(request, response);
 	}
 

@@ -16,34 +16,23 @@
 
 package org.springframework.web.filter;
 
-import java.io.IOException;
+import org.springframework.util.Assert;
+import org.springframework.web.cors.*;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.util.Assert;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.CorsProcessor;
-import org.springframework.web.cors.CorsUtils;
-import org.springframework.web.cors.DefaultCorsProcessor;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.io.IOException;
 
 /**
- * {@link javax.servlet.Filter} to handle CORS pre-flight requests and intercept
- * CORS simple and actual requests with a {@link CorsProcessor}, and to update
- * the response, e.g. with CORS response headers, based on the policy matched
- * through the provided {@link CorsConfigurationSource}.
+ * {@link javax.servlet.Filter}用于处理CORS预检请求，并使用{@link CorsProcessor}拦截CORS简单请求和实际请求，
+ * 并根据提供的{@link CorsConfigurationSource}匹配的策略更新响应，例如CORS响应头。
  *
- * <p>This is an alternative to configuring CORS in the Spring MVC Java config
- * and the Spring MVC XML namespace. It is useful for applications depending
- * only on spring-web (not on spring-webmvc) or for security constraints that
- * require CORS checks to be performed at {@link javax.servlet.Filter} level.
+ * <p>这是在Spring MVC Java配置和Spring MVC XML命名空间中配置CORS的一种替代方法。
+ * 它适用于仅依赖spring-web（而不是spring-webmvc）的应用程序，或者对安全约束要求在{@link javax.servlet.Filter}级别执行CORS检查的应用程序。
  *
- * <p>This filter could be used in conjunction with {@link DelegatingFilterProxy}
- * in order to help with its initialization.
+ * <p>此过滤器可以与{@link DelegatingFilterProxy}一起使用，以帮助进行初始化。
  *
  * @author Sebastien Deleuze
  * @since 4.2
@@ -51,15 +40,19 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * @see UrlBasedCorsConfigurationSource
  */
 public class CorsFilter extends OncePerRequestFilter {
-
+	/**
+	 * 跨域配置源
+	 */
 	private final CorsConfigurationSource configSource;
 
+	/**
+	 * 跨域配置处理器
+	 */
 	private CorsProcessor processor = new DefaultCorsProcessor();
 
 
 	/**
-	 * Constructor accepting a {@link CorsConfigurationSource} used by the filter
-	 * to find the {@link CorsConfiguration} to use for each incoming request.
+	 * 构造函数接受一个{@link CorsConfigurationSource}，该源由过滤器使用以查找每个传入请求要使用的{@link CorsConfiguration}。
 	 * @see UrlBasedCorsConfigurationSource
 	 */
 	public CorsFilter(CorsConfigurationSource configSource) {
@@ -69,9 +62,8 @@ public class CorsFilter extends OncePerRequestFilter {
 
 
 	/**
-	 * Configure a custom {@link CorsProcessor} to use to apply the matched
-	 * {@link CorsConfiguration} for a request.
-	 * <p>By default {@link DefaultCorsProcessor} is used.
+	 * 配置要使用的自定义{@link CorsProcessor}来应用匹配的{@link CorsConfiguration}的请求。
+	 * <p>默认情况下，使用{@link DefaultCorsProcessor}。
 	 */
 	public void setCorsProcessor(CorsProcessor processor) {
 		Assert.notNull(processor, "CorsProcessor must not be null");
@@ -81,13 +73,19 @@ public class CorsFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-			FilterChain filterChain) throws ServletException, IOException {
+									FilterChain filterChain) throws ServletException, IOException {
 
+		// 获取请求的 跨域配置 对象
 		CorsConfiguration corsConfiguration = this.configSource.getCorsConfiguration(request);
+		// 使用 跨域处理器 处理请求，并检查是否有效
 		boolean isValid = this.processor.processRequest(corsConfiguration, request, response);
+
+		// 如果请求无效或是预检请求，则直接返回，不进行后续的过滤操作
 		if (!isValid || CorsUtils.isPreFlightRequest(request)) {
 			return;
 		}
+
+		// 否则继续调用过滤器链的下一个过滤器
 		filterChain.doFilter(request, response);
 	}
 
