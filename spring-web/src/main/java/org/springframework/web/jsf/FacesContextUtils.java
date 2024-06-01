@@ -16,101 +16,104 @@
 
 package org.springframework.web.jsf;
 
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.WebUtils;
 
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+
 /**
- * Convenience methods to retrieve Spring's root {@link WebApplicationContext}
- * for a given JSF {@link FacesContext}. This is useful for accessing a
- * Spring application context from custom JSF-based code.
- *
- * <p>Analogous to Spring's WebApplicationContextUtils for the ServletContext.
+ * 用于检索给定JSF {@link FacesContext}的Spring根{@link WebApplicationContext}的便捷方法。
+ * 这对于从自定义基于JSF的代码访问Spring应用程序上下文非常有用。
+ * <p>
+ * 类似于Servlet环境中Spring的WebApplicationContextUtils。
  *
  * @author Juergen Hoeller
- * @since 1.1
  * @see org.springframework.web.context.ContextLoader
  * @see org.springframework.web.context.support.WebApplicationContextUtils
+ * @since 1.1
  */
 public abstract class FacesContextUtils {
 
 	/**
-	 * Find the root {@link WebApplicationContext} for this web app, typically
-	 * loaded via {@link org.springframework.web.context.ContextLoaderListener}.
-	 * <p>Will rethrow an exception that happened on root context startup,
-	 * to differentiate between a failed context startup and no context at all.
-	 * @param fc the FacesContext to find the web application context for
-	 * @return the root WebApplicationContext for this web app, or {@code null} if none
+	 * 查找此Web应用程序的根{@link WebApplicationContext}，通常通过{@link org.springframework.web.context.ContextLoaderListener}加载。
+	 * <p>将重新抛出在根上下文启动时发生的异常，以区分启动失败的上下文和没有上下文。
+	 *
+	 * @param fc 要查找Web应用程序上下文的FacesContext
+	 * @return 此Web应用程序的根WebApplicationContext，如果没有则为{@code null}
 	 * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
 	 */
 	@Nullable
 	public static WebApplicationContext getWebApplicationContext(FacesContext fc) {
+		// 确保 Faces上下文 不为 null
 		Assert.notNull(fc, "FacesContext must not be null");
+		// 从外部上下文中获取应用程序映射中的属性
 		Object attr = fc.getExternalContext().getApplicationMap().get(
 				WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 		if (attr == null) {
+			// 如果属性为 null，则返回 null
 			return null;
 		}
+		// 如果属性是 RuntimeException 类型，则抛出该异常
 		if (attr instanceof RuntimeException) {
 			throw (RuntimeException) attr;
 		}
+		// 如果属性是 Error 类型，则抛出该错误
 		if (attr instanceof Error) {
 			throw (Error) attr;
 		}
+		// 如果属性不是 Web应用上下文 类型，则抛出异常
 		if (!(attr instanceof WebApplicationContext)) {
 			throw new IllegalStateException("Root context attribute is not of type WebApplicationContext: " + attr);
 		}
+		// 将属性强制转换为 Web应用上下文 并返回
 		return (WebApplicationContext) attr;
 	}
 
 	/**
-	 * Find the root {@link WebApplicationContext} for this web app, typically
-	 * loaded via {@link org.springframework.web.context.ContextLoaderListener}.
-	 * <p>Will rethrow an exception that happened on root context startup,
-	 * to differentiate between a failed context startup and no context at all.
-	 * @param fc the FacesContext to find the web application context for
-	 * @return the root WebApplicationContext for this web app
-	 * @throws IllegalStateException if the root WebApplicationContext could not be found
+	 * 查找此Web应用程序的根{@link WebApplicationContext}，通常通过{@link org.springframework.web.context.ContextLoaderListener}加载。
+	 * <p>将重新抛出在根上下文启动时发生的异常，以区分启动失败的上下文和没有上下文。
+	 *
+	 * @param fc 要查找Web应用程序上下文的FacesContext
+	 * @return 此Web应用程序的根WebApplicationContext
+	 * @throws IllegalStateException 如果找不到根WebApplicationContext
 	 * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
 	 */
 	public static WebApplicationContext getRequiredWebApplicationContext(FacesContext fc) throws IllegalStateException {
+		// 从 Faces上下文 获取 Web应用程序上下文
 		WebApplicationContext wac = getWebApplicationContext(fc);
 		if (wac == null) {
+			// 如果获取不到，抛出异常
 			throw new IllegalStateException("No WebApplicationContext found: no ContextLoaderListener registered?");
 		}
 		return wac;
 	}
 
 	/**
-	 * Return the best available mutex for the given session:
-	 * that is, an object to synchronize on for the given session.
-	 * <p>Returns the session mutex attribute if available; usually,
-	 * this means that the HttpSessionMutexListener needs to be defined
-	 * in {@code web.xml}. Falls back to the Session reference itself
-	 * if no mutex attribute found.
-	 * <p>The session mutex is guaranteed to be the same object during
-	 * the entire lifetime of the session, available under the key defined
-	 * by the {@code SESSION_MUTEX_ATTRIBUTE} constant. It serves as a
-	 * safe reference to synchronize on for locking on the current session.
-	 * <p>In many cases, the Session reference itself is a safe mutex
-	 * as well, since it will always be the same object reference for the
-	 * same active logical session. However, this is not guaranteed across
-	 * different servlet containers; the only 100% safe way is a session mutex.
-	 * @param fc the FacesContext to find the session mutex for
-	 * @return the mutex object (never {@code null})
+	 * 返回给定会话的最佳可用互斥体：即，用于给定会话同步的对象。
+	 * <p>如果可用，返回会话互斥体属性；通常，这意味着需要在{@code web.xml}中定义{@code HttpSessionMutexListener}。
+	 * 如果未找到互斥属性，则返回会话引用本身。
+	 * <p>会话互斥体在会话的整个生命周期中保证是相同的对象，可在{@code SESSION_MUTEX_ATTRIBUTE}常量定义的键下获得。
+	 * 它用作在当前会话上同步锁定的安全引用。
+	 * <p>在许多情况下，会话引用本身也是一个安全的互斥体，因为对于同一个活动逻辑会话，它将始终是相同的对象引用。
+	 * 但是，这并不保证在不同的servlet容器中；唯一100%安全的方法是会话互斥体。
+	 *
+	 * @param fc 要为其查找会话互斥体的FacesContext
+	 * @return 互斥对象（永远不会为{@code null}）
 	 * @see org.springframework.web.util.WebUtils#SESSION_MUTEX_ATTRIBUTE
 	 * @see org.springframework.web.util.HttpSessionMutexListener
 	 */
 	@Nullable
 	public static Object getSessionMutex(FacesContext fc) {
 		Assert.notNull(fc, "FacesContext must not be null");
+		// 从 Faces上下文 获取外部上下文
 		ExternalContext ec = fc.getExternalContext();
+		// 获取会话锁对象
 		Object mutex = ec.getSessionMap().get(WebUtils.SESSION_MUTEX_ATTRIBUTE);
 		if (mutex == null) {
+			// 如果会话锁对象为 null，则创建会话锁
 			mutex = ec.getSession(true);
 		}
 		return mutex;
