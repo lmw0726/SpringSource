@@ -16,26 +16,33 @@
 
 package org.springframework.web.filter;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+
 /**
- * A response wrapper used for the implementation of
- * {@link RelativeRedirectFilter} also shared with {@link ForwardedHeaderFilter}.
+ * 一个用于实现 {@link RelativeRedirectFilter} 的响应包装器，
+ * 也与 {@link ForwardedHeaderFilter} 共享。
  *
  * @author Rossen Stoyanchev
  * @since 4.3.10
  */
 final class RelativeRedirectResponseWrapper extends HttpServletResponseWrapper {
-
+	/**
+	 * 重定向状态码
+	 */
 	private final HttpStatus redirectStatus;
 
-
+	/**
+	 * 构造函数，包含所需的信息。
+	 *
+	 * @param response        要包装的原始 HttpServletResponse
+	 * @param redirectStatus  重定向状态码
+	 */
 	private RelativeRedirectResponseWrapper(HttpServletResponse response, HttpStatus redirectStatus) {
 		super(response);
 		Assert.notNull(redirectStatus, "'redirectStatus' is required");
@@ -49,15 +56,21 @@ final class RelativeRedirectResponseWrapper extends HttpServletResponseWrapper {
 		setHeader(HttpHeaders.LOCATION, location);
 	}
 
-
-	public static HttpServletResponse wrapIfNecessary(HttpServletResponse response,
-			HttpStatus redirectStatus) {
-
+	/**
+	 * 如果有必要，包装响应。
+	 *
+	 * @param response        要包装的原始 HttpServletResponse
+	 * @param redirectStatus  重定向状态码
+	 * @return 包装后的 HttpServletResponse，如果已经包装过则返回原始响应
+	 */
+	public static HttpServletResponse wrapIfNecessary(HttpServletResponse response, HttpStatus redirectStatus) {
+		// 获取原生的 RelativeRedirectResponseWrapper 类型的响应对象
 		RelativeRedirectResponseWrapper wrapper =
 				WebUtils.getNativeResponse(response, RelativeRedirectResponseWrapper.class);
 
-		return (wrapper != null ? response :
-				new RelativeRedirectResponseWrapper(response, redirectStatus));
+		// 如果原生的响应对象不为空，则返回原始的响应对象；
+		// 否则，创建一个新的 RelativeRedirectResponseWrapper 对象并返回
+		return (wrapper != null ? response : new RelativeRedirectResponseWrapper(response, redirectStatus));
 	}
 
 }
