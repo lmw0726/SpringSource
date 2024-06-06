@@ -16,9 +16,6 @@
 
 package org.springframework.web.cors.reactive;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.http.server.PathContainer;
 import org.springframework.lang.Nullable;
 import org.springframework.web.cors.CorsConfiguration;
@@ -26,25 +23,32 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
- * {@code CorsConfigurationSource} that uses URL patterns to select the
- * {@code CorsConfiguration} for a request.
+ * 使用URL模式选择请求的{@code CorsConfiguration}的{@code CorsConfigurationSource}。
  *
  * @author Sebastien Deleuze
  * @author Brian Clozel
- * @since 5.0
  * @see PathPattern
+ * @since 5.0
  */
 public class UrlBasedCorsConfigurationSource implements CorsConfigurationSource {
-
+	/**
+	 * 路径模式解析器
+	 */
 	private final PathPatternParser patternParser;
 
+	/**
+	 * 路径模式 —— 跨域配置 映射
+	 */
 	private final Map<PathPattern, CorsConfiguration> corsConfigurations = new LinkedHashMap<>();
 
 
 	/**
-	 * Construct a new {@code UrlBasedCorsConfigurationSource} instance with default
-	 * {@code PathPatternParser}.
+	 * 使用默认的{@code PathPatternParser}构造一个新的{@code UrlBasedCorsConfigurationSource}实例。
+	 *
 	 * @since 5.0.6
 	 */
 	public UrlBasedCorsConfigurationSource() {
@@ -52,8 +56,9 @@ public class UrlBasedCorsConfigurationSource implements CorsConfigurationSource 
 	}
 
 	/**
-	 * Construct a new {@code UrlBasedCorsConfigurationSource} instance from the supplied
-	 * {@code PathPatternParser}.
+	 * 从提供的{@code PathPatternParser}构造一个新的{@code UrlBasedCorsConfigurationSource}实例。
+	 *
+	 * @param patternParser 路径模式解析器
 	 */
 	public UrlBasedCorsConfigurationSource(PathPatternParser patternParser) {
 		this.patternParser = patternParser;
@@ -61,17 +66,24 @@ public class UrlBasedCorsConfigurationSource implements CorsConfigurationSource 
 
 
 	/**
-	 * Set CORS configuration based on URL patterns.
+	 * 基于URL模式设置CORS配置。
+	 *
+	 * @param configMap URL模式与CORS配置的映射
 	 */
 	public void setCorsConfigurations(@Nullable Map<String, CorsConfiguration> configMap) {
+		// 清除当前的 CORS 配置
 		this.corsConfigurations.clear();
 		if (configMap != null) {
+			// 如果配置映射不为空，则注册每个配置
 			configMap.forEach(this::registerCorsConfiguration);
 		}
 	}
 
 	/**
-	 * Register a {@link CorsConfiguration} for the specified path pattern.
+	 * 为指定的路径模式注册{@link CorsConfiguration}。
+	 *
+	 * @param path   路径模式
+	 * @param config CORS配置
 	 */
 	public void registerCorsConfiguration(String path, CorsConfiguration config) {
 		this.corsConfigurations.put(this.patternParser.parse(path), config);
@@ -80,12 +92,16 @@ public class UrlBasedCorsConfigurationSource implements CorsConfigurationSource 
 	@Override
 	@Nullable
 	public CorsConfiguration getCorsConfiguration(ServerWebExchange exchange) {
+		// 获取请求的路径
 		PathContainer path = exchange.getRequest().getPath().pathWithinApplication();
+		// 遍历 CORS 配置映射
 		for (Map.Entry<PathPattern, CorsConfiguration> entry : this.corsConfigurations.entrySet()) {
 			if (entry.getKey().matches(path)) {
+				// 如果当前路径匹配到了 CORS 配置的路径模式，则返回相应的配置
 				return entry.getValue();
 			}
 		}
+		// 如果未匹配到任何配置，则返回空
 		return null;
 	}
 
