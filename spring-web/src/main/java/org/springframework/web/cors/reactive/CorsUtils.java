@@ -16,8 +16,6 @@
 
 package org.springframework.web.cors.reactive;
 
-import java.net.URI;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -26,9 +24,10 @@ import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+
 /**
- * Utility class for CORS reactive request handling based on the
- * <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>.
+ * 基于<a href="https://www.w3.org/TR/cors/">CORS W3C建议</a>的CORS响应式请求处理的实用工具类。
  *
  * @author Sebastien Deleuze
  * @since 5.0
@@ -36,8 +35,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public abstract class CorsUtils {
 
 	/**
-	 * Returns {@code true} if the request is a valid CORS one by checking {@code Origin}
-	 * header presence and ensuring that origins are different via {@link #isSameOrigin}.
+	 * 通过检查{@code Origin}头的存在并通过{@link #isSameOrigin}确保来源不同来返回{@code true}，
+	 * 如果请求是有效的CORS请求，则返回{@code true}。
 	 */
 	@SuppressWarnings("deprecation")
 	public static boolean isCorsRequest(ServerHttpRequest request) {
@@ -45,58 +44,68 @@ public abstract class CorsUtils {
 	}
 
 	/**
-	 * Returns {@code true} if the request is a valid CORS pre-flight one by checking {code OPTIONS} method with
-	 * {@code Origin} and {@code Access-Control-Request-Method} headers presence.
+	 * 通过检查{@code OPTIONS}方法与{@code Origin}和{@code Access-Control-Request-Method}头的存在来返回{@code true}，
+	 * 如果请求是有效的CORS预检请求，则返回{@code true}。
 	 */
 	public static boolean isPreFlightRequest(ServerHttpRequest request) {
+		// 获取请求头信息
 		HttpHeaders headers = request.getHeaders();
+		// 如果请求方法为OPTIONS，并且请求头包含ORIGIN和ACCESS_CONTROL_REQUEST_METHOD，则返回true，否则返回false
 		return (request.getMethod() == HttpMethod.OPTIONS
 				&& headers.containsKey(HttpHeaders.ORIGIN)
 				&& headers.containsKey(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD));
 	}
 
 	/**
-	 * Check if the request is a same-origin one, based on {@code Origin}, and
-	 * {@code Host} headers.
+	 * 根据{@code Origin}和{@code Host}头检查请求是否是同源的。
 	 *
-	 * <p><strong>Note:</strong> as of 5.1 this method ignores
-	 * {@code "Forwarded"} and {@code "X-Forwarded-*"} headers that specify the
-	 * client-originated address. Consider using the {@code ForwardedHeaderFilter}
-	 * to extract and use, or to discard such headers.
-	 * @return {@code true} if the request is a same-origin one, {@code false} in case
-	 * of a cross-origin request
-	 * @deprecated as of 5.2, same-origin checks are performed directly by {@link #isCorsRequest}
+	 * <p><strong>注意：</strong>从5.1开始，此方法忽略指定客户端发起的地址的{@code "Forwarded"}和{@code "X-Forwarded-*"}头。
+	 * 考虑使用{@code ForwardedHeaderFilter}来提取和使用或丢弃这些头。
+	 *
+	 * @return 如果请求是同源的，则返回{@code true}；如果是跨源请求，则返回{@code false}
+	 * @deprecated 从5.2开始，同源检查由{@link #isCorsRequest}直接执行
 	 */
 	@Deprecated
 	public static boolean isSameOrigin(ServerHttpRequest request) {
+		// 获取请求的 来源 头信息
 		String origin = request.getHeaders().getOrigin();
+		// 如果 来源 头信息为空，返回 true
 		if (origin == null) {
 			return true;
 		}
 
+		// 获取请求的 URI
 		URI uri = request.getURI();
+		// 获取请求的实际  方案 、主机地址、端口号
 		String actualScheme = uri.getScheme();
 		String actualHost = uri.getHost();
 		int actualPort = getPort(uri.getScheme(), uri.getPort());
+		// 断言实际请求的  方案 、主机地址、端口号 不为空，且端口不能为未定义
 		Assert.notNull(actualScheme, "Actual request scheme must not be null");
 		Assert.notNull(actualHost, "Actual request host must not be null");
 		Assert.isTrue(actualPort != -1, "Actual request port must not be undefined");
 
+		// 从 来源 头信息中构建 UriComponents
 		UriComponents originUrl = UriComponentsBuilder.fromOriginHeader(origin).build();
+		// 比较实际的  方案 、主机地址、端口号 是否与  来源  头信息中的相匹配，若匹配则返回 true，否则返回 false
 		return (actualScheme.equals(originUrl.getScheme()) &&
 				actualHost.equals(originUrl.getHost()) &&
 				actualPort == getPort(originUrl.getScheme(), originUrl.getPort()));
 	}
 
 	private static int getPort(@Nullable String scheme, int port) {
+		// 如果端口为未定义（-1）
 		if (port == -1) {
+			// 如果是 HTTP 或 WebSocket 请求，将端口设置为 80
 			if ("http".equals(scheme) || "ws".equals(scheme)) {
 				port = 80;
 			}
+			// 如果是 HTTPS 或 Secure WebSocket 请求，将端口设置为 443
 			else if ("https".equals(scheme) || "wss".equals(scheme)) {
 				port = 443;
 			}
 		}
+		// 返回确定的端口值
 		return port;
 	}
 
