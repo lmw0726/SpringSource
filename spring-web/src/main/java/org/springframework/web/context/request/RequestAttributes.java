@@ -46,14 +46,14 @@ public interface RequestAttributes {
 	/**
 	 * 标准请求对象引用的名称："request"。
 	 *
-	 * @参见 #resolveReference
+	 * @see #resolveReference
 	 */
 	String REFERENCE_REQUEST = "request";
 
 	/**
 	 * 标准会话对象引用的名称："session"。
 	 *
-	 * @参见 #resolveReference
+	 * @see #resolveReference
 	 */
 	String REFERENCE_SESSION = "session";
 
