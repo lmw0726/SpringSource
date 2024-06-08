@@ -16,30 +16,30 @@
 
 package org.springframework.web.context.request;
 
-import java.io.Serializable;
-
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
+import java.io.Serializable;
 
 /**
- * Adapter that implements the Servlet HttpSessionBindingListener interface,
- * wrapping a session destruction callback.
+ * 适配器，实现了 Servlet HttpSessionBindingListener 接口，包装了一个会话销毁回调。
  *
  * @author Juergen Hoeller
- * @since 3.0
  * @see RequestAttributes#registerDestructionCallback
  * @see ServletRequestAttributes#registerSessionDestructionCallback
+ * @since 3.0
  */
 @SuppressWarnings("serial")
 public class DestructionCallbackBindingListener implements HttpSessionBindingListener, Serializable {
-
+	/**
+	 * 销毁方法回调
+	 */
 	private final Runnable destructionCallback;
 
 
 	/**
-	 * Create a new DestructionCallbackBindingListener for the given callback.
-	 * @param destructionCallback the Runnable to execute when this listener
-	 * object gets unbound from the session
+	 * 为给定的回调创建一个新的 DestructionCallbackBindingListener。
+	 *
+	 * @param destructionCallback 当此监听器对象从会话中解绑时要执行的 Runnable
 	 */
 	public DestructionCallbackBindingListener(Runnable destructionCallback) {
 		this.destructionCallback = destructionCallback;
