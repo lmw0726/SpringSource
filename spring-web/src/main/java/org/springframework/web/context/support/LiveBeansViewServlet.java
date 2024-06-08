@@ -16,32 +16,31 @@
 
 package org.springframework.web.context.support;
 
-import java.io.IOException;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
+import java.io.IOException;
 
 /**
- * Servlet variant of {@link org.springframework.context.support.LiveBeansView}'s
- * MBean exposure.
+ * {@link org.springframework.context.support.LiveBeansView} 的 Servlet 变体的 MBean 暴露。
  *
- * <p>Generates a JSON snapshot for current beans and their dependencies in
- * all ApplicationContexts that live within the current web application.
+ * <p>为当前 Web 应用程序中所有 ApplicationContext 中的当前 bean 及其依赖项生成 JSON 快照。
  *
  * @author Juergen Hoeller
- * @since 3.2
  * @see org.springframework.context.support.LiveBeansView#getSnapshotAsJson()
- * @deprecated as of 5.3, in favor of using Spring Boot actuators for such needs
+ * @since 3.2
+ * @deprecated 自 5.3 起，建议使用 Spring Boot 执行器来满足此类需求
  */
 @Deprecated
 @SuppressWarnings("serial")
 public class LiveBeansViewServlet extends HttpServlet {
-
+	/**
+	 * live Bean 视图
+	 */
 	@Nullable
 	private org.springframework.context.support.LiveBeansView liveBeansView;
 
@@ -61,9 +60,17 @@ public class LiveBeansViewServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		Assert.state(this.liveBeansView != null, "No LiveBeansView available");
+
+		// 获取 LiveBeansView 快照的 JSON 内容
 		String content = this.liveBeansView.getSnapshotAsJson();
+
+		// 设置响应内容类型为 JSON
 		response.setContentType("application/json");
+
+		// 设置响应内容长度
 		response.setContentLength(content.length());
+
+		// 将 JSON 内容写入响应
 		response.getWriter().write(content);
 	}
 

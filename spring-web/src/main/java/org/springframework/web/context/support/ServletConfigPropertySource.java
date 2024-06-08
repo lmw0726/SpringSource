@@ -16,15 +16,15 @@
 
 package org.springframework.web.context.support;
 
-import javax.servlet.ServletConfig;
-
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.ServletConfig;
+
 /**
- * {@link PropertySource} that reads init parameters from a {@link ServletConfig} object.
+ * {@link PropertySource} 从 {@link ServletConfig} 对象中读取初始化参数。
  *
  * @author Chris Beams
  * @since 3.1
