@@ -16,30 +16,22 @@
 
 package org.springframework.web.context.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.lang.annotation.*;
+
 /**
- * {@code @SessionScope} is a specialization of {@link Scope @Scope} for a
- * component whose lifecycle is bound to the current web session.
+ * {@code @SessionScope} 是 {@link Scope @Scope} 的一种专门化，用于将生命周期绑定到当前 Web 会话的组件。
  *
- * <p>Specifically, {@code @SessionScope} is a <em>composed annotation</em> that
- * acts as a shortcut for {@code @Scope("session")} with the default
- * {@link #proxyMode} set to {@link ScopedProxyMode#TARGET_CLASS TARGET_CLASS}.
+ * <p>具体来说，{@code @SessionScope} 是一个 <em>组合注解</em>，充当了 {@code @Scope("session")} 的快捷方式，
+ * 其默认 {@link #proxyMode} 设置为 {@link ScopedProxyMode#TARGET_CLASS TARGET_CLASS}。
  *
- * <p>{@code @SessionScope} may be used as a meta-annotation to create custom
- * composed annotations.
+ * <p>{@code @SessionScope} 可以用作元注解，用于创建自定义的组合注解。
  *
  * @author Sam Brannen
- * @since 4.3
  * @see RequestScope
  * @see ApplicationScope
  * @see org.springframework.context.annotation.Scope
@@ -47,6 +39,7 @@ import org.springframework.web.context.WebApplicationContext;
  * @see org.springframework.web.context.request.SessionScope
  * @see org.springframework.stereotype.Component
  * @see org.springframework.context.annotation.Bean
+ * @since 4.3
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -55,8 +48,8 @@ import org.springframework.web.context.WebApplicationContext;
 public @interface SessionScope {
 
 	/**
-	 * Alias for {@link Scope#proxyMode}.
-	 * <p>Defaults to {@link ScopedProxyMode#TARGET_CLASS}.
+	 * {@link Scope#proxyMode} 的别名。
+	 * <p>默认为 {@link ScopedProxyMode#TARGET_CLASS}。
 	 */
 	@AliasFor(annotation = Scope.class)
 	ScopedProxyMode proxyMode() default ScopedProxyMode.TARGET_CLASS;
