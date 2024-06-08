@@ -16,232 +16,212 @@
 
 package org.springframework.web.context.request;
 
+import org.springframework.lang.Nullable;
+
 import java.security.Principal;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Generic interface for a web request. Mainly intended for generic web
- * request interceptors, giving them access to general request metadata,
- * not for actual handling of the request.
+ * 用于 Web 请求的通用接口。
+ * 主要用于通用的 Web 请求拦截器，使它们能够访问通用请求元数据，而不是实际处理请求。
  *
  * @author Juergen Hoeller
  * @author Brian Clozel
- * @since 2.0
  * @see WebRequestInterceptor
+ * @since 2.0
  */
 public interface WebRequest extends RequestAttributes {
 
 	/**
-	 * Return the request header of the given name, or {@code null} if none.
-	 * <p>Retrieves the first header value in case of a multi-value header.
-	 * @since 3.0
+	 * 返回给定名称的请求头，如果没有则返回 {@code null}。
+	 * <p>在多值头的情况下检索第一个头值。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getHeader(String)
+	 * @since 3.0
 	 */
 	@Nullable
 	String getHeader(String headerName);
 
 	/**
-	 * Return the request header values for the given header name,
-	 * or {@code null} if none.
-	 * <p>A single-value header will be exposed as an array with a single element.
-	 * @since 3.0
+	 * 返回给定头名称的请求头值数组，如果没有则返回 {@code null}。
+	 * <p>单个值头将作为仅包含一个元素的数组公开。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getHeaders(String)
+	 * @since 3.0
 	 */
 	@Nullable
 	String[] getHeaderValues(String headerName);
 
 	/**
-	 * Return a Iterator over request header names.
-	 * @since 3.0
+	 * 返回请求头名称的迭代器。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getHeaderNames()
+	 * @since 3.0
 	 */
 	Iterator<String> getHeaderNames();
 
 	/**
-	 * Return the request parameter of the given name, or {@code null} if none.
-	 * <p>Retrieves the first parameter value in case of a multi-value parameter.
+	 * 返回给定名称的请求参数，如果没有则返回 {@code null}。
+	 * <p>在多值参数的情况下检索第一个参数值。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getParameter(String)
 	 */
 	@Nullable
 	String getParameter(String paramName);
 
 	/**
-	 * Return the request parameter values for the given parameter name,
-	 * or {@code null} if none.
-	 * <p>A single-value parameter will be exposed as an array with a single element.
+	 * 返回给定参数名称的请求参数值数组，如果没有则返回 {@code null}。
+	 * <p>单个值参数将作为仅包含一个元素的数组公开。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getParameterValues(String)
 	 */
 	@Nullable
 	String[] getParameterValues(String paramName);
 
 	/**
-	 * Return a Iterator over request parameter names.
-	 * @since 3.0
+	 * 返回请求参数名称的迭代器。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getParameterNames()
+	 * @since 3.0
 	 */
 	Iterator<String> getParameterNames();
 
 	/**
-	 * Return a immutable Map of the request parameters, with parameter names as map keys
-	 * and parameter values as map values. The map values will be of type String array.
-	 * <p>A single-value parameter will be exposed as an array with a single element.
+	 * 返回请求参数的不可变 Map，其中参数名称为映射键，参数值为映射值。映射值将为 String 数组类型。
+	 * <p>单个值参数将作为仅包含一个元素的数组公开。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getParameterMap()
 	 */
 	Map<String, String[]> getParameterMap();
 
 	/**
-	 * Return the primary Locale for this request.
+	 * 返回此请求的主要 Locale。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getLocale()
 	 */
 	Locale getLocale();
 
 	/**
-	 * Return the context path for this request
-	 * (usually the base path that the current web application is mapped to).
+	 * 返回此请求的上下文路径（通常是当前 Web 应用程序映射到的基本路径）。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getContextPath()
 	 */
 	String getContextPath();
 
 	/**
-	 * Return the remote user for this request, if any.
+	 * 返回此请求的远程用户，如果有的话。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getRemoteUser()
 	 */
 	@Nullable
 	String getRemoteUser();
 
 	/**
-	 * Return the user principal for this request, if any.
+	 * 返回此请求的用户主体，如果有的话。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#getUserPrincipal()
 	 */
 	@Nullable
 	Principal getUserPrincipal();
 
 	/**
-	 * Determine whether the user is in the given role for this request.
+	 * 确定用户是否具有给定角色的请求。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#isUserInRole(String)
 	 */
 	boolean isUserInRole(String role);
 
 	/**
-	 * Return whether this request has been sent over a secure transport
-	 * mechanism (such as SSL).
+	 * 返回此请求是否通过安全传输机制（例如 SSL）发送。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest#isSecure()
 	 */
 	boolean isSecure();
 
 	/**
-	 * Check whether the requested resource has been modified given the
-	 * supplied last-modified timestamp (as determined by the application).
-	 * <p>This will also transparently set the "Last-Modified" response header
-	 * and HTTP status when applicable.
-	 * <p>Typical usage:
+	 * 检查所请求的资源是否已根据应用程序确定的提供的最后修改时间戳（即所谓的上次修改时间）进行了修改。
+	 * <p>在适用时，这也将透明地设置“Last-Modified”响应头和 HTTP 状态。
+	 * <p>典型用法：
 	 * <pre class="code">
 	 * public String myHandleMethod(WebRequest request, Model model) {
-	 *   long lastModified = // application-specific calculation
+	 *   long lastModified = // 应用程序特定的计算
 	 *   if (request.checkNotModified(lastModified)) {
-	 *     // shortcut exit - no further processing necessary
+	 *     // 快捷退出 - 不需要进一步处理
 	 *     return null;
 	 *   }
-	 *   // further request processing, actually building content
+	 *   // 进一步的请求处理，实际上构建内容
 	 *   model.addAttribute(...);
 	 *   return "myViewName";
 	 * }</pre>
-	 * <p>This method works with conditional GET/HEAD requests, but
-	 * also with conditional POST/PUT/DELETE requests.
-	 * <p><strong>Note:</strong> you can use either
-	 * this {@code #checkNotModified(long)} method; or
-	 * {@link #checkNotModified(String)}. If you want enforce both
-	 * a strong entity tag and a Last-Modified value,
-	 * as recommended by the HTTP specification,
-	 * then you should use {@link #checkNotModified(String, long)}.
-	 * <p>If the "If-Modified-Since" header is set but cannot be parsed
-	 * to a date value, this method will ignore the header and proceed
-	 * with setting the last-modified timestamp on the response.
-	 * @param lastModifiedTimestamp the last-modified timestamp in
-	 * milliseconds that the application determined for the underlying
-	 * resource
-	 * @return whether the request qualifies as not modified,
-	 * allowing to abort request processing and relying on the response
-	 * telling the client that the content has not been modified
+	 * <p>此方法适用于条件 GET/HEAD 请求，但也适用于条件 POST/PUT/DELETE 请求。
+	 * <p><strong>注意：</strong>您可以使用此 {@code #checkNotModified(long)} 方法；或
+	 * {@link #checkNotModified(String)}。如果要强制执行强实体标签和 Last-Modified 值，
+	 * 则应使用 {@link #checkNotModified(String, long)}，正如 HTTP 规范推荐的那样。
+	 * <p>如果设置了“If-Modified-Since”标头但无法解析为日期值，则此方法将忽略该标头并继续设置响应上的最后修改时间戳。
+	 *
+	 * @param lastModifiedTimestamp 应用程序为基础资源确定的最后修改时间戳（以毫秒为单位）
+	 * @return 请求是否符合未修改的条件，允许中止请求处理，并依赖响应告知客户端内容未被修改
 	 */
 	boolean checkNotModified(long lastModifiedTimestamp);
 
 	/**
-	 * Check whether the requested resource has been modified given the
-	 * supplied {@code ETag} (entity tag), as determined by the application.
-	 * <p>This will also transparently set the "ETag" response header
-	 * and HTTP status when applicable.
-	 * <p>Typical usage:
+	 * 检查所请求的资源是否已根据应用程序确定的提供的 ETag（实体标签）进行了修改。
+	 * <p>在适用时，这也将透明地设置“ETag”响应头和 HTTP 状态。
+	 * <p>典型用法：
 	 * <pre class="code">
 	 * public String myHandleMethod(WebRequest request, Model model) {
-	 *   String eTag = // application-specific calculation
+	 *   String eTag = // 应用程序特定的计算
 	 *   if (request.checkNotModified(eTag)) {
-	 *     // shortcut exit - no further processing necessary
+	 *     // 快捷退出 - 不需要进一步处理
 	 *     return null;
 	 *   }
-	 *   // further request processing, actually building content
+	 *   // 进一步的请求处理，实际上构建内容
 	 *   model.addAttribute(...);
 	 *   return "myViewName";
 	 * }</pre>
-	 * <p><strong>Note:</strong> you can use either
-	 * this {@code #checkNotModified(String)} method; or
-	 * {@link #checkNotModified(long)}. If you want enforce both
-	 * a strong entity tag and a Last-Modified value,
-	 * as recommended by the HTTP specification,
-	 * then you should use {@link #checkNotModified(String, long)}.
-	 * @param etag the entity tag that the application determined
-	 * for the underlying resource. This parameter will be padded
-	 * with quotes (") if necessary.
-	 * @return true if the request does not require further processing.
+	 * <p><strong>注意：</strong>您可以使用此 {@code #checkNotModified(String)} 方法；或
+	 * {@link #checkNotModified(long)}。如果要强制执行强实体标签和 Last-Modified 值，
+	 * 则应使用 {@link #checkNotModified(String, long)}。
+	 *
+	 * @param etag 应用程序为基础资源确定的实体标签。如果需要，此参数将用引号（"）进行填充。
+	 * @return 如果请求不需要进一步处理，则返回 true。
 	 */
 	boolean checkNotModified(String etag);
 
 	/**
-	 * Check whether the requested resource has been modified given the
-	 * supplied {@code ETag} (entity tag) and last-modified timestamp,
-	 * as determined by the application.
-	 * <p>This will also transparently set the "ETag" and "Last-Modified"
-	 * response headers, and HTTP status when applicable.
-	 * <p>Typical usage:
+	 * 检查所请求的资源是否已根据应用程序确定的提供的 ETag（实体标签）和最后修改时间戳进行了修改。
+	 * <p>在适用时，这也将透明地设置“ETag”和“Last-Modified”响应头以及 HTTP 状态。
+	 * <p>典型用法：
 	 * <pre class="code">
 	 * public String myHandleMethod(WebRequest request, Model model) {
-	 *   String eTag = // application-specific calculation
-	 *   long lastModified = // application-specific calculation
+	 *   String eTag = // 应用程序特定的计算
+	 *   long lastModified = // 应用程序特定的计算
 	 *   if (request.checkNotModified(eTag, lastModified)) {
-	 *     // shortcut exit - no further processing necessary
+	 *     // 快捷退出 - 不需要进一步处理
 	 *     return null;
 	 *   }
-	 *   // further request processing, actually building content
+	 *   // 进一步的请求处理，实际上构建内容
 	 *   model.addAttribute(...);
 	 *   return "myViewName";
 	 * }</pre>
-	 * <p>This method works with conditional GET/HEAD requests, but
-	 * also with conditional POST/PUT/DELETE requests.
-	 * <p><strong>Note:</strong> The HTTP specification recommends
-	 * setting both ETag and Last-Modified values, but you can also
-	 * use {@code #checkNotModified(String)} or
-	 * {@link #checkNotModified(long)}.
-	 * @param etag the entity tag that the application determined
-	 * for the underlying resource. This parameter will be padded
-	 * with quotes (") if necessary.
-	 * @param lastModifiedTimestamp the last-modified timestamp in
-	 * milliseconds that the application determined for the underlying
-	 * resource
-	 * @return true if the request does not require further processing.
+	 * <p>此方法适用于条件 GET/HEAD 请求，但也适用于条件 POST/PUT/DELETE 请求。
+	 * <p><strong>注意：</strong>HTTP 规范建议同时设置 ETag 和 Last-Modified 值，
+	 * 但您也可以使用 {@code #checkNotModified(String)} 或 {@link #checkNotModified(long)}。
+	 *
+	 * @param etag                  应用程序为基础资源确定的实体标签。如果需要，此参数将用引号（"）进行填充。
+	 * @param lastModifiedTimestamp 应用程序为基础资源确定的最后修改时间戳（以毫秒为单位）
+	 * @return 如果请求不需要进一步处理，则返回 true。
 	 * @since 4.2
 	 */
 	boolean checkNotModified(@Nullable String etag, long lastModifiedTimestamp);
 
 	/**
-	 * Get a short description of this request,
-	 * typically containing request URI and session id.
-	 * @param includeClientInfo whether to include client-specific
-	 * information such as session id and user name
-	 * @return the requested description as String
+	 * 获取此请求的简短描述，通常包含请求 URI 和会话 ID。
+	 *
+	 * @param includeClientInfo 是否包含客户端特定信息，如会话 ID 和用户名
+	 * @return 所请求的描述字符串
 	 */
 	String getDescription(boolean includeClientInfo);
 

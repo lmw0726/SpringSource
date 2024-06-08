@@ -19,11 +19,9 @@ package org.springframework.web.context.request;
 import org.springframework.lang.Nullable;
 
 /**
- * Extension of the {@link WebRequest} interface, exposing the
- * native request and response objects in a generic fashion.
+ * {@link WebRequest}接口的扩展，以通用方式公开原生请求和响应对象。
  *
- * <p>Mainly intended for framework-internal usage,
- * in particular for generic argument resolution code.
+ * <p>主要用于框架内部使用，特别是用于通用参数解析代码。
  *
  * @author Juergen Hoeller
  * @since 2.5.2
@@ -31,33 +29,35 @@ import org.springframework.lang.Nullable;
 public interface NativeWebRequest extends WebRequest {
 
 	/**
-	 * Return the underlying native request object.
+	 * 返回底层的原生请求对象。
+	 *
 	 * @see javax.servlet.http.HttpServletRequest
 	 */
 	Object getNativeRequest();
 
 	/**
-	 * Return the underlying native response object, if any.
+	 * 返回底层的原生响应对象，如果存在的话。
+	 *
 	 * @see javax.servlet.http.HttpServletResponse
 	 */
 	@Nullable
 	Object getNativeResponse();
 
 	/**
-	 * Return the underlying native request object, if available.
-	 * @param requiredType the desired type of request object
-	 * @return the matching request object, or {@code null} if none
-	 * of that type is available
+	 * 返回底层的原生请求对象，如果可用。
+	 *
+	 * @param requiredType 请求对象的期望类型
+	 * @return 匹配的请求对象，如果没有该类型的对象可用，则返回 {@code null}
 	 * @see javax.servlet.http.HttpServletRequest
 	 */
 	@Nullable
 	<T> T getNativeRequest(@Nullable Class<T> requiredType);
 
 	/**
-	 * Return the underlying native response object, if available.
-	 * @param requiredType the desired type of response object
-	 * @return the matching response object, or {@code null} if none
-	 * of that type is available
+	 * 返回底层的原生响应对象，如果可用。
+	 *
+	 * @param requiredType 响应对象的期望类型
+	 * @return 匹配的响应对象，如果没有该类型的对象可用，则返回 {@code null}
 	 * @see javax.servlet.http.HttpServletResponse
 	 */
 	@Nullable

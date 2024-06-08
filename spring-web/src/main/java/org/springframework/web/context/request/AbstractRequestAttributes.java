@@ -16,41 +16,47 @@
 
 package org.springframework.web.context.request;
 
+import org.springframework.util.Assert;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.springframework.util.Assert;
-
 /**
- * Abstract support class for RequestAttributes implementations,
- * offering a request completion mechanism for request-specific destruction
- * callbacks and for updating accessed session attributes.
+ * RequestAttributes 实现的抽象支持类，为请求特定的销毁回调和更新已访问的会话属性提供请求完成机制。
  *
  * @author Juergen Hoeller
- * @since 2.0
  * @see #requestCompleted()
+ * @since 2.0
  */
 public abstract class AbstractRequestAttributes implements RequestAttributes {
 
-	/** Map from attribute name String to destruction callback Runnable. */
+	/**
+	 * 属性名称字符串到销毁回调 Runnable 的映射。
+	 */
 	protected final Map<String, Runnable> requestDestructionCallbacks = new LinkedHashMap<>(8);
 
+	/**
+	 * 请求是否存活
+	 */
 	private volatile boolean requestActive = true;
 
 
 	/**
-	 * Signal that the request has been completed.
-	 * <p>Executes all request destruction callbacks and updates the
-	 * session attributes that have been accessed during request processing.
+	 * 表示请求已完成。
+	 * <p>执行所有请求销毁回调并更新在请求处理期间已访问的会话属性。
 	 */
 	public void requestCompleted() {
+		// 执行请求销毁回调
 		executeRequestDestructionCallbacks();
+		// 更新访问过的会话属性
 		updateAccessedSessionAttributes();
+		// 设置请求不再活跃
 		this.requestActive = false;
 	}
 
 	/**
-	 * Determine whether the original request is still active.
+	 * 确定原始请求是否仍然活动。
+	 *
 	 * @see #requestCompleted()
 	 */
 	protected final boolean isRequestActive() {
@@ -58,9 +64,10 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	}
 
 	/**
-	 * Register the given callback as to be executed after request completion.
-	 * @param name the name of the attribute to register the callback for
-	 * @param callback the callback to be executed for destruction
+	 * 注册给定的回调以在请求完成后执行。
+	 *
+	 * @param name     要为其注册回调的属性的名称
+	 * @param callback 要在销毁时执行的回调
 	 */
 	protected final void registerRequestDestructionCallback(String name, Runnable callback) {
 		Assert.notNull(name, "Name must not be null");
@@ -71,8 +78,9 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	}
 
 	/**
-	 * Remove the request destruction callback for the specified attribute, if any.
-	 * @param name the name of the attribute to remove the callback for
+	 * 删除指定属性的请求销毁回调（如果有）。
+	 *
+	 * @param name 要移除回调的属性的名称
 	 */
 	protected final void removeRequestDestructionCallback(String name) {
 		Assert.notNull(name, "Name must not be null");
@@ -82,21 +90,23 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	}
 
 	/**
-	 * Execute all callbacks that have been registered for execution
-	 * after request completion.
+	 * 执行已注册的所有在请求完成后执行的回调。
 	 */
 	private void executeRequestDestructionCallbacks() {
+		// 使用请求销毁回调列表进行同步
 		synchronized (this.requestDestructionCallbacks) {
+			// 遍历请求销毁回调列表中的每个回调对象
 			for (Runnable runnable : this.requestDestructionCallbacks.values()) {
+				// 执行其run()方法
 				runnable.run();
 			}
+			// 清空请求销毁回调列表
 			this.requestDestructionCallbacks.clear();
 		}
 	}
 
 	/**
-	 * Update all session attributes that have been accessed during request processing,
-	 * to expose their potentially updated state to the underlying session manager.
+	 * 更新在请求处理期间已访问的所有会话属性，以将其潜在更新的状态暴露给底层会话管理器。
 	 */
 	protected abstract void updateAccessedSessionAttributes();
 
