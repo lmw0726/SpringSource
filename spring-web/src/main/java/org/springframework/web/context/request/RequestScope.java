@@ -19,23 +19,21 @@ package org.springframework.web.context.request;
 import org.springframework.lang.Nullable;
 
 /**
- * Request-backed {@link org.springframework.beans.factory.config.Scope}
- * implementation.
+ * 基于请求的 {@link org.springframework.beans.factory.config.Scope} 实现。
  *
- * <p>Relies on a thread-bound {@link RequestAttributes} instance, which
- * can be exported through {@link RequestContextListener},
- * {@link org.springframework.web.filter.RequestContextFilter} or
- * {@link org.springframework.web.servlet.DispatcherServlet}.
+ * <p>依赖于一个线程绑定的 {@link RequestAttributes} 实例，可以通过 {@link RequestContextListener}、
+ * {@link org.springframework.web.filter.RequestContextFilter} 或
+ * {@link org.springframework.web.servlet.DispatcherServlet} 导出。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
- * @since 2.0
  * @see RequestContextHolder#currentRequestAttributes()
  * @see RequestAttributes#SCOPE_REQUEST
  * @see RequestContextListener
  * @see org.springframework.web.filter.RequestContextFilter
  * @see org.springframework.web.servlet.DispatcherServlet
+ * @since 2.0
  */
 public class RequestScope extends AbstractRequestAttributesScope {
 
@@ -45,8 +43,7 @@ public class RequestScope extends AbstractRequestAttributesScope {
 	}
 
 	/**
-	 * There is no conversation id concept for a request, so this method
-	 * returns {@code null}.
+	 * 请求没有会话 ID 的概念，因此此方法返回 {@code null}。
 	 */
 	@Override
 	@Nullable

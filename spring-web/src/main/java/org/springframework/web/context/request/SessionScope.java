@@ -20,23 +20,21 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.lang.Nullable;
 
 /**
- * Session-backed {@link org.springframework.beans.factory.config.Scope}
- * implementation.
+ * 基于会话的 {@link org.springframework.beans.factory.config.Scope} 实现。
  *
- * <p>Relies on a thread-bound {@link RequestAttributes} instance, which
- * can be exported through {@link RequestContextListener},
- * {@link org.springframework.web.filter.RequestContextFilter} or
- * {@link org.springframework.web.servlet.DispatcherServlet}.
+ * <p>依赖于一个线程绑定的 {@link RequestAttributes} 实例，可以通过 {@link RequestContextListener}、
+ * {@link org.springframework.web.filter.RequestContextFilter} 或
+ * {@link org.springframework.web.servlet.DispatcherServlet} 导出。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
- * @since 2.0
  * @see RequestContextHolder#currentRequestAttributes()
  * @see RequestAttributes#SCOPE_SESSION
  * @see RequestContextListener
  * @see org.springframework.web.filter.RequestContextFilter
  * @see org.springframework.web.servlet.DispatcherServlet
+ * @since 2.0
  */
 public class SessionScope extends AbstractRequestAttributesScope {
 
@@ -52,8 +50,11 @@ public class SessionScope extends AbstractRequestAttributesScope {
 
 	@Override
 	public Object get(String name, ObjectFactory<?> objectFactory) {
+		// 获取当前请求的会话互斥对象
 		Object mutex = RequestContextHolder.currentRequestAttributes().getSessionMutex();
+		// 使用会话互斥对象进行同步
 		synchronized (mutex) {
+			// 调用父类的 get 方法获取属性值，并使用提供的对象工厂创建属性值
 			return super.get(name, objectFactory);
 		}
 	}
@@ -61,8 +62,11 @@ public class SessionScope extends AbstractRequestAttributesScope {
 	@Override
 	@Nullable
 	public Object remove(String name) {
+		// 获取当前请求的会话互斥对象
 		Object mutex = RequestContextHolder.currentRequestAttributes().getSessionMutex();
+		// 使用互斥对象进行同步
 		synchronized (mutex) {
+			// 调用父类的remove方法
 			return super.remove(name);
 		}
 	}
