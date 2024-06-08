@@ -131,6 +131,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 
 	/**
 	 * Protected constructor. Not intended for direct instantiation.
+	 *
 	 * @see MockMvcBuilders#standaloneSetup(Object...)
 	 */
 	protected StandaloneMockMvcBuilder(Object... controllers) {
@@ -152,6 +153,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	 * <p>Normally {@code @ControllerAdvice} are auto-detected as long as they're declared
 	 * as Spring beans. However since the standalone setup does not load any Spring config,
 	 * they need to be registered explicitly here instead much like controllers.
+	 *
 	 * @since 4.2
 	 */
 	public StandaloneMockMvcBuilder setControllerAdvice(Object... controllerAdvice) {
@@ -165,7 +167,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	 * and response. If no message converters are added to the list, a default
 	 * list of converters is added instead.
 	 */
-	public StandaloneMockMvcBuilder setMessageConverters(HttpMessageConverter<?>...messageConverters) {
+	public StandaloneMockMvcBuilder setMessageConverters(HttpMessageConverter<?>... messageConverters) {
 		this.messageConverters = Arrays.asList(messageConverters);
 		return this;
 	}
@@ -221,6 +223,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	 * Specify the timeout value for async execution. In Spring MVC Test, this
 	 * value is used to determine how to long to wait for async execution to
 	 * complete so that a test can verify the results synchronously.
+	 *
 	 * @param timeout the timeout value in milliseconds
 	 */
 	public StandaloneMockMvcBuilder setAsyncRequestTimeout(long timeout) {
@@ -264,7 +267,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	 * Set up view resolution with the given {@link ViewResolver ViewResolvers}.
 	 * If not set, an {@link InternalResourceViewResolver} is used by default.
 	 */
-	public StandaloneMockMvcBuilder setViewResolvers(ViewResolver...resolvers) {
+	public StandaloneMockMvcBuilder setViewResolvers(ViewResolver... resolvers) {
 		this.viewResolvers = Arrays.asList(resolvers);
 		return this;
 	}
@@ -301,6 +304,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	 * Enable URL path matching with parsed
 	 * {@link org.springframework.web.util.pattern.PathPattern PathPatterns}
 	 * instead of String pattern matching with a {@link org.springframework.util.PathMatcher}.
+	 *
 	 * @param parser the parser to use
 	 * @since 5.3
 	 */
@@ -312,6 +316,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	 * Whether to use suffix pattern match (".*") when matching patterns to
 	 * requests. If enabled a method mapped to "/users" also matches to "/users.*".
 	 * <p>The default value is {@code false}.
+	 *
 	 * @deprecated as of 5.2.4. See class-level note in
 	 * {@link RequestMappingHandlerMapping} on the deprecation of path extension
 	 * config options.
@@ -347,6 +352,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	 * request mappings. This method allows manually provided placeholder values so they
 	 * can be resolved. Alternatively consider creating a test that initializes a
 	 * {@link WebApplicationContext}.
+	 *
 	 * @since 4.2.8
 	 */
 	public StandaloneMockMvcBuilder addPlaceholderValue(String name, String value) {
@@ -356,6 +362,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 
 	/**
 	 * Configure factory to create a custom {@link RequestMappingHandlerMapping}.
+	 *
 	 * @param factory the factory
 	 * @since 5.0
 	 */
@@ -436,6 +443,7 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	 * This method could be used from a sub-class to register additional Spring
 	 * MVC infrastructure such as additional {@code HandlerMapping},
 	 * {@code HandlerAdapter}, and others.
+	 *
 	 * @param servletContext the ServletContext
 	 * @return a map with additional MVC infrastructure object instances
 	 * @since 5.1.4
@@ -445,7 +453,9 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 	}
 
 
-	/** Using the MVC Java configuration as the starting point for the "standalone" setup. */
+	/**
+	 * 使用 MVC Java 配置作为“独立”设置的起点。
+	 */
 	private class StandaloneConfiguration extends WebMvcConfigurationSupport {
 
 		@SuppressWarnings("deprecation")
@@ -453,20 +463,33 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 				FormattingConversionService mvcConversionService,
 				ResourceUrlProvider mvcResourceUrlProvider) {
 
+			// 从 处理器映射工厂 获取 请求映射处理器映射 实例
 			RequestMappingHandlerMapping handlerMapping = handlerMappingFactory.get();
+
+			// 设置嵌入值解析器
 			handlerMapping.setEmbeddedValueResolver(new StaticStringValueResolver(placeholderValues));
+
+			// 如果 模式解析器 不为空，则设置 模式解析器
 			if (patternParser != null) {
 				handlerMapping.setPatternParser(patternParser);
-			}
-			else {
+			} else {
+				// 否则，设置后缀模式匹配和删除分号内容
 				handlerMapping.setUseSuffixPatternMatch(useSuffixPatternMatch);
 				if (removeSemicolonContent != null) {
 					handlerMapping.setRemoveSemicolonContent(removeSemicolonContent);
 				}
 			}
+
+			// 设置尾随斜杠匹配
 			handlerMapping.setUseTrailingSlashMatch(useTrailingSlashPatternMatch);
+
+			// 设置排序顺序
 			handlerMapping.setOrder(0);
+
+			// 设置拦截器
 			handlerMapping.setInterceptors(getInterceptors(mvcConversionService, mvcResourceUrlProvider));
+
+			// 返回配置好的 请求映射处理器映射 实例
 			return handlerMapping;
 		}
 
@@ -487,8 +510,12 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 
 		@Override
 		protected void addInterceptors(InterceptorRegistry registry) {
+			// 遍历所有的 映射拦截器
 			for (MappedInterceptor interceptor : mappedInterceptors) {
+				// 向注册表添加拦截器
 				InterceptorRegistration registration = registry.addInterceptor(interceptor.getInterceptor());
+
+				// 如果拦截器有路径模式，则添加路径模式
 				if (interceptor.getPathPatterns() != null) {
 					registration.addPathPatterns(interceptor.getPathPatterns());
 				}
@@ -508,44 +535,60 @@ public class StandaloneMockMvcBuilder extends AbstractMockMvcBuilder<StandaloneM
 		@Override
 		public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
 			if (asyncRequestTimeout != null) {
+				// 设置异步请求超时
 				configurer.setDefaultTimeout(asyncRequestTimeout);
 			}
 		}
 
 		@Override
 		public Validator mvcValidator() {
+			// 获取 MVC 验证器，如果未提供，则使用父类的 MVC 验证器
 			Validator mvcValidator = (validator != null) ? validator : super.mvcValidator();
+
+			// 如果 MVC 验证器实现了 InitializingBean 接口
 			if (mvcValidator instanceof InitializingBean) {
 				try {
+					// 调用其 afterPropertiesSet 方法进行初始化
 					((InitializingBean) mvcValidator).afterPropertiesSet();
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
+					// 抛出 BeanInitializationException 异常，表示初始化失败
 					throw new BeanInitializationException("Failed to initialize Validator", ex);
 				}
 			}
+
+			// 返回 MVC 验证器
 			return mvcValidator;
 		}
 
 		@Override
 		protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+			// 如果处理异常解析器为空，则直接返回
 			if (handlerExceptionResolvers == null) {
 				return;
 			}
+
+			// 遍历处理异常解析器
 			for (HandlerExceptionResolver resolver : handlerExceptionResolvers) {
+				// 如果处理异常解析器实现了 应用上下文意识 接口，则设置应用上下文
 				if (resolver instanceof ApplicationContextAware) {
+					// 获取应用上下文
 					ApplicationContext applicationContext = getApplicationContext();
 					if (applicationContext != null) {
+						// 如果应用上下文存在， 设置应用上下文
 						((ApplicationContextAware) resolver).setApplicationContext(applicationContext);
 					}
 				}
+				// 如果处理异常解析器实现了 InitializingBean 接口
 				if (resolver instanceof InitializingBean) {
 					try {
+						// 则调用其 afterPropertiesSet 方法进行初始化
 						((InitializingBean) resolver).afterPropertiesSet();
-					}
-					catch (Exception ex) {
+					} catch (Exception ex) {
+						// 抛出 IllegalStateException 异常，表示初始化失败
 						throw new IllegalStateException("Failure from afterPropertiesSet", ex);
 					}
 				}
+				// 将处理异常解析器添加到异常解析器列表中
 				exceptionResolvers.add(resolver);
 			}
 		}

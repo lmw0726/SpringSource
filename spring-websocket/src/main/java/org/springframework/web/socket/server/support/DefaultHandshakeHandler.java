@@ -16,15 +16,15 @@
 
 package org.springframework.web.socket.server.support;
 
-import javax.servlet.ServletContext;
-
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.socket.server.RequestUpgradeStrategy;
 
+import javax.servlet.ServletContext;
+
 /**
- * A default {@link org.springframework.web.socket.server.HandshakeHandler} implementation,
- * extending {@link AbstractHandshakeHandler} with Servlet-specific initialization support.
- * See {@link AbstractHandshakeHandler}'s javadoc for details on supported servers etc.
+ * 默认的 {@link org.springframework.web.socket.server.HandshakeHandler} 实现，
+ * 继承自 {@link AbstractHandshakeHandler}，具有 Servlet 特定的初始化支持。
+ * 有关支持的服务器等详细信息，请参阅 {@link AbstractHandshakeHandler} 的 javadoc。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -42,8 +42,11 @@ public class DefaultHandshakeHandler extends AbstractHandshakeHandler implements
 
 	@Override
 	public void setServletContext(ServletContext servletContext) {
+		// 获取请求升级策略
 		RequestUpgradeStrategy strategy = getRequestUpgradeStrategy();
+		// 如果策略实现了 Servlet上下文感知 接口
 		if (strategy instanceof ServletContextAware) {
+			// 将 servlet 上下文设置到请求升级策略中
 			((ServletContextAware) strategy).setServletContext(servletContext);
 		}
 	}

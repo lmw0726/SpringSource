@@ -16,38 +16,40 @@
 
 package org.springframework.web.context.support;
 
-import javax.servlet.ServletContext;
-
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.lang.Nullable;
 import org.springframework.web.context.ServletContextAware;
 
+import javax.servlet.ServletContext;
+
 /**
- * {@link FactoryBean} that retrieves a specific ServletContext init parameter
- * (that is, a "context-param" defined in {@code web.xml}).
- * Exposes that ServletContext init parameter when used as bean reference,
- * effectively making it available as named Spring bean instance.
+ * {@link FactoryBean} 用于检索特定的 ServletContext 初始化参数（即 {@code web.xml} 中定义的 "context-param"）。
+ * 当用作 bean 引用时，会公开该 ServletContext 初始化参数，从而使其作为命名的 Spring bean 实例可用。
  *
- * <p><b>NOTE:</b> As of Spring 3.0, you may also use the "contextParameters" default
- * bean which is of type Map, and dereference it using an "#{contextParameters.myKey}"
- * expression to access a specific parameter by name.
+ * <p><b>注意：</b> 从 Spring 3.0 开始，您还可以使用类型为 Map 的 "contextParameters" 默认 bean，
+ * 并使用 "#{contextParameters.myKey}" 表达式取消引用它，以按名称访问特定参数。
  *
  * @author Juergen Hoeller
- * @since 1.2.4
  * @see org.springframework.web.context.WebApplicationContext#CONTEXT_PARAMETERS_BEAN_NAME
  * @see ServletContextAttributeFactoryBean
+ * @since 1.2.4
  */
 public class ServletContextParameterFactoryBean implements FactoryBean<String>, ServletContextAware {
-
+	/**
+	 * 初始化参数名称
+	 */
 	@Nullable
 	private String initParamName;
 
+	/**
+	 * 参数值
+	 */
 	@Nullable
 	private String paramValue;
 
 
 	/**
-	 * Set the name of the ServletContext init parameter to expose.
+	 * 设置要公开的 ServletContext 初始化参数的名称。
 	 */
 	public void setInitParamName(String initParamName) {
 		this.initParamName = initParamName;
@@ -55,11 +57,14 @@ public class ServletContextParameterFactoryBean implements FactoryBean<String>, 
 
 	@Override
 	public void setServletContext(ServletContext servletContext) {
+		// 如果 初始化参数名称 为空，抛出 IllegalArgumentException 异常
 		if (this.initParamName == null) {
 			throw new IllegalArgumentException("initParamName is required");
 		}
+		// 从 Servlet上下文 获取初始化参数的值
 		this.paramValue = servletContext.getInitParameter(this.initParamName);
 		if (this.paramValue == null) {
+			// 如果初始化参数的值为空，抛出 IllegalStateException 异常
 			throw new IllegalStateException("No ServletContext init parameter '" + this.initParamName + "' found");
 		}
 	}
