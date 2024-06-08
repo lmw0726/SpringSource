@@ -16,31 +16,29 @@
 
 package org.springframework.web.context;
 
-import java.util.Enumeration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.DisposableBean;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.beans.factory.DisposableBean;
+import java.util.Enumeration;
 
 /**
- * Web application listener that cleans up remaining disposable attributes
- * in the ServletContext, i.e. attributes which implement {@link DisposableBean}
- * and haven't been removed before. This is typically used for destroying objects
- * in "application" scope, for which the lifecycle implies destruction at the
- * very end of the web application's shutdown phase.
+ * Web应用程序监听器，用于清理ServletContext中剩余的可清理属性，
+ * 即那些实现了{@link DisposableBean}且尚未被移除的属性。
+ * 通常用于销毁“应用程序”范围内的对象，其生命周期意味着在Web应用程序关闭阶段的最后进行销毁。
  *
  * @author Juergen Hoeller
- * @since 3.0
  * @see org.springframework.web.context.support.ServletContextScope
  * @see ContextLoaderListener
+ * @since 3.0
  */
 public class ContextCleanupListener implements ServletContextListener {
-
+	/**
+	 * 日志记录器
+	 */
 	private static final Log logger = LogFactory.getLog(ContextCleanupListener.class);
 
 
@@ -55,22 +53,29 @@ public class ContextCleanupListener implements ServletContextListener {
 
 
 	/**
-	 * Find all Spring-internal ServletContext attributes which implement
-	 * {@link DisposableBean} and invoke the destroy method on them.
-	 * @param servletContext the ServletContext to check
+	 * 查找所有Spring内部的ServletContext属性，这些属性实现了{@link DisposableBean}，
+	 * 并调用它们的destroy方法。
+	 *
+	 * @param servletContext 要检查的ServletContext
 	 * @see DisposableBean#destroy()
 	 */
 	static void cleanupAttributes(ServletContext servletContext) {
+		// 获取 Servlet上下文 中的所有属性名称
 		Enumeration<String> attrNames = servletContext.getAttributeNames();
+		// 遍历所有属性名称
 		while (attrNames.hasMoreElements()) {
 			String attrName = attrNames.nextElement();
+			// 检查属性名称是否以 "org.springframework." 开头
 			if (attrName.startsWith("org.springframework.")) {
+				// 获取属性值
 				Object attrValue = servletContext.getAttribute(attrName);
+				// 检查属性值是否为 DisposableBean 实例
 				if (attrValue instanceof DisposableBean) {
 					try {
+						// 调用 DisposableBean 的 destroy 方法
 						((DisposableBean) attrValue).destroy();
-					}
-					catch (Throwable ex) {
+					} catch (Throwable ex) {
+						// 如果 destroy 方法调用失败，记录警告日志
 						if (logger.isWarnEnabled()) {
 							logger.warn("Invocation of destroy method failed on ServletContext " +
 									"attribute with name '" + attrName + "'", ex);
