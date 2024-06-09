@@ -24,32 +24,38 @@ import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Convenient super class for application classes that need REST access.
+ * 用于需要进行REST访问的应用程序类的便捷超类。
  *
- * <p>Requires a {@link ClientHttpRequestFactory} or a {@link RestTemplate} instance to be set.
+ * <p>需要设置{@link ClientHttpRequestFactory}或{@link RestTemplate}的实例。
  *
  * @author Arjen Poutsma
- * @since 3.0
  * @see #setRestTemplate
  * @see org.springframework.web.client.RestTemplate
+ * @since 3.0
  */
 public class RestGatewaySupport {
 
-	/** Logger available to subclasses. */
+	/**
+	 * 可用与子类的日志记录器。
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
-
+	/**
+	 * Rest请求模板
+	 */
 	private RestTemplate restTemplate;
 
 
 	/**
-	 * Construct a new instance of the {@link RestGatewaySupport}, with default parameters.
+	 * 构造一个新的{@link RestGatewaySupport}实例，使用默认参数。
 	 */
 	public RestGatewaySupport() {
 		this.restTemplate = new RestTemplate();
 	}
 
 	/**
-	 * Construct a new instance of the {@link RestGatewaySupport}, with the given {@link ClientHttpRequestFactory}.
+	 * 构造一个新的{@link RestGatewaySupport}实例，使用给定的{@link ClientHttpRequestFactory}。
+	 *
+	 * @param requestFactory 请求工厂
 	 * @see RestTemplate#RestTemplate(ClientHttpRequestFactory)
 	 */
 	public RestGatewaySupport(ClientHttpRequestFactory requestFactory) {
@@ -59,7 +65,9 @@ public class RestGatewaySupport {
 
 
 	/**
-	 * Sets the {@link RestTemplate} for the gateway.
+	 * 设置网关的{@link RestTemplate}。
+	 *
+	 * @param restTemplate RestTemplate实例
 	 */
 	public void setRestTemplate(RestTemplate restTemplate) {
 		Assert.notNull(restTemplate, "'restTemplate' must not be null");
@@ -67,7 +75,9 @@ public class RestGatewaySupport {
 	}
 
 	/**
-	 * Returns the {@link RestTemplate} for the gateway.
+	 * 返回网关的{@link RestTemplate}。
+	 *
+	 * @return RestTemplate实例
 	 */
 	public RestTemplate getRestTemplate() {
 		return this.restTemplate;
