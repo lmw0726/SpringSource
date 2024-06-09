@@ -19,29 +19,26 @@ package org.springframework.web.client;
 import java.io.IOException;
 
 /**
- * Callback interface for code that operates on an
- * {@link org.springframework.http.client.AsyncClientHttpRequest}. Allows to
- * manipulate the request headers, and write to the request body.
+ * 异步请求回调接口，用于操作 {@link org.springframework.http.client.AsyncClientHttpRequest}。
+ * 允许操作请求头，并向请求体中写入内容。
  *
- * <p>Used internally by the {@link AsyncRestTemplate}, but also useful for
- * application code.
+ * <p>内部由 {@link AsyncRestTemplate} 使用，但也对应用程序代码很有用。
  *
  * @author Arjen Poutsma
- * @since 4.0
  * @see org.springframework.web.client.AsyncRestTemplate#execute
- * @deprecated as of Spring 5.0, in favor of
- * {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction}
+ * @since 4.0
+ * @deprecated 自 Spring 5.0 起弃用，推荐使用 {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction}
  */
 @FunctionalInterface
 @Deprecated
 public interface AsyncRequestCallback {
 
 	/**
-	 * Gets called by {@link AsyncRestTemplate#execute} with an opened {@code ClientHttpRequest}.
-	 * Does not need to care about closing the request or about handling errors:
-	 * this will all be handled by the {@code RestTemplate}.
-	 * @param request the active HTTP request
-	 * @throws java.io.IOException in case of I/O errors
+	 * 在 {@link AsyncRestTemplate#execute} 中被调用，传入一个打开的 {@code ClientHttpRequest}。
+	 * 不需要关心关闭请求或处理错误：这些都将由 {@code RestTemplate} 处理。
+	 *
+	 * @param request 活动的 HTTP 请求
+	 * @throws java.io.IOException 在 I/O 错误时抛出
 	 */
 	void doWithRequest(org.springframework.http.client.AsyncClientHttpRequest request) throws IOException;
 
