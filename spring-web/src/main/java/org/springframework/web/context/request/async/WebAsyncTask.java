@@ -26,36 +26,60 @@ import org.springframework.web.context.request.NativeWebRequest;
 import java.util.concurrent.Callable;
 
 /**
- * Holder for a {@link Callable}, a timeout value, and a task executor.
+ * 携带一个 {@link Callable}、一个超时值和一个任务执行器的持有者。
  *
- * @param <V> the value type
+ * @param <V> 值的类型
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @since 3.2
  */
 public class WebAsyncTask<V> implements BeanFactoryAware {
 
+	/**
+	 * 并发处理的可调用对象。
+	 */
 	private final Callable<V> callable;
 
+	/**
+	 * 超时时间（以毫秒为单位）。
+	 */
 	private Long timeout;
 
+	/**
+	 * 用于并发处理的执行器。
+	 */
 	private AsyncTaskExecutor executor;
 
+	/**
+	 * 要使用的执行器 bean 的名称。
+	 */
 	private String executorName;
 
+	/**
+	 * Bean 工厂，用于解析执行器名称。
+	 */
 	private BeanFactory beanFactory;
 
+	/**
+	 * 异步请求超时时要执行的回调。
+	 */
 	private Callable<V> timeoutCallback;
 
+	/**
+	 * 在异步请求处理期间发生错误时要调用的回调。
+	 */
 	private Callable<V> errorCallback;
 
+	/**
+	 * 在异步请求完成时要调用的回调。
+	 */
 	private Runnable completionCallback;
 
 
 	/**
-	 * Create a {@code WebAsyncTask} wrapping the given {@link Callable}.
+	 * 使用给定的 {@link Callable} 创建一个 {@code WebAsyncTask}。
 	 *
-	 * @param callable the callable for concurrent handling
+	 * @param callable 并发处理的可调用对象
 	 */
 	public WebAsyncTask(Callable<V> callable) {
 		Assert.notNull(callable, "Callable must not be null");
@@ -63,10 +87,10 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 	}
 
 	/**
-	 * Create a {@code WebAsyncTask} with a timeout value and a {@link Callable}.
+	 * 使用超时值和 {@link Callable} 创建一个 {@code WebAsyncTask}。
 	 *
-	 * @param timeout  a timeout value in milliseconds
-	 * @param callable the callable for concurrent handling
+	 * @param timeout  超时值（以毫秒为单位）
+	 * @param callable 并发处理的可调用对象
 	 */
 	public WebAsyncTask(long timeout, Callable<V> callable) {
 		this(callable);
@@ -74,11 +98,11 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 	}
 
 	/**
-	 * Create a {@code WebAsyncTask} with a timeout value, an executor name, and a {@link Callable}.
+	 * 使用超时值、执行器名称和 {@link Callable} 创建一个 {@code WebAsyncTask}。
 	 *
-	 * @param timeout      the timeout value in milliseconds; ignored if {@code null}
-	 * @param executorName the name of an executor bean to use
-	 * @param callable     the callable for concurrent handling
+	 * @param timeout      超时值（以毫秒为单位）；如果为 {@code null} 则忽略
+	 * @param executorName 要使用的执行器 bean 的名称
+	 * @param callable     并发处理的可调用对象
 	 */
 	public WebAsyncTask(@Nullable Long timeout, String executorName, Callable<V> callable) {
 		this(callable);
@@ -88,11 +112,11 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 	}
 
 	/**
-	 * Create a {@code WebAsyncTask} with a timeout value, an executor instance, and a Callable.
+	 * 使用超时值、执行器实例和 {@link Callable} 创建一个 {@code WebAsyncTask}。
 	 *
-	 * @param timeout  the timeout value in milliseconds; ignored if {@code null}
-	 * @param executor the executor to use
-	 * @param callable the callable for concurrent handling
+	 * @param timeout  超时值（以毫秒为单位）；如果为 {@code null} 则忽略
+	 * @param executor 要使用的执行器
+	 * @param callable 并发处理的可调用对象
 	 */
 	public WebAsyncTask(@Nullable Long timeout, AsyncTaskExecutor executor, Callable<V> callable) {
 		this(callable);
@@ -103,14 +127,14 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 
 
 	/**
-	 * Return the {@link Callable} to use for concurrent handling (never {@code null}).
+	 * 返回用于并发处理的 {@link Callable}（永远不会为 {@code null}）。
 	 */
 	public Callable<?> getCallable() {
 		return this.callable;
 	}
 
 	/**
-	 * Return the timeout value in milliseconds, or {@code null} if no timeout is set.
+	 * 返回超时值（以毫秒为单位），如果未设置超时，则返回 {@code null}。
 	 */
 	@Nullable
 	public Long getTimeout() {
@@ -118,9 +142,8 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 	}
 
 	/**
-	 * A {@link BeanFactory} to use for resolving an executor name.
-	 * <p>This factory reference will automatically be set when
-	 * {@code WebAsyncTask} is used within a Spring MVC controller.
+	 * 用于解析执行器名称的 {@link BeanFactory}。
+	 * <p>当在 Spring MVC 控制器中使用 {@code WebAsyncTask} 时，此工厂引用将自动设置。
 	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
@@ -128,42 +151,40 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 	}
 
 	/**
-	 * Return the AsyncTaskExecutor to use for concurrent handling,
-	 * or {@code null} if none specified.
+	 * 返回用于并发处理的 AsyncTaskExecutor，如果未指定，则返回 {@code null}。
 	 */
 	@Nullable
 	public AsyncTaskExecutor getExecutor() {
+		// 如果已经设置了执行器，则直接返回执行器
 		if (this.executor != null) {
 			return this.executor;
 		} else if (this.executorName != null) {
+			// 如果执行器名称不为空
 			Assert.state(this.beanFactory != null, "BeanFactory is required to look up an executor bean by name");
+			// 通过 Bean工厂 按名称查找 异步任务执行器 类型的执行器 Bean
 			return this.beanFactory.getBean(this.executorName, AsyncTaskExecutor.class);
 		} else {
+			// 如果既没有设置执行器，也没有设置执行器名称，则返回空
 			return null;
 		}
 	}
 
 
 	/**
-	 * Register code to invoke when the async request times out.
-	 * <p>This method is called from a container thread when an async request times
-	 * out before the {@code Callable} has completed. The callback is executed in
-	 * the same thread and therefore should return without blocking. It may return
-	 * an alternative value to use, including an {@link Exception} or return
-	 * {@link CallableProcessingInterceptor#RESULT_NONE RESULT_NONE}.
+	 * 注册在异步请求超时时调用的代码。
+	 * <p>在 {@code Callable} 完成之前，当异步请求超时时，此方法从容器线程调用。
+	 * 回调在同一个线程中执行，因此应该返回而不阻塞。它可以返回要使用的替代值，包括 {@link Exception}，
+	 * 或返回 {@link CallableProcessingInterceptor#RESULT_NONE RESULT_NONE}。
 	 */
 	public void onTimeout(Callable<V> callback) {
 		this.timeoutCallback = callback;
 	}
 
 	/**
-	 * Register code to invoke for an error during async request processing.
-	 * <p>This method is called from a container thread when an error occurred
-	 * while processing an async request before the {@code Callable} has
-	 * completed. The callback is executed in the same thread and therefore
-	 * should return without blocking. It may return an alternative value to
-	 * use, including an {@link Exception} or return
-	 * {@link CallableProcessingInterceptor#RESULT_NONE RESULT_NONE}.
+	 * 注册在异步请求处理过程中发生错误时调用的代码。
+	 * <p>当在 {@code Callable} 完成之前，处理异步请求时发生错误时，从容器线程调用此方法。
+	 * 回调在同一个线程中执行，因此应该返回而不阻塞。它可以返回要使用的替代值，包括 {@link Exception}，
+	 * 或返回 {@link CallableProcessingInterceptor#RESULT_NONE RESULT_NONE}。
 	 *
 	 * @since 5.0
 	 */
@@ -172,9 +193,8 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 	}
 
 	/**
-	 * Register code to invoke when the async request completes.
-	 * <p>This method is called from a container thread when an async request
-	 * completed for any reason, including timeout and network error.
+	 * 注册在异步请求完成时调用的代码。
+	 * <p>当任何原因导致异步请求完成时，包括超时和网络错误时，从容器线程调用此方法。
 	 */
 	public void onCompletion(Runnable callback) {
 		this.completionCallback = callback;
