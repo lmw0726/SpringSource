@@ -19,22 +19,17 @@ package org.springframework.web.context.request.async;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Intercepts concurrent request handling, where the concurrent result is
- * obtained by waiting for a {@link DeferredResult} to be set from a thread
- * chosen by the application (e.g. in response to some external event).
+ * 拦截并发请求处理，其中并发结果通过等待应用程序选择的线程（例如响应某些外部事件）设置的
+ * {@link DeferredResult} 获得。
  *
- * <p>A {@code DeferredResultProcessingInterceptor} is invoked before the start
- * of async processing, after the {@code DeferredResult} is set as well as on
- * timeout/error, or after completing for any reason including a timeout or network
- * error.
+ * <p>在开始异步处理之前、在 {@code DeferredResult} 设置之后以及在超时/错误后或
+ * 因任何原因（包括超时或网络错误）完成后，都会调用 {@code DeferredResultProcessingInterceptor}。
  *
- * <p>As a general rule exceptions raised by interceptor methods will cause
- * async processing to resume by dispatching back to the container and using
- * the Exception instance as the concurrent result. Such exceptions will then
- * be processed through the {@code HandlerExceptionResolver} mechanism.
+ * <p>通常，拦截器方法引发的异常将导致通过调度回容器并使用异常实例作为并发结果来恢复异步处理。
+ * 这些异常将通过 {@code HandlerExceptionResolver} 机制进行处理。
  *
- * <p>The {@link #handleTimeout(NativeWebRequest, DeferredResult) handleTimeout}
- * method can set the {@code DeferredResult} in order to resume processing.
+ * <p>{@link #handleTimeout(NativeWebRequest, DeferredResult) handleTimeout}
+ * 方法可以设置 {@code DeferredResult} 以恢复处理。
  *
  * @author Rossen Stoyanchev
  * @author Rob Winch
@@ -43,60 +38,56 @@ import org.springframework.web.context.request.NativeWebRequest;
 public interface DeferredResultProcessingInterceptor {
 
 	/**
-	 * Invoked immediately before the start of concurrent handling, in the same
-	 * thread that started it. This method may be used to capture state just prior
-	 * to the start of concurrent processing with the given {@code DeferredResult}.
-	 * @param request the current request
-	 * @param deferredResult the DeferredResult for the current request
-	 * @throws Exception in case of errors
+	 * 在并发处理开始之前立即调用，与启动它的线程相同。此方法可用于在
+	 * 使用给定的 {@code DeferredResult} 开始并发处理之前捕获状态。
+	 *
+	 * @param request        当前请求
+	 * @param deferredResult 当前请求的 DeferredResult
+	 * @throws Exception 如果出现错误
 	 */
 	default <T> void beforeConcurrentHandling(NativeWebRequest request, DeferredResult<T> deferredResult)
 			throws Exception {
 	}
 
 	/**
-	 * Invoked immediately after the start of concurrent handling, in the same
-	 * thread that started it. This method may be used to detect the start of
-	 * concurrent processing with the given {@code DeferredResult}.
-	 * <p>The {@code DeferredResult} may have already been set, for example at
-	 * the time of its creation or by another thread.
-	 * @param request the current request
-	 * @param deferredResult the DeferredResult for the current request
-	 * @throws Exception in case of errors
+	 * 在并发处理开始后立即调用，与启动它的线程相同。此方法可用于检测
+	 * 使用给定的 {@code DeferredResult} 开始并发处理。
+	 * <p>{@code DeferredResult} 可能已经被设置，例如在创建时或由其他线程设置。
+	 *
+	 * @param request        当前请求
+	 * @param deferredResult 当前请求的 DeferredResult
+	 * @throws Exception 如果出现错误
 	 */
 	default <T> void preProcess(NativeWebRequest request, DeferredResult<T> deferredResult)
 			throws Exception {
 	}
 
 	/**
-	 * Invoked after a {@code DeferredResult} has been set, via
-	 * {@link DeferredResult#setResult(Object)} or
-	 * {@link DeferredResult#setErrorResult(Object)}, and is also ready to
-	 * handle the concurrent result.
-	 * <p>This method may also be invoked after a timeout when the
-	 * {@code DeferredResult} was created with a constructor accepting a default
-	 * timeout result.
-	 * @param request the current request
-	 * @param deferredResult the DeferredResult for the current request
-	 * @param concurrentResult the result to which the {@code DeferredResult}
-	 * @throws Exception in case of errors
+	 * 在 {@code DeferredResult} 通过 {@link DeferredResult#setResult(Object)}
+	 * 或 {@link DeferredResult#setErrorResult(Object)} 设置后调用，并且也已准备好
+	 * 处理并发结果。
+	 * <p>在超时后，如果 {@code DeferredResult} 是使用接受默认超时结果的构造函数创建的，
+	 * 也可能会调用此方法。
+	 *
+	 * @param request          当前请求
+	 * @param deferredResult   当前请求的 DeferredResult
+	 * @param concurrentResult {@code DeferredResult} 的结果
+	 * @throws Exception 如果出现错误
 	 */
 	default <T> void postProcess(NativeWebRequest request, DeferredResult<T> deferredResult,
-			Object concurrentResult) throws Exception {
+								 Object concurrentResult) throws Exception {
 	}
 
 	/**
-	 * Invoked from a container thread when an async request times out before
-	 * the {@code DeferredResult} has been set. Implementations may invoke
-	 * {@link DeferredResult#setResult(Object) setResult} or
-	 * {@link DeferredResult#setErrorResult(Object) setErrorResult} to resume processing.
-	 * @param request the current request
-	 * @param deferredResult the DeferredResult for the current request; if the
-	 * {@code DeferredResult} is set, then concurrent processing is resumed and
-	 * subsequent interceptors are not invoked
-	 * @return {@code true} if processing should continue, or {@code false} if
-	 * other interceptors should not be invoked
-	 * @throws Exception in case of errors
+	 * 当异步请求在 {@code DeferredResult} 设置之前超时时，从容器线程调用。
+	 * 实现可以调用 {@link DeferredResult#setResult(Object)} 或
+	 * {@link DeferredResult#setErrorResult(Object)} 以恢复处理。
+	 *
+	 * @param request        当前请求
+	 * @param deferredResult 当前请求的 DeferredResult；如果 {@code DeferredResult} 已设置，
+	 *                       则恢复并发处理，不再调用后续拦截器
+	 * @return 如果处理应继续，则返回 {@code true}；如果不应调用其他拦截器，则返回 {@code false}
+	 * @throws Exception 如果出现错误
 	 */
 	default <T> boolean handleTimeout(NativeWebRequest request, DeferredResult<T> deferredResult)
 			throws Exception {
@@ -105,32 +96,30 @@ public interface DeferredResultProcessingInterceptor {
 	}
 
 	/**
-	 * Invoked from a container thread when an error occurred while processing an async request
-	 * before the {@code DeferredResult} has been set. Implementations may invoke
-	 * {@link DeferredResult#setResult(Object) setResult} or
-	 * {@link DeferredResult#setErrorResult(Object) setErrorResult} to resume processing.
-	 * @param request the current request
-	 * @param deferredResult the DeferredResult for the current request; if the
-	 * {@code DeferredResult} is set, then concurrent processing is resumed and
-	 * subsequent interceptors are not invoked
-	 * @param t the error that occurred while request processing
-	 * @return {@code true} if error handling should continue, or {@code false} if
-	 * other interceptors should by bypassed and not be invoked
-	 * @throws Exception in case of errors
+	 * 当在处理异步请求时发生错误，并且在 {@code DeferredResult} 设置之前，从容器线程调用。
+	 * 实现可以调用 {@link DeferredResult#setResult(Object)} 或
+	 * {@link DeferredResult#setErrorResult(Object)} 以恢复处理。
+	 *
+	 * @param request        当前请求
+	 * @param deferredResult 当前请求的 DeferredResult；如果 {@code DeferredResult} 已设置，
+	 *                       则恢复并发处理，不再调用后续拦截器
+	 * @param t              处理请求时发生的错误
+	 * @return 如果错误处理应继续，则返回 {@code true}；如果应绕过其他拦截器并且不应调用，则返回 {@code false}
+	 * @throws Exception 如果出现错误
 	 */
 	default <T> boolean handleError(NativeWebRequest request, DeferredResult<T> deferredResult,
-			Throwable t) throws Exception {
+									Throwable t) throws Exception {
 
 		return true;
 	}
 
 	/**
-	 * Invoked from a container thread when an async request completed for any
-	 * reason including timeout and network error. This method is useful for
-	 * detecting that a {@code DeferredResult} instance is no longer usable.
-	 * @param request the current request
-	 * @param deferredResult the DeferredResult for the current request
-	 * @throws Exception in case of errors
+	 * 当由于任何原因（包括超时和网络错误）完成异步请求时，从容器线程调用。
+	 * 此方法可用于检测 {@code DeferredResult} 实例不再可用。
+	 *
+	 * @param request        当前请求
+	 * @param deferredResult 当前请求的 DeferredResult
+	 * @throws Exception 如果出现错误
 	 */
 	default <T> void afterCompletion(NativeWebRequest request, DeferredResult<T> deferredResult)
 			throws Exception {
