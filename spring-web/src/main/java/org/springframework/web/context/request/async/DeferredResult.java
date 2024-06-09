@@ -28,23 +28,16 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * {@code DeferredResult} provides an alternative to using a {@link Callable} for
- * asynchronous request processing. While a {@code Callable} is executed concurrently
- * on behalf of the application, with a {@code DeferredResult} the application can
- * produce the result from a thread of its choice.
+ * {@code DeferredResult}提供了一种替代{@link Callable}用于异步请求处理的方法。虽然{@code Callable}
+ * 是代表应用程序并行执行的，但使用{@code DeferredResult}，应用程序可以从其选择的线程生成结果。
  *
- * <p>Subclasses can extend this class to easily associate additional data or behavior
- * with the {@link DeferredResult}. For example, one might want to associate the user
- * used to create the {@link DeferredResult} by extending the class and adding an
- * additional property for the user. In this way, the user could easily be accessed
- * later without the need to use a data structure to do the mapping.
+ * <p>子类可以扩展此类以轻松地将其他数据或行为与{@link DeferredResult}关联起来。例如，可以扩展该类并添加一个额外的属性来关联创建{@link DeferredResult}的用户。
+ * 通过这种方式，稍后可以轻松访问用户，而无需使用数据结构进行映射。
  *
- * <p>An example of associating additional behavior to this class might be realized
- * by extending the class to implement an additional interface. For example, one
- * might want to implement {@link Comparable} so that when the {@link DeferredResult}
- * is added to a {@link PriorityQueue} it is handled in the correct order.
+ * <p>将附加行为关联到此类的示例可能通过扩展类来实现一个附加接口。例如，可能想要实现{@link Comparable}，
+ * 以便将{@link DeferredResult}添加到{@link PriorityQueue}中时以正确的顺序处理它。
  *
- * @param <T> the result type
+ * @param <T> 结果类型
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @author Rob Winch
@@ -52,54 +45,81 @@ import java.util.function.Supplier;
  */
 public class DeferredResult<T> {
 
+	/**
+	 * 空的结果值
+	 */
 	private static final Object RESULT_NONE = new Object();
 
+	/**
+	 * 日志记录器
+	 */
 	private static final Log logger = LogFactory.getLog(DeferredResult.class);
 
-
+	/**
+	 * 超时值，以毫秒为单位
+	 */
 	@Nullable
 	private final Long timeoutValue;
 
+	/**
+	 * 超时时使用的结果提供者。
+	 */
 	private final Supplier<?> timeoutResult;
 
+	/**
+	 * 处理超时的回调。
+	 */
 	private Runnable timeoutCallback;
 
+	/**
+	 * 处理错误的回调。
+	 */
 	private Consumer<Throwable> errorCallback;
 
+	/**
+	 * 处理完成的回调。
+	 */
 	private Runnable completionCallback;
 
+	/**
+	 * 延迟结果处理器。
+	 */
 	private DeferredResultHandler resultHandler;
 
+	/**
+	 * 结果值。
+	 */
 	private volatile Object result = RESULT_NONE;
 
+	/**
+	 * 表示延迟结果是否已过期。
+	 */
 	private volatile boolean expired;
 
 
 	/**
-	 * Create a DeferredResult.
+	 * 创建一个DeferredResult。
 	 */
 	public DeferredResult() {
 		this(null, () -> RESULT_NONE);
 	}
 
 	/**
-	 * Create a DeferredResult with a custom timeout value.
-	 * <p>By default not set in which case the default configured in the MVC
-	 * Java Config or the MVC namespace is used, or if that's not set, then the
-	 * timeout depends on the default of the underlying server.
+	 * 创建一个具有自定义超时值的DeferredResult。
+	 * <p>默认情况下未设置，在这种情况下，默认配置在 MVC Java Config 或 MVC 命名空间中使用，
+	 * 或者如果未设置，则取决于基础服务器的默认值。
 	 *
-	 * @param timeoutValue timeout value in milliseconds
+	 * @param timeoutValue 超时值（毫秒）
 	 */
 	public DeferredResult(Long timeoutValue) {
 		this(timeoutValue, () -> RESULT_NONE);
 	}
 
 	/**
-	 * Create a DeferredResult with a timeout value and a default result to use
-	 * in case of timeout.
+	 * 创建一个带有超时值和默认结果的DeferredResult，以防超时。
 	 *
-	 * @param timeoutValue  timeout value in milliseconds (ignored if {@code null})
-	 * @param timeoutResult the result to use
+	 * @param timeoutValue  超时值（毫秒）（如果为 {@code null} 则忽略）
+	 * @param timeoutResult 要使用的结果
 	 */
 	public DeferredResult(@Nullable Long timeoutValue, Object timeoutResult) {
 		this.timeoutValue = timeoutValue;
@@ -107,11 +127,10 @@ public class DeferredResult<T> {
 	}
 
 	/**
-	 * Variant of {@link #DeferredResult(Long, Object)} that accepts a dynamic
-	 * fallback value based on a {@link Supplier}.
+	 * {@link #DeferredResult(Long, Object)} 的变体，接受基于 {@link Supplier} 的动态回退值。
 	 *
-	 * @param timeoutValue  timeout value in milliseconds (ignored if {@code null})
-	 * @param timeoutResult the result supplier to use
+	 * @param timeoutValue  超时值（毫秒）（如果为 {@code null} 则忽略）
+	 * @param timeoutResult 要使用的结果供应商
 	 * @since 5.1.1
 	 */
 	public DeferredResult(@Nullable Long timeoutValue, Supplier<?> timeoutResult) {
@@ -121,19 +140,16 @@ public class DeferredResult<T> {
 
 
 	/**
-	 * Return {@code true} if this DeferredResult is no longer usable either
-	 * because it was previously set or because the underlying request expired.
-	 * <p>The result may have been set with a call to {@link #setResult(Object)},
-	 * or {@link #setErrorResult(Object)}, or as a result of a timeout, if a
-	 * timeout result was provided to the constructor. The request may also
-	 * expire due to a timeout or network error.
+	 * 如果此DeferredResult不再可用，则返回true，要么是因为它以前已经设置，要么是因为底层请求已过期。
+	 * <p>结果可能已经通过调用 {@link #setResult(Object)}、{@link #setErrorResult(Object)} 或作为超时的结果提供给构造函数而设置。
+	 * 请求也可能由于超时或网络错误而过期。
 	 */
 	public final boolean isSetOrExpired() {
 		return (this.result != RESULT_NONE || this.expired);
 	}
 
 	/**
-	 * Return {@code true} if the DeferredResult has been set.
+	 * 如果 DeferredResult 已设置，则返回true。
 	 *
 	 * @since 4.0
 	 */
@@ -142,20 +158,20 @@ public class DeferredResult<T> {
 	}
 
 	/**
-	 * Return the result, or {@code null} if the result wasn't set. Since the result
-	 * can also be {@code null}, it is recommended to use {@link #hasResult()} first
-	 * to check if there is a result prior to calling this method.
+	 * 返回结果，如果结果未设置，则返回null。由于结果也可能为null，
+	 * 建议先使用{@link #hasResult()}检查是否存在结果，然后再调用此方法。
 	 *
 	 * @since 4.0
 	 */
 	@Nullable
 	public Object getResult() {
 		Object resultToCheck = this.result;
+		// 如果结果值为空的结果值，则返回null。否则返回当前结果值
 		return (resultToCheck != RESULT_NONE ? resultToCheck : null);
 	}
 
 	/**
-	 * Return the configured timeout value in milliseconds.
+	 * 返回配置的超时值（以毫秒为单位）。
 	 */
 	@Nullable
 	final Long getTimeoutValue() {
@@ -163,23 +179,18 @@ public class DeferredResult<T> {
 	}
 
 	/**
-	 * Register code to invoke when the async request times out.
-	 * <p>This method is called from a container thread when an async request
-	 * times out before the {@code DeferredResult} has been populated.
-	 * It may invoke {@link DeferredResult#setResult setResult} or
-	 * {@link DeferredResult#setErrorResult setErrorResult} to resume processing.
+	 * 注册异步请求超时时要调用的代码。
+	 * <p>当异步请求在{@code DeferredResult}填充之前超时时，从容器线程调用此方法。
+	 * 它可以调用{@link DeferredResult#setResult setResult}或{@link DeferredResult#setErrorResult setErrorResult}来恢复处理。
 	 */
 	public void onTimeout(Runnable callback) {
 		this.timeoutCallback = callback;
 	}
 
 	/**
-	 * Register code to invoke when an error occurred during the async request.
-	 * <p>This method is called from a container thread when an error occurs
-	 * while processing an async request before the {@code DeferredResult} has
-	 * been populated. It may invoke {@link DeferredResult#setResult setResult}
-	 * or {@link DeferredResult#setErrorResult setErrorResult} to resume
-	 * processing.
+	 * 注册在异步请求期间发生错误时要调用的代码。
+	 * <p>当在填充{@code DeferredResult}之前异步处理请求时发生错误时，从容器线程调用此方法。
+	 * 它可以调用{@link DeferredResult#setResult setResult}或{@link DeferredResult#setErrorResult setErrorResult}来恢复处理。
 	 *
 	 * @since 5.0
 	 */
@@ -188,43 +199,42 @@ public class DeferredResult<T> {
 	}
 
 	/**
-	 * Register code to invoke when the async request completes.
-	 * <p>This method is called from a container thread when an async request
-	 * completed for any reason including timeout and network error. This is useful
-	 * for detecting that a {@code DeferredResult} instance is no longer usable.
+	 * 注册在异步请求完成时要调用的代码。
+	 * <p>当异步请求由于任何原因完成，包括超时和网络错误时，从容器线程调用此方法。
+	 * 这对于检测到{@code DeferredResult}实例不再可用是有用的。
 	 */
 	public void onCompletion(Runnable callback) {
 		this.completionCallback = callback;
 	}
 
 	/**
-	 * Provide a handler to use to handle the result value.
+	 * 提供一个处理结果值的处理器。
 	 *
-	 * @param resultHandler the handler
+	 * @param resultHandler 处理器
 	 * @see DeferredResultProcessingInterceptor
 	 */
 	public final void setResultHandler(DeferredResultHandler resultHandler) {
 		Assert.notNull(resultHandler, "DeferredResultHandler is required");
-		// Immediate expiration check outside of the result lock
+		// 在结果锁之外进行立即过期检查
 		if (this.expired) {
 			return;
 		}
 		Object resultToHandle;
 		synchronized (this) {
-			// Got the lock in the meantime: double-check expiration status
+			// 在此期间获得了锁：再次检查过期状态
 			if (this.expired) {
+				// 如果延迟结果过期，直接返回。
 				return;
 			}
 			resultToHandle = this.result;
 			if (resultToHandle == RESULT_NONE) {
-				// No result yet: store handler for processing once it comes in
+				// 还没有结果：存储处理器，以便在结果可用时处理
 				this.resultHandler = resultHandler;
 				return;
 			}
 		}
-		// If we get here, we need to process an existing result object immediately.
-		// The decision is made within the result lock; just the handle call outside
-		// of it, avoiding any deadlock potential with Servlet container locks.
+		// 如果到达此处，我们需要立即处理现有的结果对象。
+		// 决定在结果锁内；只在锁之外进行处理调用，避免与 Servlet 容器锁的任何死锁潜在风险。
 		try {
 			resultHandler.handleResult(resultToHandle);
 		} catch (Throwable ex) {
@@ -233,11 +243,10 @@ public class DeferredResult<T> {
 	}
 
 	/**
-	 * Set the value for the DeferredResult and handle it.
+	 * 设置 DeferredResult 的值并处理它。
 	 *
-	 * @param result the value to set
-	 * @return {@code true} if the result was set and passed on for handling;
-	 * {@code false} if the result was already set or the async request expired
+	 * @param result 要设置的值
+	 * @return 如果结果已设置并传递给处理；如果结果已经设置或异步请求已过期，则为false
 	 * @see #isSetOrExpired()
 	 */
 	public boolean setResult(T result) {
@@ -245,44 +254,40 @@ public class DeferredResult<T> {
 	}
 
 	private boolean setResultInternal(Object result) {
-		// Immediate expiration check outside of the result lock
+		// 在结果锁之外进行立即过期检查
 		if (isSetOrExpired()) {
+			// 如果设置了结果或者是过期了，返回false。
 			return false;
 		}
 		DeferredResultHandler resultHandlerToUse;
 		synchronized (this) {
-			// Got the lock in the meantime: double-check expiration status
+			// 在此期间获得了锁：再次检查过期状态
 			if (isSetOrExpired()) {
+				// 如果设置了结果或者是过期了，返回false。
 				return false;
 			}
-			// At this point, we got a new result to process
+			// 在此时，我们获得了一个要处理的新结果
 			this.result = result;
 			resultHandlerToUse = this.resultHandler;
 			if (resultHandlerToUse == null) {
-				// No result handler set yet -> let the setResultHandler implementation
-				// pick up the result object and invoke the result handler for it.
+				// 尚未设置结果处理器 -> 让 setResultHandler 实现选择结果对象并调用其结果处理器。
 				return true;
 			}
-			// Result handler available -> let's clear the stored reference since
-			// we don't need it anymore.
+			// 结果处理器可用 -> 让我们清除存储的引用，因为我们不再需要它。
 			this.resultHandler = null;
 		}
-		// If we get here, we need to process an existing result object immediately.
-		// The decision is made within the result lock; just the handle call outside
-		// of it, avoiding any deadlock potential with Servlet container locks.
+		// 如果到达此处，我们需要立即处理现有的结果对象。
+		// 决定在结果锁内；只在锁之外进行处理调用，避免与 Servlet 容器锁的任何死锁潜在风险。
 		resultHandlerToUse.handleResult(result);
 		return true;
 	}
 
 	/**
-	 * Set an error value for the {@link DeferredResult} and handle it.
-	 * The value may be an {@link Exception} or {@link Throwable} in which case
-	 * it will be processed as if a handler raised the exception.
+	 * 设置 延迟结果 的错误值并处理它。
+	 * 值可能是 {@link Exception} 或 {@link Throwable}，在这种情况下，它将被处理为处理程序引发的异常。
 	 *
-	 * @param result the error result value
-	 * @return {@code true} if the result was set to the error value and passed on
-	 * for handling; {@code false} if the result was already set or the async
-	 * request expired
+	 * @param result 错误结果值
+	 * @return 如果结果已设置为错误值并传递给处理；如果结果已经设置或异步请求已过期，则为 false
 	 * @see #isSetOrExpired()
 	 */
 	public boolean setErrorResult(Object result) {
@@ -354,10 +359,11 @@ public class DeferredResult<T> {
 
 
 	/**
-	 * Handles a DeferredResult value when set.
+	 * 当设置 延迟结果 值时处理的函数接口。
 	 */
 	@FunctionalInterface
 	public interface DeferredResultHandler {
+
 
 		void handleResult(Object result);
 	}
