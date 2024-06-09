@@ -16,28 +16,19 @@
 
 package org.springframework.web.context.request.async;
 
-import java.util.concurrent.Callable;
-
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import java.util.concurrent.Callable;
+
 /**
- * Intercepts concurrent request handling, where the concurrent result is
- * obtained by executing a {@link Callable} on behalf of the application with
- * an {@link AsyncTaskExecutor}.
+ * 拦截并发请求处理，其中并发结果是通过在应用程序代表下执行 {@link Callable} 的方式与 {@link AsyncTaskExecutor} 获得的。
  *
- * <p>A {@code CallableProcessingInterceptor} is invoked before and after the
- * invocation of the {@code Callable} task in the asynchronous thread, as well
- * as on timeout/error from a container thread, or after completing for any reason
- * including a timeout or network error.
+ * <p>{@code CallableProcessingInterceptor} 在异步线程中执行 {@code Callable} 任务之前和之后，以及在容器线程中超时/错误时或因任何原因完成处理之前都会被调用。
  *
- * <p>As a general rule exceptions raised by interceptor methods will cause
- * async processing to resume by dispatching back to the container and using
- * the Exception instance as the concurrent result. Such exceptions will then
- * be processed through the {@code HandlerExceptionResolver} mechanism.
+ * <p>通常情况下，拦截器方法抛出的异常将导致异步处理恢复，通过返回到容器并使用异常实例作为并发结果。然后，这些异常将通过 {@code HandlerExceptionResolver} 机制进行处理。
  *
- * <p>The {@link #handleTimeout(NativeWebRequest, Callable) handleTimeout} method
- * can select a value to be used to resume processing.
+ * <p>{@link #handleTimeout(NativeWebRequest, Callable) handleTimeout} 方法可以选择一个值来恢复处理。
  *
  * @author Rossen Stoyanchev
  * @author Rob Winch
@@ -46,16 +37,16 @@ import org.springframework.web.context.request.NativeWebRequest;
 public interface CallableProcessingInterceptor {
 
 	/**
-	 * Constant indicating that no result has been determined by this
-	 * interceptor, giving subsequent interceptors a chance.
+	 * 指示此拦截器未确定结果的常量，给后续拦截器一个机会。
+	 *
 	 * @see #handleTimeout
 	 * @see #handleError
 	 */
 	Object RESULT_NONE = new Object();
 
 	/**
-	 * Constant indicating that the response has been handled by this interceptor
-	 * without a result and that no further interceptors are to be invoked.
+	 * 指示此拦截器处理了响应但没有结果，并且不会调用其他拦截器的常量。
+	 *
 	 * @see #handleTimeout
 	 * @see #handleError
 	 */
@@ -63,80 +54,63 @@ public interface CallableProcessingInterceptor {
 
 
 	/**
-	 * Invoked <em>before</em> the start of concurrent handling in the original
-	 * thread in which the {@code Callable} is submitted for concurrent handling.
-	 * <p>This is useful for capturing the state of the current thread just prior to
-	 * invoking the {@link Callable}. Once the state is captured, it can then be
-	 * transferred to the new {@link Thread} in
-	 * {@link #preProcess(NativeWebRequest, Callable)}. Capturing the state of
-	 * Spring Security's SecurityContextHolder and migrating it to the new Thread
-	 * is a concrete example of where this is useful.
-	 * <p>The default implementation is empty.
-	 * @param request the current request
-	 * @param task the task for the current async request
-	 * @throws Exception in case of errors
+	 * 在原始线程中提交 {@code Callable} 进行并发处理之前调用。
+	 * <p>这对于在调用 {@link Callable} 之前捕获当前线程的状态很有用。一旦捕获状态，它就可以传递到新的 {@link Thread} 中，在 {@link #preProcess(NativeWebRequest, Callable)} 中使用。捕获 Spring Security 的 SecurityContextHolder 的状态并将其迁移到新的线程是一个具体的例子。
+	 * <p>默认实现为空。
+	 *
+	 * @param request 当前请求
+	 * @param task    当前异步请求的任务
+	 * @throws Exception 发生错误时
 	 */
 	default <T> void beforeConcurrentHandling(NativeWebRequest request, Callable<T> task) throws Exception {
 	}
 
 	/**
-	 * Invoked <em>after</em> the start of concurrent handling in the async
-	 * thread in which the {@code Callable} is executed and <em>before</em> the
-	 * actual invocation of the {@code Callable}.
-	 * <p>The default implementation is empty.
-	 * @param request the current request
-	 * @param task the task for the current async request
-	 * @throws Exception in case of errors
+	 * 在异步线程中执行 {@code Callable} 并在实际调用 {@code Callable} 之前调用。
+	 * <p>默认实现为空。
+	 *
+	 * @param request 当前请求
+	 * @param task    当前异步请求的任务
+	 * @throws Exception 发生错误时
 	 */
 	default <T> void preProcess(NativeWebRequest request, Callable<T> task) throws Exception {
 	}
 
 	/**
-	 * Invoked <em>after</em> the {@code Callable} has produced a result in the
-	 * async thread in which the {@code Callable} is executed. This method may
-	 * be invoked later than {@code afterTimeout} or {@code afterCompletion}
-	 * depending on when the {@code Callable} finishes processing.
-	 * <p>The default implementation is empty.
-	 * @param request the current request
-	 * @param task the task for the current async request
-	 * @param concurrentResult the result of concurrent processing, which could
-	 * be a {@link Throwable} if the {@code Callable} raised an exception
-	 * @throws Exception in case of errors
+	 * 在 {@code Callable} 在异步线程中产生结果后调用。此方法可能比 {@code afterTimeout} 或 {@code afterCompletion} 晚调用，具体取决于 {@code Callable} 何时完成处理。
+	 * <p>默认实现为空。
+	 *
+	 * @param request          当前请求
+	 * @param task             当前异步请求的任务
+	 * @param concurrentResult 并发处理的结果，如果 {@code Callable} 引发了异常，则可能是 {@link Throwable}
+	 * @throws Exception 发生错误时
 	 */
 	default <T> void postProcess(NativeWebRequest request, Callable<T> task,
-			Object concurrentResult) throws Exception {
+								 Object concurrentResult) throws Exception {
 	}
 
 	/**
-	 * Invoked from a container thread when the async request times out before
-	 * the {@code Callable} task completes. Implementations may return a value,
-	 * including an {@link Exception}, to use instead of the value the
-	 * {@link Callable} did not return in time.
-	 * <p>The default implementation always returns {@link #RESULT_NONE}.
-	 * @param request the current request
-	 * @param task the task for the current async request
-	 * @return a concurrent result value; if the value is anything other than
-	 * {@link #RESULT_NONE} or {@link #RESPONSE_HANDLED}, concurrent processing
-	 * is resumed and subsequent interceptors are not invoked
-	 * @throws Exception in case of errors
+	 * 在异步请求处理完成之前 {@code Callable} 任务超时时，从容器线程调用。实现可以返回一个值，包括 {@link Exception}，以用于替代 {@link Callable} 未及时返回的值。
+	 * <p>默认实现始终返回 {@link #RESULT_NONE}。
+	 *
+	 * @param request 当前请求
+	 * @param task    当前异步请求的任务
+	 * @return 并发结果值；如果值不是 {@link #RESULT_NONE} 或 {@link #RESPONSE_HANDLED}，则会恢复并发处理，不会调用后续拦截器
+	 * @throws Exception 发生错误时
 	 */
 	default <T> Object handleTimeout(NativeWebRequest request, Callable<T> task) throws Exception {
 		return RESULT_NONE;
 	}
 
 	/**
-	 * Invoked from a container thread when an error occurred while processing
-	 * the async request before the {@code Callable} task completes.
-	 * Implementations may return a value, including an {@link Exception}, to
-	 * use instead of the value the {@link Callable} did not return in time.
-	 * <p>The default implementation always returns {@link #RESULT_NONE}.
-	 * @param request the current request
-	 * @param task the task for the current async request
-	 * @param t the error that occurred while request processing
-	 * @return a concurrent result value; if the value is anything other than
-	 * {@link #RESULT_NONE} or {@link #RESPONSE_HANDLED}, concurrent processing
-	 * is resumed and subsequent interceptors are not invoked
-	 * @throws Exception in case of errors
+	 * 在异步请求处理期间出现错误时从容器线程调用 {@code Callable} 任务。实现可以返回一个值，包括 {@link Exception}，以用于替代 {@link Callable} 未及时返回的值。
+	 * <p>默认实现始终返回 {@link #RESULT_NONE}。
+	 *
+	 * @param request 当前请求
+	 * @param task    当前异步请求的任务
+	 * @param t       在处理请求时发生的错误
+	 * @return 并发结果值；如果值不是 {@link #RESULT_NONE} 或 {@link #RESPONSE_HANDLED}，则会恢复并发处理，不会调用后续拦截器
+	 * @throws Exception 发生错误时
 	 * @since 5.0
 	 */
 	default <T> Object handleError(NativeWebRequest request, Callable<T> task, Throwable t) throws Exception {
@@ -144,12 +118,12 @@ public interface CallableProcessingInterceptor {
 	}
 
 	/**
-	 * Invoked from a container thread when async processing completes for any
-	 * reason including timeout or network error.
-	 * <p>The default implementation is empty.
-	 * @param request the current request
-	 * @param task the task for the current async request
-	 * @throws Exception in case of errors
+	 * 在异步处理完成时从容器线程调用，包括超时或网络错误。
+	 * <p>默认实现为空。
+	 *
+	 * @param request 当前请求
+	 * @param task    当前异步请求的任务
+	 * @throws Exception 发生错误时
 	 */
 	default <T> void afterCompletion(NativeWebRequest request, Callable<T> task) throws Exception {
 	}

@@ -16,18 +16,17 @@
 
 package org.springframework.web.context.request.async;
 
-import java.util.concurrent.Callable;
-
 import org.springframework.web.context.request.NativeWebRequest;
 
+import java.util.concurrent.Callable;
+
 /**
- * Abstract adapter class for the {@link CallableProcessingInterceptor} interface,
- * for simplified implementation of individual methods.
+ * {@link CallableProcessingInterceptor} 接口的抽象适配器类，用于简化各个方法的实现。
  *
  * @author Rossen Stoyanchev
  * @author Rob Winch
  * @since 3.2
- * @deprecated as of 5.0 where CallableProcessingInterceptor has default methods
+ * @deprecated 自 5.0 起，{@link CallableProcessingInterceptor} 有默认方法
  */
 @Deprecated
 public abstract class CallableProcessingInterceptorAdapter implements CallableProcessingInterceptor {

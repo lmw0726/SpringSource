@@ -74,8 +74,7 @@ final class TestDispatcherServlet extends DispatcherServlet {
 			MockAsyncContext asyncContext;
 			if (request.getAsyncContext() instanceof MockAsyncContext) {
 				asyncContext = (MockAsyncContext) request.getAsyncContext();
-			}
-			else {
+			} else {
 				MockHttpServletRequest mockRequest = WebUtils.getNativeRequest(request, MockHttpServletRequest.class);
 				Assert.notNull(mockRequest, "Expected MockHttpServletRequest");
 				asyncContext = (MockAsyncContext) mockRequest.getAsyncContext();
@@ -98,7 +97,7 @@ final class TestDispatcherServlet extends DispatcherServlet {
 				new CallableProcessingInterceptor() {
 					@Override
 					public <T> void postProcess(NativeWebRequest r, Callable<T> task, Object value) {
-						// We got the result, must also wait for the dispatch
+						// 设置异步结果
 						getMvcResult(request).setAsyncResult(value);
 					}
 				});
@@ -139,7 +138,7 @@ final class TestDispatcherServlet extends DispatcherServlet {
 
 	@Override
 	protected ModelAndView processHandlerException(HttpServletRequest request, HttpServletResponse response,
-			@Nullable Object handler, Exception ex) throws Exception {
+												   @Nullable Object handler, Exception ex) throws Exception {
 
 		ModelAndView mav = super.processHandlerException(request, response, handler, ex);
 

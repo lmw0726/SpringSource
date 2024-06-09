@@ -16,23 +16,19 @@
 
 package org.springframework.web.context.request.async;
 
-import java.util.concurrent.Callable;
-
 import org.springframework.web.context.request.NativeWebRequest;
 
+import java.util.concurrent.Callable;
+
 /**
- * Sends a 503 (SERVICE_UNAVAILABLE) in case of a timeout if the response is not
- * already committed. As of 4.2.8 this is done indirectly by setting the result
- * to an {@link AsyncRequestTimeoutException} which is then handled by
- * Spring MVC's default exception handling as a 503 error.
+ * 如果响应尚未提交，则在超时情况下发送503（SERVICE_UNAVAILABLE）。从4.2.8开始，
+ * 通过将结果设置为 {@link AsyncRequestTimeoutException} 间接实现此目的，
+ * 然后由 Spring MVC 的默认异常处理器将其处理为 503 错误。
  *
- * <p>Registered at the end, after all other interceptors and
- * therefore invoked only if no other interceptor handles the timeout.
+ * <p>在所有其他拦截器之后注册，因此仅在没有其他拦截器处理超时时才调用。
  *
- * <p>Note that according to RFC 7231, a 503 without a 'Retry-After' header is
- * interpreted as a 500 error and the client should not retry. Applications
- * can install their own interceptor to handle a timeout and add a 'Retry-After'
- * header if necessary.
+ * <p>请注意，根据 RFC 7231，没有“Retry-After”标头的503将被解释为500错误，
+ * 并且客户端不应重试。应用程序可以安装自己的拦截器来处理超时，并在必要时添加“Retry-After”标头。
  *
  * @author Rossen Stoyanchev
  * @since 3.2
