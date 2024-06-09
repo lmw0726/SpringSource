@@ -16,17 +16,16 @@
 
 package org.springframework.web.client;
 
+import org.springframework.http.client.ClientHttpRequest;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 
-import org.springframework.http.client.ClientHttpRequest;
-
 /**
- * Callback interface for code that operates on a {@link ClientHttpRequest}.
- * Allows manipulating the request headers, and write to the request body.
+ * 用于操作{@link ClientHttpRequest}的代码的回调接口。
+ * 允许操作请求头，并向请求体中写入内容。
  *
- * <p>Used internally by the {@link RestTemplate}, but also useful for
- * application code. There several available factory methods:
+ * <p>由{@link RestTemplate}在内部使用，但对应用程序代码也很有用。有几个可用的工厂方法：
  * <ul>
  * <li>{@link RestTemplate#acceptHeaderRequestCallback(Class)}
  * <li>{@link RestTemplate#httpEntityCallback(Object)}
@@ -34,18 +33,18 @@ import org.springframework.http.client.ClientHttpRequest;
  * </ul>
  *
  * @author Arjen Poutsma
- * @since 3.0
  * @see RestTemplate#execute
+ * @since 3.0
  */
 @FunctionalInterface
 public interface RequestCallback {
 
 	/**
-	 * Gets called by {@link RestTemplate#execute} with an opened {@code ClientHttpRequest}.
-	 * Does not need to care about closing the request or about handling errors:
-	 * this will all be handled by the {@code RestTemplate}.
-	 * @param request the active HTTP request
-	 * @throws IOException in case of I/O errors
+	 * 在打开的{@code ClientHttpRequest}上由{@link RestTemplate#execute}调用。
+	 * 不需要关心关闭请求或处理错误：这将由{@code RestTemplate}处理。
+	 *
+	 * @param request 当前的HTTP请求
+	 * @throws IOException 如果发生I/O错误
 	 */
 	void doWithRequest(ClientHttpRequest request) throws IOException;
 

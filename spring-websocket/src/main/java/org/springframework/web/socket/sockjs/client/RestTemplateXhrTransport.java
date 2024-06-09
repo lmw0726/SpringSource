@@ -16,35 +16,26 @@
 
 package org.springframework.web.socket.sockjs.client;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.StreamingHttpOutputMessage;
+import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.concurrent.SettableListenableFuture;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.UnknownHttpStatusCodeException;
+import org.springframework.web.client.*;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.sockjs.frame.SockJsFrame;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
 /**
  * An {@code XhrTransport} implementation that uses a
@@ -98,8 +89,8 @@ public class RestTemplateXhrTransport extends AbstractXhrTransport {
 
 	@Override
 	protected void connectInternal(final TransportRequest transportRequest, final WebSocketHandler handler,
-			final URI receiveUrl, final HttpHeaders handshakeHeaders, final XhrClientSockJsSession session,
-			final SettableListenableFuture<WebSocketSession> connectFuture) {
+								   final URI receiveUrl, final HttpHeaders handshakeHeaders, final XhrClientSockJsSession session,
+								   final SettableListenableFuture<WebSocketSession> connectFuture) {
 
 		getTaskExecutor().execute(() -> {
 			HttpHeaders httpHeaders = transportRequest.getHttpRequestHeaders();
@@ -117,12 +108,10 @@ public class RestTemplateXhrTransport extends AbstractXhrTransport {
 					}
 					getRestTemplate().execute(receiveUrl, HttpMethod.POST, requestCallback, responseExtractor);
 					requestCallback = requestCallbackAfterHandshake;
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					if (!connectFuture.isDone()) {
 						connectFuture.setException(ex);
-					}
-					else {
+					} else {
 						session.handleTransportError(ex);
 						session.afterTransportClosed(new CloseStatus(1006, ex.getMessage()));
 					}
@@ -161,12 +150,17 @@ public class RestTemplateXhrTransport extends AbstractXhrTransport {
 
 
 	/**
-	 * A RequestCallback to add the headers and (optionally) String content.
+	 * 用于添加标头和（可选的）字符串内容的 RequestCallback。
 	 */
 	private static class XhrRequestCallback implements RequestCallback {
-
+		/**
+		 * Http头部
+		 */
 		private final HttpHeaders headers;
 
+		/**
+		 * 请求体
+		 */
 		@Nullable
 		private final String body;
 
@@ -181,13 +175,16 @@ public class RestTemplateXhrTransport extends AbstractXhrTransport {
 
 		@Override
 		public void doWithRequest(ClientHttpRequest request) throws IOException {
+			// 将自定义的请求头添加到请求中
 			request.getHeaders().putAll(this.headers);
 			if (this.body != null) {
+				// 如果请求体不为空
 				if (request instanceof StreamingHttpOutputMessage) {
+					// 如果请求对象是 流式处理Http输出消息 的实例，使用流式输出设置请求体
 					((StreamingHttpOutputMessage) request).setBody(outputStream ->
 							StreamUtils.copy(this.body, SockJsFrame.CHARSET, outputStream));
-				}
-				else {
+				} else {
+					// 否则，直接将请求体内容拷贝到请求对象的输出流中
 					StreamUtils.copy(this.body, SockJsFrame.CHARSET, request.getBody());
 				}
 			}
@@ -244,8 +241,7 @@ public class RestTemplateXhrTransport extends AbstractXhrTransport {
 				}
 				if (b == '\n') {
 					handleFrame(os);
-				}
-				else {
+				} else {
 					os.write(b);
 				}
 			}
