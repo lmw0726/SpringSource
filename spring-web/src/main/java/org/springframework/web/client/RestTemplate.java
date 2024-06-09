@@ -44,6 +44,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 import org.springframework.web.util.UriTemplateHandler;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.*;
@@ -1037,27 +1038,37 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 
 
 	/**
-	 * Response extractor for {@link HttpEntity}.
+	 * {@link HttpEntity} 的响应提取器。
 	 */
 	private class ResponseEntityResponseExtractor<T> implements ResponseExtractor<ResponseEntity<T>> {
 
+		/**
+		 * Http消息转换器提取器
+		 */
 		@Nullable
 		private final HttpMessageConverterExtractor<T> delegate;
 
 		public ResponseEntityResponseExtractor(@Nullable Type responseType) {
+			// 如果响应类型不为空，且不是 Void 类
 			if (responseType != null && Void.class != responseType) {
+				// 创建一个 Http消息转换器提取器 对象作为委托对象
 				this.delegate = new HttpMessageConverterExtractor<>(responseType, getMessageConverters(), logger);
 			} else {
+				// 否则，将委托设置为 null
 				this.delegate = null;
 			}
 		}
 
 		@Override
 		public ResponseEntity<T> extractData(ClientHttpResponse response) throws IOException {
+			// 如果委托不为空
 			if (this.delegate != null) {
+				// 从响应中提取数据
 				T body = this.delegate.extractData(response);
+				// 创建一个带有状态码、头信息和响应体的 响应实体 对象
 				return ResponseEntity.status(response.getRawStatusCode()).headers(response.getHeaders()).body(body);
 			} else {
+				// 否则，创建一个只带有状态码和头信息的 响应实体 对象
 				return ResponseEntity.status(response.getRawStatusCode()).headers(response.getHeaders()).build();
 			}
 		}
@@ -1065,7 +1076,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 
 
 	/**
-	 * Response extractor that extracts the response {@link HttpHeaders}.
+	 * 提取响应 {@link HttpHeaders} 的响应提取器。
 	 */
 	private static class HeadersExtractor implements ResponseExtractor<HttpHeaders> {
 

@@ -16,13 +16,8 @@
 
 package org.springframework.web.client;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -33,39 +28,51 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
+
 /**
- * Response extractor that uses the given {@linkplain HttpMessageConverter entity converters}
- * to convert the response into a type {@code T}.
+ * 使用给定的{@linkplain HttpMessageConverter 实体转换器}将响应转换为类型{@code T}的响应提取器。
  *
+ * @param <T> 数据类型
  * @author Arjen Poutsma
  * @author Sam Brannen
- * @since 3.0
- * @param <T> the data type
  * @see RestTemplate
+ * @since 3.0
  */
 public class HttpMessageConverterExtractor<T> implements ResponseExtractor<T> {
-
+	/**
+	 * 响应类型
+	 */
 	private final Type responseType;
 
+	/**
+	 * 响应类
+	 */
 	@Nullable
 	private final Class<T> responseClass;
 
+	/**
+	 * 消息转换器列表
+	 */
 	private final List<HttpMessageConverter<?>> messageConverters;
 
+	/**
+	 * 日志记录器
+	 */
 	private final Log logger;
 
 
 	/**
-	 * Create a new instance of the {@code HttpMessageConverterExtractor} with the given response
-	 * type and message converters. The given converters must support the response type.
+	 * 使用给定的响应类型和消息转换器创建{@code HttpMessageConverterExtractor}的新实例。给定的转换器必须支持响应类型。
 	 */
 	public HttpMessageConverterExtractor(Class<T> responseType, List<HttpMessageConverter<?>> messageConverters) {
 		this((Type) responseType, messageConverters);
 	}
 
 	/**
-	 * Creates a new instance of the {@code HttpMessageConverterExtractor} with the given response
-	 * type and message converters. The given converters must support the response type.
+	 * 使用给定的响应类型和消息转换器创建{@code HttpMessageConverterExtractor}的新实例。给定的转换器必须支持响应类型。
 	 */
 	public HttpMessageConverterExtractor(Type responseType, List<HttpMessageConverter<?>> messageConverters) {
 		this(responseType, messageConverters, LogFactory.getLog(HttpMessageConverterExtractor.class));
@@ -86,58 +93,70 @@ public class HttpMessageConverterExtractor<T> implements ResponseExtractor<T> {
 	@Override
 	@SuppressWarnings({"unchecked", "rawtypes", "resource"})
 	public T extractData(ClientHttpResponse response) throws IOException {
+		// 包装响应
 		MessageBodyClientHttpResponseWrapper responseWrapper = new MessageBodyClientHttpResponseWrapper(response);
+		// 如果响应没有消息体或消息体为空，则返回空
 		if (!responseWrapper.hasMessageBody() || responseWrapper.hasEmptyMessageBody()) {
 			return null;
 		}
+		// 获取响应内容类型
 		MediaType contentType = getContentType(responseWrapper);
 
 		try {
+			// 遍历消息转换器
 			for (HttpMessageConverter<?> messageConverter : this.messageConverters) {
 				if (messageConverter instanceof GenericHttpMessageConverter) {
-					GenericHttpMessageConverter<?> genericMessageConverter =
-							(GenericHttpMessageConverter<?>) messageConverter;
+					// 如果消息转换器是 通用Http消息转换器 类型
+					GenericHttpMessageConverter<?> genericMessageConverter = (GenericHttpMessageConverter<?>) messageConverter;
+					// 如果消息转换器能够读取指定类型的响应
 					if (genericMessageConverter.canRead(this.responseType, null, contentType)) {
 						if (logger.isDebugEnabled()) {
 							ResolvableType resolvableType = ResolvableType.forType(this.responseType);
 							logger.debug("Reading to [" + resolvableType + "]");
 						}
+						// 读取响应并返回
 						return (T) genericMessageConverter.read(this.responseType, null, responseWrapper);
 					}
 				}
 				if (this.responseClass != null) {
+					// 如果消息转换器能够读取指定类的响应
 					if (messageConverter.canRead(this.responseClass, contentType)) {
 						if (logger.isDebugEnabled()) {
 							String className = this.responseClass.getName();
 							logger.debug("Reading to [" + className + "] as \"" + contentType + "\"");
 						}
+						// 读取响应并返回
 						return (T) messageConverter.read((Class) this.responseClass, responseWrapper);
 					}
 				}
 			}
-		}
-		catch (IOException | HttpMessageNotReadableException ex) {
+		} catch (IOException | HttpMessageNotReadableException ex) {
+			// 处理异常
 			throw new RestClientException("Error while extracting response for type [" +
 					this.responseType + "] and content type [" + contentType + "]", ex);
 		}
 
+		// 如果没有找到适合的消息转换器，则抛出未知内容类型异常
 		throw new UnknownContentTypeException(this.responseType, contentType,
 				responseWrapper.getRawStatusCode(), responseWrapper.getStatusText(),
 				responseWrapper.getHeaders(), getResponseBody(responseWrapper));
 	}
 
 	/**
-	 * Determine the Content-Type of the response based on the "Content-Type"
-	 * header or otherwise default to {@link MediaType#APPLICATION_OCTET_STREAM}.
-	 * @param response the response
-	 * @return the MediaType, or "application/octet-stream"
+	 * 根据“Content-Type”头确定响应的内容类型，否则默认为{@link MediaType#APPLICATION_OCTET_STREAM}。
+	 *
+	 * @param response 响应
+	 * @return 媒体类型，或者“application/octet-stream”
 	 */
 	protected MediaType getContentType(ClientHttpResponse response) {
+		// 获取响应的内容类型
 		MediaType contentType = response.getHeaders().getContentType();
 		if (contentType == null) {
+			// 如果没有指定内容类型
 			if (logger.isTraceEnabled()) {
 				logger.trace("No content-type, using 'application/octet-stream'");
 			}
+			// 使用默认的 'application/octet-stream'
 			contentType = MediaType.APPLICATION_OCTET_STREAM;
 		}
 		return contentType;
@@ -145,11 +164,13 @@ public class HttpMessageConverterExtractor<T> implements ResponseExtractor<T> {
 
 	private static byte[] getResponseBody(ClientHttpResponse response) {
 		try {
+			// 从响应体中读取数据并拷贝到字节数组中返回
 			return FileCopyUtils.copyToByteArray(response.getBody());
+		} catch (IOException ex) {
+			// 发生 I/O 异常时，忽略异常
 		}
-		catch (IOException ex) {
-			// ignore
-		}
+
+		// 如果发生异常或者无法读取数据，则返回空字节数组
 		return new byte[0];
 	}
 }

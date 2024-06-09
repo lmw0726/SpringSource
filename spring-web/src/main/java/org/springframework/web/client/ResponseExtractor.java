@@ -16,35 +16,33 @@
 
 package org.springframework.web.client;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+
 /**
- * Generic callback interface used by {@link RestTemplate}'s retrieval methods.
- * Implementations of this interface perform the actual work of extracting data
- * from a {@link ClientHttpResponse}, but don't need to worry about exception
- * handling or closing resources.
+ * {@link RestTemplate}的检索方法使用的通用回调接口。
+ * 此接口的实现执行从{@link ClientHttpResponse}中提取数据的实际工作，但无需担心异常处理或关闭资源。
  *
- * <p>Used internally by the {@link RestTemplate}, but also useful for
- * application code. There is one available factory method, see
- * {@link RestTemplate#responseEntityExtractor(Type)}.
+ * <p>由{@link RestTemplate}内部使用，但也对应用程序代码很有用。有一个可用的工厂方法，请参见
+ * {@link RestTemplate#responseEntityExtractor(Type)}。
  *
+ * @param <T> 数据类型
  * @author Arjen Poutsma
- * @since 3.0
- * @param <T> the data type
  * @see RestTemplate#execute
+ * @since 3.0
  */
 @FunctionalInterface
 public interface ResponseExtractor<T> {
 
 	/**
-	 * Extract data from the given {@code ClientHttpResponse} and return it.
-	 * @param response the HTTP response
-	 * @return the extracted data
-	 * @throws IOException in case of I/O errors
+	 * 从给定的{@code ClientHttpResponse}中提取数据并返回它。
+	 *
+	 * @param response HTTP响应
+	 * @return 提取的数据
+	 * @throws IOException 在I/O错误的情况下
 	 */
 	@Nullable
 	T extractData(ClientHttpResponse response) throws IOException;

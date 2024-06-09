@@ -140,12 +140,17 @@ public class RestTemplateXhrTransport extends AbstractXhrTransport {
 
 
 	/**
-	 * A simple ResponseExtractor that reads the body into a String.
+	 * 一个简单的 响应提取器，用于将响应体读取为String。
 	 */
 	private static final ResponseExtractor<ResponseEntity<String>> textResponseExtractor =
 			response -> {
+				// 将响应体转换为字符串
 				String body = StreamUtils.copyToString(response.getBody(), SockJsFrame.CHARSET);
-				return ResponseEntity.status(response.getRawStatusCode()).headers(response.getHeaders()).body(body);
+
+				// 创建一个带有状态码、头信息和字符串响应体的 ResponseEntity 对象
+				return ResponseEntity.status(response.getRawStatusCode())
+						.headers(response.getHeaders())
+						.body(body);
 			};
 
 
@@ -192,11 +197,12 @@ public class RestTemplateXhrTransport extends AbstractXhrTransport {
 	}
 
 	/**
-	 * Splits the body of an HTTP response into SockJS frames and delegates those
-	 * to an {@link XhrClientSockJsSession}.
+	 * 将HTTP响应的主体拆分为SockJS帧，并将其委托给{@link XhrClientSockJsSession}。
 	 */
 	private class XhrReceiveExtractor implements ResponseExtractor<Object> {
-
+		/**
+		 * SockJS会话
+		 */
 		private final XhrClientSockJsSession sockJsSession;
 
 		public XhrReceiveExtractor(XhrClientSockJsSession sockJsSession) {
@@ -205,56 +211,83 @@ public class RestTemplateXhrTransport extends AbstractXhrTransport {
 
 		@Override
 		public Object extractData(ClientHttpResponse response) throws IOException {
+			// 解析原始状态码为 HttpStatus
 			HttpStatus httpStatus = HttpStatus.resolve(response.getRawStatusCode());
+
 			if (httpStatus == null) {
+				// 如果无法解析状态码，则抛出未知的 HTTP 状态码异常
 				throw new UnknownHttpStatusCodeException(
 						response.getRawStatusCode(), response.getStatusText(), response.getHeaders(), null, null);
 			}
+
 			if (httpStatus != HttpStatus.OK) {
+				// 如果状态码不是 OK，则抛出 HTTP 服务器错误异常
 				throw new HttpServerErrorException(
 						httpStatus, response.getStatusText(), response.getHeaders(), null, null);
 			}
 
 			if (logger.isTraceEnabled()) {
+				// 如果日志级别为 TRACE，则记录收到的响应头
 				logger.trace("XHR receive headers: " + response.getHeaders());
 			}
+
+			// 获取响应体的输入流和一个用于缓存数据的输出流
 			InputStream is = response.getBody();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 
+			// 循环读取输入流中的数据，直到结束
 			while (true) {
+				// 如果 SockJS 会话已经断开连接
 				if (this.sockJsSession.isDisconnected()) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("SockJS sockJsSession closed, closing response.");
 					}
+					// 关闭响应并退出循环
 					response.close();
 					break;
 				}
+				// 读取一个字节
 				int b = is.read();
+				// 如果已到达流的末尾
 				if (b == -1) {
+					// 如果输出流中有数据，则处理帧数据
 					if (os.size() > 0) {
 						handleFrame(os);
 					}
+					// 如果日志级别为 TRACE，则记录接收完成
 					if (logger.isTraceEnabled()) {
 						logger.trace("XHR receive completed");
 					}
+					// 退出循环
 					break;
 				}
+				// 如果遇到换行符，则处理当前帧数据
 				if (b == '\n') {
 					handleFrame(os);
 				} else {
+					// 否则写入输出流
 					os.write(b);
 				}
 			}
+
+			// 返回 null，表示没有返回值
 			return null;
 		}
 
 		private void handleFrame(ByteArrayOutputStream os) throws IOException {
+			// 将输出流中的内容转换为字符串
 			String content = os.toString(SockJsFrame.CHARSET.name());
+
+			// 重置输出流
 			os.reset();
+
+			// 如果日志级别为 TRACE，则记录收到的内容
 			if (logger.isTraceEnabled()) {
 				logger.trace("XHR receive content: " + content);
 			}
+
 			if (!PRELUDE.equals(content)) {
+				// 如果收到的内容不是预设值，则处理收到的帧内容
 				this.sockJsSession.handleFrame(content);
 			}
 		}
