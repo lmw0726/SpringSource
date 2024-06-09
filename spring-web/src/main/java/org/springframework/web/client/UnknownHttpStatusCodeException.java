@@ -16,14 +16,14 @@
 
 package org.springframework.web.client;
 
-import java.nio.charset.Charset;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 
+import java.nio.charset.Charset;
+
 /**
- * Exception thrown when an unknown (or custom) HTTP status code is received.
+ * 在接收到未知（或自定义）HTTP状态代码时抛出的异常。
  *
  * @author Rossen Stoyanchev
  * @since 3.2
@@ -34,33 +34,33 @@ public class UnknownHttpStatusCodeException extends RestClientResponseException 
 
 
 	/**
-	 * Construct a new instance of {@code HttpStatusCodeException} based on an
-	 * {@link HttpStatus}, status text, and response body content.
-	 * @param rawStatusCode the raw status code value
-	 * @param statusText the status text
-	 * @param responseHeaders the response headers (may be {@code null})
-	 * @param responseBody the response body content (may be {@code null})
-	 * @param responseCharset the response body charset (may be {@code null})
+	 * 基于{@link HttpStatus}、状态文本和响应体内容构造{@code HttpStatusCodeException}的新实例。
+	 *
+	 * @param rawStatusCode   原始状态码值
+	 * @param statusText      状态文本
+	 * @param responseHeaders 响应头（可能为{@code null}）
+	 * @param responseBody    响应体内容（可能为{@code null}）
+	 * @param responseCharset 响应体字符集（可能为{@code null}）
 	 */
 	public UnknownHttpStatusCodeException(int rawStatusCode, String statusText, @Nullable HttpHeaders responseHeaders,
-			@Nullable byte[] responseBody, @Nullable Charset responseCharset) {
+										  @Nullable byte[] responseBody, @Nullable Charset responseCharset) {
 
 		this("Unknown status code [" + rawStatusCode + "]" + " " + statusText,
 				rawStatusCode, statusText, responseHeaders, responseBody, responseCharset);
 	}
 
 	/**
-	 * Construct a new instance of {@code HttpStatusCodeException} based on an
-	 * {@link HttpStatus}, status text, and response body content.
-	 * @param rawStatusCode the raw status code value
-	 * @param statusText the status text
-	 * @param responseHeaders the response headers (may be {@code null})
-	 * @param responseBody the response body content (may be {@code null})
-	 * @param responseCharset the response body charset (may be {@code null})
+	 * 基于{@link HttpStatus}、状态文本和响应体内容构造{@code HttpStatusCodeException}的新实例。
+	 *
+	 * @param rawStatusCode   原始状态码值
+	 * @param statusText      状态文本
+	 * @param responseHeaders 响应头（可能为{@code null}）
+	 * @param responseBody    响应体内容（可能为{@code null}）
+	 * @param responseCharset 响应体字符集（可能为{@code null}）
 	 * @since 5.2.2
 	 */
 	public UnknownHttpStatusCodeException(String message, int rawStatusCode, String statusText,
-			@Nullable HttpHeaders responseHeaders, @Nullable byte[] responseBody, @Nullable Charset responseCharset) {
+										  @Nullable HttpHeaders responseHeaders, @Nullable byte[] responseBody, @Nullable Charset responseCharset) {
 
 		super(message, rawStatusCode, statusText, responseHeaders, responseBody, responseCharset);
 	}

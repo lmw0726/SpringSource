@@ -16,18 +16,18 @@
 
 package org.springframework.web.client;
 
-import java.nio.charset.Charset;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 
+import java.nio.charset.Charset;
+
 /**
- * Exception thrown when an HTTP 4xx is received.
+ * 当收到 HTTP 4xx 时抛出的异常。
  *
  * @author Arjen Poutsma
- * @since 3.0
  * @see DefaultResponseErrorHandler
+ * @since 3.0
  */
 public class HttpClientErrorException extends HttpStatusCodeException {
 
@@ -35,21 +35,21 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 
 
 	/**
-	 * Constructor with a status code only.
+	 * 仅包含状态码的构造方法。
 	 */
 	public HttpClientErrorException(HttpStatus statusCode) {
 		super(statusCode);
 	}
 
 	/**
-	 * Constructor with a status code and status text.
+	 * 包含状态码和状态文本的构造方法。
 	 */
 	public HttpClientErrorException(HttpStatus statusCode, String statusText) {
 		super(statusCode, statusText);
 	}
 
 	/**
-	 * Constructor with a status code and status text, and content.
+	 * 包含状态码、状态文本和内容的构造方法。
 	 */
 	public HttpClientErrorException(
 			HttpStatus statusCode, String statusText, @Nullable byte[] body, @Nullable Charset responseCharset) {
@@ -58,28 +58,29 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 	}
 
 	/**
-	 * Constructor with a status code and status text, headers, and content.
+	 * 包含状态码、状态文本、头部和内容的构造方法。
 	 */
 	public HttpClientErrorException(HttpStatus statusCode, String statusText,
-			@Nullable HttpHeaders headers, @Nullable byte[] body, @Nullable Charset responseCharset) {
+									@Nullable HttpHeaders headers, @Nullable byte[] body, @Nullable Charset responseCharset) {
 
 		super(statusCode, statusText, headers, body, responseCharset);
 	}
 
 	/**
-	 * Constructor with a status code and status text, headers, and content,
-	 * and an prepared message.
+	 * 包含状态码、状态文本、头部、内容和准备消息的构造方法。
+	 *
 	 * @since 5.2.2
 	 */
 	public HttpClientErrorException(String message, HttpStatus statusCode, String statusText,
-			@Nullable HttpHeaders headers, @Nullable byte[] body, @Nullable Charset responseCharset) {
+									@Nullable HttpHeaders headers, @Nullable byte[] body, @Nullable Charset responseCharset) {
 
 		super(message, statusCode, statusText, headers, body, responseCharset);
 	}
 
 
 	/**
-	 * Create {@code HttpClientErrorException} or an HTTP status specific sub-class.
+	 * 创建 {@code HttpClientErrorException} 或具体 HTTP 状态的子类。
+	 *
 	 * @since 5.1
 	 */
 	public static HttpClientErrorException create(
@@ -89,59 +90,72 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 	}
 
 	/**
-	 * Variant of {@link #create(HttpStatus, String, HttpHeaders, byte[], Charset)}
-	 * with an optional prepared message.
+	 * 可选准备消息的 {@link #create(HttpStatus, String, HttpHeaders, byte[], Charset)} 的变体。
+	 *
 	 * @since 5.2.2
 	 */
 	public static HttpClientErrorException create(@Nullable String message, HttpStatus statusCode,
-			String statusText, HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+												  String statusText, HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
+		// 根据状态码创建相应的 HttpClientErrorException 实例
 		switch (statusCode) {
 			case BAD_REQUEST:
+				// 错误的请求
 				return message != null ?
 						new HttpClientErrorException.BadRequest(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.BadRequest(statusText, headers, body, charset);
 			case UNAUTHORIZED:
+				// 未授权
 				return message != null ?
 						new HttpClientErrorException.Unauthorized(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.Unauthorized(statusText, headers, body, charset);
 			case FORBIDDEN:
+				// 禁止访问
 				return message != null ?
 						new HttpClientErrorException.Forbidden(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.Forbidden(statusText, headers, body, charset);
 			case NOT_FOUND:
+				// 未找到资源
 				return message != null ?
 						new HttpClientErrorException.NotFound(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.NotFound(statusText, headers, body, charset);
 			case METHOD_NOT_ALLOWED:
+				// 方法不允许
 				return message != null ?
 						new HttpClientErrorException.MethodNotAllowed(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.MethodNotAllowed(statusText, headers, body, charset);
 			case NOT_ACCEPTABLE:
+				// 不可接受的内容
 				return message != null ?
 						new HttpClientErrorException.NotAcceptable(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.NotAcceptable(statusText, headers, body, charset);
 			case CONFLICT:
+				// 冲突
 				return message != null ?
 						new HttpClientErrorException.Conflict(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.Conflict(statusText, headers, body, charset);
 			case GONE:
+				// 资源不存在
 				return message != null ?
 						new HttpClientErrorException.Gone(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.Gone(statusText, headers, body, charset);
 			case UNSUPPORTED_MEDIA_TYPE:
+				// 不支持的媒体类型
 				return message != null ?
 						new HttpClientErrorException.UnsupportedMediaType(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.UnsupportedMediaType(statusText, headers, body, charset);
 			case TOO_MANY_REQUESTS:
+				// 请求过多
 				return message != null ?
 						new HttpClientErrorException.TooManyRequests(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.TooManyRequests(statusText, headers, body, charset);
 			case UNPROCESSABLE_ENTITY:
+				// 请求实体无法处理
 				return message != null ?
 						new HttpClientErrorException.UnprocessableEntity(message, statusText, headers, body, charset) :
 						new HttpClientErrorException.UnprocessableEntity(statusText, headers, body, charset);
 			default:
+				// 默认情况下，创建通用的 HttpClientErrorException 实例
 				return message != null ?
 						new HttpClientErrorException(message, statusCode, statusText, headers, body, charset) :
 						new HttpClientErrorException(statusCode, statusText, headers, body, charset);
@@ -149,10 +163,11 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 	}
 
 
-	// Subclasses for specific HTTP status codes
+	// 特定HTTP状态代码的子类。
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 400 Bad Request.
+	 * 表示状态为 HTTP 400 Bad Request 的 {@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -163,14 +178,16 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private BadRequest(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+						   HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.BAD_REQUEST, statusText, headers, body, charset);
 		}
 	}
 
+
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 401 Unauthorized.
+	 * 表示状态为 HTTP 401 Unauthorized 的 {@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -181,14 +198,15 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private Unauthorized(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+							 HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.UNAUTHORIZED, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 403 Forbidden.
+	 * 表示状态为 HTTP 403 Forbidden 的 {@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -199,14 +217,15 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private Forbidden(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+						  HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.FORBIDDEN, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 404 Not Found.
+	 * 表示状态为 HTTP 404 Not Found 的 {@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -217,14 +236,15 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private NotFound(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+						 HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.NOT_FOUND, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 405 Method Not Allowed.
+	 * 表示状态为 HTTP 405 Method Not Allowed 的 {@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -235,14 +255,15 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private MethodNotAllowed(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+								 HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.METHOD_NOT_ALLOWED, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 406 Not Acceptable.
+	 * 表示状态为 HTTP 406 Not Acceptable 的 {@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -253,14 +274,15 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private NotAcceptable(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+							  HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.NOT_ACCEPTABLE, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 409 Conflict.
+	 * 表示状态为 HTTP 409 Conflict 的 {@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -276,7 +298,8 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 410 Gone.
+	 * 表示状态为HTTP 410 Gone的{@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -292,7 +315,8 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 415 Unsupported Media Type.
+	 * 表示状态为HTTP 415 Unsupported Media Type的 {@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -303,14 +327,15 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private UnsupportedMediaType(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+									 HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.UNSUPPORTED_MEDIA_TYPE, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 422 Unprocessable Entity.
+	 * 表示状态为HTTP 422 Unprocessable Entity的{@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -321,14 +346,15 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private UnprocessableEntity(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+									HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.UNPROCESSABLE_ENTITY, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpClientErrorException} for status HTTP 429 Too Many Requests.
+	 * 表示状态为HTTP 429 Too Many Requests的{@link HttpClientErrorException}。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -339,7 +365,7 @@ public class HttpClientErrorException extends HttpStatusCodeException {
 		}
 
 		private TooManyRequests(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+								HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.TOO_MANY_REQUESTS, statusText, headers, body, charset);
 		}

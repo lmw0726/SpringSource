@@ -17,13 +17,10 @@
 package org.springframework.web.client;
 
 import org.springframework.core.NestedRuntimeException;
-import org.springframework.http.client.ClientHttpResponse;
 
 /**
- * Base class for exceptions thrown by {@link RestTemplate} in case a request
- * fails because of a server error response, as determined via
- * {@link ResponseErrorHandler#hasError(ClientHttpResponse)}, failure to decode
- * the response, or a low level I/O error.
+ * {@link RestTemplate}由于服务器错误响应（通过{@link ResponseErrorHandler＃hasError(ClientHttpResponse)}确定），
+ * 无法解码响应或低级I / O错误而导致请求失败而抛出的异常的基类。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -34,18 +31,19 @@ public class RestClientException extends NestedRuntimeException {
 
 
 	/**
-	 * Construct a new instance of {@code RestClientException} with the given message.
-	 * @param msg the message
+	 * 使用给定的消息构造一个新的{@code RestClientException}实例。
+	 *
+	 * @param msg 消息
 	 */
 	public RestClientException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Construct a new instance of {@code RestClientException} with the given message and
-	 * exception.
-	 * @param msg the message
-	 * @param ex the exception
+	 * 使用给定的消息和异常构造一个新的{@code RestClientException}实例。
+	 *
+	 * @param msg 消息
+	 * @param ex  异常
 	 */
 	public RestClientException(String msg, Throwable ex) {
 		super(msg, ex);

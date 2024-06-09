@@ -16,15 +16,15 @@
 
 package org.springframework.web.client;
 
-import java.nio.charset.Charset;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.nio.charset.Charset;
+
 /**
- * Abstract base class for exceptions based on an {@link HttpStatus}.
+ * 基于{@link HttpStatus}的异常的抽象基类。
  *
  * @author Arjen Poutsma
  * @author Chris Beams
@@ -35,71 +35,76 @@ public abstract class HttpStatusCodeException extends RestClientResponseExceptio
 
 	private static final long serialVersionUID = 5696801857651587810L;
 
-
+	/**
+	 * Http状态码
+	 */
 	private final HttpStatus statusCode;
 
 
 	/**
-	 * Construct a new instance with an {@link HttpStatus}.
-	 * @param statusCode the status code
+	 * 使用{@link HttpStatus}构造一个新实例。
+	 *
+	 * @param statusCode 状态码
 	 */
 	protected HttpStatusCodeException(HttpStatus statusCode) {
 		this(statusCode, statusCode.name(), null, null, null);
 	}
 
 	/**
-	 * Construct a new instance with an {@link HttpStatus} and status text.
-	 * @param statusCode the status code
-	 * @param statusText the status text
+	 * 使用{@link HttpStatus}和状态文本构造一个新实例。
+	 *
+	 * @param statusCode 状态码
+	 * @param statusText 状态文本
 	 */
 	protected HttpStatusCodeException(HttpStatus statusCode, String statusText) {
 		this(statusCode, statusText, null, null, null);
 	}
 
 	/**
-	 * Construct instance with an {@link HttpStatus}, status text, and content.
-	 * @param statusCode the status code
-	 * @param statusText the status text
-	 * @param responseBody the response body content, may be {@code null}
-	 * @param responseCharset the response body charset, may be {@code null}
+	 * 使用{@link HttpStatus}、状态文本和内容构造一个新实例。
+	 *
+	 * @param statusCode      状态码
+	 * @param statusText      状态文本
+	 * @param responseBody    响应体内容，可以为{@code null}
+	 * @param responseCharset 响应体字符集，可以为{@code null}
 	 * @since 3.0.5
 	 */
 	protected HttpStatusCodeException(HttpStatus statusCode, String statusText,
-			@Nullable byte[] responseBody, @Nullable Charset responseCharset) {
+									  @Nullable byte[] responseBody, @Nullable Charset responseCharset) {
 
 		this(statusCode, statusText, null, responseBody, responseCharset);
 	}
 
 	/**
-	 * Construct instance with an {@link HttpStatus}, status text, content, and
-	 * a response charset.
-	 * @param statusCode the status code
-	 * @param statusText the status text
-	 * @param responseHeaders the response headers, may be {@code null}
-	 * @param responseBody the response body content, may be {@code null}
-	 * @param responseCharset the response body charset, may be {@code null}
+	 * 使用{@link HttpStatus}、状态文本、内容和响应字符集构造一个新实例。
+	 *
+	 * @param statusCode      状态码
+	 * @param statusText      状态文本
+	 * @param responseHeaders 响应头，可以为{@code null}
+	 * @param responseBody    响应体内容，可以为{@code null}
+	 * @param responseCharset 响应体字符集，可以为{@code null}
 	 * @since 3.1.2
 	 */
 	protected HttpStatusCodeException(HttpStatus statusCode, String statusText,
-			@Nullable HttpHeaders responseHeaders, @Nullable byte[] responseBody, @Nullable Charset responseCharset) {
+									  @Nullable HttpHeaders responseHeaders, @Nullable byte[] responseBody, @Nullable Charset responseCharset) {
 
 		this(getMessage(statusCode, statusText),
 				statusCode, statusText, responseHeaders, responseBody, responseCharset);
 	}
 
 	/**
-	 * Construct instance with an {@link HttpStatus}, status text, content, and
-	 * a response charset.
-	 * @param message the exception message
-	 * @param statusCode the status code
-	 * @param statusText the status text
-	 * @param responseHeaders the response headers, may be {@code null}
-	 * @param responseBody the response body content, may be {@code null}
-	 * @param responseCharset the response body charset, may be {@code null}
+	 * 使用消息、状态码、状态文本、响应头、响应体内容和响应字符集构造一个新实例。
+	 *
+	 * @param message         异常消息
+	 * @param statusCode      状态码
+	 * @param statusText      状态文本
+	 * @param responseHeaders 响应头，可以为{@code null}
+	 * @param responseBody    响应体内容，可以为{@code null}
+	 * @param responseCharset 响应体字符集，可以为{@code null}
 	 * @since 5.2.2
 	 */
 	protected HttpStatusCodeException(String message, HttpStatus statusCode, String statusText,
-			@Nullable HttpHeaders responseHeaders, @Nullable byte[] responseBody, @Nullable Charset responseCharset) {
+									  @Nullable HttpHeaders responseHeaders, @Nullable byte[] responseBody, @Nullable Charset responseCharset) {
 
 		super(message, statusCode.value(), statusText, responseHeaders, responseBody, responseCharset);
 		this.statusCode = statusCode;
@@ -107,13 +112,15 @@ public abstract class HttpStatusCodeException extends RestClientResponseExceptio
 
 	private static String getMessage(HttpStatus statusCode, String statusText) {
 		if (!StringUtils.hasLength(statusText)) {
+			// 如果状态文本为空，则使用状态码对应的默认原因短语
 			statusText = statusCode.getReasonPhrase();
 		}
+		// 返回状态码和状态文本组合的字符串
 		return statusCode.value() + " " + statusText;
 	}
 
 	/**
-	 * Return the HTTP status code.
+	 * 返回HTTP状态码。
 	 */
 	public HttpStatus getStatusCode() {
 		return this.statusCode;

@@ -16,18 +16,18 @@
 
 package org.springframework.web.client;
 
-import java.nio.charset.Charset;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 
+import java.nio.charset.Charset;
+
 /**
- * Exception thrown when an HTTP 5xx is received.
+ * 当收到HTTP 5xx时抛出的异常。
  *
  * @author Arjen Poutsma
- * @since 3.0
  * @see DefaultResponseErrorHandler
+ * @since 3.0
  */
 public class HttpServerErrorException extends HttpStatusCodeException {
 
@@ -35,21 +35,21 @@ public class HttpServerErrorException extends HttpStatusCodeException {
 
 
 	/**
-	 * Constructor with a status code only.
+	 * 仅使用状态码的构造函数。
 	 */
 	public HttpServerErrorException(HttpStatus statusCode) {
 		super(statusCode);
 	}
 
 	/**
-	 * Constructor with a status code and status text.
+	 * 使用状态码和状态文本的构造函数。
 	 */
 	public HttpServerErrorException(HttpStatus statusCode, String statusText) {
 		super(statusCode, statusText);
 	}
 
 	/**
-	 * Constructor with a status code and status text, and content.
+	 * 基于状态码、状态文本和内容构造的构造函数。
 	 */
 	public HttpServerErrorException(
 			HttpStatus statusCode, String statusText, @Nullable byte[] body, @Nullable Charset charset) {
@@ -58,65 +58,73 @@ public class HttpServerErrorException extends HttpStatusCodeException {
 	}
 
 	/**
-	 * Constructor with a status code and status text, headers, and content.
+	 * 基于状态码、状态文本、头部和内容构造的构造函数。
 	 */
 	public HttpServerErrorException(HttpStatus statusCode, String statusText,
-			@Nullable HttpHeaders headers, @Nullable byte[] body, @Nullable Charset charset) {
+									@Nullable HttpHeaders headers, @Nullable byte[] body, @Nullable Charset charset) {
 
 		super(statusCode, statusText, headers, body, charset);
 	}
 
 	/**
-	 * Constructor with a status code and status text, headers, content, and an
-	 * prepared message.
+	 * 基于状态码、状态文本、头部、内容和准备好的消息构造的构造函数。
+	 *
 	 * @since 5.2.2
 	 */
 	public HttpServerErrorException(String message, HttpStatus statusCode, String statusText,
-			@Nullable HttpHeaders headers, @Nullable byte[] body, @Nullable Charset charset) {
+									@Nullable HttpHeaders headers, @Nullable byte[] body, @Nullable Charset charset) {
 
 		super(message, statusCode, statusText, headers, body, charset);
 	}
 
 	/**
-	 * Create an {@code HttpServerErrorException} or an HTTP status specific sub-class.
+	 * 创建一个{@code HttpServerErrorException}或特定于HTTP状态的子类。
+	 *
 	 * @since 5.1
 	 */
 	public static HttpServerErrorException create(HttpStatus statusCode,
-			String statusText, HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+												  String statusText, HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 		return create(null, statusCode, statusText, headers, body, charset);
 	}
 
 	/**
-	 * Variant of {@link #create(String, HttpStatus, String, HttpHeaders, byte[], Charset)}
-	 * with an optional prepared message.
-	 * @since 5.2.2.
+	 * 与可选准备好的消息一起的{@link #create(String, HttpStatus, String, HttpHeaders, byte[], Charset)}的变体。
+	 *
+	 * @since 5.2.2。
 	 */
 	public static HttpServerErrorException create(@Nullable String message, HttpStatus statusCode,
-			String statusText, HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+												  String statusText, HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
+		// 根据状态码创建相应的 HttpServerErrorException 实例
 		switch (statusCode) {
 			case INTERNAL_SERVER_ERROR:
+				// 内部服务器错误
 				return message != null ?
 						new HttpServerErrorException.InternalServerError(message, statusText, headers, body, charset) :
 						new HttpServerErrorException.InternalServerError(statusText, headers, body, charset);
 			case NOT_IMPLEMENTED:
+				// 未实现
 				return message != null ?
 						new HttpServerErrorException.NotImplemented(message, statusText, headers, body, charset) :
 						new HttpServerErrorException.NotImplemented(statusText, headers, body, charset);
 			case BAD_GATEWAY:
+				// 错误的网关
 				return message != null ?
 						new HttpServerErrorException.BadGateway(message, statusText, headers, body, charset) :
 						new HttpServerErrorException.BadGateway(statusText, headers, body, charset);
 			case SERVICE_UNAVAILABLE:
+				// 服务不可用
 				return message != null ?
 						new HttpServerErrorException.ServiceUnavailable(message, statusText, headers, body, charset) :
 						new HttpServerErrorException.ServiceUnavailable(statusText, headers, body, charset);
 			case GATEWAY_TIMEOUT:
+				// 网关超时
 				return message != null ?
 						new HttpServerErrorException.GatewayTimeout(message, statusText, headers, body, charset) :
 						new HttpServerErrorException.GatewayTimeout(statusText, headers, body, charset);
 			default:
+				// 默认情况下，创建通用的 HttpServerErrorException 实例
 				return message != null ?
 						new HttpServerErrorException(message, statusCode, statusText, headers, body, charset) :
 						new HttpServerErrorException(statusCode, statusText, headers, body, charset);
@@ -124,10 +132,11 @@ public class HttpServerErrorException extends HttpStatusCodeException {
 	}
 
 
-	// Subclasses for specific HTTP status codes
+	// 专门针对特定HTTP状态码的子类
 
 	/**
-	 * {@link HttpServerErrorException} for status HTTP 500 Internal Server Error.
+	 * {@link HttpServerErrorException}表示状态为HTTP 500 Internal Server Error。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -138,14 +147,15 @@ public class HttpServerErrorException extends HttpStatusCodeException {
 		}
 
 		private InternalServerError(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+									HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.INTERNAL_SERVER_ERROR, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpServerErrorException} for status HTTP 501 Not Implemented.
+	 * {@link HttpServerErrorException}表示状态为HTTP 501 Not Implemented。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -156,14 +166,15 @@ public class HttpServerErrorException extends HttpStatusCodeException {
 		}
 
 		private NotImplemented(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+							   HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.NOT_IMPLEMENTED, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpServerErrorException} for status HTTP HTTP 502 Bad Gateway.
+	 * {@link HttpServerErrorException}表示状态为HTTP 502 Bad Gateway。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -174,14 +185,15 @@ public class HttpServerErrorException extends HttpStatusCodeException {
 		}
 
 		private BadGateway(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+						   HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.BAD_GATEWAY, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpServerErrorException} for status HTTP 503 Service Unavailable.
+	 * {@link HttpServerErrorException}表示状态为HTTP 503 Service Unavailable。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -192,14 +204,15 @@ public class HttpServerErrorException extends HttpStatusCodeException {
 		}
 
 		private ServiceUnavailable(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+								   HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.SERVICE_UNAVAILABLE, statusText, headers, body, charset);
 		}
 	}
 
 	/**
-	 * {@link HttpServerErrorException} for status HTTP 504 Gateway Timeout.
+	 * {@link HttpServerErrorException}表示状态为HTTP 504 Gateway Timeout。
+	 *
 	 * @since 5.1
 	 */
 	@SuppressWarnings("serial")
@@ -210,7 +223,7 @@ public class HttpServerErrorException extends HttpStatusCodeException {
 		}
 
 		private GatewayTimeout(String message, String statusText,
-				HttpHeaders headers, byte[] body, @Nullable Charset charset) {
+							   HttpHeaders headers, byte[] body, @Nullable Charset charset) {
 
 			super(message, HttpStatus.GATEWAY_TIMEOUT, statusText, headers, body, charset);
 		}

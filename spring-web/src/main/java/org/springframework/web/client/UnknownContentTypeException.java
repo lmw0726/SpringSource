@@ -16,17 +16,15 @@
 
 package org.springframework.web.client;
 
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+
 /**
- * Raised when no suitable
- * {@link org.springframework.http.converter.HttpMessageConverter} could be
- * found to extract the response.
+ * 当找不到合适的{@link org.springframework.http.converter.HttpMessageConverter}来提取响应时抛出。
  *
  * @author Rossen Stoyanchev
  * @since 5.2.7
@@ -35,31 +33,49 @@ public class UnknownContentTypeException extends RestClientException {
 
 	private static final long serialVersionUID = 2759516676367274084L;
 
-
+	/**
+	 * 响应所期望的目标类型
+	 */
 	private final Type targetType;
 
+	/**
+	 * 响应的内容类型
+	 */
 	private final MediaType contentType;
 
+	/**
+	 * 原始HTTP状态码值
+	 */
 	private final int rawStatusCode;
 
+	/**
+	 * HTTP状态文本
+	 */
 	private final String statusText;
 
+	/**
+	 * 响应体
+	 */
 	private final byte[] responseBody;
 
+	/**
+	 * HTTP响应头
+	 */
 	private final HttpHeaders responseHeaders;
 
 
 	/**
-	 * Construct a new instance of with the given response data.
-	 * @param targetType the expected target type
-	 * @param contentType the content type of the response
-	 * @param statusCode the raw status code value
-	 * @param statusText the status text
-	 * @param responseHeaders the response headers (may be {@code null})
-	 * @param responseBody the response body content (may be {@code null})
+	 * 使用给定的响应数据构造一个新实例。
+	 *
+	 * @param targetType      期望的目标类型
+	 * @param contentType     响应的内容类型
+	 * @param statusCode      原始状态码值
+	 * @param statusText      状态文本
+	 * @param responseHeaders 响应头（可能为{@code null}）
+	 * @param responseBody    响应体内容（可能为{@code null}）
 	 */
 	public UnknownContentTypeException(Type targetType, MediaType contentType,
-			int statusCode, String statusText, HttpHeaders responseHeaders, byte[] responseBody) {
+									   int statusCode, String statusText, HttpHeaders responseHeaders, byte[] responseBody) {
 
 		super("Could not extract response: no suitable HttpMessageConverter found " +
 				"for response type [" + targetType + "] and content type [" + contentType + "]");
@@ -74,35 +90,35 @@ public class UnknownContentTypeException extends RestClientException {
 
 
 	/**
-	 * Return the target type expected for the response.
+	 * 返回响应所期望的目标类型。
 	 */
 	public Type getTargetType() {
 		return this.targetType;
 	}
 
 	/**
-	 * Return the content type of the response, or "application/octet-stream".
+	 * 返回响应的内容类型，或者返回“application/octet-stream”。
 	 */
 	public MediaType getContentType() {
 		return this.contentType;
 	}
 
 	/**
-	 * Return the raw HTTP status code value.
+	 * 返回原始HTTP状态码值。
 	 */
 	public int getRawStatusCode() {
 		return this.rawStatusCode;
 	}
 
 	/**
-	 * Return the HTTP status text.
+	 * 返回HTTP状态文本。
 	 */
 	public String getStatusText() {
 		return this.statusText;
 	}
 
 	/**
-	 * Return the HTTP response headers.
+	 * 返回HTTP响应头。
 	 */
 	@Nullable
 	public HttpHeaders getResponseHeaders() {
@@ -110,15 +126,14 @@ public class UnknownContentTypeException extends RestClientException {
 	}
 
 	/**
-	 * Return the response body as a byte array.
+	 * 返回响应体作为字节数组。
 	 */
 	public byte[] getResponseBody() {
 		return this.responseBody;
 	}
 
 	/**
-	 * Return the response body converted to String using the charset from the
-	 * response "Content-Type" or {@code "UTF-8"} otherwise.
+	 * 返回使用响应“Content-Type”的字符集或{@code "UTF-8"}以及默认字符集的字符串转换后的响应体。
 	 */
 	public String getResponseBodyAsString() {
 		return new String(this.responseBody, this.contentType.getCharset() != null ?

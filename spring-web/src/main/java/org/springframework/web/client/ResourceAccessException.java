@@ -19,7 +19,7 @@ package org.springframework.web.client;
 import java.io.IOException;
 
 /**
- * Exception thrown when an I/O error occurs.
+ * 当发生I/O错误时抛出的异常。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -30,17 +30,19 @@ public class ResourceAccessException extends RestClientException {
 
 
 	/**
-	 * Construct a new {@code ResourceAccessException} with the given message.
-	 * @param msg the message
+	 * 使用给定的消息构造一个新的{@code ResourceAccessException}实例。
+	 *
+	 * @param msg 消息
 	 */
 	public ResourceAccessException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Construct a new {@code ResourceAccessException} with the given message and {@link IOException}.
-	 * @param msg the message
-	 * @param ex the {@code IOException}
+	 * 使用给定的消息和{@link IOException}构造一个新的{@code ResourceAccessException}实例。
+	 *
+	 * @param msg 消息
+	 * @param ex  {@code IOException}
 	 */
 	public ResourceAccessException(String msg, IOException ex) {
 		super(msg, ex);
