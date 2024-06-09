@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Meta annotation that indicates a web mapping annotation.
+ * 表示 Web 映射注解的元注解。
  *
  * @author Juergen Hoeller
  * @since 3.0

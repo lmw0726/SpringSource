@@ -23,16 +23,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that indicates a method return value should be bound to the web
- * response body. Supported for annotated handler methods.
- *
- * <p>As of version 4.0 this annotation can also be added on the type level in
- * which case it is inherited and does not need to be added on the method level.
+ * 注解指示方法返回值应绑定到 Web 响应体。支持被注解的处理器方法。
+ * <p>
+ * 从版本 4.0 开始，此注解也可以添加在类型级别，此时它会被继承，不需要在方法级别添加。
  *
  * @author Arjen Poutsma
- * @since 3.0
  * @see RequestBody
  * @see RestController
+ * @since 3.0
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

@@ -16,27 +16,18 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Controller;
 
+import java.lang.annotation.*;
+
 /**
- * A convenience annotation that is itself annotated with
- * {@link Controller @Controller} and {@link ResponseBody @ResponseBody}.
+ * 一个方便的注解，本身带有 {@link Controller @Controller} 和 {@link ResponseBody @ResponseBody} 注解。
  * <p>
- * Types that carry this annotation are treated as controllers where
- * {@link RequestMapping @RequestMapping} methods assume
- * {@link ResponseBody @ResponseBody} semantics by default.
- *
- * <p><b>NOTE:</b> {@code @RestController} is processed if an appropriate
- * {@code HandlerMapping}-{@code HandlerAdapter} pair is configured such as the
- * {@code RequestMappingHandlerMapping}-{@code RequestMappingHandlerAdapter}
- * pair which are the default in the MVC Java config and the MVC namespace.
+ * 携带此注解的类型被视为控制器，其中 {@link RequestMapping @RequestMapping} 方法默认假定具有 {@link ResponseBody @ResponseBody} 语义。
+ * <p>
+ * 注意：如果配置了适当的 {@code HandlerMapping} - {@code HandlerAdapter} 对，例如 {@code RequestMappingHandlerMapping} - {@code RequestMappingHandlerAdapter} 对，
+ * 则会处理 {@code @RestController}，它们是 MVC Java 配置和 MVC 命名空间中的默认选项。
  *
  * @author Rossen Stoyanchev
  * @author Sam Brannen
@@ -50,9 +41,9 @@ import org.springframework.stereotype.Controller;
 public @interface RestController {
 
 	/**
-	 * The value may indicate a suggestion for a logical component name,
-	 * to be turned into a Spring bean in case of an autodetected component.
-	 * @return the suggested component name, if any (or empty String otherwise)
+	 * 该值可能表示逻辑组件名称的建议，如果是自动检测到的组件，则将其转换为 Spring bean。
+	 *
+	 * @return 建议的组件名称（如果有）；否则为空字符串
 	 * @since 4.0.1
 	 */
 	@AliasFor(annotation = Controller.class)

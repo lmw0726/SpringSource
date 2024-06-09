@@ -16,48 +16,36 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.beans.PropertyEditor;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartResolver;
 
+import java.beans.PropertyEditor;
+import java.lang.annotation.*;
+
 /**
- * Annotation that can be used to associate the part of a "multipart/form-data" request
- * with a method argument.
- *
- * <p>Supported method argument types include {@link MultipartFile} in conjunction with
- * Spring's {@link MultipartResolver} abstraction, {@code javax.servlet.http.Part} in
- * conjunction with Servlet 3.0 multipart requests, or otherwise for any other method
- * argument, the content of the part is passed through an {@link HttpMessageConverter}
- * taking into consideration the 'Content-Type' header of the request part. This is
- * analogous to what @{@link RequestBody} does to resolve an argument based on the
- * content of a non-multipart regular request.
- *
- * <p>Note that @{@link RequestParam} annotation can also be used to associate the part
- * of a "multipart/form-data" request with a method argument supporting the same method
- * argument types. The main difference is that when the method argument is not a String
- * or raw {@code MultipartFile} / {@code Part}, {@code @RequestParam} relies on type
- * conversion via a registered {@link Converter} or {@link PropertyEditor} while
- * {@link RequestPart} relies on {@link HttpMessageConverter HttpMessageConverters}
- * taking into consideration the 'Content-Type' header of the request part.
- * {@link RequestParam} is likely to be used with name-value form fields while
- * {@link RequestPart} is likely to be used with parts containing more complex content
- * e.g. JSON, XML).
+ * 注解可用于将“multipart/form-data”请求的一部分与方法参数关联起来。
+ * <p>
+ * 支持的方法参数类型包括与 Spring 的 {@link MultipartResolver} 抽象配合使用的 {@link MultipartFile}，
+ * 与 Servlet 3.0 多部分请求配合使用的 {@code javax.servlet.http.Part}，或者对于任何其他方法参数，
+ * 该部分的内容都会通过 {@link HttpMessageConverter} 传递，考虑到请求部分的 'Content-Type' 头。
+ * 这类似于 @{@link RequestBody} 根据常规请求的内容解析参数的方式。
+ * <p>
+ * 注意，@{@link RequestParam} 注解也可用于将“multipart/form-data”请求的一部分与支持相同方法参数类型的方法参数关联起来。
+ * 主要区别在于当方法参数不是 String 或原始的 {@code MultipartFile} / {@code Part} 时，
+ * {@code @RequestParam} 依赖于通过已注册的 {@link Converter} 或 {@link PropertyEditor} 进行类型转换，
+ * 而 {@link RequestPart} 则依赖于 {@link HttpMessageConverter HttpMessageConverters}，
+ * 考虑到请求部分的 'Content-Type' 头。
+ * {@link RequestParam} 可能与名称-值表单字段一起使用，而 {@link RequestPart} 可能与包含更复杂内容的部分一起使用，例如 JSON、XML。
  *
  * @author Rossen Stoyanchev
  * @author Arjen Poutsma
  * @author Sam Brannen
- * @since 3.1
  * @see RequestParam
  * @see org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
+ * @since 3.1
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
@@ -65,24 +53,23 @@ import org.springframework.web.multipart.MultipartResolver;
 public @interface RequestPart {
 
 	/**
-	 * Alias for {@link #name}.
+	 * {@link #name} 的别名。
 	 */
 	@AliasFor("name")
 	String value() default "";
 
 	/**
-	 * The name of the part in the {@code "multipart/form-data"} request to bind to.
+	 * 要绑定到“multipart/form-data”请求中的部分的名称。
+	 *
 	 * @since 4.2
 	 */
 	@AliasFor("value")
 	String name() default "";
 
 	/**
-	 * Whether the part is required.
-	 * <p>Defaults to {@code true}, leading to an exception being thrown
-	 * if the part is missing in the request. Switch this to
-	 * {@code false} if you prefer a {@code null} value if the part is
-	 * not present in the request.
+	 * 部分是否是必需的。
+	 * <p>默认为 {@code true}，如果请求中缺少该部分，则会抛出异常。
+	 * 如果希望在请求中部分不存在时得到 {@code null} 值，则将其切换为 {@code false}。
 	 */
 	boolean required() default true;
 

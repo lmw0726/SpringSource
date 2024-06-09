@@ -16,34 +16,23 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 
+import java.lang.annotation.*;
+
 /**
- * A convenience annotation that is itself annotated with
- * {@link ControllerAdvice @ControllerAdvice}
- * and {@link ResponseBody @ResponseBody}.
- *
- * <p>Types that carry this annotation are treated as controller advice where
- * {@link ExceptionHandler @ExceptionHandler} methods assume
- * {@link ResponseBody @ResponseBody} semantics by default.
- *
- * <p><b>NOTE:</b> {@code @RestControllerAdvice} is processed if an appropriate
- * {@code HandlerMapping}-{@code HandlerAdapter} pair is configured such as the
- * {@code RequestMappingHandlerMapping}-{@code RequestMappingHandlerAdapter} pair
- * which are the default in the MVC Java config and the MVC namespace.
+ * 一个方便的注解，本身带有 {@link ControllerAdvice @ControllerAdvice} 和 {@link ResponseBody @ResponseBody} 注解。
+ * <p>
+ * 携带此注解的类型被视为控制器建议，其中 {@link ExceptionHandler @ExceptionHandler} 方法默认假定具有 {@link ResponseBody @ResponseBody} 语义。
+ * <p>
+ * 注意：如果配置了适当的 {@code HandlerMapping} - {@code HandlerAdapter} 对，例如 {@code RequestMappingHandlerMapping} - {@code RequestMappingHandlerAdapter} 对，
+ * 则会处理 {@code @RestControllerAdvice}，它们是 MVC Java 配置和 MVC 命名空间中的默认选项。
  *
  * @author Rossen Stoyanchev
  * @author Sam Brannen
- * @since 4.3
  * @see RestController
  * @see ControllerAdvice
+ * @since 4.3
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -53,53 +42,41 @@ import org.springframework.core.annotation.AliasFor;
 public @interface RestControllerAdvice {
 
 	/**
-	 * Alias for the {@link #basePackages} attribute.
-	 * <p>Allows for more concise annotation declarations &mdash; for example,
-	 * {@code @RestControllerAdvice("org.my.pkg")} is equivalent to
-	 * {@code @RestControllerAdvice(basePackages = "org.my.pkg")}.
+	 * {@link #basePackages} 属性的别名。
+	 * <p>允许更简洁的注解声明，例如 {@code @RestControllerAdvice("org.my.pkg")} 相当于 {@code @RestControllerAdvice(basePackages = "org.my.pkg")}。
+	 *
 	 * @see #basePackages
 	 */
 	@AliasFor(annotation = ControllerAdvice.class)
 	String[] value() default {};
 
 	/**
-	 * Array of base packages.
-	 * <p>Controllers that belong to those base packages or sub-packages thereof
-	 * will be included &mdash; for example,
-	 * {@code @RestControllerAdvice(basePackages = "org.my.pkg")} or
-	 * {@code @RestControllerAdvice(basePackages = {"org.my.pkg", "org.my.other.pkg"})}.
-	 * <p>{@link #value} is an alias for this attribute, simply allowing for
-	 * more concise use of the annotation.
-	 * <p>Also consider using {@link #basePackageClasses} as a type-safe
-	 * alternative to String-based package names.
+	 * 基础包的数组。
+	 * <p>属于这些基础包或其子包的控制器将被包含在内，例如 {@code @RestControllerAdvice(basePackages = "org.my.pkg")} 或 {@code @RestControllerAdvice(basePackages = {"org.my.pkg", "org.my.other.pkg"})}。
+	 * <p>{@link #value} 是此属性的别名，简单地允许更简洁地使用注解。
+	 * <p>还考虑使用 {@link #basePackageClasses} 作为基于类型安全的替代方案，而不是基于字符串的包名。
 	 */
 	@AliasFor(annotation = ControllerAdvice.class)
 	String[] basePackages() default {};
 
 	/**
-	 * Type-safe alternative to {@link #basePackages} for specifying the packages
-	 * in which to select controllers to be advised by the {@code @RestControllerAdvice}
-	 * annotated class.
-	 * <p>Consider creating a special no-op marker class or interface in each package
-	 * that serves no purpose other than being referenced by this attribute.
+	 * {@link ControllerAdvice @ControllerAdvice} 注解类中选择要建议的控制器的包的类型安全替代方案。
+	 * <p>考虑在每个包中创建一个特殊的空操作标记类或接口，除了被此属性引用外，不起任何作用。
 	 */
 	@AliasFor(annotation = ControllerAdvice.class)
 	Class<?>[] basePackageClasses() default {};
 
 	/**
-	 * Array of classes.
-	 * <p>Controllers that are assignable to at least one of the given types
-	 * will be advised by the {@code @RestControllerAdvice} annotated class.
+	 * 类的数组。
+	 * <p>至少与给定类型之一相匹配的控制器将由 {@code @RestControllerAdvice} 注解的类建议。
 	 */
 	@AliasFor(annotation = ControllerAdvice.class)
 	Class<?>[] assignableTypes() default {};
 
 	/**
-	 * Array of annotations.
-	 * <p>Controllers that are annotated with at least one of the supplied annotation
-	 * types will be advised by the {@code @RestControllerAdvice} annotated class.
-	 * <p>Consider creating a custom composed annotation or use a predefined one,
-	 * like {@link RestController @RestController}.
+	 * 注解的数组。
+	 * <p>至少使用其中一个提供的注解类型进行注释的控制器将由 {@code @RestControllerAdvice} 注解的类建议。
+	 * <p>考虑创建一个自定义组合注解或使用预定义的注解，如 {@link RestController @RestController}。
 	 */
 	@AliasFor(annotation = ControllerAdvice.class)
 	Class<? extends Annotation>[] annotations() default {};

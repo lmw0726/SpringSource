@@ -16,28 +16,22 @@
 
 package org.springframework.web.bind.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 
+import java.lang.annotation.*;
+
 /**
- * Annotation for mapping HTTP {@code PATCH} requests onto specific handler
- * methods.
- *
- * <p>Specifically, {@code @PatchMapping} is a <em>composed annotation</em> that
- * acts as a shortcut for {@code @RequestMapping(method = RequestMethod.PATCH)}.
+ * 用于将 HTTP {@code PATCH} 请求映射到特定处理程序方法的注解。
+ * <p>
+ * 具体来说，{@code @PatchMapping} 是一个组合注解，作为 {@code @RequestMapping(method = RequestMethod.PATCH)} 的快捷方式。
  *
  * @author Sam Brannen
- * @since 4.3
  * @see GetMapping
  * @see PostMapping
  * @see PutMapping
  * @see DeleteMapping
  * @see RequestMapping
+ * @since 4.3
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -46,43 +40,43 @@ import org.springframework.core.annotation.AliasFor;
 public @interface PatchMapping {
 
 	/**
-	 * Alias for {@link RequestMapping#name}.
+	 * {@link RequestMapping#name} 的别名。
 	 */
 	@AliasFor(annotation = RequestMapping.class)
 	String name() default "";
 
 	/**
-	 * Alias for {@link RequestMapping#value}.
+	 * {@link RequestMapping#value} 的别名。
 	 */
 	@AliasFor(annotation = RequestMapping.class)
 	String[] value() default {};
 
 	/**
-	 * Alias for {@link RequestMapping#path}.
+	 * {@link RequestMapping#path} 的别名。
 	 */
 	@AliasFor(annotation = RequestMapping.class)
 	String[] path() default {};
 
 	/**
-	 * Alias for {@link RequestMapping#params}.
+	 * {@link RequestMapping#params} 的别名。
 	 */
 	@AliasFor(annotation = RequestMapping.class)
 	String[] params() default {};
 
 	/**
-	 * Alias for {@link RequestMapping#headers}.
+	 * {@link RequestMapping#headers} 的别名。
 	 */
 	@AliasFor(annotation = RequestMapping.class)
 	String[] headers() default {};
 
 	/**
-	 * Alias for {@link RequestMapping#consumes}.
+	 * {@link RequestMapping#consumes} 的别名。
 	 */
 	@AliasFor(annotation = RequestMapping.class)
 	String[] consumes() default {};
 
 	/**
-	 * Alias for {@link RequestMapping#produces}.
+	 * {@link RequestMapping#produces} 的别名。
 	 */
 	@AliasFor(annotation = RequestMapping.class)
 	String[] produces() default {};
