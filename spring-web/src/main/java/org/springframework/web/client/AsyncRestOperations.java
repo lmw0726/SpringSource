@@ -16,11 +16,6 @@
 
 package org.springframework.web.client;
 
-import java.net.URI;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Future;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,22 +24,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.net.URI;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Future;
+
 /**
- * Interface specifying a basic set of asynchronous RESTful operations.
- * Implemented by {@link AsyncRestTemplate}. Not often used directly, but a useful
- * option to enhance testability, as it can easily be mocked or stubbed.
+ * 接口定义了一组基本的异步 RESTful 操作。由 {@link AsyncRestTemplate} 实现。
+ * 不经常直接使用，但作为增强可测试性的一种有用选择，因为可以轻松地模拟或存根化。
  *
  * @author Arjen Poutsma
- * @since 4.0
  * @see AsyncRestTemplate
  * @see RestOperations
- * @deprecated as of Spring 5.0, in favor of {@link org.springframework.web.reactive.function.client.WebClient}
+ * @since 4.0
+ * @deprecated 自 Spring 5.0 起，建议使用 {@link org.springframework.web.reactive.function.client.WebClient}
  */
 @Deprecated
 public interface AsyncRestOperations {
 
 	/**
-	 * Expose the synchronous Spring RestTemplate to allow synchronous invocation.
+	 * 暴露同步的 Spring RestTemplate 以允许同步调用。
 	 */
 	RestOperations getRestOperations();
 
@@ -52,35 +51,35 @@ public interface AsyncRestOperations {
 	// GET
 
 	/**
-	 * Asynchronously retrieve an entity by doing a GET on the specified URL.
-	 * The response is converted and stored in an {@link ResponseEntity}.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * @param url the URL
-	 * @param responseType the type of the return value
-	 * @param uriVariables the variables to expand the template
-	 * @return the entity wrapped in a {@link Future}
+	 * 通过在指定的 URL 上执行 GET 来异步检索实体。响应被转换并存储在 {@link ResponseEntity} 中。
+	 * <p>使用给定的 URI 变量扩展 URI 模板变量（如果有）。
+	 *
+	 * @param url          URL
+	 * @param responseType 返回值的类型
+	 * @param uriVariables 用于扩展模板的变量
+	 * @return 用 {@link Future} 包装的实体
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> getForEntity(String url, Class<T> responseType,
-			Object... uriVariables) throws RestClientException;
+														 Object... uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously retrieve a representation by doing a GET on the URI template.
-	 * The response is converted and stored in an {@link ResponseEntity}.
-	 * <p>URI Template variables are expanded using the given map.
-	 * @param url the URL
-	 * @param responseType the type of the return value
-	 * @param uriVariables the map containing variables for the URI template
-	 * @return the entity wrapped in a {@link Future}
+	 * 通过在 URI 模板上执行 GET 来异步检索表示。响应被转换并存储在 {@link ResponseEntity} 中。
+	 * <p>使用给定的映射扩展 URI 模板变量。
+	 *
+	 * @param url          URL
+	 * @param responseType 返回值的类型
+	 * @param uriVariables 包含 URI 模板变量的映射
+	 * @return 用 {@link Future} 包装的实体
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> getForEntity(String url, Class<T> responseType,
-			Map<String, ?> uriVariables) throws RestClientException;
+														 Map<String, ?> uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously retrieve a representation by doing a GET on the URL.
-	 * The response is converted and stored in an {@link ResponseEntity}.
-	 * @param url the URL
-	 * @param responseType the type of the return value
-	 * @return the entity wrapped in a {@link Future}
+	 * 通过在 URL 上执行 GET 来异步检索表示。响应被转换并存储在 {@link ResponseEntity} 中。
+	 *
+	 * @param url          URL
+	 * @param responseType 返回值的类型
+	 * @return 用 {@link Future} 包装的实体
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> getForEntity(URI url, Class<T> responseType)
 			throws RestClientException;
@@ -89,29 +88,32 @@ public interface AsyncRestOperations {
 	// HEAD
 
 	/**
-	 * Asynchronously retrieve all headers of the resource specified by the URI template.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * @param url the URL
-	 * @param uriVariables the variables to expand the template
-	 * @return all HTTP headers of that resource wrapped in a {@link Future}
+	 * 异步检索由 URI 模板指定的资源的所有标头。
+	 * <p>使用给定的 URI 变量扩展 URI 模板变量（如果有）。
+	 *
+	 * @param url          URL
+	 * @param uriVariables 用于扩展模板的变量
+	 * @return 用 {@link Future} 包装的该资源的所有 HTTP 标头
 	 */
 	ListenableFuture<HttpHeaders> headForHeaders(String url, Object... uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Asynchronously retrieve all headers of the resource specified by the URI template.
-	 * <p>URI Template variables are expanded using the given map.
-	 * @param url the URL
-	 * @param uriVariables the map containing variables for the URI template
-	 * @return all HTTP headers of that resource wrapped in a {@link Future}
+	 * 异步检索由 URI 模板指定的资源的所有标头。
+	 * <p>使用给定的映射扩展 URI 模板变量。
+	 *
+	 * @param url          URL
+	 * @param uriVariables 包含 URI 模板变量的映射
+	 * @return 用 {@link Future} 包装的该资源的所有 HTTP 标头
 	 */
 	ListenableFuture<HttpHeaders> headForHeaders(String url, Map<String, ?> uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Asynchronously retrieve all headers of the resource specified by the URL.
-	 * @param url the URL
-	 * @return all HTTP headers of that resource wrapped in a {@link Future}
+	 * 异步检索由 URL 指定的资源的所有标头。
+	 *
+	 * @param url URL
+	 * @return 用 {@link Future} 包装的该资源的所有 HTTP 标头
 	 */
 	ListenableFuture<HttpHeaders> headForHeaders(URI url) throws RestClientException;
 
@@ -119,113 +121,116 @@ public interface AsyncRestOperations {
 	// POST
 
 	/**
-	 * Create a new resource by POSTing the given object to the URI template, and
-	 * asynchronously returns the value of the {@code Location} header. This header
-	 * typically indicates where the new resource is stored.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * @param url the URL
-	 * @param request the Object to be POSTed (may be {@code null})
-	 * @param uriVariables the variables to expand the template
-	 * @return the value for the {@code Location} header wrapped in a {@link Future}
+	 * 通过将给定对象POST到URI模板来创建新资源，并异步返回{@code Location}头的值。此头通常指示新资源存储的位置。
+	 * <p>如果有的话，使用给定的URI变量扩展URI模板变量。
+	 *
+	 * @param url          URL
+	 * @param request      要POST的对象（可能为{@code null}）
+	 * @param uriVariables 要扩展模板的变量
+	 * @return 包装在{@link Future}中的{@code Location}头的值
 	 * @see org.springframework.http.HttpEntity
 	 */
 	ListenableFuture<URI> postForLocation(String url, @Nullable HttpEntity<?> request, Object... uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Create a new resource by POSTing the given object to the URI template, and
-	 * asynchronously returns the value of the {@code Location} header. This header
-	 * typically indicates where the new resource is stored.
-	 * <p>URI Template variables are expanded using the given map.
-	 * @param url the URL
-	 * @param request the Object to be POSTed (may be {@code null})
-	 * @param uriVariables the variables to expand the template
-	 * @return the value for the {@code Location} header wrapped in a {@link Future}
+	 * 通过将给定对象POST到URI模板来创建新资源，并异步返回{@code Location}头的值。此头通常指示新资源存储的位置。
+	 * <p>使用给定的映射扩展URI模板变量。
+	 *
+	 * @param url          URL
+	 * @param request      要POST的对象（可能为{@code null}）
+	 * @param uriVariables 要扩展模板的变量
+	 * @return 包装在{@link Future}中的{@code Location}头的值
 	 * @see org.springframework.http.HttpEntity
 	 */
 	ListenableFuture<URI> postForLocation(String url, @Nullable HttpEntity<?> request, Map<String, ?> uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Create a new resource by POSTing the given object to the URL, and asynchronously
-	 * returns the value of the {@code Location} header. This header typically indicates
-	 * where the new resource is stored.
-	 * @param url the URL
-	 * @param request the Object to be POSTed (may be {@code null})
-	 * @return the value for the {@code Location} header wrapped in a {@link Future}
+	 * 通过将给定对象POST到URL来创建新资源，并异步返回{@code Location}头的值。此头通常指示新资源存储的位置。
+	 *
+	 * @param url     URL
+	 * @param request 要POST的对象（可能为{@code null}）
+	 * @return 包装在{@link Future}中的{@code Location}头的值
 	 * @see org.springframework.http.HttpEntity
 	 */
 	ListenableFuture<URI> postForLocation(URI url, @Nullable HttpEntity<?> request) throws RestClientException;
 
 	/**
-	 * Create a new resource by POSTing the given object to the URI template,
-	 * and asynchronously returns the response as {@link ResponseEntity}.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * @param url the URL
-	 * @param request the Object to be POSTed (may be {@code null})
-	 * @param uriVariables the variables to expand the template
-	 * @return the entity wrapped in a {@link Future}
+	 * 通过将给定对象POST到URI模板来创建新资源，并异步返回{@link ResponseEntity}作为响应。
+	 * <p>如果有的话，使用给定的URI变量扩展URI模板变量。
+	 *
+	 * @param url          URL
+	 * @param request      要POST的对象（可能为{@code null}）
+	 * @param responseType 响应类型的Class
+	 * @param uriVariables 要扩展模板的变量
+	 * @return 包装在{@link Future}中的实体
 	 * @see org.springframework.http.HttpEntity
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> postForEntity(String url, @Nullable HttpEntity<?> request,
-			Class<T> responseType, Object... uriVariables) throws RestClientException;
+														  Class<T> responseType, Object... uriVariables) throws RestClientException;
 
 	/**
-	 * Create a new resource by POSTing the given object to the URI template,
-	 * and asynchronously returns the response as {@link ResponseEntity}.
-	 * <p>URI Template variables are expanded using the given map.
-	 * @param url the URL
-	 * @param request the Object to be POSTed (may be {@code null})
-	 * @param uriVariables the variables to expand the template
-	 * @return the entity wrapped in a {@link Future}
+	 * 通过将给定对象POST到URI模板来创建新资源，并异步返回{@link ResponseEntity}作为响应。
+	 * <p>使用给定的映射扩展URI模板变量。
+	 *
+	 * @param url          URL
+	 * @param request      要POST的对象（可能为{@code null}）
+	 * @param responseType 响应类型的Class
+	 * @param uriVariables 要扩展模板的变量
+	 * @return 包装在{@link Future}中的实体
 	 * @see org.springframework.http.HttpEntity
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> postForEntity(String url, @Nullable HttpEntity<?> request,
-			Class<T> responseType, Map<String, ?> uriVariables) throws RestClientException;
+														  Class<T> responseType, Map<String, ?> uriVariables) throws RestClientException;
 
 	/**
-	 * Create a new resource by POSTing the given object to the URL,
-	 * and asynchronously returns the response as {@link ResponseEntity}.
-	 * @param url the URL
-	 * @param request the Object to be POSTed (may be {@code null})
-	 * @return the entity wrapped in a {@link Future}
+	 * 通过将给定对象POST到URL来创建新资源，并异步返回{@link ResponseEntity}作为响应。
+	 *
+	 * @param url          URL
+	 * @param request      要POST的对象（可能为{@code null}）
+	 * @param responseType 响应类型的Class
+	 * @return 包装在{@link Future}中的实体
 	 * @see org.springframework.http.HttpEntity
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> postForEntity(URI url, @Nullable HttpEntity<?> request,
-			Class<T> responseType) throws RestClientException;
+														  Class<T> responseType) throws RestClientException;
 
 
 	// PUT
 
 	/**
-	 * Create or update a resource by PUTting the given object to the URI.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * <p>The Future will return a {@code null} result upon completion.
-	 * @param url the URL
-	 * @param request the Object to be PUT (may be {@code null})
-	 * @param uriVariables the variables to expand the template
+	 * 通过将给定对象PUT到URI来创建或更新资源。
+	 * <p>如果有的话，使用给定的URI变量扩展URI模板变量。
+	 * <p>在完成后，Future将返回{@code null}结果。
+	 *
+	 * @param url          URL
+	 * @param request      要PUT的对象（可能为{@code null}）
+	 * @param uriVariables 要扩展模板的变量
 	 * @see HttpEntity
 	 */
 	ListenableFuture<?> put(String url, @Nullable HttpEntity<?> request, Object... uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Creates a new resource by PUTting the given object to URI template.
-	 * <p>URI Template variables are expanded using the given map.
-	 * <p>The Future will return a {@code null} result upon completion.
-	 * @param url the URL
-	 * @param request the Object to be PUT (may be {@code null})
-	 * @param uriVariables the variables to expand the template
+	 * 通过将给定对象PUT到URI模板来创建新资源。
+	 * <p>使用给定的映射扩展URI模板变量。
+	 * <p>在完成后，Future将返回{@code null}结果。
+	 *
+	 * @param url          URL
+	 * @param request      要PUT的对象（可能为{@code null}）
+	 * @param uriVariables 要扩展模板的变量
 	 * @see HttpEntity
 	 */
 	ListenableFuture<?> put(String url, @Nullable HttpEntity<?> request, Map<String, ?> uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Creates a new resource by PUTting the given object to URL.
-	 * <p>The Future will return a {@code null} result upon completion.
-	 * @param url the URL
-	 * @param request the Object to be PUT (may be {@code null})
+	 * 通过将给定对象PUT到URL来创建新资源。
+	 * <p>在完成后，Future将返回{@code null}结果。
+	 *
+	 * @param url     URL
+	 * @param request 要PUT的对象（可能为{@code null}）
 	 * @see HttpEntity
 	 */
 	ListenableFuture<?> put(URI url, @Nullable HttpEntity<?> request) throws RestClientException;
@@ -234,28 +239,31 @@ public interface AsyncRestOperations {
 	// DELETE
 
 	/**
-	 * Asynchronously delete the resources at the specified URI.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * <p>The Future will return a {@code null} result upon completion.
-	 * @param url the URL
-	 * @param uriVariables the variables to expand in the template
+	 * 异步删除指定URI上的资源。
+	 * <p>如果有的话，使用给定的URI变量扩展URI模板变量。
+	 * <p>在完成后，Future将返回{@code null}结果。
+	 *
+	 * @param url          URL
+	 * @param uriVariables 要扩展的模板中的变量
 	 */
 	ListenableFuture<?> delete(String url, Object... uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously delete the resources at the specified URI.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * <p>The Future will return a {@code null} result upon completion.
-	 * @param url the URL
-	 * @param uriVariables the variables to expand in the template
+	 * 异步删除指定URI上的资源。
+	 * <p>如果有的话，使用给定的URI变量扩展URI模板变量。
+	 * <p>在完成后，Future将返回{@code null}结果。
+	 *
+	 * @param url          URL
+	 * @param uriVariables 要扩展的模板中的变量
 	 */
 	ListenableFuture<?> delete(String url, Map<String, ?> uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously delete the resources at the specified URI.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * <p>The Future will return a {@code null} result upon completion.
-	 * @param url the URL
+	 * 异步删除指定URI上的资源。
+	 * <p>如果有的话，使用给定的URI变量扩展URI模板变量。
+	 * <p>在完成后，Future将返回{@code null}结果。
+	 *
+	 * @param url URL
 	 */
 	ListenableFuture<?> delete(URI url) throws RestClientException;
 
@@ -263,137 +271,128 @@ public interface AsyncRestOperations {
 	// OPTIONS
 
 	/**
-	 * Asynchronously return the value of the Allow header for the given URI.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * @param url the URL
-	 * @param uriVariables the variables to expand in the template
-	 * @return the value of the allow header wrapped in a {@link Future}
+	 * 异步返回给定URI的Allow头的值。
+	 * <p>如果有的话，使用给定的URI变量扩展URI模板变量。
+	 *
+	 * @param url          URL
+	 * @param uriVariables 要在模板中扩展的变量
+	 * @return 包装在{@link Future}中的allow头的值
 	 */
 	ListenableFuture<Set<HttpMethod>> optionsForAllow(String url, Object... uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Asynchronously return the value of the Allow header for the given URI.
-	 * <p>URI Template variables are expanded using the given map.
-	 * @param url the URL
-	 * @param uriVariables the variables to expand in the template
-	 * @return the value of the allow header wrapped in a {@link Future}
+	 * 异步返回给定URI的Allow头的值。
+	 * <p>使用给定的映射扩展URI模板变量。
+	 *
+	 * @param url          URL
+	 * @param uriVariables 要在模板中扩展的变量
+	 * @return 包装在{@link Future}中的allow头的值
 	 */
 	ListenableFuture<Set<HttpMethod>> optionsForAllow(String url, Map<String, ?> uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Asynchronously return the value of the Allow header for the given URL.
-	 * @param url the URL
-	 * @return the value of the allow header wrapped in a {@link Future}
+	 * 异步返回给定URL的Allow头的值。
+	 *
+	 * @param url URL
+	 * @return 包装在{@link Future}中的allow头的值
 	 */
 	ListenableFuture<Set<HttpMethod>> optionsForAllow(URI url) throws RestClientException;
 
 
-	// exchange
+	// 交换
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URI template, writing the
-	 * given request entity to the request, and returns the response as
-	 * {@link ResponseEntity}.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestEntity the entity (headers and/or body) to write to the request
-	 * (may be {@code null})
-	 * @param responseType the type of the return value
-	 * @param uriVariables the variables to expand in the template
-	 * @return the response as entity wrapped in a {@link Future}
+	 * 异步执行 HTTP 方法到给定的 URI 模板，将给定的请求实体写入请求，并将响应作为 {@link ResponseEntity} 返回。
+	 * <p>使用给定的 URI 变量扩展 URI 模板变量（如果有）。
+	 *
+	 * @param url           URL
+	 * @param method        HTTP 方法（GET、POST 等）
+	 * @param requestEntity 要写入请求的实体（标头和/或正文）（可能为 {@code null}）
+	 * @param responseType  返回值的类型
+	 * @param uriVariables  要在模板中扩展的变量
+	 * @return 用 {@link Future} 包装的响应实体
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> exchange(String url, HttpMethod method,
-			@Nullable HttpEntity<?> requestEntity, Class<T> responseType, Object... uriVariables)
+													 @Nullable HttpEntity<?> requestEntity, Class<T> responseType, Object... uriVariables)
 			throws RestClientException;
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URI template, writing the
-	 * given request entity to the request, and returns the response as
-	 * {@link ResponseEntity}.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestEntity the entity (headers and/or body) to write to the request
-	 * (may be {@code null})
-	 * @param responseType the type of the return value
-	 * @param uriVariables the variables to expand in the template
-	 * @return the response as entity wrapped in a {@link Future}
+	 * 异步执行 HTTP 方法到给定的 URI 模板，将给定的请求实体写入请求，并将响应作为 {@link ResponseEntity} 返回。
+	 * <p>使用给定的 URI 变量扩展 URI 模板变量（如果有）。
+	 *
+	 * @param url           URL
+	 * @param method        HTTP 方法（GET、POST 等）
+	 * @param requestEntity 要写入请求的实体（标头和/或正文）（可能为 {@code null}）
+	 * @param responseType  返回值的类型
+	 * @param uriVariables  要在模板中扩展的变量
+	 * @return 用 {@link Future} 包装的响应实体
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> exchange(String url, HttpMethod method,
-			@Nullable HttpEntity<?> requestEntity, Class<T> responseType,
-			Map<String, ?> uriVariables) throws RestClientException;
+													 @Nullable HttpEntity<?> requestEntity, Class<T> responseType,
+													 Map<String, ?> uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URI template, writing the
-	 * given request entity to the request, and returns the response as
-	 * {@link ResponseEntity}.
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestEntity the entity (headers and/or body) to write to the request
-	 * (may be {@code null})
-	 * @param responseType the type of the return value
-	 * @return the response as entity wrapped in a {@link Future}
+	 * 异步执行 HTTP 方法到给定的 URI 模板，将给定的请求实体写入请求，并将响应作为 {@link ResponseEntity} 返回。
+	 *
+	 * @param url           URL
+	 * @param method        HTTP 方法（GET、POST 等）
+	 * @param requestEntity 要写入请求的实体（标头和/或正文）（可能为 {@code null}）
+	 * @param responseType  返回值的类型
+	 * @return 用 {@link Future} 包装的响应实体
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> exchange(URI url, HttpMethod method,
-			@Nullable HttpEntity<?> requestEntity, Class<T> responseType)
+													 @Nullable HttpEntity<?> requestEntity, Class<T> responseType)
 			throws RestClientException;
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URI template, writing the given
-	 * request entity to the request, and returns the response as {@link ResponseEntity}.
-	 * The given {@link ParameterizedTypeReference} is used to pass generic type
-	 * information:
+	 * 异步执行 HTTP 方法到给定的 URI 模板，将给定的请求实体写入请求，并将响应作为 {@link ResponseEntity} 返回。
+	 * 给定的 {@link ParameterizedTypeReference} 用于传递泛型类型信息：
 	 * <pre class="code">
 	 * ParameterizedTypeReference&lt;List&lt;MyBean&gt;&gt; myBean =
 	 *     new ParameterizedTypeReference&lt;List&lt;MyBean&gt;&gt;() {};
 	 *
 	 * ResponseEntity&lt;List&lt;MyBean&gt;&gt; response =
-	 *     template.exchange(&quot;https://example.com&quot;,HttpMethod.GET, null, myBean);
+	 *     template.exchange("https://example.com", HttpMethod.GET, null, myBean);
 	 * </pre>
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestEntity the entity (headers and/or body) to write to the
-	 * request (may be {@code null})
-	 * @param responseType the type of the return value
-	 * @param uriVariables the variables to expand in the template
-	 * @return the response as entity wrapped in a {@link Future}
+	 *
+	 * @param url           URL
+	 * @param method        HTTP 方法（GET、POST 等）
+	 * @param requestEntity 要写入请求的实体（标头和/或正文）（可能为 {@code null}）
+	 * @param responseType  返回值的类型
+	 * @param uriVariables  要在模板中扩展的变量
+	 * @return 用 {@link Future} 包装的响应实体
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> exchange(String url, HttpMethod method,
-			@Nullable HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType,
-			Object... uriVariables) throws RestClientException;
+													 @Nullable HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType,
+													 Object... uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URI template, writing the given
-	 * request entity to the request, and returns the response as {@link ResponseEntity}.
-	 * The given {@link ParameterizedTypeReference} is used to pass generic type
-	 * information:
+	 * 异步执行 HTTP 方法到给定的 URI 模板，将给定的请求实体写入请求，并将响应作为 {@link ResponseEntity} 返回。
+	 * 给定的 {@link ParameterizedTypeReference} 用于传递泛型类型信息：
 	 * <pre class="code">
 	 * ParameterizedTypeReference&lt;List&lt;MyBean&gt;&gt; myBean =
 	 *     new ParameterizedTypeReference&lt;List&lt;MyBean&gt;&gt;() {};
 	 *
 	 * ResponseEntity&lt;List&lt;MyBean&gt;&gt; response =
-	 *     template.exchange(&quot;https://example.com&quot;,HttpMethod.GET, null, myBean);
+	 *     template.exchange("https://example.com", HttpMethod.GET, null, myBean);
 	 * </pre>
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestEntity the entity (headers and/or body) to write to the request
-	 * (may be {@code null})
-	 * @param responseType the type of the return value
-	 * @param uriVariables the variables to expand in the template
-	 * @return the response as entity wrapped in a {@link Future}
+	 *
+	 * @param url           URL
+	 * @param method        HTTP 方法（GET、POST 等）
+	 * @param requestEntity 要写入请求的实体（标头和/或正文）（可能为 {@code null}）
+	 * @param responseType  返回值的类型
+	 * @param uriVariables  要在模板中扩展的变量
+	 * @return 用 {@link Future} 包装的响应实体
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> exchange(String url, HttpMethod method,
-			@Nullable HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType,
-			Map<String, ?> uriVariables) throws RestClientException;
+													 @Nullable HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType,
+													 Map<String, ?> uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URI template, writing the given
-	 * request entity to the request, and returns the response as {@link ResponseEntity}.
-	 * The given {@link ParameterizedTypeReference} is used to pass generic type
-	 * information:
+	 * 异步执行HTTP方法到给定的URI模板，将给定的请求实体写入请求，并将响应作为{@link ResponseEntity}返回。
+	 * 给定的{@link ParameterizedTypeReference}用于传递泛型类型信息：
 	 * <pre class="code">
 	 * ParameterizedTypeReference&lt;List&lt;MyBean&gt;&gt; myBean =
 	 *     new ParameterizedTypeReference&lt;List&lt;MyBean&gt;&gt;() {};
@@ -401,64 +400,61 @@ public interface AsyncRestOperations {
 	 * ResponseEntity&lt;List&lt;MyBean&gt;&gt; response =
 	 *     template.exchange(&quot;https://example.com&quot;,HttpMethod.GET, null, myBean);
 	 * </pre>
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestEntity the entity (headers and/or body) to write to the request
-	 * (may be {@code null})
-	 * @param responseType the type of the return value
-	 * @return the response as entity wrapped in a {@link Future}
+	 *
+	 * @param url           URL
+	 * @param method        HTTP方法（GET、POST等）
+	 * @param requestEntity 要写入请求的实体（头部和/或正文）（可能为{@code null}）
+	 * @param responseType  返回值的类型
+	 * @return 作为实体包装在{@link Future}中的响应
 	 */
 	<T> ListenableFuture<ResponseEntity<T>> exchange(URI url, HttpMethod method,
-			@Nullable HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType)
+													 @Nullable HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType)
 			throws RestClientException;
 
 
-	// general execution
+	// 通用执行
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URI template, preparing the
-	 * request with the {@link AsyncRequestCallback}, and reading the response with a
-	 * {@link ResponseExtractor}.
-	 * <p>URI Template variables are expanded using the given URI variables, if any.
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestCallback object that prepares the request
-	 * @param responseExtractor object that extracts the return value from the response
-	 * @param uriVariables the variables to expand in the template
-	 * @return an arbitrary object, as returned by the {@link ResponseExtractor}
+	 * 异步执行HTTP方法到给定的URI模板，使用{@link AsyncRequestCallback}准备请求，并使用{@link ResponseExtractor}读取响应。
+	 * 如果有的话，使用给定的URI变量扩展URI模板变量。
+	 *
+	 * @param url               URL
+	 * @param method            HTTP方法（GET、POST等）
+	 * @param requestCallback   准备请求的对象
+	 * @param responseExtractor 从响应中提取返回值的对象
+	 * @param uriVariables      要在模板中扩展的变量
+	 * @return 由{@link ResponseExtractor}返回的任意对象
 	 */
 	<T> ListenableFuture<T> execute(String url, HttpMethod method,
-			@Nullable AsyncRequestCallback requestCallback, @Nullable ResponseExtractor<T> responseExtractor,
-			Object... uriVariables) throws RestClientException;
+									@Nullable AsyncRequestCallback requestCallback, @Nullable ResponseExtractor<T> responseExtractor,
+									Object... uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URI template, preparing the
-	 * request with the {@link AsyncRequestCallback}, and reading the response with a
-	 * {@link ResponseExtractor}.
-	 * <p>URI Template variables are expanded using the given URI variables map.
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestCallback object that prepares the request
-	 * @param responseExtractor object that extracts the return value from the response
-	 * @param uriVariables the variables to expand in the template
-	 * @return an arbitrary object, as returned by the {@link ResponseExtractor}
+	 * 异步执行HTTP方法到给定的URI模板，使用{@link AsyncRequestCallback}准备请求，并使用{@link ResponseExtractor}读取响应。
+	 * 使用给定的URI变量映射扩展URI模板变量。
+	 *
+	 * @param url               URL
+	 * @param method            HTTP方法（GET、POST等）
+	 * @param requestCallback   准备请求的对象
+	 * @param responseExtractor 从响应中提取返回值的对象
+	 * @param uriVariables      要在模板中扩展的变量
+	 * @return 由{@link ResponseExtractor}返回的任意对象
 	 */
 	<T> ListenableFuture<T> execute(String url, HttpMethod method,
-			@Nullable AsyncRequestCallback requestCallback, @Nullable ResponseExtractor<T> responseExtractor,
-			Map<String, ?> uriVariables) throws RestClientException;
+									@Nullable AsyncRequestCallback requestCallback, @Nullable ResponseExtractor<T> responseExtractor,
+									Map<String, ?> uriVariables) throws RestClientException;
 
 	/**
-	 * Asynchronously execute the HTTP method to the given URL, preparing the request
-	 * with the {@link AsyncRequestCallback}, and reading the response with a
-	 * {@link ResponseExtractor}.
-	 * @param url the URL
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param requestCallback object that prepares the request
-	 * @param responseExtractor object that extracts the return value from the response
-	 * @return an arbitrary object, as returned by the {@link ResponseExtractor}
+	 * 异步执行HTTP方法到给定的URL，使用{@link AsyncRequestCallback}准备请求，并使用{@link ResponseExtractor}读取响应。
+	 *
+	 * @param url               URL
+	 * @param method            HTTP方法（GET、POST等）
+	 * @param requestCallback   准备请求的对象
+	 * @param responseExtractor 从响应中提取返回值的对象
+	 * @return 由{@link ResponseExtractor}返回的任意对象
 	 */
 	<T> ListenableFuture<T> execute(URI url, HttpMethod method,
-			@Nullable AsyncRequestCallback requestCallback, @Nullable ResponseExtractor<T> responseExtractor)
+									@Nullable AsyncRequestCallback requestCallback, @Nullable ResponseExtractor<T> responseExtractor)
 			throws RestClientException;
 
 }
