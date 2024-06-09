@@ -16,15 +16,14 @@
 
 package org.springframework.web.client;
 
-import java.io.IOException;
-import java.net.URI;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 
+import java.io.IOException;
+import java.net.URI;
+
 /**
- * Strategy interface used by the {@link RestTemplate} to determine
- * whether a particular response has an error or not.
+ * {@link RestTemplate}使用的策略接口，用于确定特定响应是否有错误。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -32,31 +31,31 @@ import org.springframework.http.client.ClientHttpResponse;
 public interface ResponseErrorHandler {
 
 	/**
-	 * Indicate whether the given response has any errors.
-	 * <p>Implementations will typically inspect the
-	 * {@link ClientHttpResponse#getStatusCode() HttpStatus} of the response.
-	 * @param response the response to inspect
-	 * @return {@code true} if the response indicates an error; {@code false} otherwise
-	 * @throws IOException in case of I/O errors
+	 * 指示给定的响应是否有任何错误。
+	 * <p>实现通常会检查响应的{@link ClientHttpResponse#getStatusCode() HttpStatus}。
+	 *
+	 * @param response 要检查的响应
+	 * @return 如果响应指示错误，则为{@code true}；否则为{@code false}
+	 * @throws IOException 发生I/O错误时
 	 */
 	boolean hasError(ClientHttpResponse response) throws IOException;
 
 	/**
-	 * Handle the error in the given response.
-	 * <p>This method is only called when {@link #hasError(ClientHttpResponse)}
-	 * has returned {@code true}.
-	 * @param response the response with the error
-	 * @throws IOException in case of I/O errors
+	 * 处理给定响应中的错误。
+	 * <p>仅当{@link #hasError(ClientHttpResponse)}返回{@code true}时才会调用此方法。
+	 *
+	 * @param response 带有错误的响应
+	 * @throws IOException 发生I/O错误时
 	 */
 	void handleError(ClientHttpResponse response) throws IOException;
 
 	/**
-	 * Alternative to {@link #handleError(ClientHttpResponse)} with extra
-	 * information providing access to the request URL and HTTP method.
-	 * @param url the request URL
-	 * @param method the HTTP method
-	 * @param response the response with the error
-	 * @throws IOException in case of I/O errors
+	 * 与{@link #handleError(ClientHttpResponse)}的替代方法，提供了额外的信息，用于访问请求URL和HTTP方法。
+	 *
+	 * @param url      请求URL
+	 * @param method   HTTP方法
+	 * @param response 带有错误的响应
+	 * @throws IOException 发生I/O错误时
 	 * @since 5.0
 	 */
 	default void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
