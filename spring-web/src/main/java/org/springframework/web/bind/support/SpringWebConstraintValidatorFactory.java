@@ -16,26 +16,23 @@
 
 package org.springframework.web.bind.support;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
-
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorFactory;
+
 /**
- * JSR-303 {@link ConstraintValidatorFactory} implementation that delegates to
- * the current Spring {@link WebApplicationContext} for creating autowired
- * {@link ConstraintValidator} instances.
+ * JSR-303 {@link ConstraintValidatorFactory} 的实现，委托给当前的 Spring {@link WebApplicationContext}
+ * 来创建自动装配的 {@link ConstraintValidator} 实例。
  *
- * <p>In contrast to
- * {@link org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory},
- * this variant is meant for declarative use in a standard {@code validation.xml} file,
- * e.g. in combination with JAX-RS or JAX-WS.
+ * <p>与 {@link org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory} 相比，
+ * 这种变体旨在标准的 {@code validation.xml} 文件中声明性使用，例如与 JAX-RS 或 JAX-WS 结合使用。
  *
  * @author Juergen Hoeller
- * @since 4.2.1
  * @see ContextLoader#getCurrentWebApplicationContext()
  * @see org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory
+ * @since 4.2.1
  */
 public class SpringWebConstraintValidatorFactory implements ConstraintValidatorFactory {
 
@@ -44,7 +41,7 @@ public class SpringWebConstraintValidatorFactory implements ConstraintValidatorF
 		return getWebApplicationContext().getAutowireCapableBeanFactory().createBean(key);
 	}
 
-	// Bean Validation 1.1 releaseInstance method
+	// Bean Validation 1.1 releaseInstance 方法
 	@Override
 	public void releaseInstance(ConstraintValidator<?, ?> instance) {
 		getWebApplicationContext().getAutowireCapableBeanFactory().destroyBean(instance);
@@ -52,15 +49,17 @@ public class SpringWebConstraintValidatorFactory implements ConstraintValidatorF
 
 
 	/**
-	 * Retrieve the Spring {@link WebApplicationContext} to use.
-	 * The default implementation returns the current {@link WebApplicationContext}
-	 * as registered for the thread context class loader.
-	 * @return the current WebApplicationContext (never {@code null})
+	 * 检索要使用的 Spring {@link WebApplicationContext}。
+	 * 默认实现返回为线程上下文类加载器注册的当前 {@link WebApplicationContext}。
+	 *
+	 * @return 当前的 WebApplicationContext（从不为 {@code null}）
 	 * @see ContextLoader#getCurrentWebApplicationContext()
 	 */
 	protected WebApplicationContext getWebApplicationContext() {
+		// 获取当前线程的Web应用上下文
 		WebApplicationContext wac = ContextLoader.getCurrentWebApplicationContext();
 		if (wac == null) {
+			// 如果获取不到，则抛出异常
 			throw new IllegalStateException("No WebApplicationContext registered for current thread - " +
 					"consider overriding SpringWebConstraintValidatorFactory.getWebApplicationContext()");
 		}
