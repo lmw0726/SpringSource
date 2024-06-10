@@ -25,48 +25,68 @@ import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 
 /**
- * Convenient {@link WebBindingInitializer} for declarative configuration
- * in a Spring application context. Allows for reusing pre-configured
- * initializers with multiple controller/handlers.
+ * 用于在Spring应用程序上下文中声明式配置的便捷 {@link WebBindingInitializer}。
+ * 允许重用预配置的初始化器以供多个控制器/处理程序使用。
  *
  * @author Juergen Hoeller
- * @since 2.5
  * @see #setDirectFieldAccess
  * @see #setMessageCodesResolver
  * @see #setBindingErrorProcessor
  * @see #setValidator(Validator)
  * @see #setConversionService(ConversionService)
  * @see #setPropertyEditorRegistrar
+ * @since 2.5
  */
 public class ConfigurableWebBindingInitializer implements WebBindingInitializer {
 
+	/**
+	 * 是否尝试“自动增长”包含 null 值的嵌套路径，默认为 true。
+	 */
 	private boolean autoGrowNestedPaths = true;
 
+	/**
+	 * 是否使用直接字段访问而不是 bean 属性访问，默认为 false。
+	 */
 	private boolean directFieldAccess = false;
 
+	/**
+	 * 用于将错误解析为消息代码的策略。
+	 */
 	@Nullable
 	private MessageCodesResolver messageCodesResolver;
 
+	/**
+	 * 用于处理绑定错误的策略。
+	 */
 	@Nullable
 	private BindingErrorProcessor bindingErrorProcessor;
 
+	/**
+	 * 验证器。
+	 */
 	@Nullable
 	private Validator validator;
 
+	/**
+	 * 转换服务。
+	 */
 	@Nullable
 	private ConversionService conversionService;
 
+	/**
+	 * 属性编辑器注册器数组。
+	 */
 	@Nullable
 	private PropertyEditorRegistrar[] propertyEditorRegistrars;
 
 
 	/**
-	 * Set whether a binder should attempt to "auto-grow" a nested path that contains a null value.
-	 * <p>If "true", a null path location will be populated with a default object value and traversed
-	 * instead of resulting in an exception. This flag also enables auto-growth of collection elements
-	 * when accessing an out-of-bounds index.
-	 * <p>Default is "true" on a standard DataBinder. Note that this feature is only supported
-	 * for bean property access (DataBinder's default mode), not for field access.
+	 * 设置是否绑定器应尝试“自动增长”包含 null 值的嵌套路径。
+	 * <p>如果设置为“true”，则会将空路径位置填充为默认对象值并进行遍历，而不会导致异常。
+	 * 此标志还在访问超出范围的索引时启用集合元素的自动增长。
+	 * <p>在标准 DataBinder 上，默认为“true”。请注意，此功能仅支持 bean 属性访问（DataBinder 的默认模式），
+	 * 而不支持字段访问。
+	 *
 	 * @see org.springframework.validation.DataBinder#initBeanPropertyAccess()
 	 * @see org.springframework.validation.DataBinder#setAutoGrowNestedPaths
 	 */
@@ -75,16 +95,17 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Return whether a binder should attempt to "auto-grow" a nested path that contains a null value.
+	 * 返回是否绑定器应尝试“自动增长”包含 null 值的嵌套路径。
 	 */
 	public boolean isAutoGrowNestedPaths() {
 		return this.autoGrowNestedPaths;
 	}
 
 	/**
-	 * Set whether to use direct field access instead of bean property access.
-	 * <p>Default is {@code false}, using bean property access.
-	 * Switch this to {@code true} in order to enforce direct field access.
+	 * 设置是否使用直接字段访问而不是 bean 属性访问。
+	 * <p>默认为 {@code false}，即使用 bean 属性访问。
+	 * 将其设置为 {@code true} 以强制使用直接字段访问。
+	 *
 	 * @see org.springframework.validation.DataBinder#initDirectFieldAccess()
 	 * @see org.springframework.validation.DataBinder#initBeanPropertyAccess()
 	 */
@@ -93,17 +114,17 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Return whether to use direct field access instead of bean property access.
+	 * 返回是否使用直接字段访问而不是 bean 属性访问。
 	 */
 	public boolean isDirectFieldAccess() {
 		return this.directFieldAccess;
 	}
 
 	/**
-	 * Set the strategy to use for resolving errors into message codes.
-	 * Applies the given strategy to all data binders used by this controller.
-	 * <p>Default is {@code null}, i.e. using the default strategy of
-	 * the data binder.
+	 * 设置用于将错误解析为消息代码的策略。
+	 * 将给定策略应用于此控制器使用的所有数据绑定器。
+	 * <p>默认为 {@code null}，即使用数据绑定器的默认策略。
+	 *
 	 * @see org.springframework.validation.DataBinder#setMessageCodesResolver
 	 */
 	public final void setMessageCodesResolver(@Nullable MessageCodesResolver messageCodesResolver) {
@@ -111,7 +132,7 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Return the strategy to use for resolving errors into message codes.
+	 * 返回用于将错误解析为消息代码的策略。
 	 */
 	@Nullable
 	public final MessageCodesResolver getMessageCodesResolver() {
@@ -119,10 +140,9 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Set the strategy to use for processing binding errors, that is,
-	 * required field errors and {@code PropertyAccessException}s.
-	 * <p>Default is {@code null}, that is, using the default strategy
-	 * of the data binder.
+	 * 设置用于处理绑定错误的策略，即，必填字段错误和 {@code PropertyAccessException}。
+	 * <p>默认为 {@code null}，即使用数据绑定器的默认策略。
+	 *
 	 * @see org.springframework.validation.DataBinder#setBindingErrorProcessor
 	 */
 	public final void setBindingErrorProcessor(@Nullable BindingErrorProcessor bindingErrorProcessor) {
@@ -130,7 +150,7 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Return the strategy to use for processing binding errors.
+	 * 返回用于处理绑定错误的策略。
 	 */
 	@Nullable
 	public final BindingErrorProcessor getBindingErrorProcessor() {
@@ -138,14 +158,14 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Set the Validator to apply after each binding step.
+	 * 设置在每个绑定步骤之后应用的验证器。
 	 */
 	public final void setValidator(@Nullable Validator validator) {
 		this.validator = validator;
 	}
 
 	/**
-	 * Return the Validator to apply after each binding step, if any.
+	 * 返回在每个绑定步骤之后应用的验证器（如果有的话）。
 	 */
 	@Nullable
 	public final Validator getValidator() {
@@ -153,7 +173,8 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Specify a ConversionService which will apply to every DataBinder.
+	 * 指定将应用于每个 DataBinder 的 ConversionService。
+	 *
 	 * @since 3.0
 	 */
 	public final void setConversionService(@Nullable ConversionService conversionService) {
@@ -161,7 +182,7 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Return the ConversionService which will apply to every DataBinder.
+	 * 返回将应用于每个 DataBinder 的 ConversionService。
 	 */
 	@Nullable
 	public final ConversionService getConversionService() {
@@ -169,21 +190,21 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 	/**
-	 * Specify a single PropertyEditorRegistrar to be applied to every DataBinder.
+	 * 指定单个 PropertyEditorRegistrar，应用于每个 DataBinder。
 	 */
 	public final void setPropertyEditorRegistrar(PropertyEditorRegistrar propertyEditorRegistrar) {
-		this.propertyEditorRegistrars = new PropertyEditorRegistrar[] {propertyEditorRegistrar};
+		this.propertyEditorRegistrars = new PropertyEditorRegistrar[]{propertyEditorRegistrar};
 	}
 
 	/**
-	 * Specify multiple PropertyEditorRegistrars to be applied to every DataBinder.
+	 * 指定多个 PropertyEditorRegistrar，应用于每个 DataBinder。
 	 */
 	public final void setPropertyEditorRegistrars(@Nullable PropertyEditorRegistrar[] propertyEditorRegistrars) {
 		this.propertyEditorRegistrars = propertyEditorRegistrars;
 	}
 
 	/**
-	 * Return the PropertyEditorRegistrars to be applied to every DataBinder.
+	 * 返回将应用于每个 DataBinder 的 PropertyEditorRegistrar。
 	 */
 	@Nullable
 	public final PropertyEditorRegistrar[] getPropertyEditorRegistrars() {
@@ -193,25 +214,39 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 
 	@Override
 	public void initBinder(WebDataBinder binder) {
+		// 设置是否自动增长嵌套路径
 		binder.setAutoGrowNestedPaths(this.autoGrowNestedPaths);
+
+		// 如果启用了直接字段访问，则初始化 Binder 以使用直接字段访问
 		if (this.directFieldAccess) {
 			binder.initDirectFieldAccess();
 		}
+
+		// 设置消息代码解析器
 		if (this.messageCodesResolver != null) {
 			binder.setMessageCodesResolver(this.messageCodesResolver);
 		}
+
+		// 设置绑定错误处理器
 		if (this.bindingErrorProcessor != null) {
 			binder.setBindingErrorProcessor(this.bindingErrorProcessor);
 		}
+
+		// 设置验证器
 		if (this.validator != null && binder.getTarget() != null &&
 				this.validator.supports(binder.getTarget().getClass())) {
 			binder.setValidator(this.validator);
 		}
+
+		// 设置转换服务
 		if (this.conversionService != null) {
 			binder.setConversionService(this.conversionService);
 		}
+
+		// 如果属性编辑器注册器不为空
 		if (this.propertyEditorRegistrars != null) {
 			for (PropertyEditorRegistrar propertyEditorRegistrar : this.propertyEditorRegistrars) {
+				// 注册自定义属性编辑器
 				propertyEditorRegistrar.registerCustomEditors(binder);
 			}
 		}
