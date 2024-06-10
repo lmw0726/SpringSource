@@ -16,41 +16,40 @@
 
 package org.springframework.http;
 
+import reactor.core.publisher.Mono;
+
 import java.io.File;
 import java.nio.file.Path;
 
-import reactor.core.publisher.Mono;
-
 /**
- * Sub-interface of {@code ReactiveOutputMessage} that has support for "zero-copy"
- * file transfers.
+ * {@code ReactiveOutputMessage} 的子接口，支持 "zero-copy" 文件传输。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
- * @since 5.0
  * @see <a href="https://en.wikipedia.org/wiki/Zero-copy">Zero-copy</a>
+ * @since 5.0
  */
 public interface ZeroCopyHttpOutputMessage extends ReactiveHttpOutputMessage {
 
 	/**
-	 * Use the given {@link File} to write the body of the message to the underlying
-	 * HTTP layer.
-	 * @param file the file to transfer
-	 * @param position the position within the file from which the transfer is to begin
-	 * @param count the number of bytes to be transferred
-	 * @return a publisher that indicates completion or error.
+	 * 使用给定的 {@link File} 将消息的主体写入底层的 HTTP 层。
+	 *
+	 * @param file     要传输的文件
+	 * @param position 传输开始的文件中的位置
+	 * @param count    要传输的字节数
+	 * @return 表示完成或错误的发布者。
 	 */
 	default Mono<Void> writeWith(File file, long position, long count) {
 		return writeWith(file.toPath(), position, count);
 	}
 
 	/**
-	 * Use the given {@link Path} to write the body of the message to the underlying
-	 * HTTP layer.
-	 * @param file the file to transfer
-	 * @param position the position within the file from which the transfer is to begin
-	 * @param count the number of bytes to be transferred
-	 * @return a publisher that indicates completion or error.
+	 * 使用给定的 {@link Path} 将消息的主体写入底层的 HTTP 层。
+	 *
+	 * @param file     要传输的文件
+	 * @param position 传输开始的文件中的位置
+	 * @param count    要传输的字节数
+	 * @return 表示完成或错误的发布者。
 	 * @since 5.1
 	 */
 	Mono<Void> writeWith(Path file, long position, long count);

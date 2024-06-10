@@ -16,46 +16,68 @@
 
 package org.springframework.http.client.reactive;
 
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.Collection;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.netty.NettyOutbound;
-import reactor.netty.http.client.HttpClientRequest;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ZeroCopyHttpOutputMessage;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.netty.NettyOutbound;
+import reactor.netty.http.client.HttpClientRequest;
+
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.Collection;
 
 /**
- * {@link ClientHttpRequest} implementation for the Reactor-Netty HTTP client.
+ * 用于 Reactor-Netty HTTP 客户端的 {@link ClientHttpRequest} 实现。
  *
  * @author Brian Clozel
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see reactor.netty.http.client.HttpClient
+ * @since 5.0
  */
 class ReactorClientHttpRequest extends AbstractClientHttpRequest implements ZeroCopyHttpOutputMessage {
 
+	/**
+	 * HTTP请求方法
+	 */
 	private final HttpMethod httpMethod;
 
+	/**
+	 * 请求URI
+	 */
 	private final URI uri;
 
+	/**
+	 * Http客户端请求 实例
+	 */
 	private final HttpClientRequest request;
 
+	/**
+	 * Netty出站 实例
+	 */
 	private final NettyOutbound outbound;
 
+	/**
+	 * Netty数据缓冲区工厂
+	 */
 	private final NettyDataBufferFactory bufferFactory;
 
 
+	/**
+	 * 构造函数
+	 *
+	 * @param method   请求方法
+	 * @param uri      请求URI
+	 * @param request  HttpClientRequest实例
+	 * @param outbound NettyOutbound实例
+	 */
 	public ReactorClientHttpRequest(HttpMethod method, URI uri, HttpClientRequest request, NettyOutbound outbound) {
 		this.httpMethod = method;
 		this.uri = uri;
@@ -89,13 +111,13 @@ class ReactorClientHttpRequest extends AbstractClientHttpRequest implements Zero
 	@Override
 	public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
 		return doCommit(() -> {
-			// Send as Mono if possible as an optimization hint to Reactor Netty
+			// 如果body是Mono实例
 			if (body instanceof Mono) {
+				// 将body转换为Mono<ByteBuf>，并发送
 				Mono<ByteBuf> byteBufMono = Mono.from(body).map(NettyDataBufferFactory::toByteBuf);
 				return this.outbound.send(byteBufMono).then();
-
-			}
-			else {
+			} else {
+				// 否则，将body转换为Flux<ByteBuf>，并发送
 				Flux<ByteBuf> byteBufFlux = Flux.from(body).map(NettyDataBufferFactory::toByteBuf);
 				return this.outbound.send(byteBufFlux).then();
 			}
@@ -104,7 +126,9 @@ class ReactorClientHttpRequest extends AbstractClientHttpRequest implements Zero
 
 	@Override
 	public Mono<Void> writeAndFlushWith(Publisher<? extends Publisher<? extends DataBuffer>> body) {
+		// 将body转换为Publisher<Publisher<ByteBuf>>，每个元素代表一个ByteBuf流
 		Publisher<Publisher<ByteBuf>> byteBufs = Flux.from(body).map(ReactorClientHttpRequest::toByteBufs);
+		// 执行提交操作，发送字节缓冲组并返回结果
 		return doCommit(() -> this.outbound.sendGroups(byteBufs).then());
 	}
 
@@ -129,7 +153,9 @@ class ReactorClientHttpRequest extends AbstractClientHttpRequest implements Zero
 
 	@Override
 	protected void applyCookies() {
+		// 获取所有Cookie的值并扁平化为一个流
 		getCookies().values().stream().flatMap(Collection::stream)
+				// 将每个Cookie转换为 默认Cookie，并添加到请求中
 				.map(cookie -> new DefaultCookie(cookie.getName(), cookie.getValue()))
 				.forEach(this.request::addCookie);
 	}
