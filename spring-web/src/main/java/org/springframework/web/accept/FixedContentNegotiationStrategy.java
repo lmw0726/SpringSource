@@ -16,36 +16,38 @@
 
 package org.springframework.web.accept;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * A {@code ContentNegotiationStrategy} that returns a fixed content type.
+ * 一个返回固定内容类型的 {@code ContentNegotiationStrategy}。
  *
  * @author Rossen Stoyanchev
  * @since 3.2
  */
 public class FixedContentNegotiationStrategy implements ContentNegotiationStrategy {
-
+	/**
+	 * 内容类型列表
+	 */
 	private final List<MediaType> contentTypes;
 
 
 	/**
-	 * Constructor with a single default {@code MediaType}.
+	 * 使用单个默认 {@code MediaType} 的构造函数。
 	 */
 	public FixedContentNegotiationStrategy(MediaType contentType) {
 		this(Collections.singletonList(contentType));
 	}
 
 	/**
-	 * Constructor with an ordered List of default {@code MediaType}'s to return
-	 * for use in applications that support a variety of content types.
-	 * <p>Consider appending {@link MediaType#ALL} at the end if destinations
-	 * are present which do not support any of the other default media types.
+	 * 使用有序的 {@code MediaType} 列表的构造函数，用于返回一系列默认 {@code MediaType}，
+	 * 以便在支持多种内容类型的应用程序中使用。
+	 * <p>如果存在不支持任何其他默认媒体类型的目标，请考虑在末尾附加 {@link MediaType#ALL}。
+	 *
 	 * @since 5.0
 	 */
 	public FixedContentNegotiationStrategy(List<MediaType> contentTypes) {
@@ -55,7 +57,7 @@ public class FixedContentNegotiationStrategy implements ContentNegotiationStrate
 
 
 	/**
-	 * Return the configured list of media types.
+	 * 返回配置的媒体类型列表。
 	 */
 	public List<MediaType> getContentTypes() {
 		return this.contentTypes;

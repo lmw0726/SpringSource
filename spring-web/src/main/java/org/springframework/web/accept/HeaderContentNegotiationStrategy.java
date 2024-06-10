@@ -16,9 +16,6 @@
 
 package org.springframework.web.accept;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
@@ -26,8 +23,11 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * A {@code ContentNegotiationStrategy} that checks the 'Accept' request header.
+ * 一个检查 'Accept' 请求头的 {@code ContentNegotiationStrategy}。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -37,24 +37,32 @@ public class HeaderContentNegotiationStrategy implements ContentNegotiationStrat
 
 	/**
 	 * {@inheritDoc}
-	 * @throws HttpMediaTypeNotAcceptableException if the 'Accept' header cannot be parsed
+	 *
+	 * @throws HttpMediaTypeNotAcceptableException 如果无法解析 'Accept' 头
 	 */
 	@Override
 	public List<MediaType> resolveMediaTypes(NativeWebRequest request)
 			throws HttpMediaTypeNotAcceptableException {
 
+		// 获取请求中Accept头的值数组
 		String[] headerValueArray = request.getHeaderValues(HttpHeaders.ACCEPT);
+		// 如果Accept头的值数组为空，则返回默认的媒体类型列表
 		if (headerValueArray == null) {
 			return MEDIA_TYPE_ALL_LIST;
 		}
 
+		// 将Accept头的值数组转换为列表
 		List<String> headerValues = Arrays.asList(headerValueArray);
 		try {
+			// 解析Accept头的媒体类型
 			List<MediaType> mediaTypes = MediaType.parseMediaTypes(headerValues);
+			// 按照优先级和质量进行排序
 			MediaType.sortBySpecificityAndQuality(mediaTypes);
+			// 如果解析的媒体类型列表不为空，则返回该列表；
+			// 否则返回默认的媒体类型列表
 			return !CollectionUtils.isEmpty(mediaTypes) ? mediaTypes : MEDIA_TYPE_ALL_LIST;
-		}
-		catch (InvalidMediaTypeException ex) {
+		} catch (InvalidMediaTypeException ex) {
+			// 如果解析过程中发生错误，则抛出HttpMediaTypeNotAcceptableException异常
 			throw new HttpMediaTypeNotAcceptableException(
 					"Could not parse 'Accept' header " + headerValues + ": " + ex.getMessage());
 		}

@@ -16,10 +16,6 @@
 
 package org.springframework.web.accept;
 
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
@@ -28,34 +24,37 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import javax.servlet.ServletContext;
+import java.util.Map;
+
 /**
- * Extends {@code PathExtensionContentNegotiationStrategy} that also uses
- * {@link ServletContext#getMimeType(String)} to resolve file extensions.
+ * 扩展 {@code PathExtensionContentNegotiationStrategy}，还使用
+ * {@link ServletContext#getMimeType(String)} 来解析文件扩展名。
  *
  * @author Rossen Stoyanchev
  * @since 3.2
- * @deprecated as of 5.2.4. See class-level note in
- * {@link ContentNegotiationManagerFactoryBean} on the deprecation of path
- * extension config options.
+ * @deprecated 从 5.2.4 开始。请参阅 {@link ContentNegotiationManagerFactoryBean} 中的类级别注释，了解路径扩展名配置选项的已弃用情况。
  */
 @Deprecated
 public class ServletPathExtensionContentNegotiationStrategy extends PathExtensionContentNegotiationStrategy {
-
+	/**
+	 * Servlet上下文
+	 */
 	private final ServletContext servletContext;
 
 
 	/**
-	 * Create an instance without any mappings to start with. Mappings may be
-	 * added later when extensions are resolved through
-	 * {@link ServletContext#getMimeType(String)} or via
-	 * {@link org.springframework.http.MediaTypeFactory}.
+	 * 创建一个没有任何映射的实例。当通过
+	 * {@link ServletContext#getMimeType(String)} 或
+	 * 通过 {@link org.springframework.http.MediaTypeFactory} 解析扩展名时，
+	 * 可以稍后添加映射。
 	 */
 	public ServletPathExtensionContentNegotiationStrategy(ServletContext context) {
 		this(context, null);
 	}
 
 	/**
-	 * Create an instance with the given extension-to-MediaType lookup.
+	 * 使用给定的扩展名到 MediaType 查找创建一个实例。
 	 */
 	public ServletPathExtensionContentNegotiationStrategy(
 			ServletContext servletContext, @Nullable Map<String, MediaType> mediaTypes) {
@@ -67,9 +66,9 @@ public class ServletPathExtensionContentNegotiationStrategy extends PathExtensio
 
 
 	/**
-	 * Resolve file extension via {@link ServletContext#getMimeType(String)}
-	 * and also delegate to base class for a potential
-	 * {@link org.springframework.http.MediaTypeFactory} lookup.
+	 * 通过 {@link ServletContext#getMimeType(String)} 解析文件扩展名，
+	 * 并且也委托给基类进行可能的
+	 * {@link org.springframework.http.MediaTypeFactory} 查找。
 	 */
 	@Override
 	@Nullable
@@ -77,40 +76,58 @@ public class ServletPathExtensionContentNegotiationStrategy extends PathExtensio
 			throws HttpMediaTypeNotAcceptableException {
 
 		MediaType mediaType = null;
+
+		// 获取指定文件扩展名对应的 MIME 类型
 		String mimeType = this.servletContext.getMimeType("file." + extension);
+
 		if (StringUtils.hasText(mimeType)) {
+			// 如果 MIME 类型不为空，则解析为媒体类型
 			mediaType = MediaType.parseMediaType(mimeType);
 		}
+
+		// 如果媒体类型仍然为空，或者是 application_octet_stream 类型
 		if (mediaType == null || MediaType.APPLICATION_OCTET_STREAM.equals(mediaType)) {
+			// 调用父类的 handleNoMatch 方法获取媒体类型
 			MediaType superMediaType = super.handleNoMatch(webRequest, extension);
+
+			// 如果父类返回了媒体类型，则使用父类返回的媒体类型
 			if (superMediaType != null) {
 				mediaType = superMediaType;
 			}
 		}
+
+		// 返回解析或获取的媒体类型
 		return mediaType;
 	}
 
 	/**
-	 * Extends the base class
-	 * {@link PathExtensionContentNegotiationStrategy#getMediaTypeForResource}
-	 * with the ability to also look up through the ServletContext.
-	 * @param resource the resource to look up
-	 * @return the MediaType for the extension, or {@code null} if none found
+	 * 扩展基类 {@link PathExtensionContentNegotiationStrategy#getMediaTypeForResource}，
+	 * 还能够通过 ServletContext 进行查找。
+	 *
+	 * @param resource 要查找的资源
+	 * @return 扩展名的 MediaType，如果找不到则返回 {@code null}
 	 * @since 4.3
 	 */
 	@Override
 	public MediaType getMediaTypeForResource(Resource resource) {
+		// 初始化媒体类型为null
 		MediaType mediaType = null;
+		// 获取资源文件名对应的MIME类型
 		String mimeType = this.servletContext.getMimeType(resource.getFilename());
+		// 如果MIME类型不为空，则解析为媒体类型
 		if (StringUtils.hasText(mimeType)) {
 			mediaType = MediaType.parseMediaType(mimeType);
 		}
+		// 如果媒体类型为null，或为 application_octet_stream
 		if (mediaType == null || MediaType.APPLICATION_OCTET_STREAM.equals(mediaType)) {
+			// 调用父类方法获取资源的媒体类型
 			MediaType superMediaType = super.getMediaTypeForResource(resource);
+			// 如果父类方法返回的媒体类型不为空，则使用父类方法返回的媒体类型
 			if (superMediaType != null) {
 				mediaType = superMediaType;
 			}
 		}
+		// 返回媒体类型
 		return mediaType;
 	}
 

@@ -16,11 +16,6 @@
 
 package org.springframework.web.accept;
 
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
@@ -31,48 +26,58 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.UrlPathHelper;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
+import java.util.Map;
+
 /**
- * A {@code ContentNegotiationStrategy} that resolves the file extension in the
- * request path to a key to be used to look up a media type.
+ * 一个 {@code ContentNegotiationStrategy}，将请求路径中的文件扩展名解析为用于查找媒体类型的键。
  *
- * <p>If the file extension is not found in the explicit registrations provided
- * to the constructor, the {@link MediaTypeFactory} is used as a fallback
- * mechanism.
+ * <p>如果文件扩展名在构造函数中提供的显式注册中找不到，则使用 {@link MediaTypeFactory} 作为后备机制。
  *
  * @author Rossen Stoyanchev
  * @since 3.2
- * @deprecated as of 5.2.4. See class-level note in
- * {@link ContentNegotiationManagerFactoryBean} on the deprecation of path
- * extension config options.
+ * @deprecated 从 5.2.4 开始。
+ * 请参阅 {@link ContentNegotiationManagerFactoryBean} 中的类级别注释，
+ * 了解路径扩展名配置选项的已弃用情况。
  */
 @Deprecated
 public class PathExtensionContentNegotiationStrategy extends AbstractMappingContentNegotiationStrategy {
-
+	/**
+	 * URL路径助手
+	 */
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
 
 	/**
-	 * Create an instance without any mappings to start with. Mappings may be added
-	 * later on if any extensions are resolved through the Java Activation framework.
+	 * 创建一个没有任何映射的实例。如果通过 Java 激活框架解析任何扩展名，则稍后可以添加映射。
 	 */
 	public PathExtensionContentNegotiationStrategy() {
 		this(null);
 	}
 
 	/**
-	 * Create an instance with the given map of file extensions and media types.
+	 * 使用给定的文件扩展名和媒体类型映射创建一个实例。
 	 */
 	public PathExtensionContentNegotiationStrategy(@Nullable Map<String, MediaType> mediaTypes) {
+		// 调用父类的构造函数，使用给定的媒体类型列表初始化
 		super(mediaTypes);
+
+		// 设置是否仅使用已注册的扩展名
 		setUseRegisteredExtensionsOnly(false);
+
+		// 设置是否忽略未知的扩展名
 		setIgnoreUnknownExtensions(true);
+
+		// 禁用 URL 解码
 		this.urlPathHelper.setUrlDecode(false);
 	}
 
 
 	/**
-	 * Configure a {@code UrlPathHelper} to use in {@link #getMediaTypeKey}
-	 * in order to derive the lookup path for a target request URL path.
+	 * 配置一个 {@code UrlPathHelper} 用于 {@link #getMediaTypeKey} 中使用，
+	 * 以便为目标请求 URL 路径派生查找路径。
+	 *
 	 * @since 4.2.8
 	 */
 	public void setUrlPathHelper(UrlPathHelper urlPathHelper) {
@@ -80,9 +85,9 @@ public class PathExtensionContentNegotiationStrategy extends AbstractMappingCont
 	}
 
 	/**
-	 * Indicate whether to use the Java Activation Framework as a fallback option
-	 * to map from file extensions to media types.
-	 * @deprecated as of 5.0, in favor of {@link #setUseRegisteredExtensionsOnly(boolean)}.
+	 * 指示是否使用 Java 激活框架作为从文件扩展名到媒体类型的后备选项映射。
+	 *
+	 * @deprecated 从 5.0 开始，使用 {@link #setUseRegisteredExtensionsOnly(boolean)}。
 	 */
 	@Deprecated
 	public void setUseJaf(boolean useJaf) {
@@ -92,37 +97,45 @@ public class PathExtensionContentNegotiationStrategy extends AbstractMappingCont
 	@Override
 	@Nullable
 	protected String getMediaTypeKey(NativeWebRequest webRequest) {
+		// 从 Web请求 中获取原生 HttpServlet请求 对象
 		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		// 如果获取的 HttpServlet请求 为空，则返回null
 		if (request == null) {
 			return null;
 		}
-		// Ignore LOOKUP_PATH attribute, use our own "fixed" UrlPathHelper with decoding off
+		// 忽略 LOOKUP_PATH 属性，使用自定义的 Url路径助手，并关闭解码
 		String path = this.urlPathHelper.getLookupPathForRequest(request);
+		// 提取路径中的文件扩展名
 		String extension = UriUtils.extractFileExtension(path);
+		// 如果提取到的扩展名不为空，则转换为小写并返回；否则返回null
 		return (StringUtils.hasText(extension) ? extension.toLowerCase(Locale.ENGLISH) : null);
 	}
 
 	/**
-	 * A public method exposing the knowledge of the path extension strategy to
-	 * resolve file extensions to a {@link MediaType} in this case for a given
-	 * {@link Resource}. The method first looks up any explicitly registered
-	 * file extensions first and then falls back on {@link MediaTypeFactory} if available.
-	 * @param resource the resource to look up
-	 * @return the MediaType for the extension, or {@code null} if none found
+	 * 一个公共方法，将路径扩展名策略的知识暴露给这个方法来为给定的 {@link Resource} 解析文件扩展名到 {@link MediaType}。
+	 * 该方法首先查找任何显式注册的文件扩展名，然后如果可用，则使用 {@link MediaTypeFactory} 进行后备。
+	 *
+	 * @param resource 要查找的资源
+	 * @return 扩展名的 MediaType，如果找不到则返回 {@code null}
 	 * @since 4.3
 	 */
 	@Nullable
 	public MediaType getMediaTypeForResource(Resource resource) {
 		Assert.notNull(resource, "Resource must not be null");
 		MediaType mediaType = null;
+		// 获取资源文件名
 		String filename = resource.getFilename();
+		// 获取文件名的扩展名
 		String extension = StringUtils.getFilenameExtension(filename);
 		if (extension != null) {
+			// 如果扩展名不为空，则查找对应的媒体类型
 			mediaType = lookupMediaType(extension);
 		}
 		if (mediaType == null) {
+			// 如果媒体类型仍为null，则使用 媒体类型工厂 获取媒体类型
 			mediaType = MediaTypeFactory.getMediaType(filename).orElse(null);
 		}
+		// 返回媒体类型
 		return mediaType;
 	}
 
