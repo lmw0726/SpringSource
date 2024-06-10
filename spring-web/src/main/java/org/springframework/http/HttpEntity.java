@@ -21,23 +21,22 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Represents an HTTP request or response entity, consisting of headers and body.
+ * 表示 HTTP 请求或响应实体，包括头部和主体。
  *
- * <p>Often used in combination with the {@link org.springframework.web.client.RestTemplate},
- * like so:
+ * <p>通常与 {@link org.springframework.web.client.RestTemplate} 结合使用，如下所示：
  * <pre class="code">
  * HttpHeaders headers = new HttpHeaders();
  * headers.setContentType(MediaType.TEXT_PLAIN);
  * HttpEntity&lt;String&gt; entity = new HttpEntity&lt;&gt;("Hello World", headers);
  * URI location = template.postForLocation("https://example.com", entity);
  * </pre>
- * or
+ * 或者
  * <pre class="code">
  * HttpEntity&lt;String&gt; entity = template.getForEntity("https://example.com", String.class);
  * String body = entity.getBody();
  * MediaType contentType = entity.getHeaders().getContentType();
  * </pre>
- * Can also be used in Spring MVC, as a return value from a @Controller method:
+ * 还可以在 Spring MVC 中作为 @Controller 方法的返回值使用：
  * <pre class="code">
  * &#64;GetMapping("/handle")
  * public HttpEntity&lt;String&gt; handle() {
@@ -47,55 +46,63 @@ import org.springframework.util.ObjectUtils;
  * }
  * </pre>
  *
+ * @param <T> 主体类型
  * @author Arjen Poutsma
  * @author Juergen Hoeller
- * @since 3.0.2
- * @param <T> the body type
  * @see org.springframework.web.client.RestTemplate
  * @see #getBody()
  * @see #getHeaders()
+ * @since 3.0.2
  */
 public class HttpEntity<T> {
 
 	/**
-	 * The empty {@code HttpEntity}, with no body or headers.
+	 * 空的 {@code HttpEntity}，没有主体或头部。
 	 */
 	public static final HttpEntity<?> EMPTY = new HttpEntity<>();
 
-
+	/**
+	 * 实体头部
+	 */
 	private final HttpHeaders headers;
 
+	/**
+	 * 实体主体
+	 */
 	@Nullable
 	private final T body;
 
 
 	/**
-	 * Create a new, empty {@code HttpEntity}.
+	 * 创建一个新的空 {@code HttpEntity}。
 	 */
 	protected HttpEntity() {
 		this(null, null);
 	}
 
 	/**
-	 * Create a new {@code HttpEntity} with the given body and no headers.
-	 * @param body the entity body
+	 * 创建一个具有给定主体但没有头部的新 {@code HttpEntity}。
+	 *
+	 * @param body 实体主体
 	 */
 	public HttpEntity(T body) {
 		this(body, null);
 	}
 
 	/**
-	 * Create a new {@code HttpEntity} with the given headers and no body.
-	 * @param headers the entity headers
+	 * 创建一个具有给定头部但没有主体的新 {@code HttpEntity}。
+	 *
+	 * @param headers 实体头部
 	 */
 	public HttpEntity(MultiValueMap<String, String> headers) {
 		this(null, headers);
 	}
 
 	/**
-	 * Create a new {@code HttpEntity} with the given body and headers.
-	 * @param body the entity body
-	 * @param headers the entity headers
+	 * 创建一个具有给定主体和头部的新 {@code HttpEntity}。
+	 *
+	 * @param body    实体主体
+	 * @param headers 实体头部
 	 */
 	public HttpEntity(@Nullable T body, @Nullable MultiValueMap<String, String> headers) {
 		this.body = body;
@@ -104,14 +111,14 @@ public class HttpEntity<T> {
 
 
 	/**
-	 * Returns the headers of this entity.
+	 * 返回此实体的头部。
 	 */
 	public HttpHeaders getHeaders() {
 		return this.headers;
 	}
 
 	/**
-	 * Returns the body of this entity.
+	 * 返回此实体的主体。
 	 */
 	@Nullable
 	public T getBody() {
@@ -119,7 +126,7 @@ public class HttpEntity<T> {
 	}
 
 	/**
-	 * Indicates whether this entity has a body.
+	 * 表示此实体是否具有主体。
 	 */
 	public boolean hasBody() {
 		return (this.body != null);
@@ -146,13 +153,18 @@ public class HttpEntity<T> {
 
 	@Override
 	public String toString() {
+		// 创建一个 字符串构建器 对象
 		StringBuilder builder = new StringBuilder("<");
 		if (this.body != null) {
+			// 如果消息体不为空，则将消息体添加到字符串构建器中
 			builder.append(this.body);
 			builder.append(',');
 		}
+		// 将消息头部添加到字符串构建器中
 		builder.append(this.headers);
+		// 添加结尾字符
 		builder.append('>');
+		// 返回构建的字符串
 		return builder.toString();
 	}
 
