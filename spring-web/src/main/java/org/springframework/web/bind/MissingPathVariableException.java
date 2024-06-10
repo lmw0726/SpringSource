@@ -19,38 +19,42 @@ package org.springframework.web.bind;
 import org.springframework.core.MethodParameter;
 
 /**
- * {@link ServletRequestBindingException} subclass that indicates that a path
- * variable expected in the method parameters of an {@code @RequestMapping}
- * method is not present among the URI variables extracted from the URL.
- * Typically that means the URI template does not match the path variable name
- * declared on the method parameter.
+ * {@link ServletRequestBindingException} 的子类，指示在 {@code @RequestMapping} 方法的方法参数中期望的路径变量不存在于从 URL 中提取的 URI 变量中。
+ * 通常这意味着 URI 模板与在方法参数上声明的路径变量名称不匹配。
  *
  * @author Rossen Stoyanchev
- * @since 4.2
  * @see MissingMatrixVariableException
+ * @since 4.2
  */
 @SuppressWarnings("serial")
 public class MissingPathVariableException extends MissingRequestValueException {
-
+	/**
+	 * 变量名称
+	 */
 	private final String variableName;
 
+	/**
+	 * 方法参数
+	 */
 	private final MethodParameter parameter;
 
 
 	/**
-	 * Constructor for MissingPathVariableException.
-	 * @param variableName the name of the missing path variable
-	 * @param parameter the method parameter
+	 * MissingPathVariableException 的构造函数。
+	 *
+	 * @param variableName 缺失的路径变量的名称
+	 * @param parameter    方法参数
 	 */
 	public MissingPathVariableException(String variableName, MethodParameter parameter) {
 		this(variableName, parameter, false);
 	}
 
 	/**
-	 * Constructor for use when a value was present but converted to {@code null}.
-	 * @param variableName the name of the missing path variable
-	 * @param parameter the method parameter
-	 * @param missingAfterConversion whether the value became null after conversion
+	 * 在存在值但转换为 {@code null} 时使用的构造函数。
+	 *
+	 * @param variableName           缺失的路径变量的名称
+	 * @param parameter              方法参数
+	 * @param missingAfterConversion 在转换后值是否变为 null
 	 * @since 5.3.6
 	 */
 	public MissingPathVariableException(
@@ -70,14 +74,14 @@ public class MissingPathVariableException extends MissingRequestValueException {
 	}
 
 	/**
-	 * Return the expected name of the path variable.
+	 * 返回期望的路径变量的名称。
 	 */
 	public final String getVariableName() {
 		return this.variableName;
 	}
 
 	/**
-	 * Return the method parameter bound to the path variable.
+	 * 返回绑定到路径变量的方法参数。
 	 */
 	public final MethodParameter getParameter() {
 		return this.parameter;

@@ -17,23 +17,33 @@
 package org.springframework.web.bind;
 
 /**
- * Base class for {@link ServletRequestBindingException} exceptions that could
- * not bind because the request value is required but is either missing or
- * otherwise resolves to {@code null} after conversion.
+ * {@link ServletRequestBindingException}的基类，用于处理因请求值是必需的但缺失或在转换后解析为{@code null}而无法绑定的情况。
  *
  * @author Rossen Stoyanchev
  * @since 5.3.6
  */
 @SuppressWarnings("serial")
 public class MissingRequestValueException extends ServletRequestBindingException {
-
+	/**
+	 * 请求值是否存在但转换为null
+	 */
 	private final boolean missingAfterConversion;
 
-
+	/**
+	 * 使用指定的消息创建一个新的MissingRequestValueException实例。
+	 *
+	 * @param msg 详细信息
+	 */
 	public MissingRequestValueException(String msg) {
 		this(msg, false);
 	}
 
+	/**
+	 * 使用指定的消息和转换后是否缺失的标志创建一个新的MissingRequestValueException实例。
+	 *
+	 * @param msg                    详细信息
+	 * @param missingAfterConversion 值在转换后是否变为null
+	 */
 	public MissingRequestValueException(String msg, boolean missingAfterConversion) {
 		super(msg);
 		this.missingAfterConversion = missingAfterConversion;
@@ -41,8 +51,9 @@ public class MissingRequestValueException extends ServletRequestBindingException
 
 
 	/**
-	 * Whether the request value was present but converted to {@code null}, e.g. via
-	 * {@code org.springframework.core.convert.support.IdToEntityConverter}.
+	 * 请求值是否存在但转换为{@code null}，例如通过{@code org.springframework.core.convert.support.IdToEntityConverter}。
+	 *
+	 * @return 如果值在转换后变为null，则返回true
 	 */
 	public boolean isMissingAfterConversion() {
 		return this.missingAfterConversion;

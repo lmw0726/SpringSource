@@ -22,8 +22,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
 /**
- * Exception to be thrown when validation on an argument annotated with {@code @Valid} fails.
- * Extends {@link BindException} as of 5.3.
+ * 在使用 {@code @Valid} 注解的参数上的验证失败时抛出的异常。从 5.3 版开始扩展 {@link BindException}。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -31,14 +30,17 @@ import org.springframework.validation.ObjectError;
  */
 @SuppressWarnings("serial")
 public class MethodArgumentNotValidException extends BindException {
-
+	/**
+	 * 方法参数
+	 */
 	private final MethodParameter parameter;
 
 
 	/**
-	 * Constructor for {@link MethodArgumentNotValidException}.
-	 * @param parameter the parameter that failed validation
-	 * @param bindingResult the results of the validation
+	 * MethodArgumentNotValidException 的构造函数。
+	 *
+	 * @param parameter     验证失败的参数
+	 * @param bindingResult 验证结果
 	 */
 	public MethodArgumentNotValidException(MethodParameter parameter, BindingResult bindingResult) {
 		super(bindingResult);
@@ -47,7 +49,7 @@ public class MethodArgumentNotValidException extends BindException {
 
 
 	/**
-	 * Return the method parameter that failed validation.
+	 * 返回验证失败的方法参数。
 	 */
 	public final MethodParameter getParameter() {
 		return this.parameter;
@@ -55,17 +57,32 @@ public class MethodArgumentNotValidException extends BindException {
 
 	@Override
 	public String getMessage() {
+		// 创建一个 字符串构建器 对象
 		StringBuilder sb = new StringBuilder("Validation failed for argument [")
+				// 添加参数索引
 				.append(this.parameter.getParameterIndex()).append("] in ")
+				// 添加方法的泛型字符串
 				.append(this.parameter.getExecutable().toGenericString());
+
+		// 获取绑定结果
 		BindingResult bindingResult = getBindingResult();
+
+		// 如果有多个验证错误
 		if (bindingResult.getErrorCount() > 1) {
+			// 添加错误数
 			sb.append(" with ").append(bindingResult.getErrorCount()).append(" errors");
 		}
+
+		// 添加分隔符
 		sb.append(": ");
+
+		// 遍历所有验证错误
 		for (ObjectError error : bindingResult.getAllErrors()) {
+			// 将其添加到结果字符串中
 			sb.append('[').append(error).append("] ");
 		}
+
+		// 返回构建的完整字符串
 		return sb.toString();
 	}
 

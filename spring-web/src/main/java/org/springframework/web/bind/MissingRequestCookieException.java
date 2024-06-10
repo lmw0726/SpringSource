@@ -19,36 +19,41 @@ package org.springframework.web.bind;
 import org.springframework.core.MethodParameter;
 
 /**
- * {@link ServletRequestBindingException} subclass that indicates
- * that a request cookie expected in the method parameters of an
- * {@code @RequestMapping} method is not present.
+ * {@link ServletRequestBindingException} 的子类，指示在 {@code @RequestMapping} 方法的方法参数中期望的请求 cookie 不存在。
  *
  * @author Juergen Hoeller
- * @since 5.1
  * @see MissingRequestHeaderException
+ * @since 5.1
  */
 @SuppressWarnings("serial")
 public class MissingRequestCookieException extends MissingRequestValueException {
-
+	/**
+	 * Cookie名称
+	 */
 	private final String cookieName;
 
+	/**
+	 * 方法参数
+	 */
 	private final MethodParameter parameter;
 
 
 	/**
-	 * Constructor for MissingRequestCookieException.
-	 * @param cookieName the name of the missing request cookie
-	 * @param parameter the method parameter
+	 * MissingRequestCookieException 的构造函数。
+	 *
+	 * @param cookieName 缺失的请求 cookie 的名称
+	 * @param parameter  方法参数
 	 */
 	public MissingRequestCookieException(String cookieName, MethodParameter parameter) {
 		this(cookieName, parameter, false);
 	}
 
 	/**
-	 * Constructor for use when a value was present but converted to {@code null}.
-	 * @param cookieName the name of the missing request cookie
-	 * @param parameter the method parameter
-	 * @param missingAfterConversion whether the value became null after conversion
+	 * 在存在值但转换为 {@code null} 时使用的构造函数。
+	 *
+	 * @param cookieName             缺失的请求 cookie 的名称
+	 * @param parameter              方法参数
+	 * @param missingAfterConversion 在转换后值是否变为 null
 	 * @since 5.3.6
 	 */
 	public MissingRequestCookieException(
@@ -68,14 +73,14 @@ public class MissingRequestCookieException extends MissingRequestValueException 
 	}
 
 	/**
-	 * Return the expected name of the request cookie.
+	 * 返回期望的请求 cookie 的名称。
 	 */
 	public final String getCookieName() {
 		return this.cookieName;
 	}
 
 	/**
-	 * Return the method parameter bound to the request cookie.
+	 * 返回绑定到请求 cookie 的方法参数。
 	 */
 	public final MethodParameter getParameter() {
 		return this.parameter;

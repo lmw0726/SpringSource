@@ -19,36 +19,41 @@ package org.springframework.web.bind;
 import org.springframework.core.MethodParameter;
 
 /**
- * {@link ServletRequestBindingException} subclass that indicates
- * that a request header expected in the method parameters of an
- * {@code @RequestMapping} method is not present.
+ * 表示在 {@code @RequestMapping} 方法的参数中预期的请求头不存在的 {@link ServletRequestBindingException} 子类。
  *
  * @author Juergen Hoeller
- * @since 5.1
  * @see MissingRequestCookieException
+ * @since 5.1
  */
 @SuppressWarnings("serial")
 public class MissingRequestHeaderException extends MissingRequestValueException {
-
+	/**
+	 * 请求头名称
+	 */
 	private final String headerName;
 
+	/**
+	 * 方法参数
+	 */
 	private final MethodParameter parameter;
 
 
 	/**
-	 * Constructor for MissingRequestHeaderException.
-	 * @param headerName the name of the missing request header
-	 * @param parameter the method parameter
+	 * MissingRequestHeaderException 的构造函数。
+	 *
+	 * @param headerName 缺少的请求头的名称
+	 * @param parameter  方法参数
 	 */
 	public MissingRequestHeaderException(String headerName, MethodParameter parameter) {
 		this(headerName, parameter, false);
 	}
 
 	/**
-	 * Constructor for use when a value was present but converted to {@code null}.
-	 * @param headerName the name of the missing request header
-	 * @param parameter the method parameter
-	 * @param missingAfterConversion whether the value became null after conversion
+	 * 当值存在但转换为 {@code null} 时使用的构造函数。
+	 *
+	 * @param headerName             缺少的请求头的名称
+	 * @param parameter              方法参数
+	 * @param missingAfterConversion 值在转换后变为 null
 	 * @since 5.3.6
 	 */
 	public MissingRequestHeaderException(
@@ -62,20 +67,23 @@ public class MissingRequestHeaderException extends MissingRequestValueException 
 
 	@Override
 	public String getMessage() {
+		// 获取参数的嵌套参数类型的简单名称
 		String typeName = this.parameter.getNestedParameterType().getSimpleName();
+
+		// 构造描述请求头缺失的字符串
 		return "Required request header '" + this.headerName + "' for method parameter type " + typeName + " is " +
 				(isMissingAfterConversion() ? "present but converted to null" : "not present");
 	}
 
 	/**
-	 * Return the expected name of the request header.
+	 * 返回预期的请求头名称。
 	 */
 	public final String getHeaderName() {
 		return this.headerName;
 	}
 
 	/**
-	 * Return the method parameter bound to the request header.
+	 * 返回绑定到请求头的方法参数。
 	 */
 	public final MethodParameter getParameter() {
 		return this.parameter;
