@@ -16,9 +16,6 @@
 
 package org.springframework.web.bind;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.validation.Errors;
@@ -26,27 +23,28 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.util.HtmlUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Errors wrapper that adds automatic HTML escaping to the wrapped instance,
- * for convenient usage in HTML views. Can be retrieved easily via
- * RequestContext's {@code getErrors} method.
+ * 将自动HTML转义添加到包装实例的错误包装器，以便在HTML视图中方便使用。可以通过RequestContext的{@code getErrors}方法轻松检索。
  *
- * <p>Note that BindTag does <i>not</i> use this class to avoid unnecessary
- * creation of ObjectError instances. It just escapes the messages and values
- * that get copied into the respective BindStatus instance.
+ * <p>注意，BindTag不使用此类来避免不必要地创建ObjectError实例。它只是转义被复制到相应BindStatus实例中的消息和值。
  *
  * @author Juergen Hoeller
- * @since 01.03.2003
  * @see org.springframework.web.servlet.support.RequestContext#getErrors
  * @see org.springframework.web.servlet.tags.BindTag
+ * @since 01.03.2003
  */
 public class EscapedErrors implements Errors {
-
+	/**
+	 * 错误源
+	 */
 	private final Errors source;
 
 
 	/**
-	 * Create a new EscapedErrors instance for the given source instance.
+	 * 为给定的源实例创建一个新的EscapedErrors实例。
 	 */
 	public EscapedErrors(Errors source) {
 		Assert.notNull(source, "Errors source must not be null");
@@ -111,7 +109,7 @@ public class EscapedErrors implements Errors {
 
 	@Override
 	public void rejectValue(@Nullable String field, String errorCode, @Nullable Object[] errorArgs,
-			@Nullable String defaultMessage) {
+							@Nullable String defaultMessage) {
 
 		this.source.rejectValue(field, errorCode, errorArgs, defaultMessage);
 	}
@@ -203,8 +201,15 @@ public class EscapedErrors implements Errors {
 	@Override
 	@Nullable
 	public Object getFieldValue(String field) {
+		// 获取字段的值
 		Object value = this.source.getFieldValue(field);
-		return (value instanceof String ? HtmlUtils.htmlEscape((String) value) : value);
+
+		// 如果值是字符串类型
+		return (value instanceof String ?
+				// 对字符串值进行 HTML 转义处理，然后返回
+				HtmlUtils.htmlEscape((String) value) :
+				// 否则直接返回值
+				value);
 	}
 
 	@Override
@@ -216,34 +221,53 @@ public class EscapedErrors implements Errors {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	private <T extends ObjectError> T escapeObjectError(@Nullable T source) {
+		// 如果源对象为空，则返回 null
 		if (source == null) {
 			return null;
 		}
+
+		// 获取默认消息
 		String defaultMessage = source.getDefaultMessage();
+
 		if (defaultMessage != null) {
+			// 如果默认消息不为空，则对其进行 HTML 转义处理
 			defaultMessage = HtmlUtils.htmlEscape(defaultMessage);
 		}
+
+		// 如果源对象是 FieldError 类型
 		if (source instanceof FieldError) {
 			FieldError fieldError = (FieldError) source;
+
+			// 获取被拒绝的值
 			Object value = fieldError.getRejectedValue();
+
 			if (value instanceof String) {
+				// 如果值是字符串类型，则对其进行 HTML 转义处理
 				value = HtmlUtils.htmlEscape((String) value);
 			}
+
+			// 返回一个新的 FieldError 对象，其中的值已经被转义处理
 			return (T) new FieldError(
 					fieldError.getObjectName(), fieldError.getField(), value, fieldError.isBindingFailure(),
 					fieldError.getCodes(), fieldError.getArguments(), defaultMessage);
-		}
-		else {
+		} else {
+			// 如果源对象是 ObjectError 类型，则返回一个新的 ObjectError 对象
 			return (T) new ObjectError(
 					source.getObjectName(), source.getCodes(), source.getArguments(), defaultMessage);
 		}
 	}
 
 	private <T extends ObjectError> List<T> escapeObjectErrors(List<T> source) {
+		// 创建一个新的列表，用于存储转义后的对象
 		List<T> escaped = new ArrayList<>(source.size());
+
+		// 遍历源列表中的每个对象
 		for (T objectError : source) {
+			// 对每个对象调用 escapeObjectError 方法进行转义，并将结果添加到新列表中
 			escaped.add(escapeObjectError(objectError));
 		}
+
+		// 返回转义后的列表
 		return escaped;
 	}
 
