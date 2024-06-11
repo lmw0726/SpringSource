@@ -20,18 +20,21 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Represents an HTTP cookie as a name-value pair consistent with the content of
- * the "Cookie" request header. The {@link ResponseCookie} sub-class has the
- * additional attributes expected in the "Set-Cookie" response header.
+ * 表示 HTTP cookie，作为与“Cookie”请求头内容一致的名称-值对。{@link ResponseCookie}子类具有预期的“Set-Cookie”响应头中的其他属性。
  *
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see <a href="https://tools.ietf.org/html/rfc6265">RFC 6265</a>
+ * @since 5.0
  */
 public class HttpCookie {
-
+	/**
+	 * Cookie名称
+	 */
 	private final String name;
 
+	/**
+	 * Cookie值
+	 */
 	private final String value;
 
 
@@ -42,14 +45,14 @@ public class HttpCookie {
 	}
 
 	/**
-	 * Return the cookie name.
+	 * 返回 cookie 名称。
 	 */
 	public String getName() {
 		return this.name;
 	}
 
 	/**
-	 * Return the cookie value or an empty string (never {@code null}).
+	 * 返回 cookie 值或空字符串（永不为 {@code null}）。
 	 */
 	public String getValue() {
 		return this.value;
