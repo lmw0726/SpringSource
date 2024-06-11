@@ -16,6 +16,9 @@
 
 package org.springframework.http;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.*;
+
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -30,41 +33,23 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedCaseInsensitiveMap;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
-
 /**
- * A data structure representing HTTP request or response headers, mapping String header names
- * to a list of String values, also offering accessors for common application-level data types.
+ * 表示 HTTP 请求或响应头的数据结构，将 String 类型的头名称映射到一个 String 值列表，并提供对常见应用程序级数据类型的访问器。
  *
- * <p>In addition to the regular methods defined by {@link Map}, this class offers many common
- * convenience methods, for example:
+ * <p>除了 {@link Map} 定义的常规方法之外，该类还提供许多常见的便利方法，例如:
  * <ul>
- * <li>{@link #getFirst(String)} returns the first value associated with a given header name</li>
- * <li>{@link #add(String, String)} adds a header value to the list of values for a header name</li>
- * <li>{@link #set(String, String)} sets the header value to a single string value</li>
+ * <li>{@link #getFirst(String)} 返回与给定头名称关联的第一个值</li>
+ * <li>{@link #add(String, String)} 将头值添加到头名称的值列表中</li>
+ * <li>{@link #set(String, String)} 将头值设置为单个字符串值</li>
  * </ul>
  *
- * <p>Note that {@code HttpHeaders} generally treats header names in a case-insensitive manner.
+ * <p>注意，{@code HttpHeaders} 通常以大小写不敏感的方式处理头名称。
+ * <p>
  *
  * @author Arjen Poutsma
  * @author Sebastien Deleuze
@@ -80,362 +65,495 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 
 
 	/**
-	 * The HTTP {@code Accept} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">Section 5.3.2 of RFC 7231</a>
+	 * HTTP {@code Accept} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">RFC 7231 第 5.3.2 节</a>
 	 */
 	public static final String ACCEPT = "Accept";
+
 	/**
-	 * The HTTP {@code Accept-Charset} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.3">Section 5.3.3 of RFC 7231</a>
+	 * HTTP {@code Accept-Charset} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.3">RFC 7231 第 5.3.3 节</a>
 	 */
 	public static final String ACCEPT_CHARSET = "Accept-Charset";
+
 	/**
-	 * The HTTP {@code Accept-Encoding} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.4">Section 5.3.4 of RFC 7231</a>
+	 * HTTP {@code Accept-Encoding} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.4">RFC 7231 第 5.3.4 节</a>
 	 */
 	public static final String ACCEPT_ENCODING = "Accept-Encoding";
+
 	/**
-	 * The HTTP {@code Accept-Language} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.5">Section 5.3.5 of RFC 7231</a>
+	 * HTTP {@code Accept-Language} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.5">RFC 7231 第 5.3.5 节</a>
 	 */
 	public static final String ACCEPT_LANGUAGE = "Accept-Language";
+
 	/**
-	 * The HTTP {@code Accept-Patch} header field name.
+	 * HTTP {@code Accept-Patch} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc5789#section-3.1">RFC 5789 第 3.1 节</a>
 	 * @since 5.3.6
-	 * @see <a href="https://tools.ietf.org/html/rfc5789#section-3.1">Section 3.1 of RFC 5789</a>
 	 */
 	public static final String ACCEPT_PATCH = "Accept-Patch";
+
 	/**
-	 * The HTTP {@code Accept-Ranges} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7233#section-2.3">Section 5.3.5 of RFC 7233</a>
+	 * HTTP {@code Accept-Ranges} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7233#section-2.3">RFC 7233 第 2.3 节</a>
 	 */
 	public static final String ACCEPT_RANGES = "Accept-Ranges";
+
 	/**
-	 * The CORS {@code Access-Control-Allow-Credentials} response header field name.
-	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+	 * CORS {@code Access-Control-Allow-Credentials} 响应头字段名称。
+	 *
+	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C 推荐</a>
 	 */
 	public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
+
 	/**
-	 * The CORS {@code Access-Control-Allow-Headers} response header field name.
-	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+	 * CORS {@code Access-Control-Allow-Headers} 响应头字段名称。
+	 *
+	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C 推荐</a>
 	 */
 	public static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
+
 	/**
-	 * The CORS {@code Access-Control-Allow-Methods} response header field name.
-	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+	 * CORS {@code Access-Control-Allow-Methods} 响应头字段名称。
+	 *
+	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C 推荐</a>
 	 */
 	public static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
+
 	/**
-	 * The CORS {@code Access-Control-Allow-Origin} response header field name.
-	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+	 * CORS {@code Access-Control-Allow-Origin} 响应头字段名称。
+	 *
+	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C 推荐</a>
 	 */
 	public static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+
 	/**
-	 * The CORS {@code Access-Control-Expose-Headers} response header field name.
-	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+	 * CORS {@code Access-Control-Expose-Headers} 响应头字段名称。
+	 *
+	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C 推荐</a>
 	 */
 	public static final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
+
 	/**
-	 * The CORS {@code Access-Control-Max-Age} response header field name.
-	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+	 * CORS {@code Access-Control-Max-Age} 响应头字段名称。
+	 *
+	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C 推荐</a>
 	 */
 	public static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
+
 	/**
-	 * The CORS {@code Access-Control-Request-Headers} request header field name.
-	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+	 * CORS {@code Access-Control-Request-Headers} 请求头字段名称。
+	 *
+	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C 推荐</a>
 	 */
 	public static final String ACCESS_CONTROL_REQUEST_HEADERS = "Access-Control-Request-Headers";
+
 	/**
-	 * The CORS {@code Access-Control-Request-Method} request header field name.
-	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
+	 * CORS {@code Access-Control-Request-Method} 请求头字段名称。
+	 *
+	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C 推荐</a>
 	 */
 	public static final String ACCESS_CONTROL_REQUEST_METHOD = "Access-Control-Request-Method";
+
 	/**
-	 * The HTTP {@code Age} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.1">Section 5.1 of RFC 7234</a>
+	 * HTTP {@code Age} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.1">RFC 7234 第 5.1 节</a>
 	 */
 	public static final String AGE = "Age";
+
 	/**
-	 * The HTTP {@code Allow} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.4.1">Section 7.4.1 of RFC 7231</a>
+	 * HTTP {@code Allow} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.4.1">RFC 7231 第 7.4.1 节</a>
 	 */
 	public static final String ALLOW = "Allow";
+
 	/**
-	 * The HTTP {@code Authorization} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7235#section-4.2">Section 4.2 of RFC 7235</a>
+	 * HTTP {@code Authorization} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7235#section-4.2">RFC 7235 第 4.2 节</a>
 	 */
 	public static final String AUTHORIZATION = "Authorization";
+
 	/**
-	 * The HTTP {@code Cache-Control} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.2">Section 5.2 of RFC 7234</a>
+	 * HTTP {@code Cache-Control} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.2">RFC 7234 第 5.2 节</a>
 	 */
 	public static final String CACHE_CONTROL = "Cache-Control";
+
 	/**
-	 * The HTTP {@code Connection} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-6.1">Section 6.1 of RFC 7230</a>
+	 * HTTP {@code Connection} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-6.1">RFC 7230 第 6.1 节</a>
 	 */
 	public static final String CONNECTION = "Connection";
+
 	/**
-	 * The HTTP {@code Content-Encoding} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.2.2">Section 3.1.2.2 of RFC 7231</a>
+	 * HTTP {@code Content-Encoding} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.2.2">RFC 7231 第 3.1.2.2 节</a>
 	 */
 	public static final String CONTENT_ENCODING = "Content-Encoding";
+
 	/**
-	 * The HTTP {@code Content-Disposition} header field name.
+	 * HTTP {@code Content-Disposition} 头字段名称。
+	 *
 	 * @see <a href="https://tools.ietf.org/html/rfc6266">RFC 6266</a>
 	 */
 	public static final String CONTENT_DISPOSITION = "Content-Disposition";
+
 	/**
-	 * The HTTP {@code Content-Language} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.3.2">Section 3.1.3.2 of RFC 7231</a>
+	 * HTTP {@code Content-Language} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.3.2">RFC 7231 第 3.1.3.2 节</a>
 	 */
 	public static final String CONTENT_LANGUAGE = "Content-Language";
+
 	/**
-	 * The HTTP {@code Content-Length} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-3.3.2">Section 3.3.2 of RFC 7230</a>
+	 * HTTP {@code Content-Length} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-3.3.2">RFC 7230 第 3.3.2 节</a>
 	 */
 	public static final String CONTENT_LENGTH = "Content-Length";
+
 	/**
-	 * The HTTP {@code Content-Location} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.4.2">Section 3.1.4.2 of RFC 7231</a>
+	 * HTTP {@code Content-Location} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.4.2">RFC 7231 第 3.1.4.2 节</a>
 	 */
 	public static final String CONTENT_LOCATION = "Content-Location";
+
 	/**
-	 * The HTTP {@code Content-Range} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7233#section-4.2">Section 4.2 of RFC 7233</a>
+	 * HTTP {@code Content-Range} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7233#section-4.2">RFC 7233 第 4.2 节</a>
 	 */
 	public static final String CONTENT_RANGE = "Content-Range";
+
 	/**
-	 * The HTTP {@code Content-Type} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.1.5">Section 3.1.1.5 of RFC 7231</a>
+	 * HTTP {@code Content-Type} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.1.5">RFC 7231 第 3.1.1.5 节</a>
 	 */
 	public static final String CONTENT_TYPE = "Content-Type";
+
 	/**
-	 * The HTTP {@code Cookie} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc2109#section-4.3.4">Section 4.3.4 of RFC 2109</a>
+	 * HTTP {@code Cookie} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc2109#section-4.3.4">RFC 2109 第 4.3.4 节</a>
 	 */
 	public static final String COOKIE = "Cookie";
+
 	/**
-	 * The HTTP {@code Date} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.1.2">Section 7.1.1.2 of RFC 7231</a>
+	 * HTTP {@code Date} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.1.2">RFC 7231 第 7.1.1.2 节</a>
 	 */
 	public static final String DATE = "Date";
+
 	/**
-	 * The HTTP {@code ETag} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.3">Section 2.3 of RFC 7232</a>
+	 * HTTP {@code ETag} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.3">RFC 7232 第 2.3 节</a>
 	 */
 	public static final String ETAG = "ETag";
+
 	/**
-	 * The HTTP {@code Expect} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.1.1">Section 5.1.1 of RFC 7231</a>
+	 * HTTP {@code Expect} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.1.1">RFC 7231 第 5.1.1 节</a>
 	 */
 	public static final String EXPECT = "Expect";
+
 	/**
-	 * The HTTP {@code Expires} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.3">Section 5.3 of RFC 7234</a>
+	 * HTTP {@code Expires} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.3">RFC 7234 第 5.3 节</a>
 	 */
 	public static final String EXPIRES = "Expires";
+
 	/**
-	 * The HTTP {@code From} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.5.1">Section 5.5.1 of RFC 7231</a>
+	 * HTTP {@code From} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.5.1">RFC 7231 第 5.5.1 节</a>
 	 */
 	public static final String FROM = "From";
+
 	/**
-	 * The HTTP {@code Host} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-5.4">Section 5.4 of RFC 7230</a>
+	 * HTTP {@code Host} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-5.4">RFC 7230 第 5.4 节</a>
 	 */
 	public static final String HOST = "Host";
+
 	/**
-	 * The HTTP {@code If-Match} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-3.1">Section 3.1 of RFC 7232</a>
+	 * HTTP {@code If-Match} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-3.1">RFC 7232 第 3.1 节</a>
 	 */
 	public static final String IF_MATCH = "If-Match";
+
 	/**
-	 * The HTTP {@code If-Modified-Since} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-3.3">Section 3.3 of RFC 7232</a>
+	 * HTTP {@code If-Modified-Since} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-3.3">RFC 7232 第 3.3 节</a>
 	 */
 	public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
+
 	/**
-	 * The HTTP {@code If-None-Match} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-3.2">Section 3.2 of RFC 7232</a>
+	 * HTTP {@code If-None-Match} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-3.2">RFC 7232 第 3.2 节</a>
 	 */
 	public static final String IF_NONE_MATCH = "If-None-Match";
+
 	/**
-	 * The HTTP {@code If-Range} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7233#section-3.2">Section 3.2 of RFC 7233</a>
+	 * HTTP {@code If-Range} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7233#section-3.2">RFC 7233 第 3.2 节</a>
 	 */
 	public static final String IF_RANGE = "If-Range";
+
 	/**
-	 * The HTTP {@code If-Unmodified-Since} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-3.4">Section 3.4 of RFC 7232</a>
+	 * HTTP {@code If-Unmodified-Since} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-3.4">RFC 7232 第 3.4 节</a>
 	 */
 	public static final String IF_UNMODIFIED_SINCE = "If-Unmodified-Since";
+
 	/**
-	 * The HTTP {@code Last-Modified} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.2">Section 2.2 of RFC 7232</a>
+	 * HTTP {@code Last-Modified} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.2">RFC 7232 第 2.2 节</a>
 	 */
 	public static final String LAST_MODIFIED = "Last-Modified";
+
 	/**
-	 * The HTTP {@code Link} header field name.
+	 * HTTP {@code Link} 头字段名称。
+	 *
 	 * @see <a href="https://tools.ietf.org/html/rfc5988">RFC 5988</a>
 	 */
 	public static final String LINK = "Link";
+
 	/**
-	 * The HTTP {@code Location} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.2">Section 7.1.2 of RFC 7231</a>
+	 * HTTP {@code Location} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.2">RFC 7231 第 7.1.2 节</a>
 	 */
 	public static final String LOCATION = "Location";
+
 	/**
-	 * The HTTP {@code Max-Forwards} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.1.2">Section 5.1.2 of RFC 7231</a>
+	 * HTTP {@code Max-Forwards} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.1.2">RFC 7231 第 5.1.2 节</a>
 	 */
 	public static final String MAX_FORWARDS = "Max-Forwards";
+
 	/**
-	 * The HTTP {@code Origin} header field name.
+	 * HTTP {@code Origin} 头字段名称。
+	 *
 	 * @see <a href="https://tools.ietf.org/html/rfc6454">RFC 6454</a>
 	 */
 	public static final String ORIGIN = "Origin";
+
 	/**
-	 * The HTTP {@code Pragma} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.4">Section 5.4 of RFC 7234</a>
+	 * HTTP {@code Pragma} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.4">RFC 7234 第 5.4 节</a>
 	 */
 	public static final String PRAGMA = "Pragma";
+
 	/**
-	 * The HTTP {@code Proxy-Authenticate} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7235#section-4.3">Section 4.3 of RFC 7235</a>
+	 * HTTP {@code Proxy-Authenticate} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7235#section-4.3">RFC 7235 第 4.3 节</a>
 	 */
 	public static final String PROXY_AUTHENTICATE = "Proxy-Authenticate";
+
 	/**
-	 * The HTTP {@code Proxy-Authorization} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7235#section-4.4">Section 4.4 of RFC 7235</a>
+	 * HTTP {@code Proxy-Authorization} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7235#section-4.4">RFC 7235 第 4.4 节</a>
 	 */
 	public static final String PROXY_AUTHORIZATION = "Proxy-Authorization";
+
 	/**
-	 * The HTTP {@code Range} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7233#section-3.1">Section 3.1 of RFC 7233</a>
+	 * HTTP {@code Range} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7233#section-3.1">RFC 7233 第 3.1 节</a>
 	 */
 	public static final String RANGE = "Range";
+
 	/**
-	 * The HTTP {@code Referer} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.5.2">Section 5.5.2 of RFC 7231</a>
+	 * HTTP {@code Referer} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.5.2">RFC 7231 第 5.5.2 节</a>
 	 */
 	public static final String REFERER = "Referer";
+
 	/**
-	 * The HTTP {@code Retry-After} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.3">Section 7.1.3 of RFC 7231</a>
+	 * HTTP {@code Retry-After} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.3">RFC 7231 第 7.1.3 节</a>
 	 */
 	public static final String RETRY_AFTER = "Retry-After";
+
 	/**
-	 * The HTTP {@code Server} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.4.2">Section 7.4.2 of RFC 7231</a>
+	 * HTTP {@code Server} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.4.2">RFC 7231 第 7.4.2 节</a>
 	 */
 	public static final String SERVER = "Server";
+
 	/**
-	 * The HTTP {@code Set-Cookie} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc2109#section-4.2.2">Section 4.2.2 of RFC 2109</a>
+	 * HTTP {@code Set-Cookie} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc2109#section-4.2.2">RFC 2109 第 4.2.2 节</a>
 	 */
 	public static final String SET_COOKIE = "Set-Cookie";
+
 	/**
-	 * The HTTP {@code Set-Cookie2} header field name.
+	 * HTTP {@code Set-Cookie2} 头字段名称。
+	 *
 	 * @see <a href="https://tools.ietf.org/html/rfc2965">RFC 2965</a>
 	 */
 	public static final String SET_COOKIE2 = "Set-Cookie2";
+
 	/**
-	 * The HTTP {@code TE} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-4.3">Section 4.3 of RFC 7230</a>
+	 * HTTP {@code TE} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-4.3">RFC 7230 第 4.3 节</a>
 	 */
 	public static final String TE = "TE";
+
 	/**
-	 * The HTTP {@code Trailer} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-4.4">Section 4.4 of RFC 7230</a>
+	 * HTTP {@code Trailer} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-4.4">RFC 7230 第 4.4 节</a>
 	 */
 	public static final String TRAILER = "Trailer";
+
 	/**
-	 * The HTTP {@code Transfer-Encoding} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-3.3.1">Section 3.3.1 of RFC 7230</a>
+	 * HTTP {@code Transfer-Encoding} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-3.3.1">RFC 7230 第 3.3.1 节</a>
 	 */
 	public static final String TRANSFER_ENCODING = "Transfer-Encoding";
+
 	/**
-	 * The HTTP {@code Upgrade} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-6.7">Section 6.7 of RFC 7230</a>
+	 * HTTP {@code Upgrade} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-6.7">RFC 7230 第 6.7 节</a>
 	 */
 	public static final String UPGRADE = "Upgrade";
+
 	/**
-	 * The HTTP {@code User-Agent} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.5.3">Section 5.5.3 of RFC 7231</a>
+	 * HTTP {@code User-Agent} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.5.3">RFC 7231 第 5.5.3 节</a>
 	 */
 	public static final String USER_AGENT = "User-Agent";
+
 	/**
-	 * The HTTP {@code Vary} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.4">Section 7.1.4 of RFC 7231</a>
+	 * HTTP {@code Vary} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.4">RFC 7231 第 7.1.4 节</a>
 	 */
 	public static final String VARY = "Vary";
+
 	/**
-	 * The HTTP {@code Via} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-5.7.1">Section 5.7.1 of RFC 7230</a>
+	 * HTTP {@code Via} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7230#section-5.7.1">RFC 7230 第 5.7.1 节</a>
 	 */
 	public static final String VIA = "Via";
+
 	/**
-	 * The HTTP {@code Warning} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.5">Section 5.5 of RFC 7234</a>
+	 * HTTP {@code Warning} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7234#section-5.5">RFC 7234 第 5.5 节</a>
 	 */
 	public static final String WARNING = "Warning";
+
 	/**
-	 * The HTTP {@code WWW-Authenticate} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7235#section-4.1">Section 4.1 of RFC 7235</a>
+	 * HTTP {@code WWW-Authenticate} 头字段名称。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7235#section-4.1">RFC 7235 第 4.1 节</a>
 	 */
 	public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
 
 
 	/**
-	 * An empty {@code HttpHeaders} instance (immutable).
+	 * 一个空的 {@code HttpHeaders} 实例（不可变的）。
+	 *
 	 * @since 5.0
 	 */
 	public static final HttpHeaders EMPTY = new ReadOnlyHttpHeaders(new LinkedMultiValueMap<>());
 
 	/**
-	 * Pattern matching ETag multiple field values in headers such as "If-Match", "If-None-Match".
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.3">Section 2.3 of RFC 7232</a>
+	 * 匹配 ETag 头字段的多个字段值的模式，例如 "If-Match", "If-None-Match"。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.3">RFC 7232 第 2.3 节</a>
 	 */
 	private static final Pattern ETAG_HEADER_VALUE_PATTERN = Pattern.compile("\\*|\\s*((W\\/)?(\"[^\"]*\"))\\s*,?");
 
+	/**
+	 * 十进制格式符号
+	 */
 	private static final DecimalFormatSymbols DECIMAL_FORMAT_SYMBOLS = new DecimalFormatSymbols(Locale.ENGLISH);
 
+	/**
+	 * GMT时区
+	 */
 	private static final ZoneId GMT = ZoneId.of("GMT");
 
 	/**
-	 * Date formats with time zone as specified in the HTTP RFC to use for formatting.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.1.1">Section 7.1.1.1 of RFC 7231</a>
+	 * HTTP RFC 中指定的带有时区的日期格式，用于格式化。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.1.1">RFC 7231 第 7.1.1.1 节</a>
 	 */
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US).withZone(GMT);
 
 	/**
-	 * Date formats with time zone as specified in the HTTP RFC to use for parsing.
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.1.1">Section 7.1.1.1 of RFC 7231</a>
+	 * HTTP RFC 中指定的带有时区的日期格式，用于解析。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.1.1">RFC 7231 第 7.1.1.1 节</a>
 	 */
-	private static final DateTimeFormatter[] DATE_PARSERS = new DateTimeFormatter[] {
+	private static final DateTimeFormatter[] DATE_PARSERS = new DateTimeFormatter[]{
 			DateTimeFormatter.RFC_1123_DATE_TIME,
 			DateTimeFormatter.ofPattern("EEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
 			DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss yyyy", Locale.US).withZone(GMT)
 	};
 
-
+	/**
+	 * 头部值映射
+	 */
 	final MultiValueMap<String, String> headers;
 
 
 	/**
-	 * Construct a new, empty instance of the {@code HttpHeaders} object.
-	 * <p>This is the common constructor, using a case-insensitive map structure.
+	 * 构造一个新的空的 {@code HttpHeaders} 对象实例。
+	 * <p>这是常见的构造函数，使用不区分大小写的映射结构。
 	 */
 	public HttpHeaders() {
 		this(CollectionUtils.toMultiValueMap(new LinkedCaseInsensitiveMap<>(8, Locale.ENGLISH)));
 	}
 
 	/**
-	 * Construct a new {@code HttpHeaders} instance backed by an existing map.
-	 * <p>This constructor is available as an optimization for adapting to existing
-	 * headers map structures, primarily for internal use within the framework.
-	 * @param headers the headers map (expected to operate with case-insensitive keys)
+	 * 构造一个由现有映射支持的新的 {@code HttpHeaders} 实例。
+	 * <p>此构造函数作为一种优化，用于适应现有的标头映射结构，主要用于框架内部使用。
+	 *
+	 * @param headers 标头映射（预期操作不区分大小写的键）
 	 * @since 5.1
 	 */
 	public HttpHeaders(MultiValueMap<String, String> headers) {
@@ -445,9 +563,10 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 
 
 	/**
-	 * Get the list of header values for the given header name, if any.
-	 * @param headerName the header name
-	 * @return the list of header values, or an empty list
+	 * 获取给定标头名称的标头值列表（如果有）。
+	 *
+	 * @param headerName 标头名称
+	 * @return 标头值列表，如果不存在则返回空列表
 	 * @since 5.2
 	 */
 	public List<String> getOrEmpty(Object headerName) {
@@ -456,75 +575,83 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the list of acceptable {@linkplain MediaType media types},
-	 * as specified by the {@code Accept} header.
+	 * 设置可接受的 {@linkplain MediaType 媒体类型} 列表，如 {@code Accept} 标头所指定。
 	 */
 	public void setAccept(List<MediaType> acceptableMediaTypes) {
 		set(ACCEPT, MediaType.toString(acceptableMediaTypes));
 	}
 
 	/**
-	 * Return the list of acceptable {@linkplain MediaType media types},
-	 * as specified by the {@code Accept} header.
-	 * <p>Returns an empty list when the acceptable media types are unspecified.
+	 * 返回可接受的 {@linkplain MediaType 媒体类型} 列表，如 {@code Accept} 标头所指定。
+	 * <p>当未指定可接受的媒体类型时，返回空列表。
 	 */
 	public List<MediaType> getAccept() {
 		return MediaType.parseMediaTypes(get(ACCEPT));
 	}
 
 	/**
-	 * Set the acceptable language ranges, as specified by the
-	 * {@literal Accept-Language} header.
+	 * 设置可接受的语言范围，如 {@literal Accept-Language} 标头所指定。
+	 *
 	 * @since 5.0
 	 */
 	public void setAcceptLanguage(List<Locale.LanguageRange> languages) {
 		Assert.notNull(languages, "LanguageRange List must not be null");
+		// 创建带有自定义符号的十进制格式
 		DecimalFormat decimal = new DecimalFormat("0.0", DECIMAL_FORMAT_SYMBOLS);
+		// 将语言范围流映射为带权重的语言范围字符串
 		List<String> values = languages.stream()
 				.map(range ->
 						range.getWeight() == Locale.LanguageRange.MAX_WEIGHT ?
 								range.getRange() :
 								range.getRange() + ";q=" + decimal.format(range.getWeight()))
 				.collect(Collectors.toList());
+		// 将语言范围设置为逗号分隔的字符串
 		set(ACCEPT_LANGUAGE, toCommaDelimitedString(values));
 	}
 
 	/**
-	 * Return the language ranges from the {@literal "Accept-Language"} header.
-	 * <p>If you only need sorted, preferred locales only use
-	 * {@link #getAcceptLanguageAsLocales()} or if you need to filter based on
-	 * a list of supported locales you can pass the returned list to
-	 * {@link Locale#filter(List, Collection)}.
-	 * @throws IllegalArgumentException if the value cannot be converted to a language range
+	 * 从 {@literal "Accept-Language"} 标头返回语言范围。
+	 * <p>如果您只需要排序的首选区域，只需使用 {@link #getAcceptLanguageAsLocales()}，
+	 * 或者如果需要根据支持的区域列表进行过滤，可以将返回的列表传递给 {@link Locale#filter(List, Collection)}。
+	 *
+	 * @throws IllegalArgumentException 如果值无法转换为语言范围
 	 * @since 5.0
 	 */
 	public List<Locale.LanguageRange> getAcceptLanguage() {
+		// 获取Accept-Language头部的第一个值
 		String value = getFirst(ACCEPT_LANGUAGE);
+		// 如果值不为空，则解析为语言范围列表，否则返回空列表
 		return (StringUtils.hasText(value) ? Locale.LanguageRange.parse(value) : Collections.emptyList());
 	}
 
 	/**
-	 * Variant of {@link #setAcceptLanguage(List)} using {@link Locale}'s.
+	 * 使用 {@link Locale} 的变体 {@link #setAcceptLanguage(List)}。
+	 *
 	 * @since 5.0
 	 */
 	public void setAcceptLanguageAsLocales(List<Locale> locales) {
+		// 设置接受的语言范围
 		setAcceptLanguage(locales.stream()
+				// 将语言标签转换为语言范围，并收集为列表
 				.map(locale -> new Locale.LanguageRange(locale.toLanguageTag()))
 				.collect(Collectors.toList()));
 	}
 
 	/**
-	 * A variant of {@link #getAcceptLanguage()} that converts each
-	 * {@link java.util.Locale.LanguageRange} to a {@link Locale}.
-	 * @return the locales or an empty list
-	 * @throws IllegalArgumentException if the value cannot be converted to a locale
+	 * 将每个 {@link java.util.Locale.LanguageRange} 转换为 {@link Locale} 的 {@link #getAcceptLanguage()} 的变体。
+	 *
+	 * @return 区域设置或空列表
+	 * @throws IllegalArgumentException 如果值无法转换为区域设置
 	 * @since 5.0
 	 */
 	public List<Locale> getAcceptLanguageAsLocales() {
+		// 获取Accept-Language头部中的语言范围列表
 		List<Locale.LanguageRange> ranges = getAcceptLanguage();
+		// 如果范围列表为空，则返回空列表
 		if (ranges.isEmpty()) {
 			return Collections.emptyList();
 		}
+		// 将语言范围映射为Locale对象，并过滤掉不带显示名称的Locale对象
 		return ranges.stream()
 				.map(range -> Locale.forLanguageTag(range.getRange()))
 				.filter(locale -> StringUtils.hasText(locale.getDisplayName()))
@@ -532,8 +659,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the list of acceptable {@linkplain MediaType media types} for
-	 * {@code PATCH} methods, as specified by the {@code Accept-Patch} header.
+	 * 设置 {@code PATCH} 方法的可接受 {@linkplain MediaType 媒体类型} 列表，如 {@code Accept-Patch} 标头所指定。
+	 *
 	 * @since 5.3.6
 	 */
 	public void setAcceptPatch(List<MediaType> mediaTypes) {
@@ -541,9 +668,9 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the list of acceptable {@linkplain MediaType media types} for
-	 * {@code PATCH} methods, as specified by the {@code Accept-Patch} header.
-	 * <p>Returns an empty list when the acceptable media types are unspecified.
+	 * 返回 {@code PATCH} 方法的可接受 {@linkplain MediaType 媒体类型} 列表，如 {@code Accept-Patch} 标头所指定。
+	 * <p>当未指定可接受的媒体类型时，返回空列表。
+	 *
 	 * @since 5.3.6
 	 */
 	public List<MediaType> getAcceptPatch() {
@@ -551,67 +678,75 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Allow-Credentials} response header.
+	 * 设置 {@code Access-Control-Allow-Credentials} 响应标头的（新）值。
 	 */
 	public void setAccessControlAllowCredentials(boolean allowCredentials) {
 		set(ACCESS_CONTROL_ALLOW_CREDENTIALS, Boolean.toString(allowCredentials));
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Allow-Credentials} response header.
+	 * 返回 {@code Access-Control-Allow-Credentials} 响应标头的值。
 	 */
 	public boolean getAccessControlAllowCredentials() {
 		return Boolean.parseBoolean(getFirst(ACCESS_CONTROL_ALLOW_CREDENTIALS));
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Allow-Headers} response header.
+	 * 设置 {@code Access-Control-Allow-Headers} 响应标头的（新）值。
 	 */
 	public void setAccessControlAllowHeaders(List<String> allowedHeaders) {
 		set(ACCESS_CONTROL_ALLOW_HEADERS, toCommaDelimitedString(allowedHeaders));
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Allow-Headers} response header.
+	 * 返回 {@code Access-Control-Allow-Headers} 响应头的值。
 	 */
 	public List<String> getAccessControlAllowHeaders() {
 		return getValuesAsList(ACCESS_CONTROL_ALLOW_HEADERS);
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Allow-Methods} response header.
+	 * 设置 {@code Access-Control-Allow-Methods} 响应头的（新）值。
 	 */
 	public void setAccessControlAllowMethods(List<HttpMethod> allowedMethods) {
 		set(ACCESS_CONTROL_ALLOW_METHODS, StringUtils.collectionToCommaDelimitedString(allowedMethods));
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Allow-Methods} response header.
+	 * 返回 {@code Access-Control-Allow-Methods} 响应头的值。
 	 */
 	public List<HttpMethod> getAccessControlAllowMethods() {
+		// 创建一个存储HttpMethod的列表
 		List<HttpMethod> result = new ArrayList<>();
+		// 获取Access-Control-Allow-Methods头部的第一个值
 		String value = getFirst(ACCESS_CONTROL_ALLOW_METHODS);
+		// 如果值不为null
 		if (value != null) {
+			// 将值按逗号分割成字符串数组
 			String[] tokens = StringUtils.tokenizeToStringArray(value, ",");
+			// 遍历每个字符串
 			for (String token : tokens) {
+				// 解析字符串为HttpMethod对象
 				HttpMethod resolved = HttpMethod.resolve(token);
+				// 如果解析成功，则添加到结果列表中
 				if (resolved != null) {
 					result.add(resolved);
 				}
 			}
 		}
+		// 返回结果列表
 		return result;
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Allow-Origin} response header.
+	 * 设置 {@code Access-Control-Allow-Origin} 响应头的（新）值。
 	 */
 	public void setAccessControlAllowOrigin(@Nullable String allowedOrigin) {
 		setOrRemove(ACCESS_CONTROL_ALLOW_ORIGIN, allowedOrigin);
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Allow-Origin} response header.
+	 * 返回 {@code Access-Control-Allow-Origin} 响应头的值。
 	 */
 	@Nullable
 	public String getAccessControlAllowOrigin() {
@@ -619,21 +754,22 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Expose-Headers} response header.
+	 * 设置 {@code Access-Control-Expose-Headers} 响应头的（新）值。
 	 */
 	public void setAccessControlExposeHeaders(List<String> exposedHeaders) {
 		set(ACCESS_CONTROL_EXPOSE_HEADERS, toCommaDelimitedString(exposedHeaders));
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Expose-Headers} response header.
+	 * 返回 {@code Access-Control-Expose-Headers} 响应头的值。
 	 */
 	public List<String> getAccessControlExposeHeaders() {
 		return getValuesAsList(ACCESS_CONTROL_EXPOSE_HEADERS);
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Max-Age} response header.
+	 * 设置 {@code Access-Control-Max-Age} 响应头的（新）值。
+	 *
 	 * @since 5.2
 	 */
 	public void setAccessControlMaxAge(Duration maxAge) {
@@ -641,44 +777,47 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Max-Age} response header.
+	 * 设置 {@code Access-Control-Max-Age} 响应标头的（新）值。
 	 */
 	public void setAccessControlMaxAge(long maxAge) {
 		set(ACCESS_CONTROL_MAX_AGE, Long.toString(maxAge));
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Max-Age} response header.
-	 * <p>Returns -1 when the max age is unknown.
+	 * 返回 {@code Access-Control-Max-Age} 响应标头的值。
+	 * <p>当最大年龄未知时，返回 -1。
 	 */
 	public long getAccessControlMaxAge() {
+		// 获取指定名称的第一个值
 		String value = getFirst(ACCESS_CONTROL_MAX_AGE);
+
+		// 如果值不为空，则将其解析为长整型返回；否则返回 -1
 		return (value != null ? Long.parseLong(value) : -1);
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Request-Headers} request header.
+	 * 设置 {@code Access-Control-Request-Headers} 请求标头的（新）值。
 	 */
 	public void setAccessControlRequestHeaders(List<String> requestHeaders) {
 		set(ACCESS_CONTROL_REQUEST_HEADERS, toCommaDelimitedString(requestHeaders));
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Request-Headers} request header.
+	 * 返回 {@code Access-Control-Request-Headers} 请求标头的值。
 	 */
 	public List<String> getAccessControlRequestHeaders() {
 		return getValuesAsList(ACCESS_CONTROL_REQUEST_HEADERS);
 	}
 
 	/**
-	 * Set the (new) value of the {@code Access-Control-Request-Method} request header.
+	 * 设置 {@code Access-Control-Request-Method} 请求标头的（新）值。
 	 */
 	public void setAccessControlRequestMethod(@Nullable HttpMethod requestMethod) {
 		setOrRemove(ACCESS_CONTROL_REQUEST_METHOD, (requestMethod != null ? requestMethod.name() : null));
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Request-Method} request header.
+	 * 返回 {@code Access-Control-Request-Method} 请求标头的值。
 	 */
 	@Nullable
 	public HttpMethod getAccessControlRequestMethod() {
@@ -686,130 +825,144 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the list of acceptable {@linkplain Charset charsets},
-	 * as specified by the {@code Accept-Charset} header.
+	 * 设置可接受的 {@linkplain Charset 字符集} 的列表，由 {@code Accept-Charset} 标头指定。
 	 */
 	public void setAcceptCharset(List<Charset> acceptableCharsets) {
+		// 创建一个StringJoiner对象，用于拼接可接受的字符集
 		StringJoiner joiner = new StringJoiner(", ");
+		// 遍历可接受的字符集，将字符集的名称转换为小写，并添加到StringJoiner中
 		for (Charset charset : acceptableCharsets) {
 			joiner.add(charset.name().toLowerCase(Locale.ENGLISH));
 		}
+		// 将拼接好的字符串设置为ACCEPT_CHARSET头部的值
 		set(ACCEPT_CHARSET, joiner.toString());
 	}
 
 	/**
-	 * Return the list of acceptable {@linkplain Charset charsets},
-	 * as specified by the {@code Accept-Charset} header.
+	 * 返回可接受的 {@linkplain Charset 字符集} 的列表，由 {@code Accept-Charset} 标头指定。
 	 */
 	public List<Charset> getAcceptCharset() {
+		// 获取 ACCEPT_CHARSET 头部的第一个值
 		String value = getFirst(ACCEPT_CHARSET);
+
+		// 如果值不为空
 		if (value != null) {
+			// 将值按逗号分隔为字符串数组
 			String[] tokens = StringUtils.tokenizeToStringArray(value, ",");
+
+			// 创建一个新的字符集列表
 			List<Charset> result = new ArrayList<>(tokens.length);
+
+			// 遍历每个令牌
 			for (String token : tokens) {
+				// 查找参数分隔符的索引
 				int paramIdx = token.indexOf(';');
+
+				// 获取字符集名称
 				String charsetName;
 				if (paramIdx == -1) {
 					charsetName = token;
-				}
-				else {
+				} else {
 					charsetName = token.substring(0, paramIdx);
 				}
+
+				// 如果字符集名称不为通配符 "*"，则将其解析为字符集并添加到结果列表中
 				if (!charsetName.equals("*")) {
 					result.add(Charset.forName(charsetName));
 				}
 			}
+
+			// 返回结果列表
 			return result;
-		}
-		else {
+		} else {
+			// 如果值为空，则返回空列表
 			return Collections.emptyList();
 		}
 	}
 
 	/**
-	 * Set the set of allowed {@link HttpMethod HTTP methods},
-	 * as specified by the {@code Allow} header.
+	 * 设置允许的 {@link HttpMethod HTTP 方法} 的集合，由 {@code Allow} 标头指定。
 	 */
 	public void setAllow(Set<HttpMethod> allowedMethods) {
 		set(ALLOW, StringUtils.collectionToCommaDelimitedString(allowedMethods));
 	}
 
 	/**
-	 * Return the set of allowed {@link HttpMethod HTTP methods},
-	 * as specified by the {@code Allow} header.
-	 * <p>Returns an empty set when the allowed methods are unspecified.
+	 * 返回允许的 {@link HttpMethod HTTP 方法} 的集合，由 {@code Allow} 标头指定。
+	 * <p>当未指定允许的方法时，返回空集。
 	 */
 	public Set<HttpMethod> getAllow() {
+		// 获取ALLOW头部的第一个值
 		String value = getFirst(ALLOW);
+		// 如果值不为空
 		if (StringUtils.hasLength(value)) {
+			// 将值按逗号分割成字符串数组
 			String[] tokens = StringUtils.tokenizeToStringArray(value, ",");
+			// 创建一个存储HttpMethod的列表
 			List<HttpMethod> result = new ArrayList<>(tokens.length);
+			// 遍历每个字符串
 			for (String token : tokens) {
+				// 解析字符串为HttpMethod对象
 				HttpMethod resolved = HttpMethod.resolve(token);
+				// 如果解析成功，则添加到结果列表中
 				if (resolved != null) {
 					result.add(resolved);
 				}
 			}
+			// 返回结果列表的EnumSet表示形式
 			return EnumSet.copyOf(result);
-		}
-		else {
+		} else {
+			// 如果值为空，则返回空的EnumSet
 			return EnumSet.noneOf(HttpMethod.class);
 		}
 	}
 
 	/**
-	 * Set the value of the {@linkplain #AUTHORIZATION Authorization} header to
-	 * Basic Authentication based on the given username and password.
-	 * <p>Note that this method only supports characters in the
-	 * {@link StandardCharsets#ISO_8859_1 ISO-8859-1} character set.
-	 * @param username the username
-	 * @param password the password
-	 * @throws IllegalArgumentException if either {@code user} or
-	 * {@code password} contain characters that cannot be encoded to ISO-8859-1
-	 * @since 5.1
+	 * 将 {@linkplain #AUTHORIZATION 授权} 标头的值设置为基本身份验证，基于给定的用户名和密码。
+	 * <p>请注意，此方法仅支持 {@link StandardCharsets#ISO_8859_1 ISO-8859-1} 字符集中的字符。
+	 *
+	 * @param username 用户名
+	 * @param password 密码
+	 * @throws IllegalArgumentException 如果 {@code username} 或 {@code password} 包含无法编码为 ISO-8859-1 的字符
 	 * @see #setBasicAuth(String)
 	 * @see #setBasicAuth(String, String, Charset)
 	 * @see #encodeBasicAuth(String, String, Charset)
 	 * @see <a href="https://tools.ietf.org/html/rfc7617">RFC 7617</a>
+	 * @since 5.1
 	 */
 	public void setBasicAuth(String username, String password) {
 		setBasicAuth(username, password, null);
 	}
 
 	/**
-	 * Set the value of the {@linkplain #AUTHORIZATION Authorization} header to
-	 * Basic Authentication based on the given username and password.
-	 * @param username the username
-	 * @param password the password
-	 * @param charset the charset to use to convert the credentials into an octet
-	 * sequence. Defaults to {@linkplain StandardCharsets#ISO_8859_1 ISO-8859-1}.
-	 * @throws IllegalArgumentException if {@code username} or {@code password}
-	 * contains characters that cannot be encoded to the given charset
-	 * @since 5.1
+	 * 将 {@linkplain #AUTHORIZATION 授权} 标头的值设置为基本身份验证，基于给定的用户名和密码。
+	 *
+	 * @param username 用户名
+	 * @param password 密码
+	 * @param charset  用于将凭据转换为八位序列的字符集。默认为 {@linkplain StandardCharsets#ISO_8859_1 ISO-8859-1}。
+	 * @throws IllegalArgumentException 如果 {@code username} 或 {@code password} 包含无法编码为给定字符集的字符
 	 * @see #setBasicAuth(String)
 	 * @see #setBasicAuth(String, String)
 	 * @see #encodeBasicAuth(String, String, Charset)
 	 * @see <a href="https://tools.ietf.org/html/rfc7617">RFC 7617</a>
+	 * @since 5.1
 	 */
 	public void setBasicAuth(String username, String password, @Nullable Charset charset) {
 		setBasicAuth(encodeBasicAuth(username, password, charset));
 	}
 
 	/**
-	 * Set the value of the {@linkplain #AUTHORIZATION Authorization} header to
-	 * Basic Authentication based on the given {@linkplain #encodeBasicAuth
-	 * encoded credentials}.
-	 * <p>Favor this method over {@link #setBasicAuth(String, String)} and
-	 * {@link #setBasicAuth(String, String, Charset)} if you wish to cache the
-	 * encoded credentials.
-	 * @param encodedCredentials the encoded credentials
-	 * @throws IllegalArgumentException if supplied credentials string is
-	 * {@code null} or blank
-	 * @since 5.2
+	 * 将 {@linkplain #AUTHORIZATION 授权} 标头的值设置为基本身份验证，基于给定的 {@linkplain #encodeBasicAuth 编码凭据}。
+	 * <p>如果要缓存编码的凭据，建议使用此方法而不是 {@link #setBasicAuth(String, String)} 和
+	 * {@link #setBasicAuth(String, String, Charset)}。
+	 *
+	 * @param encodedCredentials 编码的凭据
+	 * @throws IllegalArgumentException 如果提供的凭据字符串为 {@code null} 或空白
 	 * @see #setBasicAuth(String, String)
 	 * @see #setBasicAuth(String, String, Charset)
 	 * @see #encodeBasicAuth(String, String, Charset)
 	 * @see <a href="https://tools.ietf.org/html/rfc7617">RFC 7617</a>
+	 * @since 5.2
 	 */
 	public void setBasicAuth(String encodedCredentials) {
 		Assert.hasText(encodedCredentials, "'encodedCredentials' must not be null or blank");
@@ -817,19 +970,19 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the value of the {@linkplain #AUTHORIZATION Authorization} header to
-	 * the given Bearer token.
-	 * @param token the Base64 encoded token
-	 * @since 5.1
+	 * 将 {@linkplain #AUTHORIZATION Authorization} 头的值设置为给定的 Bearer 令牌。
+	 *
+	 * @param token Base64 编码的令牌
 	 * @see <a href="https://tools.ietf.org/html/rfc6750">RFC 6750</a>
+	 * @since 5.1
 	 */
 	public void setBearerAuth(String token) {
 		set(AUTHORIZATION, "Bearer " + token);
 	}
 
 	/**
-	 * Set a configured {@link CacheControl} instance as the
-	 * new value of the {@code Cache-Control} header.
+	 * 将配置好的 {@link CacheControl} 实例设置为 {@code Cache-Control} 头的新值。
+	 *
 	 * @since 5.0.5
 	 */
 	public void setCacheControl(CacheControl cacheControl) {
@@ -837,14 +990,14 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code Cache-Control} header.
+	 * 设置 {@code Cache-Control} 头的（新）值。
 	 */
 	public void setCacheControl(@Nullable String cacheControl) {
 		setOrRemove(CACHE_CONTROL, cacheControl);
 	}
 
 	/**
-	 * Return the value of the {@code Cache-Control} header.
+	 * 返回 {@code Cache-Control} 头的值。
 	 */
 	@Nullable
 	public String getCacheControl() {
@@ -852,78 +1005,86 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code Connection} header.
+	 * 设置 {@code Connection} 头的（新）值。
 	 */
 	public void setConnection(String connection) {
 		set(CONNECTION, connection);
 	}
 
 	/**
-	 * Set the (new) value of the {@code Connection} header.
+	 * 设置 {@code Connection} 头的（新）值。
 	 */
 	public void setConnection(List<String> connection) {
 		set(CONNECTION, toCommaDelimitedString(connection));
 	}
 
 	/**
-	 * Return the value of the {@code Connection} header.
+	 * 返回 {@code Connection} 头的值。
 	 */
 	public List<String> getConnection() {
 		return getValuesAsList(CONNECTION);
 	}
 
 	/**
-	 * Set the {@code Content-Disposition} header when creating a
-	 * {@code "multipart/form-data"} request.
-	 * <p>Applications typically would not set this header directly but
-	 * rather prepare a {@code MultiValueMap<String, Object>}, containing an
-	 * Object or a {@link org.springframework.core.io.Resource} for each part,
-	 * and then pass that to the {@code RestTemplate} or {@code WebClient}.
-	 * @param name the control name
-	 * @param filename the filename (may be {@code null})
+	 * 在创建 {@code "multipart/form-data"} 请求时设置 {@code Content-Disposition} 头。
+	 * <p>通常应用程序不会直接设置此头，而是准备一个 {@code MultiValueMap<String, Object>}，
+	 * 其中每个部分包含一个 Object 或一个 {@link org.springframework.core.io.Resource}，
+	 * 然后将其传递给 {@code RestTemplate} 或 {@code WebClient}。
+	 *
+	 * @param name     控制名称
+	 * @param filename 文件名（可能为 {@code null}）
 	 * @see #getContentDisposition()
 	 */
 	public void setContentDispositionFormData(String name, @Nullable String filename) {
 		Assert.notNull(name, "Name must not be null");
+		// 创建一个 ContentDisposition.Builder 对象，用于构建表单数据的内容描述
 		ContentDisposition.Builder disposition = ContentDisposition.formData().name(name);
+
+		// 如果文件名非空
 		if (StringUtils.hasText(filename)) {
+			// 设置文件名
 			disposition.filename(filename);
 		}
+
+		// 设置内容描述
 		setContentDisposition(disposition.build());
 	}
 
 	/**
-	 * Set the {@literal Content-Disposition} header.
-	 * <p>This could be used on a response to indicate if the content is
-	 * expected to be displayed inline in the browser or as an attachment to be
-	 * saved locally.
-	 * <p>It can also be used for a {@code "multipart/form-data"} request.
-	 * For more details see notes on {@link #setContentDispositionFormData}.
-	 * @since 5.0
+	 * 设置 {@literal Content-Disposition} 头。
+	 * <p>这可以在响应中使用，以指示内容是否预期在浏览器中内联显示，或作为附件保存到本地。
+	 * <p>它也可以用于 {@code "multipart/form-data"} 请求。
+	 * 有关更多详细信息，请参阅 {@link #setContentDispositionFormData} 的说明。
+	 *
 	 * @see #getContentDisposition()
+	 * @since 5.0
 	 */
 	public void setContentDisposition(ContentDisposition contentDisposition) {
 		set(CONTENT_DISPOSITION, contentDisposition.toString());
 	}
 
 	/**
-	 * Return a parsed representation of the {@literal Content-Disposition} header.
-	 * @since 5.0
+	 * 返回 {@literal Content-Disposition} 头的解析表示形式。
+	 *
 	 * @see #setContentDisposition(ContentDisposition)
+	 * @since 5.0
 	 */
 	public ContentDisposition getContentDisposition() {
+		// 获取CONTENT_DISPOSITION头部的第一个值
 		String contentDisposition = getFirst(CONTENT_DISPOSITION);
+		// 如果值不为空
 		if (StringUtils.hasText(contentDisposition)) {
+			// 解析值为ContentDisposition对象并返回
 			return ContentDisposition.parse(contentDisposition);
 		}
+		// 如果值为空，则返回一个空的ContentDisposition对象
 		return ContentDisposition.empty();
 	}
 
 	/**
-	 * Set the {@link Locale} of the content language,
-	 * as specified by the {@literal Content-Language} header.
-	 * <p>Use {@code put(CONTENT_LANGUAGE, list)} if you need
-	 * to set multiple content languages.</p>
+	 * 设置内容语言的 {@link Locale}，由 {@literal Content-Language} 标头指定。
+	 * <p>如果需要设置多个内容语言，请使用 {@code put(CONTENT_LANGUAGE, list)}。</p>
+	 *
 	 * @since 5.0
 	 */
 	public void setContentLanguage(@Nullable Locale locale) {
@@ -931,70 +1092,74 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Get the first {@link Locale} of the content languages, as specified by the
-	 * {@code Content-Language} header.
-	 * <p>Use {@link #getValuesAsList(String)} if you need to get multiple content
-	 * languages.
-	 * @return the first {@code Locale} of the content languages, or {@code null}
-	 * if unknown
+	 * 获取内容语言的第一个 {@link Locale}，由 {@code Content-Language} 标头指定。
+	 * <p>如果需要获取多个内容语言，请使用 {@link #getValuesAsList(String)}。</p>
+	 *
+	 * @return 内容语言的第一个 {@code Locale}，如果未知则返回 {@code null}
 	 * @since 5.0
 	 */
 	@Nullable
 	public Locale getContentLanguage() {
+		// 获取内容语言值列表，并将其转换为流
 		return getValuesAsList(CONTENT_LANGUAGE)
 				.stream()
+				// 找到第一个内容语言值，并将其转换为Locale对象
 				.findFirst()
 				.map(Locale::forLanguageTag)
+				// 如果找不到，则返回null
 				.orElse(null);
 	}
 
 	/**
-	 * Set the length of the body in bytes, as specified by the
-	 * {@code Content-Length} header.
+	 * 设置消息正文的字节长度，由 {@code Content-Length} 标头指定。
 	 */
 	public void setContentLength(long contentLength) {
 		set(CONTENT_LENGTH, Long.toString(contentLength));
 	}
 
 	/**
-	 * Return the length of the body in bytes, as specified by the
-	 * {@code Content-Length} header.
-	 * <p>Returns -1 when the content-length is unknown.
+	 * 返回消息正文的字节长度，由 {@code Content-Length} 标头指定。
+	 * <p>当内容长度未知时返回 -1。</p>
 	 */
 	public long getContentLength() {
+		// 获取 CONTENT_LENGTH 头部的第一个值
 		String value = getFirst(CONTENT_LENGTH);
+
+		// 如果值不为空，则将其解析为长整型返回；否则返回 -1
 		return (value != null ? Long.parseLong(value) : -1);
 	}
 
 	/**
-	 * Set the {@linkplain MediaType media type} of the body,
-	 * as specified by the {@code Content-Type} header.
+	 * 设置消息正文的 {@linkplain MediaType 媒体类型}，由 {@code Content-Type} 标头指定。
 	 */
 	public void setContentType(@Nullable MediaType mediaType) {
+		// 如果媒体类型不为空
 		if (mediaType != null) {
 			Assert.isTrue(!mediaType.isWildcardType(), "Content-Type cannot contain wildcard type '*'");
 			Assert.isTrue(!mediaType.isWildcardSubtype(), "Content-Type cannot contain wildcard subtype '*'");
+			// 将媒体类型设置到请求头中
 			set(CONTENT_TYPE, mediaType.toString());
-		}
-		else {
+		} else {
+			// 如果媒体类型为空，则移除 CONTENT_TYPE 头部
 			remove(CONTENT_TYPE);
 		}
 	}
 
 	/**
-	 * Return the {@linkplain MediaType media type} of the body, as specified
-	 * by the {@code Content-Type} header.
-	 * <p>Returns {@code null} when the content-type is unknown.
+	 * 返回消息正文的 {@linkplain MediaType 媒体类型}，由 {@code Content-Type} 标头指定。
+	 * <p>当内容类型未知时返回 {@code null}。</p>
 	 */
 	@Nullable
 	public MediaType getContentType() {
+		// 获取第一个内容类型值
 		String value = getFirst(CONTENT_TYPE);
+		// 如果值非空
 		return (StringUtils.hasLength(value) ? MediaType.parseMediaType(value) : null);
 	}
 
 	/**
-	 * Set the date and time at which the message was created, as specified
-	 * by the {@code Date} header.
+	 * 设置消息创建时间，由 {@code Date} 标头指定。
+	 *
 	 * @since 5.2
 	 */
 	public void setDate(ZonedDateTime date) {
@@ -1002,8 +1167,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the date and time at which the message was created, as specified
-	 * by the {@code Date} header.
+	 * 设置消息创建时间，由 {@code Date} 标头指定。
+	 *
 	 * @since 5.2
 	 */
 	public void setDate(Instant date) {
@@ -1011,43 +1176,44 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the date and time at which the message was created, as specified
-	 * by the {@code Date} header.
-	 * <p>The date should be specified as the number of milliseconds since
-	 * January 1, 1970 GMT.
+	 * 设置消息创建时间，由 {@code Date} 标头指定。
+	 * <p>日期应指定为自 1970 年 1 月 1 日 GMT 起的毫秒数。</p>
 	 */
 	public void setDate(long date) {
 		setDate(DATE, date);
 	}
 
 	/**
-	 * Return the date and time at which the message was created, as specified
-	 * by the {@code Date} header.
-	 * <p>The date is returned as the number of milliseconds since
-	 * January 1, 1970 GMT. Returns -1 when the date is unknown.
-	 * @throws IllegalArgumentException if the value cannot be converted to a date
+	 * 返回消息创建时间，由 {@code Date} 标头指定。
+	 * <p>日期以自 1970 年 1 月 1 日 GMT 起的毫秒数返回。当日期未知时返回 -1。</p>
+	 *
+	 * @throws IllegalArgumentException 如果值无法转换为日期
 	 */
 	public long getDate() {
 		return getFirstDate(DATE);
 	}
 
 	/**
-	 * Set the (new) entity tag of the body, as specified by the {@code ETag} header.
+	 * 设置消息正文的 (新) 实体标签，由 {@code ETag} 标头指定。
 	 */
 	public void setETag(@Nullable String etag) {
+		// 如果 ETag 不为空
 		if (etag != null) {
+			// 确保 ETag 以双引号或 'W/' 开头
 			Assert.isTrue(etag.startsWith("\"") || etag.startsWith("W/"),
 					"Invalid ETag: does not start with W/ or \"");
+			// 确保 ETag 以双引号结束
 			Assert.isTrue(etag.endsWith("\""), "Invalid ETag: does not end with \"");
+			// 将 ETag 设置到请求头中
 			set(ETAG, etag);
-		}
-		else {
+		} else {
+			// 如果 ETag 为空，则移除 ETAG 头部
 			remove(ETAG);
 		}
 	}
 
 	/**
-	 * Return the entity tag of the body, as specified by the {@code ETag} header.
+	 * 返回消息正文的实体标签，由 {@code ETag} 标头指定。
 	 */
 	@Nullable
 	public String getETag() {
@@ -1055,8 +1221,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the duration after which the message is no longer valid,
-	 * as specified by the {@code Expires} header.
+	 * 设置消息失效的持续时间，由 {@code Expires} 头指定。
+	 *
 	 * @since 5.0.5
 	 */
 	public void setExpires(ZonedDateTime expires) {
@@ -1064,8 +1230,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the date and time at which the message is no longer valid,
-	 * as specified by the {@code Expires} header.
+	 * 设置消息失效的日期和时间，由 {@code Expires} 头指定。
+	 *
 	 * @since 5.2
 	 */
 	public void setExpires(Instant expires) {
@@ -1073,20 +1239,17 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the date and time at which the message is no longer valid,
-	 * as specified by the {@code Expires} header.
-	 * <p>The date should be specified as the number of milliseconds since
-	 * January 1, 1970 GMT.
+	 * 设置消息失效的日期和时间，由 {@code Expires} 头指定。
+	 * <p>日期应以自 1970 年 1 月 1 日 GMT 起的毫秒数指定。
 	 */
 	public void setExpires(long expires) {
 		setDate(EXPIRES, expires);
 	}
 
 	/**
-	 * Return the date and time at which the message is no longer valid,
-	 * as specified by the {@code Expires} header.
-	 * <p>The date is returned as the number of milliseconds since
-	 * January 1, 1970 GMT. Returns -1 when the date is unknown.
+	 * 返回消息失效的日期和时间，由 {@code Expires} 头指定。
+	 * <p>日期以自 1970 年 1 月 1 日 GMT 起的毫秒数返回。如果日期未知，则返回 -1。
+	 *
 	 * @see #getFirstZonedDateTime(String)
 	 */
 	public long getExpires() {
@@ -1094,62 +1257,76 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code Host} header.
-	 * <p>If the given {@linkplain InetSocketAddress#getPort() port} is {@code 0},
-	 * the host header will only contain the
-	 * {@linkplain InetSocketAddress#getHostString() host name}.
+	 * 设置 {@code Host} 头的（新）值。
+	 * <p>如果给定的 {@linkplain InetSocketAddress#getPort() 端口} 是 {@code 0}，
+	 * 则主机头将仅包含 {@linkplain InetSocketAddress#getHostString() 主机名}。
+	 *
 	 * @since 5.0
 	 */
 	public void setHost(@Nullable InetSocketAddress host) {
+		// 如果主机不为空
 		if (host != null) {
+			// 获取主机字符串和端口号
 			String value = host.getHostString();
 			int port = host.getPort();
+			// 如果端口号不为0，则将端口号添加到主机字符串中
 			if (port != 0) {
 				value = value + ":" + port;
 			}
+			// 设置HOST头部
 			set(HOST, value);
-		}
-		else {
+		} else {
+			// 如果主机为空，则移除HOST头部
 			remove(HOST, null);
 		}
 	}
 
 	/**
-	 * Return the value of the {@code Host} header, if available.
-	 * <p>If the header value does not contain a port, the
-	 * {@linkplain InetSocketAddress#getPort() port} in the returned address will
-	 * be {@code 0}.
+	 * 返回 {@code Host} 头的值（如果可用）。
+	 * <p>如果头值不包含端口，则返回的地址中的 {@linkplain InetSocketAddress#getPort() 端口} 将为 {@code 0}。
+	 *
 	 * @since 5.0
 	 */
 	@Nullable
 	public InetSocketAddress getHost() {
+		// 获取 HOST 头部的第一个值
 		String value = getFirst(HOST);
+
+		// 如果值为空，则返回 null
 		if (value == null) {
 			return null;
 		}
 
+		// 初始化主机名和端口号
 		String host = null;
 		int port = 0;
+
+		// 查找分隔符的索引位置
 		int separator = (value.startsWith("[") ? value.indexOf(':', value.indexOf(']')) : value.lastIndexOf(':'));
 		if (separator != -1) {
+			// 如果找到分隔符，则提取主机名和端口号
 			host = value.substring(0, separator);
 			String portString = value.substring(separator + 1);
 			try {
+				// 解析端口号
 				port = Integer.parseInt(portString);
-			}
-			catch (NumberFormatException ex) {
-				// ignore
+			} catch (NumberFormatException ex) {
+				// 忽略异常
 			}
 		}
 
+		// 如果主机名为空，则设置为整个值
 		if (host == null) {
 			host = value;
 		}
+
+		// 创建未解析的 InetSocketAddress 对象并返回
 		return InetSocketAddress.createUnresolved(host, port);
 	}
 
 	/**
-	 * Set the (new) value of the {@code If-Match} header.
+	 * 设置 {@code If-Match} 头的（新）值。
+	 *
 	 * @since 4.3
 	 */
 	public void setIfMatch(String ifMatch) {
@@ -1157,7 +1334,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code If-Match} header.
+	 * 设置 {@code If-Match} 头的（新）值。
+	 *
 	 * @since 4.3
 	 */
 	public void setIfMatch(List<String> ifMatchList) {
@@ -1165,8 +1343,9 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code If-Match} header.
-	 * @throws IllegalArgumentException if parsing fails
+	 * 返回 {@code If-Match} 头的值。
+	 *
+	 * @throws IllegalArgumentException 如果解析失败
 	 * @since 4.3
 	 */
 	public List<String> getIfMatch() {
@@ -1174,8 +1353,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the time the resource was last changed, as specified by the
-	 * {@code Last-Modified} header.
+	 * 设置资源上次修改的时间，由 {@code Last-Modified} 头部指定。
+	 *
 	 * @since 5.1.4
 	 */
 	public void setIfModifiedSince(ZonedDateTime ifModifiedSince) {
@@ -1183,8 +1362,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the time the resource was last changed, as specified by the
-	 * {@code Last-Modified} header.
+	 * 设置资源上次修改的时间，由 {@code Last-Modified} 头部指定。
+	 *
 	 * @since 5.1.4
 	 */
 	public void setIfModifiedSince(Instant ifModifiedSince) {
@@ -1192,18 +1371,17 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code If-Modified-Since} header.
-	 * <p>The date should be specified as the number of milliseconds since
-	 * January 1, 1970 GMT.
+	 * 设置 {@code If-Modified-Since} 头部的（新）值。
+	 * <p>日期应指定为自 1970 年 1 月 1 日 GMT 以来的毫秒数。
 	 */
 	public void setIfModifiedSince(long ifModifiedSince) {
 		setDate(IF_MODIFIED_SINCE, ifModifiedSince);
 	}
 
 	/**
-	 * Return the value of the {@code If-Modified-Since} header.
-	 * <p>The date is returned as the number of milliseconds since
-	 * January 1, 1970 GMT. Returns -1 when the date is unknown.
+	 * 返回 {@code If-Modified-Since} 头部的值。
+	 * <p>日期以自 1970 年 1 月 1 日 GMT 以来的毫秒数返回。当日期未知时返回 -1。
+	 *
 	 * @see #getFirstZonedDateTime(String)
 	 */
 	public long getIfModifiedSince() {
@@ -1211,30 +1389,31 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code If-None-Match} header.
+	 * 设置 {@code If-None-Match} 头部的（新）值。
 	 */
 	public void setIfNoneMatch(String ifNoneMatch) {
 		set(IF_NONE_MATCH, ifNoneMatch);
 	}
 
 	/**
-	 * Set the (new) values of the {@code If-None-Match} header.
+	 * 设置 {@code If-None-Match} 头部的（新）值。
 	 */
 	public void setIfNoneMatch(List<String> ifNoneMatchList) {
 		set(IF_NONE_MATCH, toCommaDelimitedString(ifNoneMatchList));
 	}
 
 	/**
-	 * Return the value of the {@code If-None-Match} header.
-	 * @throws IllegalArgumentException if parsing fails
+	 * 返回 {@code If-None-Match} 头部的值。
+	 *
+	 * @throws IllegalArgumentException 如果解析失败
 	 */
 	public List<String> getIfNoneMatch() {
 		return getETagValuesAsList(IF_NONE_MATCH);
 	}
 
 	/**
-	 * Set the time the resource was last changed, as specified by the
-	 * {@code Last-Modified} header.
+	 * 设置资源上次修改的时间，由 {@code Last-Modified} 头部指定。
+	 *
 	 * @since 5.1.4
 	 */
 	public void setIfUnmodifiedSince(ZonedDateTime ifUnmodifiedSince) {
@@ -1242,8 +1421,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the time the resource was last changed, as specified by the
-	 * {@code Last-Modified} header.
+	 * 设置资源上次修改的时间，由 {@code Last-Modified} 头部指定。
+	 *
 	 * @since 5.1.4
 	 */
 	public void setIfUnmodifiedSince(Instant ifUnmodifiedSince) {
@@ -1251,9 +1430,9 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code If-Unmodified-Since} header.
-	 * <p>The date should be specified as the number of milliseconds since
-	 * January 1, 1970 GMT.
+	 * 设置 {@code If-Unmodified-Since} 头部的（新）值。
+	 * <p>日期应指定为自 1970 年 1 月 1 日 GMT 以来的毫秒数。
+	 *
 	 * @since 4.3
 	 */
 	public void setIfUnmodifiedSince(long ifUnmodifiedSince) {
@@ -1261,19 +1440,19 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code If-Unmodified-Since} header.
-	 * <p>The date is returned as the number of milliseconds since
-	 * January 1, 1970 GMT. Returns -1 when the date is unknown.
-	 * @since 4.3
+	 * 返回 {@code If-Unmodified-Since} 头部的值。
+	 * <p>日期以自 1970 年 1 月 1 日 GMT 以来的毫秒数返回。当日期未知时返回 -1。
+	 *
 	 * @see #getFirstZonedDateTime(String)
+	 * @since 4.3
 	 */
 	public long getIfUnmodifiedSince() {
 		return getFirstDate(IF_UNMODIFIED_SINCE, false);
 	}
 
 	/**
-	 * Set the time the resource was last changed, as specified by the
-	 * {@code Last-Modified} header.
+	 * 设置资源上次修改的时间，由 {@code Last-Modified} 头部指定。
+	 *
 	 * @since 5.1.4
 	 */
 	public void setLastModified(ZonedDateTime lastModified) {
@@ -1281,8 +1460,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the time the resource was last changed, as specified by the
-	 * {@code Last-Modified} header.
+	 * 设置资源上次修改的时间，由 {@code Last-Modified} 头部指定。
+	 *
 	 * @since 5.1.4
 	 */
 	public void setLastModified(Instant lastModified) {
@@ -1290,20 +1469,17 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the time the resource was last changed, as specified by the
-	 * {@code Last-Modified} header.
-	 * <p>The date should be specified as the number of milliseconds since
-	 * January 1, 1970 GMT.
+	 * 设置资源上次修改的时间，由 {@code Last-Modified} 头部指定。
+	 * <p>日期应指定为自 1970 年 1 月 1 日 GMT 以来的毫秒数。
 	 */
 	public void setLastModified(long lastModified) {
 		setDate(LAST_MODIFIED, lastModified);
 	}
 
 	/**
-	 * Return the time the resource was last changed, as specified by the
-	 * {@code Last-Modified} header.
-	 * <p>The date is returned as the number of milliseconds since
-	 * January 1, 1970 GMT. Returns -1 when the date is unknown.
+	 * 返回资源上次修改的时间，由 {@code Last-Modified} 头部指定。
+	 * <p>日期以自 1970 年 1 月 1 日 GMT 以来的毫秒数返回。当日期未知时返回 -1。
+	 *
 	 * @see #getFirstZonedDateTime(String)
 	 */
 	public long getLastModified() {
@@ -1311,33 +1487,33 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) location of a resource,
-	 * as specified by the {@code Location} header.
+	 * 设置资源的（新）位置，由 {@code Location} 头部指定。
 	 */
 	public void setLocation(@Nullable URI location) {
 		setOrRemove(LOCATION, (location != null ? location.toASCIIString() : null));
 	}
 
 	/**
-	 * Return the (new) location of a resource
-	 * as specified by the {@code Location} header.
-	 * <p>Returns {@code null} when the location is unknown.
+	 * 返回 {@code Location} 头指定的资源的（新）位置。
+	 * <p>当位置未知时返回 {@code null}。
 	 */
 	@Nullable
 	public URI getLocation() {
+		// 获取第一个位置值
 		String value = getFirst(LOCATION);
+		// 如果值不为null，则创建URI对象并返回，否则返回null
 		return (value != null ? URI.create(value) : null);
 	}
 
 	/**
-	 * Set the (new) value of the {@code Origin} header.
+	 * 设置 {@code Origin} 头的（新）值。
 	 */
 	public void setOrigin(@Nullable String origin) {
 		setOrRemove(ORIGIN, origin);
 	}
 
 	/**
-	 * Return the value of the {@code Origin} header.
+	 * 返回 {@code Origin} 头的值。
 	 */
 	@Nullable
 	public String getOrigin() {
@@ -1345,14 +1521,14 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the (new) value of the {@code Pragma} header.
+	 * 设置 {@code Pragma} 头的（新）值。
 	 */
 	public void setPragma(@Nullable String pragma) {
 		setOrRemove(PRAGMA, pragma);
 	}
 
 	/**
-	 * Return the value of the {@code Pragma} header.
+	 * 返回 {@code Pragma} 头的值。
 	 */
 	@Nullable
 	public String getPragma() {
@@ -1360,31 +1536,36 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Sets the (new) value of the {@code Range} header.
+	 * 设置 {@code Range} 头的（新）值。
 	 */
 	public void setRange(List<HttpRange> ranges) {
+		// 将HttpRange对象转换为字符串
 		String value = HttpRange.toString(ranges);
+		// 设置RANGE头部
 		set(RANGE, value);
 	}
 
 	/**
-	 * Return the value of the {@code Range} header.
-	 * <p>Returns an empty list when the range is unknown.
+	 * 返回 {@code Range} 头的值。
+	 * <p>当范围未知时返回空列表。
 	 */
 	public List<HttpRange> getRange() {
+		// 获取 RANGE 头部的第一个值
 		String value = getFirst(RANGE);
+
+		// 解析范围值并返回解析结果
 		return HttpRange.parseRanges(value);
 	}
 
 	/**
-	 * Set the (new) value of the {@code Upgrade} header.
+	 * 设置 {@code Upgrade} 头的（新）值。
 	 */
 	public void setUpgrade(@Nullable String upgrade) {
 		setOrRemove(UPGRADE, upgrade);
 	}
 
 	/**
-	 * Return the value of the {@code Upgrade} header.
+	 * 返回 {@code Upgrade} 头的值。
 	 */
 	@Nullable
 	public String getUpgrade() {
@@ -1392,10 +1573,10 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the request header names (e.g. "Accept-Language") for which the
-	 * response is subject to content negotiation and variances based on the
-	 * value of those request headers.
-	 * @param requestHeaders the request header names
+	 * 设置请求头的名称（例如 "Accept-Language"），该名称用于根据请求头的值进行内容协商，
+	 * 并根据这些请求头的值产生变化。
+	 *
+	 * @param requestHeaders 请求头的名称
 	 * @since 4.3
 	 */
 	public void setVary(List<String> requestHeaders) {
@@ -1403,7 +1584,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the request header names subject to content negotiation.
+	 * 返回受内容协商影响的请求头名称。
+	 *
 	 * @since 4.3
 	 */
 	public List<String> getVary() {
@@ -1411,9 +1593,9 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the given date under the given header name after formatting it as a string
-	 * using the RFC-1123 date-time formatter. The equivalent of
-	 * {@link #set(String, String)} but for date headers.
+	 * 将给定的日期作为字符串使用 RFC-1123 日期时间格式化程序进行格式化，并将其设置为给定标头名称下的值。
+	 * 与 {@link #set(String, String)} 相同，但适用于日期标头。
+	 *
 	 * @since 5.0
 	 */
 	public void setZonedDateTime(String headerName, ZonedDateTime date) {
@@ -1421,9 +1603,9 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the given date under the given header name after formatting it as a string
-	 * using the RFC-1123 date-time formatter. The equivalent of
-	 * {@link #set(String, String)} but for date headers.
+	 * 将给定的日期作为字符串使用 RFC-1123 日期时间格式化程序进行格式化，并将其设置为给定标头名称下的值。
+	 * 与 {@link #set(String, String)} 相同，但适用于日期标头。
+	 *
 	 * @since 5.1.4
 	 */
 	public void setInstant(String headerName, Instant date) {
@@ -1431,52 +1613,51 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the given date under the given header name after formatting it as a string
-	 * using the RFC-1123 date-time formatter. The equivalent of
-	 * {@link #set(String, String)} but for date headers.
-	 * @since 3.2.4
+	 * 将给定的日期作为字符串使用 RFC-1123 日期时间格式化程序进行格式化，并将其设置为给定标头名称下的值。
+	 * 与 {@link #set(String, String)} 相同，但适用于日期标头。
+	 *
 	 * @see #setZonedDateTime(String, ZonedDateTime)
+	 * @since 3.2.4
 	 */
 	public void setDate(String headerName, long date) {
 		setInstant(headerName, Instant.ofEpochMilli(date));
 	}
 
 	/**
-	 * Parse the first header value for the given header name as a date,
-	 * return -1 if there is no value, or raise {@link IllegalArgumentException}
-	 * if the value cannot be parsed as a date.
-	 * @param headerName the header name
-	 * @return the parsed date header, or -1 if none
-	 * @since 3.2.4
+	 * 解析给定头部名称的第一个头部值作为日期，如果没有值则返回 -1，如果值无法解析为日期则抛出 {@link IllegalArgumentException}。
+	 *
+	 * @param headerName 头部名称
+	 * @return 解析后的日期头部，如果没有则返回 -1
 	 * @see #getFirstZonedDateTime(String)
+	 * @since 3.2.4
 	 */
 	public long getFirstDate(String headerName) {
 		return getFirstDate(headerName, true);
 	}
 
 	/**
-	 * Parse the first header value for the given header name as a date,
-	 * return -1 if there is no value or also in case of an invalid value
-	 * (if {@code rejectInvalid=false}), or raise {@link IllegalArgumentException}
-	 * if the value cannot be parsed as a date.
-	 * @param headerName the header name
-	 * @param rejectInvalid whether to reject invalid values with an
-	 * {@link IllegalArgumentException} ({@code true}) or rather return -1
-	 * in that case ({@code false})
-	 * @return the parsed date header, or -1 if none (or invalid)
+	 * 解析给定头部名称的第一个头部值作为日期，如果没有值或者值无效（如果 {@code rejectInvalid=false}）则返回 -1，
+	 * 如果值无法解析为日期则抛出 {@link IllegalArgumentException}。
+	 *
+	 * @param headerName    头部名称
+	 * @param rejectInvalid 是否拒绝无效值，如果是则抛出 {@link IllegalArgumentException}，否则返回 -1
+	 * @return 解析后的日期头部，如果没有或者无效则返回 -1
 	 * @see #getFirstZonedDateTime(String, boolean)
+	 * @since 3.2.4
 	 */
 	private long getFirstDate(String headerName, boolean rejectInvalid) {
+		// 获取指定头部的第一个 ZonedDateTime 对象
 		ZonedDateTime zonedDateTime = getFirstZonedDateTime(headerName, rejectInvalid);
+
+		// 如果 ZonedDateTime 对象不为空，则将其转换为毫秒数并返回；否则返回 -1
 		return (zonedDateTime != null ? zonedDateTime.toInstant().toEpochMilli() : -1);
 	}
 
 	/**
-	 * Parse the first header value for the given header name as a date,
-	 * return {@code null} if there is no value, or raise {@link IllegalArgumentException}
-	 * if the value cannot be parsed as a date.
-	 * @param headerName the header name
-	 * @return the parsed date header, or {@code null} if none
+	 * 解析给定头部名称的第一个头部值作为日期，如果没有值则返回 {@code null}，如果值无法解析为日期则抛出 {@link IllegalArgumentException}。
+	 *
+	 * @param headerName 头部名称
+	 * @return 解析后的日期头部，如果没有则返回 {@code null}
 	 * @since 5.0
 	 */
 	@Nullable
@@ -1485,75 +1666,88 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Parse the first header value for the given header name as a date,
-	 * return {@code null} if there is no value or also in case of an invalid value
-	 * (if {@code rejectInvalid=false}), or raise {@link IllegalArgumentException}
-	 * if the value cannot be parsed as a date.
-	 * @param headerName the header name
-	 * @param rejectInvalid whether to reject invalid values with an
-	 * {@link IllegalArgumentException} ({@code true}) or rather return {@code null}
-	 * in that case ({@code false})
-	 * @return the parsed date header, or {@code null} if none (or invalid)
+	 * 解析给定头部名称的第一个头部值作为日期，如果没有值或者值无效（如果 {@code rejectInvalid=false}）则返回 {@code null}，
+	 * 如果值无法解析为日期则抛出 {@link IllegalArgumentException}。
+	 *
+	 * @param headerName    头部名称
+	 * @param rejectInvalid 是否拒绝无效值，如果是则抛出 {@link IllegalArgumentException}，否则返回 {@code null}
+	 * @return 解析后的日期头部，如果没有或者无效则返回 {@code null}
 	 */
 	@Nullable
 	private ZonedDateTime getFirstZonedDateTime(String headerName, boolean rejectInvalid) {
+		// 获取指定头部的第一个值
 		String headerValue = getFirst(headerName);
+
+		// 如果头部值为空，则返回 null
 		if (headerValue == null) {
-			// No header value sent at all
+			// 没有发送任何头部值
 			return null;
 		}
-		if (headerValue.length() >= 3) {
-			// Short "0" or "-1" like values are never valid HTTP date headers...
-			// Let's only bother with DateTimeFormatter parsing for long enough values.
 
-			// See https://stackoverflow.com/questions/12626699/if-modified-since-http-header-passed-by-ie9-includes-length
+		// 如果头部值的长度大于等于3
+		if (headerValue.length() >= 3) {
+			// 短的类似 "0" 或 "-1" 的值永远不是有效的 HTTP 日期头...
+			// 让我们只针对足够长的值进行 DateTimeFormatter 解析。
+
+			// 查找参数索引
 			int parametersIndex = headerValue.indexOf(';');
 			if (parametersIndex != -1) {
 				headerValue = headerValue.substring(0, parametersIndex);
 			}
 
+			// 尝试使用每个日期格式化器解析日期头部值
 			for (DateTimeFormatter dateFormatter : DATE_PARSERS) {
 				try {
 					return ZonedDateTime.parse(headerValue, dateFormatter);
-				}
-				catch (DateTimeParseException ex) {
-					// ignore
+				} catch (DateTimeParseException ex) {
+					// 忽略异常
 				}
 			}
-
 		}
+
+		// 如果拒绝无效日期并且无法解析日期头部值，则抛出异常
 		if (rejectInvalid) {
 			throw new IllegalArgumentException("Cannot parse date value \"" + headerValue +
 					"\" for \"" + headerName + "\" header");
 		}
+
+		// 返回 null
 		return null;
 	}
 
 	/**
-	 * Return all values of a given header name,
-	 * even if this header is set multiple times.
-	 * @param headerName the header name
-	 * @return all associated values
+	 * 返回给定头部名称的所有值，即使该头部设置了多次。
+	 *
+	 * @param headerName 头部名称
+	 * @return 所有关联值的列表
 	 * @since 4.3
 	 */
 	public List<String> getValuesAsList(String headerName) {
+		// 获取指定头部名称的值列表
 		List<String> values = get(headerName);
+		// 如果值列表不为null
 		if (values != null) {
+			// 创建一个新的结果列表
 			List<String> result = new ArrayList<>();
+			// 遍历值列表
 			for (String value : values) {
+				// 如果值不为null
 				if (value != null) {
+					// 使用逗号分隔符将值拆分为字符串数组，并添加到结果列表中
 					Collections.addAll(result, StringUtils.tokenizeToStringArray(value, ","));
 				}
 			}
+			// 返回结果列表
 			return result;
 		}
+		// 如果值列表为null，则返回空列表
 		return Collections.emptyList();
 	}
 
 	/**
-	 * Remove the well-known {@code "Content-*"} HTTP headers.
-	 * <p>Such headers should be cleared from the response if the intended
-	 * body can't be written due to errors.
+	 * 移除常见的 {@code "Content-*"} HTTP 头部。
+	 * <p>如果由于错误而无法写入预期的主体，则应该从响应中清除此类头部。
+	 *
 	 * @since 5.2.3
 	 */
 	public void clearContentHeaders() {
@@ -1567,86 +1761,111 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Retrieve a combined result from the field values of the ETag header.
-	 * @param headerName the header name
-	 * @return the combined result
-	 * @throws IllegalArgumentException if parsing fails
+	 * 从 ETag 头部的字段值获取合并的结果。
+	 *
+	 * @param headerName 头部名称
+	 * @return 合并的结果列表
+	 * @throws IllegalArgumentException 如果解析失败
 	 * @since 4.3
 	 */
 	protected List<String> getETagValuesAsList(String headerName) {
+		// 获取头部名称对应的值列表
 		List<String> values = get(headerName);
+		// 如果值列表不为空
 		if (values != null) {
+			// 创建一个新的结果列表
 			List<String> result = new ArrayList<>();
+			// 遍历值列表中的每个值
 			for (String value : values) {
+				// 如果值不为null
 				if (value != null) {
+					// 使用ETAG_HEADER_VALUE_PATTERN正则表达式匹配值中的ETag
 					Matcher matcher = ETAG_HEADER_VALUE_PATTERN.matcher(value);
+					// 循环匹配结果
 					while (matcher.find()) {
+						// 如果匹配到"*"，则直接添加到结果列表中
 						if ("*".equals(matcher.group())) {
 							result.add(matcher.group());
-						}
-						else {
+						} else {
+							// 否则，添加第一个分组的值（ETag）
 							result.add(matcher.group(1));
 						}
 					}
+					// 如果结果列表为空，抛出IllegalArgumentException异常
 					if (result.isEmpty()) {
 						throw new IllegalArgumentException(
 								"Could not parse header '" + headerName + "' with value '" + value + "'");
 					}
 				}
 			}
+			// 返回结果列表
 			return result;
 		}
+		// 如果值列表为空，则返回空列表
 		return Collections.emptyList();
 	}
 
 	/**
-	 * Retrieve a combined result from the field values of multi-valued headers.
-	 * @param headerName the header name
-	 * @return the combined result
+	 * 从多值头字段的字段值中检索组合结果。
+	 *
+	 * @param headerName 标头名称
+	 * @return 组合结果
 	 * @since 4.3
 	 */
 	@Nullable
 	protected String getFieldValues(String headerName) {
+		// 获取指定头部的所有值
 		List<String> headerValues = get(headerName);
+
+		// 如果头部值列表不为空，则将其转换为逗号分隔的字符串并返回；否则返回 null
 		return (headerValues != null ? toCommaDelimitedString(headerValues) : null);
 	}
 
 	/**
-	 * Turn the given list of header values into a comma-delimited result.
-	 * @param headerValues the list of header values
-	 * @return a combined result with comma delimitation
+	 * 将给定的头值列表转换为逗号分隔的结果。
+	 *
+	 * @param headerValues 头值列表
+	 * @return 使用逗号分隔的组合结果
 	 */
 	protected String toCommaDelimitedString(List<String> headerValues) {
+		// 创建一个StringJoiner对象，用于连接多个字符串
 		StringJoiner joiner = new StringJoiner(", ");
+		// 遍历头部值数组
 		for (String val : headerValues) {
+			// 如果值不为null，则添加到StringJoiner中
 			if (val != null) {
 				joiner.add(val);
 			}
 		}
+		// 返回连接后的字符串
 		return joiner.toString();
 	}
 
 	/**
-	 * Set the given header value, or remove the header if {@code null}.
-	 * @param headerName the header name
-	 * @param headerValue the header value, or {@code null} for none
+	 * 设置给定的头值，或者如果为 {@code null} 则移除该头。
+	 *
+	 * @param headerName  头名称
+	 * @param headerValue 头值，如果没有则为 {@code null}
 	 */
 	private void setOrRemove(String headerName, @Nullable String headerValue) {
+		// 如果头部值不为 null，则设置指定头部的值为给定值；
 		if (headerValue != null) {
 			set(headerName, headerValue);
-		}
-		else {
+		} else {
+			// 否则移除指定头部
 			remove(headerName);
 		}
+
 	}
 
 
-	// MultiValueMap implementation
+	// MultiValueMap 实现
 
 	/**
-	 * Return the first header value for the given header name, if any.
-	 * @param headerName the header name
-	 * @return the first header value, or {@code null} if none
+	 * 返回给定头名称的第一个头值，如果有的话。
+	 *
+	 * @param headerName 头名称
+	 * @return 第一个头值，如果没有则为 {@code null}
 	 */
 	@Override
 	@Nullable
@@ -1655,10 +1874,11 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Add the given, single header value under the given name.
-	 * @param headerName the header name
-	 * @param headerValue the header value
-	 * @throws UnsupportedOperationException if adding headers is not supported
+	 * 在给定名称下添加给定的单个头值。
+	 *
+	 * @param headerName  头名称
+	 * @param headerValue 头值
+	 * @throws UnsupportedOperationException 如果不支持添加头
 	 * @see #put(String, List)
 	 * @see #set(String, String)
 	 */
@@ -1678,10 +1898,11 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Set the given, single header value under the given name.
-	 * @param headerName the header name
-	 * @param headerValue the header value
-	 * @throws UnsupportedOperationException if adding headers is not supported
+	 * 在给定名称下设置给定的单个头值。
+	 *
+	 * @param headerName  头名称
+	 * @param headerValue 头值
+	 * @throws UnsupportedOperationException 如果不支持添加头
 	 * @see #put(String, List)
 	 * @see #add(String, String)
 	 */
@@ -1701,7 +1922,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 
-	// Map implementation
+	// Map 实现
 
 	@Override
 	public int size() {
@@ -1795,11 +2016,11 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 
 
 	/**
-	 * Apply a read-only {@code HttpHeaders} wrapper around the given headers, if necessary.
-	 * <p>Also caches the parsed representations of the "Accept" and "Content-Type" headers.
-	 * @param headers the headers to expose
-	 * @return a read-only variant of the headers, or the original headers as-is
-	 * (in case it happens to be a read-only {@code HttpHeaders} instance already)
+	 * 如果必要，应用只读 {@code HttpHeaders} 包装器在给定头周围，
+	 * <p>还会缓存 "Accept" 和 "Content-Type" 标头的解析表示。
+	 *
+	 * @param headers 要公开的头
+	 * @return 头的只读变体，或原始头本身（如果它恰好是只读 {@code HttpHeaders} 实例）
 	 * @since 5.3
 	 */
 	public static HttpHeaders readOnlyHttpHeaders(MultiValueMap<String, String> headers) {
@@ -1808,10 +2029,11 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Apply a read-only {@code HttpHeaders} wrapper around the given headers, if necessary.
-	 * <p>Also caches the parsed representations of the "Accept" and "Content-Type" headers.
-	 * @param headers the headers to expose
-	 * @return a read-only variant of the headers, or the original headers as-is
+	 * 如果必要，应用只读 {@code HttpHeaders} 包装器在给定头周围，
+	 * <p>还会缓存 "Accept" 和 "Content-Type" 标头的解析表示。
+	 *
+	 * @param headers 要公开的头
+	 * @return 头的只读变体，或原始头本身（如果它恰好是只读 {@code HttpHeaders} 实例）
 	 */
 	public static HttpHeaders readOnlyHttpHeaders(HttpHeaders headers) {
 		Assert.notNull(headers, "HttpHeaders must not be null");
@@ -1819,78 +2041,91 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Remove any read-only wrapper that may have been previously applied around
-	 * the given headers via {@link #readOnlyHttpHeaders(HttpHeaders)}.
-	 * @param headers the headers to expose
-	 * @return a writable variant of the headers, or the original headers as-is
+	 * 删除可能先前通过 {@link #readOnlyHttpHeaders(HttpHeaders)} 应用在给定头周围的任何只读包装器。
+	 *
+	 * @param headers 要公开的头
+	 * @return 可写头的变体，或原始头本身
 	 * @since 5.1.1
 	 */
 	public static HttpHeaders writableHttpHeaders(HttpHeaders headers) {
 		Assert.notNull(headers, "HttpHeaders must not be null");
 		if (headers == EMPTY) {
+			// 如果头部为空，则返回空的头部
 			return new HttpHeaders();
 		}
 		return (headers instanceof ReadOnlyHttpHeaders ? new HttpHeaders(headers.headers) : headers);
 	}
 
 	/**
-	 * Helps to format HTTP header values, as HTTP header values themselves can
-	 * contain comma-separated values, can become confusing with regular
-	 * {@link Map} formatting that also uses commas between entries.
-	 * @param headers the headers to format
-	 * @return the headers to a String
+	 * 帮助格式化 HTTP 标头值，因为 HTTP 标头值本身可以包含逗号分隔的值，
+	 * 使用逗号分隔的值可以与也使用逗号分隔的条目的常规 {@link Map} 格式化变得混淆。
+	 *
+	 * @param headers 要格式化的头
+	 * @return 头的字符串表示形式
 	 * @since 5.1.4
 	 */
 	public static String formatHeaders(MultiValueMap<String, String> headers) {
 		return headers.entrySet().stream()
 				.map(entry -> {
+					// 将头部映射项转换为字符串
 					List<String> values = entry.getValue();
 					return entry.getKey() + ":" + (values.size() == 1 ?
 							"\"" + values.get(0) + "\"" :
 							values.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(", ")));
 				})
+				// 使用逗号和方括号进行连接
 				.collect(Collectors.joining(", ", "[", "]"));
 	}
 
 	/**
-	 * Encode the given username and password into Basic Authentication credentials.
-	 * <p>The encoded credentials returned by this method can be supplied to
-	 * {@link #setBasicAuth(String)} to set the Basic Authentication header.
-	 * @param username the username
-	 * @param password the password
-	 * @param charset the charset to use to convert the credentials into an octet
-	 * sequence. Defaults to {@linkplain StandardCharsets#ISO_8859_1 ISO-8859-1}.
-	 * @throws IllegalArgumentException if {@code username} or {@code password}
-	 * contains characters that cannot be encoded to the given charset
-	 * @since 5.2
+	 * 将给定的用户名和密码编码为基本身份验证凭据。
+	 * <p>此方法返回的编码凭据可以提供给 {@link #setBasicAuth(String)} 以设置基本身份验证标头。
+	 *
+	 * @param username 要编码的用户名
+	 * @param password 要编码的密码
+	 * @param charset  要用于将凭据转换为字节序列的字符集。默认为 {@linkplain StandardCharsets#ISO_8859_1 ISO-8859-1}。
+	 * @throws IllegalArgumentException 如果 {@code username} 或 {@code password}
+	 *                                  包含无法编码为给定字符集的字符
 	 * @see #setBasicAuth(String)
 	 * @see #setBasicAuth(String, String)
 	 * @see #setBasicAuth(String, String, Charset)
 	 * @see <a href="https://tools.ietf.org/html/rfc7617">RFC 7617</a>
+	 * @since 5.2
 	 */
 	public static String encodeBasicAuth(String username, String password, @Nullable Charset charset) {
 		Assert.notNull(username, "Username must not be null");
 		Assert.doesNotContain(username, ":", "Username must not contain a colon");
 		Assert.notNull(password, "Password must not be null");
+		// 如果字符集为空，则使用ISO_8859_1字符集
 		if (charset == null) {
 			charset = StandardCharsets.ISO_8859_1;
 		}
 
+		// 获取字符集的编码器
 		CharsetEncoder encoder = charset.newEncoder();
+		// 如果用户名或密码包含无法编码的字符，则抛出IllegalArgumentException异常
 		if (!encoder.canEncode(username) || !encoder.canEncode(password)) {
 			throw new IllegalArgumentException(
 					"Username or password contains characters that cannot be encoded to " + charset.displayName());
 		}
 
+		// 构建认证字符串：用户名+":"+密码
 		String credentialsString = username + ":" + password;
+		// 对认证字符串进行编码，并使用指定字符集编码
 		byte[] encodedBytes = Base64.getEncoder().encode(credentialsString.getBytes(charset));
+		// 将编码后的字节数组转换为字符串，并使用指定字符集解码
 		return new String(encodedBytes, charset);
 	}
 
-	// Package-private: used in ResponseCookie
+	/**
+	 * Package-private: 用于ResponseCookie
+	 */
 	static String formatDate(long date) {
+		// 将毫秒级时间戳转换为Instant对象
 		Instant instant = Instant.ofEpochMilli(date);
+		// 将Instant对象转换为GMT时区的ZonedDateTime对象
 		ZonedDateTime time = ZonedDateTime.ofInstant(instant, GMT);
+		// 使用日期格式化器格式化时间
 		return DATE_FORMATTER.format(time);
 	}
 

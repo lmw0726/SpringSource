@@ -16,20 +16,15 @@
 
 package org.springframework.http;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
- * {@code HttpHeaders} object that can only be read, not written to.
+ * {@code HttpHeaders} 对象，只能进行读取操作，不能写入。
  *
  * @author Brian Clozel
  * @author Sam Brannen
@@ -39,45 +34,65 @@ class ReadOnlyHttpHeaders extends HttpHeaders {
 
 	private static final long serialVersionUID = -8578554704772377436L;
 
+	/**
+	 * 缓存的内容类型。
+	 */
 	@Nullable
 	private MediaType cachedContentType;
 
+	/**
+	 * 缓存的接受类型。
+	 */
 	@Nullable
 	private List<MediaType> cachedAccept;
 
-
+	/**
+	 * 创建一个只读的 HttpHeaders 对象。
+	 *
+	 * @param headers 要读取的 HttpHeaders 对象
+	 */
 	ReadOnlyHttpHeaders(MultiValueMap<String, String> headers) {
 		super(headers);
 	}
 
+	// 以下为重写的方法，实现只读操作，不允许写入
 
 	@Override
 	public MediaType getContentType() {
+		// 如果已缓存的内容类型不为空
 		if (this.cachedContentType != null) {
+			// 返回已缓存的内容类型
 			return this.cachedContentType;
-		}
-		else {
+		} else {
+			// 否则，调用父类的 getContentType 方法获取内容类型
 			MediaType contentType = super.getContentType();
+
+			// 将获取到的内容类型缓存起来
 			this.cachedContentType = contentType;
+
+			// 返回获取到的内容类型
 			return contentType;
 		}
 	}
 
 	@Override
 	public List<MediaType> getAccept() {
+		// 如果已缓存的Accept列表不为空，则直接返回
 		if (this.cachedAccept != null) {
 			return this.cachedAccept;
-		}
-		else {
+		} else {
+			// 否则，调用父类方法获取Accept列表
 			List<MediaType> accept = super.getAccept();
+			// 缓存获取到的Accept列表
 			this.cachedAccept = accept;
+			// 返回获取到的Accept列表
 			return accept;
 		}
 	}
 
 	@Override
 	public void clearContentHeaders() {
-		// No-op.
+		// 无操作
 	}
 
 	@Override
@@ -148,9 +163,12 @@ class ReadOnlyHttpHeaders extends HttpHeaders {
 
 	@Override
 	public Set<Entry<String, List<String>>> entrySet() {
+		// 使用流操作将头部映射项转换为简单不可变条目，并收集到 LinkedHashSet 中以保持原始顺序
 		return this.headers.entrySet().stream().map(SimpleImmutableEntry::new)
 				.collect(Collectors.collectingAndThen(
-						Collectors.toCollection(LinkedHashSet::new), // Retain original ordering of entries
+						// 保留条目的原始顺序
+						Collectors.toCollection(LinkedHashSet::new),
+						// 将结果集合转换为不可修改的集合
 						Collections::unmodifiableSet));
 	}
 

@@ -16,20 +16,19 @@
 
 package org.springframework.http.server;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 /**
  * {@link ServerHttpResponse} implementation that is based on a {@link HttpServletResponse}.
@@ -54,6 +53,7 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 
 	/**
 	 * Construct a new instance of the ServletServerHttpResponse based on the given {@link HttpServletResponse}.
+	 *
 	 * @param servletResponse the servlet response
 	 */
 	public ServletServerHttpResponse(HttpServletResponse servletResponse) {
@@ -80,12 +80,10 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 	public HttpHeaders getHeaders() {
 		if (this.readOnlyHeaders != null) {
 			return this.readOnlyHeaders;
-		}
-		else if (this.headersWritten) {
+		} else if (this.headersWritten) {
 			this.readOnlyHeaders = HttpHeaders.readOnlyHttpHeaders(this.headers);
 			return this.readOnlyHeaders;
-		}
-		else {
+		} else {
 			return this.headers;
 		}
 	}
@@ -135,13 +133,10 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 
 
 	/**
-	 * Extends HttpHeaders with the ability to look up headers already present in
-	 * the underlying HttpServletResponse.
+	 * 通过扩展 HttpHeaders 来实现在底层的 HttpServletResponse 中查找已存在的头部的功能。
 	 *
-	 * <p>The intent is merely to expose what is available through the HttpServletResponse
-	 * i.e. the ability to look up specific header values by name. All other
-	 * map-related operations (e.g. iteration, removal, etc) apply only to values
-	 * added directly through HttpHeaders methods.
+	 * <p>其意图仅仅是暴露通过 HttpServletResponse 可用的内容，即通过名称查找特定头部值的能力。所有其他的
+	 * 与 Map 相关的操作（如迭代、移除等）仅适用于通过 HttpHeaders 方法直接添加的值。
 	 *
 	 * @since 4.0.3
 	 */
@@ -157,13 +152,16 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 		@Override
 		@Nullable
 		public String getFirst(String headerName) {
+			// 如果头部名称忽略大小写后等于CONTENT_TYPE
 			if (headerName.equalsIgnoreCase(CONTENT_TYPE)) {
-				// Content-Type is written as an override so check super first
+				// 先从父类获取Content-Type值
 				String value = super.getFirst(headerName);
+				// 如果父类返回的值不为null，则返回该值，否则从servletResponse获取Content-Type值
 				return (value != null ? value : servletResponse.getHeader(headerName));
-			}
-			else {
+			} else {
+				// 如果头部名称不是CONTENT_TYPE，则从servletResponse获取头部值
 				String value = servletResponse.getHeader(headerName);
+				// 如果servletResponse返回的值不为null，则返回该值，否则从父类获取头部值
 				return (value != null ? value : super.getFirst(headerName));
 			}
 		}
@@ -172,32 +170,50 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 		public List<String> get(Object key) {
 			Assert.isInstanceOf(String.class, key, "Key must be a String-based header name");
 
+			// 将键转换为字符串类型
 			String headerName = (String) key;
+
+			// 如果键名为 CONTENT_TYPE（不区分大小写）
 			if (headerName.equalsIgnoreCase(CONTENT_TYPE)) {
-				// Content-Type is written as an override so don't merge
+				// Content-Type 作为覆盖写入，因此不需要合并
 				return Collections.singletonList(getFirst(headerName));
 			}
 
+			// 获取 Servlet 响应中指定键名的头信息值集合
 			Collection<String> values1 = servletResponse.getHeaders(headerName);
+
+			// 如果响应头已经被写入
 			if (headersWritten) {
+				// 返回响应头中指定键名的头信息值集合的副本
 				return new ArrayList<>(values1);
 			}
+
+			// 检查响应头值集合是否为空
 			boolean isEmpty1 = CollectionUtils.isEmpty(values1);
 
+			// 获取当前对象中指定键名的头信息值集合
 			List<String> values2 = super.get(key);
+
+			// 检查当前对象中指定键名的头信息值集合是否为空
 			boolean isEmpty2 = CollectionUtils.isEmpty(values2);
 
+			// 如果两个头信息值集合都为空
 			if (isEmpty1 && isEmpty2) {
+				// 返回 null，表示不存在该键名的头信息值
 				return null;
 			}
 
+			// 否则，合并两个头信息值集合
 			List<String> values = new ArrayList<>();
+			// 如果 Servlet 响应中的头信息值集合不为空，则将其添加到合并后的集合中
 			if (!isEmpty1) {
 				values.addAll(values1);
 			}
+			// 如果当前对象中的头信息值集合不为空，则将其添加到合并后的集合中
 			if (!isEmpty2) {
 				values.addAll(values2);
 			}
+			// 返回合并后的头信息值集合
 			return values;
 		}
 	}
