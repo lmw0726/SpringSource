@@ -16,27 +16,11 @@
 
 package org.springframework.test.web.servlet.client;
 
-import java.io.StringWriter;
-import java.net.URI;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-
-import javax.servlet.http.Cookie;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBuffer;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ReactiveHttpInputMessage;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.*;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.http.client.reactive.ClientHttpResponse;
@@ -64,6 +48,16 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import reactor.core.publisher.Mono;
+
+import javax.servlet.http.Cookie;
+import java.io.StringWriter;
+import java.net.URI;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 
@@ -210,7 +204,9 @@ public class MockMvcHttpConnector implements ClientHttpConnector {
 
 	private static class MockMvcServerClientHttpResponse
 			extends MockClientHttpResponse implements MockServerClientHttpResponse {
-
+		/**
+		 * MVC结果
+		 */
 		private final MvcResult mvcResult;
 
 

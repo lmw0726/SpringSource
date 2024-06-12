@@ -26,14 +26,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 
 /**
- * Wraps another {@link ClientHttpResponse} and delegates all methods to it.
- * Sub-classes can override specific methods selectively.
+ * 包装另一个 {@link ClientHttpResponse} 并将所有方法委托给它。
+ * 子类可以有选择地重写特定方法。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class ClientHttpResponseDecorator implements ClientHttpResponse {
-
+	/**
+	 * 代理的客户端Http响应
+	 */
 	private final ClientHttpResponse delegate;
 
 
@@ -48,7 +50,7 @@ public class ClientHttpResponseDecorator implements ClientHttpResponse {
 	}
 
 
-	// ClientHttpResponse delegation methods...
+	// ClientHttpResponse 委托方法...
 
 	@Override
 	public String getId() {

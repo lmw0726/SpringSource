@@ -16,11 +16,6 @@
 
 package org.springframework.http.server.reactive;
 
-import java.net.InetSocketAddress;
-import java.net.URI;
-
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
@@ -29,16 +24,22 @@ import org.springframework.http.server.RequestPath;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
+import reactor.core.publisher.Flux;
+
+import java.net.InetSocketAddress;
+import java.net.URI;
 
 /**
- * Wraps another {@link ServerHttpRequest} and delegates all methods to it.
- * Sub-classes can override specific methods selectively.
+ * 包装另一个 {@link ServerHttpRequest} 并将所有方法委托给它。
+ * 子类可以选择性地覆盖特定方法。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class ServerHttpRequestDecorator implements ServerHttpRequest {
-
+	/**
+	 * 服务端Http请求
+	 */
 	private final ServerHttpRequest delegate;
 
 
@@ -53,7 +54,7 @@ public class ServerHttpRequestDecorator implements ServerHttpRequest {
 	}
 
 
-	// ServerHttpRequest delegation methods...
+	// ServerHttpRequest 委托方法...
 
 	@Override
 	public String getId() {
@@ -121,21 +122,25 @@ public class ServerHttpRequestDecorator implements ServerHttpRequest {
 
 
 	/**
-	 * Return the native request of the underlying server API, if possible,
-	 * also unwrapping {@link ServerHttpRequestDecorator} if necessary.
-	 * @param request the request to check
-	 * @param <T> the expected native request type
-	 * @throws IllegalArgumentException if the native request can't be obtained
+	 * 如果可能，返回基础服务器 API 的原生请求，并在必要时取消包装 {@link ServerHttpRequestDecorator}。
+	 *
+	 * @param request 要检查的请求
+	 * @param <T>     期望的原生请求类型
+	 * @throws IllegalArgumentException 如果无法获取原生请求
 	 * @since 5.3.3
 	 */
 	public static <T> T getNativeRequest(ServerHttpRequest request) {
+		// 检查请求是否是AbstractServerHttpRequest的实例
 		if (request instanceof AbstractServerHttpRequest) {
+			// 如果是，返回原生请求对象
 			return ((AbstractServerHttpRequest) request).getNativeRequest();
-		}
-		else if (request instanceof ServerHttpRequestDecorator) {
+		} else if (request instanceof ServerHttpRequestDecorator) {
+			// 检查请求是否是ServerHttpRequestDecorator的实例
+			// 如果是，递归调用getNativeRequest方法以获取原生请求对象
 			return getNativeRequest(((ServerHttpRequestDecorator) request).getDelegate());
-		}
-		else {
+		} else {
+			// 如果请求既不是AbstractServerHttpRequest也不是ServerHttpRequestDecorator的实例
+			// 抛出异常，表示无法在请求中找到原生请求对象
 			throw new IllegalArgumentException(
 					"Can't find native request in " + request.getClass().getName());
 		}

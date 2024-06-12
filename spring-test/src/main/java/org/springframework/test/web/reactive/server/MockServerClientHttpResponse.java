@@ -19,9 +19,8 @@ package org.springframework.test.web.reactive.server;
 import org.springframework.http.client.reactive.ClientHttpResponse;
 
 /**
- * Simple {@link ClientHttpResponse} extension that also exposes a result object
- * from the underlying mock server exchange for further assertions on the state
- * of the server response after the request is performed.
+ * 简单的 {@link ClientHttpResponse} 扩展，还公开了从底层模拟服务器交换中获取的结果对象，
+ * 以便在执行请求后进一步对服务器响应的状态进行断言。
  *
  * @author Rossen Stoyanchev
  * @since 5.3
@@ -29,7 +28,7 @@ import org.springframework.http.client.reactive.ClientHttpResponse;
 public interface MockServerClientHttpResponse extends ClientHttpResponse {
 
 	/**
-	 * Return the result object with the server request and response.
+	 * 返回带有服务器请求和响应的结果对象。
 	 */
 	Object getServerResult();
 

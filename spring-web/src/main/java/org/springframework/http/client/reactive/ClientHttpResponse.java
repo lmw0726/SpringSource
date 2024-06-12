@@ -23,7 +23,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Represents a client-side reactive HTTP response.
+ * 表示客户端端的响应式 HTTP 响应。
  *
  * @author Arjen Poutsma
  * @author Brian Clozel
@@ -32,8 +32,9 @@ import org.springframework.util.ObjectUtils;
 public interface ClientHttpResponse extends ReactiveHttpInputMessage {
 
 	/**
-	 * Return an id that represents the underlying connection, if available,
-	 * or the request for the purpose of correlating log messages.
+	 * 返回一个表示底层连接的 ID（如果可用），
+	 * 或用于关联日志消息的请求。
+	 *
 	 * @since 5.3.5
 	 */
 	default String getId() {
@@ -41,26 +42,27 @@ public interface ClientHttpResponse extends ReactiveHttpInputMessage {
 	}
 
 	/**
-	 * Return the HTTP status code as an {@link HttpStatus} enum value.
-	 * @return the HTTP status as an HttpStatus enum value (never {@code null})
-	 * @throws IllegalArgumentException in case of an unknown HTTP status code
-	 * @since #getRawStatusCode()
+	 * 将 HTTP 状态码作为 {@link HttpStatus} 枚举值返回。
+	 *
+	 * @return HTTP 状态作为 HttpStatus 枚举值（永远不会是 {@code null}）
+	 * @throws IllegalArgumentException 如果是未知的 HTTP 状态码
 	 * @see HttpStatus#valueOf(int)
+	 * @since #getRawStatusCode()
 	 */
 	HttpStatus getStatusCode();
 
 	/**
-	 * Return the HTTP status code (potentially non-standard and not
-	 * resolvable through the {@link HttpStatus} enum) as an integer.
-	 * @return the HTTP status as an integer value
-	 * @since 5.0.6
+	 * 将 HTTP 状态码（可能是非标准的，不能通过 {@link HttpStatus} 枚举解析）作为整数返回。
+	 *
+	 * @return HTTP 状态作为整数值
 	 * @see #getStatusCode()
 	 * @see HttpStatus#resolve(int)
+	 * @since 5.0.6
 	 */
 	int getRawStatusCode();
 
 	/**
-	 * Return a read-only map of response cookies received from the server.
+	 * 返回从服务器接收到的响应 Cookie 的只读映射。
 	 */
 	MultiValueMap<String, ResponseCookie> getCookies();
 
