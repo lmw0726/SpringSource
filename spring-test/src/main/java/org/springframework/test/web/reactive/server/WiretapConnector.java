@@ -16,29 +16,24 @@
 
 package org.springframework.test.web.reactive.server;
 
+import org.reactivestreams.Publisher;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.client.reactive.*;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import reactor.core.Scannable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+
 import java.net.URI;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
-import reactor.core.Scannable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
-
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.client.reactive.ClientHttpConnector;
-import org.springframework.http.client.reactive.ClientHttpRequest;
-import org.springframework.http.client.reactive.ClientHttpRequestDecorator;
-import org.springframework.http.client.reactive.ClientHttpResponse;
-import org.springframework.http.client.reactive.ClientHttpResponseDecorator;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 
 /**
  * Decorate another {@link ClientHttpConnector} with the purpose of
@@ -219,10 +214,12 @@ class WiretapConnector implements ClientHttpConnector {
 
 
 	/**
-	 * ClientHttpRequestDecorator that intercepts and saves the request body.
+	 * 拦截并保存请求体的 ClientHttpRequestDecorator。
 	 */
 	private static class WiretapClientHttpRequest extends ClientHttpRequestDecorator {
-
+		/**窃听记录器
+		 *
+		 */
 		@Nullable
 		private WiretapRecorder recorder;
 
@@ -238,19 +235,28 @@ class WiretapConnector implements ClientHttpConnector {
 
 		@Override
 		public Mono<Void> writeWith(Publisher<? extends DataBuffer> publisher) {
+			// 创建一个 WiretapRecorder 实例来记录发布者的数据
 			this.recorder = new WiretapRecorder(publisher, null);
+
+			// 使用记录器中的发布者来写入响应
 			return super.writeWith(this.recorder.getPublisherToUse());
 		}
 
 		@Override
 		public Mono<Void> writeAndFlushWith(Publisher<? extends Publisher<? extends DataBuffer>> publisher) {
+			// 创建一个 WiretapRecorder 实例来记录发布者的数据
 			this.recorder = new WiretapRecorder(null, publisher);
+
+			// 使用记录器中的嵌套发布者来写入并刷新响应
 			return super.writeAndFlushWith(this.recorder.getNestedPublisherToUse());
 		}
 
 		@Override
 		public Mono<Void> setComplete() {
+			// 创建一个 WiretapRecorder 实例，但不记录任何数据
 			this.recorder = new WiretapRecorder(null, null);
+
+			// 设置响应为已完成状态
 			return super.setComplete();
 		}
 	}

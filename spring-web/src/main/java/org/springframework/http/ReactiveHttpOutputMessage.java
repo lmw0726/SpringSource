@@ -16,19 +16,17 @@
 
 package org.springframework.http;
 
-import java.util.function.Supplier;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Supplier;
 
 /**
- * A "reactive" HTTP output message that accepts output as a {@link Publisher}.
+ * 一个“反应式”HTTP输出消息，接受作为{@link Publisher}的输出。
  *
- * <p>Typically implemented by an HTTP request on the client-side or an
- * HTTP response on the server-side.
+ * <p>通常由客户端的HTTP请求或服务器端的HTTP响应实现。
  *
  * @author Arjen Poutsma
  * @author Sebastien Deleuze
@@ -37,53 +35,52 @@ import org.springframework.core.io.buffer.DataBufferFactory;
 public interface ReactiveHttpOutputMessage extends HttpMessage {
 
 	/**
-	 * Return a {@link DataBufferFactory} that can be used to create the body.
-	 * @return a buffer factory
+	 * 返回一个可以用来创建消息体的{@link DataBufferFactory}。
+	 *
+	 * @return 一个缓冲区工厂
 	 * @see #writeWith(Publisher)
 	 */
 	DataBufferFactory bufferFactory();
 
 	/**
-	 * Register an action to apply just before the HttpOutputMessage is committed.
-	 * <p><strong>Note:</strong> the supplied action must be properly deferred,
-	 * e.g. via {@link Mono#defer} or {@link Mono#fromRunnable}, to ensure it's
-	 * executed in the right order, relative to other actions.
-	 * @param action the action to apply
+	 * 注册一个操作，在HttpOutputMessage提交之前应用。
+	 * <p><strong>注意：</strong>提供的操作必须正确延迟，例如通过{@link Mono#defer}或{@link Mono#fromRunnable}，
+	 * 以确保它按正确的顺序执行，相对于其他操作。
+	 *
+	 * @param action 要应用的操作
 	 */
 	void beforeCommit(Supplier<? extends Mono<Void>> action);
 
 	/**
-	 * Whether the HttpOutputMessage is committed.
+	 * 判断HttpOutputMessage是否已提交。
+	 *
+	 * @return 是否已提交
 	 */
 	boolean isCommitted();
 
 	/**
-	 * Use the given {@link Publisher} to write the body of the message to the
-	 * underlying HTTP layer.
-	 * @param body the body content publisher
-	 * @return a {@link Mono} that indicates completion or error
+	 * 使用给定的{@link Publisher}将消息体写入底层HTTP层。
+	 *
+	 * @param body 消息体内容的发布者
+	 * @return 一个指示完成或错误的{@link Mono}
 	 */
-
 	Mono<Void> writeWith(Publisher<? extends DataBuffer> body);
 
 	/**
-	 * Use the given {@link Publisher} of {@code Publishers} to write the body
-	 * of the HttpOutputMessage to the underlying HTTP layer, flushing after
-	 * each {@code Publisher<DataBuffer>}.
-	 * @param body the body content publisher
-	 * @return a {@link Mono} that indicates completion or error
+	 * 使用给定的{@link Publisher}的{@code Publishers}将HttpOutputMessage的消息体写入底层HTTP层，
+	 * 在每个{@code Publisher<DataBuffer>}之后刷新。
+	 *
+	 * @param body 消息体内容的发布者
+	 * @return 一个指示完成或错误的{@link Mono}
 	 */
 	Mono<Void> writeAndFlushWith(Publisher<? extends Publisher<? extends DataBuffer>> body);
 
 	/**
-	 * Indicate that message handling is complete, allowing for any cleanup or
-	 * end-of-processing tasks to be performed such as applying header changes
-	 * made via {@link #getHeaders()} to the underlying HTTP message (if not
-	 * applied already).
-	 * <p>This method should be automatically invoked at the end of message
-	 * processing so typically applications should not have to invoke it.
-	 * If invoked multiple times it should have no side effects.
-	 * @return a {@link Mono} that indicates completion or error
+	 * 表示消息处理已完成，允许执行任何清理或处理结束任务，例如将通过{@link #getHeaders()}进行的头更改应用到底层HTTP消息（如果尚未应用）。
+	 * <p>此方法应在消息处理结束时自动调用，因此通常应用程序不需要调用它。
+	 * 如果多次调用它，不应有任何副作用。
+	 *
+	 * @return 一个指示完成或错误的{@link Mono}
 	 */
 	Mono<Void> setComplete();
 

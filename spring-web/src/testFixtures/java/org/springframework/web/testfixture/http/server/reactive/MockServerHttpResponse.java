@@ -16,17 +16,7 @@
 
 package org.springframework.web.testfixture.http.server.reactive;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -36,23 +26,34 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.AbstractServerHttpResponse;
 import org.springframework.util.Assert;
 import org.springframework.util.MimeType;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
- * Mock extension of {@link AbstractServerHttpResponse} for use in tests without
- * an actual server.
+ * {@link AbstractServerHttpResponse} 的 Mock 扩展，用于在没有实际服务器的测试中使用。
  *
- * <p>By default response content is consumed in full upon writing and cached
- * for subsequent access, however it is also possible to set a custom
- * {@link #setWriteHandler(Function) writeHandler}.
+ * <p>默认情况下，响应内容在写入时会被完全消耗并缓存以供后续访问，但也可以设置自定义的 {@link #setWriteHandler(Function) writeHandler}。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class MockServerHttpResponse extends AbstractServerHttpResponse {
-
+	/**
+	 * 响应体数据
+	 */
 	private Flux<DataBuffer> body = Flux.error(new IllegalStateException(
 			"No content was written nor was setComplete() called on this response."));
 
+	/**
+	 * 写入处理器
+	 */
 	private Function<Flux<DataBuffer>, Mono<Void>> writeHandler;
 
 
@@ -63,22 +64,24 @@ public class MockServerHttpResponse extends AbstractServerHttpResponse {
 	public MockServerHttpResponse(DataBufferFactory dataBufferFactory) {
 		super(dataBufferFactory);
 		this.writeHandler = body -> {
-			// Avoid .then() that causes data buffers to be discarded and released
+			// 避免使用 .then() 导致数据缓冲区被丢弃和释放
 			Sinks.Empty<Void> completion = Sinks.unsafe().empty();
+			// 缓存响应体
 			this.body = body.cache();
-			this.body.subscribe(aVoid -> {}, completion::tryEmitError, completion::tryEmitEmpty); // Signals are serialized
+			// 信号被串行化
+			this.body.subscribe(aVoid -> {
+			}, completion::tryEmitError, completion::tryEmitEmpty);
 			return completion.asMono();
 		};
 	}
 
 
 	/**
-	 * Configure a custom handler to consume the response body.
-	 * <p>By default, response body content is consumed in full and cached for
-	 * subsequent access in tests. Use this option to take control over how the
-	 * response body is consumed.
-	 * @param writeHandler the write handler to use returning {@code Mono<Void>}
-	 * when the body has been "written" (i.e. consumed).
+	 * 配置自定义处理程序以消耗响应体。
+	 * <p>默认情况下，在测试中，响应体内容将被完全消耗并缓存以供后续访问。
+	 * 使用此选项控制响应体的消耗方式。
+	 *
+	 * @param writeHandler 使用返回{@code Mono<Void>}的写入处理程序，在响应体被“写入”（即消耗）后
 	 */
 	public void setWriteHandler(Function<Flux<DataBuffer>, Mono<Void>> writeHandler) {
 		Assert.notNull(writeHandler, "'writeHandler' is required");
@@ -102,8 +105,11 @@ public class MockServerHttpResponse extends AbstractServerHttpResponse {
 
 	@Override
 	protected void applyCookies() {
+		// 遍历 Cookie 集合中的每个键对应的值（每个值是一个 Cookie 列表）
 		for (List<ResponseCookie> cookies : getCookies().values()) {
+			// 遍历 Cookie 列表中的每个 Cookie 对象
 			for (ResponseCookie cookie : cookies) {
+				// 将每个 Cookie 对象转换为字符串并添加到响应头的 Set-Cookie 中
 				getHeaders().add(HttpHeaders.SET_COOKIE, cookie.toString());
 			}
 		}
@@ -127,27 +133,31 @@ public class MockServerHttpResponse extends AbstractServerHttpResponse {
 	}
 
 	/**
-	 * Return the response body or an error stream if the body was not set.
+	 * 返回响应体或错误流（如果未设置响应体）。
 	 */
 	public Flux<DataBuffer> getBody() {
 		return this.body;
 	}
 
 	/**
-	 * Aggregate response data and convert to a String using the "Content-Type"
-	 * charset or "UTF-8" by default.
+	 * 聚合响应数据并使用“Content-Type”字符集或默认情况下的“UTF-8”转换为字符串。
 	 */
 	public Mono<String> getBodyAsString() {
 
+		// 获取响应头中的字符集，如果未设置字符集，则默认为 UTF-8
 		Charset charset = Optional.ofNullable(getHeaders().getContentType()).map(MimeType::getCharset)
 				.orElse(StandardCharsets.UTF_8);
 
+		// 将响应体中的数据缓冲区合并成一个数据缓冲区
 		return DataBufferUtils.join(getBody())
+				// 将数据缓冲区转换为字符串
 				.map(buffer -> {
 					String s = buffer.toString(charset);
+					// 释放数据缓冲区
 					DataBufferUtils.release(buffer);
 					return s;
 				})
+				// 如果数据缓冲区为空，则返回一个空字符串
 				.defaultIfEmpty("");
 	}
 

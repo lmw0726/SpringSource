@@ -16,19 +16,7 @@
 
 package org.springframework.http.codec.multipart;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
 import org.springframework.core.codec.CharSequenceEncoder;
@@ -51,6 +39,12 @@ import org.springframework.http.codec.ResourceHttpMessageWriter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 /**
  * {@link HttpMessageWriter} for writing a {@code MultiValueMap<String, ?>}
@@ -283,12 +277,24 @@ public class MultipartHttpMessageWriter extends MultipartWriterSupport
 
 	private class MultipartHttpOutputMessage implements ReactiveHttpOutputMessage {
 
+		/**
+		 * 一个表示数据缓冲区工厂的字段，用于创建数据缓冲区。
+		 */
 		private final DataBufferFactory bufferFactory;
 
+		/**
+		 * 一个表示HTTP头的字段，用于存储HTTP头信息。
+		 */
 		private final HttpHeaders headers = new HttpHeaders();
 
+		/**
+		 * 一个表示HTTP消息是否已提交的字段，使用AtomicBoolean以确保线程安全。
+		 */
 		private final AtomicBoolean committed = new AtomicBoolean();
 
+		/**
+		 * 一个表示HTTP消息体的字段，使用Flux<DataBuffer>表示消息体的流。
+		 */
 		@Nullable
 		private Flux<DataBuffer> body;
 
@@ -318,12 +324,16 @@ public class MultipartHttpMessageWriter extends MultipartWriterSupport
 
 		@Override
 		public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+			// 如果 body 不为空
 			if (this.body != null) {
+				// 返回一个 Mono 错误，抛出 IllegalStateException 异常
 				return Mono.error(new IllegalStateException("Multiple calls to writeWith() not supported"));
 			}
+
+			// 生成部分头信息，并将其与 body 连接，保存到 this.body 中
 			this.body = generatePartHeaders(this.headers, this.bufferFactory).concatWith(body);
 
-			// We don't actually want to write (just save the body Flux)
+			// 实际上我们不想写入（只是保存 body 的  Flux）
 			return Mono.empty();
 		}
 

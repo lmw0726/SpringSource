@@ -16,12 +16,7 @@
 
 package org.springframework.http.client.reactive;
 
-import java.net.URI;
-import java.util.function.Supplier;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpCookie;
@@ -29,16 +24,22 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
+import reactor.core.publisher.Mono;
+
+import java.net.URI;
+import java.util.function.Supplier;
 
 /**
- * Wraps another {@link ClientHttpRequest} and delegates all methods to it.
- * Sub-classes can override specific methods selectively.
+ * 包装另一个 {@link ClientHttpRequest} 并将所有方法委托给它。
+ * 子类可以有选择地重写特定方法。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class ClientHttpRequestDecorator implements ClientHttpRequest {
-
+	/**
+	 * 客户端Http请求
+	 */
 	private final ClientHttpRequest delegate;
 
 
@@ -53,7 +54,7 @@ public class ClientHttpRequestDecorator implements ClientHttpRequest {
 	}
 
 
-	// ClientHttpRequest delegation methods...
+	// ClientHttpRequest 委托方法...
 
 	@Override
 	public HttpMethod getMethod() {

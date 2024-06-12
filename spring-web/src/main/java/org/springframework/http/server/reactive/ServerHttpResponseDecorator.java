@@ -16,11 +16,7 @@
 
 package org.springframework.http.server.reactive;
 
-import java.util.function.Supplier;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpHeaders;
@@ -29,16 +25,21 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Supplier;
 
 /**
- * Wraps another {@link ServerHttpResponse} and delegates all methods to it.
- * Sub-classes can override specific methods selectively.
+ * 包装另一个 {@link ServerHttpResponse} 并将所有方法委托给它。
+ * 子类可以有选择地重写特定方法。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class ServerHttpResponseDecorator implements ServerHttpResponse {
-
+	/**
+	 * 代理的ServerHttp响应
+	 */
 	private final ServerHttpResponse delegate;
 
 
@@ -53,7 +54,7 @@ public class ServerHttpResponseDecorator implements ServerHttpResponse {
 	}
 
 
-	// ServerHttpResponse delegation methods...
+	// ServerHttpResponse 委托方法...
 
 	@Override
 	public boolean setStatusCode(@Nullable HttpStatus status) {
@@ -122,21 +123,23 @@ public class ServerHttpResponseDecorator implements ServerHttpResponse {
 
 
 	/**
-	 * Return the native response of the underlying server API, if possible,
-	 * also unwrapping {@link ServerHttpResponseDecorator} if necessary.
-	 * @param response the response to check
-	 * @param <T> the expected native response type
-	 * @throws IllegalArgumentException if the native response can't be obtained
+	 * 返回底层服务器 API 的原生响应，如果可能的话，
+	 * 还会解包 {@link ServerHttpResponseDecorator}。
+	 *
+	 * @param response 要检查的响应
+	 * @param <T>      期望的原生响应类型
+	 * @throws IllegalArgumentException 如果无法获取原生响应
 	 * @since 5.3.3
 	 */
 	public static <T> T getNativeResponse(ServerHttpResponse response) {
+		// 如果响应对象是 AbstractServerHttpResponse 类型，则返回其内部的本机响应对象
 		if (response instanceof AbstractServerHttpResponse) {
 			return ((AbstractServerHttpResponse) response).getNativeResponse();
-		}
-		else if (response instanceof ServerHttpResponseDecorator) {
+		} else if (response instanceof ServerHttpResponseDecorator) {
+			// 如果响应对象是 ServerHttpResponseDecorator 类型，则递归获取其委托对象，并再次调用该方法
 			return getNativeResponse(((ServerHttpResponseDecorator) response).getDelegate());
-		}
-		else {
+		} else {
+			// 如果响应对象类型不是上述两种类型，则抛出异常
 			throw new IllegalArgumentException(
 					"Can't find native response in " + response.getClass().getName());
 		}

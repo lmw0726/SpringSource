@@ -16,15 +16,15 @@
 
 package org.springframework.http.client.reactive;
 
-import java.net.URI;
-
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ReactiveHttpOutputMessage;
 import org.springframework.util.MultiValueMap;
 
+import java.net.URI;
+
 /**
- * Represents a client-side reactive HTTP request.
+ * 表示客户端端的响应式 HTTP 请求。
  *
  * @author Arjen Poutsma
  * @author Brian Clozel
@@ -33,23 +33,24 @@ import org.springframework.util.MultiValueMap;
 public interface ClientHttpRequest extends ReactiveHttpOutputMessage {
 
 	/**
-	 * Return the HTTP method of the request.
+	 * 返回请求的 HTTP 方法。
 	 */
 	HttpMethod getMethod();
 
 	/**
-	 * Return the URI of the request.
+	 * 返回请求的 URI。
 	 */
 	URI getURI();
 
 	/**
-	 * Return a mutable map of request cookies to send to the server.
+	 * 返回一个可变的请求 cookie 映射，用于发送到服务器。
 	 */
 	MultiValueMap<String, HttpCookie> getCookies();
 
 	/**
-	 * Return the request from the underlying HTTP library.
-	 * @param <T> the expected type of the request to cast to
+	 * 返回底层 HTTP 库的请求。
+	 *
+	 * @param <T> 要转换的请求的预期类型
 	 * @since 5.3
 	 */
 	<T> T getNativeRequest();

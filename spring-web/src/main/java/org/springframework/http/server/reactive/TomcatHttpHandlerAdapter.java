@@ -16,28 +16,12 @@
 
 package org.springframework.http.server.reactive;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
 import org.apache.catalina.connector.CoyoteInputStream;
 import org.apache.catalina.connector.CoyoteOutputStream;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -47,14 +31,28 @@ import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+
 /**
  * {@link ServletHttpHandlerAdapter} extension that uses Tomcat APIs for reading
  * from the request and writing to the response with {@link ByteBuffer}.
  *
  * @author Violeta Georgieva
  * @author Brian Clozel
- * @since 5.0
  * @see org.springframework.web.server.adapter.AbstractReactiveWebInitializer
+ * @since 5.0
  */
 public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
@@ -75,7 +73,7 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
 	@Override
 	protected ServletServerHttpResponse createResponse(HttpServletResponse response,
-			AsyncContext asyncContext, ServletServerHttpRequest request) throws IOException {
+													   AsyncContext asyncContext, ServletServerHttpRequest request) throws IOException {
 
 		return new TomcatServerHttpResponse(
 				response, asyncContext, getDataBufferFactory(), getBufferSize(), request);
@@ -98,7 +96,7 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 		}
 
 		TomcatServerHttpRequest(HttpServletRequest request, AsyncContext context,
-				String servletPath, DataBufferFactory factory, int bufferSize)
+								String servletPath, DataBufferFactory factory, int bufferSize)
 				throws IOException, URISyntaxException {
 
 			super(createTomcatHttpHeaders(request), request, context, servletPath, factory, bufferSize);
@@ -118,13 +116,11 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 		private static RequestFacade getRequestFacade(HttpServletRequest request) {
 			if (request instanceof RequestFacade) {
 				return (RequestFacade) request;
-			}
-			else if (request instanceof HttpServletRequestWrapper) {
+			} else if (request instanceof HttpServletRequestWrapper) {
 				HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
 				HttpServletRequest wrappedRequest = (HttpServletRequest) wrapper.getRequest();
 				return getRequestFacade(wrappedRequest);
-			}
-			else {
+			} else {
 				throw new IllegalArgumentException("Cannot convert [" + request.getClass() +
 						"] to org.apache.catalina.connector.RequestFacade");
 			}
@@ -148,15 +144,12 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 					dataBuffer.writePosition(read);
 					release = false;
 					return dataBuffer;
-				}
-				else if (read == -1) {
+				} else if (read == -1) {
 					return EOF_BUFFER;
-				}
-				else {
+				} else {
 					return AbstractListenerReadPublisher.EMPTY_BUFFER;
 				}
-			}
-			finally {
+			} finally {
 				if (release) {
 					DataBufferUtils.release(dataBuffer);
 				}
@@ -166,42 +159,61 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
 
 	private static final class TomcatServerHttpResponse extends ServletServerHttpResponse {
-
+		/**
+		 * coyote 响应字段
+		 */
 		private static final Field COYOTE_RESPONSE_FIELD;
 
 		static {
+			// 使用反射工具类在 ResponseFacade 类中查找名为 "response" 的字段
 			Field field = ReflectionUtils.findField(ResponseFacade.class, "response");
+
+			// 断言字段不为 null，如果为 null 则抛出异常
 			Assert.state(field != null, "Incompatible Tomcat implementation");
+
+			// 设置字段可访问
 			ReflectionUtils.makeAccessible(field);
+
+			// 将找到的字段赋值给 COYOTE_RESPONSE_FIELD 静态字段
 			COYOTE_RESPONSE_FIELD = field;
 		}
 
 		TomcatServerHttpResponse(HttpServletResponse response, AsyncContext context,
-				DataBufferFactory factory, int bufferSize, ServletServerHttpRequest request) throws IOException {
+								 DataBufferFactory factory, int bufferSize, ServletServerHttpRequest request) throws IOException {
 
 			super(createTomcatHttpHeaders(response), response, context, factory, bufferSize, request);
 		}
 
 		private static HttpHeaders createTomcatHttpHeaders(HttpServletResponse response) {
+			// 获取 ResponseFacade 对象
 			ResponseFacade responseFacade = getResponseFacade(response);
+
+			// 获取 ResponseFacade 对应的 ConnectorResponse 对象
 			org.apache.catalina.connector.Response connectorResponse = (org.apache.catalina.connector.Response)
 					ReflectionUtils.getField(COYOTE_RESPONSE_FIELD, responseFacade);
+
+			// 断言 ConnectorResponse 对象不为 null，如果为 null 则抛出异常
 			Assert.state(connectorResponse != null, "No Tomcat connector response");
+
+			// 获取 Tomcat Response 对象
 			Response tomcatResponse = connectorResponse.getCoyoteResponse();
+
+			// 将 Tomcat Response 对象的 MimeHeaders 封装为 HttpHeaders 对象，并返回
 			TomcatHeadersAdapter headers = new TomcatHeadersAdapter(tomcatResponse.getMimeHeaders());
 			return new HttpHeaders(headers);
 		}
 
 		private static ResponseFacade getResponseFacade(HttpServletResponse response) {
+			// 如果响应是 ResponseFacade 类型，则直接返回
 			if (response instanceof ResponseFacade) {
 				return (ResponseFacade) response;
-			}
-			else if (response instanceof HttpServletResponseWrapper) {
+			} else if (response instanceof HttpServletResponseWrapper) {
+				// 如果响应是 HttpServletResponseWrapper 类型，则递归获取原始响应，并再次调用该方法
 				HttpServletResponseWrapper wrapper = (HttpServletResponseWrapper) response;
 				HttpServletResponse wrappedResponse = (HttpServletResponse) wrapper.getResponse();
 				return getResponseFacade(wrappedResponse);
-			}
-			else {
+			} else {
+				// 如果响应类型不是上述两种类型，则抛出异常
 				throw new IllegalArgumentException("Cannot convert [" + response.getClass() +
 						"] to org.apache.catalina.connector.ResponseFacade");
 			}
@@ -209,36 +221,62 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
 		@Override
 		protected void applyHeaders() {
+			// 获取原生响应对象
 			HttpServletResponse response = getNativeResponse();
+
+			// 尝试获取响应头的内容类型
 			MediaType contentType = null;
 			try {
 				contentType = getHeaders().getContentType();
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
+				// 如果出现异常，尝试直接获取响应头的原始内容类型并设置到响应中
 				String rawContentType = getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
 				response.setContentType(rawContentType);
 			}
+
+			// 如果响应中的内容类型为 null 且从头信息中解析出的内容类型不为 null，则设置响应中的内容类型
 			if (response.getContentType() == null && contentType != null) {
 				response.setContentType(contentType.toString());
 			}
+
+			// 移除响应头中的 CONTENT_TYPE
 			getHeaders().remove(HttpHeaders.CONTENT_TYPE);
+
+			// 获取内容类型的字符集
 			Charset charset = (contentType != null ? contentType.getCharset() : null);
+
+			// 如果响应中的字符编码为 null ，且字符集不为 null，则设置响应中的字符编码
 			if (response.getCharacterEncoding() == null && charset != null) {
 				response.setCharacterEncoding(charset.name());
 			}
+
+			// 获取响应头的内容长度
 			long contentLength = getHeaders().getContentLength();
+
+			// 如果内容长度不为 -1，则设置响应的内容长度
 			if (contentLength != -1) {
 				response.setContentLengthLong(contentLength);
 			}
+
+			// 移除响应头中的 CONTENT_LENGTH
 			getHeaders().remove(HttpHeaders.CONTENT_LENGTH);
 		}
 
 		@Override
 		protected int writeToOutputStream(DataBuffer dataBuffer) throws IOException {
+			// 将 DataBuffer 转换为 ByteBuffer
 			ByteBuffer input = dataBuffer.asByteBuffer();
+
+			// 获取 ByteBuffer 中剩余的字节数
 			int len = input.remaining();
+
+			// 获取原生响应对象
 			ServletResponse response = getNativeResponse();
+
+			// 将 ByteBuffer 写入响应输出流
 			((CoyoteOutputStream) response.getOutputStream()).write(input);
+
+			// 返回写入的字节数
 			return len;
 		}
 	}

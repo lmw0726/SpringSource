@@ -16,23 +16,10 @@
 
 package org.springframework.http.server.reactive;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.server.HttpOutput;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpHeaders;
@@ -41,14 +28,25 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+
 /**
  * {@link ServletHttpHandlerAdapter} extension that uses Jetty APIs for writing
  * to the response with {@link ByteBuffer}.
  *
  * @author Violeta Georgieva
  * @author Brian Clozel
- * @since 5.0
  * @see org.springframework.web.server.adapter.AbstractReactiveWebInitializer
+ * @since 5.0
  */
 public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
@@ -77,14 +75,13 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
 	@Override
 	protected ServletServerHttpResponse createResponse(HttpServletResponse response,
-			AsyncContext context, ServletServerHttpRequest request) throws IOException {
+													   AsyncContext context, ServletServerHttpRequest request) throws IOException {
 
 		// TODO: need to compile against Jetty 10 to use HttpFields (class->interface)
 		if (jetty10Present) {
 			return new BaseJettyServerHttpResponse(
 					response, context, getDataBufferFactory(), getBufferSize(), request);
-		}
-		else {
+		} else {
 			return new JettyServerHttpResponse(
 					response, context, getDataBufferFactory(), getBufferSize(), request);
 		}
@@ -94,7 +91,7 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 	private static final class JettyServerHttpRequest extends ServletServerHttpRequest {
 
 		JettyServerHttpRequest(HttpServletRequest request, AsyncContext asyncContext,
-				String servletPath, DataBufferFactory bufferFactory, int bufferSize)
+							   String servletPath, DataBufferFactory bufferFactory, int bufferSize)
 				throws IOException, URISyntaxException {
 
 			super(createHeaders(request), request, asyncContext, servletPath, bufferFactory, bufferSize);
@@ -109,13 +106,11 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 		private static Request getRequest(HttpServletRequest request) {
 			if (request instanceof Request) {
 				return (Request) request;
-			}
-			else if (request instanceof HttpServletRequestWrapper) {
+			} else if (request instanceof HttpServletRequestWrapper) {
 				HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
 				HttpServletRequest wrappedRequest = (HttpServletRequest) wrapper.getRequest();
 				return getRequest(wrappedRequest);
-			}
-			else {
+			} else {
 				throw new IllegalArgumentException("Cannot convert [" + request.getClass() +
 						"] to org.eclipse.jetty.server.Request");
 			}
@@ -128,14 +123,14 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 	private static class BaseJettyServerHttpResponse extends ServletServerHttpResponse {
 
 		BaseJettyServerHttpResponse(HttpServletResponse response, AsyncContext asyncContext,
-				DataBufferFactory bufferFactory, int bufferSize, ServletServerHttpRequest request)
+									DataBufferFactory bufferFactory, int bufferSize, ServletServerHttpRequest request)
 				throws IOException {
 
 			super(response, asyncContext, bufferFactory, bufferSize, request);
 		}
 
 		BaseJettyServerHttpResponse(HttpHeaders headers, HttpServletResponse response, AsyncContext asyncContext,
-				DataBufferFactory bufferFactory, int bufferSize, ServletServerHttpRequest request)
+									DataBufferFactory bufferFactory, int bufferSize, ServletServerHttpRequest request)
 				throws IOException {
 
 			super(headers, response, asyncContext, bufferFactory, bufferSize, request);
@@ -143,10 +138,19 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
 		@Override
 		protected int writeToOutputStream(DataBuffer dataBuffer) throws IOException {
+			// 将 DataBuffer 转换为 ByteBuffer
 			ByteBuffer input = dataBuffer.asByteBuffer();
+
+			// 获取 ByteBuffer 中剩余的字节数
 			int len = input.remaining();
+
+			// 获取原生响应对象
 			ServletResponse response = getNativeResponse();
+
+			// 将 ByteBuffer 写入响应输出流
 			((HttpOutput) response.getOutputStream()).write(input);
+
+			// 返回写入的字节数
 			return len;
 		}
 	}
@@ -155,28 +159,34 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 	private static final class JettyServerHttpResponse extends BaseJettyServerHttpResponse {
 
 		JettyServerHttpResponse(HttpServletResponse response, AsyncContext asyncContext,
-				DataBufferFactory bufferFactory, int bufferSize, ServletServerHttpRequest request)
+								DataBufferFactory bufferFactory, int bufferSize, ServletServerHttpRequest request)
 				throws IOException {
 
 			super(createHeaders(response), response, asyncContext, bufferFactory, bufferSize, request);
 		}
 
 		private static HttpHeaders createHeaders(HttpServletResponse servletResponse) {
+			// 获取响应对象
 			Response response = getResponse(servletResponse);
+
+			// 获取响应对象中的 HTTP 字段
 			HttpFields fields = response.getHttpFields();
+
+			// 将 Jetty 的 HTTP 头适配器封装到 HttpHeaders 中，并返回
 			return new HttpHeaders(new JettyHeadersAdapter(fields));
 		}
 
 		private static Response getResponse(HttpServletResponse response) {
+			// 如果响应对象是 Response 类型，则直接返回
 			if (response instanceof Response) {
 				return (Response) response;
-			}
-			else if (response instanceof HttpServletResponseWrapper) {
+			} else if (response instanceof HttpServletResponseWrapper) {
+				// 如果响应对象是 HttpServletResponseWrapper 类型，则递归获取原始响应，并再次调用该方法
 				HttpServletResponseWrapper wrapper = (HttpServletResponseWrapper) response;
 				HttpServletResponse wrappedResponse = (HttpServletResponse) wrapper.getResponse();
 				return getResponse(wrappedResponse);
-			}
-			else {
+			} else {
+				// 如果响应对象类型不是上述两种类型，则抛出异常
 				throw new IllegalArgumentException("Cannot convert [" + response.getClass() +
 						"] to org.eclipse.jetty.server.Response");
 			}
@@ -184,23 +194,36 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
 		@Override
 		protected void applyHeaders() {
+			// 获取本地响应对象
 			HttpServletResponse response = getNativeResponse();
+
+			// 尝试获取响应头中的内容类型
 			MediaType contentType = null;
 			try {
 				contentType = getHeaders().getContentType();
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
+				// 如果出现异常，尝试直接获取响应头中的原始内容类型，并设置到响应对象中
 				String rawContentType = getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
 				response.setContentType(rawContentType);
 			}
+
+			// 如果响应对象中的内容类型为 null，且从响应头中解析出的内容类型不为 null，则设置响应对象中的内容类型
 			if (response.getContentType() == null && contentType != null) {
 				response.setContentType(contentType.toString());
 			}
+
+			// 获取内容类型的字符集
 			Charset charset = (contentType != null ? contentType.getCharset() : null);
+
+			// 如果响应对象中的字符编码为 null，且字符集不为 null，则设置响应对象中的字符编码
 			if (response.getCharacterEncoding() == null && charset != null) {
 				response.setCharacterEncoding(charset.name());
 			}
+
+			// 获取响应头中的内容长度
 			long contentLength = getHeaders().getContentLength();
+
+			// 如果内容长度不为 -1，则设置响应对象中的内容长度
 			if (contentLength != -1) {
 				response.setContentLengthLong(contentLength);
 			}

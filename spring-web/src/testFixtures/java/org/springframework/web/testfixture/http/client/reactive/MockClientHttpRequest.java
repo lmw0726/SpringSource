@@ -16,17 +16,7 @@
 
 package org.springframework.web.testfixture.http.client.reactive;
 
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Function;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -39,24 +29,44 @@ import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.util.Assert;
 import org.springframework.util.MimeType;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
- * Mock implementation of {@link ClientHttpRequest}.
+ * {@link ClientHttpRequest} 的模拟实现。
  *
  * @author Brian Clozel
  * @author Rossen Stoyanchev
  * @since 5.0
  */
 public class MockClientHttpRequest extends AbstractClientHttpRequest implements HttpRequest {
-
+	/**
+	 * Http方法
+	 */
 	private final HttpMethod httpMethod;
 
+	/**
+	 * URL
+	 */
 	private final URI url;
 
+	/**
+	 * 请求体
+	 */
 	private Flux<DataBuffer> body = Flux.error(
 			new IllegalStateException("The body is not set. " +
 					"Did handling complete with success? Is a custom \"writeHandler\" configured?"));
 
+	/**
+	 * 写入处理器
+	 */
 	private Function<Flux<DataBuffer>, Mono<Void>> writeHandler;
 
 
@@ -75,14 +85,11 @@ public class MockClientHttpRequest extends AbstractClientHttpRequest implements 
 
 
 	/**
-	 * Configure a custom handler for writing the request body.
+	 * 配置用于写入请求体的自定义处理程序。
 	 *
-	 * <p>The default write handler consumes and caches the request body so it
-	 * may be accessed subsequently, e.g. in test assertions. Use this property
-	 * when the request body is an infinite stream.
+	 * <p>默认的写入处理程序消耗并缓存请求体，以便随后访问，例如在测试断言中。当请求体是无限流时使用此属性。
 	 *
-	 * @param writeHandler the write handler to use returning {@code Mono<Void>}
-	 * when the body has been "written" (i.e. consumed).
+	 * @param writeHandler 当请求体已被 "写入"（即消耗）时返回 {@code Mono<Void>} 的写入处理程序
 	 */
 	public void setWriteHandler(Function<Flux<DataBuffer>, Mono<Void>> writeHandler) {
 		Assert.notNull(writeHandler, "'writeHandler' is required");
@@ -143,28 +150,31 @@ public class MockClientHttpRequest extends AbstractClientHttpRequest implements 
 
 
 	/**
-	 * Return the request body, or an error stream if the body was never set
-	 * or when {@link #setWriteHandler} is configured.
+	 * 返回请求体，如果请求体从未设置过或配置了 {@link #setWriteHandler}，则返回错误流。
 	 */
 	public Flux<DataBuffer> getBody() {
 		return this.body;
 	}
 
 	/**
-	 * Aggregate response data and convert to a String using the "Content-Type"
-	 * charset or "UTF-8" by default.
+	 * 聚合响应数据并使用 "Content-Type" 字符集或默认情况下的 "UTF-8" 转换为字符串。
 	 */
 	public Mono<String> getBodyAsString() {
 
+		// 获取响应体的字符集，如果不存在则使用 UTF-8
 		Charset charset = Optional.ofNullable(getHeaders().getContentType()).map(MimeType::getCharset)
 				.orElse(StandardCharsets.UTF_8);
 
+		// 将响应体中的数据缓冲区连接起来，并使用指定的字符集将其转换为字符串
 		return DataBufferUtils.join(getBody())
 				.map(buffer -> {
+					// 将数据缓冲区转换为字符串
 					String s = buffer.toString(charset);
+					// 释放数据缓冲区，确保资源被正确清理
 					DataBufferUtils.release(buffer);
 					return s;
 				})
+				// 如果响应体为空，则返回空字符串
 				.defaultIfEmpty("");
 	}
 
