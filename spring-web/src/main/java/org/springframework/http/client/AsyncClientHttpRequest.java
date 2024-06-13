@@ -16,32 +16,31 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpRequest;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.io.IOException;
+
 /**
- * Represents a client-side asynchronous HTTP request. Created via an
- * implementation of the {@link AsyncClientHttpRequestFactory}.
+ * 表示客户端异步HTTP请求。通过 {@link AsyncClientHttpRequestFactory} 的实现创建。
  *
- * <p>A {@code AsyncHttpRequest} can be {@linkplain #executeAsync() executed},
- * getting a future {@link ClientHttpResponse} which can be read from.
+ * <p>{@code AsyncHttpRequest} 可以被 {@linkplain #executeAsync() 执行}，
+ * 获取一个 {@link ClientHttpResponse} 的 future，可以从中读取响应。
  *
  * @author Arjen Poutsma
- * @since 4.0
  * @see AsyncClientHttpRequestFactory#createAsyncRequest
- * @deprecated as of Spring 5.0, in favor of {@link org.springframework.web.reactive.function.client.ClientRequest}
+ * @since 4.0
+ * @deprecated 自 Spring 5.0 起，推荐使用 {@link org.springframework.web.reactive.function.client.ClientRequest}
  */
 @Deprecated
 public interface AsyncClientHttpRequest extends HttpRequest, HttpOutputMessage {
 
 	/**
-	 * Execute this request asynchronously, resulting in a Future handle.
-	 * {@link ClientHttpResponse} that can be read.
-	 * @return the future response result of the execution
-	 * @throws java.io.IOException in case of I/O errors
+	 * 异步执行此请求，返回一个 Future 处理器，可以用来获取 {@link ClientHttpResponse} 并读取响应。
+	 *
+	 * @return 执行结果的 future 响应
+	 * @throws java.io.IOException 如果发生 I/O 错误
 	 */
 	ListenableFuture<ClientHttpResponse> executeAsync() throws IOException;
 

@@ -16,15 +16,15 @@
 
 package org.springframework.http.server;
 
-import java.net.InetSocketAddress;
-import java.security.Principal;
-
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpRequest;
 import org.springframework.lang.Nullable;
 
+import java.net.InetSocketAddress;
+import java.security.Principal;
+
 /**
- * Represents a server-side HTTP request.
+ * 表示服务器端的HTTP请求。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -33,26 +33,24 @@ import org.springframework.lang.Nullable;
 public interface ServerHttpRequest extends HttpRequest, HttpInputMessage {
 
 	/**
-	 * Return a {@link java.security.Principal} instance containing the name of the
-	 * authenticated user.
-	 * <p>If the user has not been authenticated, the method returns <code>null</code>.
+	 * 返回包含经过身份验证的用户名称的 {@link java.security.Principal} 实例。
+	 * <p>如果用户尚未经过身份验证，则该方法返回 <code>null</code>。
 	 */
 	@Nullable
 	Principal getPrincipal();
 
 	/**
-	 * Return the address on which the request was received.
+	 * 返回接收请求的地址。
 	 */
 	InetSocketAddress getLocalAddress();
 
 	/**
-	 * Return the address of the remote client.
+	 * 返回远程客户端的地址。
 	 */
 	InetSocketAddress getRemoteAddress();
 
 	/**
-	 * Return a control that allows putting the request in asynchronous mode so the
-	 * response remains open until closed explicitly from the current or another thread.
+	 * 返回一个控制器，允许将请求置于异步模式，以便响应保持打开状态，直到从当前线程或另一个线程显式关闭。
 	 */
 	ServerHttpAsyncRequestControl getAsyncRequestControl(ServerHttpResponse response);
 

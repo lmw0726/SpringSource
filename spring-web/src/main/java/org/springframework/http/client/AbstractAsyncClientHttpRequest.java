@@ -16,26 +16,30 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
- * Abstract base for {@link AsyncClientHttpRequest} that makes sure that headers and body
- * are not written multiple times.
+ * {@link AsyncClientHttpRequest} 的抽象基类，确保头部和请求体不会被多次写入。
  *
  * @author Arjen Poutsma
  * @since 4.0
- * @deprecated as of Spring 5.0, in favor of {@link org.springframework.http.client.reactive.AbstractClientHttpRequest}
+ * @deprecated 自 Spring 5.0 起，推荐使用 {@link org.springframework.http.client.reactive.AbstractClientHttpRequest}
  */
 @Deprecated
 abstract class AbstractAsyncClientHttpRequest implements AsyncClientHttpRequest {
-
+	/**
+	 * 请求头
+	 */
 	private final HttpHeaders headers = new HttpHeaders();
 
+	/**
+	 * 是否已经执行
+	 */
 	private boolean executed = false;
 
 
@@ -46,21 +50,28 @@ abstract class AbstractAsyncClientHttpRequest implements AsyncClientHttpRequest 
 
 	@Override
 	public final OutputStream getBody() throws IOException {
+		// 断言未执行过
 		assertNotExecuted();
+		// 返回使用当前请求头获取的内部请求体
 		return getBodyInternal(this.headers);
 	}
 
 	@Override
 	public ListenableFuture<ClientHttpResponse> executeAsync() throws IOException {
+		// 断言未执行过
 		assertNotExecuted();
+		// 执行内部请求，并获取返回的可监听的Future对象
 		ListenableFuture<ClientHttpResponse> result = executeInternal(this.headers);
+		// 设置执行标志为true
 		this.executed = true;
+		// 返回执行结果
 		return result;
 	}
 
 	/**
-	 * Asserts that this request has not been {@linkplain #executeAsync() executed} yet.
-	 * @throws IllegalStateException if this request has been executed
+	 * 断言此请求尚未 {@linkplain #executeAsync() 执行}。
+	 *
+	 * @throws IllegalStateException 如果此请求已执行
 	 */
 	protected void assertNotExecuted() {
 		Assert.state(!this.executed, "ClientHttpRequest already executed");
@@ -68,16 +79,18 @@ abstract class AbstractAsyncClientHttpRequest implements AsyncClientHttpRequest 
 
 
 	/**
-	 * Abstract template method that returns the body.
-	 * @param headers the HTTP headers
-	 * @return the body output stream
+	 * 抽象模板方法，返回请求体输出流。
+	 *
+	 * @param headers HTTP 头部信息
+	 * @return 请求体输出流
 	 */
 	protected abstract OutputStream getBodyInternal(HttpHeaders headers) throws IOException;
 
 	/**
-	 * Abstract template method that writes the given headers and content to the HTTP request.
-	 * @param headers the HTTP headers
-	 * @return the response object for the executed request
+	 * 抽象模板方法，将给定的头部和内容写入 HTTP 请求。
+	 *
+	 * @param headers HTTP 头部信息
+	 * @return 执行请求的响应对象
 	 */
 	protected abstract ListenableFuture<ClientHttpResponse> executeInternal(HttpHeaders headers)
 			throws IOException;

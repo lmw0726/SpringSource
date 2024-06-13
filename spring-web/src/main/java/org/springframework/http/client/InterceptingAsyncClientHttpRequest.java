@@ -16,11 +16,6 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
@@ -28,36 +23,53 @@ import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.Iterator;
+import java.util.List;
+
 /**
- * An {@link AsyncClientHttpRequest} wrapper that enriches it proceeds the actual
- * request execution with calling the registered interceptors.
+ * {@link AsyncClientHttpRequest} 的包装器，通过调用注册的拦截器来增强实际请求执行过程。
  *
  * @author Jakub Narloch
  * @author Rossen Stoyanchev
  * @see InterceptingAsyncClientHttpRequestFactory
- * @deprecated as of Spring 5.0, with no direct replacement
+ * @deprecated 自 Spring 5.0 起，没有直接的替代方案
  */
 @Deprecated
 class InterceptingAsyncClientHttpRequest extends AbstractBufferingAsyncClientHttpRequest {
 
+	/**
+	 * 异步请求工厂，用于创建 {@link AsyncClientHttpRequest} 的实例。
+	 */
 	private AsyncClientHttpRequestFactory requestFactory;
 
+	/**
+	 * 异步客户端请求拦截器列表，用于拦截和处理请求。
+	 */
 	private List<AsyncClientHttpRequestInterceptor> interceptors;
 
+	/**
+	 * 请求的统一资源标识符 (URI)。
+	 */
 	private URI uri;
 
+	/**
+	 * HTTP 请求方法。
+	 */
 	private HttpMethod httpMethod;
 
 
 	/**
-	 * Create new instance of {@link InterceptingAsyncClientHttpRequest}.
-	 * @param requestFactory the async request factory
-	 * @param interceptors the list of interceptors
-	 * @param uri the request URI
-	 * @param httpMethod the HTTP method
+	 * 创建 {@link InterceptingAsyncClientHttpRequest} 的新实例。
+	 *
+	 * @param requestFactory 异步请求工厂
+	 * @param interceptors   拦截器列表
+	 * @param uri            请求的URI
+	 * @param httpMethod     HTTP 方法
 	 */
 	public InterceptingAsyncClientHttpRequest(AsyncClientHttpRequestFactory requestFactory,
-			List<AsyncClientHttpRequestInterceptor> interceptors, URI uri, HttpMethod httpMethod) {
+											  List<AsyncClientHttpRequestInterceptor> interceptors, URI uri, HttpMethod httpMethod) {
 
 		this.requestFactory = requestFactory;
 		this.interceptors = interceptors;
@@ -90,7 +102,9 @@ class InterceptingAsyncClientHttpRequest extends AbstractBufferingAsyncClientHtt
 
 
 	private class AsyncRequestExecution implements AsyncClientHttpRequestExecution {
-
+		/**
+		 * 异步客户端Http请求拦截器 迭代器
+		 */
 		private Iterator<AsyncClientHttpRequestInterceptor> iterator;
 
 		public AsyncRequestExecution() {
@@ -101,22 +115,30 @@ class InterceptingAsyncClientHttpRequest extends AbstractBufferingAsyncClientHtt
 		public ListenableFuture<ClientHttpResponse> executeAsync(HttpRequest request, byte[] body)
 				throws IOException {
 
+			// 如果仍有下一个拦截器
 			if (this.iterator.hasNext()) {
+				// 获取下一个拦截器并调用其拦截方法
 				AsyncClientHttpRequestInterceptor interceptor = this.iterator.next();
 				return interceptor.intercept(request, body, this);
-			}
-			else {
+			} else {
+				// 否则，获取请求的URI、方法和头部
 				URI uri = request.getURI();
 				HttpMethod method = request.getMethod();
 				HttpHeaders headers = request.getHeaders();
 
+				// 确保HTTP方法不为空
 				Assert.state(method != null, "No standard HTTP method");
+
+				// 使用请求工厂创建异步请求
 				AsyncClientHttpRequest delegate = requestFactory.createAsyncRequest(uri, method);
+				// 将请求的头部复制到委托请求的头部
 				delegate.getHeaders().putAll(headers);
+				// 如果请求体长度大于0，则复制请求体到委托请求的输出流中
 				if (body.length > 0) {
 					StreamUtils.copy(body, delegate.getBody());
 				}
 
+				// 执行委托请求并返回结果
 				return delegate.executeAsync();
 			}
 		}

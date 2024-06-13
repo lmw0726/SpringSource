@@ -16,31 +16,33 @@
 
 package org.springframework.http.client.support;
 
-import java.net.URI;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.net.URI;
+
 /**
- * Provides a convenient implementation of the {@link HttpRequest} interface
- * that can be overridden to adapt the request.
+ * 提供了 {@link HttpRequest} 接口的方便实现，可以被覆盖以适应请求。
  *
- * <p>These methods default to calling through to the wrapped request object.
+ * <p>这些方法默认调用包装的请求对象。
  *
  * @author Arjen Poutsma
  * @since 3.1
  */
 public class HttpRequestWrapper implements HttpRequest {
-
+	/**
+	 * Http请求
+	 */
 	private final HttpRequest request;
 
 
 	/**
-	 * Create a new {@code HttpRequest} wrapping the given request object.
-	 * @param request the request object to be wrapped
+	 * 创建一个新的 {@code HttpRequestWrapper} 包装给定的请求对象。
+	 *
+	 * @param request 要包装的请求对象
 	 */
 	public HttpRequestWrapper(HttpRequest request) {
 		Assert.notNull(request, "HttpRequest must not be null");
@@ -49,14 +51,14 @@ public class HttpRequestWrapper implements HttpRequest {
 
 
 	/**
-	 * Return the wrapped request.
+	 * 返回包装的请求对象。
 	 */
 	public HttpRequest getRequest() {
 		return this.request;
 	}
 
 	/**
-	 * Return the method of the wrapped request.
+	 * 返回包装请求的方法。
 	 */
 	@Override
 	@Nullable
@@ -65,7 +67,7 @@ public class HttpRequestWrapper implements HttpRequest {
 	}
 
 	/**
-	 * Return the method value of the wrapped request.
+	 * 返回包装请求的方法值。
 	 */
 	@Override
 	public String getMethodValue() {
@@ -73,7 +75,7 @@ public class HttpRequestWrapper implements HttpRequest {
 	}
 
 	/**
-	 * Return the URI of the wrapped request.
+	 * 返回包装请求的URI。
 	 */
 	@Override
 	public URI getURI() {
@@ -81,7 +83,7 @@ public class HttpRequestWrapper implements HttpRequest {
 	}
 
 	/**
-	 * Return the headers of the wrapped request.
+	 * 返回包装请求的头信息。
 	 */
 	@Override
 	public HttpHeaders getHeaders() {

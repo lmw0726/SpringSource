@@ -16,23 +16,22 @@
 
 package org.springframework.mock.http.client;
 
-import java.io.IOException;
-import java.net.URI;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.SettableListenableFuture;
 
+import java.io.IOException;
+import java.net.URI;
+
 /**
- * An extension of {@link MockClientHttpRequest} that also implements
- * {@link org.springframework.http.client.AsyncClientHttpRequest} by wrapping the response in a
- * {@link SettableListenableFuture}.
+ * {@link MockClientHttpRequest} 的扩展，同时实现 {@link org.springframework.http.client.AsyncClientHttpRequest}，
+ * 通过将响应包装在 {@link SettableListenableFuture} 中实现异步请求。
  *
  * @author Rossen Stoyanchev
  * @author Sam Brannen
  * @since 4.1
- * @deprecated as of Spring 5.0, with no direct replacement
+ * @deprecated 自 Spring 5.0 起，没有直接的替代方案
  */
 @Deprecated
 public class MockAsyncClientHttpRequest extends MockClientHttpRequest implements org.springframework.http.client.AsyncClientHttpRequest {
@@ -47,8 +46,11 @@ public class MockAsyncClientHttpRequest extends MockClientHttpRequest implements
 
 	@Override
 	public ListenableFuture<ClientHttpResponse> executeAsync() throws IOException {
+		// 创建一个可设置的可监听的Future对象，用于持有ClientHttpResponse
 		SettableListenableFuture<ClientHttpResponse> future = new SettableListenableFuture<>();
+		// 设置Future的结果为执行execute()方法的返回值
 		future.set(execute());
+		// 返回设置好结果的Future对象
 		return future;
 	}
 

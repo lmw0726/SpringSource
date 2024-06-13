@@ -16,41 +16,52 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-import java.net.URI;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
+import okhttp3.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.SettableListenableFuture;
 
+import java.io.IOException;
+import java.net.URI;
+
 /**
- * {@link AsyncClientHttpRequest} implementation based on OkHttp 3.x.
+ * 基于 OkHttp 3.x 的 {@link AsyncClientHttpRequest} 实现。
  *
- * <p>Created via the {@link OkHttp3ClientHttpRequestFactory}.
+ * <p>通过 {@link OkHttp3ClientHttpRequestFactory} 创建。
  *
  * @author Luciano Leggieri
  * @author Arjen Poutsma
  * @author Roy Clarkson
  * @since 4.3
- * @deprecated as of Spring 5.0, with no direct replacement
+ * @deprecated 自 Spring 5.0 起，没有直接的替代方案
  */
 @Deprecated
 class OkHttp3AsyncClientHttpRequest extends AbstractBufferingAsyncClientHttpRequest {
 
+	/**
+	 * OKHttp客户端
+	 */
 	private final OkHttpClient client;
 
+	/**
+	 * URI
+	 */
 	private final URI uri;
 
+	/**
+	 * Http方法
+	 */
 	private final HttpMethod method;
 
 
+	/**
+	 * 创建 {@link OkHttp3AsyncClientHttpRequest} 的新实例。
+	 *
+	 * @param client OkHttpClient 实例
+	 * @param uri    请求的URI
+	 * @param method HTTP 方法
+	 */
 	public OkHttp3AsyncClientHttpRequest(OkHttpClient client, URI uri, HttpMethod method) {
 		this.client = client;
 		this.uri = uri;
@@ -77,7 +88,9 @@ class OkHttp3AsyncClientHttpRequest extends AbstractBufferingAsyncClientHttpRequ
 	protected ListenableFuture<ClientHttpResponse> executeInternal(HttpHeaders headers, byte[] content)
 			throws IOException {
 
+		// 使用 OkHttp 3客户端Http请求工厂 构建请求对象
 		Request request = OkHttp3ClientHttpRequestFactory.buildRequest(headers, content, this.uri, this.method);
+		// 返回一个新的 OkHttp可监听的Future 对象
 		return new OkHttpListenableFuture(this.client.newCall(request));
 	}
 
@@ -93,6 +106,7 @@ class OkHttp3AsyncClientHttpRequest extends AbstractBufferingAsyncClientHttpRequ
 				public void onResponse(Call call, Response response) {
 					set(new OkHttp3ClientHttpResponse(response));
 				}
+
 				@Override
 				public void onFailure(Call call, IOException ex) {
 					setException(ex);

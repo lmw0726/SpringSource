@@ -16,10 +16,6 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.concurrent.Future;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
@@ -28,36 +24,41 @@ import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.apache.http.nio.entity.NByteArrayEntity;
 import org.apache.http.protocol.HttpContext;
-
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.concurrent.FailureCallback;
-import org.springframework.util.concurrent.FutureAdapter;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
-import org.springframework.util.concurrent.ListenableFutureCallbackRegistry;
-import org.springframework.util.concurrent.SuccessCallback;
+import org.springframework.util.concurrent.*;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.Future;
 
 
 /**
- * {@link ClientHttpRequest} implementation based on
- * Apache HttpComponents HttpAsyncClient.
+ * 基于 Apache HttpComponents HttpAsyncClient 的 {@link ClientHttpRequest} 实现。
  *
- * <p>Created via the {@link HttpComponentsClientHttpRequestFactory}.
+ * <p>通过 {@link HttpComponentsClientHttpRequestFactory} 创建。
  *
  * @author Oleg Kalnichevski
  * @author Arjen Poutsma
- * @since 4.0
  * @see HttpComponentsClientHttpRequestFactory#createRequest
- * @deprecated as of Spring 5.0, in favor of
- * {@link org.springframework.http.client.reactive.HttpComponentsClientHttpConnector}
+ * @since 4.0
+ * @deprecated 自 Spring 5.0 起，推荐使用 {@link org.springframework.http.client.reactive.HttpComponentsClientHttpConnector}
  */
 @Deprecated
 final class HttpComponentsAsyncClientHttpRequest extends AbstractBufferingAsyncClientHttpRequest {
 
+	/**
+	 * Http异步客户端
+	 */
 	private final HttpAsyncClient httpClient;
 
+	/**
+	 * Http URI 请求
+	 */
 	private final HttpUriRequest httpRequest;
 
+	/**
+	 * Http上下文
+	 */
 	private final HttpContext httpContext;
 
 
@@ -78,6 +79,11 @@ final class HttpComponentsAsyncClientHttpRequest extends AbstractBufferingAsyncC
 		return this.httpRequest.getURI();
 	}
 
+	/**
+	 * 获取 HTTP 上下文。
+	 *
+	 * @return HTTP 上下文
+	 */
 	HttpContext getHttpContext() {
 		return this.httpContext;
 	}
@@ -86,24 +92,38 @@ final class HttpComponentsAsyncClientHttpRequest extends AbstractBufferingAsyncC
 	protected ListenableFuture<ClientHttpResponse> executeInternal(HttpHeaders headers, byte[] bufferedOutput)
 			throws IOException {
 
+		// 添加请求头到 httpRequest 对象中
 		HttpComponentsClientHttpRequest.addHeaders(this.httpRequest, headers);
 
+		// 如果 httpRequest 是 HttpEntityEnclosingRequest 的实例
 		if (this.httpRequest instanceof HttpEntityEnclosingRequest) {
+			// 将 httpRequest 转换为 HttpEntityEnclosingRequest
 			HttpEntityEnclosingRequest entityEnclosingRequest = (HttpEntityEnclosingRequest) this.httpRequest;
+			// 创建一个新的请求实体，使用 bufferedOutput 中的数据
 			HttpEntity requestEntity = new NByteArrayEntity(bufferedOutput);
+			// 设置请求实体到 entityEnclosingRequest 中
 			entityEnclosingRequest.setEntity(requestEntity);
 		}
 
+		// 创建一个新的 HttpResponseFutureCallback 对象
 		HttpResponseFutureCallback callback = new HttpResponseFutureCallback(this.httpRequest);
+		// 使用 httpClient 执行 httpRequest
 		Future<HttpResponse> futureResponse = this.httpClient.execute(this.httpRequest, this.httpContext, callback);
+
+		// 返回一个新的 ClientHttpResponseFuture
 		return new ClientHttpResponseFuture(futureResponse, callback);
 	}
 
 
 	private static class HttpResponseFutureCallback implements FutureCallback<HttpResponse> {
-
+		/**
+		 * HttpURI请求
+		 */
 		private final HttpUriRequest request;
 
+		/**
+		 * 异步监听器回调注册表
+		 */
 		private final ListenableFutureCallbackRegistry<ClientHttpResponse> callbacks =
 				new ListenableFutureCallbackRegistry<>();
 
@@ -143,6 +163,9 @@ final class HttpComponentsAsyncClientHttpRequest extends AbstractBufferingAsyncC
 	private static class ClientHttpResponseFuture extends FutureAdapter<ClientHttpResponse, HttpResponse>
 			implements ListenableFuture<ClientHttpResponse> {
 
+		/**
+		 * Http响应异步回调
+		 */
 		private final HttpResponseFutureCallback callback;
 
 		public ClientHttpResponseFuture(Future<HttpResponse> response, HttpResponseFutureCallback callback) {
@@ -162,9 +185,11 @@ final class HttpComponentsAsyncClientHttpRequest extends AbstractBufferingAsyncC
 
 		@Override
 		public void addCallback(SuccessCallback<? super ClientHttpResponse> successCallback,
-				FailureCallback failureCallback) {
+								FailureCallback failureCallback) {
 
+			// 将 成功回调 添加到 callback 的成功回调列表中
 			this.callback.addSuccessCallback(successCallback);
+			// 将 失败回调 添加到 callback 的失败回调列表中
 			this.callback.addFailureCallback(failureCallback);
 		}
 	}

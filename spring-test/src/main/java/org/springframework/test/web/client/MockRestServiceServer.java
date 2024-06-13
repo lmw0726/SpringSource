@@ -16,10 +16,6 @@
 
 package org.springframework.test.web.client;
 
-import java.io.IOException;
-import java.net.URI;
-import java.time.Duration;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequest;
@@ -29,6 +25,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.support.RestGatewaySupport;
+
+import java.io.IOException;
+import java.net.URI;
+import java.time.Duration;
 
 /**
  * <strong>Main entry point for client-side REST testing</strong>. Used for tests
@@ -86,6 +86,7 @@ public final class MockRestServiceServer {
 	 * <p>This method may be invoked any number times before starting to make
 	 * request through the underlying {@code RestTemplate} in order to set up
 	 * all expected requests.
+	 *
 	 * @param matcher request matcher
 	 * @return a representation of the expectation
 	 */
@@ -99,7 +100,8 @@ public final class MockRestServiceServer {
 	 * <p>When request expectations have an expected count greater than one, only
 	 * the first execution is expected to match the order of declaration. Subsequent
 	 * request executions may be inserted anywhere thereafter.
-	 * @param count the expected count
+	 *
+	 * @param count   the expected count
 	 * @param matcher request matcher
 	 * @return a representation of the expectation
 	 * @since 4.3
@@ -111,6 +113,7 @@ public final class MockRestServiceServer {
 	/**
 	 * Verify that all expected requests set up via
 	 * {@link #expect(RequestMatcher)} were indeed performed.
+	 *
 	 * @throws AssertionError if not all expectations are met
 	 */
 	public void verify() {
@@ -121,9 +124,10 @@ public final class MockRestServiceServer {
 	 * Variant of {@link #verify()} that waits for up to the specified time for
 	 * all expectations to be fulfilled. This can be useful for tests that
 	 * involve asynchronous requests.
+	 *
 	 * @param timeout how long to wait for all expecations to be met
 	 * @throws AssertionError if not all expectations are met by the specified
-	 * timeout, or if any expectation fails at any time before that.
+	 *                        timeout, or if any expectation fails at any time before that.
 	 * @since 5.3.4
 	 */
 	public void verify(Duration timeout) {
@@ -141,6 +145,7 @@ public final class MockRestServiceServer {
 	/**
 	 * Return a builder for a {@code MockRestServiceServer} that should be used
 	 * to reply to the given {@code RestTemplate}.
+	 *
 	 * @since 4.3
 	 */
 	public static MockRestServiceServerBuilder bindTo(RestTemplate restTemplate) {
@@ -150,6 +155,7 @@ public final class MockRestServiceServer {
 	/**
 	 * Return a builder for a {@code MockRestServiceServer} that should be used
 	 * to reply to the given {@code AsyncRestTemplate}.
+	 *
 	 * @since 4.3
 	 * @deprecated see deprecation notice on
 	 * {@link org.springframework.web.client.AsyncRestTemplate} itself
@@ -162,6 +168,7 @@ public final class MockRestServiceServer {
 	/**
 	 * Return a builder for a {@code MockRestServiceServer} that should be used
 	 * to reply to the given {@code RestGatewaySupport}.
+	 *
 	 * @since 4.3
 	 */
 	public static MockRestServiceServerBuilder bindTo(RestGatewaySupport restGatewaySupport) {
@@ -172,6 +179,7 @@ public final class MockRestServiceServer {
 
 	/**
 	 * A shortcut for {@code bindTo(restTemplate).build()}.
+	 *
 	 * @param restTemplate the RestTemplate to set up for mock testing
 	 * @return the mock server
 	 */
@@ -181,6 +189,7 @@ public final class MockRestServiceServer {
 
 	/**
 	 * A shortcut for {@code bindTo(asyncRestTemplate).build()}.
+	 *
 	 * @param asyncRestTemplate the AsyncRestTemplate to set up for mock testing
 	 * @return the created mock server
 	 * @deprecated see deprecation notice on
@@ -193,6 +202,7 @@ public final class MockRestServiceServer {
 
 	/**
 	 * A shortcut for {@code bindTo(restGateway).build()}.
+	 *
 	 * @param restGateway the REST gateway to set up for mock testing
 	 * @return the created mock server
 	 */
@@ -212,6 +222,7 @@ public final class MockRestServiceServer {
 		 * <p>Effectively a shortcut for:<br>
 		 * {@code builder.build(new UnorderedRequestExpectationManager)}.
 		 * <p>By default this is set to {@code false}
+		 *
 		 * @param ignoreExpectOrder whether to ignore the order of expectations
 		 */
 		MockRestServiceServerBuilder ignoreExpectOrder(boolean ignoreExpectOrder);
@@ -220,6 +231,7 @@ public final class MockRestServiceServer {
 		 * Use the {@link BufferingClientHttpRequestFactory} wrapper to buffer
 		 * the input and output streams, and for example, allow multiple reads
 		 * of the response body.
+		 *
 		 * @since 5.0.5
 		 */
 		MockRestServiceServerBuilder bufferContent();
@@ -280,8 +292,7 @@ public final class MockRestServiceServer {
 		public MockRestServiceServer build() {
 			if (this.ignoreExpectOrder) {
 				return build(new UnorderedRequestExpectationManager());
-			}
-			else {
+			} else {
 				return build(new SimpleRequestExpectationManager());
 			}
 		}
@@ -293,8 +304,7 @@ public final class MockRestServiceServer {
 			if (this.restTemplate != null) {
 				if (this.bufferContent) {
 					this.restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(factory));
-				}
-				else {
+				} else {
 					this.restTemplate.setRequestFactory(factory);
 				}
 			}
@@ -335,8 +345,11 @@ public final class MockRestServiceServer {
 
 				@Override
 				protected ClientHttpResponse executeInternal() throws IOException {
+					// 验证请求并获取ClientHttpResponse对象
 					ClientHttpResponse response = expectationManager.validateRequest(this);
+					// 设置响应对象
 					setResponse(response);
+					// 返回响应对象
 					return response;
 				}
 			};
