@@ -16,29 +16,30 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpRequest;
 
+import java.io.IOException;
+
 /**
- * Represents a client-side HTTP request.
- * Created via an implementation of the {@link ClientHttpRequestFactory}.
+ * 表示客户端的 HTTP 请求。
+ * 通过 {@link ClientHttpRequestFactory} 的实现创建。
  *
- * <p>A {@code ClientHttpRequest} can be {@linkplain #execute() executed},
- * receiving a {@link ClientHttpResponse} which can be read from.
+ * <p>{@code ClientHttpRequest} 可以被 {@linkplain #execute() 执行}，
+ * 得到一个可以读取的 {@link ClientHttpResponse}。
  *
  * @author Arjen Poutsma
- * @since 3.0
  * @see ClientHttpRequestFactory#createRequest(java.net.URI, HttpMethod)
+ * @since 3.0
  */
 public interface ClientHttpRequest extends HttpRequest, HttpOutputMessage {
 
 	/**
-	 * Execute this request, resulting in a {@link ClientHttpResponse} that can be read.
-	 * @return the response result of the execution
-	 * @throws IOException in case of I/O errors
+	 * 执行此请求，得到一个可以读取的 {@link ClientHttpResponse}。
+	 *
+	 * @return 执行结果的响应
+	 * @throws IOException 如果发生 I/O 错误
 	 */
 	ClientHttpResponse execute() throws IOException;
 
