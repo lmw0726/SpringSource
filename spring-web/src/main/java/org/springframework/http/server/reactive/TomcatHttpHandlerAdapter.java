@@ -82,16 +82,31 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
 	private static final class TomcatServerHttpRequest extends ServletServerHttpRequest {
 
+		/**
+		 * Coyote 请求字段。
+		 */
 		private static final Field COYOTE_REQUEST_FIELD;
 
+		/**
+		 * 缓冲区大小。
+		 */
 		private final int bufferSize;
 
+		/**
+		 * 数据缓冲区工厂。
+		 */
 		private final DataBufferFactory factory;
 
 		static {
+			// 查找RequestFacade类中名为"request"的字段
 			Field field = ReflectionUtils.findField(RequestFacade.class, "request");
+
 			Assert.state(field != null, "Incompatible Tomcat implementation");
+
+			// 设置字段可访问
 			ReflectionUtils.makeAccessible(field);
+
+			// 将找到的字段赋值给COYOTE_REQUEST_FIELD静态变量
 			COYOTE_REQUEST_FIELD = field;
 		}
 
@@ -105,22 +120,38 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 		}
 
 		private static MultiValueMap<String, String> createTomcatHttpHeaders(HttpServletRequest request) {
+			// 获取RequestFacade对象，用于包装HTTP请求
 			RequestFacade requestFacade = getRequestFacade(request);
+
+			// 使用反射获取Tomcat的ConnectorRequest对象
 			org.apache.catalina.connector.Request connectorRequest = (org.apache.catalina.connector.Request)
 					ReflectionUtils.getField(COYOTE_REQUEST_FIELD, requestFacade);
+
 			Assert.state(connectorRequest != null, "No Tomcat connector request");
+
+			// 获取Tomcat的CoyoteRequest对象
 			Request tomcatRequest = connectorRequest.getCoyoteRequest();
+
+			// 返回一个新的TomcatHeadersAdapter对象，该对象适配了Tomcat的MimeHeaders头部信息
 			return new TomcatHeadersAdapter(tomcatRequest.getMimeHeaders());
 		}
 
 		private static RequestFacade getRequestFacade(HttpServletRequest request) {
+			// 如果request是RequestFacade的实例
 			if (request instanceof RequestFacade) {
+				// 直接将request转换为RequestFacade类型并返回
 				return (RequestFacade) request;
 			} else if (request instanceof HttpServletRequestWrapper) {
+				// 如果request是HttpServletRequestWrapper的实例
+				// 将request转换为HttpServletRequestWrapper类型
 				HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
+				// 获取HttpServletRequestWrapper中包装的HttpServletRequest
 				HttpServletRequest wrappedRequest = (HttpServletRequest) wrapper.getRequest();
+				// 递归调用getRequestFacade方法，处理被包装的HttpServletRequest
 				return getRequestFacade(wrappedRequest);
 			} else {
+				// 如果request既不是RequestFacade也不是HttpServletRequestWrapper
+				// 抛出IllegalArgumentException异常
 				throw new IllegalArgumentException("Cannot convert [" + request.getClass() +
 						"] to org.apache.catalina.connector.RequestFacade");
 			}
@@ -128,28 +159,36 @@ public class TomcatHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 
 		@Override
 		protected DataBuffer readFromInputStream() throws IOException {
+			// 获取Servlet输入流
 			ServletInputStream inputStream = ((ServletRequest) getNativeRequest()).getInputStream();
+			// 如果输入流不是CoyoteInputStream的实例，可能被包装，无法使用CoyoteInputStream
 			if (!(inputStream instanceof CoyoteInputStream)) {
-				// It's possible InputStream can be wrapped, preventing use of CoyoteInputStream
 				return super.readFromInputStream();
 			}
 			boolean release = true;
 			int capacity = this.bufferSize;
+			// 分配数据缓冲区
 			DataBuffer dataBuffer = this.factory.allocateBuffer(capacity);
 			try {
 				ByteBuffer byteBuffer = dataBuffer.asByteBuffer(0, capacity);
+				// 从CoyoteInputStream中读取数据到ByteBuffer中
 				int read = ((CoyoteInputStream) inputStream).read(byteBuffer);
+				// 记录读取的字节数
 				logBytesRead(read);
 				if (read > 0) {
+					// 设置数据缓冲区的写入位置
 					dataBuffer.writePosition(read);
 					release = false;
 					return dataBuffer;
 				} else if (read == -1) {
+					// 如果读取到末尾，返回EOF_BUFFER
 					return EOF_BUFFER;
 				} else {
+					// 否则返回空缓冲区
 					return AbstractListenerReadPublisher.EMPTY_BUFFER;
 				}
 			} finally {
+				// 如果需要释放数据缓冲区，则释放
 				if (release) {
 					DataBufferUtils.release(dataBuffer);
 				}

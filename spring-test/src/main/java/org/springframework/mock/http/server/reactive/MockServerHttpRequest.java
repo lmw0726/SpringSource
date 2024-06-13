@@ -16,39 +16,25 @@
 
 package org.springframework.mock.http.server.reactive;
 
+import org.reactivestreams.Publisher;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.*;
+import org.springframework.http.server.reactive.AbstractServerHttpRequest;
+import org.springframework.http.server.reactive.SslInfo;
+import org.springframework.lang.Nullable;
+import org.springframework.util.*;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
+
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpRange;
-import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.AbstractServerHttpRequest;
-import org.springframework.http.server.reactive.SslInfo;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MimeType;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
-import org.springframework.web.util.UriComponentsBuilder;
+import java.util.*;
 
 /**
- * Mock extension of {@link AbstractServerHttpRequest} for use in tests without
- * an actual server. Use the static methods to obtain a builder.
+ * 用于测试中的 {@link AbstractServerHttpRequest} 的模拟扩展，不需要实际的服务器。使用静态方法来获取构建器。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -56,27 +42,42 @@ import org.springframework.web.util.UriComponentsBuilder;
 public final class MockServerHttpRequest extends AbstractServerHttpRequest {
 
 	/**
-	 * String representation of one of {@link HttpMethod} or not empty custom method (e.g. <i>CONNECT</i>).
+	 * HTTP 方法的字符串表示，可以是 {@link HttpMethod} 的一种，或者是非空的自定义方法（例如 <i>CONNECT</i>）。
 	 */
 	private final String httpMethod;
 
+	/**
+	 * HTTP 请求中包含的 Cookie 的多值映射。
+	 */
 	private final MultiValueMap<String, HttpCookie> cookies;
 
+	/**
+	 * 本地地址，如果可用。
+	 */
 	@Nullable
 	private final InetSocketAddress localAddress;
 
+	/**
+	 * 远程地址，如果可用。
+	 */
 	@Nullable
 	private final InetSocketAddress remoteAddress;
 
+	/**
+	 * SSL 相关信息，如果请求通过安全协议传输。
+	 */
 	@Nullable
 	private final SslInfo sslInfo;
 
+	/**
+	 * 请求体的数据流。
+	 */
 	private final Flux<DataBuffer> body;
 
 	private MockServerHttpRequest(String httpMethod,
-			URI uri, @Nullable String contextPath, HttpHeaders headers, MultiValueMap<String, HttpCookie> cookies,
-			@Nullable InetSocketAddress localAddress, @Nullable InetSocketAddress remoteAddress,
-			@Nullable SslInfo sslInfo, Publisher<? extends DataBuffer> body) {
+								  URI uri, @Nullable String contextPath, HttpHeaders headers, MultiValueMap<String, HttpCookie> cookies,
+								  @Nullable InetSocketAddress localAddress, @Nullable InetSocketAddress remoteAddress,
+								  @Nullable SslInfo sslInfo, Publisher<? extends DataBuffer> body) {
 
 		super(uri, contextPath, headers);
 		Assert.isTrue(StringUtils.hasText(httpMethod), "HTTP method is required.");
@@ -134,86 +135,92 @@ public final class MockServerHttpRequest extends AbstractServerHttpRequest {
 	}
 
 
-	// Static builder methods
+// 静态构建器方法
 
 	/**
-	 * Create an HTTP GET builder with the given URI template. The given URI may
-	 * contain query parameters, or those may be added later via
-	 * {@link BaseBuilder#queryParam queryParam} builder methods.
-	 * @param urlTemplate a URL template; the resulting URL will be encoded
-	 * @param uriVars zero or more URI variables
-	 * @return the created builder
+	 * 创建一个使用指定 URI 模板的 HTTP GET 请求构建器。
+	 * 给定的 URI 可能包含查询参数，或者可以稍后通过 {@link BaseBuilder#queryParam queryParam} 构建器方法添加。
+	 *
+	 * @param urlTemplate URL 模板；生成的 URL 将被编码
+	 * @param uriVars     零个或多个 URI 变量
+	 * @return 创建的构建器
 	 */
 	public static BaseBuilder<?> get(String urlTemplate, Object... uriVars) {
 		return method(HttpMethod.GET, urlTemplate, uriVars);
 	}
 
 	/**
-	 * HTTP HEAD variant. See {@link #get(String, Object...)} for general info.
-	 * @param urlTemplate a URL template; the resulting URL will be encoded
-	 * @param uriVars zero or more URI variables
-	 * @return the created builder
+	 * HTTP HEAD 请求的变体。详见 {@link #get(String, Object...)} 获取一般信息。
+	 *
+	 * @param urlTemplate URL 模板；生成的 URL 将被编码
+	 * @param uriVars     零个或多个 URI 变量
+	 * @return 创建的构建器
 	 */
 	public static BaseBuilder<?> head(String urlTemplate, Object... uriVars) {
 		return method(HttpMethod.HEAD, urlTemplate, uriVars);
 	}
 
 	/**
-	 * HTTP POST variant. See {@link #get(String, Object...)} for general info.
-	 * @param urlTemplate a URL template; the resulting URL will be encoded
-	 * @param uriVars zero or more URI variables
-	 * @return the created builder
+	 * HTTP POST 请求的变体。详见 {@link #get(String, Object...)} 获取一般信息。
+	 *
+	 * @param urlTemplate URL 模板；生成的 URL 将被编码
+	 * @param uriVars     零个或多个 URI 变量
+	 * @return 创建的构建器
 	 */
 	public static BodyBuilder post(String urlTemplate, Object... uriVars) {
 		return method(HttpMethod.POST, urlTemplate, uriVars);
 	}
 
 	/**
-	 * HTTP PUT variant. See {@link #get(String, Object...)} for general info.
-	 * {@link BaseBuilder#queryParam queryParam} builder methods.
-	 * @param urlTemplate a URL template; the resulting URL will be encoded
-	 * @param uriVars zero or more URI variables
-	 * @return the created builder
+	 * HTTP PUT 请求的变体。详见 {@link #get(String, Object...)} 获取一般信息。
+	 *
+	 * @param urlTemplate URL 模板；生成的 URL 将被编码
+	 * @param uriVars     零个或多个 URI 变量
+	 * @return 创建的构建器
 	 */
 	public static BodyBuilder put(String urlTemplate, Object... uriVars) {
 		return method(HttpMethod.PUT, urlTemplate, uriVars);
 	}
 
 	/**
-	 * HTTP PATCH variant. See {@link #get(String, Object...)} for general info.
-	 * @param urlTemplate a URL template; the resulting URL will be encoded
-	 * @param uriVars zero or more URI variables
-	 * @return the created builder
+	 * HTTP PATCH 请求的变体。详见 {@link #get(String, Object...)} 获取一般信息。
+	 *
+	 * @param urlTemplate URL 模板；生成的 URL 将被编码
+	 * @param uriVars     零个或多个 URI 变量
+	 * @return 创建的构建器
 	 */
 	public static BodyBuilder patch(String urlTemplate, Object... uriVars) {
 		return method(HttpMethod.PATCH, urlTemplate, uriVars);
 	}
 
 	/**
-	 * HTTP DELETE variant. See {@link #get(String, Object...)} for general info.
-	 * @param urlTemplate a URL template; the resulting URL will be encoded
-	 * @param uriVars zero or more URI variables
-	 * @return the created builder
+	 * HTTP DELETE 请求的变体。详见 {@link #get(String, Object...)} 获取一般信息。
+	 *
+	 * @param urlTemplate URL 模板；生成的 URL 将被编码
+	 * @param uriVars     零个或多个 URI 变量
+	 * @return 创建的构建器
 	 */
 	public static BaseBuilder<?> delete(String urlTemplate, Object... uriVars) {
 		return method(HttpMethod.DELETE, urlTemplate, uriVars);
 	}
 
 	/**
-	 * HTTP OPTIONS variant. See {@link #get(String, Object...)} for general info.
-	 * @param urlTemplate a URL template; the resulting URL will be encoded
-	 * @param uriVars zero or more URI variables
-	 * @return the created builder
+	 * HTTP OPTIONS 请求的变体。详见 {@link #get(String, Object...)} 获取一般信息。
+	 *
+	 * @param urlTemplate URL 模板；生成的 URL 将被编码
+	 * @param uriVars     零个或多个 URI 变量
+	 * @return 创建的构建器
 	 */
 	public static BaseBuilder<?> options(String urlTemplate, Object... uriVars) {
 		return method(HttpMethod.OPTIONS, urlTemplate, uriVars);
 	}
 
 	/**
-	 * Create a builder with the given HTTP method and a {@link URI}.
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param url the URL
-	 * @return the created builder
+	 * 使用给定的 HTTP 方法和 {@link URI} 创建一个构建器。
+	 *
+	 * @param method HTTP 方法 (GET, POST 等)
+	 * @param url    URL
+	 * @return 创建的构建器
 	 */
 	public static BodyBuilder method(HttpMethod method, URI url) {
 		Assert.notNull(method, "HTTP method is required. " +
@@ -222,161 +229,200 @@ public final class MockServerHttpRequest extends AbstractServerHttpRequest {
 	}
 
 	/**
-	 * Alternative to {@link #method(HttpMethod, URI)} that accepts a URI template.
-	 * The given URI may contain query parameters, or those may be added later via
-	 * {@link BaseBuilder#queryParam queryParam} builder methods.
-	 * @param method the HTTP method (GET, POST, etc)
-	 * @param uri the URI template for the target URL
-	 * @param vars variables to expand into the template
-	 * @return the created builder
+	 * {@link #method(HttpMethod, URI)} 的替代方法，接受 URI 模板。
+	 * 给定的 URI 可能包含查询参数，或者可以稍后通过 {@link BaseBuilder#queryParam queryParam} 构建器方法添加。
+	 *
+	 * @param method HTTP 方法 (GET, POST 等)
+	 * @param uri    目标 URL 的 URI 模板
+	 * @param vars   要扩展到模板中的变量
+	 * @return 创建的构建器
 	 */
 	public static BodyBuilder method(HttpMethod method, String uri, Object... vars) {
 		return method(method, toUri(uri, vars));
 	}
 
 	/**
-	 * Create a builder with a raw HTTP method value value that is outside the
-	 * range of {@link HttpMethod} enum values.
-	 * @param httpMethod the HTTP methodValue value
-	 * @param uri the URI template for target the URL
-	 * @param vars variables to expand into the template
-	 * @return the created builder
+	 * 创建一个具有原始 HTTP 方法值的构建器，该值超出了 {@link HttpMethod} 枚举值的范围。
+	 *
+	 * @param httpMethod HTTP 方法值
+	 * @param uri        目标 URL 的 URI 模板
+	 * @param vars       要扩展到模板中的变量
+	 * @return 创建的构建器
 	 * @since 5.2.7
 	 */
 	public static BodyBuilder method(String httpMethod, String uri, Object... vars) {
 		return new DefaultBodyBuilder(httpMethod, toUri(uri, vars));
 	}
 
+	/**
+	 * 将 URI 字符串和变量转换为 URI。
+	 *
+	 * @param uri  URI 字符串
+	 * @param vars 要扩展到 URI 模板中的变量
+	 * @return 转换后的 URI
+	 */
 	private static URI toUri(String uri, Object[] vars) {
 		return UriComponentsBuilder.fromUriString(uri).buildAndExpand(vars).encode().toUri();
 	}
 
 
 	/**
-	 * Request builder exposing properties not related to the body.
-	 * @param <B> the builder sub-class
+	 * 请求构建器，公开与主体无关的属性。
+	 *
+	 * @param <B> 构建器子类
 	 */
 	public interface BaseBuilder<B extends BaseBuilder<B>> {
 
 		/**
-		 * Set the contextPath to return.
+		 * 设置要返回的 contextPath。
+		 *
+		 * @param contextPath 上下文路径
+		 * @return 构建器实例
 		 */
 		B contextPath(String contextPath);
 
 		/**
-		 * Append the given query parameter to the existing query parameters.
-		 * If no values are given, the resulting URI will contain the query
-		 * parameter name only (i.e. {@code ?foo} instead of {@code ?foo=bar}).
-		 * <p>The provided query name and values will be encoded.
-		 * @param name the query parameter name
-		 * @param values the query parameter values
-		 * @return this UriComponentsBuilder
+		 * 将给定的查询参数追加到现有的查询参数中。
+		 * 如果没有提供值，则生成的 URI 只包含查询参数名
+		 * （即 {@code ?foo} 而不是 {@code ?foo=bar}）。
+		 * <p>提供的查询名称和值将被编码。
+		 *
+		 * @param name   查询参数名
+		 * @param values 查询参数值
+		 * @return 构建器实例
 		 */
 		B queryParam(String name, Object... values);
 
 		/**
-		 * Add the given query parameters and values. The provided query name
-		 * and corresponding values will be encoded.
-		 * @param params the params
-		 * @return this UriComponentsBuilder
+		 * 添加给定的查询参数和值。提供的查询名称和对应的值将被编码。
+		 *
+		 * @param params 查询参数
+		 * @return 构建器实例
 		 */
 		B queryParams(MultiValueMap<String, String> params);
 
 		/**
-		 * Set the remote address to return.
+		 * 设置要返回的远程地址。
+		 *
+		 * @param remoteAddress 远程地址
+		 * @return 构建器实例
 		 */
 		B remoteAddress(InetSocketAddress remoteAddress);
 
 		/**
-		 * Set the local address to return.
+		 * 设置要返回的本地地址。
+		 *
+		 * @param localAddress 本地地址
+		 * @return 构建器实例
 		 * @since 5.2.3
 		 */
 		B localAddress(InetSocketAddress localAddress);
 
 		/**
-		 * Set SSL session information and certificates.
+		 * 设置 SSL 会话信息和证书。
+		 *
+		 * @param sslInfo SSL 信息
 		 */
 		void sslInfo(SslInfo sslInfo);
 
 		/**
-		 * Add one or more cookies.
+		 * 添加一个或多个 cookie。
+		 *
+		 * @param cookie cookie 实例
+		 * @return 构建器实例
 		 */
 		B cookie(HttpCookie... cookie);
 
 		/**
-		 * Add the given cookies.
-		 * @param cookies the cookies.
+		 * 添加给定的 cookie。
+		 *
+		 * @param cookies cookie 集合
+		 * @return 构建器实例
 		 */
 		B cookies(MultiValueMap<String, HttpCookie> cookies);
 
 		/**
-		 * Add the given, single header value under the given name.
-		 * @param headerName  the header name
-		 * @param headerValues the header value(s)
+		 * 在给定名称下添加单个 header 值。
+		 *
+		 * @param headerName   header 名称
+		 * @param headerValues header 值
+		 * @return 构建器实例
 		 * @see HttpHeaders#add(String, String)
 		 */
 		B header(String headerName, String... headerValues);
 
 		/**
-		 * Add the given header values.
-		 * @param headers the header values
+		 * 添加给定的 header 值。
+		 *
+		 * @param headers header 集合
+		 * @return 构建器实例
 		 */
 		B headers(MultiValueMap<String, String> headers);
 
 		/**
-		 * Set the list of acceptable {@linkplain MediaType media types}, as
-		 * specified by the {@code Accept} header.
-		 * @param acceptableMediaTypes the acceptable media types
+		 * 设置可接受的 {@linkplain MediaType 媒体类型} 列表，指定在 {@code Accept} 头中。
+		 *
+		 * @param acceptableMediaTypes 可接受的媒体类型
+		 * @return 构建器实例
 		 */
 		B accept(MediaType... acceptableMediaTypes);
 
 		/**
-		 * Set the list of acceptable {@linkplain Charset charsets}, as specified
-		 * by the {@code Accept-Charset} header.
-		 * @param acceptableCharsets the acceptable charsets
+		 * 设置可接受的 {@linkplain Charset 字符集} 列表，指定在 {@code Accept-Charset} 头中。
+		 *
+		 * @param acceptableCharsets 可接受的字符集
+		 * @return 构建器实例
 		 */
 		B acceptCharset(Charset... acceptableCharsets);
 
 		/**
-		 * Set the list of acceptable {@linkplain Locale locales}, as specified
-		 * by the {@code Accept-Languages} header.
-		 * @param acceptableLocales the acceptable locales
+		 * 设置可接受的 {@linkplain Locale 语言环境} 列表，指定在 {@code Accept-Languages} 头中。
+		 *
+		 * @param acceptableLocales 可接受的语言环境
+		 * @return 构建器实例
 		 */
 		B acceptLanguageAsLocales(Locale... acceptableLocales);
 
 		/**
-		 * Set the value of the {@code If-Modified-Since} header.
-		 * <p>The date should be specified as the number of milliseconds since
-		 * January 1, 1970 GMT.
-		 * @param ifModifiedSince the new value of the header
+		 * 设置 {@code If-Modified-Since} 头的值。
+		 * <p>日期应指定为自 1970 年 1 月 1 日 GMT 以来的毫秒数。
+		 *
+		 * @param ifModifiedSince 头的新值
+		 * @return 构建器实例
 		 */
 		B ifModifiedSince(long ifModifiedSince);
 
 		/**
-		 * Set the (new) value of the {@code If-Unmodified-Since} header.
-		 * <p>The date should be specified as the number of milliseconds since
-		 * January 1, 1970 GMT.
-		 * @param ifUnmodifiedSince the new value of the header
+		 * 设置 {@code If-Unmodified-Since} 头的值。
+		 * <p>日期应指定为自 1970 年 1 月 1 日 GMT 以来的毫秒数。
+		 *
+		 * @param ifUnmodifiedSince 头的新值
+		 * @return 构建器实例
 		 * @see HttpHeaders#setIfUnmodifiedSince(long)
 		 */
 		B ifUnmodifiedSince(long ifUnmodifiedSince);
 
 		/**
-		 * Set the values of the {@code If-None-Match} header.
-		 * @param ifNoneMatches the new value of the header
+		 * 设置 {@code If-None-Match} 头的值。
+		 *
+		 * @param ifNoneMatches 头的新值
+		 * @return 构建器实例
 		 */
 		B ifNoneMatch(String... ifNoneMatches);
 
 		/**
-		 * Set the (new) value of the Range header.
-		 * @param ranges the HTTP ranges
+		 * 设置 Range 头的新值。
+		 *
+		 * @param ranges HTTP 范围
+		 * @return 构建器实例
 		 * @see HttpHeaders#setRange(List)
 		 */
 		B range(HttpRange... ranges);
 
 		/**
-		 * Builds the request with no body.
-		 * @return the request
+		 * 构建不带主体的请求。
+		 *
+		 * @return 请求
 		 * @see BodyBuilder#body(Publisher)
 		 * @see BodyBuilder#body(String)
 		 */
@@ -385,41 +431,42 @@ public final class MockServerHttpRequest extends AbstractServerHttpRequest {
 
 
 	/**
-	 * A builder that adds a body to the request.
+	 * 一个为请求添加主体的构建器。
 	 */
 	public interface BodyBuilder extends BaseBuilder<BodyBuilder> {
 
 		/**
-		 * Set the length of the body in bytes, as specified by the
-		 * {@code Content-Length} header.
-		 * @param contentLength the content length
-		 * @return this builder
+		 * 设置主体的字节长度，如 {@code Content-Length} 头所指定的。
+		 *
+		 * @param contentLength 主体长度
+		 * @return 构建器实例
 		 * @see HttpHeaders#setContentLength(long)
 		 */
 		BodyBuilder contentLength(long contentLength);
 
 		/**
-		 * Set the {@linkplain MediaType media type} of the body, as specified
-		 * by the {@code Content-Type} header.
-		 * @param contentType the content type
-		 * @return this builder
+		 * 设置主体的 {@linkplain MediaType 媒体类型}，如 {@code Content-Type} 头所指定的。
+		 *
+		 * @param contentType 内容类型
+		 * @return 构建器实例
 		 * @see HttpHeaders#setContentType(MediaType)
 		 */
 		BodyBuilder contentType(MediaType contentType);
 
 		/**
-		 * Set the body of the request and build it.
-		 * @param body the body
-		 * @return the built request entity
+		 * 设置请求的主体并构建它。
+		 *
+		 * @param body 主体
+		 * @return 构建的请求实体
 		 */
 		MockServerHttpRequest body(Publisher<? extends DataBuffer> body);
 
 		/**
-		 * Set the body of the request and build it.
-		 * <p>The String is assumed to be UTF-8 encoded unless the request has a
-		 * "content-type" header with a charset attribute.
-		 * @param body the body as text
-		 * @return the built request entity
+		 * 设置请求的主体并构建它。
+		 * <p>除非请求有带有字符集属性的 "content-type" 头，否则该字符串被假定为 UTF-8 编码。
+		 *
+		 * @param body 文本形式的主体
+		 * @return 构建的请求实体
 		 */
 		MockServerHttpRequest body(String body);
 	}
@@ -427,25 +474,52 @@ public final class MockServerHttpRequest extends AbstractServerHttpRequest {
 
 	private static class DefaultBodyBuilder implements BodyBuilder {
 
+		/**
+		 * HTTP 方法的字符串表示。
+		 */
 		private final String methodValue;
 
+		/**
+		 * 请求的 URI。
+		 */
 		private final URI url;
 
+		/**
+		 * 上下文路径。
+		 */
 		@Nullable
 		private String contextPath;
 
+		/**
+		 * 用于构建查询参数的 UriComponentsBuilder 实例。
+		 */
 		private final UriComponentsBuilder queryParamsBuilder = UriComponentsBuilder.newInstance();
 
+		/**
+		 * 请求头的 HttpHeaders 实例。
+		 */
 		private final HttpHeaders headers = new HttpHeaders();
 
+		/**
+		 * 请求中的 HTTP cookie 的 MultiValueMap 实例。
+		 */
 		private final MultiValueMap<String, HttpCookie> cookies = new LinkedMultiValueMap<>();
 
+		/**
+		 * 远程地址。
+		 */
 		@Nullable
 		private InetSocketAddress remoteAddress;
 
+		/**
+		 * 本地地址。
+		 */
 		@Nullable
 		private InetSocketAddress localAddress;
 
+		/**
+		 * SSL 会话信息。
+		 */
 		@Nullable
 		private SslInfo sslInfo;
 
@@ -503,9 +577,13 @@ public final class MockServerHttpRequest extends AbstractServerHttpRequest {
 
 		@Override
 		public BodyBuilder header(String headerName, String... headerValues) {
+			// 遍历所有的头部值
 			for (String headerValue : headerValues) {
+				// 将每个头部值添加到指定的头部名称中
 				this.headers.add(headerName, headerValue);
 			}
+
+			// 返回当前对象
 			return this;
 		}
 
@@ -576,8 +654,13 @@ public final class MockServerHttpRequest extends AbstractServerHttpRequest {
 
 		@Override
 		public MockServerHttpRequest body(String body) {
+			// 将字符串body转换为字节数组，使用指定的字符集
 			byte[] bytes = body.getBytes(getCharset());
+
+			// 使用默认的数据缓冲区工厂，将字节数组包装成数据缓冲区
 			DataBuffer buffer = DefaultDataBufferFactory.sharedInstance.wrap(bytes);
+
+			// 返回一个包含数据缓冲区的Flux流
 			return body(Flux.just(buffer));
 		}
 
@@ -588,24 +671,38 @@ public final class MockServerHttpRequest extends AbstractServerHttpRequest {
 
 		@Override
 		public MockServerHttpRequest body(Publisher<? extends DataBuffer> body) {
+			// 如果需要的话，应用Cookies
 			applyCookiesIfNecessary();
+
+			// 返回一个新的MockServerHttpRequest对象，传入相应的参数
 			return new MockServerHttpRequest(this.methodValue, getUrlToUse(), this.contextPath,
 					this.headers, this.cookies, this.localAddress, this.remoteAddress, this.sslInfo, body);
 		}
 
 		private void applyCookiesIfNecessary() {
+			// 如果HTTP头部中不存在COOKIE头部
 			if (this.headers.get(HttpHeaders.COOKIE) == null) {
-				this.cookies.values().stream().flatMap(Collection::stream)
+				// 遍历cookies集合中的所有Cookie
+				this.cookies.values().stream()
+						// 展平集合，得到每个单独的Cookie
+						.flatMap(Collection::stream)
+						// 将每个Cookie添加到HTTP头部中的COOKIE头部
 						.forEach(cookie -> this.headers.add(HttpHeaders.COOKIE, cookie.toString()));
 			}
 		}
 
 		private URI getUrlToUse() {
+			// 使用查询参数构建器构建并展开查询参数
 			MultiValueMap<String, String> params =
 					this.queryParamsBuilder.buildAndExpand().encode().getQueryParams();
+
+			// 如果查询参数不为空
 			if (!params.isEmpty()) {
+				// 使用UriComponentsBuilder从当前的URL(this.url)构建URI，并设置查询参数(params)
 				return UriComponentsBuilder.fromUri(this.url).queryParams(params).build(true).toUri();
 			}
+
+			// 如果查询参数为空，直接返回当前的URL(this.url)
 			return this.url;
 		}
 	}

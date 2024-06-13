@@ -98,19 +98,30 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 		}
 
 		private static MultiValueMap<String, String> createHeaders(HttpServletRequest servletRequest) {
+			// 获取Request对象，通常通过getRequest方法获取
 			Request request = getRequest(servletRequest);
+
+			// 获取请求对象的元数据，并从中获取HTTP字段
 			HttpFields fields = request.getMetaData().getFields();
+
+			// 创建并返回一个JettyHeadersAdapter对象，将获取到的HTTP字段传入适配器中
 			return new JettyHeadersAdapter(fields);
 		}
 
 		private static Request getRequest(HttpServletRequest request) {
+			// 如果request对象本身就是org.eclipse.jetty.server.Request类型，则直接返回
 			if (request instanceof Request) {
 				return (Request) request;
 			} else if (request instanceof HttpServletRequestWrapper) {
+				// 如果request是HttpServletRequestWrapper类型（通常用于请求包装器）
+				// 将request转换为HttpServletRequestWrapper类型
 				HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
+				// 获取包装后的原始HttpServletRequest对象
 				HttpServletRequest wrappedRequest = (HttpServletRequest) wrapper.getRequest();
+				// 递归调用getRequest方法，处理包装后的HttpServletRequest对象
 				return getRequest(wrappedRequest);
 			} else {
+				// 如果request既不是Request类型，也不是HttpServletRequestWrapper类型，则抛出异常
 				throw new IllegalArgumentException("Cannot convert [" + request.getClass() +
 						"] to org.eclipse.jetty.server.Request");
 			}

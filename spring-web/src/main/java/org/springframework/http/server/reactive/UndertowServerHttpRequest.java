@@ -16,6 +16,19 @@
 
 package org.springframework.http.server.reactive;
 
+import io.undertow.connector.ByteBufferPool;
+import io.undertow.connector.PooledByteBuffer;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.Cookie;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.http.HttpCookie;
+import org.springframework.lang.Nullable;
+import org.springframework.util.*;
+import org.xnio.channels.StreamSourceChannel;
+import reactor.core.publisher.Flux;
+
+import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -23,27 +36,8 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.net.ssl.SSLSession;
-
-import io.undertow.connector.ByteBufferPool;
-import io.undertow.connector.PooledByteBuffer;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.Cookie;
-import org.xnio.channels.StreamSourceChannel;
-import reactor.core.publisher.Flux;
-
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferFactory;
-import org.springframework.http.HttpCookie;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
-
 /**
- * Adapt {@link ServerHttpRequest} to the Undertow {@link HttpServerExchange}.
+ * 将 {@link ServerHttpRequest} 适配为 Undertow {@link HttpServerExchange}。
  *
  * @author Marek Hawrylczak
  * @author Rossen Stoyanchev
@@ -51,11 +45,19 @@ import org.springframework.util.StringUtils;
  */
 class UndertowServerHttpRequest extends AbstractServerHttpRequest {
 
+	/**
+	 * 日志前缀索引
+	 */
 	private static final AtomicLong logPrefixIndex = new AtomicLong();
 
-
+	/**
+	 * Http服务端交换
+	 */
 	private final HttpServerExchange exchange;
 
+	/**
+	 * 请求体发布器
+	 */
 	private final RequestBodyPublisher body;
 
 
@@ -84,13 +86,21 @@ class UndertowServerHttpRequest extends AbstractServerHttpRequest {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected MultiValueMap<String, HttpCookie> initCookies() {
+		// 创建一个多值映射，用于存储转换后的 HTTP Cookie
 		MultiValueMap<String, HttpCookie> cookies = new LinkedMultiValueMap<>();
-		// getRequestCookies() is deprecated in Undertow 2.2
+
+		// getRequestCookies() 在Undertow 2.2中已弃用
+		// 遍历请求中的所有 Cookie 名称
 		for (String name : this.exchange.getRequestCookies().keySet()) {
+			// 获取指定名称的 Cookie 对象
 			Cookie cookie = this.exchange.getRequestCookies().get(name);
+			// 创建对应的 HTTP Cookie 对象
 			HttpCookie httpCookie = new HttpCookie(name, cookie.getValue());
+			// 将 HTTP Cookie 添加到多值映射中，按名称进行分组
 			cookies.add(name, httpCookie);
 		}
+
+		// 返回转换后的 HTTP Cookie 的多值映射
 		return cookies;
 	}
 
@@ -109,10 +119,16 @@ class UndertowServerHttpRequest extends AbstractServerHttpRequest {
 	@Nullable
 	@Override
 	protected SslInfo initSslInfo() {
+		// 获取与当前连接关联的 SSLSession
 		SSLSession session = this.exchange.getConnection().getSslSession();
+
+		// 如果 SSLSession 不为null
 		if (session != null) {
+			// 返回一个包含 SSLSession 信息的 DefaultSslInfo 对象
 			return new DefaultSslInfo(session);
 		}
+
+		// 如果 SSLSession 为null，则返回空值
 		return null;
 	}
 
@@ -136,10 +152,19 @@ class UndertowServerHttpRequest extends AbstractServerHttpRequest {
 
 	private class RequestBodyPublisher extends AbstractListenerReadPublisher<DataBuffer> {
 
+		/**
+		 * 输入流源通道。
+		 */
 		private final StreamSourceChannel channel;
 
+		/**
+		 * 数据缓冲区工厂。
+		 */
 		private final DataBufferFactory bufferFactory;
 
+		/**
+		 * 字节缓冲池。
+		 */
 		private final ByteBufferPool byteBufferPool;
 
 		public RequestBodyPublisher(HttpServerExchange exchange, DataBufferFactory bufferFactory) {
@@ -150,19 +175,30 @@ class UndertowServerHttpRequest extends AbstractServerHttpRequest {
 		}
 
 		private void registerListeners(HttpServerExchange exchange) {
+			// 添加交换完成监听器，处理数据全部读取后的操作
 			exchange.addExchangeCompleteListener((ex, next) -> {
+				// 所有数据读取完成后的回调函数
 				onAllDataRead();
+				// 继续处理下一个步骤
 				next.proceed();
 			});
+
+			// 设置通道的读取监听器，处理数据可用时的操作
 			this.channel.getReadSetter().set(c -> onDataAvailable());
+
+			// 设置通道的关闭监听器，处理通道关闭时的操作
 			this.channel.getCloseSetter().set(c -> onAllDataRead());
+
+			// 恢复通道的读取操作
 			this.channel.resumeReads();
 		}
 
 		@Override
 		protected void checkOnDataAvailable() {
+			// 恢复通道的读取操作
 			this.channel.resumeReads();
-			// We are allowed to try, it will return null if data is not available
+
+			// 尝试处理数据可用时的操作
 			onDataAvailable();
 		}
 
@@ -174,34 +210,44 @@ class UndertowServerHttpRequest extends AbstractServerHttpRequest {
 		@Override
 		@Nullable
 		protected DataBuffer read() throws IOException {
+			// 从字节缓冲池分配一个 PooledByteBuffer 对象
 			PooledByteBuffer pooledByteBuffer = this.byteBufferPool.allocate();
 			try {
+				// 获取 ByteBuffer 对象
 				ByteBuffer byteBuffer = pooledByteBuffer.getBuffer();
+				// 从通道读取数据到 ByteBuffer 中
 				int read = this.channel.read(byteBuffer);
 
+				// 如果日志级别为跟踪，则记录读取的字节数
 				if (rsReadLogger.isTraceEnabled()) {
 					rsReadLogger.trace(getLogPrefix() + "Read " + read + (read != -1 ? " bytes" : ""));
 				}
 
+				// 如果成功读取了数据
 				if (read > 0) {
+					// 反转 ByteBuffer 准备读取数据
 					byteBuffer.flip();
+					// 使用缓冲工厂分配一个 DataBuffer 对象
 					DataBuffer dataBuffer = this.bufferFactory.allocateBuffer(read);
+					// 将 ByteBuffer 中的数据写入到 DataBuffer 中
 					dataBuffer.write(byteBuffer);
+					// 返回读取的数据缓冲区
 					return dataBuffer;
-				}
-				else if (read == -1) {
+				} else if (read == -1) {
+					// 数据已全部读取完成的回调
 					onAllDataRead();
 				}
+				// 返回空值，表示没有读取到数据
 				return null;
-			}
-			finally {
+			} finally {
+				// 关闭 PooledByteBuffer 对象，释放资源
 				pooledByteBuffer.close();
 			}
 		}
 
 		@Override
 		protected void discardData() {
-			// Nothing to discard since we pass data buffers on immediately..
+			// 没有什么可丢弃的，因为我们立即传递数据缓冲区。
 		}
 	}
 

@@ -16,14 +16,6 @@
 
 package org.springframework.http.server.reactive;
 
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.function.Consumer;
-
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +24,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Flux;
+
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.function.Consumer;
 
 /**
  * Package-private default implementation of {@link ServerHttpRequest.Builder}.
@@ -176,16 +175,31 @@ class DefaultServerHttpRequestBuilder implements ServerHttpRequest.Builder {
 
 	private static class MutatedServerHttpRequest extends AbstractServerHttpRequest {
 
+		/**
+		 * HTTP 方法的字符串表示。
+		 */
 		private final String methodValue;
 
+		/**
+		 * SSL 信息。
+		 */
 		@Nullable
 		private final SslInfo sslInfo;
 
+		/**
+		 * 远程客户端地址。
+		 */
 		@Nullable
 		private InetSocketAddress remoteAddress;
 
+		/**
+		 * 请求体的数据流。
+		 */
 		private final Flux<DataBuffer> body;
 
+		/**
+		 * 原始的服务器 HTTP 请求。
+		 */
 		private final ServerHttpRequest originalRequest;
 
 
