@@ -16,33 +16,41 @@
 
 package org.springframework.mock.http;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.util.StreamUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.util.StreamUtils;
-
 /**
- * Mock implementation of {@link HttpOutputMessage}.
+ * {@link HttpOutputMessage} 的模拟实现。
  *
  * @author Rossen Stoyanchev
  * @since 3.2
  */
 public class MockHttpOutputMessage implements HttpOutputMessage {
-
+	/**
+	 * 默认字符集
+	 */
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
+	/**
+	 * 头部
+	 */
 	private final HttpHeaders headers = new HttpHeaders();
 
+	/**
+	 * 主体
+	 */
 	private final ByteArrayOutputStream body = new ByteArrayOutputStream(1024);
 
 
 	/**
-	 * Return the headers.
+	 * 返回头部信息。
 	 */
 	@Override
 	public HttpHeaders getHeaders() {
@@ -50,7 +58,7 @@ public class MockHttpOutputMessage implements HttpOutputMessage {
 	}
 
 	/**
-	 * Return the body content.
+	 * 返回输出流，用于写入消息体内容。
 	 */
 	@Override
 	public OutputStream getBody() throws IOException {
@@ -58,22 +66,22 @@ public class MockHttpOutputMessage implements HttpOutputMessage {
 	}
 
 	/**
-	 * Return body content as a byte array.
+	 * 返回消息体内容的字节数组表示。
 	 */
 	public byte[] getBodyAsBytes() {
 		return this.body.toByteArray();
 	}
 
 	/**
-	 * Return the body content interpreted as a UTF-8 string.
+	 * 返回消息体内容的 UTF-8 编码字符串表示。
 	 */
 	public String getBodyAsString() {
 		return getBodyAsString(DEFAULT_CHARSET);
 	}
 
 	/**
-	 * Return the body content as a string.
-	 * @param charset the charset to use to turn the body content to a String
+	 * 返回消息体内容的字符串表示。
+	 * @param charset 用于将消息体内容转换为字符串的字符集
 	 */
 	public String getBodyAsString(Charset charset) {
 		return StreamUtils.copyToString(this.body, charset);
