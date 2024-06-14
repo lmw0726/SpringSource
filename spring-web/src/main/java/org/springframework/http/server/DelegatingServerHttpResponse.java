@@ -16,27 +16,29 @@
 
 package org.springframework.http.server;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
- * Implementation of {@code ServerHttpResponse} that delegates all calls to a
- * given target {@code ServerHttpResponse}.
+ * 实现了 {@code ServerHttpResponse} 接口，将所有调用委托给给定的目标 {@code ServerHttpResponse}。
  *
  * @author Arjen Poutsma
  * @since 5.3.2
  */
 public class DelegatingServerHttpResponse implements ServerHttpResponse {
-
+	/**
+	 * 服务端Http响应
+	 */
 	private final ServerHttpResponse delegate;
 
 	/**
-	 * Create a new {@code DelegatingServerHttpResponse}.
-	 * @param delegate the response to delegate to
+	 * 创建一个新的 {@code DelegatingServerHttpResponse} 实例。
+	 *
+	 * @param delegate 要委托的响应对象
 	 */
 	public DelegatingServerHttpResponse(ServerHttpResponse delegate) {
 		Assert.notNull(delegate, "Delegate must not be null");
@@ -44,8 +46,9 @@ public class DelegatingServerHttpResponse implements ServerHttpResponse {
 	}
 
 	/**
-	 * Returns the target response that this response delegates to.
-	 * @return the delegate
+	 * 返回此响应对象委托的目标响应对象。
+	 *
+	 * @return 委托的目标响应对象
 	 */
 	public ServerHttpResponse getDelegate() {
 		return this.delegate;

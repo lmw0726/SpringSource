@@ -16,6 +16,12 @@
 
 package org.springframework.http.converter;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
+import org.springframework.lang.Nullable;
+import org.springframework.util.*;
+
+import javax.mail.internet.MimeUtility;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -23,29 +29,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.mail.internet.MimeUtility;
-
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.StreamingHttpOutputMessage;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MimeTypeUtils;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StreamUtils;
-import org.springframework.util.StringUtils;
+import java.util.*;
 
 /**
  * Implementation of {@link HttpMessageConverter} to read and write 'normal' HTML
@@ -149,9 +133,9 @@ import org.springframework.util.StringUtils;
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @since 3.0
  * @see org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter
  * @see org.springframework.util.MultiValueMap
+ * @since 3.0
  */
 public class FormHttpMessageConverter implements HttpMessageConverter<MultiValueMap<String, ?>> {
 
@@ -189,6 +173,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 	/**
 	 * Set the list of {@link MediaType} objects supported by this converter.
+	 *
 	 * @see #addSupportedMediaTypes(MediaType...)
 	 * @see #getSupportedMediaTypes()
 	 */
@@ -202,9 +187,10 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	 * Add {@link MediaType} objects to be supported by this converter.
 	 * <p>The supplied {@code MediaType} objects will be appended to the list
 	 * of {@linkplain #getSupportedMediaTypes() supported MediaType objects}.
+	 *
 	 * @param supportedMediaTypes a var-args list of {@code MediaType} objects to add
-	 * @since 5.2
 	 * @see #setSupportedMediaTypes(List)
+	 * @since 5.2
 	 */
 	public void addSupportedMediaTypes(MediaType... supportedMediaTypes) {
 		Assert.notNull(supportedMediaTypes, "'supportedMediaTypes' must not be null");
@@ -214,6 +200,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @see #setSupportedMediaTypes(List)
 	 * @see #addSupportedMediaTypes(MediaType...)
 	 */
@@ -234,6 +221,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	/**
 	 * Return the {@linkplain #setPartConverters configured converters} for MIME
 	 * parts.
+	 *
 	 * @since 5.3
 	 */
 	public List<HttpMessageConverter<?>> getPartConverters() {
@@ -291,8 +279,9 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	 * <p>As of 5.0 by default part headers, including {@code Content-Disposition}
 	 * (and its filename parameter) will be encoded based on the setting of
 	 * {@link #setCharset(Charset)} or {@code UTF-8} by default.
-	 * @since 4.1.1
+	 *
 	 * @see <a href="https://en.wikipedia.org/wiki/MIME#Encoded-Word">Encoded-Word</a>
+	 * @since 4.1.1
 	 */
 	public void setMultipartCharset(Charset charset) {
 		this.multipartCharset = charset;
@@ -337,7 +326,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 	@Override
 	public MultiValueMap<String, String> read(@Nullable Class<? extends MultiValueMap<String, ?>> clazz,
-			HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+											  HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
 
 		MediaType contentType = inputMessage.getHeaders().getContentType();
 		Charset charset = (contentType != null && contentType.getCharset() != null ?
@@ -350,8 +339,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 			int idx = pair.indexOf('=');
 			if (idx == -1) {
 				result.add(URLDecoder.decode(pair, charset.name()), null);
-			}
-			else {
+			} else {
 				String name = URLDecoder.decode(pair.substring(0, idx), charset.name());
 				String value = URLDecoder.decode(pair.substring(idx + 1), charset.name());
 				result.add(name, value);
@@ -367,8 +355,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 		if (isMultipart(map, contentType)) {
 			writeMultipart((MultiValueMap<String, Object>) map, contentType, outputMessage);
-		}
-		else {
+		} else {
 			writeForm((MultiValueMap<String, Object>) map, contentType, outputMessage);
 		}
 	}
@@ -389,7 +376,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	}
 
 	private void writeForm(MultiValueMap<String, Object> formData, @Nullable MediaType contentType,
-			HttpOutputMessage outputMessage) throws IOException {
+						   HttpOutputMessage outputMessage) throws IOException {
 
 		contentType = getFormContentType(contentType);
 		outputMessage.getHeaders().setContentType(contentType);
@@ -403,8 +390,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		if (outputMessage instanceof StreamingHttpOutputMessage) {
 			StreamingHttpOutputMessage streamingOutputMessage = (StreamingHttpOutputMessage) outputMessage;
 			streamingOutputMessage.setBody(outputStream -> StreamUtils.copy(bytes, outputStream));
-		}
-		else {
+		} else {
 			StreamUtils.copy(bytes, outputMessage.getBody());
 		}
 	}
@@ -416,6 +402,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	 * If {@code contentType} is {@code null},
 	 * {@code application/x-www-form-urlencoded; charset=UTF-8} is returned.
 	 * <p>Subclasses can override this method to change this behavior.
+	 *
 	 * @param contentType the preferred content type (can be {@code null})
 	 * @return the content type to be used
 	 * @since 5.2.2
@@ -423,11 +410,9 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	protected MediaType getFormContentType(@Nullable MediaType contentType) {
 		if (contentType == null) {
 			return DEFAULT_FORM_DATA_MEDIA_TYPE;
-		}
-		else if (contentType.getCharset() == null) {
+		} else if (contentType.getCharset() == null) {
 			return new MediaType(contentType, this.charset);
-		}
-		else {
+		} else {
 			return contentType;
 		}
 	}
@@ -435,25 +420,24 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	protected String serializeForm(MultiValueMap<String, Object> formData, Charset charset) {
 		StringBuilder builder = new StringBuilder();
 		formData.forEach((name, values) -> {
-				if (name == null) {
-					Assert.isTrue(CollectionUtils.isEmpty(values), "Null name in form data: " + formData);
-					return;
+			if (name == null) {
+				Assert.isTrue(CollectionUtils.isEmpty(values), "Null name in form data: " + formData);
+				return;
+			}
+			values.forEach(value -> {
+				try {
+					if (builder.length() != 0) {
+						builder.append('&');
+					}
+					builder.append(URLEncoder.encode(name, charset.name()));
+					if (value != null) {
+						builder.append('=');
+						builder.append(URLEncoder.encode(String.valueOf(value), charset.name()));
+					}
+				} catch (UnsupportedEncodingException ex) {
+					throw new IllegalStateException(ex);
 				}
-				values.forEach(value -> {
-					try {
-						if (builder.length() != 0) {
-							builder.append('&');
-						}
-						builder.append(URLEncoder.encode(name, charset.name()));
-						if (value != null) {
-							builder.append('=');
-							builder.append(URLEncoder.encode(String.valueOf(value), charset.name()));
-						}
-					}
-					catch (UnsupportedEncodingException ex) {
-						throw new IllegalStateException(ex);
-					}
-				});
+			});
 		});
 
 		return builder.toString();
@@ -492,8 +476,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 				writeParts(outputStream, parts, boundary);
 				writeEnd(outputStream, boundary);
 			});
-		}
-		else {
+		} else {
 			writeParts(outputMessage.getBody(), parts, boundary);
 			writeEnd(outputMessage.getBody(), boundary);
 		}
@@ -557,6 +540,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 	/**
 	 * Return an {@link HttpEntity} for the given part Object.
+	 *
 	 * @param part the part to return an {@link HttpEntity} for
 	 * @return the part Object itself it is an {@link HttpEntity},
 	 * or a newly built {@link HttpEntity} wrapper for that part
@@ -570,6 +554,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	 * {@code Content-Disposition} header.
 	 * <p>The default implementation returns {@link Resource#getFilename()} if the part is a
 	 * {@code Resource}, and {@code null} in other cases. Can be overridden in subclasses.
+	 *
 	 * @param part the part to determine the file name for
 	 * @return the filename, or {@code null} if not known
 	 */
@@ -582,8 +567,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 				filename = MimeDelegate.encode(filename, this.multipartCharset.name());
 			}
 			return filename;
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
@@ -612,19 +596,35 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 
 	/**
-	 * Implementation of {@link org.springframework.http.HttpOutputMessage} used
-	 * to write a MIME multipart.
+	 * 用于编写MIME多部分消息的 {@link org.springframework.http.HttpOutputMessage} 实现。
 	 */
 	private static class MultipartHttpOutputMessage implements HttpOutputMessage {
-
+		/**
+		 * 输出流
+		 */
 		private final OutputStream outputStream;
 
+		/**
+		 * 字符集
+		 */
 		private final Charset charset;
 
+		/**
+		 * 头部信息
+		 */
 		private final HttpHeaders headers = new HttpHeaders();
 
+		/**
+		 * 是否已经写入头部信息到输出流。
+		 */
 		private boolean headersWritten = false;
 
+		/**
+		 * 构造函数，初始化输出流和字符集。
+		 *
+		 * @param outputStream 输出流
+		 * @param charset      字符集
+		 */
 		public MultipartHttpOutputMessage(OutputStream outputStream, Charset charset) {
 			this.outputStream = outputStream;
 			this.charset = charset;
@@ -637,28 +637,59 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 		@Override
 		public OutputStream getBody() throws IOException {
+			// 写入头部信息
 			writeHeaders();
+			// 返回输出流
 			return this.outputStream;
 		}
 
+		/**
+		 * 写入头部信息到输出流。
+		 *
+		 * @throws IOException 写入过程中可能抛出的IO异常
+		 */
 		private void writeHeaders() throws IOException {
+			// 如果还没有写入过头部信息
 			if (!this.headersWritten) {
+				// 遍历所有的头部条目
 				for (Map.Entry<String, List<String>> entry : this.headers.entrySet()) {
+					// 获取头部名称的字节数组
 					byte[] headerName = getBytes(entry.getKey());
+
+					// 遍历头部值列表
 					for (String headerValueString : entry.getValue()) {
+						// 获取头部值的字节数组
 						byte[] headerValue = getBytes(headerValueString);
+
+						// 将头部名称写入输出流
 						this.outputStream.write(headerName);
+
+						// 写入冒号和空格
 						this.outputStream.write(':');
 						this.outputStream.write(' ');
+
+						// 将头部值写入输出流
 						this.outputStream.write(headerValue);
+
+						// 写入换行符
 						writeNewLine(this.outputStream);
 					}
 				}
+
+				// 写入一个额外的换行符，表示头部结束
 				writeNewLine(this.outputStream);
+
+				// 标记头部已经写入
 				this.headersWritten = true;
 			}
 		}
 
+		/**
+		 * 将字符串转换为字节数组，使用指定的字符集。
+		 *
+		 * @param name 要转换的字符串
+		 * @return 使用指定字符集转换后的字节数组
+		 */
 		private byte[] getBytes(String name) {
 			return name.getBytes(this.charset);
 		}
@@ -673,8 +704,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		public static String encode(String value, String charset) {
 			try {
 				return MimeUtility.encodeText(value, charset, null);
-			}
-			catch (UnsupportedEncodingException ex) {
+			} catch (UnsupportedEncodingException ex) {
 				throw new IllegalStateException(ex);
 			}
 		}

@@ -31,30 +31,44 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * {@link ServerHttpResponse} implementation that is based on a {@link HttpServletResponse}.
+ * 基于 {@link HttpServletResponse} 的 {@link ServerHttpResponse} 实现。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @since 3.0
  */
 public class ServletServerHttpResponse implements ServerHttpResponse {
-
+	/**
+	 * Servlet响应
+	 */
 	private final HttpServletResponse servletResponse;
 
+	/**
+	 * 头部信息
+	 */
 	private final HttpHeaders headers;
 
+	/**
+	 * 是否将头部写入过输出流
+	 */
 	private boolean headersWritten = false;
 
+	/**
+	 * 是否使用过主体
+	 */
 	private boolean bodyUsed = false;
 
+	/**
+	 * 是否是只读头部
+	 */
 	@Nullable
 	private HttpHeaders readOnlyHeaders;
 
 
 	/**
-	 * Construct a new instance of the ServletServerHttpResponse based on the given {@link HttpServletResponse}.
+	 * 使用给定的 {@link HttpServletResponse} 构造一个 ServletServerHttpResponse 的新实例。
 	 *
-	 * @param servletResponse the servlet response
+	 * @param servletResponse Servlet响应对象
 	 */
 	public ServletServerHttpResponse(HttpServletResponse servletResponse) {
 		Assert.notNull(servletResponse, "HttpServletResponse must not be null");
@@ -64,7 +78,7 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 
 
 	/**
-	 * Return the {@code HttpServletResponse} this object is based on.
+	 * 返回此对象基于的 {@code HttpServletResponse}。
 	 */
 	public HttpServletResponse getServletResponse() {
 		return this.servletResponse;
@@ -78,27 +92,39 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 
 	@Override
 	public HttpHeaders getHeaders() {
+		// 如果只读头部不为空，则直接返回只读头部
 		if (this.readOnlyHeaders != null) {
 			return this.readOnlyHeaders;
 		} else if (this.headersWritten) {
+			// 如果头部已经被写入过，则创建只读头部并返回
 			this.readOnlyHeaders = HttpHeaders.readOnlyHttpHeaders(this.headers);
 			return this.readOnlyHeaders;
 		} else {
+			// 否则，直接返回当前的可写头部
 			return this.headers;
 		}
 	}
 
 	@Override
 	public OutputStream getBody() throws IOException {
+		// 设置响应体已被使用的标志为 true
 		this.bodyUsed = true;
+
+		// 调用写入响应头部的方法
 		writeHeaders();
+
+		// 返回 Servlet 响应对象的输出流
 		return this.servletResponse.getOutputStream();
 	}
 
 	@Override
 	public void flush() throws IOException {
+		// 调用写入响应头部的方法
 		writeHeaders();
+
+		// 如果响应体已经被使用过
 		if (this.bodyUsed) {
+			// 刷新 Servlet 响应的缓冲区
 			this.servletResponse.flushBuffer();
 		}
 	}
@@ -109,24 +135,37 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 	}
 
 	private void writeHeaders() {
+		// 如果头部信息尚未被写入
 		if (!this.headersWritten) {
+			// 遍历获取到的头部信息
 			getHeaders().forEach((headerName, headerValues) -> {
+				// 将每个头部信息写入到 Servlet 响应中
 				for (String headerValue : headerValues) {
 					this.servletResponse.addHeader(headerName, headerValue);
 				}
 			});
-			// HttpServletResponse exposes some headers as properties: we should include those if not already present
+
+			// 如果 Servlet 响应的内容类型为空，但是头部信息中有内容类型
 			if (this.servletResponse.getContentType() == null && this.headers.getContentType() != null) {
+				// 设置 Servlet 响应的内容类型
 				this.servletResponse.setContentType(this.headers.getContentType().toString());
 			}
+
+			// 如果 Servlet 响应的字符编码为空，但是头部信息中有内容类型且其字符集不为空
 			if (this.servletResponse.getCharacterEncoding() == null && this.headers.getContentType() != null &&
 					this.headers.getContentType().getCharset() != null) {
+				// 设置 Servlet 响应的字符编码
 				this.servletResponse.setCharacterEncoding(this.headers.getContentType().getCharset().name());
 			}
+
+			// 获取头部信息中的内容长度
 			long contentLength = getHeaders().getContentLength();
+			// 如果内容长度有效，则设置 Servlet 响应的内容长度
 			if (contentLength != -1) {
 				this.servletResponse.setContentLengthLong(contentLength);
 			}
+
+			// 标记头部信息已经被写入
 			this.headersWritten = true;
 		}
 	}
