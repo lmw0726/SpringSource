@@ -16,34 +16,37 @@
 
 package org.springframework.http.client;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StreamUtils;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * {@link ClientHttpResponse} implementation based on
- * Apache HttpComponents HttpClient.
+ * 基于 Apache HttpComponents HttpClient 的 {@link ClientHttpResponse} 实现。
  *
- * <p>Created via the {@link HttpComponentsClientHttpRequest}.
+ * <p>通过 {@link HttpComponentsClientHttpRequest} 创建。
  *
  * @author Oleg Kalnichevski
  * @author Arjen Poutsma
- * @since 3.1
  * @see HttpComponentsClientHttpRequest#execute()
+ * @since 3.1
  */
 final class HttpComponentsClientHttpResponse extends AbstractClientHttpResponse {
-
+	/**
+	 * Http响应
+	 */
 	private final HttpResponse httpResponse;
 
+	/**
+	 * Http头部
+	 */
 	@Nullable
 	private HttpHeaders headers;
 
@@ -65,37 +68,47 @@ final class HttpComponentsClientHttpResponse extends AbstractClientHttpResponse 
 
 	@Override
 	public HttpHeaders getHeaders() {
+		// 如果当前对象的头部信息为空
 		if (this.headers == null) {
+			// 创建一个新的HttpHeaders对象
 			this.headers = new HttpHeaders();
+
+			// 遍历HTTP响应对象的所有头部信息
 			for (Header header : this.httpResponse.getAllHeaders()) {
+				// 将每个头部信息的名称和值添加到新创建的HttpHeaders对象中
 				this.headers.add(header.getName(), header.getValue());
 			}
 		}
+
+		// 返回头部信息对象
 		return this.headers;
 	}
 
 	@Override
 	public InputStream getBody() throws IOException {
+		// 获取HTTP响应的实体对象
 		HttpEntity entity = this.httpResponse.getEntity();
+
+		// 如果实体对象不为空，则返回实体内容流；
+		// 否则返回一个空输入流
 		return (entity != null ? entity.getContent() : StreamUtils.emptyInput());
 	}
 
 	@Override
 	public void close() {
-		// Release underlying connection back to the connection manager
+		// 释放底层连接到连接管理器
 		try {
 			try {
-				// Attempt to keep connection alive by consuming its remaining content
+				// 尝试通过消耗剩余内容来保持连接活动
 				EntityUtils.consume(this.httpResponse.getEntity());
-			}
-			finally {
+			} finally {
+				// 如果HTTP响应实现了Closeable接口，关闭它
 				if (this.httpResponse instanceof Closeable) {
 					((Closeable) this.httpResponse).close();
 				}
 			}
-		}
-		catch (IOException ex) {
-			// Ignore exception on close...
+		} catch (IOException ex) {
+			// 关闭时出现IO异常，忽略该异常...
 		}
 	}
 

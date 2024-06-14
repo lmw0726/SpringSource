@@ -16,32 +16,47 @@
 
 package org.springframework.mock.http;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.util.Assert;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * Mock implementation of {@link HttpInputMessage}.
+ * {@link HttpInputMessage} 的模拟实现。
  *
  * @author Rossen Stoyanchev
  * @since 3.2
  */
 public class MockHttpInputMessage implements HttpInputMessage {
-
+	/**
+	 * Http头部
+	 */
 	private final HttpHeaders headers = new HttpHeaders();
 
+	/**
+	 * 主体输入流
+	 */
 	private final InputStream body;
 
 
+	/**
+	 * 使用字节数组内容创建 {@link MockHttpInputMessage}。
+	 *
+	 * @param content 字节数组内容，不能为空
+	 */
 	public MockHttpInputMessage(byte[] content) {
 		Assert.notNull(content, "Byte array must not be null");
 		this.body = new ByteArrayInputStream(content);
 	}
 
+	/**
+	 * 使用输入流创建 {@link MockHttpInputMessage}。
+	 *
+	 * @param body 输入流，不能为空
+	 */
 	public MockHttpInputMessage(InputStream body) {
 		Assert.notNull(body, "InputStream must not be null");
 		this.body = body;

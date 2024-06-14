@@ -20,11 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Represents an HTTP input message, consisting of {@linkplain #getHeaders() headers}
- * and a readable {@linkplain #getBody() body}.
+ * 表示一个HTTP输入消息，由 {@linkplain #getHeaders() headers} 和可读的 {@linkplain #getBody() body} 组成。
  *
- * <p>Typically implemented by an HTTP request handle on the server side,
- * or an HTTP response handle on the client side.
+ * <p>通常由服务器端的HTTP请求处理程序或客户端的HTTP响应处理程序实现。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -32,9 +30,10 @@ import java.io.InputStream;
 public interface HttpInputMessage extends HttpMessage {
 
 	/**
-	 * Return the body of the message as an input stream.
-	 * @return the input stream body (never {@code null})
-	 * @throws IOException in case of I/O errors
+	 * 以输入流的形式返回消息体。
+	 *
+	 * @return 输入流形式的消息体（永不为 {@code null}）
+	 * @throws IOException 在I/O错误的情况下
 	 */
 	InputStream getBody() throws IOException;
 

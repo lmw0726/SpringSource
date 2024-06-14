@@ -16,26 +16,31 @@
 
 package org.springframework.http.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StreamUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * Simple implementation of {@link ClientHttpResponse} that reads the response's body
- * into memory, thus allowing for multiple invocations of {@link #getBody()}.
+ * 简单的 {@link ClientHttpResponse} 实现，将响应的主体读取到内存中，
+ * 从而允许多次调用 {@link #getBody()}。
  *
  * @author Arjen Poutsma
  * @since 3.1
  */
 final class BufferingClientHttpResponseWrapper implements ClientHttpResponse {
-
+	/**
+	 * 客户端Http响应
+	 */
 	private final ClientHttpResponse response;
 
+	/**
+	 * 响应主体字节数组
+	 */
 	@Nullable
 	private byte[] body;
 
@@ -67,9 +72,13 @@ final class BufferingClientHttpResponseWrapper implements ClientHttpResponse {
 
 	@Override
 	public InputStream getBody() throws IOException {
+		// 如果当前对象的body属性为空
 		if (this.body == null) {
+			// 将响应体的内容复制为字节数组，并赋值给body属性
 			this.body = StreamUtils.copyToByteArray(this.response.getBody());
 		}
+
+		// 返回一个包含body字节数组的新ByteArrayInputStream对象
 		return new ByteArrayInputStream(this.body);
 	}
 

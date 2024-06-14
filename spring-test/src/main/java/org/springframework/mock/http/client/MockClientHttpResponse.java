@@ -16,27 +16,29 @@
 
 package org.springframework.mock.http.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.http.MockHttpInputMessage;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * Mock implementation of {@link ClientHttpResponse}.
+ * {@link ClientHttpResponse} 的模拟实现。
  *
  * @author Rossen Stoyanchev
  * @since 3.2
  */
 public class MockClientHttpResponse extends MockHttpInputMessage implements ClientHttpResponse {
-
+	/**
+	 * 状态码
+	 */
 	private final int statusCode;
 
 
 	/**
-	 * Constructor with response body as a byte array.
+	 * 使用字节数组作为响应主体的构造函数。
 	 */
 	public MockClientHttpResponse(byte[] body, HttpStatus statusCode) {
 		super(body);
@@ -45,8 +47,8 @@ public class MockClientHttpResponse extends MockHttpInputMessage implements Clie
 	}
 
 	/**
-	 * Variant of {@link #MockClientHttpResponse(byte[], HttpStatus)} with a
-	 * custom HTTP status code.
+	 * {@link #MockClientHttpResponse(byte[], HttpStatus)} 的变体，带有自定义的 HTTP 状态码。
+	 *
 	 * @since 5.3.17
 	 */
 	public MockClientHttpResponse(byte[] body, int statusCode) {
@@ -55,7 +57,7 @@ public class MockClientHttpResponse extends MockHttpInputMessage implements Clie
 	}
 
 	/**
-	 * Constructor with response body as InputStream.
+	 * 使用 InputStream 作为响应主体的构造函数。
 	 */
 	public MockClientHttpResponse(InputStream body, HttpStatus statusCode) {
 		super(body);
@@ -64,8 +66,8 @@ public class MockClientHttpResponse extends MockHttpInputMessage implements Clie
 	}
 
 	/**
-	 * Variant of {@link #MockClientHttpResponse(InputStream, HttpStatus)} with a
-	 * custom HTTP status code.
+	 * {@link #MockClientHttpResponse(InputStream, HttpStatus)} 的变体，带有自定义的 HTTP 状态码。
+	 *
 	 * @since 5.3.17
 	 */
 	public MockClientHttpResponse(InputStream body, int statusCode) {
@@ -86,7 +88,11 @@ public class MockClientHttpResponse extends MockHttpInputMessage implements Clie
 
 	@Override
 	public String getStatusText() {
+		// 根据当前对象的状态码解析为HttpStatus对象
 		HttpStatus status = HttpStatus.resolve(this.statusCode);
+
+		// 如果解析出的HttpStatus对象不为空，则返回其对应的原因短语；
+		// 否则返回空字符串
 		return (status != null ? status.getReasonPhrase() : "");
 	}
 
@@ -94,9 +100,8 @@ public class MockClientHttpResponse extends MockHttpInputMessage implements Clie
 	public void close() {
 		try {
 			getBody().close();
-		}
-		catch (IOException ex) {
-			// ignore
+		} catch (IOException ex) {
+			// 忽略
 		}
 	}
 

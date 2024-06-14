@@ -16,19 +16,19 @@
 
 package org.springframework.http.client;
 
-import java.io.Closeable;
-import java.io.IOException;
-
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
- * Represents a client-side HTTP response.
+ * 表示客户端 HTTP 响应。
  *
- * <p>Obtained via an invocation of {@link ClientHttpRequest#execute()}.
+ * <p>通过调用 {@link ClientHttpRequest#execute()} 获得。
  *
- * <p>A {@code ClientHttpResponse} must be {@linkplain #close() closed},
- * typically in a {@code finally} block.
+ * <p>{@code ClientHttpResponse} 必须被 {@linkplain #close() 关闭}，
+ * 通常在 {@code finally} 块中进行。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -36,37 +36,38 @@ import org.springframework.http.HttpStatus;
 public interface ClientHttpResponse extends HttpInputMessage, Closeable {
 
 	/**
-	 * Get the HTTP status code as an {@link HttpStatus} enum value.
-	 * <p>For status codes not supported by {@code HttpStatus}, use
-	 * {@link #getRawStatusCode()} instead.
-	 * @return the HTTP status as an HttpStatus enum value (never {@code null})
-	 * @throws IOException in case of I/O errors
-	 * @throws IllegalArgumentException in case of an unknown HTTP status code
-	 * @since #getRawStatusCode()
+	 * 获取 HTTP 状态码作为 {@link HttpStatus} 枚举值。
+	 * <p>对于 {@code HttpStatus} 不支持的状态码，请使用
+	 * {@link #getRawStatusCode()}。
+	 *
+	 * @return 作为 HttpStatus 枚举值的 HTTP 状态码（永不为 {@code null}）
+	 * @throws IOException              如果发生 I/O 错误
+	 * @throws IllegalArgumentException 如果是未知的 HTTP 状态码
 	 * @see HttpStatus#valueOf(int)
 	 */
 	HttpStatus getStatusCode() throws IOException;
 
 	/**
-	 * Get the HTTP status code (potentially non-standard and not
-	 * resolvable through the {@link HttpStatus} enum) as an integer.
-	 * @return the HTTP status as an integer value
-	 * @throws IOException in case of I/O errors
-	 * @since 3.1.1
+	 * 以整数形式获取 HTTP 状态码（可能是非标准且不能通过 {@link HttpStatus} 枚举解析）。
+	 *
+	 * @return 整数形式的 HTTP 状态码
+	 * @throws IOException 如果发生 I/O 错误
 	 * @see #getStatusCode()
 	 * @see HttpStatus#resolve(int)
+	 * @since 3.1.1
 	 */
 	int getRawStatusCode() throws IOException;
 
 	/**
-	 * Get the HTTP status text of the response.
-	 * @return the HTTP status text
-	 * @throws IOException in case of I/O errors
+	 * 获取响应的 HTTP 状态文本。
+	 *
+	 * @return HTTP 状态文本
+	 * @throws IOException 如果发生 I/O 错误
 	 */
 	String getStatusText() throws IOException;
 
 	/**
-	 * Close this response, freeing any resources created.
+	 * 关闭此响应，释放所有创建的资源。
 	 */
 	@Override
 	void close();

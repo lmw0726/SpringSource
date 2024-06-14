@@ -16,12 +16,12 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-
 import org.springframework.http.HttpStatus;
 
+import java.io.IOException;
+
 /**
- * Abstract base for {@link ClientHttpResponse}.
+ * {@link ClientHttpResponse} 的抽象基类。
  *
  * @author Arjen Poutsma
  * @since 3.1.1

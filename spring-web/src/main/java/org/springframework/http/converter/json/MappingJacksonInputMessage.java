@@ -16,26 +16,33 @@
 
 package org.springframework.http.converter.json;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * {@link HttpInputMessage} that can eventually stores a Jackson view that will be used
- * to deserialize the message.
+ * 可以最终存储用于反序列化消息的 Jackson 视图的 {@link HttpInputMessage} 实现。
  *
  * @author Sebastien Deleuze
  * @since 4.2
  */
 public class MappingJacksonInputMessage implements HttpInputMessage {
-
+	/**
+	 * 请求体输入流
+	 */
 	private final InputStream body;
 
+	/**
+	 * 请求头
+	 */
 	private final HttpHeaders headers;
 
+	/**
+	 * 反序列化视图类
+	 */
 	@Nullable
 	private Class<?> deserializationView;
 
