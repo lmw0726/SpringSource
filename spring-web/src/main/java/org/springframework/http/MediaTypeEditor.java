@@ -16,34 +16,39 @@
 
 package org.springframework.http;
 
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditorSupport;
+
 /**
- * {@link java.beans.PropertyEditor Editor} for {@link MediaType}
- * descriptors, to automatically convert {@code String} specifications
- * (e.g. {@code "text/html"}) to {@code MediaType} properties.
+ * {@link java.beans.PropertyEditor PropertyEditor}，用于 {@link MediaType}
+ * 描述符，自动将 {@code String} 规范（例如 {@code "text/html"}）转换为 {@code MediaType} 属性。
  *
  * @author Juergen Hoeller
- * @since 3.0
  * @see MediaType
+ * @since 3.0
  */
 public class MediaTypeEditor extends PropertyEditorSupport {
 
 	@Override
 	public void setAsText(String text) {
+		// 如果文本内容不为空，或不是空白字符串
 		if (StringUtils.hasText(text)) {
+			// 解析文本内容为MediaType，并设置为属性值
 			setValue(MediaType.parseMediaType(text));
-		}
-		else {
+		} else {
+			// 如果文本内容为空，或空白字符串，则设置属性值为null
 			setValue(null);
 		}
 	}
 
 	@Override
 	public String getAsText() {
+		// 获取存储在属性中的MediaType对象
 		MediaType mediaType = (MediaType) getValue();
+
+		// 如果MediaType对象不为null，则返回其字符串表示形式；
+		// 否则返回空字符串
 		return (mediaType != null ? mediaType.toString() : "");
 	}
 
