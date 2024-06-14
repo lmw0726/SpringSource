@@ -22,47 +22,49 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.core.log.LogDelegateFactory;
 
 /**
- * Holds the shared logger named "org.springframework.web.HttpLogging" for HTTP
- * related logging when "org.springframework.http" is not enabled but
- * "org.springframework.web" is.
+ * 保存名为 "org.springframework.web.HttpLogging" 的共享日志器，用于在
+ * "org.springframework.http" 未启用但 "org.springframework.web" 启用时进行HTTP相关日志记录。
  *
- * <p>That means "org.springframework.web" enables all web logging including
- * from lower level packages such as "org.springframework.http" and modules
- * such as codecs from {@literal "spring-core"} when those are wrapped with
- * {@link org.springframework.http.codec.EncoderHttpMessageWriter EncoderHttpMessageWriter} or
- * {@link org.springframework.http.codec.DecoderHttpMessageReader DecoderHttpMessageReader}.
+ * <p>这意味着 "org.springframework.web" 启用所有Web日志记录，包括来自
+ * 诸如 "org.springframework.http" 和 "spring-core" 中被
+ * {@link org.springframework.http.codec.EncoderHttpMessageWriter EncoderHttpMessageWriter}
+ * 或 {@link org.springframework.http.codec.DecoderHttpMessageReader DecoderHttpMessageReader}
+ * 包装的编解码器模块等较低级别包的日志记录。
  *
- * <p>To see logging from the primary class loggers simply enable logging for
- * "org.springframework.http" and "org.springframework.codec".
+ * <p>要查看来自主要类日志记录器的日志，只需启用 "org.springframework.http" 和 "org.springframework.codec" 的日志记录。
  *
  * @author Rossen Stoyanchev
- * @since 5.1
  * @see LogDelegateFactory
+ * @since 5.1
  */
 public abstract class HttpLogging {
 
+	/**
+	 * 回退日志记录器
+	 */
 	private static final Log fallbackLogger =
 			LogFactory.getLog("org.springframework.web." + HttpLogging.class.getSimpleName());
 
 
 	/**
-	 * Create a primary logger for the given class and wrap it with a composite
-	 * that delegates to it or to the fallback logger
-	 * "org.springframework.web.HttpLogging", if the primary is not enabled.
-	 * @param primaryLoggerClass the class for the name of the primary logger
-	 * @return the resulting composite logger
+	 * 为给定类创建一个主日志记录器，并将其包装成一个复合日志记录器，
+	 * 该复合日志记录器委托给它或后备日志记录器 "org.springframework.web.HttpLogging"，如果主日志记录器未启用。
+	 *
+	 * @param primaryLoggerClass 主日志记录器的类
+	 * @return 生成的复合日志记录器
 	 */
 	public static Log forLogName(Class<?> primaryLoggerClass) {
+		// 获取主要的日志记录器
 		Log primaryLogger = LogFactory.getLog(primaryLoggerClass);
 		return forLog(primaryLogger);
 	}
 
 	/**
-	 * Wrap the given primary logger with a composite logger that delegates to
-	 * it or to the fallback logger "org.springframework.web.HttpLogging",
-	 * if the primary is not enabled.
-	 * @param primaryLogger the primary logger to use
-	 * @return the resulting composite logger
+	 * 将给定的主日志记录器包装成一个复合日志记录器，该复合日志记录器委托给它或
+	 * 后备日志记录器 "org.springframework.web.HttpLogging"，如果主日志记录器未启用。
+	 *
+	 * @param primaryLogger 主日志记录器
+	 * @return 生成的复合日志记录器
 	 */
 	public static Log forLog(Log primaryLogger) {
 		return LogDelegateFactory.getCompositeLog(primaryLogger, fallbackLogger);
