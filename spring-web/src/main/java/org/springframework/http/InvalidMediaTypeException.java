@@ -19,8 +19,7 @@ package org.springframework.http;
 import org.springframework.util.InvalidMimeTypeException;
 
 /**
- * Exception thrown from {@link MediaType#parseMediaType(String)} in case of
- * encountering an invalid media type specification String.
+ * 在 {@link MediaType#parseMediaType(String)} 中遇到无效媒体类型规范字符串时抛出的异常。
  *
  * @author Juergen Hoeller
  * @since 3.2.2
@@ -28,13 +27,17 @@ import org.springframework.util.InvalidMimeTypeException;
 @SuppressWarnings("serial")
 public class InvalidMediaTypeException extends IllegalArgumentException {
 
+	/**
+	 * 引起异常的媒体类型字符串。
+	 */
 	private final String mediaType;
 
 
 	/**
-	 * Create a new InvalidMediaTypeException for the given media type.
-	 * @param mediaType the offending media type
-	 * @param message a detail message indicating the invalid part
+	 * 使用给定的媒体类型和详细消息创建一个新的 InvalidMediaTypeException。
+	 *
+	 * @param mediaType 引起异常的媒体类型
+	 * @param message   描述无效部分的详细消息
 	 */
 	public InvalidMediaTypeException(String mediaType, String message) {
 		super("Invalid media type \"" + mediaType + "\": " + message);
@@ -42,7 +45,9 @@ public class InvalidMediaTypeException extends IllegalArgumentException {
 	}
 
 	/**
-	 * Constructor that allows wrapping {@link InvalidMimeTypeException}.
+	 * 允许包装 {@link InvalidMimeTypeException} 的构造方法。
+	 *
+	 * @param ex {@link InvalidMimeTypeException} 异常对象
 	 */
 	InvalidMediaTypeException(InvalidMimeTypeException ex) {
 		super(ex.getMessage(), ex);
@@ -51,7 +56,9 @@ public class InvalidMediaTypeException extends IllegalArgumentException {
 
 
 	/**
-	 * Return the offending media type.
+	 * 返回引起异常的媒体类型。
+	 *
+	 * @return 引起异常的媒体类型字符串
 	 */
 	public String getMediaType() {
 		return this.mediaType;
