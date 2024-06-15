@@ -36,7 +36,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 /**
- * Adapt {@link ServerHttpResponse} to the Servlet {@link HttpServletResponse}.
+ * 使 {@link ServerHttpResponse} 适配Servlet {@link HttpServletResponse}。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
