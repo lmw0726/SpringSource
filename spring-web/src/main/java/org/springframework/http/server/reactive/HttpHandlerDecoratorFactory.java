@@ -19,7 +19,7 @@ package org.springframework.http.server.reactive;
 import java.util.function.Function;
 
 /**
- * Contract for applying a decorator to an {@code HttpHandler}.
+ * 用于对 {@code HttpHandler} 应用装饰器的契约。
  *
  * @author Christophe Maillard
  * @since 5.3.4
