@@ -16,16 +16,13 @@
 
 package org.springframework.http.server;
 
-import java.net.URI;
-
 import org.springframework.lang.Nullable;
 
+import java.net.URI;
+
 /**
- * Specialization of {@link PathContainer} that sub-divides the path into a
- * {@link #contextPath()} and the remaining {@link #pathWithinApplication()}.
- * The lattery is typically used for request mapping within the application
- * while the former is useful when preparing external links that point back to
- * the application.
+ * {@link PathContainer} 的特化版本，将路径分为 {@link #contextPath()} 和剩余的 {@link #pathWithinApplication()}。
+ * 后者通常用于应用程序内的请求映射，而前者在准备指向应用程序的外部链接时很有用。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -33,46 +30,46 @@ import org.springframework.lang.Nullable;
 public interface RequestPath extends PathContainer {
 
 	/**
-	 * Returns the portion of the URL path that represents the application.
-	 * The context path is always at the beginning of the path and starts but
-	 * does not end with "/". It is shared for URLs of the same application.
-	 * <p>The context path may come from the underlying runtime API such as
-	 * when deploying as a WAR to a Servlet container or it may be assigned in
-	 * a WebFlux application through the use of
-	 * {@link org.springframework.http.server.reactive.ContextPathCompositeHandler
-	 * ContextPathCompositeHandler}.
+	 * 返回表示应用程序的URL路径部分。上下文路径始终位于路径的开头，并以 "/" 开头但不以 "/" 结尾。
+	 * 它在相同应用程序的URL中是共享的。
+	 * <p>上下文路径可能来自底层的运行时API，例如在将WAR部署到Servlet容器时，或者可以通过
+	 * {@link org.springframework.http.server.reactive.ContextPathCompositeHandler ContextPathCompositeHandler}
+	 * 在WebFlux应用程序中分配。</p>
 	 */
 	PathContainer contextPath();
 
 	/**
-	 * The portion of the request path after the context path which is typically
-	 * used for request mapping within the application .
+	 * 上下文路径之后的请求路径部分，通常用于应用程序内的请求映射。
 	 */
 	PathContainer pathWithinApplication();
 
 	/**
-	 * Return a new {@code RequestPath} instance with a modified context path.
-	 * The new context path must match 0 or more path segments at the start.
-	 * @param contextPath the new context path
-	 * @return a new {@code RequestPath} instance
+	 * 返回具有修改上下文路径的新 {@code RequestPath} 实例。
+	 * 新的上下文路径必须匹配开始处的0个或更多个路径段。
+	 *
+	 * @param contextPath 新的上下文路径
+	 * @return 新的 {@code RequestPath} 实例
 	 */
 	RequestPath modifyContextPath(String contextPath);
 
 
 	/**
-	 * Parse the URI for a request into a {@code RequestPath}.
-	 * @param uri the URI of the request
-	 * @param contextPath the contextPath portion of the URI path
+	 * 将请求的URI解析为 {@code RequestPath} 实例。
+	 *
+	 * @param uri         请求的URI
+	 * @param contextPath URI路径的上下文路径部分
+	 * @return 解析后的 {@code RequestPath} 实例
 	 */
 	static RequestPath parse(URI uri, @Nullable String contextPath) {
 		return parse(uri.getRawPath(), contextPath);
 	}
 
 	/**
-	 * Variant of {@link #parse(URI, String)} with the encoded
-	 * {@link URI#getRawPath() raw path}.
-	 * @param rawPath the path
-	 * @param contextPath the contextPath portion of the URI path
+	 * 使用编码的 {@link URI#getRawPath() raw path} 的变体解析。
+	 *
+	 * @param rawPath     路径
+	 * @param contextPath URI路径的上下文路径部分
+	 * @return 解析后的 {@code RequestPath} 实例
 	 * @since 5.3
 	 */
 	static RequestPath parse(String rawPath, @Nullable String contextPath) {
