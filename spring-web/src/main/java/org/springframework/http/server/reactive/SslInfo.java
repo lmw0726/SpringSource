@@ -16,12 +16,12 @@
 
 package org.springframework.http.server.reactive;
 
-import java.security.cert.X509Certificate;
-
 import org.springframework.lang.Nullable;
 
+import java.security.cert.X509Certificate;
+
 /**
- * A holder for SSL session information.
+ * SSL会话信息的持有者。
  *
  * @author Rossen Stoyanchev
  * @since 5.0.2
@@ -29,13 +29,17 @@ import org.springframework.lang.Nullable;
 public interface SslInfo {
 
 	/**
-	 * Return the SSL session id, if any.
+	 * 返回SSL会话的ID，如果有的话。
+	 *
+	 * @return SSL会话的ID，如果存在则返回；否则返回null。
 	 */
 	@Nullable
 	String getSessionId();
 
 	/**
-	 * Return SSL certificates associated with the request, if any.
+	 * 返回与请求关联的SSL证书，如果有的话。
+	 *
+	 * @return 与请求关联的SSL证书数组，如果存在则返回；否则返回null。
 	 */
 	@Nullable
 	X509Certificate[] getPeerCertificates();
