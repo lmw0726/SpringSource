@@ -19,34 +19,29 @@ package org.springframework.http.server.reactive;
 import reactor.core.publisher.Mono;
 
 /**
- * Lowest level contract for reactive HTTP request handling that serves as a
- * common denominator across different runtimes.
+ * 用作不同运行时环境中响应式HTTP请求处理的最低级契约。
  *
- * <p>Higher-level, but still generic, building blocks for applications such as
- * {@code WebFilter}, {@code WebSession}, {@code ServerWebExchange}, and others
- * are available in the {@code org.springframework.web.server} package.
+ * <p>应用程序中更高级别但仍通用的构建块，例如 {@code WebFilter}、{@code WebSession}、
+ * {@code ServerWebExchange} 等，位于 {@code org.springframework.web.server} 包中。
  *
- * <p>Application level programming models such as annotated controllers and
- * functional handlers are available in the {@code spring-webflux} module.
+ * <p>应用程序级别的编程模型，例如注解控制器和函数式处理程序，位于 {@code spring-webflux} 模块中。
  *
- * <p>Typically an {@link HttpHandler} represents an entire application with
- * higher-level programming models bridged via
- * {@link org.springframework.web.server.adapter.WebHttpHandlerBuilder}.
- * Multiple applications at unique context paths can be plugged in with the
- * help of the {@link ContextPathCompositeHandler}.
+ * <p>通常，一个 {@link HttpHandler} 表示一个完整的应用程序，通过 {@link org.springframework.web.server.adapter.WebHttpHandlerBuilder}
+ * 桥接更高级别的编程模型。多个应用程序可以通过 {@link ContextPathCompositeHandler} 在唯一的上下文路径中进行插入。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see ContextPathCompositeHandler
+ * @since 5.0
  */
 public interface HttpHandler {
 
 	/**
-	 * Handle the given request and write to the response.
-	 * @param request current request
-	 * @param response current response
-	 * @return indicates completion of request handling
+	 * 处理给定的请求并写入响应。
+	 *
+	 * @param request  当前请求
+	 * @param response 当前响应
+	 * @return 表示请求处理完成的 Mono
 	 */
 	Mono<Void> handle(ServerHttpRequest request, ServerHttpResponse response);
 
