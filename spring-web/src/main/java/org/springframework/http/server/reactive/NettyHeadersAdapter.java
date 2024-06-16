@@ -16,30 +16,26 @@
 
 package org.springframework.http.server.reactive;
 
-import java.util.AbstractSet;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import io.netty.handler.codec.http.HttpHeaders;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
- * {@code MultiValueMap} implementation for wrapping Netty HTTP headers.
+ * 用于包装Netty HTTP头的 {@code MultiValueMap} 实现。
  *
- * <p>There is a duplicate of this class in the client package!
+ * <p>客户端包中也存在此类的副本！
  *
  * @author Brian Clozel
  * @since 5.1.1
  */
 class NettyHeadersAdapter implements MultiValueMap<String, String> {
-
+	/**
+	 * Http请求头
+	 */
 	private final HttpHeaders headers;
 
 
@@ -56,7 +52,9 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public void add(String key, @Nullable String value) {
+		// 如果值不为null
 		if (value != null) {
+			// 将键值对添加到 Http头部 中
 			this.headers.add(key, value);
 		}
 	}
@@ -73,7 +71,9 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public void set(String key, @Nullable String value) {
+		// 如果值不为null
 		if (value != null) {
+			// 将键值对设置到 Http头部 中
 			this.headers.set(key, value);
 		}
 	}
@@ -85,13 +85,20 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public Map<String, String> toSingleValueMap() {
+		// 创建一个新的 LinkedHashMap 对象 单值映射
 		Map<String, String> singleValueMap = CollectionUtils.newLinkedHashMap(this.headers.size());
+
+		// 遍历 Http头部 中的每个条目
 		this.headers.entries()
 				.forEach(entry -> {
+					// 如果 单值映射 中不包含当前条目的键
 					if (!singleValueMap.containsKey(entry.getKey())) {
+						// 则将该条目的键值对添加到 单值映射 中
 						singleValueMap.put(entry.getKey(), entry.getValue());
 					}
 				});
+
+		// 返回最终的 单值映射
 		return singleValueMap;
 	}
 
@@ -112,8 +119,11 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public boolean containsValue(Object value) {
+		// 判断 值 是否为 String 类型
 		return (value instanceof String &&
+				// 获取 Http头部 中所有条目的流
 				this.headers.entries().stream()
+						// 判断流中是否存在与 值 相等的值
 						.anyMatch(entry -> value.equals(entry.getValue())));
 	}
 
@@ -121,27 +131,42 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 	@Nullable
 	public List<String> get(Object key) {
 		if (containsKey(key)) {
+			// 如果含有该键，则获取该键对应的头部值列表
 			return this.headers.getAll((String) key);
 		}
+		// 否则返回 null
 		return null;
 	}
 
 	@Nullable
 	@Override
 	public List<String> put(String key, @Nullable List<String> value) {
+		// 获取指定键 键 的所有旧值
 		List<String> previousValues = this.headers.getAll(key);
+
+		// 给 指定的键 设置新的值
 		this.headers.set(key, value);
+
+		// 返回所有旧值的列表
 		return previousValues;
 	}
 
 	@Nullable
 	@Override
 	public List<String> remove(Object key) {
+		// 如果 键 是 String 类型的实例
 		if (key instanceof String) {
+			// 获取指定键 键 的所有旧值，并存储在 以前的值列表 中
 			List<String> previousValues = this.headers.getAll((String) key);
+
+			// 移除指定键
 			this.headers.remove((String) key);
+
+			// 返回 以前的值 列表
 			return previousValues;
 		}
+
+		// 如果 键 不是 String 类型的实例，则返回 null
 		return null;
 	}
 
@@ -189,7 +214,9 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private class EntryIterator implements Iterator<Entry<String, List<String>>> {
-
+		/**
+		 * 名称迭代器
+		 */
 		private Iterator<String> names = headers.names().iterator();
 
 		@Override
@@ -206,6 +233,9 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 	private class HeaderEntry implements Entry<String, List<String>> {
 
+		/**
+		 * 键
+		 */
 		private final String key;
 
 		HeaderEntry(String key) {
@@ -224,8 +254,13 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public List<String> setValue(List<String> value) {
+			// 获取指定 键 的所有旧值，并存储在 以前的值列表 中
 			List<String> previousValues = headers.getAll(this.key);
+
+			// 给 指定的键 设置新的值
 			headers.set(this.key, value);
+
+			// 返回以前的值列表
 			return previousValues;
 		}
 	}
@@ -245,8 +280,14 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 	private final class HeaderNamesIterator implements Iterator<String> {
 
+		/**
+		 * 迭代器
+		 */
 		private final Iterator<String> iterator;
 
+		/**
+		 * 当前名称
+		 */
 		@Nullable
 		private String currentName;
 
@@ -267,12 +308,19 @@ class NettyHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public void remove() {
+			// 如果 当前名称 为 null
 			if (this.currentName == null) {
+				// 抛出 IllegalStateException 异常，指示迭代器中没有当前的头部
 				throw new IllegalStateException("No current Header in iterator");
 			}
+
+			// 如果 Http头部 中不包含当前名称
 			if (!headers.contains(this.currentName)) {
+				// 抛出 IllegalStateException 异常，指示当前名称的头部不存在
 				throw new IllegalStateException("Header not present: " + this.currentName);
 			}
+
+			// 移除 Http头部 中的当前名称
 			headers.remove(this.currentName);
 		}
 	}
