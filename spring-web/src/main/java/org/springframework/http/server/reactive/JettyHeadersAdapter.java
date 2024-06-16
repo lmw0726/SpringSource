@@ -16,33 +16,29 @@
 
 package org.springframework.http.server.reactive;
 
-import java.util.AbstractSet;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpFields;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
- * {@code MultiValueMap} implementation for wrapping Jetty HTTP headers.
+ * 用于包装Jetty HTTP头的 {@code MultiValueMap} 实现。
  *
- * <p>There is a duplicate of this class in the client package!
+ * <p>注意：客户端包中存在此类的副本！
  *
  * @author Brian Clozel
  * @since 5.1.1
  */
 class JettyHeadersAdapter implements MultiValueMap<String, String> {
 
+	/**
+	 * 存放请求头的Http字段
+	 */
 	private final HttpFields headers;
 
 
@@ -83,13 +79,22 @@ class JettyHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public Map<String, String> toSingleValueMap() {
+		// 创建一个 LinkedHashMap，用于存储头部字段名和对应的唯一值
 		Map<String, String> singleValueMap = CollectionUtils.newLinkedHashMap(this.headers.size());
+
+		// 获取请求头集合的迭代器
 		Iterator<HttpField> iterator = this.headers.iterator();
+
+		// 使用迭代器遍历 请求头集合 中的每个 Http字段 对象
 		iterator.forEachRemaining(field -> {
+			// 如果 唯一值的映射 中不包含当前字段名
 			if (!singleValueMap.containsKey(field.getName())) {
+				// 将字段名和值添加到 唯一值的映射 中
 				singleValueMap.put(field.getName(), field.getValue());
 			}
 		});
+
+		// 返回包含唯一值的映射
 		return singleValueMap;
 	}
 
@@ -118,16 +123,23 @@ class JettyHeadersAdapter implements MultiValueMap<String, String> {
 	@Override
 	public List<String> get(Object key) {
 		if (containsKey(key)) {
+			// 如果 请求头 中包含指定的 键，则返回与该键关联的所有值的列表
 			return this.headers.getValuesList((String) key);
 		}
+		// 如果 请求头 中不包含指定的 键，则返回null
 		return null;
 	}
 
 	@Nullable
 	@Override
 	public List<String> put(String key, List<String> value) {
+		// 获取指定键在 请求头 中的旧值列表
 		List<String> oldValues = get(key);
+
+		// 将指定键的值更新为新的值
 		this.headers.put(key, value);
+
+		// 返回旧值列表
 		return oldValues;
 	}
 
@@ -135,11 +147,21 @@ class JettyHeadersAdapter implements MultiValueMap<String, String> {
 	@Override
 	public List<String> remove(Object key) {
 		if (key instanceof String) {
+			// 如果键是String类型的实例
+
+			// 获取指定键在请求头中的旧值列表
 			List<String> oldValues = get(key);
+
+			// 移除请求头中指定键对应的条目
 			this.headers.remove((String) key);
+
+			// 返回获取到的旧值列表
 			return oldValues;
 		}
+
+		// 如果 键 不是String类型的实例，则返回null
 		return null;
+
 	}
 
 	@Override
@@ -186,7 +208,9 @@ class JettyHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private class EntryIterator implements Iterator<Entry<String, List<String>>> {
-
+		/**
+		 * Http字段名称枚举
+		 */
 		private final Enumeration<String> names = headers.getFieldNames();
 
 		@Override
@@ -202,7 +226,9 @@ class JettyHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private class HeaderEntry implements Entry<String, List<String>> {
-
+		/**
+		 * 键
+		 */
 		private final String key;
 
 		HeaderEntry(String key) {
@@ -221,8 +247,11 @@ class JettyHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public List<String> setValue(List<String> value) {
+			// 获取指定键的旧值列表
 			List<String> previousValues = headers.getValuesList(this.key);
+			// 将指定键更新为新值列表
 			headers.put(this.key, value);
+			// 返回旧值列表
 			return previousValues;
 		}
 	}
@@ -243,9 +272,14 @@ class JettyHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private final class HeaderNamesIterator implements Iterator<String> {
-
+		/**
+		 * 迭代器
+		 */
 		private final Iterator<String> iterator;
 
+		/**
+		 * 当前名称
+		 */
 		@Nullable
 		private String currentName;
 
@@ -260,18 +294,23 @@ class JettyHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public String next() {
+			// 获取下一个字符串作为当前名称
 			this.currentName = this.iterator.next();
+			// 返回当前名称
 			return this.currentName;
 		}
 
 		@Override
 		public void remove() {
 			if (this.currentName == null) {
+				// 如果当前名称为空，则抛出异常
 				throw new IllegalStateException("No current Header in iterator");
 			}
 			if (!headers.containsKey(this.currentName)) {
+				// 如果请求头不包含当前名称，则抛出异常
 				throw new IllegalStateException("Header not present: " + this.currentName);
 			}
+			// 从请求头中移除当前名称
 			headers.remove(this.currentName);
 		}
 	}
