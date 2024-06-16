@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
- * Package-private default implementation of {@link ServerHttpRequest.Builder}.
+ * {@link ServerHttpRequest.Builder} 的包私有默认实现。
  *
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
@@ -41,27 +41,53 @@ import java.util.function.Consumer;
  * @since 5.0
  */
 class DefaultServerHttpRequestBuilder implements ServerHttpRequest.Builder {
-
+	/**
+	 * URI
+	 */
 	private URI uri;
 
+	/**
+	 * 请求头部
+	 */
 	private HttpHeaders headers;
 
+	/**
+	 * HTTP方法值
+	 */
 	private String httpMethodValue;
 
+	/**
+	 * URI路径
+	 */
 	@Nullable
 	private String uriPath;
 
+	/**
+	 * 上下文路径
+	 */
 	@Nullable
 	private String contextPath;
 
+	/**
+	 * SSL信息
+	 */
 	@Nullable
 	private SslInfo sslInfo;
 
+	/**
+	 * 远程地址
+	 */
 	@Nullable
 	private InetSocketAddress remoteAddress;
 
+	/**
+	 * 请求体
+	 */
 	private Flux<DataBuffer> body;
 
+	/**
+	 * 原始请求
+	 */
 	private final ServerHttpRequest originalRequest;
 
 
@@ -135,39 +161,57 @@ class DefaultServerHttpRequestBuilder implements ServerHttpRequest.Builder {
 	}
 
 	private URI getUriToUse() {
+		// 如果 URI路径 为空，则返回原始的 URI
 		if (this.uriPath == null) {
 			return this.uri;
 		}
 
+		// 创建一个 字符串构建器 对象，用于构建新的 URI 字符串
 		StringBuilder uriBuilder = new StringBuilder();
+
+		// 如果 URI 有 scheme（例如 http, https），则添加到 字符串构建器 中
 		if (this.uri.getScheme() != null) {
 			uriBuilder.append(this.uri.getScheme()).append(':');
 		}
+
+		// 如果 URI 有用户信息或主机信息
 		if (this.uri.getRawUserInfo() != null || this.uri.getHost() != null) {
+			// 添加 "://" 前缀
 			uriBuilder.append("//");
+			// 如果 URI 有用户信息，则添加到 字符串构建器 中
 			if (this.uri.getRawUserInfo() != null) {
 				uriBuilder.append(this.uri.getRawUserInfo()).append('@');
 			}
+			// 如果 URI 有主机信息，则添加到 字符串构建器 中
 			if (this.uri.getHost() != null) {
 				uriBuilder.append(this.uri.getHost());
 			}
+			// 如果 URI 有端口信息，则添加到 字符串构建器 中
 			if (this.uri.getPort() != -1) {
 				uriBuilder.append(':').append(this.uri.getPort());
 			}
 		}
+
+		// 如果 URI路径 有内容，则添加到 字符串构建器 中
 		if (StringUtils.hasLength(this.uriPath)) {
 			uriBuilder.append(this.uriPath);
 		}
+
+		// 如果 URI 有查询参数，则添加到 字符串构建器 中
 		if (this.uri.getRawQuery() != null) {
 			uriBuilder.append('?').append(this.uri.getRawQuery());
 		}
+
+		// 如果 URI 有片段，则添加到 字符串构建器 中
 		if (this.uri.getRawFragment() != null) {
 			uriBuilder.append('#').append(this.uri.getRawFragment());
 		}
+
 		try {
+			// 尝试将构建的 URI 字符串转换为 URI 对象并返回
 			return new URI(uriBuilder.toString());
-		}
-		catch (URISyntaxException ex) {
+		} catch (URISyntaxException ex) {
+			// 如果构建的 URI 字符串无效，则抛出异常
 			throw new IllegalStateException("Invalid URI path: \"" + this.uriPath + "\"", ex);
 		}
 	}
@@ -204,8 +248,8 @@ class DefaultServerHttpRequestBuilder implements ServerHttpRequest.Builder {
 
 
 		public MutatedServerHttpRequest(URI uri, @Nullable String contextPath,
-				String methodValue, @Nullable SslInfo sslInfo, @Nullable InetSocketAddress remoteAddress,
-				HttpHeaders headers, Flux<DataBuffer> body, ServerHttpRequest originalRequest) {
+										String methodValue, @Nullable SslInfo sslInfo, @Nullable InetSocketAddress remoteAddress,
+										HttpHeaders headers, Flux<DataBuffer> body, ServerHttpRequest originalRequest) {
 
 			super(uri, contextPath, headers);
 			this.methodValue = methodValue;
