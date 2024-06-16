@@ -16,30 +16,29 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-
 import org.springframework.http.HttpRequest;
 
+import java.io.IOException;
+
 /**
- * Represents the context of a client-side HTTP request execution.
+ * 表示客户端 HTTP 请求执行的上下文。
  *
- * <p>Used to invoke the next interceptor in the interceptor chain,
- * or - if the calling interceptor is last - execute the request itself.
+ * <p>用于调用拦截器链中的下一个拦截器，或者如果调用的拦截器是最后一个，则执行请求本身。
  *
  * @author Arjen Poutsma
- * @since 3.1
  * @see ClientHttpRequestInterceptor
+ * @since 3.1
  */
 @FunctionalInterface
 public interface ClientHttpRequestExecution {
 
 	/**
-	 * Execute the request with the given request attributes and body,
-	 * and return the response.
-	 * @param request the request, containing method, URI, and headers
-	 * @param body the body of the request to execute
-	 * @return the response
-	 * @throws IOException in case of I/O errors
+	 * 使用给定的请求属性和请求体执行请求，并返回响应。
+	 *
+	 * @param request 请求对象，包含方法、URI 和头部信息
+	 * @param body    请求体的字节数组表示
+	 * @return 响应对象
+	 * @throws IOException 如果发生 I/O 错误
 	 */
 	ClientHttpResponse execute(HttpRequest request, byte[] body) throws IOException;
 

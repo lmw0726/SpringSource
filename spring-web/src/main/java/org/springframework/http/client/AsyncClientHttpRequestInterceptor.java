@@ -16,58 +16,54 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-
 import org.springframework.http.HttpRequest;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.io.IOException;
+
 /**
- * Intercepts client-side HTTP requests. Implementations of this interface can be
- * {@linkplain org.springframework.web.client.AsyncRestTemplate#setInterceptors registered}
- * with the {@link org.springframework.web.client.AsyncRestTemplate} as to modify
- * the outgoing {@link HttpRequest} and/or register to modify the incoming
- * {@link ClientHttpResponse} with help of a
- * {@link org.springframework.util.concurrent.ListenableFutureAdapter}.
+ * 拦截客户端 HTTP 请求。实现该接口的类可以注册到 {@link org.springframework.web.client.AsyncRestTemplate}，
+ * 以修改传出的 {@link HttpRequest}，并且可以注册以修改传入的 {@link ClientHttpResponse}，
+ * 使用 {@link org.springframework.util.concurrent.ListenableFutureAdapter} 进行适配。
  *
- * <p>The main entry point for interceptors is {@link #intercept}.
+ * <p>拦截器的主要入口点是 {@link #intercept} 方法。
  *
  * @author Jakub Narloch
  * @author Rossen Stoyanchev
- * @since 4.3
  * @see org.springframework.web.client.AsyncRestTemplate
  * @see org.springframework.http.client.support.InterceptingAsyncHttpAccessor
- * @deprecated as of Spring 5.0, in favor of
- * {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction}
+ * @since 4.3
+ * @deprecated 自 Spring 5.0，推荐使用 {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction}
  */
 @Deprecated
 public interface AsyncClientHttpRequestInterceptor {
 
 	/**
-	 * Intercept the given request, and return a response future. The given
-	 * {@link AsyncClientHttpRequestExecution} allows the interceptor to pass on
-	 * the request to the next entity in the chain.
-	 * <p>An implementation might follow this pattern:
+	 * 拦截给定的请求，并返回一个响应的 Future。给定的 {@link AsyncClientHttpRequestExecution} 允许拦截器
+	 * 将请求传递给链中的下一个实体。
+	 *
+	 * <p>实现可能会遵循以下模式：
 	 * <ol>
-	 * <li>Examine the {@linkplain HttpRequest request} and body</li>
-	 * <li>Optionally {@linkplain org.springframework.http.client.support.HttpRequestWrapper
-	 * wrap} the request to filter HTTP attributes.</li>
-	 * <li>Optionally modify the body of the request.</li>
-	 * <li>One of the following:
+	 * <li>检查 {@linkplain HttpRequest 请求} 和主体</li>
+	 * <li>可选择 {@linkplain org.springframework.http.client.support.HttpRequestWrapper
+	 * 包装} 请求以过滤 HTTP 属性。</li>
+	 * <li>可选择修改请求的主体。</li>
+	 * <li>以下操作之一：
 	 * <ul>
-	 * <li>execute the request through {@link ClientHttpRequestExecution}</li>
-	 * <li>don't execute the request to block the execution altogether</li>
+	 * <li>通过 {@link ClientHttpRequestExecution} 执行请求</li>
+	 * <li>不执行请求以完全阻塞执行</li>
 	 * </ul>
-	 * <li>Optionally adapt the response to filter HTTP attributes with the help of
-	 * {@link org.springframework.util.concurrent.ListenableFutureAdapter
-	 * ListenableFutureAdapter}.</li>
+	 * <li>可选择使用 {@link org.springframework.util.concurrent.ListenableFutureAdapter
+	 * ListenableFutureAdapter} 适配器来过滤响应的 HTTP 属性。</li>
 	 * </ol>
-	 * @param request the request, containing method, URI, and headers
-	 * @param body the body of the request
-	 * @param execution the request execution
-	 * @return the response future
-	 * @throws IOException in case of I/O errors
+	 *
+	 * @param request   请求，包含方法、URI 和头部信息
+	 * @param body      请求的主体
+	 * @param execution 请求执行
+	 * @return 响应的 Future
+	 * @throws IOException 如果发生 I/O 错误
 	 */
 	ListenableFuture<ClientHttpResponse> intercept(HttpRequest request, byte[] body,
-			AsyncClientHttpRequestExecution execution) throws IOException;
+												   AsyncClientHttpRequestExecution execution) throws IOException;
 
 }

@@ -16,34 +16,32 @@
 
 package org.springframework.http.client;
 
-import java.io.IOException;
-
 import org.springframework.http.HttpRequest;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.io.IOException;
+
 /**
- * Represents the context of a client-side HTTP request execution.
+ * 表示客户端 HTTP 请求执行的上下文。
  *
- * <p>Used to invoke the next interceptor in the interceptor chain, or -
- * if the calling interceptor is last - execute the request itself.
+ * <p>用于调用拦截器链中的下一个拦截器，或者如果调用的拦截器是最后一个，直接执行请求本身。
  *
  * @author Jakub Narloch
  * @author Rossen Stoyanchev
- * @since 4.3
  * @see AsyncClientHttpRequestInterceptor
- * @deprecated as of Spring 5.0, in favor of
- * {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction}
+ * @since 4.3
+ * @deprecated 自 Spring 5.0，推荐使用 {@link org.springframework.web.reactive.function.client.ExchangeFilterFunction}
  */
 @Deprecated
 public interface AsyncClientHttpRequestExecution {
 
 	/**
-	 * Resume the request execution by invoking the next interceptor in the chain
-	 * or executing the request to the remote service.
-	 * @param request the HTTP request, containing the HTTP method and headers
-	 * @param body the body of the request
-	 * @return a corresponding future handle
-	 * @throws IOException in case of I/O errors
+	 * 通过调用链中的下一个拦截器或执行请求到远程服务来恢复请求执行。
+	 *
+	 * @param request HTTP 请求，包含 HTTP 方法和头部信息
+	 * @param body    请求的主体
+	 * @return 相应的异步处理句柄
+	 * @抛出 IOException 如果发生 I/O 错误
 	 */
 	ListenableFuture<ClientHttpResponse> executeAsync(HttpRequest request, byte[] body) throws IOException;
 
