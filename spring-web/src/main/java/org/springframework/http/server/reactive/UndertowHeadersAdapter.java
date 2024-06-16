@@ -16,32 +16,27 @@
 
 package org.springframework.http.server.reactive;
 
-import java.util.AbstractSet;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.HttpString;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
- * {@code MultiValueMap} implementation for wrapping Undertow HTTP headers.
+ * {@code MultiValueMap} 实现用于包装 Undertow HTTP 头信息。
  *
  * @author Brian Clozel
  * @author Sam Brannen
  * @since 5.1.1
  */
 class UndertowHeadersAdapter implements MultiValueMap<String, String> {
-
+	/**
+	 * Undertow 头部映射
+	 */
 	private final HeaderMap headers;
 
 
@@ -83,9 +78,16 @@ class UndertowHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public Map<String, String> toSingleValueMap() {
+		// 创建一个 单值映射表 对象
 		Map<String, String> singleValueMap = CollectionUtils.newLinkedHashMap(this.headers.size());
+
+		// 遍历 头部映射
 		this.headers.forEach(values ->
-				singleValueMap.put(values.getHeaderName().toString(), values.getFirst()));
+				// 将每个 HeaderValues 对象的头部名称和第一个值放入 单值映射表
+				singleValueMap.put(values.getHeaderName().toString(), values.getFirst())
+		);
+
+		// 返回 单值映射表
 		return singleValueMap;
 	}
 
@@ -106,6 +108,7 @@ class UndertowHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public boolean containsValue(Object value) {
+		// 判断 值 是否为 字符串 类型，并且在 头部映射 的所有头部值中是否有包含该值
 		return (value instanceof String &&
 				this.headers.getHeaderNames().stream()
 						.map(this.headers::get)
@@ -115,29 +118,42 @@ class UndertowHeadersAdapter implements MultiValueMap<String, String> {
 	@Override
 	@Nullable
 	public List<String> get(Object key) {
+		// 如果 键 是 字符串 类型的实例
 		if (key instanceof String) {
+			// 返回 头部信息 中对应键 的值
 			return this.headers.get((String) key);
 		}
+
+		// 如果 键 不是 字符串 类型的实例，则返回 null
 		return null;
 	}
 
 	@Override
 	@Nullable
 	public List<String> put(String key, List<String> value) {
+		// 获取指定键  的所有旧值
 		HeaderValues previousValues = this.headers.get(key);
+
+		// 将新的值  放入 头部信息 中，对应的键通过 HttpString.tryFromString(key) 转换得到
 		this.headers.putAll(HttpString.tryFromString(key), value);
+
+		// 返回之前该键对应的所有旧值
 		return previousValues;
 	}
 
 	@Override
 	@Nullable
 	public List<String> remove(Object key) {
+		// 如果键是 字符串 类型的实例
 		if (key instanceof String) {
+			// 删除指定键，并获取删除的旧值列表
 			Collection<String> removed = this.headers.remove((String) key);
 			if (removed != null) {
+				// 如果删除成功，返回获取到的旧值列表
 				return new ArrayList<>(removed);
 			}
 		}
+		// 如果 键 不是 字符串 类型的实例，则返回null
 		return null;
 	}
 
@@ -187,7 +203,9 @@ class UndertowHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private class EntryIterator implements Iterator<Entry<String, List<String>>> {
-
+		/**
+		 * Http头部名称迭代器
+		 */
 		private Iterator<HttpString> names = headers.getHeaderNames().iterator();
 
 		@Override
@@ -204,6 +222,9 @@ class UndertowHeadersAdapter implements MultiValueMap<String, String> {
 
 	private class HeaderEntry implements Entry<String, List<String>> {
 
+		/**
+		 * Http字符串
+		 */
 		private final HttpString key;
 
 		HeaderEntry(HttpString key) {
@@ -222,8 +243,11 @@ class UndertowHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public List<String> setValue(List<String> value) {
+			// 获取指定键的旧值列表
 			List<String> previousValues = headers.get(this.key);
+			// 将指定键更新为新值列表
 			headers.putAll(this.key, value);
+			// 返回旧值列表
 			return previousValues;
 		}
 	}
@@ -244,8 +268,14 @@ class UndertowHeadersAdapter implements MultiValueMap<String, String> {
 
 	private final class HeaderNamesIterator implements Iterator<String> {
 
+		/**
+		 * Http字符串迭代器
+		 */
 		private final Iterator<HttpString> iterator;
 
+		/**
+		 * 当前名称
+		 */
 		@Nullable
 		private String currentName;
 
@@ -260,18 +290,23 @@ class UndertowHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public String next() {
+			// 获取下一个字符串作为当前名称
 			this.currentName = this.iterator.next().toString();
+			// 返回当前名称
 			return this.currentName;
 		}
 
 		@Override
 		public void remove() {
 			if (this.currentName == null) {
+				// 如果当前名称为空，则抛出异常
 				throw new IllegalStateException("No current Header in iterator");
 			}
 			if (!headers.contains(this.currentName)) {
+				// 如果请求头不包含当前名称，则抛出异常
 				throw new IllegalStateException("Header not present: " + this.currentName);
 			}
+			// 从请求头中移除当前名称
 			headers.remove(this.currentName);
 		}
 	}
