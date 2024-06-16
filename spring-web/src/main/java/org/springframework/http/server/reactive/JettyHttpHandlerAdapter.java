@@ -40,8 +40,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * {@link ServletHttpHandlerAdapter} extension that uses Jetty APIs for writing
- * to the response with {@link ByteBuffer}.
+ * {@link ServletHttpHandlerAdapter} 的扩展，使用 Jetty API 以 {@link ByteBuffer} 形式写入响应。
  *
  * @author Violeta Georgieva
  * @author Brian Clozel
@@ -49,7 +48,9 @@ import java.nio.charset.Charset;
  * @since 5.0
  */
 public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
-
+	/**
+	 * Jetty 10 是否存在
+	 */
 	private static final boolean jetty10Present = ClassUtils.isPresent(
 			"org.eclipse.jetty.http.CookieCutter", JettyHttpHandlerAdapter.class.getClassLoader());
 
@@ -63,12 +64,15 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 	protected ServletServerHttpRequest createRequest(HttpServletRequest request, AsyncContext context)
 			throws IOException, URISyntaxException {
 
-		// TODO: need to compile against Jetty 10 to use HttpFields (class->interface)
+		// TODO: 需要根据Jetty 10编译以使用HttpFields（从类->接口）
 		if (jetty10Present) {
+			// 如果Jetty 10存在，调用父类的方法来创建请求对象
 			return super.createRequest(request, context);
 		}
 
+		// 否则，确保Servlet路径已初始化
 		Assert.notNull(getServletPath(), "Servlet path is not initialized");
+		// 返回基于JettyServerHttpRequest的请求对象
 		return new JettyServerHttpRequest(
 				request, context, getServletPath(), getDataBufferFactory(), getBufferSize());
 	}
@@ -77,11 +81,13 @@ public class JettyHttpHandlerAdapter extends ServletHttpHandlerAdapter {
 	protected ServletServerHttpResponse createResponse(HttpServletResponse response,
 													   AsyncContext context, ServletServerHttpRequest request) throws IOException {
 
-		// TODO: need to compile against Jetty 10 to use HttpFields (class->interface)
+		// TODO: 需要根据Jetty 10编译以使用HttpFields（从类->接口）
 		if (jetty10Present) {
+			// 如果Jetty 10存在，返回基于BaseJettyServerHttpResponse的响应对象
 			return new BaseJettyServerHttpResponse(
 					response, context, getDataBufferFactory(), getBufferSize(), request);
 		} else {
+			// 否则，返回基于JettyServerHttpResponse的响应对象
 			return new JettyServerHttpResponse(
 					response, context, getDataBufferFactory(), getBufferSize(), request);
 		}
