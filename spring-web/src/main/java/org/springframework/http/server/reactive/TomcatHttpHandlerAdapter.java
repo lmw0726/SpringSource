@@ -46,8 +46,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * {@link ServletHttpHandlerAdapter} extension that uses Tomcat APIs for reading
- * from the request and writing to the response with {@link ByteBuffer}.
+ * {@link ServletHttpHandlerAdapter} 的扩展，使用 Tomcat API 从请求中读取
+ * 并使用 {@link ByteBuffer} 写入响应。
  *
  * @author Violeta Georgieva
  * @author Brian Clozel

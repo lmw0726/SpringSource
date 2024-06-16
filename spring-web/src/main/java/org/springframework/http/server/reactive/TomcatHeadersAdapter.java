@@ -16,32 +16,26 @@
 
 package org.springframework.http.server.reactive;
 
-import java.util.AbstractSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
- * {@code MultiValueMap} implementation for wrapping Tomcat HTTP headers.
+ * {@code MultiValueMap} 的实现，用于包装 Tomcat HTTP 头信息。
  *
  * @author Brian Clozel
  * @since 5.1.1
  */
 class TomcatHeadersAdapter implements MultiValueMap<String, String> {
-
+	/**
+	 * Mime 头部信息
+	 */
 	private final MimeHeaders headers;
 
 
@@ -82,19 +76,32 @@ class TomcatHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public Map<String, String> toSingleValueMap() {
+		// 创建一个 单值映射 对象
 		Map<String, String> singleValueMap = CollectionUtils.newLinkedHashMap(this.headers.size());
+
+		// 遍历 当前对象 中的所有键，并将每个键的第一个值放入 单值映射 中
 		this.keySet().forEach(key -> singleValueMap.put(key, getFirst(key)));
+
+		// 返回最终的 单值映射
 		return singleValueMap;
 	}
 
 	@Override
 	public int size() {
+		// 获取 头部信息 对象中所有头部名称的枚举
 		Enumeration<String> names = this.headers.names();
+
 		int size = 0;
+
+		// 遍历枚举中的每个元素（头部名称）
 		while (names.hasMoreElements()) {
+			// 每遍历一个元素，头部数量加1
 			size++;
+			// 移动到枚举中的下一个元素（头部名称）
 			names.nextElement();
 		}
+
+		// 返回统计得到的头部数量
 		return size;
 	}
 
@@ -105,52 +112,83 @@ class TomcatHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public boolean containsKey(Object key) {
+		// 如果 键 是 字符串 类型的实例
 		if (key instanceof String) {
+			// 查找具有 指定键 的头部在列表中的索引位置
 			return (this.headers.findHeader((String) key, 0) != -1);
 		}
+
+		// 如果 键 不是 字符串 类型的实例，则返回 false
 		return false;
 	}
 
 	@Override
 	public boolean containsValue(Object value) {
+		// 检查 值 是否是 字符串 类型
 		if (value instanceof String) {
+			// 创建一个新的 MessageBytes 对象
 			MessageBytes needle = MessageBytes.newInstance();
+			// 设置 MessageBytes 对象的字符串值为 当前值
 			needle.setString((String) value);
+
+			// 遍历头部的所有值
 			for (int i = 0; i < this.headers.size(); i++) {
+				// 如果头部的值等于 所需的MessageBytes对象，则返回 true
 				if (this.headers.getValue(i).equals(needle)) {
 					return true;
 				}
 			}
 		}
+
+		// 如果 值 不是 字符串 类型，或者没有找到匹配的值，则返回 false
 		return false;
 	}
 
 	@Override
 	@Nullable
 	public List<String> get(Object key) {
+		// 检查是否包含特定键
 		if (containsKey(key)) {
+			// 如果包含，则返回该键对应的所有值的列表
 			return Collections.list(this.headers.values((String) key));
 		}
+
+		// 如果不包含特定键，则返回 null
 		return null;
 	}
 
 	@Override
 	@Nullable
 	public List<String> put(String key, List<String> value) {
+		// 获取特定键的所有旧值列表
 		List<String> previousValues = get(key);
+
+		// 移除该键对应的所有头部
 		this.headers.removeHeader(key);
+
+		// 将新的值列表中的每个元素添加到该键对应的头部中
 		value.forEach(v -> this.headers.addValue(key).setString(v));
+
+		// 返回之前该键对应的所有旧值列表
 		return previousValues;
 	}
 
 	@Override
 	@Nullable
 	public List<String> remove(Object key) {
+		// 检查给定的键是否是字符串类型
 		if (key instanceof String) {
+			// 获取该键对应的所有值
 			List<String> previousValues = get(key);
+
+			// 移除该键对应的所有头部
 			this.headers.removeHeader((String) key);
+
+			// 返回该键对应的所有旧值的列表
 			return previousValues;
 		}
+
+		// 如果键不是字符串类型，则返回 null
 		return null;
 	}
 
@@ -197,7 +235,9 @@ class TomcatHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private class EntryIterator implements Iterator<Entry<String, List<String>>> {
-
+		/**
+		 * 头部名称枚举
+		 */
 		private Enumeration<String> names = headers.names();
 
 		@Override
@@ -213,7 +253,9 @@ class TomcatHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private final class HeaderEntry implements Entry<String, List<String>> {
-
+		/**
+		 * 键
+		 */
 		private final String key;
 
 		HeaderEntry(String key) {
@@ -234,9 +276,16 @@ class TomcatHeadersAdapter implements MultiValueMap<String, String> {
 		@Nullable
 		@Override
 		public List<String> setValue(List<String> value) {
+			// 获取当前头部中特定键的所有值
 			List<String> previous = getValue();
+
+			// 移除当前头部中特定键对应的所有头部
 			headers.removeHeader(this.key);
+
+			// 添加新的值到当前头部中特定键
 			addAll(this.key, value);
+
+			// 返回之前特定键对应的所有旧值的列表
 			return previous;
 		}
 	}
@@ -251,20 +300,35 @@ class TomcatHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public int size() {
+			// 获取头部名称的枚举器
 			Enumeration<String> names = headers.names();
+
+			// 初始化名称数量
 			int size = 0;
+
+			// 遍历枚举器中的每个元素（即每个头部名称）
 			while (names.hasMoreElements()) {
+				// 获取下一个元素（头部名称）
 				names.nextElement();
+				// 增加名称数量计数
 				size++;
 			}
+
+			// 返回统计的名称数量
 			return size;
 		}
 	}
 
 	private final class HeaderNamesIterator implements Iterator<String> {
 
+		/**
+		 * 枚举字符串
+		 */
 		private final Enumeration<String> enumeration;
 
+		/**
+		 * 当前名称
+		 */
 		@Nullable
 		private String currentName;
 
@@ -279,19 +343,25 @@ class TomcatHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public String next() {
+			// 获取下一个元素作为当前名称
 			this.currentName = this.enumeration.nextElement();
+			// 返回当前名称
 			return this.currentName;
 		}
 
 		@Override
 		public void remove() {
 			if (this.currentName == null) {
+				// 如果当前名称为空，则抛出异常
 				throw new IllegalStateException("No current Header in iterator");
 			}
+			// 寻找当前名称在头部信息的索引
 			int index = headers.findHeader(this.currentName, 0);
 			if (index == -1) {
+				// 如果请求头不包含当前名称，则抛出异常
 				throw new IllegalStateException("Header not present: " + this.currentName);
 			}
+			// 从头部信息中移除当前名称
 			headers.removeHeader(index);
 		}
 	}
