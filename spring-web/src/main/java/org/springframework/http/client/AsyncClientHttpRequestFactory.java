@@ -16,31 +16,30 @@
 
 package org.springframework.http.client;
 
+import org.springframework.http.HttpMethod;
+
 import java.io.IOException;
 import java.net.URI;
 
-import org.springframework.http.HttpMethod;
-
 /**
- * Factory for {@link AsyncClientHttpRequest} objects.
- * Requests are created by the {@link #createAsyncRequest(URI, HttpMethod)} method.
+ * 用于创建 {@link AsyncClientHttpRequest} 对象的工厂。
+ * 请求通过 {@link #createAsyncRequest(URI, HttpMethod)} 方法创建。
  *
  * @author Arjen Poutsma
  * @since 4.0
- * @deprecated as of Spring 5.0, in favor of {@link org.springframework.http.client.reactive.ClientHttpConnector}
+ * @deprecated 从 Spring 5.0 起，推荐使用 {@link org.springframework.http.client.reactive.ClientHttpConnector}
  */
 @Deprecated
 public interface AsyncClientHttpRequestFactory {
 
 	/**
-	 * Create a new asynchronous {@link AsyncClientHttpRequest} for the specified URI
-	 * and HTTP method.
-	 * <p>The returned request can be written to, and then executed by calling
-	 * {@link AsyncClientHttpRequest#executeAsync()}.
-	 * @param uri the URI to create a request for
-	 * @param httpMethod the HTTP method to execute
-	 * @return the created request
-	 * @throws IOException in case of I/O errors
+	 * 为指定的 URI 和 HTTP 方法创建一个新的异步 {@link AsyncClientHttpRequest}。
+	 * <p>返回的请求可以写入数据，然后通过调用 {@link AsyncClientHttpRequest#executeAsync()} 执行。
+	 *
+	 * @param uri        要创建请求的 URI
+	 * @param httpMethod 要执行的 HTTP 方法
+	 * @return 创建的请求
+	 * @throws IOException 如果发生 I/O 错误
 	 */
 	AsyncClientHttpRequest createAsyncRequest(URI uri, HttpMethod httpMethod) throws IOException;
 

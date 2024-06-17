@@ -16,38 +16,42 @@
 
 package org.springframework.http.client;
 
+import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.http.HttpMethod;
-import org.springframework.lang.Nullable;
-
 /**
- * Wrapper for a {@link AsyncClientHttpRequestFactory} that has support for
- * {@link AsyncClientHttpRequestInterceptor AsyncClientHttpRequestInterceptors}.
+ * {@link AsyncClientHttpRequestFactory} 的包装器，支持 {@link AsyncClientHttpRequestInterceptor AsyncClientHttpRequestInterceptors}。
  *
  * @author Jakub Narloch
- * @since 4.3
  * @see InterceptingAsyncClientHttpRequest
- * @deprecated as of Spring 5.0, with no direct replacement
+ * @since 4.3
+ * @deprecated 从 Spring 5.0 起，没有直接的替代方案
  */
 @Deprecated
 public class InterceptingAsyncClientHttpRequestFactory implements AsyncClientHttpRequestFactory {
-
+	/**
+	 * 异步客户端Http请求工厂
+	 */
 	private AsyncClientHttpRequestFactory delegate;
 
+	/**
+	 * 异步客户端Http请求拦截器列表
+	 */
 	private List<AsyncClientHttpRequestInterceptor> interceptors;
 
 
 	/**
-	 * Create new instance of {@link InterceptingAsyncClientHttpRequestFactory}
-	 * with delegated request factory and list of interceptors.
-	 * @param delegate the request factory to delegate to
-	 * @param interceptors the list of interceptors to use
+	 * 使用委托的请求工厂和拦截器列表创建 {@link InterceptingAsyncClientHttpRequestFactory} 的新实例。
+	 *
+	 * @param delegate     要委托的请求工厂
+	 * @param interceptors 要使用的拦截器列表
 	 */
 	public InterceptingAsyncClientHttpRequestFactory(AsyncClientHttpRequestFactory delegate,
-			@Nullable List<AsyncClientHttpRequestInterceptor> interceptors) {
+													 @Nullable List<AsyncClientHttpRequestInterceptor> interceptors) {
 
 		this.delegate = delegate;
 		this.interceptors = (interceptors != null ? interceptors : Collections.emptyList());
