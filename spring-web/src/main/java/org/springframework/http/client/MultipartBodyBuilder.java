@@ -37,40 +37,35 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Prepare the body of a multipart request, resulting in a
- * {@code MultiValueMap<String, HttpEntity>}. Parts may be concrete values or
- * via asynchronous types such as Reactor {@code Mono}, {@code Flux}, and
- * others registered in the
- * {@link org.springframework.core.ReactiveAdapterRegistry ReactiveAdapterRegistry}.
+ * 准备多部分请求的主体，生成一个 {@code MultiValueMap<String, HttpEntity>}。
+ * 部件可以是具体的值，也可以是通过 Reactor 的 {@code Mono}、{@code Flux} 等异步类型，
+ * 这些类型注册在 {@link org.springframework.core.ReactiveAdapterRegistry ReactiveAdapterRegistry} 中。
  *
- * <p>This builder is intended for use with the reactive
- * {@link org.springframework.web.reactive.function.client.WebClient WebClient}.
- * For multipart requests with the {@code RestTemplate}, simply create and
- * populate a {@code MultiValueMap<String, HttpEntity>} as shown in the Javadoc for
- * {@link org.springframework.http.converter.FormHttpMessageConverter FormHttpMessageConverter}
- * and in the
- * <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#rest-template-multipart">reference docs</a>.
+ * <p>此构建器旨在与反应式 {@link org.springframework.web.reactive.function.client.WebClient WebClient} 一起使用。
+ * 对于使用 {@code RestTemplate} 的多部分请求，只需创建并填充一个 {@code MultiValueMap<String, HttpEntity>}，
+ * 如 {@link org.springframework.http.converter.FormHttpMessageConverter FormHttpMessageConverter} 的 Javadoc 中所示，
+ * 以及参考文档中的<a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#rest-template-multipart">相关部分</a>。
  *
- * <p>Below are examples of using this builder:
+ * <p>以下是使用此构建器的示例：
  * <pre class="code">
  *
- * // Add form field
+ * // 添加表单字段
  * MultipartBodyBuilder builder = new MultipartBodyBuilder();
  * builder.part("form field", "form value").header("foo", "bar");
  *
- * // Add file part
+ * // 添加文件部件
  * Resource image = new ClassPathResource("image.jpg");
  * builder.part("image", image).header("foo", "bar");
  *
- * // Add content (e.g. JSON)
+ * // 添加内容（例如 JSON）
  * Account account = ...
  * builder.part("account", account).header("foo", "bar");
  *
- * // Add content from Publisher
+ * // 添加来自 Publisher 的内容
  * Mono&lt;Account&gt; accountMono = ...
  * builder.asyncPart("account", accountMono).header("foo", "bar");
  *
- * // Build and use
+ * // 构建并使用
  * MultiValueMap&lt;String, HttpEntity&lt;?&gt;&gt; multipartBody = builder.build();
  *
  * Mono&lt;Void&gt; result = webClient.post()
@@ -86,125 +81,156 @@ import java.util.function.Consumer;
  * @since 5.0.2
  */
 public final class MultipartBodyBuilder {
-
+	/**
+	 * 部分名称 —— 默认部分构建器 映射
+	 */
 	private final LinkedMultiValueMap<String, DefaultPartBuilder> parts = new LinkedMultiValueMap<>();
 
 
 	/**
-	 * Creates a new, empty instance of the {@code MultipartBodyBuilder}.
+	 * 创建一个新的空实例 {@code MultipartBodyBuilder}。
 	 */
 	public MultipartBodyBuilder() {
 	}
 
 
 	/**
-	 * Add a part where the Object may be:
+	 * 添加一个部件，Object 可以是：
 	 * <ul>
-	 * <li>String -- form field
-	 * <li>{@link org.springframework.core.io.Resource Resource} -- file part
-	 * <li>Object -- content to be encoded (e.g. to JSON)
-	 * <li>{@link HttpEntity} -- part content and headers although generally it's
-	 * easier to add headers through the returned builder
-	 * <li>{@link Part} -- a part from a server request
+	 * <li>String -- 表单字段
+	 * <li>{@link org.springframework.core.io.Resource Resource} -- 文件部件
+	 * <li>Object -- 要编码的内容（例如 JSON）
+	 * <li>{@link HttpEntity} -- 部件内容和头部，尽管通常更容易通过返回的构建器添加头部
+	 * <li>{@link Part} -- 来自服务器请求的部件
 	 * </ul>
 	 *
-	 * @param name the name of the part to add
-	 * @param part the part data
-	 * @return builder that allows for further customization of part headers
+	 * @param name 要添加的部件名称
+	 * @param part 部件数据
+	 * @return 允许进一步自定义部件头部的构建器
 	 */
 	public PartBuilder part(String name, Object part) {
 		return part(name, part, null);
 	}
 
 	/**
-	 * Variant of {@link #part(String, Object)} that also accepts a MediaType.
+	 * {@link #part(String, Object)} 的变体，还接受一个 MediaType。
 	 *
-	 * @param name        the name of the part to add
-	 * @param part        the part data
-	 * @param contentType the media type to help with encoding the part
-	 * @return builder that allows for further customization of part headers
+	 * @param name        要添加的部件名称
+	 * @param part        部件数据
+	 * @param contentType 用于帮助编码部件的媒体类型
+	 * @return 允许进一步自定义部件头部的构建器
 	 */
 	public PartBuilder part(String name, Object part, @Nullable MediaType contentType) {
 		Assert.hasLength(name, "'name' must not be empty");
 		Assert.notNull(part, "'part' must not be null");
 
+		// 如果 部分 是 Part 的实例
 		if (part instanceof Part) {
+			// 将 部分 强制转换为 Part 类型
 			Part partObject = (Part) part;
+			// 创建异步 部分构建器 对象
 			PartBuilder builder = asyncPart(name, partObject.content(), DataBuffer.class);
+			// 如果 部分对象 的 头部 不为空
 			if (!partObject.headers().isEmpty()) {
+				// 设置 头部
 				builder.headers(headers -> {
+					// 将 部分对象 的 所有头部 放入 当前头部
 					headers.putAll(partObject.headers());
+					// 获取文件名
 					String filename = headers.getContentDisposition().getFilename();
-					// reset to parameter name
+					// 重置为参数名称
 					headers.setContentDispositionFormData(name, filename);
 				});
 			}
+			// 如果 内容类型 非空
 			if (contentType != null) {
+				// 设置内容类型
 				builder.contentType(contentType);
 			}
+			// 返回构建器对象
 			return builder;
 		}
 
+		// 如果 部分 是 PublisherEntity 的实例
 		if (part instanceof PublisherEntity<?, ?>) {
+			// 创建 发布者部件生成器 对象
 			PublisherPartBuilder<?, ?> builder = new PublisherPartBuilder<>(name, (PublisherEntity<?, ?>) part);
+			// 如果 内容 非空
 			if (contentType != null) {
+				// 设置内容类型
 				builder.contentType(contentType);
 			}
+			// 将构建器添加到 部分映射 中
 			this.parts.add(name, builder);
+			// 返回构建器对象
 			return builder;
 		}
 
+		// 声明 部分主体 对象
 		Object partBody;
+		// 声明 部分头部 对象
 		HttpHeaders partHeaders = null;
+		// 如果 部分 是 Http实体 的实例
 		if (part instanceof HttpEntity) {
+			// 获取 部分 的主体内容
 			partBody = ((HttpEntity<?>) part).getBody();
+			// 初始化 部分头部 对象
 			partHeaders = new HttpHeaders();
+			// 将 部分的所有头部 放入 部分头部 中
 			partHeaders.putAll(((HttpEntity<?>) part).getHeaders());
 		} else {
+			// 否则直接将 部分 赋值给 部分主体
 			partBody = part;
 		}
 
 		if (partBody instanceof Publisher) {
+			// 如果部分主体是发布者，则抛出异常
 			throw new IllegalArgumentException(
 					"Use asyncPart(String, Publisher, Class)" +
 							" or asyncPart(String, Publisher, ParameterizedTypeReference) or" +
 							" or MultipartBodyBuilder.PublisherEntity");
 		}
 
+		// 创建 默认部分构建器
 		DefaultPartBuilder builder = new DefaultPartBuilder(name, partHeaders, partBody);
 		if (contentType != null) {
+			// 如果内容类型不为空，则设置到构建器中
 			builder.contentType(contentType);
 		}
+		// 将 名称 和 发布者部分构建器 添加到 部分映射 中
 		this.parts.add(name, builder);
+		// 返回创建的 发布者部分构建器
 		return builder;
 	}
 
 	/**
-	 * Add a part from {@link Publisher} content.
+	 * 从 {@link Publisher} 内容添加一个部件。
 	 *
-	 * @param name         the name of the part to add
-	 * @param publisher    a Publisher of content for the part
-	 * @param elementClass the type of elements contained in the publisher
-	 * @return builder that allows for further customization of part headers
+	 * @param name         要添加的部件名称
+	 * @param publisher    部件内容的 Publisher
+	 * @param elementClass 发布者包含的元素类型
+	 * @return 允许进一步自定义部件头部的构建器
 	 */
 	public <T, P extends Publisher<T>> PartBuilder asyncPart(String name, P publisher, Class<T> elementClass) {
 		Assert.hasLength(name, "'name' must not be empty");
 		Assert.notNull(publisher, "'publisher' must not be null");
 		Assert.notNull(elementClass, "'elementClass' must not be null");
-
+		// 创建发布者部分构建器
 		PublisherPartBuilder<T, P> builder = new PublisherPartBuilder<>(name, null, publisher, elementClass);
+		// 将 名称 和 发布者部分构建器 添加到 部分映射 中
 		this.parts.add(name, builder);
+		// 返回创建的 发布者部分构建器
 		return builder;
 	}
 
 	/**
-	 * Variant of {@link #asyncPart(String, Publisher, Class)} with a
-	 * {@link ParameterizedTypeReference} for the element type information.
+	 * {@link #asyncPart(String, Publisher, Class)} 的变体，
+	 * 使用 {@link ParameterizedTypeReference} 来提供元素类型信息。
 	 *
-	 * @param name          the name of the part to add
-	 * @param publisher     the part contents
-	 * @param typeReference the type of elements contained in the publisher
-	 * @return builder that allows for further customization of part headers
+	 * @param name          要添加的部件名称
+	 * @param publisher     部件内容的 Publisher
+	 * @param typeReference 发布者包含的元素类型
+	 * @return 允许进一步自定义部件头部的构建器
 	 */
 	public <T, P extends Publisher<T>> PartBuilder asyncPart(
 			String name, P publisher, ParameterizedTypeReference<T> typeReference) {
@@ -212,67 +238,75 @@ public final class MultipartBodyBuilder {
 		Assert.hasLength(name, "'name' must not be empty");
 		Assert.notNull(publisher, "'publisher' must not be null");
 		Assert.notNull(typeReference, "'typeReference' must not be null");
-
+		// 创建发布者部分构建器
 		PublisherPartBuilder<T, P> builder = new PublisherPartBuilder<>(name, null, publisher, typeReference);
+		// 将 名称 和 发布者部分构建器 添加到 部分映射 中
 		this.parts.add(name, builder);
+		// 返回创建的 发布者部分构建器
 		return builder;
 	}
 
 	/**
-	 * Return a {@code MultiValueMap} with the configured parts.
+	 * 返回一个包含已配置部件的 {@code MultiValueMap}。
 	 */
 	public MultiValueMap<String, HttpEntity<?>> build() {
+		// 创建一个新的 结果集 对象
 		MultiValueMap<String, HttpEntity<?>> result = new LinkedMultiValueMap<>(this.parts.size());
+
+		// 遍历 默认部分构建器映射 中的每个条目
 		for (Map.Entry<String, List<DefaultPartBuilder>> entry : this.parts.entrySet()) {
+			// 遍历每个条目中的 默认部分构建器映射 列表
 			for (DefaultPartBuilder builder : entry.getValue()) {
+				// 使用 默认部分构建器映射 构建 Http实体 对象
 				HttpEntity<?> entity = builder.build();
+				// 将构建的 Http实体 对象添加到 结果集 中，键为当前条目的键
 				result.add(entry.getKey(), entity);
 			}
 		}
+
+		// 返回构建的 结果集
 		return result;
 	}
 
 
 	/**
-	 * Builder that allows for further customization of part headers.
+	 * 一个允许进一步自定义部件头部的构建器接口。
 	 */
 	public interface PartBuilder {
 
 		/**
-		 * Set the {@linkplain MediaType media type} of the part.
+		 * 设置部件的 {@linkplain MediaType 媒体类型}。
 		 *
-		 * @param contentType the content type
+		 * @param contentType 媒体类型
 		 * @see HttpHeaders#setContentType(MediaType)
 		 * @since 5.2
 		 */
 		PartBuilder contentType(MediaType contentType);
 
 		/**
-		 * Set the filename parameter for a file part. This should not be
-		 * necessary with {@link org.springframework.core.io.Resource Resource}
-		 * based parts that expose a filename but may be useful for
-		 * {@link Publisher} parts.
+		 * 为文件部件设置文件名参数。对于基于 {@link org.springframework.core.io.Resource Resource} 的
+		 * 部件，这通常不必要，因为它们可以暴露文件名，但对于 {@link Publisher} 部件可能有用。
 		 *
-		 * @param filename the filename to set on the Content-Disposition
+		 * @param filename 要在 Content-Disposition 中设置的文件名
 		 * @since 5.2
 		 */
 		PartBuilder filename(String filename);
 
 		/**
-		 * Add part header values.
+		 * 添加部件头部的值。
 		 *
-		 * @param headerName   the part header name
-		 * @param headerValues the part header value(s)
-		 * @return this builder
+		 * @param headerName   部件头部的名称
+		 * @param headerValues 部件头部的值
+		 * @return 这个构建器
 		 * @see HttpHeaders#addAll(String, List)
 		 */
 		PartBuilder header(String headerName, String... headerValues);
 
 		/**
-		 * Manipulate the part headers through the given consumer.
+		 * 通过给定的消费者操作部件头部。
 		 *
-		 * @param headersConsumer consumer to manipulate the part headers with
-		 * @return this builder
+		 * @param headersConsumer 用于操作部件头部的消费者
+		 * @return 这个构建器
 		 */
 		PartBuilder headers(Consumer<HttpHeaders> headersConsumer);
 	}
@@ -280,8 +314,14 @@ public final class MultipartBodyBuilder {
 
 	private static class DefaultPartBuilder implements PartBuilder {
 
+		/**
+		 * 名称
+		 */
 		private final String name;
 
+		/**
+		 * Http头部
+		 */
 		@Nullable
 		protected HttpHeaders headers;
 
@@ -320,8 +360,10 @@ public final class MultipartBodyBuilder {
 
 		private HttpHeaders initHeadersIfNecessary() {
 			if (this.headers == null) {
+				// 如果Http头部为空，则创建一个Http头部
 				this.headers = new HttpHeaders();
 			}
+			// 返回该Http头部
 			return this.headers;
 		}
 
@@ -332,7 +374,9 @@ public final class MultipartBodyBuilder {
 
 
 	private static class PublisherPartBuilder<S, P extends Publisher<S>> extends DefaultPartBuilder {
-
+		/**
+		 * 可解析类型
+		 */
 		private final ResolvableType resolvableType;
 
 		public PublisherPartBuilder(String name, @Nullable HttpHeaders headers, P body, Class<S> elementClass) {
