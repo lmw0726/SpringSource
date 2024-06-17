@@ -317,8 +317,7 @@ public final class MockRestServiceServer {
 
 
 	/**
-	 * Mock ClientHttpRequestFactory that creates requests by iterating
-	 * over the list of expected {@link DefaultRequestExpectation}'s.
+	 * 模拟的ClientHttpRequestFactory，通过迭代预期的{@link DefaultRequestExpectation}列表来创建请求。
 	 */
 	private class MockClientHttpRequestFactory implements ClientHttpRequestFactory,
 			org.springframework.http.client.AsyncClientHttpRequestFactory {

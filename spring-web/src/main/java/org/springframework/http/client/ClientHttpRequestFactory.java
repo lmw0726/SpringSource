@@ -16,14 +16,17 @@
 
 package org.springframework.http.client;
 
+import org.springframework.http.HttpMethod;
+
 import java.io.IOException;
 import java.net.URI;
 
-import org.springframework.http.HttpMethod;
-
 /**
- * Factory for {@link ClientHttpRequest} objects.
- * Requests are created by the {@link #createRequest(URI, HttpMethod)} method.
+ * {@link ClientHttpRequest} 对象的工厂接口。
+ * 请求通过 {@link #createRequest(URI, HttpMethod)} 方法创建。
+ *
+ * <p>该工厂接口允许根据给定的 URI 和 HTTP 方法创建新的 {@link ClientHttpRequest} 对象，
+ * 返回的请求可以进行写入操作，并通过调用 {@link ClientHttpRequest#execute()} 方法执行。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -32,13 +35,12 @@ import org.springframework.http.HttpMethod;
 public interface ClientHttpRequestFactory {
 
 	/**
-	 * Create a new {@link ClientHttpRequest} for the specified URI and HTTP method.
-	 * <p>The returned request can be written to, and then executed by calling
-	 * {@link ClientHttpRequest#execute()}.
-	 * @param uri the URI to create a request for
-	 * @param httpMethod the HTTP method to execute
-	 * @return the created request
-	 * @throws IOException in case of I/O errors
+	 * 根据指定的 URI 和 HTTP 方法创建一个新的 {@link ClientHttpRequest} 对象。
+	 *
+	 * @param uri        要创建请求的 URI
+	 * @param httpMethod 要执行的 HTTP 方法
+	 * @return 创建的请求对象
+	 * @throws IOException 如果发生I/O错误
 	 */
 	ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException;
 
