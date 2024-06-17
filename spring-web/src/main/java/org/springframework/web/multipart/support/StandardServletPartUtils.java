@@ -29,8 +29,8 @@ import java.util.List;
 /**
  * 用于标准 Servlet {@link Part} 处理的实用方法。
  *
- * @作者 Juergen Hoeller
- * @自 5.3
+ * @author Juergen Hoeller
+ * @since  5.3
  * @see HttpServletRequest#getParts()
  * @see StandardServletMultipartResolver
  */
