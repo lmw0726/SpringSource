@@ -31,9 +31,9 @@ import java.util.List;
  * 解析 <code>&lt;mvc:tiles-configurer&gt;</code> MVC 命名空间元素并注册
  * 一个相应的 {@code TilesConfigurer} bean。
  *
- * @作者 Rossen Stoyanchev
- * @作者 Juergen Hoeller
- * @自从 4.1
+ * @author Rossen Stoyanchev
+ * @author Juergen Hoeller
+ * @since   4.1
  */
 public class TilesConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 

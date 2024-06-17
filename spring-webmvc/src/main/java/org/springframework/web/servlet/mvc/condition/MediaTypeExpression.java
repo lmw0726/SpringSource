@@ -23,11 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * 媒体类型表达式（例如 "text/plain", "!text/plain"）的合同，
  * 这些表达式在 {@code @RequestMapping} 注解中的 "consumes" 和 "produces" 条件中定义。
  *
- * @作者 Rossen Stoyanchev
- * @自 3.1 以来
- *
+ * @author Rossen Stoyanchev
  * @see RequestMapping#consumes()
  * @see RequestMapping#produces()
+ * @since 3.1
  */
 public interface MediaTypeExpression {
 
