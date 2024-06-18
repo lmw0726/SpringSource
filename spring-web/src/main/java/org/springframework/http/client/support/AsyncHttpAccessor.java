@@ -16,43 +16,45 @@
 
 package org.springframework.http.client.support;
 
-import java.io.IOException;
-import java.net.URI;
-
 import org.apache.commons.logging.Log;
-
 import org.springframework.http.HttpLogging;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
+import java.net.URI;
+
 /**
- * Base class for {@link org.springframework.web.client.AsyncRestTemplate}
- * and other HTTP accessing gateway helpers, defining common properties
- * such as the {@link org.springframework.http.client.AsyncClientHttpRequestFactory}
- * to operate on.
+ * {@link org.springframework.web.client.AsyncRestTemplate}和其他HTTP访问网关助手的基类，
+ * 定义了操作所需的通用属性，如{@link org.springframework.http.client.AsyncClientHttpRequestFactory}。
  *
- * <p>Not intended to be used directly. See
- * {@link org.springframework.web.client.AsyncRestTemplate}.
+ * <p>不打算直接使用。参见{@link org.springframework.web.client.AsyncRestTemplate}。
  *
  * @author Arjen Poutsma
- * @since 4.0
  * @see org.springframework.web.client.AsyncRestTemplate
- * @deprecated as of Spring 5.0, with no direct replacement
+ * @since 4.0
+ * @deprecated 从Spring 5.0开始，不再推荐使用，没有直接的替代品
  */
 @Deprecated
 public class AsyncHttpAccessor {
 
-	/** Logger available to subclasses. */
+	/**
+	 * 可供子类使用的日志记录器。
+	 */
 	protected final Log logger = HttpLogging.forLogName(getClass());
 
+	/**
+	 * 异步请求工厂
+	 */
 	@Nullable
 	private org.springframework.http.client.AsyncClientHttpRequestFactory asyncRequestFactory;
 
 
 	/**
-	 * Set the request factory that this accessor uses for obtaining {@link
-	 * org.springframework.http.client.ClientHttpRequest HttpRequests}.
+	 * 设置此访问器用于获取{@link org.springframework.http.client.ClientHttpRequest HttpRequests}的请求工厂。
+	 *
+	 * @param asyncRequestFactory 要设置的请求工厂
 	 */
 	public void setAsyncRequestFactory(
 			org.springframework.http.client.AsyncClientHttpRequestFactory asyncRequestFactory) {
@@ -62,8 +64,9 @@ public class AsyncHttpAccessor {
 	}
 
 	/**
-	 * Return the request factory that this accessor uses for obtaining {@link
-	 * org.springframework.http.client.ClientHttpRequest HttpRequests}.
+	 * 返回此访问器用于获取{@link org.springframework.http.client.ClientHttpRequest HttpRequests}的请求工厂。
+	 *
+	 * @return 请求工厂
 	 */
 	public org.springframework.http.client.AsyncClientHttpRequestFactory getAsyncRequestFactory() {
 		Assert.state(this.asyncRequestFactory != null, "No AsyncClientHttpRequestFactory set");
@@ -71,21 +74,25 @@ public class AsyncHttpAccessor {
 	}
 
 	/**
-	 * Create a new {@link org.springframework.http.client.AsyncClientHttpRequest} via this template's
-	 * {@link org.springframework.http.client.AsyncClientHttpRequestFactory}.
-	 * @param url the URL to connect to
-	 * @param method the HTTP method to execute (GET, POST, etc.)
-	 * @return the created request
-	 * @throws IOException in case of I/O errors
+	 * 通过此模板的{@link org.springframework.http.client.AsyncClientHttpRequestFactory}创建一个新的{@link org.springframework.http.client.AsyncClientHttpRequest}。
+	 *
+	 * @param url    要连接的URL
+	 * @param method 要执行的HTTP方法（GET, POST等）
+	 * @return 创建的请求
+	 * @throws IOException 在I/O错误的情况下抛出
 	 */
 	protected org.springframework.http.client.AsyncClientHttpRequest createAsyncRequest(URI url, HttpMethod method)
 			throws IOException {
 
+		// 使用异步请求工厂创建 异步客户端Http请求 对象
 		org.springframework.http.client.AsyncClientHttpRequest request =
 				getAsyncRequestFactory().createAsyncRequest(url, method);
+		// 如果日志记录器处于调试级别
 		if (logger.isDebugEnabled()) {
+			// 记录调试信息，包含请求方法和 URL
 			logger.debug("Created asynchronous " + method.name() + " request for \"" + url + "\"");
 		}
+		// 返回创建的异步请求对象
 		return request;
 	}
 
