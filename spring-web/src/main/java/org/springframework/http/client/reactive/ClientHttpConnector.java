@@ -16,17 +16,14 @@
 
 package org.springframework.http.client.reactive;
 
+import org.springframework.http.HttpMethod;
+import reactor.core.publisher.Mono;
+
 import java.net.URI;
 import java.util.function.Function;
 
-import reactor.core.publisher.Mono;
-
-import org.springframework.http.HttpMethod;
-
 /**
- * Abstraction over HTTP clients driving the underlying HTTP client to connect
- * to the origin server and provide all necessary infrastructure to send a
- * {@link ClientHttpRequest} and receive a {@link ClientHttpResponse}.
+ * HTTP 客户端连接器的抽象，驱动底层的 HTTP 客户端连接到原始服务器，并提供发送 {@link ClientHttpRequest} 和接收 {@link ClientHttpResponse} 所需的所有基础设施。
  *
  * @author Brian Clozel
  * @since 5.0
@@ -34,18 +31,15 @@ import org.springframework.http.HttpMethod;
 public interface ClientHttpConnector {
 
 	/**
-	 * Connect to the origin server using the given {@code HttpMethod} and
-	 * {@code URI} and apply the given {@code requestCallback} when the HTTP
-	 * request of the underlying API can be initialized and written to.
-	 * @param method the HTTP request method
-	 * @param uri the HTTP request URI
-	 * @param requestCallback a function that prepares and writes to the request,
-	 * returning a publisher that signals when it's done writing.
-	 * Implementations can return a {@code Mono<Void>} by calling
-	 * {@link ClientHttpRequest#writeWith} or {@link ClientHttpRequest#setComplete}.
-	 * @return publisher for the {@link ClientHttpResponse}
+	 * 使用给定的 {@code HttpMethod} 和 {@code URI} 连接到原始服务器，并在底层 API 的 HTTP 请求可以初始化并写入时应用给定的 {@code requestCallback}。
+	 *
+	 * @param method          HTTP 请求方法
+	 * @param uri             HTTP 请求 URI
+	 * @param requestCallback 准备并写入请求的函数，返回一个发布者，表示写入完成的信号。
+	 *                        实现可以通过调用 {@link ClientHttpRequest#writeWith} 或 {@link ClientHttpRequest#setComplete} 返回 {@code Mono<Void>}。
+	 * @return {@link ClientHttpResponse} 的发布者
 	 */
 	Mono<ClientHttpResponse> connect(HttpMethod method, URI uri,
-			Function<? super ClientHttpRequest, Mono<Void>> requestCallback);
+									 Function<? super ClientHttpRequest, Mono<Void>> requestCallback);
 
 }
