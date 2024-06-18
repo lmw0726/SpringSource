@@ -16,34 +16,25 @@
 
 package org.springframework.http.client.reactive;
 
-import java.util.AbstractSet;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpMessage;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
+import java.util.*;
+
 /**
- * {@code MultiValueMap} implementation for wrapping Apache HttpComponents
- * HttpClient headers.
+ * {@code MultiValueMap}实现，用于包装Apache HttpComponents HttpClient的头部。
  *
  * @author Rossen Stoyanchev
  * @since 5.3
  */
 class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
-
+	/**
+	 * Http消息
+	 */
 	private final HttpMessage message;
 
 
@@ -54,7 +45,10 @@ class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public String getFirst(String key) {
+		// 获取指定键对应的第一个头部
 		Header header = this.message.getFirstHeader(key);
+		// 如果头部不为 null，则返回其值；
+		// 否则返回 null
 		return (header != null ? header.getValue() : null);
 	}
 
@@ -85,8 +79,13 @@ class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public Map<String, String> toSingleValueMap() {
+		// 创建一个 映射
 		Map<String, String> map = CollectionUtils.newLinkedHashMap(size());
+
+		// 将每个头部的名称和值放入 映射 中
 		this.message.headerIterator().forEachRemaining(h -> map.putIfAbsent(h.getName(), h.getValue()));
+
+		// 返回包含消息所有头部名称和值的 映射
 		return map;
 	}
 
@@ -107,7 +106,9 @@ class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public boolean containsValue(Object value) {
+		// 如果值是字符串类型
 		return (value instanceof String &&
+				// 并且检查是否有任何头部的值与给定值相等
 				Arrays.stream(this.message.getHeaders()).anyMatch(h -> h.getValue().equals(value)));
 	}
 
@@ -115,32 +116,47 @@ class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
 	@Override
 	public List<String> get(Object key) {
 		List<String> values = null;
+		// 如果消息中包含指定键的头部
 		if (containsKey(key)) {
+			// 获取指定键对应的所有头部
 			Header[] headers = this.message.getHeaders((String) key);
+			// 创建一个 值列表
 			values = new ArrayList<>(headers.length);
+			// 将每个头部的值添加到 值列表 中
 			for (Header header : headers) {
 				values.add(header.getValue());
 			}
 		}
+		// 返回包含指定键所有头部值的列表，如果键不存在则返回 null
 		return values;
 	}
 
 	@Nullable
 	@Override
 	public List<String> put(String key, List<String> values) {
+		// 移除指定键的所有旧值，并返回旧值列表
 		List<String> oldValues = remove(key);
+
+		// 遍历新的值列表，并将每个值添加到指定键中
 		values.forEach(value -> add(key, value));
+
+		// 返回旧的值列表
 		return oldValues;
 	}
 
 	@Nullable
 	@Override
 	public List<String> remove(Object key) {
+		// 如果键是 字符串 类型
 		if (key instanceof String) {
+			// 获取指定键的所有旧值
 			List<String> oldValues = get(key);
+			// 移除消息中指定键对应的所有头部
 			this.message.removeHeaders((String) key);
+			// 返回被移除的旧值列表
 			return oldValues;
 		}
+		// 如果键不是 字符串 类型，返回 null
 		return null;
 	}
 
@@ -156,19 +172,31 @@ class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
 
 	@Override
 	public Set<String> keySet() {
+		// 创建一个 键集合
 		Set<String> keys = new LinkedHashSet<>(size());
+
+		// 遍历消息中的所有头部
 		for (Header header : this.message.getHeaders()) {
+			// 将每个头部的名称添加到 键集合 中
 			keys.add(header.getName());
 		}
+
+		// 返回包含消息所有头部名称的集合
 		return keys;
 	}
 
 	@Override
 	public Collection<List<String>> values() {
+		// 创建一个 值列表
 		Collection<List<String>> values = new ArrayList<>(size());
+
+		// 遍历消息中的所有头部
 		for (Header header : this.message.getHeaders()) {
+			// 获取每个头部名称对应的值列表，并将其添加到 值列表 中
 			values.add(get(header.getName()));
 		}
+
+		// 返回包含消息所有头部名称对应值列表的集合
 		return values;
 	}
 
@@ -195,7 +223,9 @@ class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private class EntryIterator implements Iterator<Entry<String, List<String>>> {
-
+		/**
+		 * 头部信息迭代器
+		 */
 		private final Iterator<Header> iterator = message.headerIterator();
 
 		@Override
@@ -211,7 +241,9 @@ class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
 
 
 	private class HeaderEntry implements Entry<String, List<String>> {
-
+		/**
+		 * 键
+		 */
 		private final String key;
 
 		HeaderEntry(String key) {
@@ -225,14 +257,19 @@ class HttpComponentsHeadersAdapter implements MultiValueMap<String, String> {
 
 		@Override
 		public List<String> getValue() {
+			// 获取 值列表
 			List<String> values = HttpComponentsHeadersAdapter.this.get(this.key);
+			// 如果值列表不为空，则返回该值列表。否则返回空的列表
 			return values != null ? values : Collections.emptyList();
 		}
 
 		@Override
 		public List<String> setValue(List<String> value) {
+			// 获取当前键的所有旧值
 			List<String> previousValues = getValue();
+			// 设置指定键的新值
 			HttpComponentsHeadersAdapter.this.put(this.key, value);
+			// 返回旧的所有值
 			return previousValues;
 		}
 	}
