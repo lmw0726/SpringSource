@@ -17,9 +17,6 @@
 package org.springframework.http.client.reactive;
 
 
-import java.nio.ByteBuffer;
-import java.util.concurrent.Executor;
-
 import org.eclipse.jetty.io.ByteBufferPool;
 import org.eclipse.jetty.io.MappedByteBufferPool;
 import org.eclipse.jetty.util.ProcessorUtils;
@@ -28,69 +25,84 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 import org.eclipse.jetty.util.thread.Scheduler;
 import org.eclipse.jetty.util.thread.ThreadPool;
-
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.nio.ByteBuffer;
+import java.util.concurrent.Executor;
+
 /**
- * Factory to manage Jetty resources, i.e. {@link Executor}, {@link ByteBufferPool} and
- * {@link Scheduler}, within the lifecycle of a Spring {@code ApplicationContext}.
+ * 管理 Jetty 资源的工厂，例如 {@link Executor}、{@link ByteBufferPool} 和 {@link Scheduler}，
+ * 在 Spring {@code ApplicationContext} 的生命周期内管理这些资源。
  *
- * <p>This factory implements {@link InitializingBean} and {@link DisposableBean}
- * and is expected typically to be declared as a Spring-managed bean.
+ * <p>该工厂实现了 {@link InitializingBean} 和 {@link DisposableBean}，
+ * 通常会被声明为一个由 Spring 管理的 bean。
  *
  * @author Sebastien Deleuze
  * @since 5.1
  */
 public class JettyResourceFactory implements InitializingBean, DisposableBean {
-
+	/**
+	 * 要使用的执行器
+	 */
 	@Nullable
 	private Executor executor;
 
+	/**
+	 * 字节缓冲池
+	 */
 	@Nullable
 	private ByteBufferPool byteBufferPool;
 
+	/**
+	 * 调度程序
+	 */
 	@Nullable
 	private Scheduler scheduler;
 
+	/**
+	 * 线程前缀
+	 */
 	private String threadPrefix = "jetty-http";
 
 
 	/**
-	 * Configure the {@link Executor} to use.
-	 * <p>By default, initialized with a {@link QueuedThreadPool}.
-	 * @param executor the executor to use
+	 * 配置要使用的 {@link Executor}。
+	 * <p>默认情况下，使用 {@link QueuedThreadPool} 进行初始化。
+	 *
+	 * @param executor 要使用的执行器
 	 */
 	public void setExecutor(@Nullable Executor executor) {
 		this.executor = executor;
 	}
 
 	/**
-	 * Configure the {@link ByteBufferPool} to use.
-	 * <p>By default, initialized with a {@link MappedByteBufferPool}.
-	 * @param byteBufferPool the {@link ByteBuffer} pool to use
+	 * 配置要使用的 {@link ByteBufferPool}。
+	 * <p>默认情况下，使用 {@link MappedByteBufferPool} 进行初始化。
+	 *
+	 * @param byteBufferPool 要使用的 {@link ByteBuffer} 池
 	 */
 	public void setByteBufferPool(@Nullable ByteBufferPool byteBufferPool) {
 		this.byteBufferPool = byteBufferPool;
 	}
 
 	/**
-	 * Configure the {@link Scheduler} to use.
-	 * <p>By default, initialized with a {@link ScheduledExecutorScheduler}.
-	 * @param scheduler the {@link Scheduler} to use
+	 * 配置要使用的 {@link Scheduler}。
+	 * <p>默认情况下，使用 {@link ScheduledExecutorScheduler} 进行初始化。
+	 *
+	 * @param scheduler 要使用的 {@link Scheduler}
 	 */
 	public void setScheduler(@Nullable Scheduler scheduler) {
 		this.scheduler = scheduler;
 	}
 
 	/**
-	 * Configure the thread prefix to initialize {@link QueuedThreadPool} executor with. This
-	 * is used only when a {@link Executor} instance isn't
-	 * {@link #setExecutor(Executor) provided}.
-	 * <p>By default set to "jetty-http".
-	 * @param threadPrefix the thread prefix to use
+	 * 配置用于初始化 {@link QueuedThreadPool} 执行器的线程前缀。仅在未提供 {@link Executor} 实例时使用。
+	 * <p>默认设置为 "jetty-http"。
+	 *
+	 * @param threadPrefix 要使用的线程前缀
 	 */
 	public void setThreadPrefix(String threadPrefix) {
 		Assert.notNull(threadPrefix, "Thread prefix is required");
@@ -98,7 +110,9 @@ public class JettyResourceFactory implements InitializingBean, DisposableBean {
 	}
 
 	/**
-	 * Return the configured {@link Executor}.
+	 * 返回配置的 {@link Executor}。
+	 *
+	 * @return 配置的 {@link Executor}
 	 */
 	@Nullable
 	public Executor getExecutor() {
@@ -106,7 +120,9 @@ public class JettyResourceFactory implements InitializingBean, DisposableBean {
 	}
 
 	/**
-	 * Return the configured {@link ByteBufferPool}.
+	 * 返回配置的 {@link ByteBufferPool}。
+	 *
+	 * @return 配置的 {@link ByteBufferPool}
 	 */
 	@Nullable
 	public ByteBufferPool getByteBufferPool() {
@@ -114,7 +130,9 @@ public class JettyResourceFactory implements InitializingBean, DisposableBean {
 	}
 
 	/**
-	 * Return the configured {@link Scheduler}.
+	 * 返回配置的 {@link Scheduler}。
+	 *
+	 * @return 配置的 {@link Scheduler}
 	 */
 	@Nullable
 	public Scheduler getScheduler() {
@@ -123,45 +141,63 @@ public class JettyResourceFactory implements InitializingBean, DisposableBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		// 根据线程前缀和对象哈希码生成线程池的名称
 		String name = this.threadPrefix + "@" + Integer.toHexString(hashCode());
+
+		// 如果执行器（线程池）为空
 		if (this.executor == null) {
+			// 创建一个新的 排队线程池
 			QueuedThreadPool threadPool = new QueuedThreadPool();
+			// 设置名称
 			threadPool.setName(name);
+			// 设置执行器
 			this.executor = threadPool;
 		}
+
+		// 如果字节缓冲池为空
 		if (this.byteBufferPool == null) {
+			// 如果执行器实现了 SizedThreadPool 接口，则使用其最大线程数的一半作为缓冲池的容量
 			this.byteBufferPool = new MappedByteBufferPool(2048,
 					this.executor instanceof ThreadPool.SizedThreadPool
 							? ((ThreadPool.SizedThreadPool) this.executor).getMaxThreads() / 2
+							// 否则，使用当前可用处理器数目的两倍作为缓冲池的容量
 							: ProcessorUtils.availableProcessors() * 2);
 		}
+
+		// 如果调度器为空
 		if (this.scheduler == null) {
+			// 创建一个新的 ScheduledExecutorScheduler，并设置名称和非 daemon 模式
 			this.scheduler = new ScheduledExecutorScheduler(name + "-scheduler", false);
 		}
 
+		// 如果执行器实现了 LifeCycle 接口
 		if (this.executor instanceof LifeCycle) {
-			((LifeCycle)this.executor).start();
+			// 启动执行器
+			((LifeCycle) this.executor).start();
 		}
+
+		// 启动调度器
 		this.scheduler.start();
 	}
 
 	@Override
 	public void destroy() throws Exception {
 		try {
+			// 如果执行器实现了 LifeCycle 接口，停止执行器（线程池）
 			if (this.executor instanceof LifeCycle) {
-				((LifeCycle)this.executor).stop();
+				((LifeCycle) this.executor).stop();
 			}
+		} catch (Throwable ex) {
+			// 忽略
 		}
-		catch (Throwable ex) {
-			// ignore
-		}
+
 		try {
+			// 如果调度器不为 null，停止调度器
 			if (this.scheduler != null) {
 				this.scheduler.stop();
 			}
-		}
-		catch (Throwable ex) {
-			// ignore
+		} catch (Throwable ex) {
+			// 忽略
 		}
 	}
 
