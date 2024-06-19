@@ -32,53 +32,42 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * Implementation of {@link HttpMessageConverter} to read and write 'normal' HTML
- * forms and also to write (but not read) multipart data (e.g. file uploads).
+ * 实现 {@link HttpMessageConverter} 来读取和写入“普通”HTML表单，并且还可以写入（但不读取）多部分数据（例如文件上传）。
  *
- * <p>In other words, this converter can read and write the
- * {@code "application/x-www-form-urlencoded"} media type as
- * {@link MultiValueMap MultiValueMap&lt;String, String&gt;}, and it can also
- * write (but not read) the {@code "multipart/form-data"} and
- * {@code "multipart/mixed"} media types as
+ * <p>换句话说，此转换器可以读取和写入 {@code "application/x-www-form-urlencoded"} 媒体类型作为
+ * {@link MultiValueMap MultiValueMap&lt;String, String&gt;}, 并且它还可以写入（但不读取）
+ * {@code "multipart/form-data"} 和 {@code "multipart/mixed"} 媒体类型作为
  * {@link MultiValueMap MultiValueMap&lt;String, Object&gt;}.
  *
- * <h3>Multipart Data</h3>
+ * <h3>多部分数据</h3>
  *
- * <p>By default, {@code "multipart/form-data"} is used as the content type when
- * {@linkplain #write writing} multipart data. As of Spring Framework 5.2 it is
- * also possible to write multipart data using other multipart subtypes such as
- * {@code "multipart/mixed"} and {@code "multipart/related"}, as long as the
- * multipart subtype is registered as a {@linkplain #getSupportedMediaTypes
- * supported media type} <em>and</em> the desired multipart subtype is specified
- * as the content type when {@linkplain #write writing} the multipart data. Note
- * that {@code "multipart/mixed"} is registered as a supported media type by
- * default.
+ * <p>默认情况下，当 {@linkplain #write 写入} 多部分数据时，使用 {@code "multipart/form-data"} 作为内容类型。
+ * 从 Spring Framework 5.2 开始，还可以使用其他多部分子类型（例如 {@code "multipart/mixed"} 和
+ * {@code "multipart/related"}）写入多部分数据，只要多部分子类型注册为 {@linkplain #getSupportedMediaTypes
+ * 支持的媒体类型} <em>并且</em> 指定所需的多部分子类型作为内容类型在 {@linkplain #write 写入} 多部分数据时。
+ * 请注意，默认情况下，{@code "multipart/mixed"} 注册为支持的媒体类型。
  *
- * <p>When writing multipart data, this converter uses other
- * {@link HttpMessageConverter HttpMessageConverters} to write the respective
- * MIME parts. By default, basic converters are registered for byte array,
- * {@code String}, and {@code Resource}. These can be overridden via
- * {@link #setPartConverters} or augmented via {@link #addPartConverter}.
+ * <p>在写入多部分数据时，此转换器使用其他 {@link HttpMessageConverter HttpMessageConverters} 来写入各个 MIME 部分。
+ * 默认情况下，基本转换器注册用于字节数组、{@code String} 和 {@code Resource}。这些可以通过
+ * {@link #setPartConverters} 覆盖或通过 {@link #addPartConverter} 增强。
  *
- * <h3>Examples</h3>
+ * <h3>示例</h3>
  *
- * <p>The following snippet shows how to submit an HTML form using the
- * {@code "multipart/form-data"} content type.
+ * <p>以下代码片段显示如何使用 {@code "multipart/form-data"} 内容类型提交 HTML 表单。
  *
  * <pre class="code">
  * RestTemplate restTemplate = new RestTemplate();
- * // AllEncompassingFormHttpMessageConverter is configured by default
+ * // 默认情况下配置 AllEncompassingFormHttpMessageConverter
  *
  * MultiValueMap&lt;String, Object&gt; form = new LinkedMultiValueMap&lt;&gt;();
  * form.add("field 1", "value 1");
  * form.add("field 2", "value 2");
  * form.add("field 2", "value 3");
- * form.add("field 3", 4);  // non-String form values supported as of 5.1.4
+ * form.add("field 3", 4);  // 从 5.1.4 开始支持非字符串表单值
  *
  * restTemplate.postForLocation("https://example.com/myForm", form);</pre>
  *
- * <p>The following snippet shows how to do a file upload using the
- * {@code "multipart/form-data"} content type.
+ * <p>以下代码片段显示如何使用 {@code "multipart/form-data"} 内容类型上传文件。
  *
  * <pre class="code">
  * MultiValueMap&lt;String, Object&gt; parts = new LinkedMultiValueMap&lt;&gt;();
@@ -87,8 +76,7 @@ import java.util.*;
  *
  * restTemplate.postForLocation("https://example.com/myFileUpload", parts);</pre>
  *
- * <p>The following snippet shows how to do a file upload using the
- * {@code "multipart/mixed"} content type.
+ * <p>以下代码片段显示如何使用 {@code "multipart/mixed"} 内容类型上传文件。
  *
  * <pre class="code">
  * MultiValueMap&lt;String, Object&gt; parts = new LinkedMultiValueMap&lt;&gt;();
@@ -101,8 +89,7 @@ import java.util.*;
  * restTemplate.postForLocation("https://example.com/myFileUpload",
  *     new HttpEntity&lt;&gt;(parts, requestHeaders));</pre>
  *
- * <p>The following snippet shows how to do a file upload using the
- * {@code "multipart/related"} content type.
+ * <p>以下代码片段显示如何使用 {@code "multipart/related"} 内容类型上传文件。
  *
  * <pre class="code">
  * MediaType multipartRelated = new MediaType("multipart", "related");
@@ -111,7 +98,7 @@ import java.util.*;
  *     .filter(FormHttpMessageConverter.class::isInstance)
  *     .map(FormHttpMessageConverter.class::cast)
  *     .findFirst()
- *     .orElseThrow(() -&gt; new IllegalStateException("Failed to find FormHttpMessageConverter"))
+ *     .orElseThrow(() -&gt; new IllegalStateException("未找到 FormHttpMessageConverter"))
  *     .addSupportedMediaTypes(multipartRelated);
  *
  * MultiValueMap&lt;String, Object&gt; parts = new LinkedMultiValueMap&lt;&gt;();
@@ -124,10 +111,9 @@ import java.util.*;
  * restTemplate.postForLocation("https://example.com/myFileUpload",
  *     new HttpEntity&lt;&gt;(parts, requestHeaders));</pre>
  *
- * <h3>Miscellaneous</h3>
+ * <h3>其他事项</h3>
  *
- * <p>Some methods in this class were inspired by
- * {@code org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity}.
+ * <p>此类中的某些方法受到 {@code org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity} 的启发。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -140,55 +126,75 @@ import java.util.*;
 public class FormHttpMessageConverter implements HttpMessageConverter<MultiValueMap<String, ?>> {
 
 	/**
-	 * The default charset used by the converter.
+	 * 转换器使用的默认字符集。
 	 */
 	public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
+	/**
+	 * 默认表单数据媒体类型
+	 */
 	private static final MediaType DEFAULT_FORM_DATA_MEDIA_TYPE =
 			new MediaType(MediaType.APPLICATION_FORM_URLENCODED, DEFAULT_CHARSET);
 
-
+	/**
+	 * 支持的媒体类型列表
+	 */
 	private List<MediaType> supportedMediaTypes = new ArrayList<>();
 
+	/**
+	 * 部分转换器列表
+	 */
 	private List<HttpMessageConverter<?>> partConverters = new ArrayList<>();
 
+	/**
+	 * 字符集
+	 */
 	private Charset charset = DEFAULT_CHARSET;
 
+	/**
+	 * 多部分字符集
+	 */
 	@Nullable
 	private Charset multipartCharset;
 
 
 	public FormHttpMessageConverter() {
+		// 添加支持的媒体类型：应用程序/x-www-form-urlencoded
 		this.supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);
+		// 添加支持的媒体类型：多部分表单数据
 		this.supportedMediaTypes.add(MediaType.MULTIPART_FORM_DATA);
+		// 添加支持的媒体类型：多部分混合
 		this.supportedMediaTypes.add(MediaType.MULTIPART_MIXED);
 
+		// 添加部件转换器：字节数组 HTTP 消息转换器
 		this.partConverters.add(new ByteArrayHttpMessageConverter());
+		// 添加部件转换器：字符串 HTTP 消息转换器
 		this.partConverters.add(new StringHttpMessageConverter());
+		// 添加部件转换器：资源 HTTP 消息转换器
 		this.partConverters.add(new ResourceHttpMessageConverter());
 
+		// 应用默认字符集设置
 		applyDefaultCharset();
 	}
 
 
 	/**
-	 * Set the list of {@link MediaType} objects supported by this converter.
+	 * 设置此转换器支持的 {@link MediaType} 对象列表。
 	 *
 	 * @see #addSupportedMediaTypes(MediaType...)
 	 * @see #getSupportedMediaTypes()
 	 */
 	public void setSupportedMediaTypes(List<MediaType> supportedMediaTypes) {
 		Assert.notNull(supportedMediaTypes, "'supportedMediaTypes' must not be null");
-		// Ensure internal list is mutable.
+		// 确保内部列表是可变的。
 		this.supportedMediaTypes = new ArrayList<>(supportedMediaTypes);
 	}
 
 	/**
-	 * Add {@link MediaType} objects to be supported by this converter.
-	 * <p>The supplied {@code MediaType} objects will be appended to the list
-	 * of {@linkplain #getSupportedMediaTypes() supported MediaType objects}.
+	 * 添加此转换器支持的 {@link MediaType} 对象。
+	 * <p>提供的 {@code MediaType} 对象将被附加到 {@linkplain #getSupportedMediaTypes() 支持的 MediaType 对象} 列表中。
 	 *
-	 * @param supportedMediaTypes a var-args list of {@code MediaType} objects to add
+	 * @param supportedMediaTypes 要添加的一组 {@code MediaType} 对象
 	 * @see #setSupportedMediaTypes(List)
 	 * @since 5.2
 	 */
@@ -210,8 +216,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	}
 
 	/**
-	 * Set the message body converters to use. These converters are used to
-	 * convert objects to MIME parts.
+	 * 设置要使用的消息体转换器。这些转换器用于将对象转换为 MIME 部分。
 	 */
 	public void setPartConverters(List<HttpMessageConverter<?>> partConverters) {
 		Assert.notEmpty(partConverters, "'partConverters' must not be empty");
@@ -219,8 +224,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	}
 
 	/**
-	 * Return the {@linkplain #setPartConverters configured converters} for MIME
-	 * parts.
+	 * 返回配置的 MIME 部分的转换器。
 	 *
 	 * @since 5.3
 	 */
@@ -229,8 +233,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	}
 
 	/**
-	 * Add a message body converter. Such a converter is used to convert objects
-	 * to MIME parts.
+	 * 添加消息体转换器。此类转换器用于将对象转换为 MIME 部分。
 	 */
 	public void addPartConverter(HttpMessageConverter<?> partConverter) {
 		Assert.notNull(partConverter, "'partConverter' must not be null");
@@ -238,34 +241,35 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	}
 
 	/**
-	 * Set the default character set to use for reading and writing form data when
-	 * the request or response {@code Content-Type} header does not explicitly
-	 * specify it.
-	 * <p>As of 4.3, this is also used as the default charset for the conversion
-	 * of text bodies in a multipart request.
-	 * <p>As of 5.0, this is also used for part headers including
-	 * {@code Content-Disposition} (and its filename parameter) unless (the mutually
-	 * exclusive) {@link #setMultipartCharset multipartCharset} is also set, in
-	 * which case part headers are encoded as ASCII and <i>filename</i> is encoded
-	 * with the {@code encoded-word} syntax from RFC 2047.
-	 * <p>By default this is set to "UTF-8".
+	 * 设置在请求或响应的 {@code Content-Type} 头未明确指定时用于读取和写入表单数据的默认字符集。
+	 * <p>从 4.3 开始，这也用于在多部分请求中转换文本主体的默认字符集。
+	 * <p>从 5.0 开始，这也用于部分头包括 {@code Content-Disposition}（及其文件名参数），
+	 * 除非还设置了（互斥的）{@link #setMultipartCharset multipartCharset}，在这种情况下部分头以 ASCII 编码，
+	 * 并且 <i>文件名</i> 使用 RFC 2047 的 {@code encoded-word} 语法编码。
+	 * <p>默认情况下，此设置为 "UTF-8"。
 	 */
 	public void setCharset(@Nullable Charset charset) {
+		// 如果给定的字符集不等于当前字符集
 		if (charset != this.charset) {
+			// 更新当前字符集为给定字符集，如果给定字符集为 null，则使用默认字符集
 			this.charset = (charset != null ? charset : DEFAULT_CHARSET);
+			// 应用默认字符集设置
 			applyDefaultCharset();
 		}
 	}
 
 	/**
-	 * Apply the configured charset as a default to registered part converters.
+	 * 将配置的字符集作为默认值应用于注册的部分转换器。
 	 */
 	private void applyDefaultCharset() {
+		// 遍历部分转换器列表
 		for (HttpMessageConverter<?> candidate : this.partConverters) {
+			// 如果候选转换器是 抽象Http消息转换器 的实例
 			if (candidate instanceof AbstractHttpMessageConverter) {
 				AbstractHttpMessageConverter<?> converter = (AbstractHttpMessageConverter<?>) candidate;
-				// Only override default charset if the converter operates with a charset to begin with...
+				// 如果转换器使用默认字符集
 				if (converter.getDefaultCharset() != null) {
+					// 将默认字符集设置为指定的字符集
 					converter.setDefaultCharset(this.charset);
 				}
 			}
@@ -273,12 +277,10 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	}
 
 	/**
-	 * Set the character set to use when writing multipart data to encode file
-	 * names. Encoding is based on the {@code encoded-word} syntax defined in
-	 * RFC 2047 and relies on {@code MimeUtility} from {@code javax.mail}.
-	 * <p>As of 5.0 by default part headers, including {@code Content-Disposition}
-	 * (and its filename parameter) will be encoded based on the setting of
-	 * {@link #setCharset(Charset)} or {@code UTF-8} by default.
+	 * 设置在编写多部分数据时用于编码文件名的字符集。编码基于 RFC 2047 中定义的
+	 * {@code encoded-word} 语法，并依赖于 {@code javax.mail} 中的 {@code MimeUtility}。
+	 * <p>从 5.0 开始，默认情况下部分头包括 {@code Content-Disposition}
+	 * （及其文件名参数）将基于 {@link #setCharset(Charset)} 的设置或默认情况下的 {@code UTF-8} 进行编码。
 	 *
 	 * @see <a href="https://en.wikipedia.org/wiki/MIME#Encoded-Word">Encoded-Word</a>
 	 * @since 4.1.1
@@ -290,37 +292,48 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 	@Override
 	public boolean canRead(Class<?> clazz, @Nullable MediaType mediaType) {
+		// 如果 类型 不是 MultiValueMap 类或其子类，则返回 false
 		if (!MultiValueMap.class.isAssignableFrom(clazz)) {
 			return false;
 		}
+		// 如果 媒体类型 为 null，则返回 true
 		if (mediaType == null) {
 			return true;
 		}
+		// 遍历支持的媒体类型列表
 		for (MediaType supportedMediaType : getSupportedMediaTypes()) {
+			// 如果支持的媒体类型的主类型是 "multipart"，则跳过
 			if (supportedMediaType.getType().equalsIgnoreCase("multipart")) {
-				// We can't read multipart, so skip this supported media type.
+				// 我们不能读取多部分，所以跳过这个支持的媒体类型。
 				continue;
 			}
+			// 如果支持的媒体类型包含给定的 媒体类型，则返回 true
 			if (supportedMediaType.includes(mediaType)) {
 				return true;
 			}
 		}
+		// 如果没有找到包含给定 媒体类型 的支持的媒体类型，则返回 false
 		return false;
 	}
 
 	@Override
 	public boolean canWrite(Class<?> clazz, @Nullable MediaType mediaType) {
+		// 如果 类 不是 MultiValueMap 类或其子类，则返回 false
 		if (!MultiValueMap.class.isAssignableFrom(clazz)) {
 			return false;
 		}
+		// 如果 媒体类型 为 null 或者是 所有媒体类型，则返回 true
 		if (mediaType == null || MediaType.ALL.equals(mediaType)) {
 			return true;
 		}
+		// 遍历支持的媒体类型列表
 		for (MediaType supportedMediaType : getSupportedMediaTypes()) {
+			// 如果支持的媒体类型与给定的 媒体类型 兼容，则返回 true
 			if (supportedMediaType.isCompatibleWith(mediaType)) {
 				return true;
 			}
 		}
+		// 如果没有找到兼容的媒体类型，则返回 false
 		return false;
 	}
 
@@ -328,23 +341,34 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	public MultiValueMap<String, String> read(@Nullable Class<? extends MultiValueMap<String, ?>> clazz,
 											  HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
 
+		// 获取输入消息的内容类型
 		MediaType contentType = inputMessage.getHeaders().getContentType();
+		// 获取字符集，如果内容类型不为 null， 且包含字符集，则使用内容类型的字符集，否则使用默认字符集
 		Charset charset = (contentType != null && contentType.getCharset() != null ?
 				contentType.getCharset() : this.charset);
+		// 将输入消息的主体内容转换为字符串
 		String body = StreamUtils.copyToString(inputMessage.getBody(), charset);
 
+		// 将字符串 body 按 '&' 分隔为键值对数组
 		String[] pairs = StringUtils.tokenizeToStringArray(body, "&");
+		// 创建 解析好键值对 的映射
 		MultiValueMap<String, String> result = new LinkedMultiValueMap<>(pairs.length);
+		// 遍历键值对数组
 		for (String pair : pairs) {
+			// 查找键值对中的 '=' 符号位置
 			int idx = pair.indexOf('=');
+			// 如果找不到 '=' 符号，则将整个 对 视为键名，值为 null
 			if (idx == -1) {
 				result.add(URLDecoder.decode(pair, charset.name()), null);
 			} else {
+				// 否则，将 '=' 符号之前的部分作为键名，之后的部分作为值，并解码为指定字符集的字符串
 				String name = URLDecoder.decode(pair.substring(0, idx), charset.name());
 				String value = URLDecoder.decode(pair.substring(idx + 1), charset.name());
 				result.add(name, value);
 			}
 		}
+
+		// 返回解析后的键值对映射
 		return result;
 	}
 
@@ -353,93 +377,129 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 	public void write(MultiValueMap<String, ?> map, @Nullable MediaType contentType, HttpOutputMessage outputMessage)
 			throws IOException, HttpMessageNotWritableException {
 
+		// 如果是多部分内容
 		if (isMultipart(map, contentType)) {
+			// 写入多部分内容
 			writeMultipart((MultiValueMap<String, Object>) map, contentType, outputMessage);
 		} else {
+			// 否则写入表单内容
 			writeForm((MultiValueMap<String, Object>) map, contentType, outputMessage);
 		}
 	}
 
 
 	private boolean isMultipart(MultiValueMap<String, ?> map, @Nullable MediaType contentType) {
+		// 如果内容类型不为 null
 		if (contentType != null) {
+			// 检查内容类型是否为 多部分（忽略大小写）
 			return contentType.getType().equalsIgnoreCase("multipart");
 		}
+
+		// 遍历 映射 的每个值列表
 		for (List<?> values : map.values()) {
+			// 遍历每个值列表的每个值
 			for (Object value : values) {
+				// 如果值不为 null ，并且不是 字符串 类型，则返回 true
 				if (value != null && !(value instanceof String)) {
 					return true;
 				}
 			}
 		}
+
+		// 如果没有找到非 字符串 类型的值，则返回 false
 		return false;
 	}
 
 	private void writeForm(MultiValueMap<String, Object> formData, @Nullable MediaType contentType,
 						   HttpOutputMessage outputMessage) throws IOException {
 
+		// 获取表单数据的内容类型
 		contentType = getFormContentType(contentType);
+		// 设置输出消息的内容类型
 		outputMessage.getHeaders().setContentType(contentType);
 
+		// 获取内容类型的字符集
 		Charset charset = contentType.getCharset();
-		Assert.notNull(charset, "No charset"); // should never occur
+		// 确保字符集不为空，否则抛出异常（理论上不会发生）
+		// 不应该发生的情况
+		Assert.notNull(charset, "No charset");
 
+		// 序列化表单数据，并将其转换为指定字符集的字节数组
 		byte[] bytes = serializeForm(formData, charset).getBytes(charset);
+		// 设置输出消息的内容长度
 		outputMessage.getHeaders().setContentLength(bytes.length);
 
+		// 如果输出消息是 流式处理Http输出消息 的实例
 		if (outputMessage instanceof StreamingHttpOutputMessage) {
 			StreamingHttpOutputMessage streamingOutputMessage = (StreamingHttpOutputMessage) outputMessage;
+			// 设置输出消息的主体
 			streamingOutputMessage.setBody(outputStream -> StreamUtils.copy(bytes, outputStream));
 		} else {
+			// 否则直接将字节数组写入到输出消息的主体中
 			StreamUtils.copy(bytes, outputMessage.getBody());
 		}
 	}
 
 	/**
-	 * Return the content type used to write forms, given the preferred content type.
-	 * By default, this method returns the given content type, but adds the
-	 * {@linkplain #setCharset(Charset) charset} if it does not have one.
-	 * If {@code contentType} is {@code null},
-	 * {@code application/x-www-form-urlencoded; charset=UTF-8} is returned.
-	 * <p>Subclasses can override this method to change this behavior.
+	 * 返回用于编写表单的内容类型，给定首选的内容类型。
+	 * 默认情况下，此方法返回给定的内容类型，但如果没有字符集，则添加
+	 * {@linkplain #setCharset(Charset) charset}。
+	 * 如果 {@code contentType} 为 {@code null}，则返回
+	 * {@code application/x-www-form-urlencoded; charset=UTF-8}。
+	 * <p>子类可以重写此方法以更改此行为。
 	 *
-	 * @param contentType the preferred content type (can be {@code null})
-	 * @return the content type to be used
+	 * @param contentType 首选的内容类型（可以为 {@code null}）
+	 * @return 要使用的内容类型
 	 * @since 5.2.2
 	 */
 	protected MediaType getFormContentType(@Nullable MediaType contentType) {
+		// 如果内容类型为空，则返回默认的表单数据媒体类型
 		if (contentType == null) {
 			return DEFAULT_FORM_DATA_MEDIA_TYPE;
 		} else if (contentType.getCharset() == null) {
+			// 如果内容类型的字符集为空
+			// 使用指定的字符集创建一个新的内容类型，并返回
 			return new MediaType(contentType, this.charset);
 		} else {
+			// 否则直接返回内容类型
 			return contentType;
 		}
 	}
 
 	protected String serializeForm(MultiValueMap<String, Object> formData, Charset charset) {
+		// 创建一个 字符串构建器 对象，用于构建表单数据字符串
 		StringBuilder builder = new StringBuilder();
+		// 遍历表单数据的每个条目
 		formData.forEach((name, values) -> {
+			// 如果名称为 null
 			if (name == null) {
+				// 确保值列表为空，否则抛出异常
 				Assert.isTrue(CollectionUtils.isEmpty(values), "Null name in form data: " + formData);
 				return;
 			}
+			// 遍历名称对应的每个值
 			values.forEach(value -> {
 				try {
+					// 如果 字符串构建器 中已有数据，则添加 '&' 分隔符
 					if (builder.length() != 0) {
 						builder.append('&');
 					}
+					// 将名称进行 URL 编码并添加到 字符串构建器 中
 					builder.append(URLEncoder.encode(name, charset.name()));
+					// 如果值不为 null
 					if (value != null) {
+						// 进行 URL 编码并添加到 字符串构建器 中
 						builder.append('=');
 						builder.append(URLEncoder.encode(String.valueOf(value), charset.name()));
 					}
 				} catch (UnsupportedEncodingException ex) {
+					// 如果编码不支持，则抛出 IllegalStateException 异常
 					throw new IllegalStateException(ex);
 				}
 			});
 		});
 
+		// 返回构建好的表单数据字符串
 		return builder.toString();
 	}
 
@@ -447,57 +507,77 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 			MultiValueMap<String, Object> parts, @Nullable MediaType contentType, HttpOutputMessage outputMessage)
 			throws IOException {
 
-		// If the supplied content type is null, fall back to multipart/form-data.
-		// Otherwise rely on the fact that isMultipart() already verified the
-		// supplied content type is multipart.
+		// 如果提供的内容类型为空，则使用 multipart/form-data 作为默认值。
+		// 否则，依赖于 isMultipart() 方法已经验证过提供的内容类型是 多部分。
 		if (contentType == null) {
+			// 如果内存类型为空，则设置为 多部分表单数据
 			contentType = MediaType.MULTIPART_FORM_DATA;
 		}
 
+		// 创建一个存储内容类型的参数映射
 		Map<String, String> parameters = new LinkedHashMap<>(contentType.getParameters().size() + 2);
+		// 将内容类型的现有参数复制到新的参数映射中
 		parameters.putAll(contentType.getParameters());
 
+		// 生成多部分请求的边界
 		byte[] boundary = generateMultipartBoundary();
+		// 如果文件名字符集未设置
 		if (!isFilenameCharsetSet()) {
+			// 如果字符集既不是 UTF-8 也不是 美国ASCII字符集
 			if (!this.charset.equals(StandardCharsets.UTF_8) &&
 					!this.charset.equals(StandardCharsets.US_ASCII)) {
+				// 将字符集参数添加到参数映射中
 				parameters.put("charset", this.charset.name());
 			}
 		}
+		// 将边界参数添加到参数映射中，使用 美国ASCII字符集 编码
 		parameters.put("boundary", new String(boundary, StandardCharsets.US_ASCII));
 
-		// Add parameters to output content type
+		// 将参数添加到内容类型中
 		contentType = new MediaType(contentType, parameters);
+		// 设置输出消息的内容类型
 		outputMessage.getHeaders().setContentType(contentType);
 
+		// 如果输出消息是 流式处理Http输出消息 的实例
 		if (outputMessage instanceof StreamingHttpOutputMessage) {
 			StreamingHttpOutputMessage streamingOutputMessage = (StreamingHttpOutputMessage) outputMessage;
+			// 设置输出消息的主体
 			streamingOutputMessage.setBody(outputStream -> {
+				// 写入所有部分到输出流
 				writeParts(outputStream, parts, boundary);
+				// 写入结束边界到输出流
 				writeEnd(outputStream, boundary);
 			});
 		} else {
+			// 写入所有部分到输出消息的主体
 			writeParts(outputMessage.getBody(), parts, boundary);
+			// 写入结束边界到输出消息的主体
 			writeEnd(outputMessage.getBody(), boundary);
 		}
 	}
 
 	/**
-	 * When {@link #setMultipartCharset(Charset)} is configured (i.e. RFC 2047,
-	 * {@code encoded-word} syntax) we need to use ASCII for part headers, or
-	 * otherwise we encode directly using the configured {@link #setCharset(Charset)}.
+	 * 当配置了 {@link #setMultipartCharset(Charset)}（即 RFC 2047, {@code encoded-word} 语法）时，
+	 * 我们需要对部分头使用 ASCII，否则我们直接使用配置的 {@link #setCharset(Charset)} 进行编码。
 	 */
 	private boolean isFilenameCharsetSet() {
 		return (this.multipartCharset != null);
 	}
 
 	private void writeParts(OutputStream os, MultiValueMap<String, Object> parts, byte[] boundary) throws IOException {
+		// 遍历 部分映射 的每个条目
 		for (Map.Entry<String, List<Object>> entry : parts.entrySet()) {
+			// 获取条目的键（部分的名称）
 			String name = entry.getKey();
+			// 遍历条目的值（部分的内容列表）
 			for (Object part : entry.getValue()) {
+				// 如果部分内容不为空
 				if (part != null) {
+					// 写入边界到输出流
 					writeBoundary(os, boundary);
+					// 将部分内容作为 Http实体 写入输出流
 					writePart(name, getHttpEntity(part), os);
+					// 写入一个换行符到输出流
 					writeNewLine(os);
 				}
 			}
@@ -506,68 +586,89 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 	@SuppressWarnings("unchecked")
 	private void writePart(String name, HttpEntity<?> partEntity, OutputStream os) throws IOException {
+		// 获取 部分实体 的主体内容
 		Object partBody = partEntity.getBody();
+		// 如果主体内容为空，则抛出异常
 		if (partBody == null) {
 			throw new IllegalStateException("Empty body for part '" + name + "': " + partEntity);
 		}
+		// 获取主体内容的类型
 		Class<?> partType = partBody.getClass();
+		// 获取 部分实体 的头信息
 		HttpHeaders partHeaders = partEntity.getHeaders();
+		// 获取部分内容的媒体类型
 		MediaType partContentType = partHeaders.getContentType();
+		// 遍历所有的 Http消息转换器
 		for (HttpMessageConverter<?> messageConverter : this.partConverters) {
+			// 如果转换器可以写入该类型和媒体类型的内容
 			if (messageConverter.canWrite(partType, partContentType)) {
+				// 如果文件名字符集已设置，则使用 美国ASCII字符集，否则使用默认字符集
 				Charset charset = isFilenameCharsetSet() ? StandardCharsets.US_ASCII : this.charset;
+				// 创建 多部分Http输出消息 对象
 				HttpOutputMessage multipartMessage = new MultipartHttpOutputMessage(os, charset);
+				// 设置内容处理方式为表单数据
 				multipartMessage.getHeaders().setContentDispositionFormData(name, getFilename(partBody));
+				// 如果部分头信息不为空
 				if (!partHeaders.isEmpty()) {
+					// 将其添加到 多部分消息 的头信息中
 					multipartMessage.getHeaders().putAll(partHeaders);
 				}
+				// 使用转换器写入主体内容到 多部分消息
 				((HttpMessageConverter<Object>) messageConverter).write(partBody, partContentType, multipartMessage);
 				return;
 			}
 		}
+		// 如果没有找到合适的 Http消息转换器，则抛出异常
 		throw new HttpMessageNotWritableException("Could not write request: no suitable HttpMessageConverter " +
 				"found for request type [" + partType.getName() + "]");
 	}
 
 	/**
-	 * Generate a multipart boundary.
-	 * <p>This implementation delegates to
-	 * {@link MimeTypeUtils#generateMultipartBoundary()}.
+	 * 生成一个多部分边界。
+	 * <p>此实现委托给 {@link MimeTypeUtils#generateMultipartBoundary()}。
+	 *
+	 * @return 生成的多部分边界字节数组
 	 */
 	protected byte[] generateMultipartBoundary() {
 		return MimeTypeUtils.generateMultipartBoundary();
 	}
 
 	/**
-	 * Return an {@link HttpEntity} for the given part Object.
+	 * 返回给定部分对象的 {@link HttpEntity}。
 	 *
-	 * @param part the part to return an {@link HttpEntity} for
-	 * @return the part Object itself it is an {@link HttpEntity},
-	 * or a newly built {@link HttpEntity} wrapper for that part
+	 * @param part 要返回 {@link HttpEntity} 的部分对象
+	 * @return 如果部分对象是 {@link HttpEntity}，则返回部分对象本身；
+	 * 否则返回新构建的包装了该部分对象的 {@link HttpEntity}
 	 */
 	protected HttpEntity<?> getHttpEntity(Object part) {
 		return (part instanceof HttpEntity ? (HttpEntity<?>) part : new HttpEntity<>(part));
 	}
 
 	/**
-	 * Return the filename of the given multipart part. This value will be used for the
-	 * {@code Content-Disposition} header.
-	 * <p>The default implementation returns {@link Resource#getFilename()} if the part is a
-	 * {@code Resource}, and {@code null} in other cases. Can be overridden in subclasses.
+	 * 返回给定多部分部分的文件名。此值将用于 {@code Content-Disposition} 头部。
+	 * <p>默认实现如果部分对象是 {@code Resource}，则返回 {@link Resource#getFilename()}；
+	 * 否则返回 {@code null}。可以在子类中覆盖此方法。
 	 *
-	 * @param part the part to determine the file name for
-	 * @return the filename, or {@code null} if not known
+	 * @param part 要确定文件名的多部分部分
+	 * @return 文件名，如果不知道则返回 {@code null}
 	 */
 	@Nullable
 	protected String getFilename(Object part) {
+		// 如果 部分 是 Resource 的实例
 		if (part instanceof Resource) {
+			// 将 部分 转换为 Resource
 			Resource resource = (Resource) part;
+			// 获取资源的文件名
 			String filename = resource.getFilename();
+			// 如果文件名不为空，且 多部分字符集 也不为空
 			if (filename != null && this.multipartCharset != null) {
+				// 使用指定的字符集对文件名进行编码
 				filename = MimeDelegate.encode(filename, this.multipartCharset.name());
 			}
+			// 返回编码后的文件名
 			return filename;
 		} else {
+			// 否则返回 null
 			return null;
 		}
 	}
@@ -697,14 +798,24 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 
 	/**
-	 * Inner class to avoid a hard dependency on the JavaMail API.
+	 * 内部类，避免对 JavaMail API 的硬依赖。
 	 */
 	private static class MimeDelegate {
 
+		/**
+		 * 使用指定的字符集编码给定的值。
+		 *
+		 * @param value   要编码的值
+		 * @param charset 字符集
+		 * @return 编码后的文本
+		 * @throws IllegalStateException 如果编码过程中出现不支持的编码异常
+		 */
 		public static String encode(String value, String charset) {
 			try {
+				// 尝试使用指定的字符集对值进行 MIME 编码
 				return MimeUtility.encodeText(value, charset, null);
 			} catch (UnsupportedEncodingException ex) {
+				// 如果编码不支持，则抛出 IllegalStateException 异常
 				throw new IllegalStateException(ex);
 			}
 		}
