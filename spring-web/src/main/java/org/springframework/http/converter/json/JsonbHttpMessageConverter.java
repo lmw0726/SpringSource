@@ -16,56 +16,57 @@
 
 package org.springframework.http.converter.json;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Implementation of {@link org.springframework.http.converter.HttpMessageConverter}
- * that can read and write JSON using the
- * <a href="http://json-b.net/">JSON Binding API</a>.
+ * 实现 {@link org.springframework.http.converter.HttpMessageConverter} 接口，
+ * 使用 <a href="http://json-b.net/">JSON Binding API</a> 读写 JSON 的转换器。
  *
- * <p>This converter can be used to bind to typed beans or untyped {@code HashMap}s.
- * By default, it supports {@code application/json} and {@code application/*+json} with
- * {@code UTF-8} character set.
+ * <p>此转换器可用于绑定到类型化的 bean 或未类型化的 {@code HashMap}。
+ * 默认支持 {@code application/json} 和 {@code application/*+json}，使用 {@code UTF-8} 字符集。
  *
  * @author Juergen Hoeller
- * @since 5.0
  * @see javax.json.bind.Jsonb
  * @see javax.json.bind.JsonbBuilder
  * @see #setJsonb
+ * @since 5.0
  */
 public class JsonbHttpMessageConverter extends AbstractJsonHttpMessageConverter {
-
+	/**
+	 * Jsonb 实例
+	 */
 	private Jsonb jsonb;
 
 
 	/**
-	 * Construct a new {@code JsonbHttpMessageConverter} with default configuration.
+	 * 使用默认配置构造新的 {@code JsonbHttpMessageConverter}。
 	 */
 	public JsonbHttpMessageConverter() {
 		this(JsonbBuilder.create());
 	}
 
 	/**
-	 * Construct a new {@code JsonbHttpMessageConverter} with the given configuration.
-	 * @param config the {@code JsonbConfig} for the underlying delegate
+	 * 使用给定配置构造新的 {@code JsonbHttpMessageConverter}。
+	 *
+	 * @param config 底层代理的 {@code JsonbConfig}
 	 */
 	public JsonbHttpMessageConverter(JsonbConfig config) {
 		this.jsonb = JsonbBuilder.create(config);
 	}
 
 	/**
-	 * Construct a new {@code JsonbHttpMessageConverter} with the given delegate.
-	 * @param jsonb the Jsonb instance to use
+	 * 使用给定的 Jsonb 实例构造新的 {@code JsonbHttpMessageConverter}。
+	 *
+	 * @param jsonb 要使用的 Jsonb 实例
 	 */
 	public JsonbHttpMessageConverter(Jsonb jsonb) {
 		Assert.notNull(jsonb, "A Jsonb instance is required");
@@ -74,10 +75,10 @@ public class JsonbHttpMessageConverter extends AbstractJsonHttpMessageConverter 
 
 
 	/**
-	 * Set the {@code Jsonb} instance to use.
-	 * If not set, a default {@code Jsonb} instance will be created.
-	 * <p>Setting a custom-configured {@code Jsonb} is one way to take further
-	 * control of the JSON serialization process.
+	 * 设置要使用的 {@code Jsonb} 实例。
+	 * 如果未设置，将创建一个默认的 {@code Jsonb} 实例。
+	 * <p>设置自定义配置的 {@code Jsonb} 是控制 JSON 序列化过程的一种方式。
+	 *
 	 * @see #JsonbHttpMessageConverter(Jsonb)
 	 * @see #JsonbHttpMessageConverter(JsonbConfig)
 	 * @see JsonbBuilder
@@ -88,7 +89,7 @@ public class JsonbHttpMessageConverter extends AbstractJsonHttpMessageConverter 
 	}
 
 	/**
-	 * Return the configured {@code Jsonb} instance for this converter.
+	 * 返回此转换器配置的 {@code Jsonb} 实例。
 	 */
 	public Jsonb getJsonb() {
 		return this.jsonb;
@@ -103,9 +104,10 @@ public class JsonbHttpMessageConverter extends AbstractJsonHttpMessageConverter 
 	@Override
 	protected void writeInternal(Object object, @Nullable Type type, Writer writer) throws Exception {
 		if (type instanceof ParameterizedType) {
+			// 如果类型是参数化类型，则调用带有类型的toJson方法
 			getJsonb().toJson(object, type, writer);
-		}
-		else {
+		} else {
+			// 否则调用不带类型的toJson方法
 			getJsonb().toJson(object, writer);
 		}
 	}

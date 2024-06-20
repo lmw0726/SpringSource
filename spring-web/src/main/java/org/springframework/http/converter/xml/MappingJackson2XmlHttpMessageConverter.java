@@ -16,28 +16,28 @@
 
 package org.springframework.http.converter.xml;
 
-import java.nio.charset.StandardCharsets;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.Assert;
 
+import java.nio.charset.StandardCharsets;
+
 /**
- * Implementation of {@link org.springframework.http.converter.HttpMessageConverter HttpMessageConverter}
- * that can read and write XML using <a href="https://github.com/FasterXML/jackson-dataformat-xml">
- * Jackson 2.x extension component for reading and writing XML encoded data</a>.
+ * 实现 {@link org.springframework.http.converter.HttpMessageConverter HttpMessageConverter}
+ * 接口，可以使用 <a href="https://github.com/FasterXML/jackson-dataformat-xml">
+ * Jackson 2.x 扩展组件读写 XML 编码数据</a>。
  *
- * <p>By default, this converter supports {@code application/xml}, {@code text/xml}, and
- * {@code application/*+xml} with {@code UTF-8} character set. This can be overridden by
- * setting the {@link #setSupportedMediaTypes supportedMediaTypes} property.
+ * <p>默认情况下，此转换器支持 {@code application/xml}、{@code text/xml} 和
+ * {@code application/*+xml} 媒体类型，使用 {@code UTF-8} 字符集。可以通过
+ * 设置 {@link #setSupportedMediaTypes supportedMediaTypes} 属性进行覆盖。
  *
- * <p>The default constructor uses the default configuration provided by {@link Jackson2ObjectMapperBuilder}.
+ * <p>默认构造函数使用由 {@link Jackson2ObjectMapperBuilder}
+ * 提供的默认配置。
  *
- * <p>Compatible with Jackson 2.9 to 2.12, as of Spring 5.3.
+ * <p>从 Spring 5.3 开始兼容 Jackson 2.9 到 2.12。
  *
  * @author Sebastien Deleuze
  * @since 4.1
@@ -45,17 +45,19 @@ import org.springframework.util.Assert;
 public class MappingJackson2XmlHttpMessageConverter extends AbstractJackson2HttpMessageConverter {
 
 	/**
-	 * Construct a new {@code MappingJackson2XmlHttpMessageConverter} using default configuration
-	 * provided by {@code Jackson2ObjectMapperBuilder}.
+	 * 使用 {@code Jackson2ObjectMapperBuilder} 提供的默认配置构造新的
+	 * {@code MappingJackson2XmlHttpMessageConverter}。
 	 */
 	public MappingJackson2XmlHttpMessageConverter() {
 		this(Jackson2ObjectMapperBuilder.xml().build());
 	}
 
 	/**
-	 * Construct a new {@code MappingJackson2XmlHttpMessageConverter} with a custom {@link ObjectMapper}
-	 * (must be a {@link XmlMapper} instance).
-	 * You can use {@link Jackson2ObjectMapperBuilder} to build it easily.
+	 * 使用自定义 {@link ObjectMapper} 构造新的
+	 * {@code MappingJackson2XmlHttpMessageConverter}。
+	 * <p>必须是 {@link XmlMapper} 实例的 {@link ObjectMapper}。
+	 * 可以使用 {@link Jackson2ObjectMapperBuilder} 轻松构建。
+	 *
 	 * @see Jackson2ObjectMapperBuilder#xml()
 	 */
 	public MappingJackson2XmlHttpMessageConverter(ObjectMapper objectMapper) {
@@ -68,7 +70,7 @@ public class MappingJackson2XmlHttpMessageConverter extends AbstractJackson2Http
 
 	/**
 	 * {@inheritDoc}
-	 * The {@code ObjectMapper} parameter must be a {@link XmlMapper} instance.
+	 * {@code ObjectMapper} 参数必须是 {@link XmlMapper} 实例。
 	 */
 	@Override
 	public void setObjectMapper(ObjectMapper objectMapper) {

@@ -16,9 +16,6 @@
 
 package org.springframework.http.converter;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -26,16 +23,16 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+
 /**
- * An {@code HttpMessageConverter} that uses {@link StringHttpMessageConverter}
- * for reading and writing content and a {@link ConversionService} for converting
- * the String content to and from the target object type.
+ * 实现了 {@code HttpMessageConverter} 接口，使用 {@link StringHttpMessageConverter} 用于读取和写入内容，
+ * 并使用 {@link ConversionService} 将字符串内容转换为目标对象类型及其反向转换。
  *
- * <p>By default, this converter supports the media type {@code text/plain} only.
- * This can be overridden through the {@link #setSupportedMediaTypes supportedMediaTypes}
- * property.
+ * <p>默认情况下，此转换器仅支持媒体类型 {@code text/plain}。可以通过 {@link #setSupportedMediaTypes supportedMediaTypes} 属性进行覆盖。
  *
- * <p>A usage example:
+ * <p>使用示例:
  *
  * <pre class="code">
  * &lt;bean class="org.springframework.http.converter.ObjectToStringHttpMessageConverter"&gt;
@@ -50,26 +47,31 @@ import org.springframework.util.Assert;
  * @since 3.2
  */
 public class ObjectToStringHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
-
+	/**
+	 * 转换服务
+	 */
 	private final ConversionService conversionService;
 
+	/**
+	 * 字符串Http消息转换器
+	 */
 	private final StringHttpMessageConverter stringHttpMessageConverter;
 
 
 	/**
-	 * A constructor accepting a {@code ConversionService} to use to convert the
-	 * (String) message body to/from the target class type. This constructor uses
-	 * {@link StringHttpMessageConverter#DEFAULT_CHARSET} as the default charset.
-	 * @param conversionService the conversion service
+	 * 构造函数，接受一个 {@code ConversionService} 用于将（String）消息主体转换为目标类类型，并使用 {@link StringHttpMessageConverter#DEFAULT_CHARSET} 作为默认字符集。
+	 *
+	 * @param conversionService 转换服务
 	 */
 	public ObjectToStringHttpMessageConverter(ConversionService conversionService) {
 		this(conversionService, StringHttpMessageConverter.DEFAULT_CHARSET);
 	}
 
 	/**
-	 * A constructor accepting a {@code ConversionService} as well as a default charset.
-	 * @param conversionService the conversion service
-	 * @param defaultCharset the default charset
+	 * 构造函数，接受一个 {@code ConversionService} 和一个默认字符集。
+	 *
+	 * @param conversionService 转换服务
+	 * @param defaultCharset    默认字符集
 	 */
 	public ObjectToStringHttpMessageConverter(ConversionService conversionService, Charset defaultCharset) {
 		super(defaultCharset, MediaType.TEXT_PLAIN);
@@ -81,7 +83,7 @@ public class ObjectToStringHttpMessageConverter extends AbstractHttpMessageConve
 
 
 	/**
-	 * Delegates to {@link StringHttpMessageConverter#setWriteAcceptCharset(boolean)}.
+	 * 委托给 {@link StringHttpMessageConverter#setWriteAcceptCharset(boolean)} 方法。
 	 */
 	public void setWriteAcceptCharset(boolean writeAcceptCharset) {
 		this.stringHttpMessageConverter.setWriteAcceptCharset(writeAcceptCharset);
@@ -100,7 +102,7 @@ public class ObjectToStringHttpMessageConverter extends AbstractHttpMessageConve
 
 	@Override
 	protected boolean supports(Class<?> clazz) {
-		// should not be called, since we override canRead/Write
+		// 不应该被调用，因为我们重写了canRead/Write
 		throw new UnsupportedOperationException();
 	}
 
@@ -108,30 +110,42 @@ public class ObjectToStringHttpMessageConverter extends AbstractHttpMessageConve
 	protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage)
 			throws IOException, HttpMessageNotReadableException {
 
+		// 使用 字符串Http消息转换器 读取输入消息并转换为 String 类型的 值
 		String value = this.stringHttpMessageConverter.readInternal(String.class, inputMessage);
+		// 使用 转换服务 将 值 转换为 对应类型的 结果
 		Object result = this.conversionService.convert(value, clazz);
+		// 如果转换结果为 null
 		if (result == null) {
+			// 抛出消息不可读异常，指示意外的 null 转换结果
 			throw new HttpMessageNotReadableException(
 					"Unexpected null conversion result for '" + value + "' to " + clazz,
 					inputMessage);
 		}
+		// 返回转换后的结果
 		return result;
 	}
 
 	@Override
 	protected void writeInternal(Object obj, HttpOutputMessage outputMessage) throws IOException {
+		// 使用 转换服务 将 对象 转换为 String 类型的 值
 		String value = this.conversionService.convert(obj, String.class);
+		// 如果 值 不为 null
 		if (value != null) {
+			// 使用 字符串Http消息转换器 将 值 写入输出消息
 			this.stringHttpMessageConverter.writeInternal(value, outputMessage);
 		}
 	}
 
 	@Override
 	protected Long getContentLength(Object obj, @Nullable MediaType contentType) {
+		// 使用 转换服务 将 对象 转换为 String 类型的 值
 		String value = this.conversionService.convert(obj, String.class);
+		// 如果 值 为 null
 		if (value == null) {
+			// 返回 0L
 			return 0L;
 		}
+		// 否则，使用 字符串Http消息转换器 计算 值 的内容长度
 		return this.stringHttpMessageConverter.getContentLength(value, contentType);
 	}
 

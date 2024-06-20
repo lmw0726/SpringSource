@@ -21,19 +21,16 @@ import com.rometools.rome.feed.atom.Feed;
 import org.springframework.http.MediaType;
 
 /**
- * Implementation of {@link org.springframework.http.converter.HttpMessageConverter}
- * that can read and write Atom feeds. Specifically, this converter can handle {@link Feed}
- * objects from the <a href="https://github.com/rometools/rome">ROME</a> project.
+ * 实现 {@link org.springframework.http.converter.HttpMessageConverter} 接口，
+ * 用于读取和写入 Atom 订阅源。具体来说，这个转换器可以处理来自 <a href="https://github.com/rometools/rome">ROME</a> 项目的 {@link Feed} 对象。
  *
- * <p><b>NOTE: As of Spring 4.1, this is based on the {@code com.rometools}
- * variant of ROME, version 1.5. Please upgrade your build dependency.</b>
+ * <p><b>注意: 从 Spring 4.1 开始，基于 {@code com.rometools} 的 ROME 变体，版本为 1.5。请升级您的构建依赖。</b>
  *
- * <p>By default, this converter reads and writes the media type ({@code application/atom+xml}).
- * This can be overridden through the {@link #setSupportedMediaTypes supportedMediaTypes} property.
+ * <p>默认情况下，此转换器读取和写入媒体类型 ({@code application/atom+xml})。可以通过 {@link #setSupportedMediaTypes supportedMediaTypes} 属性进行覆盖。
  *
  * @author Arjen Poutsma
- * @since 3.0.2
  * @see Feed
+ * @since 3.0.2
  */
 public class AtomFeedHttpMessageConverter extends AbstractWireFeedHttpMessageConverter<Feed> {
 

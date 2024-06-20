@@ -16,10 +16,6 @@
 
 package org.springframework.http.converter;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -30,12 +26,14 @@ import org.springframework.http.MediaTypeFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StreamUtils;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * Implementation of {@link HttpMessageConverter} that can read/write {@link Resource Resources}
- * and supports byte range requests.
+ * 实现了 {@link HttpMessageConverter}，能够读取和写入 {@link Resource} 对象，并支持字节范围请求。
  *
- * <p>By default, this converter can read all media types. The {@link MediaTypeFactory} is used
- * to determine the {@code Content-Type} of written resources.
+ * <p>默认情况下，此转换器可以读取所有媒体类型。{@link MediaTypeFactory} 用于确定写入资源的 {@code Content-Type}。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -43,14 +41,15 @@ import org.springframework.util.StreamUtils;
  * @since 3.0.2
  */
 public class ResourceHttpMessageConverter extends AbstractHttpMessageConverter<Resource> {
-
+	/**
+	 * 是否支持读取流
+	 */
 	private final boolean supportsReadStreaming;
 
 
 	/**
-	 * Create a new instance of the {@code ResourceHttpMessageConverter}
-	 * that supports read streaming, i.e. can convert an
-	 * {@code HttpInputMessage} to {@code InputStreamResource}.
+	 * 创建一个支持读取流的 {@code ResourceHttpMessageConverter} 实例，
+	 * 即可以将 {@code HttpInputMessage} 转换为 {@code InputStreamResource}。
 	 */
 	public ResourceHttpMessageConverter() {
 		super(MediaType.ALL);
@@ -58,9 +57,9 @@ public class ResourceHttpMessageConverter extends AbstractHttpMessageConverter<R
 	}
 
 	/**
-	 * Create a new instance of the {@code ResourceHttpMessageConverter}.
-	 * @param supportsReadStreaming whether the converter should support
-	 * read streaming, i.e. convert to {@code InputStreamResource}
+	 * 创建一个新的 {@code ResourceHttpMessageConverter} 实例。
+	 *
+	 * @param supportsReadStreaming 是否支持读取流，即是否转换为 {@code InputStreamResource}
 	 * @since 5.0
 	 */
 	public ResourceHttpMessageConverter(boolean supportsReadStreaming) {
@@ -78,30 +77,38 @@ public class ResourceHttpMessageConverter extends AbstractHttpMessageConverter<R
 	protected Resource readInternal(Class<? extends Resource> clazz, HttpInputMessage inputMessage)
 			throws IOException, HttpMessageNotReadableException {
 
+		// 如果支持读取流并且 类 是 输入流资源 类型
 		if (this.supportsReadStreaming && InputStreamResource.class == clazz) {
+			// 返回一个含有 输入消息的主体 的 输入流资源 对象
 			return new InputStreamResource(inputMessage.getBody()) {
 				@Override
 				public String getFilename() {
+					// 获取文件名
 					return inputMessage.getHeaders().getContentDisposition().getFilename();
 				}
+
 				@Override
 				public long contentLength() throws IOException {
+					// 获取内容长度
 					long length = inputMessage.getHeaders().getContentLength();
 					return (length != -1 ? length : super.contentLength());
 				}
 			};
-		}
-		else if (Resource.class == clazz || ByteArrayResource.class.isAssignableFrom(clazz)) {
+		} else if (Resource.class == clazz || ByteArrayResource.class.isAssignableFrom(clazz)) {
+			// 如果 类 是 Resource 类型或者是 ByteArrayResource 的子类
+			// 将输入消息的主体内容复制到字节数组中
 			byte[] body = StreamUtils.copyToByteArray(inputMessage.getBody());
+			// 使用复制后的字节数组作为内容，返回一个 字节数组资源 对象
 			return new ByteArrayResource(body) {
 				@Override
 				@Nullable
 				public String getFilename() {
+					// 获取文件名
 					return inputMessage.getHeaders().getContentDisposition().getFilename();
 				}
 			};
-		}
-		else {
+		} else {
+			// 如果 类 类型不支持，则抛出异常
 			throw new HttpMessageNotReadableException("Unsupported resource class: " + clazz, inputMessage);
 		}
 	}
@@ -113,12 +120,15 @@ public class ResourceHttpMessageConverter extends AbstractHttpMessageConverter<R
 
 	@Override
 	protected Long getContentLength(Resource resource, @Nullable MediaType contentType) throws IOException {
-		// Don't try to determine contentLength on InputStreamResource - cannot be read afterwards...
-		// Note: custom InputStreamResource subclasses could provide a pre-calculated content length!
+		// 不要尝试在 InputStreamResource 上确定 内容长度 - 之后无法读取...
+		// 注意: 自定义的 InputStreamResource 子类可以提供预先计算的 内容长度!
+		// 如果 资源类型 是 InputStreamResource 类型，则直接返回 null
 		if (InputStreamResource.class == resource.getClass()) {
 			return null;
 		}
+		// 获取 资源的内容长度
 		long contentLength = resource.contentLength();
+		// 如果 内容长度 小于 0，则返回 null；否则返回 内容长度
 		return (contentLength < 0 ? null : contentLength);
 	}
 
@@ -131,27 +141,26 @@ public class ResourceHttpMessageConverter extends AbstractHttpMessageConverter<R
 
 	protected void writeContent(Resource resource, HttpOutputMessage outputMessage)
 			throws IOException, HttpMessageNotWritableException {
-		// We cannot use try-with-resources here for the InputStream, since we have
-		// custom handling of the close() method in a finally-block.
+		// 由于我们在 finally 块中对 close() 方法进行了自定义处理，
+		// 因此不能在这里使用 try-with-resources 处理 InputStream。
 		try {
+			// 获取资源的输入流
 			InputStream in = resource.getInputStream();
 			try {
+				// 将输入流复制到输出消息的主体中
 				StreamUtils.copy(in, outputMessage.getBody());
-			}
-			catch (NullPointerException ex) {
-				// ignore, see SPR-13620
-			}
-			finally {
+			} catch (NullPointerException ex) {
+				// 忽略空指针异常，参见 SPR-13620
+			} finally {
 				try {
+					// 关闭输入流
 					in.close();
-				}
-				catch (Throwable ex) {
-					// ignore, see SPR-12999
+				} catch (Throwable ex) {
+					// 忽略关闭流时可能抛出的异常，参见 SPR-12999
 				}
 			}
-		}
-		catch (FileNotFoundException ex) {
-			// ignore, see SPR-12999
+		} catch (FileNotFoundException ex) {
+			// 忽略文件未找到异常，参见 SPR-12999
 		}
 	}
 

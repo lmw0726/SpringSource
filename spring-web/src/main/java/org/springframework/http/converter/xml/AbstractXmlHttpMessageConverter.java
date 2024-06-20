@@ -16,16 +16,6 @@
 
 package org.springframework.http.converter.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -36,27 +26,36 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.util.StreamUtils;
 
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- * Abstract base class for {@link org.springframework.http.converter.HttpMessageConverter HttpMessageConverters}
- * that convert from/to XML.
+ * 抽象基类，用于实现从/到 XML 的 {@link org.springframework.http.converter.HttpMessageConverter HttpMessageConverter}。
  *
- * <p>By default, subclasses of this converter support {@code text/xml}, {@code application/xml}, and {@code
- * application/*-xml}. This can be overridden by setting the {@link #setSupportedMediaTypes(java.util.List)
- * supportedMediaTypes} property.
+ * <p>默认情况下，此转换器的子类支持 {@code text/xml}、{@code application/xml} 和 {@code application/*-xml}。
+ * 可以通过设置 {@link #setSupportedMediaTypes(java.util.List) supportedMediaTypes} 属性来覆盖这些设置。
  *
+ * @param <T> 转换后的对象类型
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @since 3.0
- * @param <T> the converted object type
  */
 public abstract class AbstractXmlHttpMessageConverter<T> extends AbstractHttpMessageConverter<T> {
-
+	/**
+	 * 转换器工厂
+	 */
 	private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
 
 	/**
-	 * Protected constructor that sets the {@link #setSupportedMediaTypes(java.util.List) supportedMediaTypes}
-	 * to {@code text/xml} and {@code application/xml}, and {@code application/*-xml}.
+	 * 受保护的构造函数，将 {@link #setSupportedMediaTypes(java.util.List) supportedMediaTypes} 设置为
+	 * {@code text/xml}、{@code application/xml} 和 {@code application/*-xml}。
 	 */
 	protected AbstractXmlHttpMessageConverter() {
 		super(MediaType.APPLICATION_XML, MediaType.TEXT_XML, new MediaType("application", "*+xml"));
@@ -68,13 +67,15 @@ public abstract class AbstractXmlHttpMessageConverter<T> extends AbstractHttpMes
 			throws IOException, HttpMessageNotReadableException {
 
 		try {
+			// 获取输入消息主体的输入流并包装成一个不会关闭的输入流
 			InputStream inputStream = StreamUtils.nonClosing(inputMessage.getBody());
+			// 从 流源 读取数据并反序列化为指定的类类型对象
 			return readFromSource(clazz, inputMessage.getHeaders(), new StreamSource(inputStream));
-		}
-		catch (IOException | HttpMessageConversionException ex) {
+		} catch (IOException | HttpMessageConversionException ex) {
+			// 如果捕获到 IO异常 或 Http消息转换异常，则重新抛出异常
 			throw ex;
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
+			// 如果捕获到其他异常，则抛出 Http消息不可读异常
 			throw new HttpMessageNotReadableException("Could not unmarshal to [" + clazz + "]: " + ex.getMessage(),
 					ex, inputMessage);
 		}
@@ -85,21 +86,23 @@ public abstract class AbstractXmlHttpMessageConverter<T> extends AbstractHttpMes
 			throws IOException, HttpMessageNotWritableException {
 
 		try {
+			// 将 对象 写入结果，传递输出消息的头信息和输出流
 			writeToResult(t, outputMessage.getHeaders(), new StreamResult(outputMessage.getBody()));
-		}
-		catch (IOException | HttpMessageConversionException ex) {
+		} catch (IOException | HttpMessageConversionException ex) {
+			// 如果捕获到 IO异常 或 Http消息转换异常，则重新抛出异常
 			throw ex;
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
+			// 如果捕获到其他异常，则抛出 Http消息不可写异常
 			throw new HttpMessageNotWritableException("Could not marshal [" + t + "]: " + ex.getMessage(), ex);
 		}
 	}
 
 	/**
-	 * Transforms the given {@code Source} to the {@code Result}.
-	 * @param source the source to transform from
-	 * @param result the result to transform to
-	 * @throws TransformerException in case of transformation errors
+	 * 将给定的 {@code Source} 转换为 {@code Result}。
+	 *
+	 * @param source 要转换的源
+	 * @param result 要转换的结果
+	 * @throws TransformerException 如果发生转换错误
 	 */
 	protected void transform(Source source, Result result) throws TransformerException {
 		this.transformerFactory.newTransformer().transform(source, result);
@@ -107,21 +110,23 @@ public abstract class AbstractXmlHttpMessageConverter<T> extends AbstractHttpMes
 
 
 	/**
-	 * Abstract template method called from {@link #read(Class, HttpInputMessage)}.
-	 * @param clazz the type of object to return
-	 * @param headers the HTTP input headers
-	 * @param source the HTTP input body
-	 * @return the converted object
-	 * @throws Exception in case of I/O or conversion errors
+	 * 从 {@link #read(Class, HttpInputMessage)} 调用的抽象模板方法。
+	 *
+	 * @param clazz   要返回对象的类型
+	 * @param headers HTTP 输入头
+	 * @param source  HTTP 输入主体
+	 * @return 转换后的对象
+	 * @throws Exception 如果发生 I/O 或转换错误
 	 */
 	protected abstract T readFromSource(Class<? extends T> clazz, HttpHeaders headers, Source source) throws Exception;
 
 	/**
-	 * Abstract template method called from {@link #writeInternal(Object, HttpOutputMessage)}.
-	 * @param t the object to write to the output message
-	 * @param headers the HTTP output headers
-	 * @param result the HTTP output body
-	 * @throws Exception in case of I/O or conversion errors
+	 * 从 {@link #writeInternal(Object, HttpOutputMessage)} 调用的抽象模板方法。
+	 *
+	 * @param t       要写入到输出消息的对象
+	 * @param headers HTTP 输出头
+	 * @param result  HTTP 输出主体
+	 * @throws Exception 如果发生 I/O 或转换错误
 	 */
 	protected abstract void writeToResult(T t, HttpHeaders headers, Result result) throws Exception;
 

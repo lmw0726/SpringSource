@@ -16,21 +16,20 @@
 
 package org.springframework.http.converter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StreamUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 /**
- * Implementation of {@link HttpMessageConverter} that can read and write byte arrays.
+ * 实现了 {@link HttpMessageConverter}，能够读取和写入字节数组。
  *
- * <p>By default, this converter supports all media types (<code>&#42;/&#42;</code>), and
- * writes with a {@code Content-Type} of {@code application/octet-stream}. This can be
- * overridden by setting the {@link #setSupportedMediaTypes supportedMediaTypes} property.
+ * <p>默认情况下，此转换器支持所有媒体类型（<code>&#42;/&#42;</code>），并使用 {@code Content-Type} 为 {@code application/octet-stream} 进行写入。
+ * 可以通过设置 {@link #setSupportedMediaTypes supportedMediaTypes} 属性进行覆盖。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -39,7 +38,7 @@ import org.springframework.util.StreamUtils;
 public class ByteArrayHttpMessageConverter extends AbstractHttpMessageConverter<byte[]> {
 
 	/**
-	 * Create a new instance of the {@code ByteArrayHttpMessageConverter}.
+	 * 创建一个新的 {@code ByteArrayHttpMessageConverter} 实例。
 	 */
 	public ByteArrayHttpMessageConverter() {
 		super(MediaType.APPLICATION_OCTET_STREAM, MediaType.ALL);
@@ -52,11 +51,15 @@ public class ByteArrayHttpMessageConverter extends AbstractHttpMessageConverter<
 	}
 
 	@Override
-	public byte[] readInternal(Class<? extends byte[]> clazz, HttpInputMessage inputMessage) throws IOException {
+	protected byte[] readInternal(Class<? extends byte[]> clazz, HttpInputMessage inputMessage) throws IOException {
+		// 获取输入消息的内容长度
 		long contentLength = inputMessage.getHeaders().getContentLength();
+		// 创建 字节数组输出流 对象，并指定初始容量
 		ByteArrayOutputStream bos =
 				new ByteArrayOutputStream(contentLength >= 0 ? (int) contentLength : StreamUtils.BUFFER_SIZE);
+		// 将输入消息的主体内容复制到 字节数组输出流 中
 		StreamUtils.copy(inputMessage.getBody(), bos);
+		// 将 字节数组输出流 转换为字节数组并返回
 		return bos.toByteArray();
 	}
 
