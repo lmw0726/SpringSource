@@ -16,88 +16,80 @@
 
 package org.springframework.http.converter;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+
 /**
- * A specialization of {@link HttpMessageConverter} that can convert an HTTP request
- * into a target object of a specified generic type and a source object of a specified
- * generic type into an HTTP response.
+ * 一个 {@link HttpMessageConverter} 的特化接口，可以将 HTTP 请求转换为指定泛型类型的目标对象，并将源对象转换为 HTTP 响应。
  *
+ * @param <T> 转换后的对象类型
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @author Sebastien Deleuze
- * @since 3.2
- * @param <T> the converted object type
  * @see org.springframework.core.ParameterizedTypeReference
+ * @since 3.2
  */
 public interface GenericHttpMessageConverter<T> extends HttpMessageConverter<T> {
 
 	/**
-	 * Indicates whether the given type can be read by this converter.
-	 * This method should perform the same checks than
-	 * {@link HttpMessageConverter#canRead(Class, MediaType)} with additional ones
-	 * related to the generic type.
-	 * @param type the (potentially generic) type to test for readability
-	 * @param contextClass a context class for the target type, for example a class
-	 * in which the target type appears in a method signature (can be {@code null})
-	 * @param mediaType the media type to read, can be {@code null} if not specified.
-	 * Typically the value of a {@code Content-Type} header.
-	 * @return {@code true} if readable; {@code false} otherwise
+	 * 指示此转换器是否可以读取给定类型。
+	 * 此方法应执行与 {@link HttpMessageConverter#canRead(Class, MediaType)} 相同的检查，
+	 * 并添加与泛型类型相关的其他检查。
+	 *
+	 * @param type         泛型类型，用于测试可读性
+	 * @param contextClass 目标类型的上下文类，例如目标类型出现在方法签名中的类（可以为 {@code null}）
+	 * @param mediaType    要读取的媒体类型，如果未指定则可以为 {@code null}。
+	 *                     通常是 {@code Content-Type} 标头的值。
+	 * @return {@code true} 如果可读；{@code false} 否则
 	 */
 	boolean canRead(Type type, @Nullable Class<?> contextClass, @Nullable MediaType mediaType);
 
 	/**
-	 * Read an object of the given type form the given input message, and returns it.
-	 * @param type the (potentially generic) type of object to return. This type must have
-	 * previously been passed to the {@link #canRead canRead} method of this interface,
-	 * which must have returned {@code true}.
-	 * @param contextClass a context class for the target type, for example a class
-	 * in which the target type appears in a method signature (can be {@code null})
-	 * @param inputMessage the HTTP input message to read from
-	 * @return the converted object
-	 * @throws IOException in case of I/O errors
-	 * @throws HttpMessageNotReadableException in case of conversion errors
+	 * 从给定的输入消息中读取指定类型的对象，并返回它。
+	 *
+	 * @param type         要返回的对象的泛型类型。此类型必须先前已传递给此接口的 {@link #canRead canRead} 方法，
+	 *                     该方法必须返回 {@code true}。
+	 * @param contextClass 目标类型的上下文类，例如目标类型出现在方法签名中的类（可以为 {@code null}）
+	 * @param inputMessage 要读取的 HTTP 输入消息
+	 * @return 转换后的对象
+	 * @throws IOException                     在 I/O 错误时抛出
+	 * @throws HttpMessageNotReadableException 在转换错误时抛出
 	 */
 	T read(Type type, @Nullable Class<?> contextClass, HttpInputMessage inputMessage)
 			throws IOException, HttpMessageNotReadableException;
 
 	/**
-	 * Indicates whether the given class can be written by this converter.
-	 * <p>This method should perform the same checks than
-	 * {@link HttpMessageConverter#canWrite(Class, MediaType)} with additional ones
-	 * related to the generic type.
-	 * @param type the (potentially generic) type to test for writability
-	 * (can be {@code null} if not specified)
-	 * @param clazz the source object class to test for writability
-	 * @param mediaType the media type to write (can be {@code null} if not specified);
-	 * typically the value of an {@code Accept} header.
-	 * @return {@code true} if writable; {@code false} otherwise
+	 * 指示此转换器是否可以写入给定的类。
+	 * <p>此方法应执行与 {@link HttpMessageConverter#canWrite(Class, MediaType)} 相同的检查，
+	 * 并添加与泛型类型相关的其他检查。
+	 *
+	 * @param type      要测试可写性的泛型类型（如果未指定可以为 {@code null}）
+	 * @param clazz     要测试可写性的源对象类
+	 * @param mediaType 要写入的媒体类型（如果未指定可以为 {@code null}）；
+	 *                  通常是 {@code Accept} 标头的值。
+	 * @return {@code true} 如果可写；{@code false} 否则
 	 * @since 4.2
 	 */
 	boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType);
 
 	/**
-	 * Write an given object to the given output message.
-	 * @param t the object to write to the output message. The type of this object must
-	 * have previously been passed to the {@link #canWrite canWrite} method of this
-	 * interface, which must have returned {@code true}.
-	 * @param type the (potentially generic) type of object to write. This type must have
-	 * previously been passed to the {@link #canWrite canWrite} method of this interface,
-	 * which must have returned {@code true}. Can be {@code null} if not specified.
-	 * @param contentType the content type to use when writing. May be {@code null} to
-	 * indicate that the default content type of the converter must be used. If not
-	 * {@code null}, this media type must have previously been passed to the
-	 * {@link #canWrite canWrite} method of this interface, which must have returned
-	 * {@code true}.
-	 * @param outputMessage the message to write to
-	 * @throws IOException in case of I/O errors
-	 * @throws HttpMessageNotWritableException in case of conversion errors
+	 * 将给定对象写入到给定的输出消息中。
+	 *
+	 * @param t             要写入到输出消息的对象。此对象的类型必须先前已传递给此接口的 {@link #canWrite canWrite} 方法，
+	 *                      该方法必须返回 {@code true}。
+	 * @param type          要写入的对象的泛型类型。此类型必须先前已传递给此接口的 {@link #canWrite canWrite} 方法，
+	 *                      该方法必须返回 {@code true}。如果未指定可以为 {@code null}。
+	 * @param contentType   写入时要使用的内容类型。可以为 {@code null}，表示必须使用转换器的默认内容类型。
+	 *                      如果不为 {@code null}，则此媒体类型必须先前已传递给此接口的 {@link #canWrite canWrite} 方法，
+	 *                      该方法必须返回 {@code true}。
+	 * @param outputMessage 要写入的消息
+	 * @throws IOException                     在 I/O 错误时抛出
+	 * @throws HttpMessageNotWritableException 在转换错误时抛出
 	 * @since 4.2
 	 */
 	void write(T t, @Nullable Type type, @Nullable MediaType contentType, HttpOutputMessage outputMessage)
