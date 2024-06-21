@@ -38,30 +38,32 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 
 /**
- * Allows for creating Jackson ({@link JsonSerializer}, {@link JsonDeserializer},
- * {@link KeyDeserializer}, {@link TypeResolverBuilder}, {@link TypeIdResolver})
- * beans with autowiring against a Spring {@link ApplicationContext}.
+ * 允许使用 Spring {@link ApplicationContext} 进行自动装配的方式创建 Jackson {@link JsonSerializer}、
+ * {@link JsonDeserializer}、{@link KeyDeserializer}、{@link TypeResolverBuilder}、{@link TypeIdResolver} bean。
  *
- * <p>As of Spring 4.3, this overrides all factory methods in {@link HandlerInstantiator},
- * including non-abstract ones and recently introduced ones from Jackson 2.4 and 2.5:
- * for {@link ValueInstantiator}, {@link ObjectIdGenerator}, {@link ObjectIdResolver},
- * {@link PropertyNamingStrategy}, {@link Converter}, {@link VirtualBeanPropertyWriter}.
+ * <p>从 Spring 4.3 开始，此类重写了 {@link HandlerInstantiator} 中的所有工厂方法，
+ * 包括非抽象方法和最近引入的 Jackson 2.4 和 2.5 中的方法：
+ * {@link ValueInstantiator}、{@link ObjectIdGenerator}、{@link ObjectIdResolver}、
+ * {@link PropertyNamingStrategy}、{@link Converter}、{@link VirtualBeanPropertyWriter}。
  *
  * @author Sebastien Deleuze
  * @author Juergen Hoeller
- * @since 4.1.3
  * @see Jackson2ObjectMapperBuilder#handlerInstantiator(HandlerInstantiator)
  * @see ApplicationContext#getAutowireCapableBeanFactory()
  * @see HandlerInstantiator
+ * @since 4.1.3
  */
 public class SpringHandlerInstantiator extends HandlerInstantiator {
-
+	/**
+	 * 自动装配Bean工厂
+	 */
 	private final AutowireCapableBeanFactory beanFactory;
 
 
 	/**
-	 * Create a new SpringHandlerInstantiator for the given BeanFactory.
-	 * @param beanFactory the target BeanFactory
+	 * 使用给定的 BeanFactory 创建一个新的 SpringHandlerInstantiator。
+	 *
+	 * @param beanFactory 目标 BeanFactory
 	 */
 	public SpringHandlerInstantiator(AutowireCapableBeanFactory beanFactory) {
 		Assert.notNull(beanFactory, "BeanFactory must not be null");
@@ -71,28 +73,28 @@ public class SpringHandlerInstantiator extends HandlerInstantiator {
 
 	@Override
 	public JsonDeserializer<?> deserializerInstance(DeserializationConfig config,
-			Annotated annotated, Class<?> implClass) {
+													Annotated annotated, Class<?> implClass) {
 
 		return (JsonDeserializer<?>) this.beanFactory.createBean(implClass);
 	}
 
 	@Override
 	public KeyDeserializer keyDeserializerInstance(DeserializationConfig config,
-			Annotated annotated, Class<?> implClass) {
+												   Annotated annotated, Class<?> implClass) {
 
 		return (KeyDeserializer) this.beanFactory.createBean(implClass);
 	}
 
 	@Override
 	public JsonSerializer<?> serializerInstance(SerializationConfig config,
-			Annotated annotated, Class<?> implClass) {
+												Annotated annotated, Class<?> implClass) {
 
 		return (JsonSerializer<?>) this.beanFactory.createBean(implClass);
 	}
 
 	@Override
 	public TypeResolverBuilder<?> typeResolverBuilderInstance(MapperConfig<?> config,
-			Annotated annotated, Class<?> implClass) {
+															  Annotated annotated, Class<?> implClass) {
 
 		return (TypeResolverBuilder<?>) this.beanFactory.createBean(implClass);
 	}
@@ -102,47 +104,59 @@ public class SpringHandlerInstantiator extends HandlerInstantiator {
 		return (TypeIdResolver) this.beanFactory.createBean(implClass);
 	}
 
-	/** @since 4.3 */
+	/**
+	 * @since 4.3
+	 */
 	@Override
 	public ValueInstantiator valueInstantiatorInstance(MapperConfig<?> config,
-			Annotated annotated, Class<?> implClass) {
+													   Annotated annotated, Class<?> implClass) {
 
 		return (ValueInstantiator) this.beanFactory.createBean(implClass);
 	}
 
-	/** @since 4.3 */
+	/**
+	 * @since 4.3
+	 */
 	@Override
 	public ObjectIdGenerator<?> objectIdGeneratorInstance(MapperConfig<?> config,
-			Annotated annotated, Class<?> implClass) {
+														  Annotated annotated, Class<?> implClass) {
 
 		return (ObjectIdGenerator<?>) this.beanFactory.createBean(implClass);
 	}
 
-	/** @since 4.3 */
+	/**
+	 * @since 4.3
+	 */
 	@Override
 	public ObjectIdResolver resolverIdGeneratorInstance(MapperConfig<?> config,
-			Annotated annotated, Class<?> implClass) {
+														Annotated annotated, Class<?> implClass) {
 
 		return (ObjectIdResolver) this.beanFactory.createBean(implClass);
 	}
 
-	/** @since 4.3 */
+	/**
+	 * @since 4.3
+	 */
 	@Override
 	public PropertyNamingStrategy namingStrategyInstance(MapperConfig<?> config,
-			Annotated annotated, Class<?> implClass) {
+														 Annotated annotated, Class<?> implClass) {
 
 		return (PropertyNamingStrategy) this.beanFactory.createBean(implClass);
 	}
 
-	/** @since 4.3 */
+	/**
+	 * @since 4.3
+	 */
 	@Override
 	public Converter<?, ?> converterInstance(MapperConfig<?> config,
-			Annotated annotated, Class<?> implClass) {
+											 Annotated annotated, Class<?> implClass) {
 
 		return (Converter<?, ?>) this.beanFactory.createBean(implClass);
 	}
 
-	/** @since 4.3 */
+	/**
+	 * @since 4.3
+	 */
 	@Override
 	public VirtualBeanPropertyWriter virtualPropertyWriterInstance(MapperConfig<?> config, Class<?> implClass) {
 		return (VirtualBeanPropertyWriter) this.beanFactory.createBean(implClass);
