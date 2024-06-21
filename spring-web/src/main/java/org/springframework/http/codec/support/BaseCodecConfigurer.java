@@ -16,40 +16,39 @@
 
 package org.springframework.http.codec.support;
 
+import org.springframework.core.ResolvableType;
+import org.springframework.core.codec.Decoder;
+import org.springframework.core.codec.Encoder;
+import org.springframework.http.codec.*;
+import org.springframework.util.Assert;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.springframework.core.ResolvableType;
-import org.springframework.core.codec.Decoder;
-import org.springframework.core.codec.Encoder;
-import org.springframework.http.codec.CodecConfigurer;
-import org.springframework.http.codec.DecoderHttpMessageReader;
-import org.springframework.http.codec.EncoderHttpMessageWriter;
-import org.springframework.http.codec.HttpMessageReader;
-import org.springframework.http.codec.HttpMessageWriter;
-import org.springframework.util.Assert;
-
 /**
- * Default implementation of {@link CodecConfigurer} that serves as a base for
- * client and server specific variants.
+ * {@link CodecConfigurer} 的默认实现，作为客户端和服务器特定变体的基础。
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
  * @since 5.0
  */
 abstract class BaseCodecConfigurer implements CodecConfigurer {
-
+	/**
+	 * 默认编解码器
+	 */
 	protected final BaseDefaultCodecs defaultCodecs;
 
+	/**
+	 * 自定义编解码器
+	 */
 	protected final DefaultCustomCodecs customCodecs;
 
 
 	/**
-	 * Constructor with the base {@link BaseDefaultCodecs} to use, which can be
-	 * a client or server specific variant.
+	 * 使用基础 {@link BaseDefaultCodecs} 构造器，可以是客户端或服务器特定变体。
 	 */
 	BaseCodecConfigurer(BaseDefaultCodecs defaultCodecs) {
 		Assert.notNull(defaultCodecs, "'defaultCodecs' is required");
@@ -58,7 +57,8 @@ abstract class BaseCodecConfigurer implements CodecConfigurer {
 	}
 
 	/**
-	 * Create a deep copy of the given {@link BaseCodecConfigurer}.
+	 * 创建给定 {@link BaseCodecConfigurer} 的深层副本。
+	 *
 	 * @since 5.1.12
 	 */
 	protected BaseCodecConfigurer(BaseCodecConfigurer other) {
@@ -67,8 +67,9 @@ abstract class BaseCodecConfigurer implements CodecConfigurer {
 	}
 
 	/**
-	 * Sub-classes should override this to create a deep copy of
-	 * {@link BaseDefaultCodecs} which can be client or server specific.
+	 * 子类应该重写此方法，以创建 {@link BaseDefaultCodecs} 的深层副本，
+	 * 可以是客户端或服务器特定的。
+	 *
 	 * @since 5.1.12
 	 */
 	protected abstract BaseDefaultCodecs cloneDefaultCodecs();
@@ -91,27 +92,55 @@ abstract class BaseCodecConfigurer implements CodecConfigurer {
 
 	@Override
 	public List<HttpMessageReader<?>> getReaders() {
+		// 应用默认配置到自定义编解码器
 		this.defaultCodecs.applyDefaultConfig(this.customCodecs);
 
+		// 创建一个空的结果列表
 		List<HttpMessageReader<?>> result = new ArrayList<>();
+
+		// 将自定义编解码器中的类型化读取器添加到结果列表中
 		result.addAll(this.customCodecs.getTypedReaders().keySet());
+
+		// 将默认编解码器中的类型化读取器添加到结果列表中
 		result.addAll(this.defaultCodecs.getTypedReaders());
+
+		// 将自定义编解码器中的对象读取器添加到结果列表中
 		result.addAll(this.customCodecs.getObjectReaders().keySet());
+
+		// 将默认编解码器中的对象读取器添加到结果列表中
 		result.addAll(this.defaultCodecs.getObjectReaders());
+
+		// 将默认编解码器中的通用读取器添加到结果列表中
 		result.addAll(this.defaultCodecs.getCatchAllReaders());
+
+		// 返回填充了各种读取器的结果列表
 		return result;
 	}
 
 	@Override
 	public List<HttpMessageWriter<?>> getWriters() {
+		// 应用默认配置到自定义编解码器
 		this.defaultCodecs.applyDefaultConfig(this.customCodecs);
 
+		// 创建一个空的结果列表
 		List<HttpMessageWriter<?>> result = new ArrayList<>();
+
+		// 将自定义编解码器中的类型化编码器添加到结果列表中
 		result.addAll(this.customCodecs.getTypedWriters().keySet());
+
+		// 将默认编解码器中的类型化编码器添加到结果列表中
 		result.addAll(this.defaultCodecs.getTypedWriters());
+
+		// 将自定义编解码器中的对象编码器添加到结果列表中
 		result.addAll(this.customCodecs.getObjectWriters().keySet());
+
+		// 将默认编解码器中的对象编码器添加到结果列表中
 		result.addAll(this.defaultCodecs.getObjectWriters());
+
+		// 将默认编解码器中的通用编码器添加到结果列表中
 		result.addAll(this.defaultCodecs.getCatchAllWriters());
+
+		// 返回填充了各种编码器的结果列表
 		return result;
 	}
 
@@ -120,25 +149,40 @@ abstract class BaseCodecConfigurer implements CodecConfigurer {
 
 
 	/**
-	 * Default implementation of {@code CustomCodecs}.
+	 * {@code CustomCodecs} 的默认实现。
 	 */
 	protected static final class DefaultCustomCodecs implements CustomCodecs {
-
+		/**
+		 * 类型读取器映射
+		 */
 		private final Map<HttpMessageReader<?>, Boolean> typedReaders = new LinkedHashMap<>(4);
 
+		/**
+		 * 类型写入器映射
+		 */
 		private final Map<HttpMessageWriter<?>, Boolean> typedWriters = new LinkedHashMap<>(4);
 
+		/**
+		 * 对象读取器映射
+		 */
 		private final Map<HttpMessageReader<?>, Boolean> objectReaders = new LinkedHashMap<>(4);
 
+		/**
+		 * 对象写入器映射
+		 */
 		private final Map<HttpMessageWriter<?>, Boolean> objectWriters = new LinkedHashMap<>(4);
 
+		/**
+		 * 默认配置消费者列表
+		 */
 		private final List<Consumer<DefaultCodecConfig>> defaultConfigConsumers = new ArrayList<>(4);
 
 		DefaultCustomCodecs() {
 		}
 
 		/**
-		 * Create a deep copy of the given {@link DefaultCustomCodecs}.
+		 * 创建给定 {@link DefaultCustomCodecs} 的深层副本。
+		 *
 		 * @since 5.1.12
 		 */
 		DefaultCustomCodecs(DefaultCustomCodecs other) {
@@ -196,29 +240,36 @@ abstract class BaseCodecConfigurer implements CodecConfigurer {
 
 		private void addCodec(Object codec, boolean applyDefaultConfig) {
 
+			// 检查编解码器是否为解码器
 			if (codec instanceof Decoder) {
+				// 如果是解码器，创建对应的 DecoderHttpMessageReader
 				codec = new DecoderHttpMessageReader<>((Decoder<?>) codec);
-			}
-			else if (codec instanceof Encoder) {
+			} else if (codec instanceof Encoder) {
+				// 如果编解码器是编码器，创建对应的 EncoderHttpMessageWriter
 				codec = new EncoderHttpMessageWriter<>((Encoder<?>) codec);
 			}
 
+			// 如果编解码器是HttpMessageReader
 			if (codec instanceof HttpMessageReader) {
 				HttpMessageReader<?> reader = (HttpMessageReader<?>) codec;
+				// 检查是否能够读取 Object 类型
 				boolean canReadToObject = reader.canRead(ResolvableType.forClass(Object.class), null);
+				// 如果可以读取 Object 类型，则将读取器和是否应用默认配置，添加到对象读取器中；否则添加到类型读取器中。
 				(canReadToObject ? this.objectReaders : this.typedReaders).put(reader, applyDefaultConfig);
-			}
-			else if (codec instanceof HttpMessageWriter) {
+			} else if (codec instanceof HttpMessageWriter) {
+				// 如果编解码器是 HttpMessageWriter
 				HttpMessageWriter<?> writer = (HttpMessageWriter<?>) codec;
+				// 检查是否能够写入 Object 类型
 				boolean canWriteObject = writer.canWrite(ResolvableType.forClass(Object.class), null);
+				// 如果可以写入，添加到对象写入器；否则添加到类型写入器
 				(canWriteObject ? this.objectWriters : this.typedWriters).put(writer, applyDefaultConfig);
-			}
-			else {
+			} else {
+				// 如果既不是解码器也不是编码器，则抛出异常
 				throw new IllegalArgumentException("Unexpected codec type: " + codec.getClass().getName());
 			}
 		}
 
-		// Package private accessors...
+		// 包私有访问器...
 
 		Map<HttpMessageReader<?>, Boolean> getTypedReaders() {
 			return this.typedReaders;

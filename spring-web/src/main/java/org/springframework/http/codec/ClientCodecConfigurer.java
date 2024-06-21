@@ -20,34 +20,33 @@ import org.springframework.core.codec.Decoder;
 import org.springframework.core.codec.Encoder;
 
 /**
- * Extension of {@link CodecConfigurer} for HTTP message reader and writer
- * options relevant on the client side.
+ * {@link CodecConfigurer} 的扩展，用于在客户端侧配置相关的HTTP消息读取器和写入器选项。
  *
- * <p>HTTP message readers for the following are registered by default:
+ * <p>默认情况下，注册了以下类型的HTTP消息读取器：
  * <ul>{@code byte[]}
  * <li>{@link java.nio.ByteBuffer}
  * <li>{@link org.springframework.core.io.buffer.DataBuffer DataBuffer}
  * <li>{@link org.springframework.core.io.Resource Resource}
  * <li>{@link String}
  * <li>{@link org.springframework.util.MultiValueMap
- * MultiValueMap&lt;String,String&gt;} for form data
- * <li>JSON and Smile, if Jackson is present
- * <li>XML, if JAXB2 is present
- * <li>Server-Sent Events
+ * MultiValueMap&lt;String,String&gt;} 用于表单数据
+ * <li>如果Jackson存在，还有JSON和Smile
+ * <li>如果JAXB2存在，还有XML
+ * <li>用于服务器发送事件（SSE）
  * </ul>
  *
- * <p>HTTP message writers registered by default:
+ * <p>默认情况下，注册了以下类型的HTTP消息写入器：
  * <ul>{@code byte[]}
  * <li>{@link java.nio.ByteBuffer}
  * <li>{@link org.springframework.core.io.buffer.DataBuffer DataBuffer}
  * <li>{@link org.springframework.core.io.Resource Resource}
  * <li>{@link String}
  * <li>{@link org.springframework.util.MultiValueMap
- * MultiValueMap&lt;String,String&gt;} for form data
+ * MultiValueMap&lt;String,String&gt;} 用于表单数据
  * <li>{@link org.springframework.util.MultiValueMap
- * MultiValueMap&lt;String,Object&gt;} for multipart data
- * <li>JSON and Smile, if Jackson is present
- * <li>XML, if JAXB2 is present
+ * MultiValueMap&lt;String,Object&gt;} 用于多部分数据
+ * <li>如果Jackson存在，还有JSON和Smile
+ * <li>如果JAXB2存在，还有XML
  * </ul>
  *
  * @author Rossen Stoyanchev
@@ -57,8 +56,8 @@ public interface ClientCodecConfigurer extends CodecConfigurer {
 
 	/**
 	 * {@inheritDoc}
-	 * <p>On the client side, built-in default also include customizations related
-	 * to multipart readers and writers, as well as the decoder for SSE.
+	 * <p>在客户端侧，默认内置的默认值还包括与多部分读取器和写入器相关的定制，
+	 * 以及SSE解码器。
 	 */
 	@Override
 	ClientDefaultCodecs defaultCodecs();
@@ -71,7 +70,7 @@ public interface ClientCodecConfigurer extends CodecConfigurer {
 
 
 	/**
-	 * Static factory method for a {@code ClientCodecConfigurer}.
+	 * 静态工厂方法，用于创建 {@code ClientCodecConfigurer}。
 	 */
 	static ClientCodecConfigurer create() {
 		return CodecConfigurerFactory.create(ClientCodecConfigurer.class);
@@ -79,47 +78,46 @@ public interface ClientCodecConfigurer extends CodecConfigurer {
 
 
 	/**
-	 * {@link CodecConfigurer.DefaultCodecs} extension with extra client-side options.
+	 * {@link CodecConfigurer.DefaultCodecs} 的扩展，包含额外的客户端侧选项。
 	 */
 	interface ClientDefaultCodecs extends DefaultCodecs {
 
 		/**
-		 * Configure encoders or writers for use with
-		 * {@link org.springframework.http.codec.multipart.MultipartHttpMessageWriter
-		 * MultipartHttpMessageWriter}.
+		 * 配置编码器或写入器，用于与 {@link org.springframework.http.codec.multipart.MultipartHttpMessageWriter
+		 * MultipartHttpMessageWriter} 一起使用。
 		 */
 		MultipartCodecs multipartCodecs();
 
 		/**
-		 * Configure the {@code Decoder} to use for Server-Sent Events.
-		 * <p>By default if this is not set, and Jackson is available, the
-		 * {@link #jackson2JsonDecoder} override is used instead. Use this property
-		 * if you want to further customize the SSE decoder.
-		 * <p>Note that {@link #maxInMemorySize(int)}, if configured, will be
-		 * applied to the given decoder.
-		 * @param decoder the decoder to use
+		 * 配置用于服务器发送事件（SSE）的 {@code Decoder}。
+		 * <p>默认情况下，如果未设置此项且Jackson可用，则使用 {@link #jackson2JsonDecoder} 覆盖。
+		 * 如果要进一步自定义SSE解码器，请使用此属性。
+		 * <p>注意，如果配置了 {@link #maxInMemorySize(int)}，将应用于给定的解码器。
+		 *
+		 * @param decoder 要使用的解码器
 		 */
 		void serverSentEventDecoder(Decoder<?> decoder);
 	}
 
 
 	/**
-	 * Registry and container for multipart HTTP message writers.
+	 * 多部分HTTP消息写入器的注册和容器。
 	 */
 	interface MultipartCodecs {
 
 		/**
-		 * Add a Part {@code Encoder}, internally wrapped with
-		 * {@link EncoderHttpMessageWriter}.
-		 * @param encoder the encoder to add
+		 * 添加一个部分 {@code Encoder}，内部包装为 {@link EncoderHttpMessageWriter}。
+		 *
+		 * @param encoder 要添加的编码器
 		 */
 		MultipartCodecs encoder(Encoder<?> encoder);
 
 		/**
-		 * Add a Part {@link HttpMessageWriter}. For writers of type
-		 * {@link EncoderHttpMessageWriter} consider using the shortcut
-		 * {@link #encoder(Encoder)} instead.
-		 * @param writer the writer to add
+		 * 添加一个部分 {@link HttpMessageWriter}。对于类型为
+		 * {@link EncoderHttpMessageWriter} 的写入器，考虑使用快捷方式
+		 * {@link #encoder(Encoder)}。
+		 *
+		 * @param writer 要添加的写入器
 		 */
 		MultipartCodecs writer(HttpMessageWriter<?> writer);
 	}
