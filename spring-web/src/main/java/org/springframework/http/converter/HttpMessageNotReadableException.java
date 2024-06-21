@@ -21,8 +21,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Thrown by {@link HttpMessageConverter} implementations when the
- * {@link HttpMessageConverter#read} method fails.
+ * 当 {@link HttpMessageConverter} 实现的 {@link HttpMessageConverter#read} 方法失败时抛出。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -30,15 +29,18 @@ import org.springframework.util.Assert;
  */
 @SuppressWarnings("serial")
 public class HttpMessageNotReadableException extends HttpMessageConversionException {
-
+	/**
+	 * Http输入消息
+	 */
 	@Nullable
 	private final HttpInputMessage httpInputMessage;
 
 
 	/**
-	 * Create a new HttpMessageNotReadableException.
-	 * @param msg the detail message
-	 * @deprecated as of 5.1, in favor of {@link #HttpMessageNotReadableException(String, HttpInputMessage)}
+	 * 创建一个新的 HttpMessageNotReadableException。
+	 *
+	 * @param msg 详细信息
+	 * @deprecated 自 5.1 起，建议使用 {@link #HttpMessageNotReadableException(String, HttpInputMessage)}
 	 */
 	@Deprecated
 	public HttpMessageNotReadableException(String msg) {
@@ -47,10 +49,11 @@ public class HttpMessageNotReadableException extends HttpMessageConversionExcept
 	}
 
 	/**
-	 * Create a new HttpMessageNotReadableException.
-	 * @param msg the detail message
-	 * @param cause the root cause (if any)
-	 * @deprecated as of 5.1, in favor of {@link #HttpMessageNotReadableException(String, Throwable, HttpInputMessage)}
+	 * 创建一个新的 HttpMessageNotReadableException。
+	 *
+	 * @param msg   详细信息
+	 * @param cause 根本原因（如果有）
+	 * @deprecated 自 5.1 起，建议使用 {@link #HttpMessageNotReadableException(String, Throwable, HttpInputMessage)}
 	 */
 	@Deprecated
 	public HttpMessageNotReadableException(String msg, @Nullable Throwable cause) {
@@ -59,9 +62,10 @@ public class HttpMessageNotReadableException extends HttpMessageConversionExcept
 	}
 
 	/**
-	 * Create a new HttpMessageNotReadableException.
-	 * @param msg the detail message
-	 * @param httpInputMessage the original HTTP message
+	 * 创建一个新的 HttpMessageNotReadableException。
+	 *
+	 * @param msg              详细信息
+	 * @param httpInputMessage 原始 HTTP 消息
 	 * @since 5.1
 	 */
 	public HttpMessageNotReadableException(String msg, HttpInputMessage httpInputMessage) {
@@ -70,10 +74,11 @@ public class HttpMessageNotReadableException extends HttpMessageConversionExcept
 	}
 
 	/**
-	 * Create a new HttpMessageNotReadableException.
-	 * @param msg the detail message
-	 * @param cause the root cause (if any)
-	 * @param httpInputMessage the original HTTP message
+	 * 创建一个新的 HttpMessageNotReadableException。
+	 *
+	 * @param msg              详细信息
+	 * @param cause            根本原因（如果有）
+	 * @param httpInputMessage 原始 HTTP 消息
 	 * @since 5.1
 	 */
 	public HttpMessageNotReadableException(String msg, @Nullable Throwable cause, HttpInputMessage httpInputMessage) {
@@ -83,7 +88,8 @@ public class HttpMessageNotReadableException extends HttpMessageConversionExcept
 
 
 	/**
-	 * Return the original HTTP message.
+	 * 返回原始 HTTP 消息。
+	 *
 	 * @since 5.1
 	 */
 	public HttpInputMessage getHttpInputMessage() {
