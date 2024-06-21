@@ -19,7 +19,7 @@ package org.springframework.http.codec.support;
 import org.springframework.http.codec.ServerCodecConfigurer;
 
 /**
- * Default implementation of {@link ServerCodecConfigurer}.
+ * {@link ServerCodecConfigurer} 的默认实现。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
