@@ -21,34 +21,39 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import org.springframework.lang.Nullable;
 
 /**
- * A simple holder for the POJO to serialize via
- * {@link MappingJackson2HttpMessageConverter} along with further
- * serialization instructions to be passed in to the converter.
+ * 用于包装要通过 {@link MappingJackson2HttpMessageConverter} 序列化的 POJO，
+ * 并传递给转换器的进一步序列化指令的简单持有者。
  *
- * <p>On the server side this wrapper is added with a
- * {@code ResponseBodyInterceptor} after content negotiation selects the
- * converter to use but before the write.
+ * <p>在服务器端，此包装器在内容协商选择使用转换器但在写入之前，使用 {@code ResponseBodyInterceptor} 添加。
  *
- * <p>On the client side, simply wrap the POJO and pass it in to the
- * {@code RestTemplate}.
+ * <p>在客户端，只需包装 POJO 并将其传递给 {@code RestTemplate} 即可。
  *
  * @author Rossen Stoyanchev
  * @since 4.1
  */
 public class MappingJacksonValue {
-
+	/**
+	 * 要序列化的实体类
+	 */
 	private Object value;
 
+	/**
+	 * 序列化视图类
+	 */
 	@Nullable
 	private Class<?> serializationView;
 
+	/**
+	 * 筛选器提供者
+	 */
 	@Nullable
 	private FilterProvider filters;
 
 
 	/**
-	 * Create a new instance wrapping the given POJO to be serialized.
-	 * @param value the Object to be serialized
+	 * 创建一个新实例，包装要序列化的给定 POJO。
+	 *
+	 * @param value 要序列化的对象
 	 */
 	public MappingJacksonValue(Object value) {
 		this.value = value;
@@ -56,21 +61,22 @@ public class MappingJacksonValue {
 
 
 	/**
-	 * Modify the POJO to serialize.
+	 * 修改要序列化的 POJO。
 	 */
 	public void setValue(Object value) {
 		this.value = value;
 	}
 
 	/**
-	 * Return the POJO that needs to be serialized.
+	 * 返回需要序列化的 POJO。
 	 */
 	public Object getValue() {
 		return this.value;
 	}
 
 	/**
-	 * Set the serialization view to serialize the POJO with.
+	 * 设置要用于序列化 POJO 的序列化视图。
+	 *
 	 * @see com.fasterxml.jackson.databind.ObjectMapper#writerWithView(Class)
 	 * @see com.fasterxml.jackson.annotation.JsonView
 	 */
@@ -79,7 +85,8 @@ public class MappingJacksonValue {
 	}
 
 	/**
-	 * Return the serialization view to use.
+	 * 返回要使用的序列化视图。
+	 *
 	 * @see com.fasterxml.jackson.databind.ObjectMapper#writerWithView(Class)
 	 * @see com.fasterxml.jackson.annotation.JsonView
 	 */
@@ -89,21 +96,23 @@ public class MappingJacksonValue {
 	}
 
 	/**
-	 * Set the Jackson filter provider to serialize the POJO with.
-	 * @since 4.2
+	 * 设置要用于序列化 POJO 的 Jackson 过滤器提供程序。
+	 *
 	 * @see com.fasterxml.jackson.databind.ObjectMapper#writer(FilterProvider)
 	 * @see com.fasterxml.jackson.annotation.JsonFilter
 	 * @see Jackson2ObjectMapperBuilder#filters(FilterProvider)
+	 * @since 4.2
 	 */
 	public void setFilters(@Nullable FilterProvider filters) {
 		this.filters = filters;
 	}
 
 	/**
-	 * Return the Jackson filter provider to use.
-	 * @since 4.2
+	 * 返回要使用的 Jackson 过滤器提供程序。
+	 *
 	 * @see com.fasterxml.jackson.databind.ObjectMapper#writer(FilterProvider)
 	 * @see com.fasterxml.jackson.annotation.JsonFilter
+	 * @since 4.2
 	 */
 	@Nullable
 	public FilterProvider getFilters() {
