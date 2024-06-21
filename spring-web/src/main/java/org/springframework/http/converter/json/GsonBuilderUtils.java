@@ -16,41 +16,44 @@
 
 package org.springframework.http.converter.json;
 
-import java.lang.reflect.Type;
-
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
+import com.google.gson.*;
 import org.springframework.util.Base64Utils;
 
+import java.lang.reflect.Type;
+
 /**
- * A simple utility class for obtaining a Google Gson 2.x {@link GsonBuilder}
- * which Base64-encodes {@code byte[]} properties when reading and writing JSON.
+ * 用于获取一个 Google Gson 2.x {@link GsonBuilder} 的简单实用工具类，
+ * 当读取和写入 JSON 时，将 {@code byte[]} 属性进行 Base64 编码。
+ *
+ * <p>通过注册一个自定义的 {@link com.google.gson.TypeAdapter}，
+ * 通过 {@link GsonBuilder#registerTypeHierarchyAdapter(Class, Object)} 注册，
+ * 该适配器将 {@code byte[]} 属性序列化为和反序列化为 Base64 编码的字符串，
+ * 而不是 JSON 数组。
  *
  * @author Juergen Hoeller
  * @author Roy Clarkson
- * @since 4.1
  * @see GsonFactoryBean#setBase64EncodeByteArrays
  * @see org.springframework.util.Base64Utils
+ * @since 4.1
  */
 public abstract class GsonBuilderUtils {
 
 	/**
-	 * Obtain a {@link GsonBuilder} which Base64-encodes {@code byte[]}
-	 * properties when reading and writing JSON.
-	 * <p>A custom {@link com.google.gson.TypeAdapter} will be registered via
-	 * {@link GsonBuilder#registerTypeHierarchyAdapter(Class, Object)} which
-	 * serializes a {@code byte[]} property to and from a Base64-encoded String
-	 * instead of a JSON array.
+	 * 获取一个 {@link GsonBuilder}，用于对读取和写入 JSON 时对 {@code byte[]} 属性进行 Base64 编码。
+	 * <p>将通过 {@link GsonBuilder#registerTypeHierarchyAdapter(Class, Object)} 注册一个自定义的
+	 * {@link com.google.gson.TypeAdapter}，该适配器将 {@code byte[]} 属性序列化为和反序列化为
+	 * Base64 编码的字符串，而不是 JSON 数组。
+	 *
+	 * @return 配置了 Base64 编码 {@code byte[]} 属性的 GsonBuilder
 	 */
 	public static GsonBuilder gsonBuilderWithBase64EncodedByteArrays() {
+		// 创建一个GsonBuilder实例
 		GsonBuilder builder = new GsonBuilder();
+
+		// 注册Base64TypeAdapter来处理 字节数组 类型的数据
 		builder.registerTypeHierarchyAdapter(byte[].class, new Base64TypeAdapter());
+
+		// 返回配置好的GsonBuilder实例
 		return builder;
 	}
 
