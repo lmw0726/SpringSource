@@ -16,13 +16,9 @@
 
 package org.springframework.http.codec.cbor;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
@@ -30,22 +26,34 @@ import org.springframework.http.codec.json.AbstractJackson2Decoder;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.MimeType;
+import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 /**
- * Decode bytes into CBOR and convert to Object's with Jackson.
- * Stream decoding is not supported yet.
+ * 使用Jackson解码字节为CBOR并转换为对象。
+ * 目前不支持流解码。
  *
  * @author Sebastien Deleuze
  * @since 5.2
  * @see Jackson2CborEncoder
- * @see <a href="https://github.com/spring-projects/spring-framework/issues/20513">Add CBOR support to WebFlux</a>
+ * @see <a href="https://github.com/spring-projects/spring-framework/issues/20513">将CBOR支持添加到WebFlux</a>
  */
 public class Jackson2CborDecoder extends AbstractJackson2Decoder {
 
+	/**
+	 * 默认构造函数，使用默认的ObjectMapper和CBOR媒体类型。
+	 */
 	public Jackson2CborDecoder() {
 		this(Jackson2ObjectMapperBuilder.cbor().build(), MediaType.APPLICATION_CBOR);
 	}
 
+	/**
+	 * 使用指定的ObjectMapper和Mime类型构造解码器。
+	 *
+	 * @param mapper    用于解码的ObjectMapper
+	 * @param mimeTypes 支持的Mime类型
+	 */
 	public Jackson2CborDecoder(ObjectMapper mapper, MimeType... mimeTypes) {
 		super(mapper, mimeTypes);
 		Assert.isAssignable(CBORFactory.class, mapper.getFactory().getClass());

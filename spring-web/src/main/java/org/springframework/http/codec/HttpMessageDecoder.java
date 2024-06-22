@@ -16,36 +16,33 @@
 
 package org.springframework.http.codec;
 
-import java.util.Map;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.codec.Decoder;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 
+import java.util.Map;
+
 /**
- * Extension of {@code Decoder} exposing extra methods relevant in the context
- * of HTTP request or response body decoding.
+ * 扩展{@code Decoder}接口，暴露在HTTP请求或响应体解码上下文中相关的额外方法。
  *
+ * @param <T> 输出流中元素的类型
  * @author Rossen Stoyanchev
  * @since 5.0
- * @param <T> the type of elements in the output stream
  */
 public interface HttpMessageDecoder<T> extends Decoder<T> {
 
 	/**
-	 * Get decoding hints based on the server request or annotations on the
-	 * target controller method parameter.
-	 * @param actualType the actual target type to decode to, possibly a reactive
-	 * wrapper and sourced from {@link org.springframework.core.MethodParameter},
-	 * i.e. providing access to method parameter annotations
-	 * @param elementType the element type within {@code Flux/Mono} that we're
-	 * trying to decode to
-	 * @param request the current request
-	 * @param response the current response
-	 * @return a Map with hints, possibly empty
+	 * 基于服务器请求或目标控制器方法参数上的注解获取解码提示。
+	 *
+	 * @param actualType  要解码的实际目标类型，可能是一个反应性包装器，并且源自
+	 *                    {@link org.springframework.core.MethodParameter}，即提供对方法参数注解的访问
+	 * @param elementType 我们尝试解码的{@code Flux/Mono}中的元素类型
+	 * @param request     当前请求
+	 * @param response    当前响应
+	 * @return 一个包含提示的Map，可能为空
 	 */
 	Map<String, Object> getDecodeHints(ResolvableType actualType, ResolvableType elementType,
-			ServerHttpRequest request, ServerHttpResponse response);
+									   ServerHttpRequest request, ServerHttpResponse response);
 
 }
