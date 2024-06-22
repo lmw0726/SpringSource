@@ -16,42 +16,57 @@
 
 package org.springframework.http.codec;
 
-import java.time.Duration;
-
 import org.springframework.lang.Nullable;
 
+import java.time.Duration;
+
 /**
- * Representation for a Server-Sent Event for use with Spring's reactive Web support.
- * {@code Flux<ServerSentEvent>} or {@code Observable<ServerSentEvent>} is the
- * reactive equivalent to Spring MVC's {@code SseEmitter}.
+ * 表示用于 Spring 响应式 Web 支持的服务器发送事件（Server-Sent Event）。
+ * {@code Flux<ServerSentEvent>} 或 {@code Observable<ServerSentEvent>} 是
+ * Spring MVC 的 {@code SseEmitter} 的响应式等价物。
  *
+ * @param <T> 此事件包含的数据类型
  * @author Sebastien Deleuze
  * @author Arjen Poutsma
- * @since 5.0
- * @param <T> the type of data that this event contains
  * @see ServerSentEventHttpMessageWriter
- * @see <a href="https://www.w3.org/TR/eventsource/">Server-Sent Events W3C recommendation</a>
+ * @see <a href="https://www.w3.org/TR/eventsource/">Server-Sent Events W3C 推荐</a>
+ * @since 5.0
  */
 public final class ServerSentEvent<T> {
 
+	/**
+	 * 事件ID
+	 */
 	@Nullable
 	private final String id;
 
+	/**
+	 * 事件类型
+	 */
 	@Nullable
 	private final String event;
 
+	/**
+	 * 重新连接时间
+	 */
 	@Nullable
 	private final Duration retry;
 
+	/**
+	 * 事件注释
+	 */
 	@Nullable
 	private final String comment;
 
+	/**
+	 * 消息的数据字段
+	 */
 	@Nullable
 	private final T data;
 
 
 	private ServerSentEvent(@Nullable String id, @Nullable String event, @Nullable Duration retry,
-			@Nullable String comment, @Nullable T data) {
+							@Nullable String comment, @Nullable T data) {
 
 		this.id = id;
 		this.event = event;
@@ -62,7 +77,7 @@ public final class ServerSentEvent<T> {
 
 
 	/**
-	 * Return the {@code id} field of this event, if available.
+	 * 返回此事件的 {@code id} 字段（如果可用）。
 	 */
 	@Nullable
 	public String id() {
@@ -70,7 +85,7 @@ public final class ServerSentEvent<T> {
 	}
 
 	/**
-	 * Return the {@code event} field of this event, if available.
+	 * 返回此事件的 {@code event} 字段，如果可用。
 	 */
 	@Nullable
 	public String event() {
@@ -78,7 +93,7 @@ public final class ServerSentEvent<T> {
 	}
 
 	/**
-	 * Return the {@code retry} field of this event, if available.
+	 * 返回此事件的 {@code retry} 字段（如果可用）。
 	 */
 	@Nullable
 	public Duration retry() {
@@ -86,7 +101,7 @@ public final class ServerSentEvent<T> {
 	}
 
 	/**
-	 * Return the comment of this event, if available.
+	 * 返回此事件的注释（如果可用）。
 	 */
 	@Nullable
 	public String comment() {
@@ -94,7 +109,7 @@ public final class ServerSentEvent<T> {
 	}
 
 	/**
-	 * Return the {@code data} field of this event, if available.
+	 * 返回此事件的 {@code data} 字段（如果可用）。
 	 */
 	@Nullable
 	public T data() {
@@ -110,18 +125,21 @@ public final class ServerSentEvent<T> {
 
 
 	/**
-	 * Return a builder for a {@code SseEvent}.
-	 * @param <T> the type of data that this event contains
-	 * @return the builder
+	 * 返回一个 {@code SseEvent} 的构建器。
+	 *
+	 * @param <T> 此事件包含的数据类型
+	 * @return 构建器
 	 */
 	public static <T> Builder<T> builder() {
 		return new BuilderImpl<>();
 	}
 
 	/**
-	 * Return a builder for a {@code SseEvent}, populated with the given {@linkplain #data() data}.
-	 * @param <T> the type of data that this event contains
-	 * @return the builder
+	 * 返回一个 {@code SseEvent} 的构建器，并用给定的 {@linkplain #data() 数据} 填充。
+	 *
+	 * @param <T>  此事件包含的数据类型
+	 * @param data 要填充的数据
+	 * @return 构建器
 	 */
 	public static <T> Builder<T> builder(T data) {
 		return new BuilderImpl<>(data);
@@ -129,54 +147,58 @@ public final class ServerSentEvent<T> {
 
 
 	/**
-	 * A mutable builder for a {@code SseEvent}.
+	 * {@code SseEvent} 的可变构建器。
 	 *
-	 * @param <T> the type of data that this event contains
+	 * @param <T> 此事件包含的数据类型
 	 */
 	public interface Builder<T> {
 
 		/**
-		 * Set the value of the {@code id} field.
-		 * @param id the value of the id field
-		 * @return {@code this} builder
+		 * 设置 {@code id} 字段的值。
+		 *
+		 * @param id id 字段的值
+		 * @return {@code this} 构建器
 		 */
 		Builder<T> id(String id);
 
 		/**
-		 * Set the value of the {@code event} field.
-		 * @param event the value of the event field
-		 * @return {@code this} builder
+		 * 设置 {@code event} 字段的值。
+		 *
+		 * @param event event 字段的值
+		 * @return {@code this} 构建器
 		 */
 		Builder<T> event(String event);
 
 		/**
-		 * Set the value of the {@code retry} field.
-		 * @param retry the value of the retry field
-		 * @return {@code this} builder
+		 * 设置 {@code retry} 字段的值。
+		 *
+		 * @param retry retry 字段的值
+		 * @return {@code this} 构建器
 		 */
 		Builder<T> retry(Duration retry);
 
 		/**
-		 * Set SSE comment. If a multi-line comment is provided, it will be turned into multiple
-		 * SSE comment lines as defined in Server-Sent Events W3C recommendation.
-		 * @param comment the comment to set
-		 * @return {@code this} builder
+		 * 设置 SSE 注释。如果提供了多行注释，它将被转换为多个 SSE 注释行，如 Server-Sent Events W3C 推荐中定义的那样。
+		 *
+		 * @param comment 要设置的注释
+		 * @return {@code this} 构建器
 		 */
 		Builder<T> comment(String comment);
 
 		/**
-		 * Set the value of the {@code data} field. If the {@code data} argument is a multi-line
-		 * {@code String}, it will be turned into multiple {@code data} field lines as defined
-		 * in the Server-Sent Events W3C recommendation. If {@code data} is not a String, it will
-		 * be {@linkplain org.springframework.http.codec.json.Jackson2JsonEncoder encoded} into JSON.
-		 * @param data the value of the data field
-		 * @return {@code this} builder
+		 * 设置 {@code data} 字段的值。如果 {@code data} 参数是多行 {@code String}，它将被转换为多个 {@code data} 字段行，
+		 * 如 Server-Sent Events W3C 推荐中定义的那样。如果 {@code data} 不是 String，
+		 * 它将通过 {@linkplain org.springframework.http.codec.json.Jackson2JsonEncoder 编码} 为 JSON。
+		 *
+		 * @param data data 字段的值
+		 * @return {@code this} 构建器
 		 */
 		Builder<T> data(@Nullable T data);
 
 		/**
-		 * Builds the event.
-		 * @return the built event
+		 * 构建事件。
+		 *
+		 * @return 构建的事件
 		 */
 		ServerSentEvent<T> build();
 	}
@@ -184,18 +206,33 @@ public final class ServerSentEvent<T> {
 
 	private static class BuilderImpl<T> implements Builder<T> {
 
+		/**
+		 * 事件ID
+		 */
 		@Nullable
 		private String id;
 
+		/**
+		 * 事件类型
+		 */
 		@Nullable
 		private String event;
 
+		/**
+		 * 重新连接的时间
+		 */
 		@Nullable
 		private Duration retry;
 
+		/**
+		 * 事件注释
+		 */
 		@Nullable
 		private String comment;
 
+		/**
+		 * 消息的数据字段
+		 */
 		@Nullable
 		private T data;
 
