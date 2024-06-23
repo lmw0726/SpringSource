@@ -16,13 +16,9 @@
 
 package org.springframework.http.codec.cbor;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -31,15 +27,18 @@ import org.springframework.http.codec.json.AbstractJackson2Encoder;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.MimeType;
+import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 /**
- * Encode from an {@code Object} to bytes of CBOR objects using Jackson.
- * Stream encoding is not supported yet.
+ * 使用Jackson将{@code Object}编码为CBOR对象的字节。
+ * 目前不支持流编码。
  *
  * @author Sebastien Deleuze
  * @since 5.2
  * @see Jackson2CborDecoder
- * @see <a href="https://github.com/spring-projects/spring-framework/issues/20513">Add CBOR support to WebFlux</a>
+ * @see <a href="https://github.com/spring-projects/spring-framework/issues/20513">将CBOR支持添加到WebFlux</a>
  */
 public class Jackson2CborEncoder extends AbstractJackson2Encoder {
 
