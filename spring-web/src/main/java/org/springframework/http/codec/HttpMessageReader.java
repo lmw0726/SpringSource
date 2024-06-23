@@ -16,13 +16,6 @@
 
 package org.springframework.http.codec;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
 import org.springframework.http.MediaType;
@@ -30,37 +23,39 @@ import org.springframework.http.ReactiveHttpInputMessage;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.lang.Nullable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Strategy for reading from a {@link ReactiveHttpInputMessage} and decoding
- * the stream of bytes to Objects of type {@code <T>}.
+ * 策略接口，用于从{@link ReactiveHttpInputMessage}读取并解码字节流到类型为{@code <T>}的对象流中。
  *
+ * @param <T> 解码输出流中对象的类型
  * @author Rossen Stoyanchev
  * @author Arjen Poutsma
  * @author Sebastien Deleuze
  * @since 5.0
- * @param <T> the type of objects in the decoded output stream
  */
 public interface HttpMessageReader<T> {
 
 	/**
-	 * Return the list of media types supported by this reader. The list may not
-	 * apply to every possible target element type and calls to this method
-	 * should typically be guarded via {@link #canRead(ResolvableType, MediaType)
-	 * canWrite(elementType, null)}. The list may also exclude media types
-	 * supported only for a specific element type. Alternatively, use
-	 * {@link #getReadableMediaTypes(ResolvableType)} for a more precise list.
-	 * @return the general list of supported media types
+	 * 返回此读取器支持的媒体类型列表。该列表可能不适用于每种可能的目标元素类型，
+	 * 调用此方法应通常通过 {@link #canRead(ResolvableType, MediaType) canWrite(elementType, null)} 进行保护。
+	 * 列表也可能不包括仅支持特定元素类型的媒体类型。或者，使用 {@link #getReadableMediaTypes(ResolvableType)} 获取更精确的列表。
+	 *
+	 * @return 支持的通用媒体类型列表
 	 */
 	List<MediaType> getReadableMediaTypes();
 
 	/**
-	 * Return the list of media types supported by this Reader for the given type
-	 * of element. This list may differ from {@link #getReadableMediaTypes()}
-	 * if the Reader doesn't support the element type, or if it supports it
-	 * only for a subset of media types.
-	 * @param elementType the type of element to read
-	 * @return the list of media types supported for the given class
+	 * 返回此读取器针对给定元素类型支持的媒体类型列表。
+	 * 如果读取器不支持元素类型，或者仅支持部分媒体类型，则此列表可能与 {@link #getReadableMediaTypes()} 不同。
+	 *
+	 * @param elementType 要读取的元素类型
+	 * @return 支持给定类的媒体类型列表
 	 * @since 5.3.4
 	 */
 	default List<MediaType> getReadableMediaTypes(ResolvableType elementType) {
@@ -68,67 +63,64 @@ public interface HttpMessageReader<T> {
 	}
 
 	/**
-	 * Whether the given object type is supported by this reader.
-	 * @param elementType the type of object to check
-	 * @param mediaType the media type for the read (possibly {@code null})
-	 * @return {@code true} if readable, {@code false} otherwise
+	 * 检查此读取器是否支持给定对象类型。
+	 *
+	 * @param elementType 要检查的对象类型
+	 * @param mediaType   读取的媒体类型（可能为{@code null}）
+	 * @return 如果可读则为{@code true}，否则为{@code false}
 	 */
 	boolean canRead(ResolvableType elementType, @Nullable MediaType mediaType);
 
 	/**
-	 * Read from the input message and decode to a stream of objects.
-	 * @param elementType the type of objects in the stream which must have been
-	 * previously checked via {@link #canRead(ResolvableType, MediaType)}
-	 * @param message the message to read from
-	 * @param hints additional information about how to read and decode the input
-	 * @return the decoded stream of elements
+	 * 从输入消息中读取并解码为对象流。
+	 *
+	 * @param elementType 要解码的流中的对象类型，必须通过 {@link #canRead(ResolvableType, MediaType)} 进行检查
+	 * @param message     要从中读取的消息
+	 * @param hints       关于如何读取和解码输入的附加信息
+	 * @return 解码的元素流
 	 */
 	Flux<T> read(ResolvableType elementType, ReactiveHttpInputMessage message, Map<String, Object> hints);
 
 	/**
-	 * Read from the input message and decode to a single object.
-	 * @param elementType the type of objects in the stream which must have been
-	 * previously checked via {@link #canRead(ResolvableType, MediaType)}
-	 * @param message the message to read from
-	 * @param hints additional information about how to read and decode the input
-	 * @return the decoded object
+	 * 从输入消息中读取并解码为单个对象。
+	 *
+	 * @param elementType 要解码的流中的对象类型，必须通过 {@link #canRead(ResolvableType, MediaType)} 进行检查
+	 * @param message     要从中读取的消息
+	 * @param hints       关于如何读取和解码输入的附加信息
+	 * @return 解码的对象
 	 */
 	Mono<T> readMono(ResolvableType elementType, ReactiveHttpInputMessage message, Map<String, Object> hints);
 
 	/**
-	 * Server-side only alternative to
-	 * {@link #read(ResolvableType, ReactiveHttpInputMessage, Map)}
-	 * with additional context available.
-	 * @param actualType the actual type of the target method parameter;
-	 * for annotated controllers, the {@link MethodParameter} can be accessed
-	 * via {@link ResolvableType#getSource()}.
-	 * @param elementType the type of Objects in the output stream
-	 * @param request the current request
-	 * @param response the current response
-	 * @param hints additional information about how to read the body
-	 * @return the decoded stream of elements
+	 * 服务器端的替代方法，与 {@link #read(ResolvableType, ReactiveHttpInputMessage, Map)} 类似，提供额外的上下文信息。
+	 *
+	 * @param actualType  实际的目标方法参数类型；
+	 *                    对于带注解的控制器，可以通过 {@link ResolvableType#getSource()} 访问 {@link MethodParameter}。
+	 * @param elementType 输出流中对象的类型
+	 * @param request     当前请求
+	 * @param response    当前响应
+	 * @param hints       关于如何读取请求体的附加信息
+	 * @return 解码的元素流
 	 */
 	default Flux<T> read(ResolvableType actualType, ResolvableType elementType, ServerHttpRequest request,
-			ServerHttpResponse response, Map<String, Object> hints) {
+						 ServerHttpResponse response, Map<String, Object> hints) {
 
 		return read(elementType, request, hints);
 	}
 
 	/**
-	 * Server-side only alternative to
-	 * {@link #readMono(ResolvableType, ReactiveHttpInputMessage, Map)}
-	 * with additional, context available.
-	 * @param actualType the actual type of the target method parameter;
-	 * for annotated controllers, the {@link MethodParameter} can be accessed
-	 * via {@link ResolvableType#getSource()}.
-	 * @param elementType the type of Objects in the output stream
-	 * @param request the current request
-	 * @param response the current response
-	 * @param hints additional information about how to read the body
-	 * @return the decoded stream of elements
+	 * 服务器端的替代方法，与 {@link #readMono(ResolvableType, ReactiveHttpInputMessage, Map)} 类似，提供额外的上下文信息。
+	 *
+	 * @param actualType  实际的目标方法参数类型；
+	 *                    对于带注解的控制器，可以通过 {@link ResolvableType#getSource()} 访问 {@link MethodParameter}。
+	 * @param elementType 输出流中对象的类型
+	 * @param request     当前请求
+	 * @param response    当前响应
+	 * @param hints       关于如何读取请求体的附加信息
+	 * @return 解码的元素流
 	 */
 	default Mono<T> readMono(ResolvableType actualType, ResolvableType elementType, ServerHttpRequest request,
-			ServerHttpResponse response, Map<String, Object> hints) {
+							 ServerHttpResponse response, Map<String, Object> hints) {
 
 		return readMono(elementType, request, hints);
 	}
