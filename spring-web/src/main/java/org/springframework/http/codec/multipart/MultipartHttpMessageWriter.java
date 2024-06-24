@@ -47,41 +47,43 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 /**
- * {@link HttpMessageWriter} for writing a {@code MultiValueMap<String, ?>}
- * as multipart form data, i.e. {@code "multipart/form-data"}, to the body
- * of a request.
+ * {@link HttpMessageWriter} 实现，用于将 {@code MultiValueMap<String, ?>}
+ * 序列化为 multipart 表单数据（即 {@code "multipart/form-data"}）并写入请求体中。
  *
- * <p>The serialization of individual parts is delegated to other writers.
- * By default only {@link String} and {@link Resource} parts are supported but
- * you can configure others through a constructor argument.
+ * <p>单个部分的序列化委托给其他写入器处理。默认情况下，仅支持 {@link String} 和 {@link Resource} 类型的部分，
+ * 但可以通过构造函数参数配置其他类型的部分。
  *
- * <p>This writer can be configured with a {@link FormHttpMessageWriter} to
- * delegate to. It is the preferred way of supporting both form data and
- * multipart data (as opposed to registering each writer separately) so that
- * when the {@link MediaType} is not specified and generics are not present on
- * the target element type, we can inspect the values in the actual map and
- * decide whether to write plain form data (String values only) or otherwise.
+ * <p>此写入器可以配置一个 {@link FormHttpMessageWriter} 来进行委托处理。
+ * 这是支持表单数据和多部分数据的首选方式（而不是单独注册每个写入器），这样当未指定 {@link MediaType} 并且在目标元素类型上没有泛型时，
+ * 我们可以检查实际映射中的值，并决定是写入普通表单数据（仅字符串值）还是其他内容。
  *
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see FormHttpMessageWriter
+ * @since 5.0
  */
 public class MultipartHttpMessageWriter extends MultipartWriterSupport
 		implements HttpMessageWriter<MultiValueMap<String, ?>> {
 
-	/** Suppress logging from individual part writers (full map logged at this level). */
+	/**
+	 * 用于抑制单个部分写入器的日志记录（在此级别记录完整映射）。
+	 */
 	private static final Map<String, Object> DEFAULT_HINTS = Hints.from(Hints.SUPPRESS_LOGGING_HINT, true);
 
-
+	/**
+	 * 部分写入器列表
+	 */
 	private final List<HttpMessageWriter<?>> partWriters;
 
+	/**
+	 * 表单写入器
+	 */
 	@Nullable
 	private final HttpMessageWriter<MultiValueMap<String, String>> formWriter;
 
 
 	/**
-	 * Constructor with a default list of part writers (String and Resource).
+	 * 使用默认的部分写入器列表（String 和 Resource）构造函数。
 	 */
 	public MultipartHttpMessageWriter() {
 		this(Arrays.asList(
@@ -91,21 +93,22 @@ public class MultipartHttpMessageWriter extends MultipartWriterSupport
 	}
 
 	/**
-	 * Constructor with explicit list of writers for serializing parts.
+	 * 使用显式指定的部分写入器列表构造函数。
+	 *
+	 * @param partWriters 用于序列化部分的写入器列表
 	 */
 	public MultipartHttpMessageWriter(List<HttpMessageWriter<?>> partWriters) {
 		this(partWriters, new FormHttpMessageWriter());
 	}
 
 	/**
-	 * Constructor with explicit list of writers for serializing parts and a
-	 * writer for plain form data to fall back when no media type is specified
-	 * and the actual map consists of String values only.
-	 * @param partWriters the writers for serializing parts
-	 * @param formWriter the fallback writer for form data, {@code null} by default
+	 * 使用显式指定的部分写入器列表和用于纯文本表单数据的写入器构造函数。
+	 *
+	 * @param partWriters 用于序列化部分的写入器列表
+	 * @param formWriter  用于表单数据的写入器，如果未指定媒体类型并且实际映射包含仅字符串值，则为 {@code null}
 	 */
 	public MultipartHttpMessageWriter(List<HttpMessageWriter<?>> partWriters,
-			@Nullable  HttpMessageWriter<MultiValueMap<String, String>> formWriter) {
+									  @Nullable HttpMessageWriter<MultiValueMap<String, String>> formWriter) {
 
 		super(initMediaTypes(formWriter));
 		this.partWriters = partWriters;
@@ -113,16 +116,21 @@ public class MultipartHttpMessageWriter extends MultipartWriterSupport
 	}
 
 	private static List<MediaType> initMediaTypes(@Nullable HttpMessageWriter<?> formWriter) {
+		// 创建一个包含 Mime类型 所有元素的新 ArrayList
 		List<MediaType> result = new ArrayList<>(MultipartHttpMessageReader.MIME_TYPES);
+		// 如果 表单写入器 不为 null，则将 表单写入器 的可写媒体类型添加到 结果集 中
 		if (formWriter != null) {
 			result.addAll(formWriter.getWritableMediaTypes());
 		}
+		// 返回不可修改的结果集
 		return Collections.unmodifiableList(result);
 	}
 
 
 	/**
-	 * Return the configured part writers.
+	 * 返回配置的部分写入器列表。
+	 *
+	 * @return 部分写入器列表
 	 * @since 5.0.7
 	 */
 	public List<HttpMessageWriter<?>> getPartWriters() {
@@ -131,7 +139,9 @@ public class MultipartHttpMessageWriter extends MultipartWriterSupport
 
 
 	/**
-	 * Return the configured form writer.
+	 * 返回配置的表单写入器。
+	 *
+	 * @return 表单写入器
 	 * @since 5.1.13
 	 */
 	@Nullable
@@ -140,63 +150,83 @@ public class MultipartHttpMessageWriter extends MultipartWriterSupport
 	}
 
 
-
 	@Override
 	public Mono<Void> write(Publisher<? extends MultiValueMap<String, ?>> inputStream,
-			ResolvableType elementType, @Nullable MediaType mediaType, ReactiveHttpOutputMessage outputMessage,
-			Map<String, Object> hints) {
+							ResolvableType elementType, @Nullable MediaType mediaType, ReactiveHttpOutputMessage outputMessage,
+							Map<String, Object> hints) {
 
+		// 将 输入流 转换为 Mono，并进行 flatMap 操作
 		return Mono.from(inputStream)
 				.flatMap(map -> {
+					// 如果 表单写入器 为 null，如果是多部分数据
 					if (this.formWriter == null || isMultipart(map, mediaType)) {
+						// 调用 writeMultipart 方法写入数据
 						return writeMultipart(map, outputMessage, mediaType, hints);
-					}
-					else {
+					} else {
+						// 否则，将 map 转换为 MultiValueMap<String, String> 类型的 Mono
 						@SuppressWarnings("unchecked")
 						Mono<MultiValueMap<String, String>> input = Mono.just((MultiValueMap<String, String>) map);
+						// 调用 表单写入器 的 write 方法写入数据
 						return this.formWriter.write(input, elementType, mediaType, outputMessage, hints);
 					}
 				});
 	}
 
 	private boolean isMultipart(MultiValueMap<String, ?> map, @Nullable MediaType contentType) {
+		// 如果 内容类型 不为 null，则检查其类型是否为 "multipart"
 		if (contentType != null) {
 			return contentType.getType().equalsIgnoreCase("multipart");
 		}
+
+		// 遍历 映射 中的所有值
 		for (List<?> values : map.values()) {
 			for (Object value : values) {
+				// 如果值不为 null 并且不是 String 类型，则返回 true
 				if (value != null && !(value instanceof String)) {
 					return true;
 				}
 			}
 		}
+
+		// 如果没有找到非 String 类型的值，则返回 false
 		return false;
 	}
 
 	private Mono<Void> writeMultipart(MultiValueMap<String, ?> map,
-			ReactiveHttpOutputMessage outputMessage, @Nullable MediaType mediaType, Map<String, Object> hints) {
+									  ReactiveHttpOutputMessage outputMessage, @Nullable MediaType mediaType, Map<String, Object> hints) {
 
+		// 生成 多部分 的 边界
 		byte[] boundary = generateMultipartBoundary();
 
+		// 获取包含边界的 多部分 媒体类型
 		mediaType = getMultipartMediaType(mediaType, boundary);
+		// 将媒体类型设置到输出消息的头部
 		outputMessage.getHeaders().setContentType(mediaType);
 
+		// 打印日志信息，根据是否 启用日志记录请求详细信息 判断是否记录详细信息
 		LogFormatUtils.traceDebug(logger, traceOn -> Hints.getLogPrefix(hints) + "Encoding " +
 				(isEnableLoggingRequestDetails() ?
 						LogFormatUtils.formatValue(map, !traceOn) :
 						"parts " + map.keySet() + " (content masked)"));
 
+		// 获取数据缓冲工厂
 		DataBufferFactory bufferFactory = outputMessage.bufferFactory();
 
+		// 创建 Flux<DataBuffer>，从 映射 的条目集合开始
 		Flux<DataBuffer> body = Flux.fromIterable(map.entrySet())
+				// 处理每个条目，调用 encodePartValues 方法编码部分值
 				.concatMap(entry -> encodePartValues(boundary, entry.getKey(), entry.getValue(), bufferFactory))
+				// 将生成的最后一行内容连接到 Flux<DataBuffer> 中
 				.concatWith(generateLastLine(boundary, bufferFactory))
+				// 当丢弃 PooledDataBuffer 类型时，释放 DataBuffer
 				.doOnDiscard(PooledDataBuffer.class, DataBufferUtils::release);
 
+		// 如果日志级别为 DEBUG，则在每个数据缓冲上标记日志信息
 		if (logger.isDebugEnabled()) {
 			body = body.doOnNext(buffer -> Hints.touchDataBuffer(buffer, hints, logger));
 		}
 
+		// 将 响应数据 写入的输出消息
 		return outputMessage.writeWith(body);
 	}
 
@@ -209,65 +239,85 @@ public class MultipartHttpMessageWriter extends MultipartWriterSupport
 
 	@SuppressWarnings("unchecked")
 	private <T> Flux<DataBuffer> encodePart(byte[] boundary, String name, T value, DataBufferFactory factory) {
+		// 创建 MultipartHttpOutputMessage 对象
 		MultipartHttpOutputMessage message = new MultipartHttpOutputMessage(factory);
+		// 获取消息 头部 对象
 		HttpHeaders headers = message.getHeaders();
 
 		T body;
 		ResolvableType resolvableType = null;
+
+		// 如果 值 是 HttpEntity 类型
 		if (value instanceof HttpEntity) {
 			HttpEntity<T> httpEntity = (HttpEntity<T>) value;
+			// 将 Http实体 的头部信息添加到消息头中
 			headers.putAll(httpEntity.getHeaders());
+			// 获取 Http实体 的 主体
 			body = httpEntity.getBody();
+			// 断言确保 主体 不为 null
 			Assert.state(body != null, "MultipartHttpMessageWriter only supports HttpEntity with body");
+			// 如果 Http实体 是 ResolvableTypeProvider 的实例，则获取其 可解析类型
 			if (httpEntity instanceof ResolvableTypeProvider) {
 				resolvableType = ((ResolvableTypeProvider) httpEntity).getResolvableType();
 			}
-		}
-		else {
+		} else {
+			// 否则，直接将 值 设置为 主体
 			body = value;
 		}
+
+		// 如果 可解析类型 仍然为 null，则根据 主体 的类创建 可解析类型
 		if (resolvableType == null) {
 			resolvableType = ResolvableType.forClass(body.getClass());
 		}
 
+		// 如果消息头中不包含 Content-Disposition
 		if (!headers.containsKey(HttpHeaders.CONTENT_DISPOSITION)) {
+			// 如果 主体 是 Resource 类型
 			if (body instanceof Resource) {
+				// 使用 Resource 的文件名，设置内容的 Content-Disposition
 				headers.setContentDispositionFormData(name, ((Resource) body).getFilename());
-			}
-			else if (resolvableType.resolve() == Resource.class) {
+			} else if (resolvableType.resolve() == Resource.class) {
+				// 如果 可解析类型 解析为 Resource.class
+				// 将 主体 转换为 Mono，并在下一个元素到达时设置 Content-Disposition
 				body = (T) Mono.from((Publisher<?>) body).doOnNext(o -> headers
 						.setContentDispositionFormData(name, ((Resource) o).getFilename()));
-			}
-			else {
+			} else {
+				// 否则，设置 Content-Disposition 为默认值
 				headers.setContentDispositionFormData(name, null);
 			}
 		}
 
+		// 获取消息头的 内容类型
 		MediaType contentType = headers.getContentType();
 
+		// 定义 最终主体类型 为 可解析类型
 		final ResolvableType finalBodyType = resolvableType;
+
+		// 从 部分写入器列表 中找到可以处理 最终主体类型 和 内容类型 的第一个 写入器
 		Optional<HttpMessageWriter<?>> writer = this.partWriters.stream()
 				.filter(partWriter -> partWriter.canWrite(finalBodyType, contentType))
 				.findFirst();
 
+		// 如果找不到合适的 写入器，则抛出 编解码器异常
 		if (!writer.isPresent()) {
 			return Flux.error(new CodecException("No suitable writer found for part: " + name));
 		}
 
-		Publisher<T> bodyPublisher =
-				body instanceof Publisher ? (Publisher<T>) body : Mono.just(body);
+		// 如果 主体 是 Publisher 类型，则将其转换为 Publisher<T>
+		Publisher<T> bodyPublisher = body instanceof Publisher ? (Publisher<T>) body : Mono.just(body);
 
-		// The writer will call MultipartHttpOutputMessage#write which doesn't actually write
-		// but only stores the body Flux and returns Mono.empty().
+		// 写入器 将调用 MultipartHttpOutputMessage#write 方法，
+		// 该方法并不实际写入数据，而是存储 主体 Flux 并返回 Mono.empty()。
 
+		// 执行 部分内容准备，可以从 MultipartHttpOutputMessage 中访问部分内容，并用于写入到实际的请求体中
 		Mono<Void> partContentReady = ((HttpMessageWriter<T>) writer.get())
+				// 使用 写入器 写入内容到 消息 中
 				.write(bodyPublisher, resolvableType, contentType, message, DEFAULT_HINTS);
 
-		// After partContentReady, we can access the part content from MultipartHttpOutputMessage
-		// and use it for writing to the actual request body
-
+		// 完成 部分内容准备 后，从 MultipartHttpOutputMessage 中获取部分内容的 Flux<DataBuffer>
 		Flux<DataBuffer> partContent = partContentReady.thenMany(Flux.defer(message::getBody));
 
+		// 返回拼接后的 Flux，包括生成的边界行、部分内容和新的换行符
 		return Flux.concat(
 				generateBoundaryLine(boundary, factory),
 				partContent,
