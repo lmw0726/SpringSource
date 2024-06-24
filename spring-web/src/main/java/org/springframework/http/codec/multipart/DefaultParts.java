@@ -202,7 +202,7 @@ abstract class DefaultParts {
 
 
 	/**
-	 * Default implementation of {@link FilePart}.
+	 *  {@link FilePart}的默认实现。
 	 */
 	private static final class DefaultFilePart extends DefaultPart implements FilePart {
 
@@ -212,7 +212,9 @@ abstract class DefaultParts {
 
 		@Override
 		public String filename() {
+			// 获取文件名
 			String filename = headers().getContentDisposition().getFilename();
+			// 断言文件名不为空
 			Assert.state(filename != null, "No filename found");
 			return filename;
 		}

@@ -16,14 +16,13 @@
 
 package org.springframework.http.codec.multipart;
 
+import reactor.core.publisher.Mono;
+
 import java.io.File;
 import java.nio.file.Path;
 
-import reactor.core.publisher.Mono;
-
 /**
- * Specialization of {@link Part} that represents an uploaded file received in
- * a multipart request.
+ * {@link Part} 的特化接口，表示在多部分请求中接收到的上传文件。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -32,28 +31,23 @@ import reactor.core.publisher.Mono;
 public interface FilePart extends Part {
 
 	/**
-	 * Return the original filename in the client's filesystem.
-	 * <p><strong>Note:</strong> Please keep in mind this filename is supplied
-	 * by the client and should not be used blindly. In addition to not using
-	 * the directory portion, the file name could also contain characters such
-	 * as ".." and others that can be used maliciously. It is recommended to not
-	 * use this filename directly. Preferably generate a unique one and save
-	 * this one one somewhere for reference, if necessary.
-	 * @return the original filename, or the empty String if no file has been chosen
-	 * in the multipart form, or {@code null} if not defined or not available
-	 * @see <a href="https://tools.ietf.org/html/rfc7578#section-4.2">RFC 7578, Section 4.2</a>
-	 * @see <a href="https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload">Unrestricted File Upload</a>
+	 * 返回客户端文件系统中的原始文件名。
+	 * <p><strong>注意：</strong>请注意，此文件名由客户端提供，不应盲目使用。除了不使用目录部分外，
+	 * 文件名还可能包含诸如 ".." 和其他可能被恶意使用的字符。建议不直接使用此文件名。最好生成一个唯一的文件名，
+	 * 并在需要时保存原始文件名作为参考。
+	 *
+	 * @return 原始文件名；如果未在多部分表单中选择文件，则返回空字符串；如果未定义或不可用，则返回 {@code null}
+	 * @see <a href="https://tools.ietf.org/html/rfc7578#section-4.2">RFC 7578，第4.2节</a>
+	 * @see <a href="https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload">不受限制的文件上传</a>
 	 */
 	String filename();
 
 	/**
-	 * Convenience method to copy the content of the file in this part to the
-	 * given destination file. If the destination file already exists, it will
-	 * be truncated first.
-	 * <p>The default implementation delegates to {@link #transferTo(Path)}.
-	 * @param dest the target file
-	 * @return completion {@code Mono} with the result of the file transfer,
-	 * possibly {@link IllegalStateException} if the part isn't a file
+	 * 将此部分中文件的内容复制到给定的目标文件中的便捷方法。如果目标文件已经存在，则首先将其截断。
+	 * <p>默认实现委托给 {@link #transferTo(Path)}。
+	 *
+	 * @param dest 目标文件
+	 * @return 完成的 {@code Mono}，包含文件传输的结果，如果部分不是文件可能会抛出 {@link IllegalStateException}
 	 * @see #transferTo(Path)
 	 */
 	default Mono<Void> transferTo(File dest) {
@@ -61,14 +55,12 @@ public interface FilePart extends Part {
 	}
 
 	/**
-	 * Convenience method to copy the content of the file in this part to the
-	 * given destination file. If the destination file already exists, it will
-	 * be truncated first.
-	 * @param dest the target file
-	 * @return completion {@code Mono} with the result of the file transfer,
-	 * possibly {@link IllegalStateException} if the part isn't a file
-	 * @since 5.1
+	 * 将此部分中文件的内容复制到给定的目标文件中的便捷方法。如果目标文件已经存在，则首先将其截断。
+	 *
+	 * @param dest 目标文件
+	 * @return 完成的 {@code Mono}，包含文件传输的结果，如果部分不是文件可能会抛出 {@link IllegalStateException}
 	 * @see #transferTo(File)
+	 * @since 5.1
 	 */
 	Mono<Void> transferTo(Path dest);
 
