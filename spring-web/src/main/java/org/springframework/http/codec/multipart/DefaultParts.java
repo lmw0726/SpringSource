@@ -16,22 +16,21 @@
 
 package org.springframework.http.codec.multipart;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.concurrent.Callable;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.util.concurrent.Callable;
 
 /**
  * Default implementations of {@link Part} and subtypes.
@@ -43,8 +42,9 @@ abstract class DefaultParts {
 
 	/**
 	 * Create a new {@link FormFieldPart} with the given parameters.
+	 *
 	 * @param headers the part headers
-	 * @param value the form field value
+	 * @param value   the form field value
 	 * @return the created part
 	 */
 	public static FormFieldPart formFieldPart(HttpHeaders headers, String value) {
@@ -59,7 +59,8 @@ abstract class DefaultParts {
 	 * buffers. Returns {@link FilePart} if the {@code Content-Disposition} of
 	 * the given headers contains a filename, or a "normal" {@link Part}
 	 * otherwise.
-	 * @param headers the part headers
+	 *
+	 * @param headers     the part headers
 	 * @param dataBuffers the content of the part
 	 * @return {@link Part} or {@link FilePart}, depending on {@link HttpHeaders#getContentDisposition()}
 	 */
@@ -74,8 +75,9 @@ abstract class DefaultParts {
 	 * Create a new {@link Part} or {@link FilePart} based on the given file.
 	 * Returns {@link FilePart} if the {@code Content-Disposition} of the given
 	 * headers contains a filename, or a "normal" {@link Part} otherwise
-	 * @param headers the part headers
-	 * @param file  the file
+	 *
+	 * @param headers   the part headers
+	 * @param file      the file
 	 * @param scheduler the scheduler used for reading the file
 	 * @return {@link Part} or {@link FilePart}, depending on {@link HttpHeaders#getContentDisposition()}
 	 */
@@ -92,8 +94,7 @@ abstract class DefaultParts {
 		String filename = headers.getContentDisposition().getFilename();
 		if (filename != null) {
 			return new DefaultFilePart(headers, content);
-		}
-		else {
+		} else {
 			return new DefaultPart(headers, content);
 		}
 	}
@@ -126,10 +127,12 @@ abstract class DefaultParts {
 
 
 	/**
-	 * Default implementation of {@link FormFieldPart}.
+	 * {@link FormFieldPart}的默认实现
 	 */
 	private static class DefaultFormFieldPart extends AbstractPart implements FormFieldPart {
-
+		/**
+		 * 字段值
+		 */
 		private final String value;
 
 		public DefaultFormFieldPart(HttpHeaders headers, String value) {
@@ -140,7 +143,9 @@ abstract class DefaultParts {
 		@Override
 		public Flux<DataBuffer> content() {
 			return Flux.defer(() -> {
+				// 将字符串转换为字节数组，并使用指定的字符集进行编码
 				byte[] bytes = this.value.getBytes(MultipartUtils.charset(headers()));
+				// 将字节数组包装成DataBuffer并生成Flux
 				return Flux.just(DefaultDataBufferFactory.sharedInstance.wrap(bytes));
 			});
 		}
@@ -155,8 +160,7 @@ abstract class DefaultParts {
 			String name = headers().getContentDisposition().getName();
 			if (name != null) {
 				return "DefaultFormFieldPart{" + name() + "}";
-			}
-			else {
+			} else {
 				return "DefaultFormFieldPart";
 			}
 		}
@@ -190,8 +194,7 @@ abstract class DefaultParts {
 			String name = headers().getContentDisposition().getName();
 			if (name != null) {
 				return "DefaultPart{" + name + "}";
-			}
-			else {
+			} else {
 				return "DefaultPart";
 			}
 		}
@@ -226,8 +229,7 @@ abstract class DefaultParts {
 			String filename = contentDisposition.getFilename();
 			if (name != null) {
 				return "DefaultFilePart{" + name + " (" + filename + ")}";
-			}
-			else {
+			} else {
 				return "DefaultFilePart{(" + filename + ")}";
 			}
 		}
@@ -292,7 +294,7 @@ abstract class DefaultParts {
 		@Override
 		public Flux<DataBuffer> content() {
 			return DataBufferUtils.readByteChannel(
-					() -> Files.newByteChannel(this.file, StandardOpenOption.READ),
+							() -> Files.newByteChannel(this.file, StandardOpenOption.READ),
 							DefaultDataBufferFactory.sharedInstance, 1024)
 					.subscribeOn(this.scheduler);
 		}
@@ -315,8 +317,7 @@ abstract class DefaultParts {
 						try {
 							callable.call();
 							sink.success();
-						}
-						catch (Exception ex) {
+						} catch (Exception ex) {
 							sink.error(ex);
 						}
 					})
