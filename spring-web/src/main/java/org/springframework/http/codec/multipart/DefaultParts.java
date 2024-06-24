@@ -33,7 +33,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.concurrent.Callable;
 
 /**
- * Default implementations of {@link Part} and subtypes.
+ * {@link Part} 及其子类型的默认实现。
+ *
+ * <p>该类提供了创建 {@link FormFieldPart} 和 {@link Part} 的静态方法。
+ *
+ * <p>注意：返回的 {@link Part} 或 {@link FilePart} 取决于 {@code Content-Disposition} 头部是否包含文件名。
  *
  * @author Arjen Poutsma
  * @since 5.3
@@ -41,11 +45,11 @@ import java.util.concurrent.Callable;
 abstract class DefaultParts {
 
 	/**
-	 * Create a new {@link FormFieldPart} with the given parameters.
+	 * 使用给定的参数创建一个新的 {@link FormFieldPart}。
 	 *
-	 * @param headers the part headers
-	 * @param value   the form field value
-	 * @return the created part
+	 * @param headers 头部信息
+	 * @param value   表单字段的值
+	 * @return 创建的表单字段部分
 	 */
 	public static FormFieldPart formFieldPart(HttpHeaders headers, String value) {
 		Assert.notNull(headers, "Headers must not be null");
@@ -55,14 +59,12 @@ abstract class DefaultParts {
 	}
 
 	/**
-	 * Create a new {@link Part} or {@link FilePart} based on a flux of data
-	 * buffers. Returns {@link FilePart} if the {@code Content-Disposition} of
-	 * the given headers contains a filename, or a "normal" {@link Part}
-	 * otherwise.
+	 * 基于数据缓冲区流创建一个新的 {@link Part} 或 {@link FilePart}。
+	 * 如果 {@code Content-Disposition} 头部包含文件名，则返回 {@link FilePart}；否则返回普通的 {@link Part}。
 	 *
-	 * @param headers     the part headers
-	 * @param dataBuffers the content of the part
-	 * @return {@link Part} or {@link FilePart}, depending on {@link HttpHeaders#getContentDisposition()}
+	 * @param headers     头部信息
+	 * @param dataBuffers 部分内容的数据缓冲区流
+	 * @return {@link Part} 或 {@link FilePart}
 	 */
 	public static Part part(HttpHeaders headers, Flux<DataBuffer> dataBuffers) {
 		Assert.notNull(headers, "Headers must not be null");
@@ -72,14 +74,13 @@ abstract class DefaultParts {
 	}
 
 	/**
-	 * Create a new {@link Part} or {@link FilePart} based on the given file.
-	 * Returns {@link FilePart} if the {@code Content-Disposition} of the given
-	 * headers contains a filename, or a "normal" {@link Part} otherwise
+	 * 基于给定的文件创建一个新的 {@link Part} 或 {@link FilePart}。
+	 * 如果 {@code Content-Disposition} 头部包含文件名，则返回 {@link FilePart}；否则返回普通的 {@link Part}。
 	 *
-	 * @param headers   the part headers
-	 * @param file      the file
-	 * @param scheduler the scheduler used for reading the file
-	 * @return {@link Part} or {@link FilePart}, depending on {@link HttpHeaders#getContentDisposition()}
+	 * @param headers   头部信息
+	 * @param file      文件
+	 * @param scheduler 用于读取文件的调度器
+	 * @return {@link Part} 或 {@link FilePart}
 	 */
 	public static Part part(HttpHeaders headers, Path file, Scheduler scheduler) {
 		Assert.notNull(headers, "Headers must not be null");
@@ -91,10 +92,13 @@ abstract class DefaultParts {
 
 
 	private static Part partInternal(HttpHeaders headers, Content content) {
+		// 从 Content-Disposition 获取文件名
 		String filename = headers.getContentDisposition().getFilename();
 		if (filename != null) {
+			// 如果Content-Disposition中包含文件名，则创建一个DefaultFilePart对象
 			return new DefaultFilePart(headers, content);
 		} else {
+			// 否则创建一个DefaultPart对象
 			return new DefaultPart(headers, content);
 		}
 	}
@@ -245,39 +249,73 @@ abstract class DefaultParts {
 
 
 	/**
-	 * Part content abstraction.
+	 * 部分内容的抽象表示。
 	 */
 	private interface Content {
 
+		/**
+		 * 返回此内容的数据流。
+		 *
+		 * @return 数据流
+		 */
 		Flux<DataBuffer> content();
 
+		/**
+		 * 将内容传输到指定的目标路径。
+		 *
+		 * @param dest 目标路径
+		 * @return 表示传输完成或错误的 {@code Mono}
+		 */
 		Mono<Void> transferTo(Path dest);
 
+		/**
+		 * 删除此内容的底层存储。
+		 *
+		 * @return 表示删除操作完成或错误的 {@code Mono}
+		 */
 		Mono<Void> delete();
 	}
 
 
 	/**
-	 * {@code Content} implementation based on a flux of data buffers.
+	 * 基于数据缓冲区流的 {@code Content} 实现。
 	 */
 	private static final class FluxContent implements Content {
-
+		/**
+		 * 存放 内容 的数据缓冲区
+		 */
 		private final Flux<DataBuffer> content;
 
 		public FluxContent(Flux<DataBuffer> content) {
 			this.content = content;
 		}
 
+		/**
+		 * 返回数据缓冲区流。
+		 *
+		 * @return 数据缓冲区流
+		 */
 		@Override
 		public Flux<DataBuffer> content() {
 			return this.content;
 		}
 
+		/**
+		 * 将内容传输到指定的目标路径。
+		 *
+		 * @param dest 目标路径
+		 * @return 表示传输完成或错误的 {@code Mono}
+		 */
 		@Override
 		public Mono<Void> transferTo(Path dest) {
 			return DataBufferUtils.write(this.content, dest);
 		}
 
+		/**
+		 * 删除此内容的底层存储。由于基于流的内容通常不需要删除操作，此方法返回一个空的 {@code Mono}。
+		 *
+		 * @return 表示删除操作完成或错误的 {@code Mono}
+		 */
 		@Override
 		public Mono<Void> delete() {
 			return Mono.empty();
@@ -286,12 +324,17 @@ abstract class DefaultParts {
 
 
 	/**
-	 * {@code Content} implementation based on a file.
+	 * 基于文件的 {@code Content} 实现。
 	 */
 	private static final class FileContent implements Content {
-
+		/**
+		 * 文件路径
+		 */
 		private final Path file;
 
+		/**
+		 * 调度器
+		 */
 		private final Scheduler scheduler;
 
 		public FileContent(Path file, Scheduler scheduler) {
@@ -299,36 +342,67 @@ abstract class DefaultParts {
 			this.scheduler = scheduler;
 		}
 
+		/**
+		 * 返回文件的内容作为数据缓冲区流。
+		 *
+		 * @return 文件内容的数据缓冲区流
+		 */
 		@Override
 		public Flux<DataBuffer> content() {
 			return DataBufferUtils.readByteChannel(
+							// 打开文件的字节通道，并指定为读取模式
 							() -> Files.newByteChannel(this.file, StandardOpenOption.READ),
+							// 使用默认的DataBuffer工厂来创建DataBuffer
+							// 指定每次读取的字节数
 							DefaultDataBufferFactory.sharedInstance, 1024)
+					// 在指定的调度器上执行读取操作
 					.subscribeOn(this.scheduler);
 		}
 
+		/**
+		 * 将文件内容传输到指定的目标路径。
+		 *
+		 * @param dest 目标路径
+		 * @return 表示传输完成或错误的 {@code Mono}
+		 */
 		@Override
 		public Mono<Void> transferTo(Path dest) {
 			return blockingOperation(() -> Files.copy(this.file, dest, StandardCopyOption.REPLACE_EXISTING));
 		}
 
+		/**
+		 * 删除文件的底层存储。
+		 *
+		 * @return 表示删除操作完成或错误的 {@code Mono}
+		 */
 		@Override
 		public Mono<Void> delete() {
 			return blockingOperation(() -> {
+				// 删除文件
 				Files.delete(this.file);
 				return null;
 			});
 		}
 
+		/**
+		 * 执行阻塞操作的辅助方法，将其包装为 {@code Mono<Void>}。
+		 *
+		 * @param callable 执行的可调用对象
+		 * @return 表示操作完成或错误的 {@code Mono}
+		 */
 		private Mono<Void> blockingOperation(Callable<?> callable) {
 			return Mono.<Void>create(sink -> {
 						try {
+							// 执行回调程序
 							callable.call();
+							// 通知操作完成
 							sink.success();
 						} catch (Exception ex) {
+							// 通知操作失败
 							sink.error(ex);
 						}
 					})
+					// 在指定的调度器上执行回调操作
 					.subscribeOn(this.scheduler);
 		}
 	}
