@@ -23,44 +23,42 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 
 /**
- * Representation for a part in a "multipart/form-data" request.
+ * 表示"multipart/form-data"请求中的一个部分。
  *
- * <p>The origin of a multipart request may be a browser form in which case each
- * part is either a {@link FormFieldPart} or a {@link FilePart}.
+ * <p>multipart请求的来源可以是浏览器表单，此时每个部分可以是 {@link FormFieldPart} 或 {@link FilePart}。
  *
- * <p>Multipart requests may also be used outside of a browser for data of any
- * content type (e.g. JSON, PDF, etc).
+ * <p>multipart请求也可以在浏览器以外的场景中使用，用于传输任何类型的数据（如JSON、PDF等）。
  *
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
- * @since 5.0
  * @see <a href="https://tools.ietf.org/html/rfc7578">RFC 7578 (multipart/form-data)</a>
  * @see <a href="https://tools.ietf.org/html/rfc2183">RFC 2183 (Content-Disposition)</a>
  * @see <a href="https://www.w3.org/TR/html5/forms.html#multipart-form-data">HTML5 (multipart forms)</a>
+ * @since 5.0
  */
 public interface Part {
 
 	/**
-	 * Return the name of the part in the multipart form.
-	 * @return the name of the part, never {@code null} or empty
+	 * 返回multipart表单中部分的名称。
+	 *
+	 * @return 部分的名称，永不为 {@code null} 或空字符串
 	 */
 	String name();
 
 	/**
-	 * Return the headers associated with the part.
+	 * 返回与部分关联的头信息。
 	 */
 	HttpHeaders headers();
 
 	/**
-	 * Return the content for this part.
-	 * <p>Note that for a {@link FormFieldPart} the content may be accessed
-	 * more easily via {@link FormFieldPart#value()}.
+	 * 返回此部分的内容。
+	 * <p>请注意，对于 {@link FormFieldPart}，可以通过 {@link FormFieldPart#value()} 更轻松地访问内容。
 	 */
 	Flux<DataBuffer> content();
 
 	/**
-	 * Return a mono that, when subscribed to, deletes the underlying storage
-	 * for this part.
+	 * 返回一个单元素 {@code Mono}，当订阅时，删除此部分的底层存储。
+	 *
 	 * @since 5.3.13
 	 */
 	default Mono<Void> delete() {

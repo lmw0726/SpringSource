@@ -101,10 +101,12 @@ abstract class DefaultParts {
 
 
 	/**
-	 * Abstract base class for {@link Part} implementations.
+	 * {@link Part} 实现的抽象基类。
 	 */
 	private static abstract class AbstractPart implements Part {
-
+		/**
+		 * Http头部信息
+		 */
 		private final HttpHeaders headers;
 
 		protected AbstractPart(HttpHeaders headers) {
@@ -114,7 +116,9 @@ abstract class DefaultParts {
 
 		@Override
 		public String name() {
+			// 获取名称
 			String name = headers().getContentDisposition().getName();
+			// 断言名称不为空
 			Assert.state(name != null, "No name available");
 			return name;
 		}
@@ -168,10 +172,12 @@ abstract class DefaultParts {
 
 
 	/**
-	 * Default implementation of {@link Part}.
+	 * {@link Part}的默认实现
 	 */
 	private static class DefaultPart extends AbstractPart {
-
+		/**
+		 * 内容
+		 */
 		protected final Content content;
 
 		public DefaultPart(HttpHeaders headers, Content content) {
@@ -202,7 +208,7 @@ abstract class DefaultParts {
 
 
 	/**
-	 *  {@link FilePart}的默认实现。
+	 * {@link FilePart}的默认实现。
 	 */
 	private static final class DefaultFilePart extends DefaultPart implements FilePart {
 
