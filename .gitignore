@@ -50,3 +50,4 @@ ci/
 
 *.class
 /spring-aop/out/
+/demo/spring-learn/build/

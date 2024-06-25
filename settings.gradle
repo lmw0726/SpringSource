@@ -39,7 +39,9 @@ include "spring-websocket"
 include "framework-bom"
 include "integration-tests"
 include 'spring-learn'
+project(":spring-learn").projectDir = file("demo/spring-learn")
 include 'spring-mvc-learn'
+project(":spring-mvc-learn").projectDir = file("demo/spring-mvc-learn")
 
 rootProject.name = "spring"
 rootProject.children.each {project ->
