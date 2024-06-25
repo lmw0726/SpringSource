@@ -307,6 +307,17 @@ public enum HttpStatus {
 	PAYLOAD_TOO_LARGE(413, Series.CLIENT_ERROR, "Payload Too Large"),
 
 	/**
+	 * {@code 413 Request Entity Too Large}.
+	 * 表示请求实体过大。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc2616#section-10.4.14">HTTP/1.1, section 10.4.14</a>
+	 * @deprecated 推荐使用 {@link #PAYLOAD_TOO_LARGE}，它将从 {@code HttpStatus.valueOf(413)} 返回
+	 * @since 5.3
+	 */
+	@Deprecated
+	REQUEST_ENTITY_TOO_LARGE(413, Series.CLIENT_ERROR, "Request Entity Too Large"),
+
+	/**
 	 * {@code 414 请求的URI过长}.
 	 *
 	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-6.5.12">HTTP/1.1: 语义和内容，第6.5.12节</a>
