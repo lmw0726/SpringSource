@@ -326,6 +326,17 @@ public enum HttpStatus {
 	URI_TOO_LONG(414, Series.CLIENT_ERROR, "URI Too Long"),
 
 	/**
+	 * {@code 414 Request-URI Too Long}.
+	 * 表示请求的URI过长。
+	 *
+	 * @see <a href="https://tools.ietf.org/html/rfc2616#section-10.4.15">HTTP/1.1, section 10.4.15</a>
+	 * @deprecated 推荐使用 {@link #URI_TOO_LONG}，它将从 {@code HttpStatus.valueOf(414)} 返回
+	 * @since 5.3
+	 */
+	@Deprecated
+	REQUEST_URI_TOO_LONG(414, Series.CLIENT_ERROR, "Request-URI Too Long"),
+
+	/**
 	 * {@code 415 不支持的媒体类型}.
 	 *
 	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-6.5.13">HTTP/1.1: 语义和内容，第6.5.13节</a>
