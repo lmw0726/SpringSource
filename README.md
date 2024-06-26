@@ -25,7 +25,7 @@ Spring 框架时更加得心应手。当前源码版本为 5.3.21 。
 
 1. 克隆本仓库到本地：
    ```sh
-   git clone https://gitee.com/lmw0726/spring-source.git
+   git clone https://gitee.com/lmw0726/SpringSource.git
 
 2. 导入项目到您的 IDE（例如 IntelliJ IDEA）。
 3. 确保您已安装 JDK 11 及以上版本和 Gradle。
