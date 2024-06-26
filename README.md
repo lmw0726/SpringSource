@@ -3,7 +3,7 @@
 ## 简介
 
 本项目致力于深入解析 Spring 框架的源码，帮助开发者更好地理解其内部实现原理。通过详细的注释、文档和示例代码，我们希望能让开发者在使用
-Spring 框架时更加得心应手。
+Spring 框架时更加得心应手。当前源码版本为 5.3.21 。
 
 ## 目录
 
@@ -29,6 +29,9 @@ Spring 框架时更加得心应手。
 
 2. 导入项目到您的 IDE（例如 IntelliJ IDEA）。
 3. 确保您已安装 JDK 11 及以上版本和 Gradle。
+- JDK 11.0.18
+- Gradle 7.2
+
 4. 使用 Gradle 构建项目：
    ```sh
    build -x test -x :checkstyleNohttp
