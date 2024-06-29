@@ -42,6 +42,9 @@ include 'spring-learn'
 project(":spring-learn").projectDir = file("demo/spring-learn")
 include 'spring-mvc-learn'
 project(":spring-mvc-learn").projectDir = file("demo/spring-mvc-learn")
+include 'demo:spring-mvc-generate-controller'
+findProject(':demo:spring-mvc-generate-controller')?.name = 'spring-mvc-generate-controller'
+
 
 rootProject.name = "spring"
 rootProject.children.each {project ->
@@ -62,3 +65,4 @@ settings.gradle.projectsLoaded {
 		}
 	}
 }
+
