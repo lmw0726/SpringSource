@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.lmw'
+version = '5.3.21'
+
+repositories {
+    maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+    maven { url "https://repo.spring.io/plugins-release" }
+    mavenCentral()
+}
+
+dependencies {
+
+    // 日志包
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-logging', version: '2.7.1'
+
+    // SpringBoot WebMVC依赖
+    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.7.1') {
+        exclude(group: 'org.springframework', module: 'spring-web')
+        exclude(group: 'org.springframework', module: 'spring-webmvc')
+        exclude(group: 'org.springframework', module: 'spring-context')
+    }
+    // 引用当前项目的Context包
+    api(project(":spring-context"))
+    // 引用当前项目的Web包
+    api(project(":spring-web"))
+    // 引用当前项目的WebMvc包
+    api(project(":spring-webmvc"))
+    implementation project(path: ':spring-context')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}

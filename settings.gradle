@@ -1,16 +1,16 @@
 pluginManagement {
-	repositories {
-		maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
-		maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
-		maven { url "https://repo.spring.io/plugins-release" }
-		mavenCentral()
-		gradlePluginPortal()
-		maven { url "https://repo.spring.io/release" }
-	}
+    repositories {
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        maven { url "https://repo.spring.io/plugins-release" }
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url "https://repo.spring.io/release" }
+    }
 }
 
 plugins {
-	id "com.gradle.enterprise" version "3.9"
+    id "com.gradle.enterprise" version "3.9"
 //	id "io.spring.ge.conventions" version "0.0.9"
 }
 
@@ -42,9 +42,10 @@ include 'spring-learn'
 project(":spring-learn").projectDir = file("demo/spring-learn")
 include 'spring-mvc-learn'
 project(":spring-mvc-learn").projectDir = file("demo/spring-mvc-learn")
-include 'demo:spring-mvc-generate-controller'
-findProject(':demo:spring-mvc-generate-controller')?.name = 'spring-mvc-generate-controller'
-
+include 'spring-mvc-generate-controller'
+project(":spring-mvc-generate-controller").projectDir = file("demo/spring-mvc-generate-controller")
+include 'spring-boot-learn'
+project(":spring-boot-learn").projectDir = file("demo/spring-boot-learn")
 
 rootProject.name = "spring"
 rootProject.children.each {project ->

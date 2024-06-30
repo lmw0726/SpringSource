@@ -3,7 +3,7 @@ plugins {
     id 'war'
 }
 
-group = 'org.springframework'
+group = 'com.lmw'
 version = '5.3.21'
 
 apply plugin: "war"

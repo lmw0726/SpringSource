@@ -10,13 +10,13 @@
     
 如何演示?
 
-- 请求 http://127.0.0.1:8080/groovy/generate （POST请求）
+- 请求 http://127.0.0.1:8080/groovy/generate （POST请求）</br>
   此时，URL /groovy/hello将会被加载进Spring MVC中。
 - 发起GET请求，访问 http://127.0.0.1:8080/groovy/hello 。可以看到显示 hello,groovy。
-- 发起DELETE请求，访问 http://127.0.0.1:8080/groovy/unload。
+- 发起DELETE请求，访问 http://127.0.0.1:8080/groovy/unload 。 </br>
   此时，Spring MVC 会卸载掉 URL /groovy/hello
 - 再次访问 http://127.0.0.1:8080/groovy/hello ，就会显示 404 状态码。
 
     
-2、通过FreeMarker生成Controller的java文件，然后编译成class文件后，加载进SpringMVC中。
+2、通过FreeMarker生成Controller的java文件，然后编译成class文件后，加载进SpringMVC中。</br>
 3、通过字节码生成工具如Cglib等，直接生成相应的Controller。
