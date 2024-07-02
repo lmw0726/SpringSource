@@ -23,6 +23,9 @@ dependencies {
         exclude(group: 'org.springframework', module: 'spring-webmvc')
         exclude(group: 'org.springframework', module: 'spring-context')
     }
+    // 文件上传组件 commons-fileupload
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+
     // 引用当前项目的Context包
     api(project(":spring-context"))
     // 引用当前项目的Web包
