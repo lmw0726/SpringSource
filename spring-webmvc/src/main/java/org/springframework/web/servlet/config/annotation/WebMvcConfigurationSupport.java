@@ -758,7 +758,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	@Nullable
 	public HandlerMapping defaultServletHandlerMapping() {
 		// 断言 Servlet 上下文不为空
-		Assert.state(this.servletContext != null, "未设置 ServletContext");
+		Assert.state(this.servletContext != null, "No ServletContext set");
 
 		// 创建默认 Servlet 处理器配置器
 		DefaultServletHandlerConfigurer configurer = new DefaultServletHandlerConfigurer(this.servletContext);
