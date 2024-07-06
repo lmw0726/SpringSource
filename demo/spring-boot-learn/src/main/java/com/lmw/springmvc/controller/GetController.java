@@ -1,6 +1,8 @@
 package com.lmw.springmvc.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * GetMapping测试
@@ -11,4 +13,8 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 public class GetController {
+	@GetMapping("/index")
+	public ResponseEntity<String> index(){
+		return ResponseEntity.ok("index");
+	}
 }

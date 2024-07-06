@@ -23,31 +23,13 @@
 	</bean>
 
 
-	<!--	&lt;!&ndash; 配置消息属性文件 &ndash;&gt;-->
-	<!--	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">-->
-	<!--		&lt;!&ndash; 资源文件名 &ndash;&gt;-->
-	<!--		<property name="basenames">-->
-	<!--			<list>-->
-	<!--				<value>classpath:messages.message</value>-->
-	<!--				<value>classpath:ValidationMessages</value>-->
-	<!--			</list>-->
-	<!--		</property>-->
-	<!--		<property name="useCodeAsDefaultMessage" value="false"></property>-->
-	<!--		&lt;!&ndash; 资源文件编码格式 &ndash;&gt;-->
-	<!--		<property name="fileEncodings" value="UTF-8"/>-->
-	<!--		&lt;!&ndash; 对资源文件内容缓存的时间，单位为秒 &ndash;&gt;-->
-	<!--		<property name="cacheSeconds" value="60"/>-->
-	<!--	</bean>-->
-	<!--	&lt;!&ndash; 注册校验器 &ndash;&gt;-->
-	<!--	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">-->
-	<!--		&lt;!&ndash; hibernate 校验器 &ndash;&gt;-->
-	<!--		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>-->
-	<!--		&lt;!&ndash; 指定校验使用的资源文件，在文件中配置校验错误信息，如果不指定则默认使用 classpath下的 ValidationMessages.properties &ndash;&gt;-->
-	<!--		<property name="validationMessageSource" ref="messageSource"/>-->
-	<!--	</bean>-->
-	<!--	<bean id="conversionService" class="org.springframework.format.support.DefaultFormattingConversionService">-->
-	<!--	</bean>-->
-	<!--	&lt;!&ndash;开启 Spring的 Valid 功能 &ndash;&gt;-->
-	<!--	<mvc:annotation-driven conversion-service="conversionService" validator="validator"/>-->
+	<!-- 拦截器配置 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<mvc:exclude-mapping path="/hello"/>
+			<bean class="com.lmw.springmvc.interceptor.HelloInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
 
 </beans>
