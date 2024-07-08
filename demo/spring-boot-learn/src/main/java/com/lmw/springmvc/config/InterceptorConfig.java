@@ -8,6 +8,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.MappedInterceptor;
+import org.springframework.web.servlet.mvc.WebContentInterceptor;
+
+import java.util.Properties;
 
 /**
  * 拦截器配置
@@ -25,6 +28,13 @@ public class InterceptorConfig implements WebMvcConfigurer {
 		registration.excludePathPatterns("/hello");
 		registration.order(1);
 
+		// 图像缓存拦截器
+		WebContentInterceptor webContentInterceptor = new WebContentInterceptor();
+		webContentInterceptor.setCacheSeconds(30);
+		Properties cacheMappings = new Properties();
+		cacheMappings.put("/image/**", "30");
+		webContentInterceptor.setCacheMappings(cacheMappings );
+		registry.addInterceptor(webContentInterceptor);
 	}
 
 	@Bean
