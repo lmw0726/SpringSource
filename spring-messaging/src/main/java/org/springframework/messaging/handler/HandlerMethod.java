@@ -16,25 +16,20 @@
 
 package org.springframework.messaging.handler;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.SynthesizingMethodParameter;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.*;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Encapsulates information about a handler method consisting of a
@@ -54,7 +49,9 @@ import org.springframework.util.StringUtils;
  */
 public class HandlerMethod {
 
-	/** Public for wrapping with fallback logger. */
+	/**
+	 * Public for wrapping with fallback logger.
+	 */
 	public static final Log defaultLogger = LogFactory.getLog(HandlerMethod.class);
 
 
@@ -94,6 +91,7 @@ public class HandlerMethod {
 
 	/**
 	 * Create an instance from a bean instance, method name, and parameter types.
+	 *
 	 * @throws NoSuchMethodException when the method cannot be found
 	 */
 	public HandlerMethod(Object bean, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
@@ -172,6 +170,7 @@ public class HandlerMethod {
 
 	/**
 	 * Set an alternative logger to use than the one based on the class name.
+	 *
 	 * @param logger the logger to use
 	 * @since 5.1
 	 */
@@ -181,6 +180,7 @@ public class HandlerMethod {
 
 	/**
 	 * Return the currently configured Logger.
+	 *
 	 * @since 5.1
 	 */
 	public Log getLogger() {
@@ -251,6 +251,7 @@ public class HandlerMethod {
 	 * if no annotation can be found on the given method itself.
 	 * <p>Also supports <em>merged</em> composed annotations with attribute
 	 * overrides as of Spring Framework 4.3.
+	 *
 	 * @param annotationType the type of annotation to introspect the method for
 	 * @return the annotation, or {@code null} if none found
 	 * @see AnnotatedElementUtils#findMergedAnnotation
@@ -262,9 +263,10 @@ public class HandlerMethod {
 
 	/**
 	 * Return whether the parameter is declared with the given annotation type.
+	 *
 	 * @param annotationType the annotation type to look for
-	 * @since 4.3
 	 * @see AnnotatedElementUtils#hasAnnotation
+	 * @since 4.3
 	 */
 	public <A extends Annotation> boolean hasMethodAnnotation(Class<A> annotationType) {
 		return AnnotatedElementUtils.hasAnnotation(this.method, annotationType);
@@ -273,6 +275,7 @@ public class HandlerMethod {
 	/**
 	 * Return the HandlerMethod from which this HandlerMethod instance was
 	 * resolved via {@link #createWithResolvedBean()}.
+	 *
 	 * @since 4.3
 	 */
 	@Nullable
@@ -380,7 +383,7 @@ public class HandlerMethod {
 
 
 	/**
-	 * A MethodParameter with HandlerMethod-specific behavior.
+	 * 具有 HandlerMethod 特定行为的 MethodParameter。
 	 */
 	protected class HandlerMethodParameter extends SynthesizingMethodParameter {
 
@@ -415,10 +418,12 @@ public class HandlerMethod {
 
 
 	/**
-	 * A MethodParameter for a HandlerMethod return type based on an actual return value.
+	 * 用于基于实际返回值的 HandlerMethod 返回类型的 MethodParameter。
 	 */
 	private class ReturnValueMethodParameter extends HandlerMethodParameter {
-
+		/**
+		 * 返回值类型
+		 */
 		@Nullable
 		private final Class<?> returnValueType;
 
