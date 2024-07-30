@@ -2,7 +2,11 @@ package com.lmw.springmvc.argument;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.method.annotation.RequestParamMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Part;
@@ -11,6 +15,7 @@ import java.util.Map;
 
 /**
  * RequestParam Map参数解析器示例，其中 RequestParam的name属性不为空
+ *这个控制器是 {@link RequestParamMethodArgumentResolver} 参数解析器的一个示例。
  *
  * @author LMW
  * @version 1.0

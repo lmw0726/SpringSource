@@ -5,12 +5,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.method.annotation.PathVariableMethodArgumentResolver;
 
 import java.util.Map;
 
 /**
  * 参数解析器
  * 带有@PathVariable的方法参数解析器示例
+ * 这个控制器是 {@link PathVariableMethodArgumentResolver} 参数解析器的一个示例。
  *
  * @author LMW
  * @version 1.0
