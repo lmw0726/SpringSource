@@ -23,10 +23,25 @@ import java.util.Map;
 @Controller
 @RequestMapping("/argument")
 public class MatrixVariableMapMethodController {
+
+
+	/**
+	 * 使用@MatrixVariable 修饰  Map<String, Object> ，并且@MatrixVariable的name属性为空
+	 * 访问 /argument/matrixVariable/map/map;name=LMW;age=18
+	 * 可以成功接收到数据
+	 *
+	 * @param map 矩阵变量映射
+	 * @return 解析结果
+	 */
+	@GetMapping("/matrixVariable/map/{map}")
+	public ResponseEntity<String> matrixVariableMap(@PathVariable String map, @MatrixVariable(pathVar = "map") Map<String, Object> names) {
+		return ResponseEntity.ok(names.toString());
+	}
+
 	/**
 	 * 多个路径变量
 	 * 访问 /argument/matrixVariable/first;a=1;b=2/second;c=3;d=4
-	 * 可以接受到结果
+	 * 可以接收到结果
 	 *
 	 * @param first     第一个路径变量
 	 * @param firstMap  第一个矩阵变量

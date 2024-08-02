@@ -55,14 +55,14 @@ public class MatrixVariableMethodController {
 
 	/**
 	 * 矩阵变量映射示例，使用@MatrixVariable 修饰  Map<String, Object>
-	 * 访问 /argument/matrixVariable/map/map;name=LMW;age=18
+	 * 访问 /argument/matrixVariable/mapName/map;name=LMW;age=18
 	 * 不能使用Map接收，因为返回的类型实际上是 List<String>，导致参数转换错误
 	 *
 	 * @param map 矩阵变量映射
 	 * @return 解析结果
 	 */
-	@GetMapping("/matrixVariable/map/{map}")
-	public ResponseEntity<String> matrixVariableMap(@PathVariable String map, @MatrixVariable(name = "name", pathVar = "map") Map<String, Object> names) {
+	@GetMapping("/matrixVariable/mapName/{map}")
+	public ResponseEntity<String> matrixVariableNameMap(@PathVariable String map, @MatrixVariable(name = "name", pathVar = "map") Map<String, Object> names) {
 		return ResponseEntity.ok(names.toString());
 	}
 
