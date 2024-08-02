@@ -62,7 +62,7 @@ public class MatrixVariableMethodController {
 	 * @return 解析结果
 	 */
 	@GetMapping("/matrixVariable/map/{map}")
-	public ResponseEntity<String> matrixVariableMap(@PathVariable String map, @MatrixVariable("name") Map<String, Object> names) {
+	public ResponseEntity<String> matrixVariableMap(@PathVariable String map, @MatrixVariable(name = "name", pathVar = "map") Map<String, Object> names) {
 		return ResponseEntity.ok(names.toString());
 	}
 
@@ -82,5 +82,19 @@ public class MatrixVariableMethodController {
 		return ResponseEntity.ok(pathName + " " + name + " " + age);
 	}
 
+	/**
+	 * 多个矩阵变量，指定变量归属的路径段
+	 * 访问路径：/argument/matrixVariable/multi/firstname;name=lmw/age;age=18
+	 * 可以接收到参数
+	 *
+	 * @param name 名称
+	 * @param age  年龄
+	 * @return 解析结果
+	 */
+	@GetMapping("/matrixVariable/multi/{type}/{pathName}")
+	public ResponseEntity<String> multiMatrixVariable(@MatrixVariable(name = "name", pathVar = "type") String name,
+													  @MatrixVariable(name = "age", pathVar = "pathName") String age) {
+		return ResponseEntity.ok(name + " " + age);
+	}
 
 }
