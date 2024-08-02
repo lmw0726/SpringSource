@@ -26,6 +26,9 @@ dependencies {
     // 文件上传组件 commons-fileupload
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
 
+    // hibernate validation校验组件
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.1'
+
     // 引用当前项目的Context包
     api(project(":spring-context"))
     // 引用当前项目的Web包
