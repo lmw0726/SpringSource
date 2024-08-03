@@ -16,23 +16,20 @@
 
 package org.springframework.validation;
 
-import java.util.List;
-
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.lang.Nullable;
 
+import java.util.List;
+
 /**
- * Stores and exposes information about data-binding and validation
- * errors for a specific object.
+ * 存储并暴露特定对象的数据绑定和验证错误的信息。
  *
- * <p>Field names can be properties of the target object (e.g. "name"
- * when binding to a customer object), or nested fields in case of
- * subobjects (e.g. "address.street"). Supports subtree navigation
- * via {@link #setNestedPath(String)}: for example, an
- * {@code AddressValidator} validates "address", not being aware
- * that this is a subobject of customer.
+ * <p>字段名可以是目标对象的属性（例如，当绑定到客户对象时的“name”），
+ * 也可以是在子对象中的嵌套字段（例如“address.street”）。支持通过
+ * {@link #setNestedPath(String)}进行子树导航：例如，一个
+ * {@code AddressValidator} 验证“address”，而不知道这是客户对象的子对象。
  *
- * <p>Note: {@code Errors} objects are single-threaded.
+ * <p>注意：{@code Errors} 对象是单线程的。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -44,263 +41,270 @@ import org.springframework.lang.Nullable;
 public interface Errors {
 
 	/**
-	 * The separator between path elements in a nested path,
-	 * for example in "customer.name" or "customer.address.street".
-	 * <p>"." = same as the
-	 * {@link org.springframework.beans.PropertyAccessor#NESTED_PROPERTY_SEPARATOR nested property separator}
-	 * in the beans package.
+	 * 嵌套路径中路径元素之间的分隔符，
+	 * 例如在“customer.name”或“customer.address.street”中。
+	 * <p>“.” = 同 beans 包中的
+	 * {@link org.springframework.beans.PropertyAccessor#NESTED_PROPERTY_SEPARATOR 嵌套属性分隔符}。
 	 */
 	String NESTED_PATH_SEPARATOR = PropertyAccessor.NESTED_PROPERTY_SEPARATOR;
 
 
 	/**
-	 * Return the name of the bound root object.
+	 * 返回绑定根对象的名称。
 	 */
 	String getObjectName();
 
 	/**
-	 * Allow context to be changed so that standard validators can validate
-	 * subtrees. Reject calls prepend the given path to the field names.
-	 * <p>For example, an address validator could validate the subobject
-	 * "address" of a customer object.
-	 * @param nestedPath nested path within this object,
-	 * e.g. "address" (defaults to "", {@code null} is also acceptable).
-	 * Can end with a dot: both "address" and "address." are valid.
+	 * 允许更改上下文，以便标准验证器可以验证子树。拒绝调用会将给定路径添加到字段名称之前。
+	 * <p>例如，一个地址验证器可以验证客户对象的子对象“address”。
+	 *
+	 * @param nestedPath 嵌套路径中的路径，
+	 *                   例如“address”（默认为""，{@code null} 也可以接受）。
+	 *                   可以以点结尾：“address”和“address.”都是有效的。
 	 */
 	void setNestedPath(String nestedPath);
 
 	/**
-	 * Return the current nested path of this {@link Errors} object.
-	 * <p>Returns a nested path with a dot, i.e. "address.", for easy
-	 * building of concatenated paths. Default is an empty String.
+	 * 返回此 {@link Errors} 对象的当前嵌套路径。
+	 * <p>返回带点的嵌套路径，即“address.”，以便于构建连接路径。默认是一个空字符串。
 	 */
 	String getNestedPath();
 
 	/**
-	 * Push the given sub path onto the nested path stack.
-	 * <p>A {@link #popNestedPath()} call will reset the original
-	 * nested path before the corresponding
-	 * {@code pushNestedPath(String)} call.
-	 * <p>Using the nested path stack allows to set temporary nested paths
-	 * for subobjects without having to worry about a temporary path holder.
-	 * <p>For example: current path "spouse.", pushNestedPath("child") &rarr;
-	 * result path "spouse.child."; popNestedPath() &rarr; "spouse." again.
-	 * @param subPath the sub path to push onto the nested path stack
+	 * 将给定的子路径推送到嵌套路径堆栈中。
+	 * <p>调用 {@link #popNestedPath()} 将重置相应
+	 * {@code pushNestedPath(String)} 调用之前的原始嵌套路径。
+	 * <p>使用嵌套路径堆栈可以设置子对象的临时嵌套路径，而不必担心临时路径持有者。
+	 * <p>例如：当前路径“spouse.”，pushNestedPath("child") &rarr;
+	 * 结果路径“spouse.child.”；popNestedPath() &rarr; 再次变为“spouse.”。
+	 *
+	 * @param subPath 要推送到嵌套路径堆栈中的子路径
 	 * @see #popNestedPath
 	 */
 	void pushNestedPath(String subPath);
 
 	/**
-	 * Pop the former nested path from the nested path stack.
-	 * @throws IllegalStateException if there is no former nested path on the stack
+	 * 从嵌套路径堆栈中弹出前一个嵌套路径。
+	 *
+	 * @throws IllegalStateException 如果堆栈中没有前一个嵌套路径
 	 * @see #pushNestedPath
 	 */
 	void popNestedPath() throws IllegalStateException;
 
 	/**
-	 * Register a global error for the entire target object,
-	 * using the given error description.
-	 * @param errorCode error code, interpretable as a message key
+	 * 为整个目标对象注册全局错误，
+	 * 使用给定的错误描述。
+	 *
+	 * @param errorCode 错误代码，可解释为消息键
 	 */
 	void reject(String errorCode);
 
 	/**
-	 * Register a global error for the entire target object,
-	 * using the given error description.
-	 * @param errorCode error code, interpretable as a message key
-	 * @param defaultMessage fallback default message
+	 * 为整个目标对象注册全局错误，
+	 * 使用给定的错误描述。
+	 *
+	 * @param errorCode      错误代码，可解释为消息键
+	 * @param defaultMessage 后备默认消息
 	 */
 	void reject(String errorCode, String defaultMessage);
 
 	/**
-	 * Register a global error for the entire target object,
-	 * using the given error description.
-	 * @param errorCode error code, interpretable as a message key
-	 * @param errorArgs error arguments, for argument binding via MessageFormat
-	 * (can be {@code null})
-	 * @param defaultMessage fallback default message
+	 * 为整个目标对象注册全局错误，
+	 * 使用给定的错误描述。
+	 *
+	 * @param errorCode      错误代码，可解释为消息键
+	 * @param errorArgs      错误参数，用于通过 MessageFormat 绑定参数
+	 *                       （可以是 {@code null}）
+	 * @param defaultMessage 后备默认消息
 	 */
 	void reject(String errorCode, @Nullable Object[] errorArgs, @Nullable String defaultMessage);
 
 	/**
-	 * Register a field error for the specified field of the current object
-	 * (respecting the current nested path, if any), using the given error
-	 * description.
-	 * <p>The field name may be {@code null} or empty String to indicate
-	 * the current object itself rather than a field of it. This may result
-	 * in a corresponding field error within the nested object graph or a
-	 * global error if the current object is the top object.
-	 * @param field the field name (may be {@code null} or empty String)
-	 * @param errorCode error code, interpretable as a message key
+	 * 为当前对象的指定字段（考虑到当前嵌套路径，如果有的话）注册字段错误，
+	 * 使用给定的错误描述。
+	 * <p>字段名称可以是 {@code null} 或空字符串，以表示当前对象本身而不是其字段。
+	 * 这可能会在嵌套对象图中导致相应的字段错误，或者如果当前对象是顶层对象，则会导致全局错误。
+	 *
+	 * @param field     字段名称（可以是 {@code null} 或空字符串）
+	 * @param errorCode 错误代码，可解释为消息键
 	 * @see #getNestedPath()
 	 */
 	void rejectValue(@Nullable String field, String errorCode);
 
 	/**
-	 * Register a field error for the specified field of the current object
-	 * (respecting the current nested path, if any), using the given error
-	 * description.
-	 * <p>The field name may be {@code null} or empty String to indicate
-	 * the current object itself rather than a field of it. This may result
-	 * in a corresponding field error within the nested object graph or a
-	 * global error if the current object is the top object.
-	 * @param field the field name (may be {@code null} or empty String)
-	 * @param errorCode error code, interpretable as a message key
-	 * @param defaultMessage fallback default message
+	 * 为当前对象的指定字段（考虑到当前嵌套路径，如果有的话）注册字段错误，
+	 * 使用给定的错误描述。
+	 * <p>字段名称可以是 {@code null} 或空字符串，以表示当前对象本身而不是其字段。
+	 * 这可能会在嵌套对象图中导致相应的字段错误，或者如果当前对象是顶层对象，则会导致全局错误。
+	 *
+	 * @param field          字段名称（可以是 {@code null} 或空字符串）
+	 * @param errorCode      错误代码，可解释为消息键
+	 * @param defaultMessage 后备默认消息
 	 * @see #getNestedPath()
 	 */
 	void rejectValue(@Nullable String field, String errorCode, String defaultMessage);
 
 	/**
-	 * Register a field error for the specified field of the current object
-	 * (respecting the current nested path, if any), using the given error
-	 * description.
-	 * <p>The field name may be {@code null} or empty String to indicate
-	 * the current object itself rather than a field of it. This may result
-	 * in a corresponding field error within the nested object graph or a
-	 * global error if the current object is the top object.
-	 * @param field the field name (may be {@code null} or empty String)
-	 * @param errorCode error code, interpretable as a message key
-	 * @param errorArgs error arguments, for argument binding via MessageFormat
-	 * (can be {@code null})
-	 * @param defaultMessage fallback default message
+	 * 为当前对象的指定字段（考虑到当前嵌套路径，如果有的话）注册字段错误，
+	 * 使用给定的错误描述。
+	 * <p>字段名称可以是 {@code null} 或空字符串，以表示当前对象本身而不是其字段。
+	 * 这可能会在嵌套对象图中导致相应的字段错误，或者如果当前对象是顶层对象，则会导致全局错误。
+	 *
+	 * @param field          字段名称（可以是 {@code null} 或空字符串）
+	 * @param errorCode      错误代码，可解释为消息键
+	 * @param errorArgs      错误参数，用于通过 MessageFormat 绑定参数
+	 *                       （可以是 {@code null}）
+	 * @param defaultMessage 后备默认消息
 	 * @see #getNestedPath()
 	 */
 	void rejectValue(@Nullable String field, String errorCode,
-			@Nullable Object[] errorArgs, @Nullable String defaultMessage);
+					 @Nullable Object[] errorArgs, @Nullable String defaultMessage);
 
 	/**
-	 * Add all errors from the given {@code Errors} instance to this
-	 * {@code Errors} instance.
-	 * <p>This is a convenience method to avoid repeated {@code reject(..)}
-	 * calls for merging an {@code Errors} instance into another
-	 * {@code Errors} instance.
-	 * <p>Note that the passed-in {@code Errors} instance is supposed
-	 * to refer to the same target object, or at least contain compatible errors
-	 * that apply to the target object of this {@code Errors} instance.
-	 * @param errors the {@code Errors} instance to merge in
+	 * 将给定 {@code Errors} 实例中的所有错误添加到此
+	 * {@code Errors} 实例中。
+	 * <p>这是一个便利方法，可以避免重复调用 {@code reject(..)}
+	 * 以便将一个 {@code Errors} 实例合并到另一个
+	 * {@code Errors} 实例中。
+	 * <p>注意，传入的 {@code Errors} 实例应该
+	 * 指向相同的目标对象，或者至少包含适用于此 {@code Errors} 实例的目标对象的兼容错误。
+	 *
+	 * @param errors 要合并的 {@code Errors} 实例
 	 */
 	void addAllErrors(Errors errors);
 
 	/**
-	 * Return if there were any errors.
+	 * 返回是否存在任何错误。
 	 */
 	boolean hasErrors();
 
 	/**
-	 * Return the total number of errors.
+	 * 返回错误的总数。
 	 */
 	int getErrorCount();
 
 	/**
-	 * Get all errors, both global and field ones.
-	 * @return a list of {@link ObjectError} instances
+	 * 获取所有错误，包括全局错误和字段错误。
+	 *
+	 * @return {@link ObjectError} 实例的列表
 	 */
 	List<ObjectError> getAllErrors();
 
 	/**
-	 * Are there any global errors?
-	 * @return {@code true} if there are any global errors
+	 * 是否存在任何全局错误？
+	 *
+	 * @return 如果存在任何全局错误，则返回 {@code true}
 	 * @see #hasFieldErrors()
 	 */
 	boolean hasGlobalErrors();
 
 	/**
-	 * Return the number of global errors.
-	 * @return the number of global errors
+	 * 返回全局错误的数量。
+	 *
+	 * @return 全局错误的数量
 	 * @see #getFieldErrorCount()
 	 */
 	int getGlobalErrorCount();
 
 	/**
-	 * Get all global errors.
-	 * @return a list of {@link ObjectError} instances
+	 * 获取所有全局错误。
+	 *
+	 * @return {@link ObjectError} 实例的列表
 	 */
 	List<ObjectError> getGlobalErrors();
 
 	/**
-	 * Get the <i>first</i> global error, if any.
-	 * @return the global error, or {@code null}
+	 * 获取第一个全局错误（如果有）。
+	 *
+	 * @return 全局错误，或 {@code null}
 	 */
 	@Nullable
 	ObjectError getGlobalError();
 
 	/**
-	 * Are there any field errors?
-	 * @return {@code true} if there are any errors associated with a field
+	 * 是否存在任何字段错误？
+	 *
+	 * @return 如果存在任何与字段关联的错误，则返回 {@code true}
 	 * @see #hasGlobalErrors()
 	 */
 	boolean hasFieldErrors();
 
 	/**
-	 * Return the number of errors associated with a field.
-	 * @return the number of errors associated with a field
+	 * 返回与字段关联的错误的数量。
+	 *
+	 * @return 与字段关联的错误的数量
 	 * @see #getGlobalErrorCount()
 	 */
 	int getFieldErrorCount();
 
 	/**
-	 * Get all errors associated with a field.
-	 * @return a List of {@link FieldError} instances
+	 * 获取与字段关联的所有错误。
+	 *
+	 * @return {@link FieldError} 实例的列表
 	 */
 	List<FieldError> getFieldErrors();
 
 	/**
-	 * Get the <i>first</i> error associated with a field, if any.
-	 * @return the field-specific error, or {@code null}
+	 * 获取与字段关联的第一个错误（如果有）。
+	 *
+	 * @return 字段特定的错误，或 {@code null}
 	 */
 	@Nullable
 	FieldError getFieldError();
 
 	/**
-	 * Are there any errors associated with the given field?
-	 * @param field the field name
-	 * @return {@code true} if there were any errors associated with the given field
+	 * 是否存在与给定字段关联的任何错误？
+	 *
+	 * @param field 字段名称
+	 * @return 如果存在任何与给定字段关联的错误，则返回 {@code true}
 	 */
 	boolean hasFieldErrors(String field);
 
 	/**
-	 * Return the number of errors associated with the given field.
-	 * @param field the field name
-	 * @return the number of errors associated with the given field
+	 * 返回与给定字段关联的错误的数量。
+	 *
+	 * @param field 字段名称
+	 * @return 与给定字段关联的错误的数量
 	 */
 	int getFieldErrorCount(String field);
 
 	/**
-	 * Get all errors associated with the given field.
-	 * <p>Implementations should support not only full field names like
-	 * "name" but also pattern matches like "na*" or "address.*".
-	 * @param field the field name
-	 * @return a List of {@link FieldError} instances
+	 * 获取与给定字段关联的所有错误。
+	 * <p>实现应支持不仅是完整字段名如“name”，
+	 * 还应支持模式匹配如“na*”或“address.*”。
+	 *
+	 * @param field 字段名称
+	 * @return {@link FieldError} 实例的列表
 	 */
 	List<FieldError> getFieldErrors(String field);
 
 	/**
-	 * Get the first error associated with the given field, if any.
-	 * @param field the field name
-	 * @return the field-specific error, or {@code null}
+	 * 获取与给定字段关联的第一个错误（如果有）。
+	 *
+	 * @param field 字段名称
+	 * @return 字段特定的错误，或 {@code null}
 	 */
 	@Nullable
 	FieldError getFieldError(String field);
 
 	/**
-	 * Return the current value of the given field, either the current
-	 * bean property value or a rejected update from the last binding.
-	 * <p>Allows for convenient access to user-specified field values,
-	 * even if there were type mismatches.
-	 * @param field the field name
-	 * @return the current value of the given field
+	 * 返回给定字段的当前值，无论是当前的 bean 属性值还是上次绑定的拒绝更新。
+	 * <p>允许方便地访问用户指定的字段值，
+	 * 即使存在类型不匹配。
+	 *
+	 * @param field 字段名称
+	 * @return 给定字段的当前值
 	 */
 	@Nullable
 	Object getFieldValue(String field);
 
 	/**
-	 * Return the type of a given field.
-	 * <p>Implementations should be able to determine the type even
-	 * when the field value is {@code null}, for example from some
-	 * associated descriptor.
-	 * @param field the field name
-	 * @return the type of the field, or {@code null} if not determinable
+	 * 返回给定字段的类型。
+	 * <p>即使字段值为 {@code null}，实现也应能够确定类型，
+	 * 例如从某个关联描述符中。
+	 *
+	 * @param field 字段名称
+	 * @return 字段的类型，或如果无法确定则为 {@code null}
 	 */
 	@Nullable
 	Class<?> getFieldType(String field);

@@ -16,23 +16,20 @@
 
 package org.springframework.validation;
 
-import java.beans.PropertyEditor;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.beans.PropertyEditor;
+import java.util.List;
+import java.util.Map;
+
 /**
- * Thrown when binding errors are considered fatal. Implements the
- * {@link BindingResult} interface (and its super-interface {@link Errors})
- * to allow for the direct analysis of binding errors.
+ * 当绑定错误被认为是致命的时抛出。实现了 {@link BindingResult} 接口（及其超接口 {@link Errors}），
+ * 允许直接分析绑定错误。
  *
- * <p>As of Spring 2.0, this is a special-purpose class. Normally,
- * application code will work with the {@link BindingResult} interface,
- * or with a {@link DataBinder} that in turn exposes a BindingResult via
- * {@link org.springframework.validation.DataBinder#getBindingResult()}.
+ * <p>自 Spring 2.0 起，这是一个特殊用途的类。通常，应用代码会使用 {@link BindingResult} 接口，
+ * 或者使用 {@link DataBinder}，后者通过 {@link org.springframework.validation.DataBinder#getBindingResult()} 方法暴露 BindingResult。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -43,13 +40,16 @@ import org.springframework.util.Assert;
  */
 @SuppressWarnings("serial")
 public class BindException extends Exception implements BindingResult {
-
+	/**
+	 * 绑定结果
+	 */
 	private final BindingResult bindingResult;
 
 
 	/**
-	 * Create a new BindException instance for a BindingResult.
-	 * @param bindingResult the BindingResult instance to wrap
+	 * 创建一个新的 BindException 实例，用于包装一个 BindingResult。
+	 *
+	 * @param bindingResult 要包装的 BindingResult 实例
 	 */
 	public BindException(BindingResult bindingResult) {
 		Assert.notNull(bindingResult, "BindingResult must not be null");
@@ -57,9 +57,10 @@ public class BindException extends Exception implements BindingResult {
 	}
 
 	/**
-	 * Create a new BindException instance for a target bean.
-	 * @param target the target bean to bind onto
-	 * @param objectName the name of the target object
+	 * 创建一个新的 BindException 实例，用于目标 bean。
+	 *
+	 * @param target     要绑定到的目标 bean
+	 * @param objectName 目标对象的名称
 	 * @see BeanPropertyBindingResult
 	 */
 	public BindException(Object target, String objectName) {
@@ -69,7 +70,7 @@ public class BindException extends Exception implements BindingResult {
 
 
 	/**
-	 * Return the BindingResult that this BindException wraps.
+	 * 返回该 BindException 所包装的 BindingResult。
 	 */
 	public final BindingResult getBindingResult() {
 		return this.bindingResult;
@@ -290,7 +291,7 @@ public class BindException extends Exception implements BindingResult {
 
 
 	/**
-	 * Returns diagnostic information about the errors held in this object.
+	 * 返回有关此对象中持有的错误的诊断信息。
 	 */
 	@Override
 	public String getMessage() {

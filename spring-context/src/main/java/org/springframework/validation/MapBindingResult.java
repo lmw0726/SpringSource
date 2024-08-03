@@ -16,35 +16,36 @@
 
 package org.springframework.validation;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.io.Serializable;
+import java.util.Map;
+
 /**
- * Map-based implementation of the BindingResult interface,
- * supporting registration and evaluation of binding errors on
- * Map attributes.
+ * 基于 Map 的 {@link BindingResult} 接口实现，
+ * 支持在 Map 属性上注册和评估绑定错误。
  *
- * <p>Can be used as errors holder for custom binding onto a
- * Map, for example when invoking a Validator for a Map object.
+ * <p>可以用作自定义绑定到 Map 的错误持有器，例如在对 Map 对象调用 Validator 时。
  *
  * @author Juergen Hoeller
- * @since 2.0
  * @see java.util.Map
+ * @since 2.0
  */
 @SuppressWarnings("serial")
 public class MapBindingResult extends AbstractBindingResult implements Serializable {
-
+	/**
+	 * 目标Map
+	 */
 	private final Map<?, ?> target;
 
 
 	/**
-	 * Create a new MapBindingResult instance.
-	 * @param target the target Map to bind onto
-	 * @param objectName the name of the target object
+	 * 创建一个新的 {@link MapBindingResult} 实例。
+	 *
+	 * @param target     目标 Map
+	 * @param objectName 目标对象的名称
 	 */
 	public MapBindingResult(Map<?, ?> target, String objectName) {
 		super(objectName);
@@ -54,7 +55,7 @@ public class MapBindingResult extends AbstractBindingResult implements Serializa
 
 
 	/**
-	 * Return the target Map to bind onto.
+	 * 返回要绑定到的目标 Map。
 	 */
 	public final Map<?, ?> getTargetMap() {
 		return this.target;

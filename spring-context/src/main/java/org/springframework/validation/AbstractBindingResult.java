@@ -16,52 +16,62 @@
 
 package org.springframework.validation;
 
-import java.beans.PropertyEditor;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditor;
+import java.io.Serializable;
+import java.util.*;
+
 /**
- * Abstract implementation of the {@link BindingResult} interface and
- * its super-interface {@link Errors}. Encapsulates common management of
- * {@link ObjectError ObjectErrors} and {@link FieldError FieldErrors}.
+ * {@link BindingResult} 接口及其超接口 {@link Errors} 的抽象实现。封装了对 {@link ObjectError ObjectErrors}
+ * 和 {@link FieldError FieldErrors} 的常见管理。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
- * @since 2.0
  * @see Errors
+ * @since 2.0
  */
 @SuppressWarnings("serial")
 public abstract class AbstractBindingResult extends AbstractErrors implements BindingResult, Serializable {
-
+	/**
+	 * 对象名称
+	 */
 	private final String objectName;
 
+	/**
+	 * 消息编码解析器
+	 */
 	private MessageCodesResolver messageCodesResolver = new DefaultMessageCodesResolver();
 
+	/**
+	 * 错误列表
+	 */
 	private final List<ObjectError> errors = new ArrayList<>();
 
+	/**
+	 * 字段 —— 类型映射
+	 */
 	private final Map<String, Class<?>> fieldTypes = new HashMap<>();
 
+	/**
+	 * 字段 —— 值映射
+	 */
 	private final Map<String, Object> fieldValues = new HashMap<>();
 
+	/**
+	 * 抑制字段列表
+	 */
 	private final Set<String> suppressedFields = new HashSet<>();
 
 
 	/**
-	 * Create a new AbstractBindingResult instance.
-	 * @param objectName the name of the target object
+	 * 创建一个新的 AbstractBindingResult 实例。
+	 *
+	 * @param objectName 目标对象的名称
 	 * @see DefaultMessageCodesResolver
 	 */
 	protected AbstractBindingResult(String objectName) {
@@ -70,8 +80,9 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 
 
 	/**
-	 * Set the strategy to use for resolving errors into message codes.
-	 * Default is DefaultMessageCodesResolver.
+	 * 设置用于将错误解析为消息代码的策略。默认为 DefaultMessageCodesResolver。
+	 *
+	 * @param messageCodesResolver 用于解析消息代码的策略
 	 * @see DefaultMessageCodesResolver
 	 */
 	public void setMessageCodesResolver(MessageCodesResolver messageCodesResolver) {
@@ -80,7 +91,9 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 	}
 
 	/**
-	 * Return the strategy to use for resolving errors into message codes.
+	 * 返回用于将错误解析为消息代码的策略。
+	 *
+	 * @return 用于解析消息代码的策略
 	 */
 	public MessageCodesResolver getMessageCodesResolver() {
 		return this.messageCodesResolver;
@@ -88,7 +101,7 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 
 
 	//---------------------------------------------------------------------
-	// Implementation of the Errors interface
+	// Errors接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -103,28 +116,39 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 
 	@Override
 	public void rejectValue(@Nullable String field, String errorCode, @Nullable Object[] errorArgs,
-			@Nullable String defaultMessage) {
+							@Nullable String defaultMessage) {
 
+		// 如果嵌套路径和字段都没有长度
 		if (!StringUtils.hasLength(getNestedPath()) && !StringUtils.hasLength(field)) {
-			// We're at the top of the nested object hierarchy,
-			// so the present level is not a field but rather the top object.
-			// The best we can do is register a global error here...
+			// 处于嵌套对象层次结构的顶层，当前层次不是字段而是顶层对象
+			// 在这里我们能做的最好是注册一个全局错误
 			reject(errorCode, errorArgs, defaultMessage);
 			return;
 		}
 
+		// 修正字段名称
 		String fixedField = fixedField(field);
+
+		// 获取修正字段的实际值
 		Object newVal = getActualFieldValue(fixedField);
+
+		// 创建一个新的 FieldError 对象
 		FieldError fe = new FieldError(getObjectName(), fixedField, newVal, false,
 				resolveMessageCodes(errorCode, field), errorArgs, defaultMessage);
+
+		// 添加错误到错误列表中
 		addError(fe);
 	}
 
 	@Override
 	public void addAllErrors(Errors errors) {
+		// 如果错误对象的名称与当前对象的名称不相同
 		if (!errors.getObjectName().equals(getObjectName())) {
+			// 抛出 IllegalArgumentException 异常，提示错误对象需要具有相同的对象名称
 			throw new IllegalArgumentException("Errors object needs to have same object name");
 		}
+
+		// 将所有错误添加到当前对象的错误列表中
 		this.errors.addAll(errors.getAllErrors());
 	}
 
@@ -145,135 +169,183 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 
 	@Override
 	public List<ObjectError> getGlobalErrors() {
+		// 创建一个结果列表用于存储非字段错误
 		List<ObjectError> result = new ArrayList<>();
+
+		// 遍历当前对象的所有错误
 		for (ObjectError objectError : this.errors) {
+			// 如果错误不是字段错误
 			if (!(objectError instanceof FieldError)) {
+				// 将该错误添加到结果列表中
 				result.add(objectError);
 			}
 		}
+
+		// 返回一个不可修改的结果列表
 		return Collections.unmodifiableList(result);
 	}
 
 	@Override
 	@Nullable
 	public ObjectError getGlobalError() {
+		// 遍历当前对象的所有错误
 		for (ObjectError objectError : this.errors) {
+			// 如果错误不是字段错误
 			if (!(objectError instanceof FieldError)) {
+				// 返回该错误
 				return objectError;
 			}
 		}
+
+		// 如果没有找到非字段错误，返回 null
 		return null;
 	}
 
 	@Override
 	public List<FieldError> getFieldErrors() {
+		// 创建一个结果列表用于存储字段错误
 		List<FieldError> result = new ArrayList<>();
+
+		// 遍历当前对象的所有错误
 		for (ObjectError objectError : this.errors) {
+			// 如果错误是字段错误
 			if (objectError instanceof FieldError) {
+				// 将字段错误添加到结果列表中
 				result.add((FieldError) objectError);
 			}
 		}
+
+		// 返回一个不可修改的结果列表
 		return Collections.unmodifiableList(result);
 	}
 
 	@Override
 	@Nullable
 	public FieldError getFieldError() {
+		// 遍历当前对象的所有错误
 		for (ObjectError objectError : this.errors) {
+			// 如果错误是字段错误
 			if (objectError instanceof FieldError) {
+				// 返回字段错误
 				return (FieldError) objectError;
 			}
 		}
+
+		// 如果没有找到字段错误，返回 null
 		return null;
 	}
 
 	@Override
 	public List<FieldError> getFieldErrors(String field) {
+		// 创建一个结果列表用于存储匹配的字段错误
 		List<FieldError> result = new ArrayList<>();
+
+		// 修正字段名称
 		String fixedField = fixedField(field);
+
+		// 遍历当前对象的所有错误
 		for (ObjectError objectError : this.errors) {
+			// 如果错误是字段错误并且与修正后的字段名称匹配
 			if (objectError instanceof FieldError && isMatchingFieldError(fixedField, (FieldError) objectError)) {
+				// 将匹配的字段错误添加到结果列表中
 				result.add((FieldError) objectError);
 			}
 		}
+
+		// 返回一个不可修改的结果列表
 		return Collections.unmodifiableList(result);
 	}
 
 	@Override
 	@Nullable
 	public FieldError getFieldError(String field) {
+		// 修正字段名称
 		String fixedField = fixedField(field);
+
+		// 遍历当前对象的所有错误
 		for (ObjectError objectError : this.errors) {
+			// 如果错误是字段错误
 			if (objectError instanceof FieldError) {
+				// 将错误转换为 FieldError 类型
 				FieldError fieldError = (FieldError) objectError;
+
+				// 如果字段错误与修正后的字段名称匹配
 				if (isMatchingFieldError(fixedField, fieldError)) {
+					// 返回匹配的字段错误
 					return fieldError;
 				}
 			}
 		}
+
+		// 如果没有找到匹配的字段错误，返回 null
 		return null;
 	}
 
 	@Override
 	@Nullable
 	public Object getFieldValue(String field) {
+		// 获取指定字段的字段错误
 		FieldError fieldError = getFieldError(field);
-		// Use rejected value in case of error, current field value otherwise.
+
+		// 使用被拒绝的值（如果存在错误），否则使用当前字段值
 		if (fieldError != null) {
+			// 获取被拒绝的值
 			Object value = fieldError.getRejectedValue();
-			// Do not apply formatting on binding failures like type mismatches.
+			// 对于绑定失败（如类型不匹配）的情况，不应用格式化
 			return (fieldError.isBindingFailure() || getTarget() == null ? value : formatFieldValue(field, value));
-		}
-		else if (getTarget() != null) {
+		} else if (getTarget() != null) {
+			// 如果目标对象存在，获取实际字段值并应用格式化
 			Object value = getActualFieldValue(fixedField(field));
 			return formatFieldValue(field, value);
-		}
-		else {
+		} else {
+			// 如果没有字段错误且目标对象不存在，返回字段的原始值
 			return this.fieldValues.get(field);
 		}
 	}
 
 	/**
-	 * This default implementation determines the type based on the actual
-	 * field value, if any. Subclasses should override this to determine
-	 * the type from a descriptor, even for {@code null} values.
+	 * 此默认实现基于实际字段值（如果有）来确定字段类型。子类应重写此方法，以便从描述符中确定字段类型，即使对于 {@code null} 值也是如此。
+	 *
 	 * @see #getActualFieldValue
 	 */
 	@Override
 	@Nullable
 	public Class<?> getFieldType(@Nullable String field) {
+		// 如果目标对象存在
 		if (getTarget() != null) {
+			// 获取修正后的字段值
 			Object value = getActualFieldValue(fixedField(field));
+			// 如果字段值不为 null，返回字段值的类类型
 			if (value != null) {
 				return value.getClass();
 			}
 		}
+
+		// 返回字段类型的原始值
 		return this.fieldTypes.get(field);
 	}
 
 
 	//---------------------------------------------------------------------
-	// Implementation of BindingResult interface
+	// BindingResult 接口的实现
 	//---------------------------------------------------------------------
 
 	/**
-	 * Return a model Map for the obtained state, exposing an Errors
-	 * instance as '{@link #MODEL_KEY_PREFIX MODEL_KEY_PREFIX} + objectName'
-	 * and the object itself.
-	 * <p>Note that the Map is constructed every time you're calling this method.
-	 * Adding things to the map and then re-calling this method will not work.
-	 * <p>The attributes in the model Map returned by this method are usually
-	 * included in the ModelAndView for a form view that uses Spring's bind tag,
-	 * which needs access to the Errors instance.
+	 * 返回一个模型 Map，暴露了一个 {@link #MODEL_KEY_PREFIX MODEL_KEY_PREFIX} + objectName 的 Errors 实例
+	 * 和目标对象本身。
+	 * <p>请注意，每次调用此方法时，Map 都会被构建。将内容添加到 Map 中然后重新调用此方法将不起作用。
+	 * <p>由此方法返回的模型 Map 中的属性通常会包含在用于表单视图的 ModelAndView 中，该视图使用 Spring 的 bind 标签，
+	 * 需要访问 Errors 实例。
+	 *
 	 * @see #getObjectName
 	 * @see #MODEL_KEY_PREFIX
 	 */
 	@Override
 	public Map<String, Object> getModel() {
 		Map<String, Object> model = new LinkedHashMap<>(2);
-		// Mapping from name to target object.
+		// 从名称到目标对象的映射。
 		model.put(getObjectName(), getTarget());
-		// Errors instance, even if no errors.
+		// 即使没有错误，也包含 Errors 实例。
 		model.put(MODEL_KEY_PREFIX + getObjectName(), this);
 		return model;
 	}
@@ -285,28 +357,31 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 	}
 
 	/**
-	 * This implementation delegates to the
-	 * {@link #getPropertyEditorRegistry() PropertyEditorRegistry}'s
-	 * editor lookup facility, if available.
+	 * 此实现委托给 {@link #getPropertyEditorRegistry() PropertyEditorRegistry} 的编辑器查找功能（如果可用）。
 	 */
 	@Override
 	@Nullable
 	public PropertyEditor findEditor(@Nullable String field, @Nullable Class<?> valueType) {
+		// 获取属性编辑器注册表
 		PropertyEditorRegistry editorRegistry = getPropertyEditorRegistry();
+
+		// 如果属性编辑器注册表不为 null
 		if (editorRegistry != null) {
+			// 使用提供的值类型，如果值类型为 null，则获取字段类型
 			Class<?> valueTypeToUse = valueType;
 			if (valueTypeToUse == null) {
 				valueTypeToUse = getFieldType(field);
 			}
+			// 从注册表中查找与值类型和字段名称匹配的自定义编辑器
 			return editorRegistry.findCustomEditor(valueTypeToUse, fixedField(field));
-		}
-		else {
+		} else {
+			// 如果属性编辑器注册表为 null，返回 null
 			return null;
 		}
 	}
 
 	/**
-	 * This implementation returns {@code null}.
+	 * 此实现返回 {@code null}。
 	 */
 	@Override
 	@Nullable
@@ -337,9 +412,9 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 	}
 
 	/**
-	 * Mark the specified disallowed field as suppressed.
-	 * <p>The data binder invokes this for each field value that was
-	 * detected to target a disallowed field.
+	 * 将指定的禁止字段标记为已抑制。
+	 * <p>数据绑定器会为每个被检测到的目标禁止字段的字段值调用此方法。
+	 *
 	 * @see DataBinder#setAllowedFields
 	 */
 	@Override
@@ -348,9 +423,9 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 	}
 
 	/**
-	 * Return the list of fields that were suppressed during the bind process.
-	 * <p>Can be used to determine whether any field values were targeting
-	 * disallowed fields.
+	 * 返回绑定过程中被抑制的字段列表。
+	 * <p>可以用来确定是否有任何字段值目标指向了禁止字段。
+	 *
 	 * @see DataBinder#setAllowedFields
 	 */
 	@Override
@@ -380,31 +455,32 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 
 
 	//---------------------------------------------------------------------
-	// Template methods to be implemented/overridden by subclasses
+	// 子类需要实现/重写的模板方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * Return the wrapped target object.
+	 * 返回被包装的目标对象。
 	 */
 	@Override
 	@Nullable
 	public abstract Object getTarget();
 
 	/**
-	 * Extract the actual field value for the given field.
-	 * @param field the field to check
-	 * @return the current value of the field
+	 * 提取给定字段的实际值。
+	 *
+	 * @param field 要检查的字段
+	 * @return 字段的当前值
 	 */
 	@Nullable
 	protected abstract Object getActualFieldValue(String field);
 
 	/**
-	 * Format the given value for the specified field.
-	 * <p>The default implementation simply returns the field value as-is.
-	 * @param field the field to check
-	 * @param value the value of the field (either a rejected value
-	 * other than from a binding error, or an actual field value)
-	 * @return the formatted value
+	 * 格式化指定字段的给定值。
+	 * <p>默认实现只是按原样返回字段值。
+	 *
+	 * @param field 要检查的字段
+	 * @param value 字段的值（可能是绑定错误的拒绝值，也可能是实际的字段值）
+	 * @return 格式化后的值
 	 */
 	@Nullable
 	protected Object formatFieldValue(String field, @Nullable Object value) {
