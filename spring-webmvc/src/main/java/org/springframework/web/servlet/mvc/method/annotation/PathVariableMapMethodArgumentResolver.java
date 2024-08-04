@@ -46,7 +46,7 @@ public class PathVariableMapMethodArgumentResolver implements HandlerMethodArgum
 	public boolean supportsParameter(MethodParameter parameter) {
 		// 获取方法参数上的@PathVariable注解
 		PathVariable ann = parameter.getParameterAnnotation(PathVariable.class);
-		// 检查是否存在@PathVariable注解，并且参数类型是Map的子类或实现类，并且@PathVariable注解的值不为空
+		// 检查是否存在@PathVariable注解，并且参数类型是Map的子类或实现类，并且@PathVariable注解的value值为空
 		return (ann != null && Map.class.isAssignableFrom(parameter.getParameterType()) &&
 				!StringUtils.hasText(ann.value()));
 	}
