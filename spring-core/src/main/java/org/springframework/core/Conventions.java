@@ -16,14 +16,14 @@
 
 package org.springframework.core;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Iterator;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Provides methods to support various naming and other conventions used
@@ -88,42 +88,62 @@ public final class Conventions {
 	}
 
 	/**
-	 * Determine the conventional variable name for the given parameter taking
-	 * the generic collection type, if any, into account.
-	 * <p>As of 5.0 this method supports reactive types:<br>
-	 * {@code Mono<com.myapp.Product>} becomes {@code "productMono"}<br>
-	 * {@code Flux<com.myapp.MyProduct>} becomes {@code "myProductFlux"}<br>
-	 * {@code Observable<com.myapp.MyProduct>} becomes {@code "myProductObservable"}<br>
+	 * 为给定的参数确定常规的变量名，
+	 * 如果参数是泛型集合类型，则考虑该类型。
+	 * <p>自5.0版本起，此方法支持响应式类型：<br>
+	 * {@code Mono<com.myapp.Product>} 变为 {@code "productMono"}<br>
+	 * {@code Flux<com.myapp.MyProduct>} 变为 {@code "myProductFlux"}<br>
+	 * {@code Observable<com.myapp.MyProduct>} 变为 {@code "myProductObservable"}<br>
 	 *
-	 * @param parameter the method or constructor parameter
-	 * @return the generated variable name
+	 * @param parameter 方法或构造函数的参数
+	 * @return 生成的变量名
 	 */
 	public static String getVariableNameForParameter(MethodParameter parameter) {
 		Assert.notNull(parameter, "MethodParameter must not be null");
+
+		// 存储参数的实际类型的Class<?>类型
 		Class<?> valueClass;
+
+		// 标记是否需要将名称复数化布尔变量pluralize，
 		boolean pluralize = false;
+
+		// 存储响应式类型的后缀的字符串变量reactiveSuffix，
 		String reactiveSuffix = "";
 
+		// 判断参数是否为数组类型
 		if (parameter.getParameterType().isArray()) {
+			// 如果是数组类型，则获取数组的元素类型
 			valueClass = parameter.getParameterType().getComponentType();
+			// 标记需要将名称复数化
 			pluralize = true;
 		} else if (Collection.class.isAssignableFrom(parameter.getParameterType())) {
+			// 如果是集合类型，则使用ResolvableType获取集合元素的类型
 			valueClass = ResolvableType.forMethodParameter(parameter).asCollection().resolveGeneric();
+			// 如果获取不到元素类型，则抛出异常
 			if (valueClass == null) {
 				throw new IllegalArgumentException(
 						"Cannot generate variable name for non-typed Collection parameter type");
 			}
+			// 标记需要将名称复数化
 			pluralize = true;
 		} else {
+			// 如果参数既不是数组也不是集合
+			// 直接将参数类型设置为实际的参数类型
 			valueClass = parameter.getParameterType();
+			// 尝试获取参数的响应式适配器
 			ReactiveAdapter adapter = ReactiveAdapterRegistry.getSharedInstance().getAdapter(valueClass);
+			// 如果存在适配器且适配器描述的不是空值
 			if (adapter != null && !adapter.getDescriptor().isNoValue()) {
+				// 将响应式类型的简短名称作为后缀
 				reactiveSuffix = ClassUtils.getShortName(valueClass);
+				// 尝试获取嵌套参数类型，用于后续处理
 				valueClass = parameter.nested().getNestedParameterType();
 			}
 		}
 
+		// 使用ClassUtils获取实际类型的简短名称，并作为属性名
 		String name = ClassUtils.getShortNameAsProperty(valueClass);
+		// 如果需要复数化，则对名称进行复数化处理；否则，将reactiveSuffix附加到名称后
 		return (pluralize ? pluralize(name) : name + reactiveSuffix);
 	}
 
@@ -281,7 +301,7 @@ public final class Conventions {
 	}
 
 	/**
-	 * Pluralize the given name.
+	 * 将给定的名称转换为复数形式。
 	 */
 	private static String pluralize(String name) {
 		return name + PLURAL_SUFFIX;
