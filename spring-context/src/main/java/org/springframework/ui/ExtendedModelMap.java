@@ -16,18 +16,17 @@
 
 package org.springframework.ui;
 
+import org.springframework.lang.Nullable;
+
 import java.util.Collection;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Subclass of {@link ModelMap} that implements the {@link Model} interface.
+ * {@link ModelMap} 的子类，实现了 {@link Model} 接口。
  *
- * <p>This is an implementation class exposed to handler methods by Spring MVC, typically via
- * a declaration of the {@link org.springframework.ui.Model} interface. There is no need to
- * build it within user code; a plain {@link org.springframework.ui.ModelMap} or even a just
- * a regular {@link Map} with String keys will be good enough to return a user model.
+ * <p>这是一个由 Spring MVC 暴露给处理器方法的实现类，通常通过声明 {@link org.springframework.ui.Model} 接口。
+ * 无需在用户代码中构建它；一个普通的 {@link org.springframework.ui.ModelMap} 或者甚至只是一个带有字符串键的常规 {@link Map}
+ * 就足以返回用户模型。
  *
  * @author Juergen Hoeller
  * @since 2.5.1
