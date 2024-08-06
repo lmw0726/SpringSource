@@ -1025,11 +1025,10 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return the short string name of a Java class in uncapitalized JavaBeans
-	 * property format. Strips the outer class name in case of a nested class.
+	 * 返回一个 Java 类的小写 JavaBeans 属性格式的短名称。如果是嵌套类，则去除外部类名。
 	 *
-	 * @param clazz the class
-	 * @return the short name rendered in a standard JavaBeans property format
+	 * @param clazz 类
+	 * @return 以标准 JavaBeans 属性格式呈现的短名称
 	 * @see java.beans.Introspector#decapitalize(String)
 	 */
 	public static String getShortNameAsProperty(Class<?> clazz) {
