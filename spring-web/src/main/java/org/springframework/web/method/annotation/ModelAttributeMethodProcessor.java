@@ -251,7 +251,8 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 		String fieldDefaultPrefix = binder.getFieldDefaultPrefix();
 		// 获取字段标记前缀
 		String fieldMarkerPrefix = binder.getFieldMarkerPrefix();
-		boolean bindingFailure = false; // 绑定失败标志
+		// 绑定失败标志
+		boolean bindingFailure = false;
 		// 存储绑定失败的参数名称的集合
 		Set<String> failedParams = new HashSet<>(4);
 
@@ -277,11 +278,11 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 				}
 				// 如果值仍为空
 				if (value == null) {
-					// 如果字段标记前缀存在且存在与字段标记前缀+参数名对应的请求参数，则使用空值填充
+					// 如果字段标记前缀存在，且存在与字段标记前缀+参数名对应的请求参数，则使用空值填充
 					if (fieldMarkerPrefix != null && webRequest.getParameter(fieldMarkerPrefix + paramName) != null) {
 						value = binder.getEmptyValue(paramType);
 					} else {
-						// 否则，从请求参数中解析参数值
+						// 否则，从请求参数中解析构造参数值
 						value = resolveConstructorArgument(paramName, paramType, webRequest);
 					}
 				}
