@@ -16,14 +16,14 @@
 
 package org.springframework.beans;
 
-import java.beans.PropertyChangeEvent;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+import java.beans.PropertyChangeEvent;
+
 /**
- * Exception thrown on a type mismatch when trying to set a bean property.
+ * 在尝试设置 bean 属性时发生类型不匹配时抛出的异常。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -32,38 +32,46 @@ import org.springframework.util.ClassUtils;
 public class TypeMismatchException extends PropertyAccessException {
 
 	/**
-	 * Error code that a type mismatch error will be registered with.
+	 * 类型不匹配错误将注册的错误代码。
 	 */
 	public static final String ERROR_CODE = "typeMismatch";
 
-
+	/**
+	 * 属性名称
+	 */
 	@Nullable
 	private String propertyName;
 
+	/**
+	 * 属性值
+	 */
 	@Nullable
 	private final transient Object value;
 
+	/**
+	 * 所需的目标类型
+	 */
 	@Nullable
 	private final Class<?> requiredType;
 
 
 	/**
-	 * Create a new {@code TypeMismatchException}.
-	 * @param propertyChangeEvent the PropertyChangeEvent that resulted in the problem
-	 * @param requiredType the required target type
+	 * 创建一个新的 {@code TypeMismatchException}。
+	 * @param propertyChangeEvent 导致问题的 PropertyChangeEvent
+	 * @param requiredType 所需的目标类型
 	 */
 	public TypeMismatchException(PropertyChangeEvent propertyChangeEvent, Class<?> requiredType) {
 		this(propertyChangeEvent, requiredType, null);
 	}
 
 	/**
-	 * Create a new {@code TypeMismatchException}.
-	 * @param propertyChangeEvent the PropertyChangeEvent that resulted in the problem
-	 * @param requiredType the required target type (or {@code null} if not known)
-	 * @param cause the root cause (may be {@code null})
+	 * 创建一个新的 {@code TypeMismatchException}。
+	 * @param propertyChangeEvent 导致问题的 PropertyChangeEvent
+	 * @param requiredType 所需的目标类型（如果未知，则为 {@code null}）
+	 * @param cause 根本原因（可能为 {@code null}）
 	 */
 	public TypeMismatchException(PropertyChangeEvent propertyChangeEvent, @Nullable Class<?> requiredType,
-			@Nullable Throwable cause) {
+								 @Nullable Throwable cause) {
 
 		super(propertyChangeEvent,
 				"Failed to convert property value of type '" +
@@ -79,9 +87,9 @@ public class TypeMismatchException extends PropertyAccessException {
 	}
 
 	/**
-	 * Create a new {@code TypeMismatchException} without a {@code PropertyChangeEvent}.
-	 * @param value the offending value that couldn't be converted (may be {@code null})
-	 * @param requiredType the required target type (or {@code null} if not known)
+	 * 创建一个没有 {@code PropertyChangeEvent} 的新的 {@code TypeMismatchException}。
+	 * @param value 无法转换的有问题的值（可能为 {@code null}）
+	 * @param requiredType 所需的目标类型（如果未知，则为 {@code null}）
 	 * @see #initPropertyName
 	 */
 	public TypeMismatchException(@Nullable Object value, @Nullable Class<?> requiredType) {
@@ -89,10 +97,10 @@ public class TypeMismatchException extends PropertyAccessException {
 	}
 
 	/**
-	 * Create a new {@code TypeMismatchException} without a {@code PropertyChangeEvent}.
-	 * @param value the offending value that couldn't be converted (may be {@code null})
-	 * @param requiredType the required target type (or {@code null} if not known)
-	 * @param cause the root cause (may be {@code null})
+	 * 创建一个没有 {@code PropertyChangeEvent} 的新的 {@code TypeMismatchException}。
+	 * @param value 无法转换的有问题的值（可能为 {@code null}）
+	 * @param requiredType 所需的目标类型（如果未知，则为 {@code null}）
+	 * @param cause 根本原因（可能为 {@code null}）
 	 * @see #initPropertyName
 	 */
 	public TypeMismatchException(@Nullable Object value, @Nullable Class<?> requiredType, @Nullable Throwable cause) {
@@ -105,9 +113,9 @@ public class TypeMismatchException extends PropertyAccessException {
 
 
 	/**
-	 * Initialize this exception's property name for exposure through {@link #getPropertyName()},
-	 * as an alternative to having it initialized via a {@link PropertyChangeEvent}.
-	 * @param propertyName the property name to expose
+	 * 初始化此异常的属性名称，以便通过 {@link #getPropertyName()} 公开，
+	 * 作为通过 {@link PropertyChangeEvent} 初始化的替代方法。
+	 * @param propertyName 要公开的属性名称
 	 * @since 5.0.4
 	 * @see #TypeMismatchException(Object, Class)
 	 * @see #TypeMismatchException(Object, Class, Throwable)
@@ -118,7 +126,7 @@ public class TypeMismatchException extends PropertyAccessException {
 	}
 
 	/**
-	 * Return the name of the affected property, if available.
+	 * 返回受影响的属性名称（如果可用）。
 	 */
 	@Override
 	@Nullable
@@ -127,7 +135,7 @@ public class TypeMismatchException extends PropertyAccessException {
 	}
 
 	/**
-	 * Return the offending value (may be {@code null}).
+	 * 返回有问题的值（可能为 {@code null}）。
 	 */
 	@Override
 	@Nullable
@@ -136,7 +144,7 @@ public class TypeMismatchException extends PropertyAccessException {
 	}
 
 	/**
-	 * Return the required target type, if any.
+	 * 返回所需的目标类型（如果有）。
 	 */
 	@Nullable
 	public Class<?> getRequiredType() {
