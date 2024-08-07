@@ -16,6 +16,16 @@
 
 package org.springframework.beans;
 
+import kotlin.jvm.JvmClassMappingKt;
+import kotlin.reflect.KFunction;
+import kotlin.reflect.KParameter;
+import kotlin.reflect.full.KClasses;
+import kotlin.reflect.jvm.KCallablesJvm;
+import kotlin.reflect.jvm.ReflectJvmMapping;
+import org.springframework.core.*;
+import org.springframework.lang.Nullable;
+import org.springframework.util.*;
+
 import java.beans.ConstructorProperties;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
@@ -26,34 +36,7 @@ import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URL;
 import java.time.temporal.Temporal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import kotlin.jvm.JvmClassMappingKt;
-import kotlin.reflect.KFunction;
-import kotlin.reflect.KParameter;
-import kotlin.reflect.full.KClasses;
-import kotlin.reflect.jvm.KCallablesJvm;
-import kotlin.reflect.jvm.ReflectJvmMapping;
-
-import org.springframework.core.DefaultParameterNameDiscoverer;
-import org.springframework.core.KotlinDetector;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.ParameterNameDiscoverer;
-import org.springframework.core.ResolvableType;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ConcurrentReferenceHashMap;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
+import java.util.*;
 
 /**
  * Static convenience methods for JavaBeans: for instantiating beans,
@@ -653,7 +636,7 @@ public abstract class BeanUtils {
 	 * @since 5.3
 	 */
 	public static String[] getParameterNames(Constructor<?> ctor) {
-		//通过ConstructorProperties注解标记餐宿名称获取参数值
+		//通过ConstructorProperties注解标记参数名称获取参数值
 		ConstructorProperties cp = ctor.getAnnotation(ConstructorProperties.class);
 		//如果获取不到，通过parameterNameDiscoverer获取参数名称
 		String[] paramNames = (cp == null ? parameterNameDiscoverer.getParameterNames(ctor) : cp.value());
