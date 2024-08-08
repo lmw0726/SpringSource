@@ -36,10 +36,10 @@ import java.io.Writer;
  * <li>{@link Writer}
  * </ul>
  * <p>
- * 作者：Arjen Poutsma
- * Rossen Stoyanchev
- * Juergen Hoeller
  *
+ * @author Arjen Poutsma
+ * @author Rossen Stoyanchev
+ * @author Juergen Hoeller
  * @since 3.1
  */
 public class ServletResponseMethodArgumentResolver implements HandlerMethodArgumentResolver {
