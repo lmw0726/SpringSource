@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBodyReturnValueHandler;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -64,12 +63,11 @@ public class StreamingResponseBodyController {
 		ResourceLoader resourceLoader = new ClassRelativeResourceLoader(StreamingResponseBodyController.class);
 		Resource resource = resourceLoader.getResource("classpath:/static/TestExcel.xlsx");
 		StreamingResponseBody stream = outputStream -> {
-			try (InputStream inputStream = resource.getInputStream();
-				 OutputStream out = outputStream) {
-				byte[] buffer = new byte[1024];
+			try (InputStream inputStream = resource.getInputStream()) {
+				byte[] buffer = new byte[2048];
 				int bytesRead;
 				while ((bytesRead = inputStream.read(buffer)) != -1) {
-					out.write(buffer, 0, bytesRead);
+					outputStream.write(buffer, 0, bytesRead);
 				}
 			}
 		};
