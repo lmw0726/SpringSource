@@ -28,6 +28,10 @@ dependencies {
 
     // hibernate validation校验组件
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.1'
+//    // reactive-streams 响应式流组件
+//    implementation group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.4'
+    //  reactor-core 响应式流组件
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.4.19'
 
     // 引用当前项目的Context包
     api(project(":spring-context"))
