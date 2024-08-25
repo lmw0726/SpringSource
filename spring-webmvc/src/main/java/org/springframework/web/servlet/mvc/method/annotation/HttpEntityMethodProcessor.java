@@ -107,7 +107,7 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
-		// 如果返回类型不是HttpEntity，也不是RequestEntity
+		// 如果返回类型是HttpEntity，并且不是RequestEntity
 		return (HttpEntity.class.isAssignableFrom(returnType.getParameterType()) &&
 				!RequestEntity.class.isAssignableFrom(returnType.getParameterType()));
 	}
