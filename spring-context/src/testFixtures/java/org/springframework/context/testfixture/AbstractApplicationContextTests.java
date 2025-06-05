@@ -16,15 +16,8 @@
 
 package org.springframework.context.testfixture;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Locale;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.testfixture.beans.LifecycleBean;
 import org.springframework.beans.testfixture.beans.TestBean;
@@ -37,6 +30,12 @@ import org.springframework.context.testfixture.beans.ACATester;
 import org.springframework.context.testfixture.beans.BeanThatListens;
 import org.springframework.context.testfixture.beans.TestApplicationListener;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Locale;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -47,12 +46,12 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 public abstract class AbstractApplicationContextTests extends AbstractListableBeanFactoryTests {
 
-	/** Must be supplied as XML */
+	/** 测试命名空间，必须以 XML 方式提供 */
 	public static final String TEST_NAMESPACE = "testNamespace";
 
 	protected ConfigurableApplicationContext applicationContext;
 
-	/** Subclass must register this */
+	/** 子类必须注册的测试监听器 */
 	protected TestApplicationListener listener = new TestApplicationListener();
 
 	protected TestApplicationListener parentListener = new TestApplicationListener();
@@ -72,10 +71,10 @@ public abstract class AbstractApplicationContextTests extends AbstractListableBe
 	}
 
 	/**
-	 * Must register a TestListener.
-	 * Must register standard beans.
-	 * Parent must register rod with name Roderick
-	 * and father with name Albert.
+     * 必须注册一个TestListener。
+	 * 必须注册标准bean。
+	 * 父母必须用Roderick的名字注册rod
+	 * 和父亲的名字阿尔伯特。
 	 */
 	protected abstract ConfigurableApplicationContext createContext() throws Exception;
 

@@ -20,8 +20,8 @@ import java.time.Clock;
 import java.util.EventObject;
 
 /**
- * Class to be extended by all application events. Abstract as it
- * doesn't make sense for generic events to be published directly.
+ * 所有应用事件的基类。此类为抽象类，
+ * 因为直接发布通用事件没有实际意义。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -30,18 +30,17 @@ import java.util.EventObject;
  */
 public abstract class ApplicationEvent extends EventObject {
 
-	/** use serialVersionUID from Spring 1.2 for interoperability. */
+	/** 使用 Spring 1.2 版本的 serialVersionUID 保持兼容性。 */
 	private static final long serialVersionUID = 7099057708183571937L;
 
-	/** System time when the event happened. */
+	/** 事件发生的系统时间戳（毫秒）。 */
 	private final long timestamp;
 
 
 	/**
-	 * Create a new {@code ApplicationEvent} with its {@link #getTimestamp() timestamp}
-	 * set to {@link System#currentTimeMillis()}.
-	 * @param source the object on which the event initially occurred or with
-	 * which the event is associated (never {@code null})
+	 * 创建一个新的 {@code ApplicationEvent}，其 {@link #getTimestamp() timestamp}
+	 * 设置为 {@link System#currentTimeMillis()} 返回的当前时间。
+	 * @param source 事件最初发生的对象，或与事件关联的对象（不能为空）
 	 * @see #ApplicationEvent(Object, Clock)
 	 */
 	public ApplicationEvent(Object source) {
@@ -50,12 +49,11 @@ public abstract class ApplicationEvent extends EventObject {
 	}
 
 	/**
-	 * Create a new {@code ApplicationEvent} with its {@link #getTimestamp() timestamp}
-	 * set to the value returned by {@link Clock#millis()} in the provided {@link Clock}.
-	 * <p>This constructor is typically used in testing scenarios.
-	 * @param source the object on which the event initially occurred or with
-	 * which the event is associated (never {@code null})
-	 * @param clock a clock which will provide the timestamp
+	 * 创建一个新的 {@code ApplicationEvent}，其 {@link #getTimestamp() timestamp}
+	 * 设置为传入 {@link Clock} 的 {@link Clock#millis()} 返回值。
+	 * <p>此构造方法通常用于测试场景。
+	 * @param source 事件最初发生的对象，或与事件关联的对象（不能为空）
+	 * @param clock 提供时间戳的时钟实例
 	 * @since 5.3.8
 	 * @see #ApplicationEvent(Object)
 	 */
@@ -66,7 +64,7 @@ public abstract class ApplicationEvent extends EventObject {
 
 
 	/**
-	 * Return the time in milliseconds when the event occurred.
+	 * 返回事件发生的时间戳（毫秒）。
 	 * @see #ApplicationEvent(Object)
 	 * @see #ApplicationEvent(Object, Clock)
 	 */

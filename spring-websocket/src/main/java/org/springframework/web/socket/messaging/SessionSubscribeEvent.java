@@ -16,14 +16,13 @@
 
 package org.springframework.web.socket.messaging;
 
-import java.security.Principal;
-
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
+import java.security.Principal;
+
 /**
- * Event raised when a new WebSocket client using a Simple Messaging Protocol
- * (e.g. STOMP) sends a subscription request.
+ * 当使用简单消息协议（例如 STOMP）的新 WebSocket 客户端发送订阅请求时引发的事件。
  *
  * @author Rossen Stoyanchev
  * @since 4.0.3

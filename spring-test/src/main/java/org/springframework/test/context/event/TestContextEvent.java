@@ -20,7 +20,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.test.context.TestContext;
 
 /**
- * Base class for events published by the {@link EventPublishingTestExecutionListener}.
+ * 由 {@link EventPublishingTestExecutionListener} 发布事件的基类。
  *
  * @author Frank Scheffler
  * @author Sam Brannen
@@ -30,17 +30,16 @@ import org.springframework.test.context.TestContext;
 public abstract class TestContextEvent extends ApplicationEvent {
 
 	/**
-	 * Create a new {@code TestContextEvent}.
-	 * @param source the {@code TestContext} associated with this event
-	 * (must not be {@code null})
+	 * 创建一个新的 {@code TestContextEvent}。
+	 * @param source 与该事件关联的 {@code TestContext}（不能为空）
 	 */
 	public TestContextEvent(TestContext source) {
 		super(source);
 	}
 
 	/**
-	 * Get the {@link TestContext} associated with this event.
-	 * @return the {@code TestContext} associated with this event (never {@code null})
+	 * 获取与该事件关联的 {@link TestContext}。
+	 * @return 与该事件关联的 {@code TestContext}（永不为 {@code null}）
 	 * @see #getTestContext()
 	 */
 	@Override
@@ -49,11 +48,11 @@ public abstract class TestContextEvent extends ApplicationEvent {
 	}
 
 	/**
-	 * Alias for {@link #getSource()}.
-	 * <p>This method may be favored over {@code getSource()} &mdash; for example,
-	 * to improve readability in SpEL expressions for event processing
-	 * {@linkplain org.springframework.context.event.EventListener#condition conditions}.
-	 * @return the {@code TestContext} associated with this event (never {@code null})
+	 * {@link #getSource()} 的别名。
+	 * <p>此方法在 SpEL 表达式中用于事件处理的
+	 * {@linkplain org.springframework.context.event.EventListener#condition 条件}时，
+	 * 能提升代码的可读性，因此可能优先使用。
+	 * @return 与该事件关联的 {@code TestContext}（永不为 {@code null}）
 	 * @see #getSource()
 	 */
 	public final TestContext getTestContext() {

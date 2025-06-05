@@ -16,14 +16,14 @@
 
 package org.springframework.web.socket.messaging;
 
-import java.security.Principal;
-
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
+import java.security.Principal;
+
 /**
- * A connected event represents the server response to a client's connect request.
- * See {@link org.springframework.web.socket.messaging.SessionConnectEvent}.
+ * 表示服务器对客户端连接请求的响应事件。
+ * 参见 {@link org.springframework.web.socket.messaging.SessionConnectEvent}。
  *
  * @author Rossen Stoyanchev
  * @since 4.0.3
@@ -32,9 +32,9 @@ import org.springframework.messaging.Message;
 public class SessionConnectedEvent extends AbstractSubProtocolEvent {
 
 	/**
-	 * Create a new SessionConnectedEvent.
-	 * @param source the component that published the event (never {@code null})
-	 * @param message the connected message (never {@code null})
+	 * 创建一个新的 SessionConnectedEvent。
+	 * @param source 发布该事件的组件（不能为空）
+	 * @param message 连接消息（不能为空）
 	 */
 	public SessionConnectedEvent(Object source, Message<byte[]> message) {
 		super(source, message);

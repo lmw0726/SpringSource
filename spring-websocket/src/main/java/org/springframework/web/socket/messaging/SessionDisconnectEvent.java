@@ -16,19 +16,17 @@
 
 package org.springframework.web.socket.messaging;
 
-import java.security.Principal;
-
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 import org.springframework.web.socket.CloseStatus;
 
+import java.security.Principal;
+
 /**
- * Event raised when the session of a WebSocket client using a Simple Messaging
- * Protocol (e.g. STOMP) as the WebSocket sub-protocol is closed.
+ * 当使用简单消息协议（例如 STOMP）作为 WebSocket 子协议的客户端会话关闭时引发的事件。
  *
- * <p>Note that this event may be raised more than once for a single session and
- * therefore event consumers should be idempotent and ignore a duplicate event.
+ * <p>请注意，对于单个会话，此事件可能会被多次触发，因此事件消费者应具有幂等性，并忽略重复事件。
  *
  * @author Rossen Stoyanchev
  * @since 4.0.3
@@ -42,11 +40,12 @@ public class SessionDisconnectEvent extends AbstractSubProtocolEvent {
 
 
 	/**
-	 * Create a new SessionDisconnectEvent.
-	 * @param source the component that published the event (never {@code null})
-	 * @param message the message (never {@code null})
-	 * @param sessionId the disconnect message
-	 * @param closeStatus the status object
+	 * 创建一个新的 SessionDisconnectEvent。
+	 *
+	 * @param source 发布该事件的组件（不能为空）
+	 * @param message 消息（不能为空）
+	 * @param sessionId 会话 ID（不能为空）
+	 * @param closeStatus 关闭状态对象
 	 */
 	public SessionDisconnectEvent(Object source, Message<byte[]> message, String sessionId,
 			CloseStatus closeStatus) {
@@ -55,12 +54,13 @@ public class SessionDisconnectEvent extends AbstractSubProtocolEvent {
 	}
 
 	/**
-	 * Create a new SessionDisconnectEvent.
-	 * @param source the component that published the event (never {@code null})
-	 * @param message the message (never {@code null})
-	 * @param sessionId the disconnect message
-	 * @param closeStatus the status object
-	 * @param user the current session user
+	 * 创建一个新的 SessionDisconnectEvent。
+	 *
+	 * @param source 发布该事件的组件（不能为空）
+	 * @param message 消息（不能为空）
+	 * @param sessionId 会话 ID（不能为空）
+	 * @param closeStatus 关闭状态对象
+	 * @param user 当前会话用户，可为 null
 	 */
 	public SessionDisconnectEvent(Object source, Message<byte[]> message, String sessionId,
 			CloseStatus closeStatus, @Nullable Principal user) {
@@ -73,14 +73,14 @@ public class SessionDisconnectEvent extends AbstractSubProtocolEvent {
 
 
 	/**
-	 * Return the session id.
+	 * 返回会话 ID。
 	 */
 	public String getSessionId() {
 		return this.sessionId;
 	}
 
 	/**
-	 * Return the status with which the session was closed.
+	 * 返回会话关闭时的状态。
 	 */
 	public CloseStatus getCloseStatus() {
 		return this.status;

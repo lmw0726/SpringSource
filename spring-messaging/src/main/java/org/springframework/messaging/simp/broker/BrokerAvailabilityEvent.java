@@ -19,7 +19,7 @@ package org.springframework.messaging.simp.broker;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * Event raised when a broker's availability changes.
+ * 当消息代理的可用性发生变化时，发布的事件。
  *
  * @author Andy Wilkinson
  */
@@ -31,13 +31,10 @@ public class BrokerAvailabilityEvent extends ApplicationEvent {
 
 
 	/**
-	 * Creates a new {@code BrokerAvailabilityEvent}.
+	 * 创建一个新的 {@code BrokerAvailabilityEvent}。
 	 *
-	 * @param brokerAvailable {@code true} if the broker is available, {@code}
-	 * false otherwise
-	 * @param source the component that is acting as the broker, or as a relay
-	 * for an external broker, that has changed availability. Must not be {@code
-	 * null}.
+	 * @param brokerAvailable {@code true} 表示代理可用，{@code false} 表示代理不可用
+	 * @param source 发生变化的组件，通常是充当代理的组件，或作为外部代理的中继的组件。不能为空。
 	 */
 	public BrokerAvailabilityEvent(boolean brokerAvailable, Object source) {
 		super(source);

@@ -16,16 +16,15 @@
 
 package org.springframework.web.socket.messaging;
 
-import java.security.Principal;
-
 import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 
+import java.security.Principal;
+
 /**
- * A base class for events for a message received from a WebSocket client and
- * parsed into a higher-level sub-protocol (e.g. STOMP).
+ * 用于处理从 WebSocket 客户端接收的消息并将其解析为更高级子协议（如 STOMP）的事件基类。
  *
  * @author Rossen Stoyanchev
  * @since 4.1
@@ -40,18 +39,19 @@ public abstract class AbstractSubProtocolEvent extends ApplicationEvent {
 
 
 	/**
-	 * Create a new AbstractSubProtocolEvent.
-	 * @param source the component that published the event (never {@code null})
-	 * @param message the incoming message (never {@code null})
+	 * 创建一个新的 AbstractSubProtocolEvent。
+	 * @param source 发布该事件的组件（不能为空）
+	 * @param message 接收到的消息（不能为空）
 	 */
 	protected AbstractSubProtocolEvent(Object source, Message<byte[]> message) {
 		this(source, message, null);
 	}
 
 	/**
-	 * Create a new AbstractSubProtocolEvent.
-	 * @param source the component that published the event (never {@code null})
-	 * @param message the incoming message (never {@code null})
+	 * 创建一个新的 AbstractSubProtocolEvent。
+	 * @param source 发布该事件的组件（不能为空）
+	 * @param message 接收到的消息（不能为空）
+	 * @param user 与该事件关联的会话用户，可为空
 	 */
 	protected AbstractSubProtocolEvent(Object source, Message<byte[]> message, @Nullable Principal user) {
 		super(source);
@@ -62,9 +62,7 @@ public abstract class AbstractSubProtocolEvent extends ApplicationEvent {
 
 
 	/**
-	 * Return the Message associated with the event. Here is an example of
-	 * obtaining information about the session id or any headers in the
-	 * message:
+	 * 返回与该事件关联的 Message。以下示例演示了如何获取会话 ID 或消息头中的任何信息：
 	 * <pre class="code">
 	 * StompHeaderAccessor headers = StompHeaderAccessor.wrap(message);
 	 * headers.getSessionId();
@@ -77,7 +75,7 @@ public abstract class AbstractSubProtocolEvent extends ApplicationEvent {
 	}
 
 	/**
-	 * Return the user for the session associated with the event.
+	 * 返回与该事件关联的会话用户。
 	 */
 	@Nullable
 	public Principal getUser() {

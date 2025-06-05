@@ -16,19 +16,19 @@
 
 package org.springframework.context;
 
-import java.util.function.Consumer;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
 import org.springframework.util.Assert;
 
+import java.util.function.Consumer;
+
 /**
- * An {@link ApplicationEvent} that carries an arbitrary payload.
+ * 一个携带任意负载的 {@link ApplicationEvent}。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller
  * @since 4.2
- * @param <T> the payload type of the event
+ * @param <T> 事件的负载类型
  * @see ApplicationEventPublisher#publishEvent(Object)
  * @see ApplicationListener#forPayload(Consumer)
  */
@@ -39,9 +39,9 @@ public class PayloadApplicationEvent<T> extends ApplicationEvent implements Reso
 
 
 	/**
-	 * Create a new PayloadApplicationEvent.
-	 * @param source the object on which the event initially occurred (never {@code null})
-	 * @param payload the payload object (never {@code null})
+	 * 创建一个新的 PayloadApplicationEvent。
+	 * @param source 事件最初发生的对象（不能为空）
+	 * @param payload 负载对象（不能为空）
 	 */
 	public PayloadApplicationEvent(Object source, T payload) {
 		super(source);
@@ -56,7 +56,7 @@ public class PayloadApplicationEvent<T> extends ApplicationEvent implements Reso
 	}
 
 	/**
-	 * Return the payload of the event.
+	 * 返回事件的负载。
 	 */
 	public T getPayload() {
 		return this.payload;

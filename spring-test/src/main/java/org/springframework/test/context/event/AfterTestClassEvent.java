@@ -19,9 +19,9 @@ package org.springframework.test.context.event;
 import org.springframework.test.context.TestContext;
 
 /**
- * {@link TestContextEvent} published by the {@link EventPublishingTestExecutionListener} when
+ * {@link EventPublishingTestExecutionListener} 在调用
  * {@link org.springframework.test.context.TestExecutionListener#afterTestClass(TestContext)}
- * is invoked.
+ * 方法时发布的 {@link TestContextEvent}。
  *
  * @author Frank Scheffler
  * @since 5.2
