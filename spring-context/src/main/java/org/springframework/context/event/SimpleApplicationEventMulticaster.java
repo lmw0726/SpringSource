@@ -16,11 +16,8 @@
 
 package org.springframework.context.event;
 
-import java.util.concurrent.Executor;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -29,18 +26,17 @@ import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ErrorHandler;
 
+import java.util.concurrent.Executor;
+
 /**
- * Simple implementation of the {@link ApplicationEventMulticaster} interface.
+ * {@link ApplicationEventMulticaster} 接口的简单实现。
  *
- * <p>Multicasts all events to all registered listeners, leaving it up to
- * the listeners to ignore events that they are not interested in.
- * Listeners will usually perform corresponding {@code instanceof}
- * checks on the passed-in event object.
+ * <p>将所有事件广播给所有注册的监听器，由监听器自行忽略不感兴趣的事件。
+ * 监听器通常会对传入的事件对象执行相应的 {@code instanceof} 检查。
  *
- * <p>By default, all listeners are invoked in the calling thread.
- * This allows the danger of a rogue listener blocking the entire application,
- * but adds minimal overhead. Specify an alternative task executor to have
- * listeners executed in different threads, for example from a thread pool.
+ * <p>默认情况下，所有监听器都在调用线程中执行。
+ * 这虽然存在单个监听器阻塞整个应用的风险，但开销最小。
+ * 也可以指定其他任务执行器，让监听器在不同线程中执行，例如线程池中的线程。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -61,13 +57,13 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 
 
 	/**
-	 * Create a new SimpleApplicationEventMulticaster.
+	 * 创建一个新的 SimpleApplicationEventMulticaster 实例。
 	 */
 	public SimpleApplicationEventMulticaster() {
 	}
 
 	/**
-	 * Create a new SimpleApplicationEventMulticaster for the given BeanFactory.
+	 * 为给定的 BeanFactory 创建一个新的 SimpleApplicationEventMulticaster 实例。
 	 */
 	public SimpleApplicationEventMulticaster(BeanFactory beanFactory) {
 		setBeanFactory(beanFactory);
@@ -75,14 +71,12 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 
 
 	/**
-	 * Set a custom executor (typically a {@link org.springframework.core.task.TaskExecutor})
-	 * to invoke each listener with.
-	 * <p>Default is equivalent to {@link org.springframework.core.task.SyncTaskExecutor},
-	 * executing all listeners synchronously in the calling thread.
-	 * <p>Consider specifying an asynchronous task executor here to not block the
-	 * caller until all listeners have been executed. However, note that asynchronous
-	 * execution will not participate in the caller's thread context (class loader,
-	 * transaction association) unless the TaskExecutor explicitly supports this.
+	 * 设置一个自定义执行器（通常是 {@link org.springframework.core.task.TaskExecutor}），
+	 * 用于调用每个监听器。
+	 * <p>默认相当于 {@link org.springframework.core.task.SyncTaskExecutor}，
+	 * 在调用线程中同步执行所有监听器。
+	 * <p>可以考虑指定一个异步任务执行器，以避免阻塞调用者直到所有监听器执行完毕。
+	 * 但请注意，除非任务执行器明确支持，否则异步执行不会继承调用线程的上下文（类加载器、事务关联等）。
 	 * @see org.springframework.core.task.SyncTaskExecutor
 	 * @see org.springframework.core.task.SimpleAsyncTaskExecutor
 	 */
@@ -91,7 +85,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	}
 
 	/**
-	 * Return the current task executor for this multicaster.
+	 * 返回当前用于该广播器的任务执行器。
 	 */
 	@Nullable
 	protected Executor getTaskExecutor() {
@@ -99,18 +93,14 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	}
 
 	/**
-	 * Set the {@link ErrorHandler} to invoke in case an exception is thrown
-	 * from a listener.
-	 * <p>Default is none, with a listener exception stopping the current
-	 * multicast and getting propagated to the publisher of the current event.
-	 * If a {@linkplain #setTaskExecutor task executor} is specified, each
-	 * individual listener exception will get propagated to the executor but
-	 * won't necessarily stop execution of other listeners.
-	 * <p>Consider setting an {@link ErrorHandler} implementation that catches
-	 * and logs exceptions (a la
-	 * {@link org.springframework.scheduling.support.TaskUtils#LOG_AND_SUPPRESS_ERROR_HANDLER})
-	 * or an implementation that logs exceptions while nevertheless propagating them
-	 * (e.g. {@link org.springframework.scheduling.support.TaskUtils#LOG_AND_PROPAGATE_ERROR_HANDLER}).
+	 * 设置当监听器抛出异常时调用的 {@link ErrorHandler}。
+	 * <p>默认情况下不设置错误处理器，监听器异常会停止当前事件的广播并向事件发布者传播。
+	 * 如果指定了 {@linkplain #setTaskExecutor 任务执行器}，每个监听器的异常会传播到执行器，
+	 * 但不一定会停止其他监听器的执行。
+	 * <p>建议设置一个 {@link ErrorHandler} 实现来捕获并记录异常（例如
+	 * {@link org.springframework.scheduling.support.TaskUtils#LOG_AND_SUPPRESS_ERROR_HANDLER}），
+	 * 或者一个在记录异常的同时仍将异常传播的实现
+	 * （例如 {@link org.springframework.scheduling.support.TaskUtils#LOG_AND_PROPAGATE_ERROR_HANDLER}）。
 	 * @since 4.1
 	 */
 	public void setErrorHandler(@Nullable ErrorHandler errorHandler) {
@@ -118,7 +108,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	}
 
 	/**
-	 * Return the current error handler for this multicaster.
+	 * 返回当前多播器使用的错误处理器。
 	 * @since 4.1
 	 */
 	@Nullable
@@ -150,9 +140,9 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	}
 
 	/**
-	 * Invoke the given listener with the given event.
-	 * @param listener the ApplicationListener to invoke
-	 * @param event the current event to propagate
+	 * 使用给定的事件调用指定的监听器。
+	 * @param listener 要调用的 ApplicationListener
+	 * @param event 当前需要传播的事件
 	 * @since 4.1
 	 */
 	protected void invokeListener(ApplicationListener<?> listener, ApplicationEvent event) {
@@ -180,8 +170,8 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 			if (msg == null || matchesClassCastMessage(msg, event.getClass()) ||
 					(event instanceof PayloadApplicationEvent &&
 							matchesClassCastMessage(msg, ((PayloadApplicationEvent) event).getPayload().getClass()))) {
-				// Possibly a lambda-defined listener which we could not resolve the generic event type for
-				// -> let's suppress the exception.
+				// 可能是使用 lambda 定义的监听器，无法解析泛型事件类型
+				// -> 抑制异常。
 				Log loggerToUse = this.lazyLogger;
 				if (loggerToUse == null) {
 					loggerToUse = LogFactory.getLog(getClass());
@@ -198,20 +188,20 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	}
 
 	private boolean matchesClassCastMessage(String classCastMessage, Class<?> eventClass) {
-		// On Java 8, the message starts with the class name: "java.lang.String cannot be cast..."
+		// 在 Java 8 中，异常信息以类名开头："java.lang.String cannot be cast..."
 		if (classCastMessage.startsWith(eventClass.getName())) {
 			return true;
 		}
-		// On Java 11, the message starts with "class ..." a.k.a. Class.toString()
+		// 在 Java 11 中，异常信息以 "class ..." 开头，即 Class.toString() 的结果
 		if (classCastMessage.startsWith(eventClass.toString())) {
 			return true;
 		}
-		// On Java 9, the message used to contain the module name: "java.base/java.lang.String cannot be cast..."
+		// 在 Java 9 中，异常信息中包含模块名，如："java.base/java.lang.String cannot be cast..."
 		int moduleSeparatorIndex = classCastMessage.indexOf('/');
 		if (moduleSeparatorIndex != -1 && classCastMessage.startsWith(eventClass.getName(), moduleSeparatorIndex + 1)) {
 			return true;
 		}
-		// Assuming an unrelated class cast failure...
+		// 假设是无关的类转换异常
 		return false;
 	}
 
