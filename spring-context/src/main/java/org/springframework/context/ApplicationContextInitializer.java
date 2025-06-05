@@ -17,23 +17,21 @@
 package org.springframework.context;
 
 /**
- * Callback interface for initializing a Spring {@link ConfigurableApplicationContext}
- * prior to being {@linkplain ConfigurableApplicationContext#refresh() refreshed}.
+ * 回调接口，在 Spring {@link ConfigurableApplicationContext} 被
+ * {@linkplain ConfigurableApplicationContext#refresh() 刷新} 之前进行初始化。
  *
- * <p>Typically used within web applications that require some programmatic initialization
- * of the application context. For example, registering property sources or activating
- * profiles against the {@linkplain ConfigurableApplicationContext#getEnvironment()
- * context's environment}. See {@code ContextLoader} and {@code FrameworkServlet} support
- * for declaring a "contextInitializerClasses" context-param and init-param, respectively.
+ * <p>通常用于需要以编程方式初始化应用上下文的 Web 应用程序中。
+ * 例如，可用于注册属性源或激活 {@linkplain ConfigurableApplicationContext#getEnvironment()
+ * 上下文环境}中的 profile。参考 {@code ContextLoader} 和 {@code FrameworkServlet}
+ * 对于声明 "contextInitializerClasses" 的 context-param 和 init-param 的支持。
  *
- * <p>{@code ApplicationContextInitializer} processors are encouraged to detect
- * whether Spring's {@link org.springframework.core.Ordered Ordered} interface has been
- * implemented or if the {@link org.springframework.core.annotation.Order @Order}
- * annotation is present and to sort instances accordingly if so prior to invocation.
+ * <p>建议 {@code ApplicationContextInitializer} 的处理器检测是否实现了 Spring 的
+ * {@link org.springframework.core.Ordered Ordered} 接口或是否存在
+ * {@link org.springframework.core.annotation.Order @Order} 注解，并在调用之前按顺序对其实例排序。
  *
  * @author Chris Beams
  * @since 3.1
- * @param <C> the application context type
+ * @param <C> 应用上下文类型
  * @see org.springframework.web.context.ContextLoader#customizeContext
  * @see org.springframework.web.context.ContextLoader#CONTEXT_INITIALIZER_CLASSES_PARAM
  * @see org.springframework.web.servlet.FrameworkServlet#setContextInitializerClasses
@@ -43,8 +41,8 @@ package org.springframework.context;
 public interface ApplicationContextInitializer<C extends ConfigurableApplicationContext> {
 
 	/**
-	 * Initialize the given application context.
-	 * @param applicationContext the application to configure
+	 * 初始化给定的应用上下文。
+	 * @param applicationContext 要配置的应用上下文
 	 */
 	void initialize(C applicationContext);
 
