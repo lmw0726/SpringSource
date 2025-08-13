@@ -16,6 +16,12 @@
 
 package org.springframework.core.type.classreading;
 
+import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashSet;
@@ -23,27 +29,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.lang.Nullable;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.ObjectUtils;
-
 /**
- * ASM visitor which looks for annotations defined on a class or method,
- * including meta-annotations.
+ * ASM 访问者，用于查找类或方法上定义的注解，
+ * 包括元注解。
  *
- * <p>This visitor is fully recursive, taking into account any nested
- * annotations or nested annotation arrays.
+ * <p>该访问者是完全递归的，会处理任何嵌套注解或嵌套注解数组。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
  * @author Phillip Webb
  * @author Sam Brannen
  * @since 3.0
- * @deprecated As of Spring Framework 5.2, this class and related classes in this
- * package have been replaced by {@link SimpleAnnotationMetadataReadingVisitor}
- * and related classes for internal use within the framework.
+ * @deprecated 自 Spring Framework 5.2 起，此类及本包中相关类
+ * 已被 {@link SimpleAnnotationMetadataReadingVisitor} 及其相关类替代，
+ * 仅供框架内部使用。
  */
 @Deprecated
 final class AnnotationAttributesReadingVisitor extends RecursiveAnnotationAttributesVisitor {
@@ -107,9 +106,9 @@ final class AnnotationAttributesReadingVisitor extends RecursiveAnnotationAttrib
 		String annotationName = annotationType.getName();
 		if (!AnnotationUtils.isInJavaLangAnnotationPackage(annotationName) && visited.add(annotation)) {
 			try {
-				// Only do attribute scanning for public annotations; we'd run into
-				// IllegalAccessExceptions otherwise, and we don't want to mess with
-				// accessibility in a SecurityManager environment.
+				// 仅对公共注解进行属性扫描；
+				// 否则可能遇到 IllegalAccessException，
+				// 并且我们不想在 SecurityManager 环境中调整访问权限。
 				if (Modifier.isPublic(annotationType.getModifiers())) {
 					this.attributesMap.add(annotationName,
 							AnnotationUtils.getAnnotationAttributes(annotation, false, true));

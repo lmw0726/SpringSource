@@ -16,23 +16,22 @@
 
 package org.springframework.util.function;
 
-import java.util.function.Supplier;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.function.Supplier;
+
 /**
- * A {@link java.util.function.Supplier} decorator that caches a singleton result and
- * makes it available from {@link #get()} (nullable) and {@link #obtain()} (null-safe).
+ * 一个装饰{@link java.util.function.Supplier}的实现类，用于缓存单例结果，
+ * 并通过{@link #get()}（可返回null）和{@link #obtain()}（非null安全）方法提供该结果。
  *
- * <p>A {@code SingletonSupplier} can be constructed via {@code of} factory methods
- * or via constructors that provide a default supplier as a fallback. This is
- * particularly useful for method reference suppliers, falling back to a default
- * supplier for a method that returned {@code null} and caching the result.
+ * <p>{@code SingletonSupplier}可以通过{@code of}工厂方法构建，
+ * 也可以通过提供后备默认supplier的构造函数构建。这对于方法引用supplier特别有用，
+ * 可以在方法返回{@code null}时回退到默认supplier，并缓存结果。
  *
  * @author Juergen Hoeller
  * @since 5.1
- * @param <T> the type of results supplied by this supplier
+ * @param <T> 此supplier提供的结果类型
  */
 public class SingletonSupplier<T> implements Supplier<T> {
 
@@ -47,10 +46,10 @@ public class SingletonSupplier<T> implements Supplier<T> {
 
 
 	/**
-	 * Build a {@code SingletonSupplier} with the given singleton instance
-	 * and a default supplier for the case when the instance is {@code null}.
-	 * @param instance the singleton instance (potentially {@code null})
-	 * @param defaultSupplier the default supplier as a fallback
+	 * 使用给定的单例实例和默认supplier构建{@code SingletonSupplier}，
+	 * 当实例为{@code null}时使用默认supplier。
+	 * @param instance 单例实例(可能为{@code null})
+	 * @param defaultSupplier 作为后备的默认supplier
 	 */
 	public SingletonSupplier(@Nullable T instance, Supplier<? extends T> defaultSupplier) {
 		this.instanceSupplier = null;
@@ -59,10 +58,10 @@ public class SingletonSupplier<T> implements Supplier<T> {
 	}
 
 	/**
-	 * Build a {@code SingletonSupplier} with the given instance supplier
-	 * and a default supplier for the case when the instance is {@code null}.
-	 * @param instanceSupplier the immediate instance supplier
-	 * @param defaultSupplier the default supplier as a fallback
+	 * 使用给定的实例supplier和默认supplier构建{@code SingletonSupplier}，
+	 * 当实例为{@code null}时使用默认supplier。
+	 * @param instanceSupplier 直接实例supplier
+	 * @param defaultSupplier 作为后备的默认supplier
 	 */
 	public SingletonSupplier(@Nullable Supplier<? extends T> instanceSupplier, Supplier<? extends T> defaultSupplier) {
 		this.instanceSupplier = instanceSupplier;
@@ -82,8 +81,8 @@ public class SingletonSupplier<T> implements Supplier<T> {
 
 
 	/**
-	 * Get the shared singleton instance for this supplier.
-	 * @return the singleton instance (or {@code null} if none)
+	 * 获取此supplier的共享单例实例。
+	 * @return 单例实例(如果没有则返回{@code null})
 	 */
 	@Override
 	@Nullable
@@ -107,9 +106,9 @@ public class SingletonSupplier<T> implements Supplier<T> {
 	}
 
 	/**
-	 * Obtain the shared singleton instance for this supplier.
-	 * @return the singleton instance (never {@code null})
-	 * @throws IllegalStateException in case of no instance
+	 * 获取此supplier的共享单例实例。
+	 * @return 单例实例(不会返回{@code null})
+	 * @throws IllegalStateException 如果没有可用实例
 	 */
 	public T obtain() {
 		T instance = get();
@@ -119,18 +118,18 @@ public class SingletonSupplier<T> implements Supplier<T> {
 
 
 	/**
-	 * Build a {@code SingletonSupplier} with the given singleton instance.
-	 * @param instance the singleton instance (never {@code null})
-	 * @return the singleton supplier (never {@code null})
+	 * 使用给定的单例实例构建{@code SingletonSupplier}。
+	 * @param instance 单例实例(不能为{@code null})
+	 * @return 单例supplier(不会返回{@code null})
 	 */
 	public static <T> SingletonSupplier<T> of(T instance) {
 		return new SingletonSupplier<>(instance);
 	}
 
 	/**
-	 * Build a {@code SingletonSupplier} with the given singleton instance.
-	 * @param instance the singleton instance (potentially {@code null})
-	 * @return the singleton supplier, or {@code null} if the instance was {@code null}
+	 * 使用给定的单例实例构建{@code SingletonSupplier}。
+	 * @param instance 单例实例(可能为{@code null})
+	 * @return 单例supplier，如果实例为{@code null}则返回{@code null}
 	 */
 	@Nullable
 	public static <T> SingletonSupplier<T> ofNullable(@Nullable T instance) {
@@ -138,18 +137,18 @@ public class SingletonSupplier<T> implements Supplier<T> {
 	}
 
 	/**
-	 * Build a {@code SingletonSupplier} with the given supplier.
-	 * @param supplier the instance supplier (never {@code null})
-	 * @return the singleton supplier (never {@code null})
+	 * 使用给定的supplier构建{@code SingletonSupplier}。
+	 * @param supplier 实例supplier(不能为{@code null})
+	 * @return 单例supplier(不会返回{@code null})
 	 */
 	public static <T> SingletonSupplier<T> of(Supplier<T> supplier) {
 		return new SingletonSupplier<>(supplier);
 	}
 
 	/**
-	 * Build a {@code SingletonSupplier} with the given supplier.
-	 * @param supplier the instance supplier (potentially {@code null})
-	 * @return the singleton supplier, or {@code null} if the instance supplier was {@code null}
+	 * 使用给定的supplier构建{@code SingletonSupplier}。
+	 * @param supplier 实例supplier(可能为{@code null})
+	 * @return 单例supplier，如果supplier为{@code null}则返回{@code null}
 	 */
 	@Nullable
 	public static <T> SingletonSupplier<T> ofNullable(@Nullable Supplier<T> supplier) {

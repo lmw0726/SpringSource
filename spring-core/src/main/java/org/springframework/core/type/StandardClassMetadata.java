@@ -16,16 +16,15 @@
 
 package org.springframework.core.type;
 
-import java.lang.reflect.Modifier;
-import java.util.LinkedHashSet;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Modifier;
+import java.util.LinkedHashSet;
+
 /**
- * {@link ClassMetadata} implementation that uses standard reflection
- * to introspect a given {@code Class}.
+ * {@link ClassMetadata} 的实现，使用标准反射机制来分析给定的 {@code Class}。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -37,9 +36,9 @@ public class StandardClassMetadata implements ClassMetadata {
 
 
 	/**
-	 * Create a new StandardClassMetadata wrapper for the given Class.
-	 * @param introspectedClass the Class to introspect
-	 * @deprecated since 5.2 in favor of {@link StandardAnnotationMetadata}
+	 * 为给定的类创建一个新的 StandardClassMetadata 包装器。
+	 * @param introspectedClass 要分析的类
+	 * @deprecated 自 5.2 起，推荐使用 {@link StandardAnnotationMetadata}
 	 */
 	@Deprecated
 	public StandardClassMetadata(Class<?> introspectedClass) {
@@ -48,7 +47,7 @@ public class StandardClassMetadata implements ClassMetadata {
 	}
 
 	/**
-	 * Return the underlying Class.
+	 * 返回底层的 Class 对象。
 	 */
 	public final Class<?> getIntrospectedClass() {
 		return this.introspectedClass;

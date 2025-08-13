@@ -16,23 +16,23 @@
 
 package org.springframework.util.concurrent;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Abstract class that adapts a {@link Future} parameterized over S into a {@code Future}
- * parameterized over T. All methods are delegated to the adaptee, where {@link #get()}
- * and {@link #get(long, TimeUnit)} call {@link #adapt(Object)} on the adaptee's result.
+ * 抽象适配器类，将参数化为S类型的{@link Future}适配为参数化为T类型的{@code Future}。
+ * 所有方法都委托给adaptee，其中{@link #get()}和{@link #get(long, TimeUnit)}
+ * 会调用{@link #adapt(Object)}方法处理adaptee的结果。
  *
  * @author Arjen Poutsma
  * @since 4.0
- * @param <T> the type of this {@code Future}
- * @param <S> the type of the adaptee's {@code Future}
+ * @param <T> 此{@code Future}的类型参数
+ * @param <S> adaptee的{@code Future}的类型参数
  */
 public abstract class FutureAdapter<T, S> implements Future<T> {
 
@@ -47,8 +47,9 @@ public abstract class FutureAdapter<T, S> implements Future<T> {
 
 
 	/**
-	 * Constructs a new {@code FutureAdapter} with the given adaptee.
-	 * @param adaptee the future to delegate to
+	 * 使用给定的adaptee构造新的{@code FutureAdapter}。
+	 * @param adaptee 要委托的future
+	 * @throws IllegalArgumentException 如果adaptee为null
 	 */
 	protected FutureAdapter(Future<S> adaptee) {
 		Assert.notNull(adaptee, "Delegate must not be null");
@@ -57,7 +58,8 @@ public abstract class FutureAdapter<T, S> implements Future<T> {
 
 
 	/**
-	 * Returns the adaptee.
+	 * 返回adaptee。
+	 * @return 被委托的future实例
 	 */
 	protected Future<S> getAdaptee() {
 		return this.adaptee;
@@ -125,8 +127,10 @@ public abstract class FutureAdapter<T, S> implements Future<T> {
 	}
 
 	/**
-	 * Adapts the given adaptee's result into T.
-	 * @return the adapted result
+	 * 将给定的adaptee结果适配为T类型。
+	 * @param adapteeResult 需要适配的结果
+	 * @return 适配后的结果
+	 * @throws ExecutionException 如果适配过程中发生错误
 	 */
 	@Nullable
 	protected abstract T adapt(S adapteeResult) throws ExecutionException;

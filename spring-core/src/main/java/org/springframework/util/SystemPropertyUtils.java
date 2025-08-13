@@ -19,11 +19,10 @@ package org.springframework.util;
 import org.springframework.lang.Nullable;
 
 /**
- * Helper class for resolving placeholders in texts. Usually applied to file paths.
+ * 用于解析文本中占位符的辅助类。通常应用于文件路径。
  *
- * <p>A text may contain {@code ${...}} placeholders, to be resolved as system properties:
- * e.g. {@code ${user.dir}}. Default values can be supplied using the ":" separator
- * between key and value.
+ * <p>文本中可以包含 {@code ${...}} 占位符，将被解析为系统属性：
+ * 例如 {@code ${user.dir}}。默认值可以使用 ":" 分隔符在键和值之间提供。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -35,13 +34,13 @@ import org.springframework.lang.Nullable;
  */
 public abstract class SystemPropertyUtils {
 
-	/** Prefix for system property placeholders: "${". */
+	/** 系统属性占位符的前缀："${"。 */
 	public static final String PLACEHOLDER_PREFIX = "${";
 
-	/** Suffix for system property placeholders: "}". */
+	/** 系统属性占位符的后缀："}"。 */
 	public static final String PLACEHOLDER_SUFFIX = "}";
 
-	/** Value separator for system property placeholders: ":". */
+	/** 系统属性占位符的值分隔符：":"。 */
 	public static final String VALUE_SEPARATOR = ":";
 
 
@@ -53,11 +52,10 @@ public abstract class SystemPropertyUtils {
 
 
 	/**
-	 * Resolve {@code ${...}} placeholders in the given text, replacing them with
-	 * corresponding system property values.
-	 * @param text the String to resolve
-	 * @return the resolved String
-	 * @throws IllegalArgumentException if there is an unresolvable placeholder
+	 * 解析给定文本中的 {@code ${...}} 占位符，并将其替换为相应的系统属性值。
+	 * @param text 要解析的字符串
+	 * @return 解析后的字符串
+	 * @throws IllegalArgumentException 如果存在无法解析的占位符
 	 * @see #PLACEHOLDER_PREFIX
 	 * @see #PLACEHOLDER_SUFFIX
 	 */
@@ -66,16 +64,16 @@ public abstract class SystemPropertyUtils {
 	}
 
 	/**
-	 * Resolve {@code ${...}} placeholders in the given text, replacing them with
-	 * corresponding system property values. Unresolvable placeholders with no default
-	 * value are ignored and passed through unchanged if the flag is set to {@code true}.
-	 * @param text the String to resolve
-	 * @param ignoreUnresolvablePlaceholders whether unresolved placeholders are to be ignored
-	 * @return the resolved String
-	 * @throws IllegalArgumentException if there is an unresolvable placeholder
+	 * 解析给定文本中的 {@code ${...}} 占位符，并将其替换为相应的系统属性值。
+	 * 如果未解析的占位符没有默认值且 ignoreUnresolvablePlaceholders 为 {@code true}，
+	 * 则忽略该占位符并原样保留。
+	 *
+	 * @param text                           要解析的字符串
+	 * @param ignoreUnresolvablePlaceholders 是否忽略无法解析的占位符
+	 * @return 解析后的字符串
+	 * @throws IllegalArgumentException 如果存在无法解析的占位符，且 ignoreUnresolvablePlaceholders 为 {@code false}
 	 * @see #PLACEHOLDER_PREFIX
 	 * @see #PLACEHOLDER_SUFFIX
-	 * and the "ignoreUnresolvablePlaceholders" flag is {@code false}
 	 */
 	public static String resolvePlaceholders(String text, boolean ignoreUnresolvablePlaceholders) {
 		if (text.isEmpty()) {
@@ -87,8 +85,7 @@ public abstract class SystemPropertyUtils {
 
 
 	/**
-	 * PlaceholderResolver implementation that resolves against system properties
-	 * and system environment variables.
+	 * 占位符解析器实现类，支持从系统属性和环境变量中解析占位符。
 	 */
 	private static class SystemPropertyPlaceholderResolver implements PropertyPlaceholderHelper.PlaceholderResolver {
 
@@ -104,7 +101,7 @@ public abstract class SystemPropertyUtils {
 			try {
 				String propVal = System.getProperty(placeholderName);
 				if (propVal == null) {
-					// Fall back to searching the system environment.
+					// 退回使用系统环境变量查找
 					propVal = System.getenv(placeholderName);
 				}
 				return propVal;

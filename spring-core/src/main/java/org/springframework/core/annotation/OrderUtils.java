@@ -16,16 +16,16 @@
 
 package org.springframework.core.annotation;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.Map;
-
 import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
+import java.lang.reflect.AnnotatedElement;
+import java.util.Map;
+
 /**
- * General utility for determining the order of an object based on its type declaration.
- * Handles Spring's {@link Order} annotation as well as {@link javax.annotation.Priority}.
+ * 用于根据对象的类型声明确定其顺序的通用实用程序。
+ * 处理 Spring 的 {@link Order} 注解以及 {@link javax.annotation.Priority}。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller
@@ -35,21 +35,20 @@ import org.springframework.util.ConcurrentReferenceHashMap;
  */
 public abstract class OrderUtils {
 
-	/** Cache marker for a non-annotated Class. */
+	/** 非注解类的缓存标记。*/
 	private static final Object NOT_ANNOTATED = new Object();
 
 	private static final String JAVAX_PRIORITY_ANNOTATION = "javax.annotation.Priority";
 
-	/** Cache for @Order value (or NOT_ANNOTATED marker) per Class. */
+	/** 每个 Class 的 @Order 值（或 NOT_ANNOTATED 标记）缓存。 */
 	private static final Map<AnnotatedElement, Object> orderCache = new ConcurrentReferenceHashMap<>(64);
 
 
 	/**
-	 * Return the order on the specified {@code type}, or the specified
-	 * default value if none can be found.
-	 * <p>Takes care of {@link Order @Order} and {@code @javax.annotation.Priority}.
-	 * @param type the type to handle
-	 * @return the priority value, or the specified default order if none can be found
+	 * 返回指定 {@code type} 上的顺序，如果找不到则返回指定的默认值。
+	 * <p>处理 {@link Order @Order} 和 {@code @javax.annotation.Priority}。
+	 * @param type 要处理的类型
+	 * @return 优先级值，如果找不到则返回指定的默认顺序
 	 * @since 5.0
 	 * @see #getPriority(Class)
 	 */
@@ -59,11 +58,10 @@ public abstract class OrderUtils {
 	}
 
 	/**
-	 * Return the order on the specified {@code type}, or the specified
-	 * default value if none can be found.
-	 * <p>Takes care of {@link Order @Order} and {@code @javax.annotation.Priority}.
-	 * @param type the type to handle
-	 * @return the priority value, or the specified default order if none can be found
+	 * 返回指定 {@code type} 上的顺序，如果找不到则返回指定的默认值。
+	 * <p>处理 {@link Order @Order} 和 {@code @javax.annotation.Priority}。
+	 * @param type 要处理的类型
+	 * @return 优先级值，如果找不到则返回指定的默认顺序
 	 * @see #getPriority(Class)
 	 */
 	@Nullable
@@ -73,10 +71,10 @@ public abstract class OrderUtils {
 	}
 
 	/**
-	 * Return the order on the specified {@code type}.
-	 * <p>Takes care of {@link Order @Order} and {@code @javax.annotation.Priority}.
-	 * @param type the type to handle
-	 * @return the order value, or {@code null} if none can be found
+	 * 返回指定 {@code type} 上的顺序。
+	 * <p>处理 {@link Order @Order} 和 {@code @javax.annotation.Priority}。
+	 * @param type 要处理的类型
+	 * @return 顺序值，如果找不到则返回 {@code null}
 	 * @see #getPriority(Class)
 	 */
 	@Nullable
@@ -85,10 +83,10 @@ public abstract class OrderUtils {
 	}
 
 	/**
-	 * Return the order declared on the specified {@code element}.
-	 * <p>Takes care of {@link Order @Order} and {@code @javax.annotation.Priority}.
-	 * @param element the annotated element (e.g. type or method)
-	 * @return the order value, or {@code null} if none can be found
+	 * 返回指定 {@code element} 上声明的顺序。
+	 * <p>处理 {@link Order @Order} 和 {@code @javax.annotation.Priority}。
+	 * @param element 注解元素（例如类型或方法）
+	 * @return 顺序值，如果找不到则返回 {@code null}
 	 * @since 5.3
 	 */
 	@Nullable
@@ -97,12 +95,12 @@ public abstract class OrderUtils {
 	}
 
 	/**
-	 * Return the order from the specified annotations collection.
-	 * <p>Takes care of {@link Order @Order} and
-	 * {@code @javax.annotation.Priority}.
-	 * @param element the source element
-	 * @param annotations the annotation to consider
-	 * @return the order value, or {@code null} if none can be found
+	 * 从指定的注解集合中返回顺序。
+	 * <p>处理 {@link Order @Order} 和
+	 * {@code @javax.annotation.Priority}。
+	 * @param element 源元素
+	 * @param annotations 要考虑的注解
+	 * @return 顺序值，如果找不到则返回 {@code null}
 	 */
 	@Nullable
 	static Integer getOrderFromAnnotations(AnnotatedElement element, MergedAnnotations annotations) {
@@ -132,10 +130,9 @@ public abstract class OrderUtils {
 	}
 
 	/**
-	 * Return the value of the {@code javax.annotation.Priority} annotation
-	 * declared on the specified type, or {@code null} if none.
-	 * @param type the type to handle
-	 * @return the priority value if the annotation is declared, or {@code null} if none
+	 * 返回指定类型上声明的 {@code javax.annotation.Priority} 注解的值，如果不存在则返回 {@code null}。
+	 * @param type 要处理的类型
+	 * @return 如果注解已声明，则返回优先级值，否则返回 {@code null}
 	 */
 	@Nullable
 	public static Integer getPriority(Class<?> type) {

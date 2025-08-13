@@ -16,13 +16,6 @@
 
 package org.springframework.core.type.classreading;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.asm.Type;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -32,8 +25,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.ObjectUtils;
 
+import java.util.*;
+
 /**
- * Internal utility class used when reading annotations via ASM.
+ * 通过 ASM 读取注解时使用的内部工具类。
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -41,15 +36,15 @@ import org.springframework.util.ObjectUtils;
  * @author Phillip Webb
  * @author Sam Brannen
  * @since 4.0
- * @deprecated As of Spring Framework 5.2, this class and related classes in this
- * package have been replaced by {@link SimpleAnnotationMetadataReadingVisitor}
- * and related classes for internal use within the framework.
+ * @deprecated 自 Spring Framework 5.2 起，此类及本包中相关类
+ * 已被 {@link SimpleAnnotationMetadataReadingVisitor} 及其相关类替代，
+ * 仅供框架内部使用。
  */
 @Deprecated
 abstract class AnnotationReadingVisitorUtils {
 
 	public static AnnotationAttributes convertClassValues(Object annotatedElement,
-			@Nullable ClassLoader classLoader, AnnotationAttributes original, boolean classValuesAsString) {
+														  @Nullable ClassLoader classLoader, AnnotationAttributes original, boolean classValuesAsString) {
 
 		AnnotationAttributes result = new AnnotationAttributes(original);
 		AnnotationUtils.postProcessAnnotationAttributes(annotatedElement, result, classValuesAsString);
@@ -98,7 +93,7 @@ abstract class AnnotationReadingVisitorUtils {
 				entry.setValue(value);
 			}
 			catch (Throwable ex) {
-				// Class not found - can't resolve class reference in annotation attribute.
+				// 类未找到 —— 无法解析注解属性中的类引用。
 				result.put(entry.getKey(), ex);
 			}
 		}
@@ -107,19 +102,13 @@ abstract class AnnotationReadingVisitorUtils {
 	}
 
 	/**
-	 * Retrieve the merged attributes of the annotation of the given type,
-	 * if any, from the supplied {@code attributesMap}.
-	 * <p>Annotation attribute values appearing <em>lower</em> in the annotation
-	 * hierarchy (i.e., closer to the declaring class) will override those
-	 * defined <em>higher</em> in the annotation hierarchy.
-	 * @param attributesMap the map of annotation attribute lists, keyed by
-	 * annotation type name
-	 * @param metaAnnotationMap the map of meta annotation relationships,
-	 * keyed by annotation type name
-	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
-	 * @return the merged annotation attributes, or {@code null} if no
-	 * matching annotation is present in the {@code attributesMap}
+	 * 从提供的 {@code attributesMap} 中获取指定类型注解的合并属性（如果有）。
+	 * <p>在注解层级中位置 <em>较低</em>（即更接近声明类） 的注解属性值
+	 * 会覆盖位置 <em>较高</em> 的注解属性值。
+	 * @param attributesMap 注解属性列表的映射，键为注解类型名称
+	 * @param metaAnnotationMap 元注解关系映射，键为注解类型名称
+	 * @param annotationName 要查找的注解类型的全限定类名
+	 * @return 合并后的注解属性；如果 {@code attributesMap} 中不存在匹配的注解则返回 {@code null}
 	 * @since 4.0.3
 	 */
 	@Nullable
@@ -127,27 +116,25 @@ abstract class AnnotationReadingVisitorUtils {
 			LinkedMultiValueMap<String, AnnotationAttributes> attributesMap,
 			Map<String, Set<String>> metaAnnotationMap, String annotationName) {
 
-		// Get the unmerged list of attributes for the target annotation.
+		// 获取目标注解的未合并属性列表。
 		List<AnnotationAttributes> attributesList = attributesMap.get(annotationName);
 		if (CollectionUtils.isEmpty(attributesList)) {
 			return null;
 		}
 
-		// To start with, we populate the result with a copy of all attribute values
-		// from the target annotation. A copy is necessary so that we do not
-		// inadvertently mutate the state of the metadata passed to this method.
+		// 首先用目标注解的第一个属性列表拷贝填充结果，
+		// 以避免意外修改传入的元数据状态。
 		AnnotationAttributes result = new AnnotationAttributes(attributesList.get(0));
 
 		Set<String> overridableAttributeNames = new HashSet<>(result.keySet());
 		overridableAttributeNames.remove(AnnotationUtils.VALUE);
 
-		// Since the map is a LinkedMultiValueMap, we depend on the ordering of
-		// elements in the map and reverse the order of the keys in order to traverse
-		// "down" the annotation hierarchy.
+		// 由于使用的是 LinkedMultiValueMap，我们依赖映射中元素的顺序，
+		// 并反转键的顺序以便“向下”遍历注解层级。
 		List<String> annotationTypes = new ArrayList<>(attributesMap.keySet());
 		Collections.reverse(annotationTypes);
 
-		// No need to revisit the target annotation type:
+		// 不必重复访问目标注解类型：
 		annotationTypes.remove(annotationName);
 
 		for (String currentAnnotationType : annotationTypes) {
@@ -159,8 +146,7 @@ abstract class AnnotationReadingVisitorUtils {
 					for (String overridableAttributeName : overridableAttributeNames) {
 						Object value = currentAttributes.get(overridableAttributeName);
 						if (value != null) {
-							// Store the value, potentially overriding a value from an attribute
-							// of the same name found higher in the annotation hierarchy.
+							// 存储该值，可能覆盖注解层级中更高处相同名称的属性值。
 							result.put(overridableAttributeName, value);
 						}
 					}

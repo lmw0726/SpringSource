@@ -16,17 +16,17 @@
 
 package org.springframework.core.io.support;
 
+import org.springframework.core.io.VfsUtils;
+import org.springframework.lang.Nullable;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 
-import org.springframework.core.io.VfsUtils;
-import org.springframework.lang.Nullable;
-
 /**
- * Artificial class used for accessing the {@link VfsUtils} methods
- * without exposing them to the entire world.
+ * 用于访问 {@link VfsUtils} 方法的辅助类，
+ * 以避免将这些方法暴露给整个系统。
  *
  * @author Costin Leau
  * @since 3.0.3

@@ -16,15 +16,14 @@
 
 package org.springframework.core.log;
 
-import java.util.function.Supplier;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.function.Supplier;
+
 /**
- * A convenient accessor for Commons Logging, providing not only
- * {@code CharSequence} based log methods but also {@code Supplier}
- * based variants for use with Java 8 lambda expressions.
+ * 一个便捷的 Commons Logging 访问器，不仅提供基于 {@code CharSequence} 的日志方法，
+ * 还提供基于 {@code Supplier} 的变体，方便在 Java 8 lambda 表达式中使用。
  *
  * @author Juergen Hoeller
  * @since 5.2
@@ -35,7 +34,7 @@ public class LogAccessor {
 
 
 	/**
-	 * Create a new accessor for the given Commons Log.
+	 * 为给定的 Commons Log 创建一个新的访问器。
 	 * @see LogFactory#getLog(Class)
 	 * @see LogFactory#getLog(String)
 	 */
@@ -44,7 +43,7 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Create a new accessor for the specified Commons Log category.
+	 * 为指定的 Commons Log 分类创建一个新的访问器。
 	 * @see LogFactory#getLog(Class)
 	 */
 	public LogAccessor(Class<?> logCategory) {
@@ -52,7 +51,7 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Create a new accessor for the specified Commons Log category.
+	 * 为指定的 Commons Log 分类创建一个新的访问器。
 	 * @see LogFactory#getLog(String)
 	 */
 	public LogAccessor(String logCategory) {
@@ -61,168 +60,165 @@ public class LogAccessor {
 
 
 	/**
-	 * Return the target Commons Log.
+	 * 返回目标 Commons Log。
 	 */
 	public final Log getLog() {
 		return this.log;
 	}
 
-
-	// Log level checks
+	// 日志级别检查
 
 	/**
-	 * Is fatal logging currently enabled?
+	 * 当前是否启用致命错误日志？
 	 */
 	public boolean isFatalEnabled() {
 		return this.log.isFatalEnabled();
 	}
 
 	/**
-	 * Is error logging currently enabled?
+	 * 当前是否启用错误日志？
 	 */
 	public boolean isErrorEnabled() {
 		return this.log.isErrorEnabled();
 	}
 
 	/**
-	 * Is warn logging currently enabled?
+	 * 当前是否启用警告日志？
 	 */
 	public boolean isWarnEnabled() {
 		return this.log.isWarnEnabled();
 	}
 
 	/**
-	 * Is info logging currently enabled?
+	 * 当前是否启用信息日志？
 	 */
 	public boolean isInfoEnabled() {
 		return this.log.isInfoEnabled();
 	}
 
 	/**
-	 * Is debug logging currently enabled?
+	 * 当前是否启用调试日志？
 	 */
 	public boolean isDebugEnabled() {
 		return this.log.isDebugEnabled();
 	}
 
 	/**
-	 * Is trace logging currently enabled?
+	 * 当前是否启用跟踪日志？
 	 */
 	public boolean isTraceEnabled() {
 		return this.log.isTraceEnabled();
 	}
 
-
-	// Plain log methods
+	// 纯日志方法
 
 	/**
-	 * Log a message with fatal log level.
-	 * @param message the message to log
+	 * 记录一条致命错误级别的消息。
+	 * @param message 要记录的消息
 	 */
 	public void fatal(CharSequence message) {
 		this.log.fatal(message);
 	}
 
 	/**
-	 * Log an error with fatal log level.
-	 * @param cause the exception to log
-	 * @param message the message to log
+	 * 记录一条致命错误级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param message 要记录的消息
 	 */
 	public void fatal(Throwable cause, CharSequence message) {
 		this.log.fatal(message, cause);
 	}
 
 	/**
-	 * Log a message with error log level.
-	 * @param message the message to log
+	 * 记录一条错误级别的消息。
+	 * @param message 要记录的消息
 	 */
 	public void error(CharSequence message) {
 		this.log.error(message);
 	}
 
 	/**
-	 * Log an error with error log level.
-	 * @param cause the exception to log
-	 * @param message the message to log
+	 * 记录一条错误级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param message 要记录的消息
 	 */
 	public void error(Throwable cause, CharSequence message) {
 		this.log.error(message, cause);
 	}
 
 	/**
-	 * Log a message with warn log level.
-	 * @param message the message to log
+	 * 记录一条警告级别的消息。
+	 * @param message 要记录的消息
 	 */
 	public void warn(CharSequence message) {
 		this.log.warn(message);
 	}
 
 	/**
-	 * Log an error with warn log level.
-	 * @param cause the exception to log
-	 * @param message the message to log
+	 * 记录一条警告级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param message 要记录的消息
 	 */
 	public void warn(Throwable cause, CharSequence message) {
 		this.log.warn(message, cause);
 	}
 
 	/**
-	 * Log a message with info log level.
-	 * @param message the message to log
+	 * 记录一条信息级别的消息。
+	 * @param message 要记录的消息
 	 */
 	public void info(CharSequence message) {
 		this.log.info(message);
 	}
 
 	/**
-	 * Log an error with info log level.
-	 * @param cause the exception to log
-	 * @param message the message to log
+	 * 记录一条信息级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param message 要记录的消息
 	 */
 	public void info(Throwable cause, CharSequence message) {
 		this.log.info(message, cause);
 	}
 
 	/**
-	 * Log a message with debug log level.
-	 * @param message the message to log
+	 * 记录一条调试级别的消息。
+	 * @param message 要记录的消息
 	 */
 	public void debug(CharSequence message) {
 		this.log.debug(message);
 	}
 
 	/**
-	 * Log an error with debug log level.
-	 * @param cause the exception to log
-	 * @param message the message to log
+	 * 记录一条调试级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param message 要记录的消息
 	 */
 	public void debug(Throwable cause, CharSequence message) {
 		this.log.debug(message, cause);
 	}
 
 	/**
-	 * Log a message with trace log level.
-	 * @param message the message to log
+	 * 记录一条跟踪级别的消息。
+	 * @param message 要记录的消息
 	 */
 	public void trace(CharSequence message) {
 		this.log.trace(message);
 	}
 
 	/**
-	 * Log an error with trace log level.
-	 * @param cause the exception to log
-	 * @param message the message to log
+	 * 记录一条跟踪级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param message 要记录的消息
 	 */
 	public void trace(Throwable cause, CharSequence message) {
 		this.log.trace(message, cause);
 	}
 
-
-	// Supplier-based log methods
+	// 基于 Supplier 的日志方法
 
 	/**
-	 * Log a message with fatal log level.
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条致命错误级别的消息。
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void fatal(Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isFatalEnabled()) {
@@ -231,9 +227,9 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log an error with fatal log level.
-	 * @param cause the exception to log
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条致命错误级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void fatal(Throwable cause, Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isFatalEnabled()) {
@@ -242,8 +238,8 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log a message with error log level.
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条错误级别的消息。
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void error(Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isErrorEnabled()) {
@@ -252,9 +248,9 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log an error with error log level.
-	 * @param cause the exception to log
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条错误级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void error(Throwable cause, Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isErrorEnabled()) {
@@ -263,8 +259,8 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log a message with warn log level.
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条警告级别的消息。
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void warn(Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isWarnEnabled()) {
@@ -273,9 +269,9 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log an error with warn log level.
-	 * @param cause the exception to log
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条警告级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void warn(Throwable cause, Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isWarnEnabled()) {
@@ -284,8 +280,8 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log a message with info log level.
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条信息级别的消息。
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void info(Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isInfoEnabled()) {
@@ -294,9 +290,9 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log an error with info log level.
-	 * @param cause the exception to log
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条信息级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void info(Throwable cause, Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isInfoEnabled()) {
@@ -305,8 +301,8 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log a message with debug log level.
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条调试级别的消息。
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void debug(Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isDebugEnabled()) {
@@ -315,9 +311,9 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log an error with debug log level.
-	 * @param cause the exception to log
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条调试级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void debug(Throwable cause, Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isDebugEnabled()) {
@@ -326,8 +322,8 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log a message with trace log level.
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条跟踪级别的消息。
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void trace(Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isTraceEnabled()) {
@@ -336,9 +332,9 @@ public class LogAccessor {
 	}
 
 	/**
-	 * Log an error with trace log level.
-	 * @param cause the exception to log
-	 * @param messageSupplier a lazy supplier for the message to log
+	 * 记录一条跟踪级别的异常及消息。
+	 * @param cause 要记录的异常
+	 * @param messageSupplier 懒加载消息供应器
 	 */
 	public void trace(Throwable cause, Supplier<? extends CharSequence> messageSupplier) {
 		if (this.log.isTraceEnabled()) {

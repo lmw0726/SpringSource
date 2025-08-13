@@ -17,27 +17,25 @@
 package org.springframework.util.backoff;
 
 /**
- * Provide a {@link BackOffExecution} that indicates the rate at which
- * an operation should be retried.
+ * 提供一个{@link BackOffExecution}，指示操作应按照何种速率进行重试。
  *
- * <p>Users of this interface are expected to use it like this:
+ * <p>此接口的使用者应按以下方式使用：
  *
  * <pre class="code">
  * BackOffExecution exec = backOff.start();
  *
- * // In the operation recovery/retry loop:
+ * // 在操作恢复/重试循环中：
  * long waitInterval = exec.nextBackOff();
  * if (waitInterval == BackOffExecution.STOP) {
- *     // do not retry operation
+ *     // 不重试操作
  * }
  * else {
- *     // sleep, e.g. Thread.sleep(waitInterval)
- *     // retry operation
+ *     // 休眠，例如 Thread.sleep(waitInterval)
+ *     // 重试操作
  * }
  * }</pre>
  *
- * Once the underlying operation has completed successfully,
- * the execution instance can be simply discarded.
+ * 一旦底层操作成功完成，执行实例可以直接丢弃。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -47,8 +45,8 @@ package org.springframework.util.backoff;
 public interface BackOff {
 
 	/**
-	 * Start a new back off execution.
-	 * @return a fresh {@link BackOffExecution} ready to be used
+	 * 开始一个新的退避执行。
+	 * @return 一个新的{@link BackOffExecution}实例，准备使用
 	 */
 	BackOffExecution start();
 

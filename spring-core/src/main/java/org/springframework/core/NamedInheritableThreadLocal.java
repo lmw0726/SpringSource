@@ -19,12 +19,11 @@ package org.springframework.core;
 import org.springframework.util.Assert;
 
 /**
- * {@link InheritableThreadLocal} subclass that exposes a specified name
- * as {@link #toString()} result (allowing for introspection).
+ * {@link InheritableThreadLocal} 子类，暴露指定的名称作为 {@link #toString()} 的结果（便于检测）。
  *
  * @author Juergen Hoeller
  * @since 2.5.2
- * @param <T> the value type
+ * @param <T> 值的类型
  * @see NamedThreadLocal
  */
 public class NamedInheritableThreadLocal<T> extends InheritableThreadLocal<T> {
@@ -33,8 +32,8 @@ public class NamedInheritableThreadLocal<T> extends InheritableThreadLocal<T> {
 
 
 	/**
-	 * Create a new NamedInheritableThreadLocal with the given name.
-	 * @param name a descriptive name for this ThreadLocal
+	 * 使用给定名称创建一个新的 NamedInheritableThreadLocal。
+	 * @param name 该 ThreadLocal 的描述性名称
 	 */
 	public NamedInheritableThreadLocal(String name) {
 		Assert.hasText(name, "Name must not be empty");
@@ -47,3 +46,4 @@ public class NamedInheritableThreadLocal<T> extends InheritableThreadLocal<T> {
 	}
 
 }
+

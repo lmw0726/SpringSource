@@ -17,17 +17,17 @@
 package org.springframework.core;
 
 /**
- * Default implementation of the {@link ParameterNameDiscoverer} strategy interface,
- * using the Java 8 standard reflection mechanism (if available), and falling back
- * to the ASM-based {@link LocalVariableTableParameterNameDiscoverer} for checking
- * debug information in the class file.
+ * {@link ParameterNameDiscoverer} 策略接口的默认实现，
+ * 使用 Java 8 标准反射机制（如果可用），
+ * 并回退到基于 ASM 的 {@link LocalVariableTableParameterNameDiscoverer}，
+ * 用于检查类文件中的调试信息。
  *
- * <p>If a Kotlin reflection implementation is present,
- * {@link KotlinReflectionParameterNameDiscoverer} is added first in the list and
- * used for Kotlin classes and interfaces. When compiling or running as a GraalVM
- * native image, the {@code KotlinReflectionParameterNameDiscoverer} is not used.
+ * <p>如果存在 Kotlin 反射实现，
+ * {@link KotlinReflectionParameterNameDiscoverer} 会优先被添加到列表中，
+ * 用于 Kotlin 类和接口。
+ * 在编译或作为 GraalVM 原生镜像运行时，不使用 {@code KotlinReflectionParameterNameDiscoverer}。
  *
- * <p>Further discoverers may be added through {@link #addDiscoverer(ParameterNameDiscoverer)}.
+ * <p>可通过 {@link #addDiscoverer(ParameterNameDiscoverer)} 添加更多发现器。
  *
  * @author Juergen Hoeller
  * @author Sebastien Deleuze
@@ -40,7 +40,7 @@ package org.springframework.core;
 public class DefaultParameterNameDiscoverer extends PrioritizedParameterNameDiscoverer {
 
 	public DefaultParameterNameDiscoverer() {
-		// TODO Remove this conditional inclusion when upgrading to Kotlin 1.5, see https://youtrack.jetbrains.com/issue/KT-44594
+		// TODO 在升级到 Kotlin 1.5 时移除此条件包含，详见 https://youtrack.jetbrains.com/issue/KT-44594
 		if (KotlinDetector.isKotlinReflectPresent() && !NativeDetector.inNativeImage()) {
 			addDiscoverer(new KotlinReflectionParameterNameDiscoverer());
 		}

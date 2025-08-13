@@ -16,17 +16,17 @@
 
 package org.springframework.core;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Base class for decorating ClassLoaders such as {@link OverridingClassLoader}
- * and {@link org.springframework.instrument.classloading.ShadowingClassLoader},
- * providing common handling of excluded packages and classes.
+ * 装饰 ClassLoader 的基类，如 {@link OverridingClassLoader}
+ * 和 {@link org.springframework.instrument.classloading.ShadowingClassLoader}，
+ * 提供对排除包和类的通用处理。
  *
  * @author Juergen Hoeller
  * @author Rod Johnson
@@ -45,14 +45,13 @@ public abstract class DecoratingClassLoader extends ClassLoader {
 
 
 	/**
-	 * Create a new DecoratingClassLoader with no parent ClassLoader.
+	 * 创建一个无父 ClassLoader 的 DecoratingClassLoader。
 	 */
 	public DecoratingClassLoader() {
 	}
 
 	/**
-	 * Create a new DecoratingClassLoader using the given parent ClassLoader
-	 * for delegation.
+	 * 使用给定的父 ClassLoader 创建一个 DecoratingClassLoader 以进行委托。
 	 */
 	public DecoratingClassLoader(@Nullable ClassLoader parent) {
 		super(parent);
@@ -60,11 +59,11 @@ public abstract class DecoratingClassLoader extends ClassLoader {
 
 
 	/**
-	 * Add a package name to exclude from decoration (e.g. overriding).
-	 * <p>Any class whose fully-qualified name starts with the name registered
-	 * here will be handled by the parent ClassLoader in the usual fashion.
+	 * 添加要排除装饰（例如重写）的包名。
+	 * <p>任何全限定名以此注册名开头的类，
+	 * 都将由父 ClassLoader 以通常方式处理。
 	 *
-	 * @param packageName the package name to exclude
+	 * @param packageName 要排除的包名
 	 */
 	public void excludePackage(String packageName) {
 		Assert.notNull(packageName, "Package name must not be null");
@@ -83,12 +82,11 @@ public abstract class DecoratingClassLoader extends ClassLoader {
 	}
 
 	/**
-	 * Determine whether the specified class is excluded from decoration
-	 * by this class loader.
-	 * <p>The default implementation checks against excluded packages and classes.
+	 * 判断指定的类是否被该类加载器排除装饰。
+	 * <p>默认实现检查排除的包和类列表。
 	 *
-	 * @param className the class name to check
-	 * @return whether the specified class is eligible
+	 * @param className 需要检查的类名
+	 * @return 指定类是否被排除
 	 * @see #excludePackage
 	 * @see #excludeClass
 	 */

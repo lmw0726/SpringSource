@@ -16,34 +16,29 @@
 
 package org.springframework.core.codec;
 
-import java.util.Map;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 /**
- * Abstract base class for {@code Decoder} implementations that can decode
- * a {@code DataBuffer} directly to the target element type.
+ * 抽象基类，用于 {@code Decoder} 实现，可以直接将 {@code DataBuffer} 解码为目标元素类型。
  *
- * <p>Sub-classes must implement {@link #decodeDataBuffer} to provide a way to
- * transform a {@code DataBuffer} to the target data type. The default
- * {@link #decode} implementation transforms each individual data buffer while
- * {@link #decodeToMono} applies "reduce" and transforms the aggregated buffer.
+ * <p>子类必须实现 {@link #decodeDataBuffer} 以提供将 {@code DataBuffer} 转换为目标数据类型的方法。
+ * 默认的 {@link #decode} 实现转换每个单独的数据缓冲区，而 {@link #decodeToMono} 应用“减少”并转换聚合的缓冲区。
  *
- * <p>Sub-classes can override {@link #decode} in order to split the input stream
- * along different boundaries (e.g. on new line characters for {@code String})
- * or always reduce to a single data buffer (e.g. {@code Resource}).
+ * <p>子类可以覆盖 {@link #decode} 以便沿不同边界（例如，针对 {@code String} 的换行符）拆分输入流，
+ * 或者始终减少到一个数据缓冲区（例如，{@code Resource}）。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
- * @param <T> the element type
+ * @param <T> 元素类型
  */
 @SuppressWarnings("deprecation")
 public abstract class AbstractDataBufferDecoder<T> extends AbstractDecoder<T> {
@@ -57,15 +52,13 @@ public abstract class AbstractDataBufferDecoder<T> extends AbstractDecoder<T> {
 
 
 	/**
-	 * Configure a limit on the number of bytes that can be buffered whenever
-	 * the input stream needs to be aggregated. This can be a result of
-	 * decoding to a single {@code DataBuffer},
-	 * {@link java.nio.ByteBuffer ByteBuffer}, {@code byte[]},
-	 * {@link org.springframework.core.io.Resource Resource}, {@code String}, etc.
-	 * It can also occur when splitting the input stream, e.g. delimited text,
-	 * in which case the limit applies to data buffered between delimiters.
-	 * <p>By default this is set to 256K.
-	 * @param byteCount the max number of bytes to buffer, or -1 for unlimited
+	 * 配置在需要聚合输入流时可以缓冲的字节数限制。
+	 * 这可能是解码为单个 {@code DataBuffer}、{@link java.nio.ByteBuffer ByteBuffer}、
+	 * {@code byte[]}、{@link org.springframework.core.io.Resource Resource}、
+	 * {@code String} 等的结果。
+	 * 也可能发生在拆分输入流时，例如带分隔符的文本，在这种情况下，限制适用于分隔符之间缓冲的数据。
+	 * <p>默认情况下，此值设置为 256K。
+	 * @param byteCount 要缓冲的最大字节数，或 -1 表示无限制
 	 * @since 5.1.11
 	 */
 	public void setMaxInMemorySize(int byteCount) {
@@ -73,7 +66,7 @@ public abstract class AbstractDataBufferDecoder<T> extends AbstractDecoder<T> {
 	}
 
 	/**
-	 * Return the {@link #setMaxInMemorySize configured} byte count limit.
+	 * 返回 {@link #setMaxInMemorySize 配置的} 字节计数限制。
 	 * @since 5.1.11
 	 */
 	public int getMaxInMemorySize() {
@@ -97,9 +90,9 @@ public abstract class AbstractDataBufferDecoder<T> extends AbstractDecoder<T> {
 	}
 
 	/**
-	 * How to decode a {@code DataBuffer} to the target element type.
-	 * @deprecated as of 5.2, please implement
-	 * {@link #decode(DataBuffer, ResolvableType, MimeType, Map)} instead
+	 * 如何将 {@code DataBuffer} 解码为目标元素类型。
+	 * @deprecated 自 5.2 版本起已废弃，请转而实现
+	 * {@link #decode(DataBuffer, ResolvableType, MimeType, Map)}
 	 */
 	@Deprecated
 	@Nullable

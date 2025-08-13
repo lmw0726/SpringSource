@@ -20,7 +20,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * A simple filter which matches classes that are assignable to a given type.
+ * 一个简单的过滤器，用于匹配可赋值给指定类型的类。
  *
  * @author Rod Johnson
  * @author Mark Fisher
@@ -33,8 +33,8 @@ public class AssignableTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 
 
 	/**
-	 * Create a new AssignableTypeFilter for the given type.
-	 * @param targetType the type to match
+	 * 为指定类型创建一个新的 AssignableTypeFilter。
+	 * @param targetType 要匹配的类型
 	 */
 	public AssignableTypeFilter(Class<?> targetType) {
 		super(true, true);
@@ -42,7 +42,7 @@ public class AssignableTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 	}
 
 	/**
-	 * Return the {@code type} that this instance is using to filter candidates.
+	 * 返回此实例用于过滤候选者的 {@code type}。
 	 * @since 5.0
 	 */
 	public final Class<?> getTargetType() {
@@ -80,7 +80,7 @@ public class AssignableTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 				return this.targetType.isAssignableFrom(clazz);
 			}
 			catch (Throwable ex) {
-				// Class not regularly loadable - can't determine a match that way.
+				// 类无法正常加载，无法通过该方式确定匹配结果。
 			}
 		}
 		return null;

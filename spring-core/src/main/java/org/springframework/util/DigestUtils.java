@@ -22,11 +22,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Miscellaneous methods for calculating digests.
+ * 计算摘要的各种杂项方法。
  *
- * <p>Mainly for internal use within the framework; consider
- * <a href="https://commons.apache.org/codec/">Apache Commons Codec</a>
- * for a more comprehensive suite of digest utilities.
+ * <p>主要供框架内部使用；如果需要更全面的摘要工具集，
+ * 请考虑使用
+ * <a href="https://commons.apache.org/codec/">Apache Commons Codec</a>。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -42,19 +42,19 @@ public abstract class DigestUtils {
 
 
 	/**
-	 * Calculate the MD5 digest of the given bytes.
-	 * @param bytes the bytes to calculate the digest over
-	 * @return the digest
+	 * 计算给定字节数组的 MD5 摘要。
+	 * @param bytes 要计算摘要的字节数组
+	 * @return 摘要字节数组
 	 */
 	public static byte[] md5Digest(byte[] bytes) {
 		return digest(MD5_ALGORITHM_NAME, bytes);
 	}
 
 	/**
-	 * Calculate the MD5 digest of the given stream.
-	 * <p>This method does <strong>not</strong> close the input stream.
-	 * @param inputStream the InputStream to calculate the digest over
-	 * @return the digest
+	 * 计算给定输入流的 MD5 摘要。
+	 * <p>此方法<strong>不会</strong>关闭输入流。
+	 * @param inputStream 要计算摘要的输入流
+	 * @return 摘要字节数组
 	 * @since 4.2
 	 */
 	public static byte[] md5Digest(InputStream inputStream) throws IOException {
@@ -62,19 +62,19 @@ public abstract class DigestUtils {
 	}
 
 	/**
-	 * Return a hexadecimal string representation of the MD5 digest of the given bytes.
-	 * @param bytes the bytes to calculate the digest over
-	 * @return a hexadecimal digest string
+	 * 返回给定字节数组的 MD5 摘要的十六进制字符串表示。
+	 * @param bytes 要计算摘要的字节数组
+	 * @return 十六进制的摘要字符串
 	 */
 	public static String md5DigestAsHex(byte[] bytes) {
 		return digestAsHexString(MD5_ALGORITHM_NAME, bytes);
 	}
 
 	/**
-	 * Return a hexadecimal string representation of the MD5 digest of the given stream.
-	 * <p>This method does <strong>not</strong> close the input stream.
-	 * @param inputStream the InputStream to calculate the digest over
-	 * @return a hexadecimal digest string
+	 * 返回给定输入流的 MD5 摘要的十六进制字符串表示。
+	 * <p>此方法<strong>不会</strong>关闭输入流。
+	 * @param inputStream 要计算摘要的输入流
+	 * @return 十六进制的摘要字符串
 	 * @since 4.2
 	 */
 	public static String md5DigestAsHex(InputStream inputStream) throws IOException {
@@ -82,23 +82,21 @@ public abstract class DigestUtils {
 	}
 
 	/**
-	 * Append a hexadecimal string representation of the MD5 digest of the given
-	 * bytes to the given {@link StringBuilder}.
-	 * @param bytes the bytes to calculate the digest over
-	 * @param builder the string builder to append the digest to
-	 * @return the given string builder
+	 * 将给定字节数组的 MD5 摘要的十六进制字符串表示追加到指定的 {@link StringBuilder} 中。
+	 * @param bytes 要计算摘要的字节数组
+	 * @param builder 用于追加摘要的字符串构建器
+	 * @return 传入的字符串构建器
 	 */
 	public static StringBuilder appendMd5DigestAsHex(byte[] bytes, StringBuilder builder) {
 		return appendDigestAsHex(MD5_ALGORITHM_NAME, bytes, builder);
 	}
 
 	/**
-	 * Append a hexadecimal string representation of the MD5 digest of the given
-	 * inputStream to the given {@link StringBuilder}.
-	 * <p>This method does <strong>not</strong> close the input stream.
-	 * @param inputStream the inputStream to calculate the digest over
-	 * @param builder the string builder to append the digest to
-	 * @return the given string builder
+	 * 将给定输入流的 MD5 摘要的十六进制字符串表示追加到指定的 {@link StringBuilder} 中。
+	 * <p>此方法<strong>不会</strong>关闭输入流。
+	 * @param inputStream 要计算摘要的输入流
+	 * @param builder 用于追加摘要的字符串构建器
+	 * @return 传入的字符串构建器
 	 * @since 4.2
 	 */
 	public static StringBuilder appendMd5DigestAsHex(InputStream inputStream, StringBuilder builder) throws IOException {
@@ -107,8 +105,8 @@ public abstract class DigestUtils {
 
 
 	/**
-	 * Create a new {@link MessageDigest} with the given algorithm.
-	 * <p>Necessary because {@code MessageDigest} is not thread-safe.
+	 * 使用指定的算法创建一个新的 {@link MessageDigest} 实例。
+	 * <p>此方法是必要的，因为 {@code MessageDigest} 不是线程安全的。
 	 */
 	private static MessageDigest getDigest(String algorithm) {
 		try {

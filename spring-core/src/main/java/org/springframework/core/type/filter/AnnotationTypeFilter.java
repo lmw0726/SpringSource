@@ -16,25 +16,24 @@
 
 package org.springframework.core.type.filter;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Inherited;
-
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Inherited;
+
 /**
- * A simple {@link TypeFilter} which matches classes with a given annotation,
- * checking inherited annotations as well.
+ * 一个简单的 {@link TypeFilter}，用于匹配带有指定注解的类，
+ * 也会检查继承的注解。
  *
- * <p>By default, the matching logic mirrors that of
- * {@link AnnotationUtils#getAnnotation(java.lang.reflect.AnnotatedElement, Class)},
- * supporting annotations that are <em>present</em> or <em>meta-present</em> for a
- * single level of meta-annotations. The search for meta-annotations my be disabled.
- * Similarly, the search for annotations on interfaces may optionally be enabled.
- * Consult the various constructors in this class for details.
+ * <p>默认情况下，匹配逻辑与
+ * {@link AnnotationUtils#getAnnotation(java.lang.reflect.AnnotatedElement, Class)}
+ * 一致，支持单层元注解的 <em>存在</em> 或 <em>元存在</em> 注解。
+ * 可以禁用对元注解的搜索。同样，也可以选择是否启用对接口注解的搜索。
+ * 详细信息请查看本类的各种构造函数。
  *
  * @author Mark Fisher
  * @author Ramnivas Laddad
@@ -50,32 +49,31 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 
 
 	/**
-	 * Create a new {@code AnnotationTypeFilter} for the given annotation type.
-	 * <p>The filter will also match meta-annotations. To disable the
-	 * meta-annotation matching, use the constructor that accepts a
-	 * '{@code considerMetaAnnotations}' argument.
-	 * <p>The filter will not match interfaces.
-	 * @param annotationType the annotation type to match
+	 * 创建一个新的 {@code AnnotationTypeFilter} 用于指定的注解类型。
+	 * <p>该过滤器也会匹配元注解。若要禁用元注解匹配，
+	 * 请使用带有 {@code considerMetaAnnotations} 参数的构造函数。
+	 * <p>该过滤器不会匹配接口。
+	 * @param annotationType 要匹配的注解类型
 	 */
 	public AnnotationTypeFilter(Class<? extends Annotation> annotationType) {
 		this(annotationType, true, false);
 	}
 
 	/**
-	 * Create a new {@code AnnotationTypeFilter} for the given annotation type.
-	 * <p>The filter will not match interfaces.
-	 * @param annotationType the annotation type to match
-	 * @param considerMetaAnnotations whether to also match on meta-annotations
+	 * 创建一个新的 {@code AnnotationTypeFilter} 用于指定的注解类型。
+	 * <p>该过滤器不会匹配接口。
+	 * @param annotationType 要匹配的注解类型
+	 * @param considerMetaAnnotations 是否也匹配元注解
 	 */
 	public AnnotationTypeFilter(Class<? extends Annotation> annotationType, boolean considerMetaAnnotations) {
 		this(annotationType, considerMetaAnnotations, false);
 	}
 
 	/**
-	 * Create a new {@code AnnotationTypeFilter} for the given annotation type.
-	 * @param annotationType the annotation type to match
-	 * @param considerMetaAnnotations whether to also match on meta-annotations
-	 * @param considerInterfaces whether to also match interfaces
+	 * 创建一个新的 {@code AnnotationTypeFilter} 用于指定的注解类型。
+	 * @param annotationType 要匹配的注解类型
+	 * @param considerMetaAnnotations 是否也匹配元注解
+	 * @param considerInterfaces 是否也匹配接口
 	 */
 	public AnnotationTypeFilter(
 			Class<? extends Annotation> annotationType, boolean considerMetaAnnotations, boolean considerInterfaces) {
@@ -86,8 +84,7 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 	}
 
 	/**
-	 * Return the {@link Annotation} that this instance is using to filter
-	 * candidates.
+	 * 返回此实例用于过滤候选类的 {@link Annotation} 类型。
 	 * @since 5.0
 	 */
 	public final Class<? extends Annotation> getAnnotationType() {
@@ -120,8 +117,8 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 		}
 		else if (typeName.startsWith("java")) {
 			if (!this.annotationType.getName().startsWith("java")) {
-				// Standard Java types do not have non-standard annotations on them ->
-				// skip any load attempt, in particular for Java language interfaces.
+				// 标准 Java 类型上不会有非标准注解，尤其是 Java 语言接口，
+				// 因此跳过尝试加载的操作。
 				return false;
 			}
 			try {
@@ -130,7 +127,7 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 						clazz.getAnnotation(this.annotationType)) != null);
 			}
 			catch (Throwable ex) {
-				// Class not regularly loadable - can't determine a match that way.
+				// 类无法正常加载，无法通过此方式判断匹配。
 			}
 		}
 		return null;

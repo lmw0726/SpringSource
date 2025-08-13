@@ -16,24 +16,22 @@
 
 package org.springframework.core.io.support;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+
 /**
- * Holder that combines a {@link Resource} descriptor with a specific encoding
- * or {@code Charset} to be used for reading from the resource.
+ * 持有者，结合了一个 {@link Resource} 描述符和用于读取该资源的特定编码或 {@code Charset}。
  *
- * <p>Used as an argument for operations that support reading content with
- * a specific encoding, typically via a {@code java.io.Reader}.
+ * <p>用作支持使用特定编码读取内容的操作的参数，通常通过 {@code java.io.Reader} 实现。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -63,22 +61,20 @@ public class EncodedResource implements InputStreamSource {
 	}
 
 	/**
-	 * Create a new {@code EncodedResource} for the given {@code Resource},
-	 * using the specified {@code encoding}.
+	 * 使用指定的 {@code encoding} 为给定的 {@code Resource} 创建一个新的 {@code EncodedResource}。
 	 *
-	 * @param resource the {@code Resource} to hold (never {@code null})
-	 * @param encoding the encoding to use for reading from the resource
+	 * @param resource 要持有的 {@code Resource}（绝不为 {@code null}）
+	 * @param encoding 用于读取资源的编码
 	 */
 	public EncodedResource(Resource resource, @Nullable String encoding) {
 		this(resource, encoding, null);
 	}
 
 	/**
-	 * Create a new {@code EncodedResource} for the given {@code Resource},
-	 * using the specified {@code Charset}.
+	 * 使用指定的 {@code Charset} 为给定的 {@code Resource} 创建一个新的 {@code EncodedResource}。
 	 *
-	 * @param resource the {@code Resource} to hold (never {@code null})
-	 * @param charset  the {@code Charset} to use for reading from the resource
+	 * @param resource 要持有的 {@code Resource}（绝不为 {@code null}）
+	 * @param charset 用于读取资源的 {@code Charset}
 	 */
 	public EncodedResource(Resource resource, @Nullable Charset charset) {
 		this(resource, null, charset);
@@ -101,8 +97,8 @@ public class EncodedResource implements InputStreamSource {
 	}
 
 	/**
-	 * Return the encoding to use for reading from the {@linkplain #getResource() resource},
-	 * or {@code null} if none specified.
+	 * 返回用于读取 {@linkplain #getResource() 资源} 的编码，
+	 * 如果未指定则返回 {@code null}。
 	 */
 	@Nullable
 	public final String getEncoding() {
@@ -110,8 +106,8 @@ public class EncodedResource implements InputStreamSource {
 	}
 
 	/**
-	 * Return the {@code Charset} to use for reading from the {@linkplain #getResource() resource},
-	 * or {@code null} if none specified.
+	 * 返回用于读取 {@linkplain #getResource() 资源} 的 {@code Charset}，
+	 * 如果未指定则返回 {@code null}。
 	 */
 	@Nullable
 	public final Charset getCharset() {
@@ -119,9 +115,8 @@ public class EncodedResource implements InputStreamSource {
 	}
 
 	/**
-	 * Determine whether a {@link Reader} is required as opposed to an {@link InputStream},
-	 * i.e. whether an {@linkplain #getEncoding() encoding} or a {@link #getCharset() Charset}
-	 * has been specified.
+	 * 判断是否需要使用 {@link Reader} 而非 {@link InputStream}，
+	 * 即是否指定了 {@linkplain #getEncoding() 编码} 或 {@link #getCharset() Charset}。
 	 *
 	 * @see #getReader()
 	 * @see #getInputStream()
@@ -131,11 +126,10 @@ public class EncodedResource implements InputStreamSource {
 	}
 
 	/**
-	 * Open a {@code java.io.Reader} for the specified resource, using the specified
-	 * {@link #getCharset() Charset} or {@linkplain #getEncoding() encoding}
-	 * (if any).
+	 * 使用指定的 {@link #getCharset() Charset} 或 {@linkplain #getEncoding() 编码}（如果有）
+	 * 为指定资源打开一个 {@code java.io.Reader}。
 	 *
-	 * @throws IOException if opening the Reader failed
+	 * @throws IOException 如果打开 Reader 失败
 	 * @see #requiresReader()
 	 * @see #getInputStream()
 	 */
@@ -150,10 +144,10 @@ public class EncodedResource implements InputStreamSource {
 	}
 
 	/**
-	 * Open an {@code InputStream} for the specified resource, ignoring any specified
-	 * {@link #getCharset() Charset} or {@linkplain #getEncoding() encoding}.
+	 * 为指定资源打开一个 {@code InputStream}，忽略任何指定的
+	 * {@link #getCharset() Charset} 或 {@linkplain #getEncoding() 编码}。
 	 *
-	 * @throws IOException if opening the InputStream failed
+	 * @throws IOException 如果打开 InputStream 失败
 	 * @see #requiresReader()
 	 * @see #getReader()
 	 */

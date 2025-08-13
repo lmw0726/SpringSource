@@ -16,15 +16,7 @@
 
 package org.springframework.core.codec;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.OptionalLong;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -37,9 +29,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StreamUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.OptionalLong;
 
 /**
- * Encoder for {@link ResourceRegion ResourceRegions}.
+ * {@link ResourceRegion ResourceRegions} 的编码器。
  *
  * @author Brian Clozel
  * @since 5.0
@@ -47,12 +46,12 @@ import org.springframework.util.StreamUtils;
 public class ResourceRegionEncoder extends AbstractEncoder<ResourceRegion> {
 
 	/**
-	 * The default buffer size used by the encoder.
+	 * 编码器使用的默认缓冲区大小。
 	 */
 	public static final int DEFAULT_BUFFER_SIZE = StreamUtils.BUFFER_SIZE;
 
 	/**
-	 * The hint key that contains the boundary string.
+	 * 包含边界字符串的提示键。
 	 */
 	public static final String BOUNDARY_STRING_HINT = ResourceRegionEncoder.class.getName() + ".boundaryString";
 
@@ -108,13 +107,13 @@ public class ResourceRegionEncoder extends AbstractEncoder<ResourceRegion> {
 						Flux<DataBuffer> prefix = Flux.just(
 								bufferFactory.wrap(startBoundary),
 								bufferFactory.wrap(contentType),
-								bufferFactory.wrap(getContentRangeHeader(region))); // only wrapping, no allocation
+								bufferFactory.wrap(getContentRangeHeader(region))); // 只包装，不分配
 
 						return prefix.concatWith(writeResourceRegion(region, bufferFactory, hints));
 					})
 					.concatWithValues(getRegionSuffix(bufferFactory, boundaryString));
 		}
-		// No doOnDiscard (no caching after DataBufferUtils#read)
+		// 没有doOnDiscard (在DataBufferUtils # read之后没有缓存)
 	}
 
 	private Flux<DataBuffer> writeResourceRegion(
@@ -159,13 +158,13 @@ public class ResourceRegionEncoder extends AbstractEncoder<ResourceRegion> {
 	}
 
 	/**
-	 * Determine, if possible, the contentLength of the given resource without reading it.
-	 * @param resource the resource instance
-	 * @return the contentLength of the resource
+	 * 如果可能，在不读取资源的情况下确定其内容长度。
+	 * @param resource 资源实例
+	 * @return 资源的内容长度
 	 */
 	private OptionalLong contentLength(Resource resource) {
-		// Don't try to determine contentLength on InputStreamResource - cannot be read afterwards...
-		// Note: custom InputStreamResource subclasses could provide a pre-calculated content length!
+		// 不要尝试在 InputStreamResource 上确定内容长度 - 之后无法读取...
+		// 注意：自定义的 InputStreamResource 子类可以提供预先计算的内容长度！
 		if (InputStreamResource.class != resource.getClass()) {
 			try {
 				return OptionalLong.of(resource.contentLength());

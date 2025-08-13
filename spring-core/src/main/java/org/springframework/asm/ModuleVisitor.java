@@ -28,42 +28,38 @@
 package org.springframework.asm;
 
 /**
- * A visitor to visit a Java module. The methods of this class must be called in the following
- * order: ( {@code visitMainClass} | ( {@code visitPackage} | {@code visitRequire} | {@code
- * visitExport} | {@code visitOpen} | {@code visitUse} | {@code visitProvide} )* ) {@code visitEnd}.
+ * 访问Java模块的访问者。该类的方法调用顺序必须是：
+ * ( {@code visitMainClass} | ( {@code visitPackage} | {@code visitRequire} | {@code visitExport} | {@code visitOpen} |
+ * {@code visitUse} | {@code visitProvide} )* ) {@code visitEnd}。
  *
  * @author Remi Forax
  * @author Eric Bruneton
  */
 public abstract class ModuleVisitor {
   /**
-   * The ASM API version implemented by this visitor. The value of this field must be one of {@link
-   * Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   * 该访问者实现的ASM API版本。该字段的值必须是{@link Opcodes#ASM6}或{@link Opcodes#ASM7}之一。
    */
   protected final int api;
 
   /**
-   * The module visitor to which this visitor must delegate method calls. May be {@literal null}.
+   * 该访问者委托方法调用的模块访问者。可能为{@literal null}。
    */
   protected ModuleVisitor mv;
 
   /**
-   * Constructs a new {@link ModuleVisitor}.
+   * 构造一个新的{@link ModuleVisitor}。
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link Opcodes#ASM6}
-   *     or {@link Opcodes#ASM7}.
+   * @param api 该访问者实现的ASM API版本。必须是{@link Opcodes#ASM6}或{@link Opcodes#ASM7}之一。
    */
   protected ModuleVisitor(final int api) {
     this(api, null);
   }
 
   /**
-   * Constructs a new {@link ModuleVisitor}.
+   * 构造一个新的{@link ModuleVisitor}。
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link Opcodes#ASM6}
-   *     or {@link Opcodes#ASM7}.
-   * @param moduleVisitor the module visitor to which this visitor must delegate method calls. May
-   *     be null.
+   * @param api 该访问者实现的ASM API版本。必须是{@link Opcodes#ASM6}或{@link Opcodes#ASM7}之一。
+   * @param moduleVisitor 委托方法调用的模块访问者。可以为null。
    */
   protected ModuleVisitor(final int api, final ModuleVisitor moduleVisitor) {
     if (api != Opcodes.ASM9
@@ -75,15 +71,15 @@ public abstract class ModuleVisitor {
         && api != Opcodes.ASM10_EXPERIMENTAL) {
       throw new IllegalArgumentException("Unsupported api " + api);
     }
-    // SPRING PATCH: no preview mode check for ASM experimental
+    // SPRING PATCH: 不对ASM experimental进行预览模式检查
     this.api = api;
     this.mv = moduleVisitor;
   }
 
   /**
-   * Visit the main class of the current module.
+   * 访问当前模块的主类。
    *
-   * @param mainClass the internal name of the main class of the current module.
+   * @param mainClass 当前模块主类的内部名称。
    */
   public void visitMainClass(final String mainClass) {
     if (mv != null) {
@@ -92,9 +88,9 @@ public abstract class ModuleVisitor {
   }
 
   /**
-   * Visit a package of the current module.
+   * 访问当前模块的一个包。
    *
-   * @param packaze the internal name of a package.
+   * @param packaze 包的内部名称。
    */
   public void visitPackage(final String packaze) {
     if (mv != null) {
@@ -103,12 +99,11 @@ public abstract class ModuleVisitor {
   }
 
   /**
-   * Visits a dependence of the current module.
+   * 访问当前模块的一个依赖模块。
    *
-   * @param module the fully qualified name (using dots) of the dependence.
-   * @param access the access flag of the dependence among {@code ACC_TRANSITIVE}, {@code
-   *     ACC_STATIC_PHASE}, {@code ACC_SYNTHETIC} and {@code ACC_MANDATED}.
-   * @param version the module version at compile time, or {@literal null}.
+   * @param module 依赖模块的全限定名（用点号分隔）。
+   * @param access 依赖模块的访问标志，可能值包括 {@code ACC_TRANSITIVE}、{@code ACC_STATIC_PHASE}、{@code ACC_SYNTHETIC} 和 {@code ACC_MANDATED}。
+   * @param version 编译时依赖模块的版本，可能为 {@literal null}。
    */
   public void visitRequire(final String module, final int access, final String version) {
     if (mv != null) {
@@ -117,13 +112,11 @@ public abstract class ModuleVisitor {
   }
 
   /**
-   * Visit an exported package of the current module.
+   * 访问当前模块导出的包。
    *
-   * @param packaze the internal name of the exported package.
-   * @param access the access flag of the exported package, valid values are among {@code
-   *     ACC_SYNTHETIC} and {@code ACC_MANDATED}.
-   * @param modules the fully qualified names (using dots) of the modules that can access the public
-   *     classes of the exported package, or {@literal null}.
+   * @param packaze 导出包的内部名称。
+   * @param access 导出包的访问标志，有效值包括 {@code ACC_SYNTHETIC} 和 {@code ACC_MANDATED}。
+   * @param modules 可以访问该导出包的模块的全限定名数组，或 {@literal null}。
    */
   public void visitExport(final String packaze, final int access, final String... modules) {
     if (mv != null) {
@@ -132,13 +125,11 @@ public abstract class ModuleVisitor {
   }
 
   /**
-   * Visit an open package of the current module.
+   * 访问当前模块的一个开放包。
    *
-   * @param packaze the internal name of the opened package.
-   * @param access the access flag of the opened package, valid values are among {@code
-   *     ACC_SYNTHETIC} and {@code ACC_MANDATED}.
-   * @param modules the fully qualified names (using dots) of the modules that can use deep
-   *     reflection to the classes of the open package, or {@literal null}.
+   * @param packaze 开放包的内部名称。
+   * @param access 开放包的访问标志，有效值包括 {@code ACC_SYNTHETIC} 和 {@code ACC_MANDATED}。
+   * @param modules 可以使用深度反射访问该开放包类的模块的全限定名数组，或 {@literal null}。
    */
   public void visitOpen(final String packaze, final int access, final String... modules) {
     if (mv != null) {
@@ -147,10 +138,9 @@ public abstract class ModuleVisitor {
   }
 
   /**
-   * Visit a service used by the current module. The name must be the internal name of an interface
-   * or a class.
+   * 访问当前模块使用的服务。名称必须是接口或类的内部名称。
    *
-   * @param service the internal name of the service.
+   * @param service 服务的内部名称。
    */
   public void visitUse(final String service) {
     if (mv != null) {
@@ -159,11 +149,10 @@ public abstract class ModuleVisitor {
   }
 
   /**
-   * Visit an implementation of a service.
+   * 访问服务的实现。
    *
-   * @param service the internal name of the service.
-   * @param providers the internal names of the implementations of the service (there is at least
-   *     one provider).
+   * @param service 服务的内部名称。
+   * @param providers 服务的实现类的内部名称数组（至少有一个实现）。
    */
   public void visitProvide(final String service, final String... providers) {
     if (mv != null) {
@@ -172,8 +161,7 @@ public abstract class ModuleVisitor {
   }
 
   /**
-   * Visits the end of the module. This method, which is the last one to be called, is used to
-   * inform the visitor that everything have been visited.
+   * 访问模块的结束。该方法是最后被调用的方法，用于通知访问者访问已完成。
    */
   public void visitEnd() {
     if (mv != null) {

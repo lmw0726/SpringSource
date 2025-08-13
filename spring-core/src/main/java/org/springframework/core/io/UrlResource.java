@@ -27,9 +27,8 @@ import java.io.InputStream;
 import java.net.*;
 
 /**
- * {@link Resource} implementation for {@code java.net.URL} locators.
- * Supports resolution as a {@code URL} and also as a {@code File} in
- * case of the {@code "file:"} protocol.
+ * 基于 {@code java.net.URL} 定位器的 {@link Resource} 实现。
+ * 支持作为 {@code URL} 解析，也支持在协议为 {@code "file:"} 时解析为 {@code File}。
  *
  * @author Juergen Hoeller
  * @see java.net.URL

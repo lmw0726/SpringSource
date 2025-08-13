@@ -16,22 +16,21 @@
 
 package org.springframework.util.comparator;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.io.Serializable;
+import java.util.Comparator;
+
 /**
- * A decorator for a comparator, with an "ascending" flag denoting
- * whether comparison results should be treated in forward (standard
- * ascending) order or flipped for reverse (descending) order.
+ * 比较器的装饰器，带有"升序"标志，表示比较结果应按正向（标准升序）
+ * 还是反向（降序）顺序处理。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @since 1.2.2
- * @param <T> the type of objects that may be compared by this comparator
- * @deprecated as of Spring Framework 5.0, in favor of the standard JDK 8
+ * @param <T> 此比较器可以比较的对象类型
+ * @deprecated 自Spring Framework 5.0起，推荐使用标准的JDK 8
  * {@link Comparator#reversed()}
  */
 @Deprecated
@@ -44,9 +43,10 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
 
 
 	/**
-	 * Create an InvertibleComparator that sorts ascending by default.
-	 * For the actual comparison, the specified Comparator will be used.
-	 * @param comparator the comparator to decorate
+	 * 创建一个默认升序排序的InvertibleComparator。
+	 * 实际比较时将使用指定的Comparator。
+	 * @param comparator 要装饰的比较器
+	 * @throws IllegalArgumentException 如果comparator为null
 	 */
 	public InvertibleComparator(Comparator<T> comparator) {
 		Assert.notNull(comparator, "Comparator must not be null");
@@ -54,10 +54,11 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
 	}
 
 	/**
-	 * Create an InvertibleComparator that sorts based on the provided order.
-	 * For the actual comparison, the specified Comparator will be used.
-	 * @param comparator the comparator to decorate
-	 * @param ascending the sort order: ascending (true) or descending (false)
+	 * 根据指定排序顺序创建InvertibleComparator。
+	 * 实际比较时将使用指定的Comparator。
+	 * @param comparator 要装饰的比较器
+	 * @param ascending 排序顺序：true表示升序，false表示降序
+	 * @throws IllegalArgumentException 如果comparator为null
 	 */
 	public InvertibleComparator(Comparator<T> comparator, boolean ascending) {
 		Assert.notNull(comparator, "Comparator must not be null");
@@ -67,22 +68,23 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
 
 
 	/**
-	 * Specify the sort order: ascending (true) or descending (false).
+	 * 设置排序顺序。
+	 * @param ascending 排序顺序：true表示升序，false表示降序
 	 */
 	public void setAscending(boolean ascending) {
 		this.ascending = ascending;
 	}
 
 	/**
-	 * Return the sort order: ascending (true) or descending (false).
+	 * 获取当前排序顺序。
+	 * @return true表示升序，false表示降序
 	 */
 	public boolean isAscending() {
 		return this.ascending;
 	}
 
 	/**
-	 * Invert the sort order: ascending &rarr; descending or
-	 * descending &rarr; ascending.
+	 * 反转当前排序顺序：升序变降序或降序变升序。
 	 */
 	public void invertOrder() {
 		this.ascending = !this.ascending;
@@ -93,7 +95,7 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
 	public int compare(T o1, T o2) {
 		int result = this.comparator.compare(o1, o2);
 		if (result != 0) {
-			// Invert the order if it is a reverse sort.
+			// 如果是反向排序，则反转顺序。
 			if (!this.ascending) {
 				if (Integer.MIN_VALUE == result) {
 					result = Integer.MAX_VALUE;

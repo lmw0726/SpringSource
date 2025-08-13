@@ -31,11 +31,11 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.StandardOpenOption;
 
 /**
- * Abstract base class for resources which resolve URLs into File references,
- * such as {@link UrlResource} or {@link ClassPathResource}.
+ * 用于将 URL 解析为 File 引用的资源的抽象基类，
+ * 例如 {@link UrlResource} 或 {@link ClassPathResource}。
  *
- * <p>Detects the "file" protocol as well as the JBoss "vfs" protocol in URLs,
- * resolving file system references accordingly.
+ * <p>检测 URL 中的 "file" 协议以及 JBoss 的 "vfs" 协议，
+ * 并相应地解析文件系统引用。
  *
  * @author Juergen Hoeller
  * @since 3.0

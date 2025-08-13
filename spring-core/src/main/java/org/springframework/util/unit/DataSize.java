@@ -16,32 +16,31 @@
 
 package org.springframework.util.unit;
 
-import java.io.Serializable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * A data size, such as '12MB'.
+ * 表示数据大小的类，如'12MB'。
  *
- * <p>This class models data size in terms of bytes and is immutable and thread-safe.
+ * <p>此类以字节为单位建模数据大小，是不可变且线程安全的。
  *
- * <p>The terms and units used in this class are based on
- * <a href="https://en.wikipedia.org/wiki/Binary_prefix">binary prefixes</a>
- * indicating multiplication by powers of 2. Consult the following table and
- * the Javadoc for {@link DataUnit} for details.
+ * <p>本类使用的术语和单位基于表示乘以2的幂次的
+ * <a href="https://en.wikipedia.org/wiki/Binary_prefix">二进制前缀</a>。
+ * 详情请参考下表及{@link DataUnit}的Javadoc。
  *
  * <p>
  * <table border="1">
- * <tr><th>Term</th><th>Data Size</th><th>Size in Bytes</th></tr>
- * <tr><td>byte</td><td>1B</td><td>1</td></tr>
- * <tr><td>kilobyte</td><td>1KB</td><td>1,024</td></tr>
- * <tr><td>megabyte</td><td>1MB</td><td>1,048,576</td></tr>
- * <tr><td>gigabyte</td><td>1GB</td><td>1,073,741,824</td></tr>
- * <tr><td>terabyte</td><td>1TB</td><td>1,099,511,627,776</td></tr>
+ * <tr><th>术语</th><th>数据大小</th><th>字节大小</th></tr>
+ * <tr><td>字节</td><td>1B</td><td>1</td></tr>
+ * <tr><td>千字节</td><td>1KB</td><td>1,024</td></tr>
+ * <tr><td>兆字节</td><td>1MB</td><td>1,048,576</td></tr>
+ * <tr><td>吉字节</td><td>1GB</td><td>1,073,741,824</td></tr>
+ * <tr><td>太字节</td><td>1TB</td><td>1,099,511,627,776</td></tr>
  * </table>
  *
  * @author Stephane Nicoll
@@ -53,22 +52,22 @@ import org.springframework.util.StringUtils;
 public final class DataSize implements Comparable<DataSize>, Serializable {
 
 	/**
-	 * Bytes per Kilobyte.
+	 * 每千字节的字节数。
 	 */
 	private static final long BYTES_PER_KB = 1024;
 
 	/**
-	 * Bytes per Megabyte.
+	 * 每兆字节的字节数。
 	 */
 	private static final long BYTES_PER_MB = BYTES_PER_KB * 1024;
 
 	/**
-	 * Bytes per Gigabyte.
+	 * 每吉字节的字节数。
 	 */
 	private static final long BYTES_PER_GB = BYTES_PER_MB * 1024;
 
 	/**
-	 * Bytes per Terabyte.
+	 * 每太字节的字节数。
 	 */
 	private static final long BYTES_PER_TB = BYTES_PER_GB * 1024;
 
@@ -82,55 +81,56 @@ public final class DataSize implements Comparable<DataSize>, Serializable {
 
 
 	/**
-	 * Obtain a {@link DataSize} representing the specified number of bytes.
-	 * @param bytes the number of bytes, positive or negative
-	 * @return a {@link DataSize}
+	 * 获取表示指定字节数的{@link DataSize}。
+	 * @param bytes 字节数，可为正或负
+	 * @return 对应的{@link DataSize}实例
 	 */
 	public static DataSize ofBytes(long bytes) {
 		return new DataSize(bytes);
 	}
 
 	/**
-	 * Obtain a {@link DataSize} representing the specified number of kilobytes.
-	 * @param kilobytes the number of kilobytes, positive or negative
-	 * @return a {@link DataSize}
+	 * 获取表示指定千字节数的{@link DataSize}。
+	 * @param kilobytes 千字节数，可为正或负
+	 * @return 对应的{@link DataSize}实例
 	 */
 	public static DataSize ofKilobytes(long kilobytes) {
 		return new DataSize(Math.multiplyExact(kilobytes, BYTES_PER_KB));
 	}
 
 	/**
-	 * Obtain a {@link DataSize} representing the specified number of megabytes.
-	 * @param megabytes the number of megabytes, positive or negative
-	 * @return a {@link DataSize}
+	 * 获取表示指定兆字节数的{@link DataSize}。
+	 * @param megabytes 兆字节数，可为正或负
+	 * @return 对应的{@link DataSize}实例
 	 */
 	public static DataSize ofMegabytes(long megabytes) {
 		return new DataSize(Math.multiplyExact(megabytes, BYTES_PER_MB));
 	}
 
 	/**
-	 * Obtain a {@link DataSize} representing the specified number of gigabytes.
-	 * @param gigabytes the number of gigabytes, positive or negative
-	 * @return a {@link DataSize}
+	 * 获取表示指定吉字节数的{@link DataSize}。
+	 * @param gigabytes 吉字节数，可为正或负
+	 * @return 对应的{@link DataSize}实例
 	 */
 	public static DataSize ofGigabytes(long gigabytes) {
 		return new DataSize(Math.multiplyExact(gigabytes, BYTES_PER_GB));
 	}
 
 	/**
-	 * Obtain a {@link DataSize} representing the specified number of terabytes.
-	 * @param terabytes the number of terabytes, positive or negative
-	 * @return a {@link DataSize}
+	 * 获取表示指定太字节数的{@link DataSize}。
+	 * @param terabytes 太字节数，可为正或负
+	 * @return 对应的{@link DataSize}实例
 	 */
 	public static DataSize ofTerabytes(long terabytes) {
 		return new DataSize(Math.multiplyExact(terabytes, BYTES_PER_TB));
 	}
 
 	/**
-	 * Obtain a {@link DataSize} representing an amount in the specified {@link DataUnit}.
-	 * @param amount the amount of the size, measured in terms of the unit,
-	 * positive or negative
-	 * @return a corresponding {@link DataSize}
+	 * 获取表示指定单位和数量的{@link DataSize}。
+	 * @param amount 大小数值，以指定单位计量，可为正或负
+	 * @param unit 计量单位
+	 * @return 对应的{@link DataSize}实例
+	 * @throws IllegalArgumentException 如果单位为null
 	 */
 	public static DataSize of(long amount, DataUnit unit) {
 		Assert.notNull(unit, "Unit must not be null");
@@ -138,17 +138,17 @@ public final class DataSize implements Comparable<DataSize>, Serializable {
 	}
 
 	/**
-	 * Obtain a {@link DataSize} from a text string such as {@code 12MB} using
-	 * {@link DataUnit#BYTES} if no unit is specified.
+	 * 从文本字符串(如{@code 12MB})解析获取{@link DataSize}，
+	 * 如果未指定单位则使用{@link DataUnit#BYTES}。
 	 * <p>
-	 * Examples:
+	 * 示例:
 	 * <pre>
-	 * "12KB" -- parses as "12 kilobytes"
-	 * "5MB"  -- parses as "5 megabytes"
-	 * "20"   -- parses as "20 bytes"
+	 * "12KB" -- 解析为"12千字节"
+	 * "5MB"  -- 解析为"5兆字节"
+	 * "20"   -- 解析为"20字节"
 	 * </pre>
-	 * @param text the text to parse
-	 * @return the parsed {@link DataSize}
+	 * @param text 要解析的文本
+	 * @return 解析后的{@link DataSize}
 	 * @see #parse(CharSequence, DataUnit)
 	 */
 	public static DataSize parse(CharSequence text) {
@@ -156,20 +156,20 @@ public final class DataSize implements Comparable<DataSize>, Serializable {
 	}
 
 	/**
-	 * Obtain a {@link DataSize} from a text string such as {@code 12MB} using
-	 * the specified default {@link DataUnit} if no unit is specified.
+	 * 从文本字符串(如{@code 12MB})解析获取{@link DataSize}，
+	 * 如果未指定单位则使用指定的默认{@link DataUnit}。
 	 * <p>
-	 * The string starts with a number followed optionally by a unit matching one of the
-	 * supported {@linkplain DataUnit suffixes}.
+	 * 字符串以数字开头，后跟可选的单位(匹配支持的{@linkplain DataUnit 后缀}之一)。
 	 * <p>
-	 * Examples:
+	 * 示例:
 	 * <pre>
-	 * "12KB" -- parses as "12 kilobytes"
-	 * "5MB"  -- parses as "5 megabytes"
-	 * "20"   -- parses as "20 kilobytes" (where the {@code defaultUnit} is {@link DataUnit#KILOBYTES})
+	 * "12KB" -- 解析为"12千字节"
+	 * "5MB"  -- 解析为"5兆字节"
+	 * "20"   -- 解析为"20千字节" (当{@code defaultUnit}为{@link DataUnit#KILOBYTES}时)
 	 * </pre>
-	 * @param text the text to parse
-	 * @return the parsed {@link DataSize}
+	 * @param text 要解析的文本
+	 * @param defaultUnit 默认单位(可为null)
+	 * @return 解析后的{@link DataSize}
 	 */
 	public static DataSize parse(CharSequence text, @Nullable DataUnit defaultUnit) {
 		Assert.notNull(text, "Text must not be null");
@@ -186,48 +186,48 @@ public final class DataSize implements Comparable<DataSize>, Serializable {
 	}
 
 	/**
-	 * Checks if this size is negative, excluding zero.
-	 * @return true if this size has a size less than zero bytes
+	 * 检查当前大小是否为负数（不包括零）。
+	 * @return 如果当前大小小于零字节则返回true
 	 */
 	public boolean isNegative() {
 		return this.bytes < 0;
 	}
 
 	/**
-	 * Return the number of bytes in this instance.
-	 * @return the number of bytes
+	 * 返回当前实例的字节数。
+	 * @return 字节数
 	 */
 	public long toBytes() {
 		return this.bytes;
 	}
 
 	/**
-	 * Return the number of kilobytes in this instance.
-	 * @return the number of kilobytes
+	 * 返回当前实例的千字节数。
+	 * @return 千字节数
 	 */
 	public long toKilobytes() {
 		return this.bytes / BYTES_PER_KB;
 	}
 
 	/**
-	 * Return the number of megabytes in this instance.
-	 * @return the number of megabytes
+	 * 返回当前实例的兆字节数。
+	 * @return 兆字节数
 	 */
 	public long toMegabytes() {
 		return this.bytes / BYTES_PER_MB;
 	}
 
 	/**
-	 * Return the number of gigabytes in this instance.
-	 * @return the number of gigabytes
+	 * 返回当前实例的吉字节数。
+	 * @return 吉字节数
 	 */
 	public long toGigabytes() {
 		return this.bytes / BYTES_PER_GB;
 	}
 
 	/**
-	 * Return the number of terabytes in this instance.
-	 * @return the number of terabytes
+	 * 返回当前实例的太字节数。
+	 * @return 太字节数
 	 */
 	public long toTerabytes() {
 		return this.bytes / BYTES_PER_TB;
@@ -263,13 +263,13 @@ public final class DataSize implements Comparable<DataSize>, Serializable {
 
 
 	/**
-	 * Static nested class to support lazy loading of the {@link #PATTERN}.
+	 * 静态嵌套类，用于支持{@link #PATTERN}的延迟加载。
 	 * @since 5.3.21
 	 */
 	private static class DataSizeUtils {
 
 		/**
-		 * The pattern for parsing.
+		 * 用于解析的正则表达式模式。
 		 */
 		private static final Pattern PATTERN = Pattern.compile("^([+\\-]?\\d+)([a-zA-Z]{0,2})$");
 

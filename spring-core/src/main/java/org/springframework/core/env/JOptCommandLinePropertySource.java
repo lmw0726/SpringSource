@@ -16,25 +16,23 @@
 
 package org.springframework.core.env;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * {@link CommandLinePropertySource} implementation backed by a JOpt {@link OptionSet}.
+ * 由 JOpt {@link OptionSet} 支持的 {@link CommandLinePropertySource} 实现。
  *
- * <h2>Typical usage</h2>
+ * <h2>典型用法</h2>
  *
- * Configure and execute an {@code OptionParser} against the {@code String[]} of arguments
- * supplied to the {@code main} method, and create a {@link JOptCommandLinePropertySource}
- * using the resulting {@code OptionSet} object:
+ * 针对提供给 {@code main} 方法的 {@code String[]} 参数配置并执行一个 {@code OptionParser}，
+ * 然后使用生成的 {@code OptionSet} 对象创建一个 {@link JOptCommandLinePropertySource}：
  *
  * <pre class="code">
  * public static void main(String[] args) {
@@ -46,9 +44,9 @@ import org.springframework.util.StringUtils;
  *     // ...
  * }</pre>
  *
- * See {@link CommandLinePropertySource} for complete general usage examples.
+ * 有关完整的通用用法示例，请参阅 {@link CommandLinePropertySource}。
  *
- * <p>Requires JOpt Simple version 4.3 or higher. Tested against JOpt up until 5.0.
+ * <p>需要 JOpt Simple 4.3 或更高版本。已针对 JOpt 5.0 及以下版本进行测试。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -61,8 +59,7 @@ import org.springframework.util.StringUtils;
 public class JOptCommandLinePropertySource extends CommandLinePropertySource<OptionSet> {
 
 	/**
-	 * Create a new {@code JOptCommandLinePropertySource} having the default name
-	 * and backed by the given {@code OptionSet}.
+	 * 创建一个具有默认名称且由给定 {@code OptionSet} 支持的新 {@code JOptCommandLinePropertySource}。
 	 * @see CommandLinePropertySource#COMMAND_LINE_PROPERTY_SOURCE_NAME
 	 * @see CommandLinePropertySource#CommandLinePropertySource(Object)
 	 */
@@ -71,8 +68,7 @@ public class JOptCommandLinePropertySource extends CommandLinePropertySource<Opt
 	}
 
 	/**
-	 * Create a new {@code JOptCommandLinePropertySource} having the given name
-	 * and backed by the given {@code OptionSet}.
+	 * 创建一个具有给定名称且由给定 {@code OptionSet} 支持的新 {@code JOptCommandLinePropertySource}。
 	 */
 	public JOptCommandLinePropertySource(String name, OptionSet options) {
 		super(name, options);
@@ -90,7 +86,7 @@ public class JOptCommandLinePropertySource extends CommandLinePropertySource<Opt
 		for (OptionSpec<?> spec : this.source.specs()) {
 			String lastOption = CollectionUtils.lastElement(spec.options());
 			if (lastOption != null) {
-				// Only the longest name is used for enumerating
+				// 只使用最长的名称来枚举
 				names.add(lastOption);
 			}
 		}

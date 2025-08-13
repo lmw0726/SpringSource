@@ -20,14 +20,14 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * Strategy interface for {@code String}-based path matching.
+ * 基于字符串的路径匹配策略接口。
  *
- * <p>Used by {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver},
- * {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping},
- * and {@link org.springframework.web.servlet.mvc.WebContentInterceptor}.
+ * <p>被以下类使用：
+ * {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}、
+ * {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping}、
+ * 以及{@link org.springframework.web.servlet.mvc.WebContentInterceptor}。
  *
- * <p>The default implementation is {@link AntPathMatcher}, supporting the
- * Ant-style pattern syntax.
+ * <p>默认实现是{@link AntPathMatcher}，支持Ant风格的模式语法。
  *
  * @author Juergen Hoeller
  * @since 1.2
@@ -36,90 +36,77 @@ import java.util.Map;
 public interface PathMatcher {
 
 	/**
-	 * Does the given {@code path} represent a pattern that can be matched
-	 * by an implementation of this interface?
-	 * <p>If the return value is {@code false}, then the {@link #match}
-	 * method does not have to be used because direct equality comparisons
-	 * on the static path Strings will lead to the same result.
-	 * @param path the path to check
-	 * @return {@code true} if the given {@code path} represents a pattern
+	 * 判断给定的{@code path}是否表示可由本接口实现匹配的模式。
+	 * <p>如果返回值为{@code false}，则不需要使用{@link #match}方法，
+	 * 因为对静态路径字符串的直接相等比较会得出相同结果。
+	 * @param path 要检查的路径
+	 * @return 如果给定的{@code path}表示一个模式则返回{@code true}
 	 */
 	boolean isPattern(String path);
 
 	/**
-	 * Match the given {@code path} against the given {@code pattern},
-	 * according to this PathMatcher's matching strategy.
-	 * @param pattern the pattern to match against
-	 * @param path the path to test
-	 * @return {@code true} if the supplied {@code path} matched,
-	 * {@code false} if it didn't
+	 * 根据此PathMatcher的匹配策略，将给定{@code path}与给定{@code pattern}进行匹配。
+	 * @param pattern 要匹配的模式
+	 * @param path 要测试的路径
+	 * @return 如果提供的{@code path}匹配则返回{@code true}，否则返回{@code false}
 	 */
 	boolean match(String pattern, String path);
 
 	/**
-	 * Match the given {@code path} against the corresponding part of the given
-	 * {@code pattern}, according to this PathMatcher's matching strategy.
-	 * <p>Determines whether the pattern at least matches as far as the given base
-	 * path goes, assuming that a full path may then match as well.
-	 * @param pattern the pattern to match against
-	 * @param path the path to test
-	 * @return {@code true} if the supplied {@code path} matched,
-	 * {@code false} if it didn't
+	 * 根据此PathMatcher的匹配策略，将给定{@code path}与给定{@code pattern}的对应部分进行匹配。
+	 * <p>确定模式至少匹配到给定基本路径的程度，假设完整路径也可能匹配。
+	 * @param pattern 要匹配的模式
+	 * @param path 要测试的路径
+	 * @return 如果提供的{@code path}匹配则返回{@code true}，否则返回{@code false}
 	 */
 	boolean matchStart(String pattern, String path);
 
 	/**
-	 * Given a pattern and a full path, determine the pattern-mapped part.
-	 * <p>This method is supposed to find out which part of the path is matched
-	 * dynamically through an actual pattern, that is, it strips off a statically
-	 * defined leading path from the given full path, returning only the actually
-	 * pattern-matched part of the path.
-	 * <p>For example: For "myroot/*.html" as pattern and "myroot/myfile.html"
-	 * as full path, this method should return "myfile.html". The detailed
-	 * determination rules are specified to this PathMatcher's matching strategy.
-	 * <p>A simple implementation may return the given full path as-is in case
-	 * of an actual pattern, and the empty String in case of the pattern not
-	 * containing any dynamic parts (i.e. the {@code pattern} parameter being
-	 * a static path that wouldn't qualify as an actual {@link #isPattern pattern}).
-	 * A sophisticated implementation will differentiate between the static parts
-	 * and the dynamic parts of the given path pattern.
-	 * @param pattern the path pattern
-	 * @param path the full path to introspect
-	 * @return the pattern-mapped part of the given {@code path}
-	 * (never {@code null})
+	 * 给定模式和完整路径，确定模式映射的部分。
+	 * <p>此方法旨在找出路径中通过实际模式动态匹配的部分，
+	 * 也就是说，它会从给定的完整路径中去掉静态定义的前导路径，
+	 * 只返回路径中实际被模式匹配的部分。
+	 * <p>例如：对于模式"myroot/*.html"和完整路径"myroot/myfile.html"，
+	 * 此方法应返回"myfile.html"。具体的确定规则取决于此PathMatcher的匹配策略。
+	 * <p>简单实现可能在遇到实际模式时原样返回给定完整路径，
+	 * 而在模式不包含任何动态部分时返回空字符串（即{@code pattern}参数是
+	 * 不符合{@link #isPattern 模式}条件的静态路径）。
+	 * 复杂的实现会区分给定路径模式的静态部分和动态部分。
+	 * @param pattern 路径模式
+	 * @param path 要检查的完整路径
+	 * @return 给定{@code path}中模式映射的部分（永不返回{@code null}）
 	 */
 	String extractPathWithinPattern(String pattern, String path);
 
 	/**
-	 * Given a pattern and a full path, extract the URI template variables. URI template
-	 * variables are expressed through curly brackets ('{' and '}').
-	 * <p>For example: For pattern "/hotels/{hotel}" and path "/hotels/1", this method will
-	 * return a map containing "hotel" &rarr; "1".
-	 * @param pattern the path pattern, possibly containing URI templates
-	 * @param path the full path to extract template variables from
-	 * @return a map, containing variable names as keys; variables values as values
+	 * 根据给定的路径模式和完整路径，提取URI模板变量。URI模板
+	 * 变量通过大括号('{'和'}')表示。
+	 * <p>例如：对于模式"/hotels/{hotel}"和路径"/hotels/1"，该方法将
+	 * 返回一个包含"hotel"→"1"的映射。
+	 * @param pattern 路径模式，可能包含URI模板
+	 * @param path 要从中提取模板变量的完整路径
+	 * @return 一个映射，包含变量名作为键，变量值作为值
 	 */
 	Map<String, String> extractUriTemplateVariables(String pattern, String path);
 
 	/**
-	 * Given a full path, returns a {@link Comparator} suitable for sorting patterns
-	 * in order of explicitness for that path.
-	 * <p>The full algorithm used depends on the underlying implementation,
-	 * but generally, the returned {@code Comparator} will
-	 * {@linkplain java.util.List#sort(java.util.Comparator) sort}
-	 * a list so that more specific patterns come before generic patterns.
-	 * @param path the full path to use for comparison
-	 * @return a comparator capable of sorting patterns in order of explicitness
+	 * 给定一个完整路径，返回适合按该路径的明确性排序模式的{@link Comparator}。
+	 * <p>使用的完整算法取决于底层实现，
+	 * 但通常，返回的{@code Comparator}将
+	 * {@linkplain java.util.List#sort(java.util.Comparator) 排序}
+	 * 一个列表，使更具体的模式排在通用模式之前。
+	 * @param path 用于比较的完整路径
+	 * @return 能够按明确性排序模式的比较器
 	 */
 	Comparator<String> getPatternComparator(String path);
 
 	/**
-	 * Combines two patterns into a new pattern that is returned.
-	 * <p>The full algorithm used for combining the two pattern depends on the underlying implementation.
-	 * @param pattern1 the first pattern
-	 * @param pattern2 the second pattern
-	 * @return the combination of the two patterns
-	 * @throws IllegalArgumentException when the two patterns cannot be combined
+	 * 将两个模式组合成一个返回的新模式。
+	 * <p>用于组合两个模式的完整算法取决于底层实现。
+	 * @param pattern1 第一个模式
+	 * @param pattern2 第二个模式
+	 * @return 两个模式的组合
+	 * @throws IllegalArgumentException 当两个模式无法组合时抛出
 	 */
 	String combine(String pattern1, String pattern2);
 

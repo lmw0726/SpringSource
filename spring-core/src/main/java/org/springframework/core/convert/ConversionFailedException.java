@@ -20,7 +20,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Exception to be thrown when an actual type conversion attempt fails.
+ * 当实际类型转换尝试失败时抛出的异常。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -39,11 +39,11 @@ public class ConversionFailedException extends ConversionException {
 
 
 	/**
-	 * Create a new conversion exception.
-	 * @param sourceType the value's original type
-	 * @param targetType the value's target type
-	 * @param value the value we tried to convert
-	 * @param cause the cause of the conversion failure
+	 * 创建新的转换异常。
+	 * @param sourceType 值的原始类型
+	 * @param targetType 值的目标类型
+	 * @param value 我们尝试转换的值
+	 * @param cause 转换失败的原因
 	 */
 	public ConversionFailedException(@Nullable TypeDescriptor sourceType, TypeDescriptor targetType,
 			@Nullable Object value, Throwable cause) {
@@ -57,7 +57,7 @@ public class ConversionFailedException extends ConversionException {
 
 
 	/**
-	 * Return the source type we tried to convert the value from.
+	 * 返回我们尝试转换值的源类型。
 	 */
 	@Nullable
 	public TypeDescriptor getSourceType() {
@@ -65,14 +65,14 @@ public class ConversionFailedException extends ConversionException {
 	}
 
 	/**
-	 * Return the target type we tried to convert the value to.
+	 * 返回我们尝试转换值的目标类型。
 	 */
 	public TypeDescriptor getTargetType() {
 		return this.targetType;
 	}
 
 	/**
-	 * Return the offending value.
+	 * 返回有问题的值。
 	 */
 	@Nullable
 	public Object getValue() {

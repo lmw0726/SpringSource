@@ -16,24 +16,21 @@
 
 package org.springframework.util.comparator;
 
-import java.util.Comparator;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.Comparator;
+
 /**
- * Compares objects based on an arbitrary class order. Allows objects to be sorted based
- * on the types of class that they inherit &mdash; for example, this comparator can be used
- * to sort a list of {@code Number}s such that {@code Long}s occur before {@code Integer}s.
+ * 基于任意类顺序比较对象的比较器。允许根据对象继承的类类型进行排序 &mdash;
+ * 例如，此比较器可用于对{@code Number}列表排序，使{@code Long}排在{@code Integer}之前。
  *
- * <p>Only the specified {@code instanceOrder} classes are considered during comparison.
- * If two objects are both instances of the ordered type this comparator will return a
- * value of {@code 0}. Consider combining with {@link Comparator#thenComparing(Comparator)}
- * if additional sorting is required.
+ * <p>比较时仅考虑指定的{@code instanceOrder}类。如果两个对象都是已排序类型的实例，
+ * 此比较器将返回{@code 0}。如果需要额外的排序，考虑结合使用{@link Comparator#thenComparing(Comparator)}。
  *
  * @author Phillip Webb
  * @since 3.2
- * @param <T> the type of objects that may be compared by this comparator
+ * @param <T> 此比较器可以比较的对象类型
  * @see Comparator#thenComparing(Comparator)
  */
 public class InstanceComparator<T> implements Comparator<T> {
@@ -42,9 +39,9 @@ public class InstanceComparator<T> implements Comparator<T> {
 
 
 	/**
-	 * Create a new {@link InstanceComparator} instance.
-	 * @param instanceOrder the ordered list of classes that should be used when comparing
-	 * objects. Classes earlier in the list will be given a higher priority.
+	 * 创建新的{@link InstanceComparator}实例。
+	 * @param instanceOrder 用于比较对象的有序类列表。列表中靠前的类将获得更高优先级。
+	 * @throws IllegalArgumentException 如果instanceOrder数组为null
 	 */
 	public InstanceComparator(Class<?>... instanceOrder) {
 		Assert.notNull(instanceOrder, "'instanceOrder' array must not be null");

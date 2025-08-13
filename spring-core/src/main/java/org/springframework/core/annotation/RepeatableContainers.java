@@ -16,27 +16,25 @@
 
 package org.springframework.core.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Repeatable;
-import java.lang.reflect.Method;
-import java.util.Map;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Repeatable;
+import java.lang.reflect.Method;
+import java.util.Map;
+
 /**
- * Strategy used to determine annotations that act as containers for other
- * annotations. The {@link #standardRepeatables()} method provides a default
- * strategy that respects Java's {@link Repeatable @Repeatable} support and
- * should be suitable for most situations.
+ * 用于确定作为其他注解容器的注解的策略。
+ * {@link #standardRepeatables()} 方法提供了一个默认策略，该策略遵循 Java 的 {@link Repeatable @Repeatable} 支持，
+ * 并且应该适用于大多数情况。
  *
- * <p>The {@link #of} method can be used to register relationships for
- * annotations that do not wish to use {@link Repeatable @Repeatable}.
+ * <p>{@link #of} 方法可用于注册不希望使用 {@link Repeatable @Repeatable} 的注解之间的关系。
  *
- * <p>To completely disable repeatable support use {@link #none()}.
+ * <p>要完全禁用可重复支持，请使用 {@link #none()}。
  *
  * @author Phillip Webb
  * @since 5.2
@@ -53,11 +51,10 @@ public abstract class RepeatableContainers {
 
 
 	/**
-	 * Add an additional explicit relationship between a contained and
-	 * repeatable annotation.
-	 * @param container the container type
-	 * @param repeatable the contained repeatable type
-	 * @return a new {@link RepeatableContainers} instance
+	 * 添加包含注解和可重复注解之间的额外显式关系。
+	 * @param container 容器类型
+	 * @param repeatable 包含的可重复类型
+	 * @return 一个新的 {@link RepeatableContainers} 实例
 	 */
 	public RepeatableContainers and(Class<? extends Annotation> container,
 			Class<? extends Annotation> repeatable) {
@@ -92,24 +89,23 @@ public abstract class RepeatableContainers {
 
 
 	/**
-	 * Create a {@link RepeatableContainers} instance that searches using Java's
-	 * {@link Repeatable @Repeatable} annotation.
-	 * @return a {@link RepeatableContainers} instance
+	 * 创建一个 {@link RepeatableContainers} 实例，该实例使用 Java 的
+	 * {@link Repeatable @Repeatable} 注解进行搜索。
+	 * @return 一个 {@link RepeatableContainers} 实例
 	 */
 	public static RepeatableContainers standardRepeatables() {
 		return StandardRepeatableContainers.INSTANCE;
 	}
 
 	/**
-	 * Create a {@link RepeatableContainers} instance that uses a defined
-	 * container and repeatable type.
-	 * @param repeatable the contained repeatable annotation
-	 * @param container the container annotation or {@code null}. If specified,
-	 * this annotation must declare a {@code value} attribute returning an array
-	 * of repeatable annotations. If not specified, the container will be
-	 * deduced by inspecting the {@code @Repeatable} annotation on
-	 * {@code repeatable}.
-	 * @return a {@link RepeatableContainers} instance
+	 * 创建一个 {@link RepeatableContainers} 实例，该实例使用定义的
+	 * 容器和可重复类型。
+	 * @param repeatable 包含的可重复注解
+	 * @param container 容器注解或 {@code null}。如果指定，
+	 * 此注解必须声明一个 {@code value} 属性，返回一个可重复注解数组。
+	 * 如果未指定，则容器将通过检查 {@code repeatable} 上的
+	 * {@code @Repeatable} 注解来推断。
+	 * @return 一个 {@link RepeatableContainers} 实例
 	 */
 	public static RepeatableContainers of(
 			Class<? extends Annotation> repeatable, @Nullable Class<? extends Annotation> container) {
@@ -118,9 +114,9 @@ public abstract class RepeatableContainers {
 	}
 
 	/**
-	 * Create a {@link RepeatableContainers} instance that does not expand any
-	 * repeatable annotations.
-	 * @return a {@link RepeatableContainers} instance
+	 * 创建一个 {@link RepeatableContainers} 实例，该实例不扩展任何
+	 * 可重复注解。
+	 * @return 一个 {@link RepeatableContainers} 实例
 	 */
 	public static RepeatableContainers none() {
 		return NoRepeatableContainers.INSTANCE;
@@ -128,8 +124,8 @@ public abstract class RepeatableContainers {
 
 
 	/**
-	 * Standard {@link RepeatableContainers} implementation that searches using
-	 * Java's {@link Repeatable @Repeatable} annotation.
+	 * 标准的 {@link RepeatableContainers} 实现，使用 Java 的
+	 * {@link Repeatable @Repeatable} 注解进行搜索。
 	 */
 	private static class StandardRepeatableContainers extends RepeatableContainers {
 
@@ -179,7 +175,7 @@ public abstract class RepeatableContainers {
 
 
 	/**
-	 * A single explicit mapping.
+	 * 单个显式映射。
 	 */
 	private static class ExplicitRepeatableContainer extends RepeatableContainers {
 
@@ -260,7 +256,7 @@ public abstract class RepeatableContainers {
 
 
 	/**
-	 * No repeatable containers.
+	 * 没有可重复容器。
 	 */
 	private static class NoRepeatableContainers extends RepeatableContainers {
 

@@ -16,31 +16,20 @@
 
 package org.springframework.core;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.springframework.lang.Nullable;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.Map.Entry;
+
 /**
- * Specialization of {@link Properties} that sorts properties alphanumerically
- * based on their keys.
+ * {@link Properties} 的特化实现，按照键的字母顺序进行排序。
  *
- * <p>This can be useful when storing the {@link Properties} instance in a
- * properties file, since it allows such files to be generated in a repeatable
- * manner with consistent ordering of properties.
+ * <p>当将 {@link Properties} 实例存储到属性文件中时，这会很有用，
+ * 因为它允许生成的文件具有一致的属性顺序，从而可重复生成。
  *
- * <p>Comments in generated properties files can also be optionally omitted.
+ * <p>生成的属性文件中的注释也可以选择省略。
  *
  * @author Sam Brannen
  * @since 5.2
@@ -60,25 +49,21 @@ class SortedProperties extends Properties {
 
 
 	/**
-	 * Construct a new {@code SortedProperties} instance that honors the supplied
-	 * {@code omitComments} flag.
-	 * @param omitComments {@code true} if comments should be omitted when
-	 * storing properties in a file
+	 * 构造一个新的 {@code SortedProperties} 实例，并根据提供的
+	 * {@code omitComments} 标志进行设置。
+	 * @param omitComments 如果在将属性存储到文件时应省略注释，则为 {@code true}
 	 */
 	SortedProperties(boolean omitComments) {
 		this.omitComments = omitComments;
 	}
 
 	/**
-	 * Construct a new {@code SortedProperties} instance with properties populated
-	 * from the supplied {@link Properties} object and honoring the supplied
-	 * {@code omitComments} flag.
-	 * <p>Default properties from the supplied {@code Properties} object will
-	 * not be copied.
-	 * @param properties the {@code Properties} object from which to copy the
-	 * initial properties
-	 * @param omitComments {@code true} if comments should be omitted when
-	 * storing properties in a file
+	 * 构造一个新的 {@code SortedProperties} 实例，并从提供的
+	 * {@link Properties} 对象中填充属性，同时根据提供的
+	 * {@code omitComments} 标志进行设置。
+	 * <p>不会复制提供的 {@code Properties} 对象中的默认属性。
+	 * @param properties 要复制初始属性的 {@code Properties} 对象
+	 * @param omitComments 如果在将属性存储到文件时应省略注释，则为 {@code true}
 	 */
 	SortedProperties(Properties properties, boolean omitComments) {
 		this(omitComments);
@@ -121,7 +106,7 @@ class SortedProperties extends Properties {
 	}
 
 	/**
-	 * Return a sorted enumeration of the keys in this {@link Properties} object.
+	 * 返回此 {@link Properties} 对象中已排序的键的枚举。
 	 * @see #keySet()
 	 */
 	@Override
@@ -130,10 +115,9 @@ class SortedProperties extends Properties {
 	}
 
 	/**
-	 * Return a sorted set of the keys in this {@link Properties} object.
-	 * <p>The keys will be converted to strings if necessary using
-	 * {@link String#valueOf(Object)} and sorted alphanumerically according to
-	 * the natural order of strings.
+	 * 返回此 {@link Properties} 对象中已排序的键的集合。
+	 * <p>如有必要，会将键转换为字符串（使用 {@link String#valueOf(Object)}），
+	 * 并根据字符串的自然顺序按字母顺序进行排序。
 	 */
 	@Override
 	public Set<Object> keySet() {
@@ -143,10 +127,9 @@ class SortedProperties extends Properties {
 	}
 
 	/**
-	 * Return a sorted set of the entries in this {@link Properties} object.
-	 * <p>The entries will be sorted based on their keys, and the keys will be
-	 * converted to strings if necessary using {@link String#valueOf(Object)}
-	 * and compared alphanumerically according to the natural order of strings.
+	 * 返回此 {@link Properties} 对象中已排序的条目集合。
+	 * <p>条目将基于其键进行排序，如有必要会将键转换为字符串
+	 * （使用 {@link String#valueOf(Object)}），并根据字符串的自然顺序进行字母排序。
 	 */
 	@Override
 	public Set<Entry<Object, Object>> entrySet() {

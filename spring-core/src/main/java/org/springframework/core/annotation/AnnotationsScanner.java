@@ -34,8 +34,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- * Scanner to search for relevant annotations in the annotation hierarchy of an
- * {@link AnnotatedElement}.
+ * 扫描器，用于在 {@link AnnotatedElement} 的注解层级中搜索相关注解。
  *
  * @author Phillip Webb
  * @author Sam Brannen
@@ -61,15 +60,13 @@ abstract class AnnotationsScanner {
 
 
 	/**
-	 * Scan the hierarchy of the specified element for relevant annotations and
-	 * call the processor as required.
+	 * 扫描指定元素的层级以查找相关注解，并根据需要调用处理器。
 	 *
-	 * @param context        an optional context object that will be passed back to the
-	 *                       processor
-	 * @param source         the source element to scan
-	 * @param searchStrategy the search strategy to use
-	 * @param processor      the processor that receives the annotations
-	 * @return the result of {@link AnnotationsProcessor#finish(Object)}
+	 * @param context        一个可选的上下文对象，将传递回处理器
+	 * @param source         要扫描的源元素
+	 * @param searchStrategy 要使用的搜索策略
+	 * @param processor      接收注解的处理器
+	 * @return {@link AnnotationsProcessor#finish(Object)} 的结果
 	 */
 	@Nullable
 	static <C, R> R scan(C context, AnnotatedElement source, SearchStrategy searchStrategy,
@@ -208,11 +205,11 @@ abstract class AnnotationsScanner {
 				}
 			}
 			if (includeEnclosing) {
-				// Since merely attempting to load the enclosing class may result in
-				// automatic loading of sibling nested classes that in turn results
-				// in an exception such as NoClassDefFoundError, we wrap the following
-				// in its own dedicated try-catch block in order not to preemptively
-				// halt the annotation scanning process.
+				// 由于仅仅尝试加载封闭类可能会导致
+				// 同级嵌套类的自动加载，进而可能导致
+				// 诸如 NoClassDefFoundError 这样的异常，因此我们
+				// 将以下内容包装在其独立的 try-catch 块中，
+				// 以免过早地中止注解扫描过程。
 				try {
 					Class<?> enclosingClass = source.getEnclosingClass();
 					if (enclosingClass != null) {

@@ -16,22 +16,20 @@
 
 package org.springframework.core.env;
 
+import org.springframework.lang.Nullable;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Read-only {@code Map<String, String>} implementation that is backed by system
- * properties or environment variables.
+ * 只读的 {@code Map<String, String>} 实现，由系统属性或环境变量支持。
  *
- * <p>Used by {@link AbstractEnvironment} when a {@link SecurityManager} prohibits
- * access to {@link System#getProperties()} or {@link System#getenv()}. It is for this
- * reason that the implementations of {@link #keySet()}, {@link #entrySet()}, and
- * {@link #values()} always return empty even though {@link #get(Object)} may in fact
- * return non-null if the current security manager allows access to individual keys.
+ * <p>当 {@link SecurityManager} 禁止访问 {@link System#getProperties()} 或
+ * {@link System#getenv()} 时，由 {@link AbstractEnvironment} 使用。正因为如此，
+ * {@link #keySet()}、{@link #entrySet()} 和 {@link #values()} 的实现总是返回空集合，
+ * 即使 {@link #get(Object)} 实际上可能返回非空值（如果当前安全管理器允许访问单个键）。
  *
  * @author Arjen Poutsma
  * @author Chris Beams
@@ -45,10 +43,9 @@ abstract class ReadOnlySystemAttributesMap implements Map<String, String> {
 	}
 
 	/**
-	 * Returns the value to which the specified key is mapped, or {@code null} if this map
- 	 * contains no mapping for the key.
-	 * @param key the name of the system attribute to retrieve
-	 * @throws IllegalArgumentException if given key is non-String
+	 * 返回指定键所映射的值，如果此映射不包含该键的映射关系，则返回 {@code null}。
+	 * @param key 要检索的系统属性名称
+	 * @throws IllegalArgumentException 如果给定的键不是字符串类型
 	 */
 	@Override
 	@Nullable
@@ -66,14 +63,14 @@ abstract class ReadOnlySystemAttributesMap implements Map<String, String> {
 	}
 
 	/**
-	 * Template method that returns the underlying system attribute.
-	 * <p>Implementations typically call {@link System#getProperty(String)} or {@link System#getenv(String)} here.
+	 * 返回底层系统属性的模板方法。
+	 * <p>实现通常会在这里调用 {@link System#getProperty(String)} 或 {@link System#getenv(String)}。
 	 */
 	@Nullable
 	protected abstract String getSystemAttribute(String attributeName);
 
 
-	// Unsupported
+	// 不支持的操作
 
 	@Override
 	public int size() {

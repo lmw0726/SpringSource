@@ -16,14 +16,14 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Converts String to a Boolean.
+ * 将字符串转换为布尔值。
  *
  * @author Keith Donald
  * @author Juergen Hoeller

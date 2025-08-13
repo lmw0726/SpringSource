@@ -16,12 +16,7 @@
 
 package org.springframework.core.codec;
 
-import java.io.ByteArrayInputStream;
-import java.util.Map;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
@@ -31,9 +26,13 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
+import reactor.core.publisher.Flux;
+
+import java.io.ByteArrayInputStream;
+import java.util.Map;
 
 /**
- * Decoder for {@link Resource Resources}.
+ * {@link Resource Resources} 的解码器。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -41,7 +40,7 @@ import org.springframework.util.MimeTypeUtils;
  */
 public class ResourceDecoder extends AbstractDataBufferDecoder<Resource> {
 
-	/** Name of hint with a filename for the resource(e.g. from "Content-Disposition" HTTP header). */
+	/** 包含资源文件名的提示名称（例如来自 "Content-Disposition" HTTP 头）。 */
 	public static String FILENAME_HINT = ResourceDecoder.class.getName() + ".filename";
 
 

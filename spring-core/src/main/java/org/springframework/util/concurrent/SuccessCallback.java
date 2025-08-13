@@ -19,19 +19,19 @@ package org.springframework.util.concurrent;
 import org.springframework.lang.Nullable;
 
 /**
- * Success callback for a {@link ListenableFuture}.
+ * 用于{@link ListenableFuture}的成功回调接口。
  *
  * @author Sebastien Deleuze
  * @since 4.1
- * @param <T> the result type
+ * @param <T> 结果类型
  */
 @FunctionalInterface
 public interface SuccessCallback<T> {
 
 	/**
-	 * Called when the {@link ListenableFuture} completes with success.
-	 * <p>Note that Exceptions raised by this method are ignored.
-	 * @param result the result
+	 * 当{@link ListenableFuture}成功完成时调用。
+	 * <p>注意：此方法抛出的异常将被忽略。
+	 * @param result 结果(可为null)
 	 */
 	void onSuccess(@Nullable T result);
 

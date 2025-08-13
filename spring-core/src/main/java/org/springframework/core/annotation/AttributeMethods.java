@@ -16,20 +16,20 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.ConcurrentReferenceHashMap;
+import org.springframework.util.ReflectionUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ConcurrentReferenceHashMap;
-import org.springframework.util.ReflectionUtils;
-
 /**
- * Provides a quick way to access the attribute methods of an {@link Annotation}
- * with consistent ordering as well as a few useful utility methods.
+ * 提供一种快速访问 {@link Annotation} 属性方法的方式，
+ * 具有一致的顺序以及一些有用的实用方法。
  *
  * @author Phillip Webb
  * @author Sam Brannen
@@ -87,9 +87,8 @@ final class AttributeMethods {
 
 
 	/**
-	 * Determine if this instance only contains a single attribute named
-	 * {@code value}.
-	 * @return {@code true} if there is only a value attribute
+	 * 确定此实例是否只包含一个名为 {@code value} 的属性。
+	 * @return 如果只有一个 value 属性，则返回 {@code true}
 	 */
 	boolean hasOnlyValueAttribute() {
 		return (this.attributeMethods.length == 1 &&
@@ -98,10 +97,10 @@ final class AttributeMethods {
 
 
 	/**
-	 * Determine if values from the given annotation can be safely accessed without
-	 * causing any {@link TypeNotPresentException TypeNotPresentExceptions}.
-	 * @param annotation the annotation to check
-	 * @return {@code true} if all values are present
+	 * 确定给定注解中的值是否可以安全访问，而不会导致
+	 * 任何 {@link TypeNotPresentException TypeNotPresentExceptions}。
+	 * @param annotation 要检查的注解
+	 * @return 如果所有值都存在，则返回 {@code true}
 	 * @see #validate(Annotation)
 	 */
 	boolean isValid(Annotation annotation) {
@@ -120,13 +119,12 @@ final class AttributeMethods {
 	}
 
 	/**
-	 * Check if values from the given annotation can be safely accessed without causing
-	 * any {@link TypeNotPresentException TypeNotPresentExceptions}. In particular,
-	 * this method is designed to cover Google App Engine's late arrival of such
-	 * exceptions for {@code Class} values (instead of the more typical early
-	 * {@code Class.getAnnotations() failure}.
-	 * @param annotation the annotation to validate
-	 * @throws IllegalStateException if a declared {@code Class} attribute could not be read
+	 * 检查给定注解中的值是否可以安全访问，而不会导致
+	 * 任何 {@link TypeNotPresentException TypeNotPresentExceptions}。特别是，
+	 * 此方法旨在解决 Google App Engine 中 {@code Class} 值的此类异常延迟发生的情况
+	 * （而不是更典型的早期 {@code Class.getAnnotations()} 失败）。
+	 * @param annotation 要验证的注解
+	 * @throws IllegalStateException 如果声明的 {@code Class} 属性无法读取
 	 * @see #isValid(Annotation)
 	 */
 	void validate(Annotation annotation) {
@@ -152,10 +150,9 @@ final class AttributeMethods {
 	}
 
 	/**
-	 * Get the attribute with the specified name or {@code null} if no
-	 * matching attribute exists.
-	 * @param name the attribute name to find
-	 * @return the attribute method or {@code null}
+	 * 获取具有指定名称的属性，如果不存在匹配的属性，则返回 {@code null}。
+	 * @param name 要查找的属性名称
+	 * @return 属性方法或 {@code null}
 	 */
 	@Nullable
 	Method get(String name) {
@@ -164,10 +161,10 @@ final class AttributeMethods {
 	}
 
 	/**
-	 * Get the attribute at the specified index.
-	 * @param index the index of the attribute to return
-	 * @return the attribute method
-	 * @throws IndexOutOfBoundsException if the index is out of range
+	 * 获取指定索引处的属性。
+	 * @param index 要返回的属性的索引
+	 * @return 属性方法
+	 * @throws IndexOutOfBoundsException 如果索引超出范围
 	 * (<tt>index &lt; 0 || index &gt;= size()</tt>)
 	 */
 	Method get(int index) {
@@ -175,21 +172,18 @@ final class AttributeMethods {
 	}
 
 	/**
-	 * Determine if the attribute at the specified index could throw a
-	 * {@link TypeNotPresentException} when accessed.
-	 * @param index the index of the attribute to check
-	 * @return {@code true} if the attribute can throw a
-	 * {@link TypeNotPresentException}
+	 * 确定指定索引处的属性在访问时是否可能抛出 {@link TypeNotPresentException}。
+	 * @param index 要检查的属性的索引
+	 * @return 如果属性可能抛出 {@link TypeNotPresentException}，则返回 {@code true}
 	 */
 	boolean canThrowTypeNotPresentException(int index) {
 		return this.canThrowTypeNotPresentException[index];
 	}
 
 	/**
-	 * Get the index of the attribute with the specified name, or {@code -1}
-	 * if there is no attribute with the name.
-	 * @param name the name to find
-	 * @return the index of the attribute, or {@code -1}
+	 * 获取具有指定名称的属性的索引，如果没有具有该名称的属性，则返回 {@code -1}。
+	 * @param name 要查找的名称
+	 * @return 属性的索引，如果未找到则返回 {@code -1}
 	 */
 	int indexOf(String name) {
 		for (int i = 0; i < this.attributeMethods.length; i++) {
@@ -201,10 +195,9 @@ final class AttributeMethods {
 	}
 
 	/**
-	 * Get the index of the specified attribute, or {@code -1} if the
-	 * attribute is not in this collection.
-	 * @param attribute the attribute to find
-	 * @return the index of the attribute, or {@code -1}
+	 * 获取指定属性的索引，如果此集合中没有该属性，则返回 {@code -1}。
+	 * @param attribute 要查找的属性
+	 * @return 属性的索引，如果未找到则返回 {@code -1}
 	 */
 	int indexOf(Method attribute) {
 		for (int i = 0; i < this.attributeMethods.length; i++) {
@@ -216,25 +209,24 @@ final class AttributeMethods {
 	}
 
 	/**
-	 * Get the number of attributes in this collection.
-	 * @return the number of attributes
+	 * 获取此集合中的属性数量。
+	 * @return 属性数量
 	 */
 	int size() {
 		return this.attributeMethods.length;
 	}
 
 	/**
-	 * Determine if at least one of the attribute methods has a default value.
-	 * @return {@code true} if there is at least one attribute method with a default value
+	 * 确定至少一个属性方法是否具有默认值。
+	 * @return 如果至少有一个属性方法具有默认值，则返回 {@code true}
 	 */
 	boolean hasDefaultValueMethod() {
 		return this.hasDefaultValueMethod;
 	}
 
 	/**
-	 * Determine if at least one of the attribute methods is a nested annotation.
-	 * @return {@code true} if there is at least one attribute method with a nested
-	 * annotation type
+	 * 确定至少一个属性方法是否是嵌套注解。
+	 * @return 如果至少有一个属性方法具有嵌套注解类型，则返回 {@code true}
 	 */
 	boolean hasNestedAnnotation() {
 		return this.hasNestedAnnotation;
@@ -242,9 +234,9 @@ final class AttributeMethods {
 
 
 	/**
-	 * Get the attribute methods for the given annotation type.
-	 * @param annotationType the annotation type
-	 * @return the attribute methods for the annotation type
+	 * 获取给定注解类型的属性方法。
+	 * @param annotationType 注解类型
+	 * @return 注解类型的属性方法
 	 */
 	static AttributeMethods forAnnotationType(@Nullable Class<? extends Annotation> annotationType) {
 		if (annotationType == null) {
@@ -275,10 +267,9 @@ final class AttributeMethods {
 	}
 
 	/**
-	 * Create a description for the given attribute method suitable to use in
-	 * exception messages and logs.
-	 * @param attribute the attribute to describe
-	 * @return a description of the attribute
+	 * 为给定的属性方法创建适合在异常消息和日志中使用的描述。
+	 * @param attribute 要描述的属性
+	 * @return 属性的描述
 	 */
 	static String describe(@Nullable Method attribute) {
 		if (attribute == null) {
@@ -288,11 +279,10 @@ final class AttributeMethods {
 	}
 
 	/**
-	 * Create a description for the given attribute method suitable to use in
-	 * exception messages and logs.
-	 * @param annotationType the annotation type
-	 * @param attributeName the attribute name
-	 * @return a description of the attribute
+	 * 为给定的属性方法创建适合在异常消息和日志中使用的描述。
+	 * @param annotationType 注解类型
+	 * @param attributeName 属性名称
+	 * @return 属性的描述
 	 */
 	static String describe(@Nullable Class<?> annotationType, @Nullable String attributeName) {
 		if (attributeName == null) {

@@ -28,8 +28,8 @@
 package org.springframework.asm;
 
 /**
- * A {@link FieldVisitor} that generates a corresponding 'field_info' structure, as defined in the
- * Java Virtual Machine Specification (JVMS).
+ * 一个 {@link FieldVisitor}，用于生成对应的 'field_info' 结构，  
+ * 该结构定义在 Java 虚拟机规范（JVMS）中。  
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.5">JVMS
  *     4.5</a>
@@ -37,85 +37,83 @@ package org.springframework.asm;
  */
 final class FieldWriter extends FieldVisitor {
 
-  /** Where the constants used in this FieldWriter must be stored. */
+  /** 该 FieldWriter 使用的常量存储位置。 */
   private final SymbolTable symbolTable;
 
-  // Note: fields are ordered as in the field_info structure, and those related to attributes are
-  // ordered as in Section 4.7 of the JVMS.
+  // 注意：字段顺序与 field_info 结构中一致，与属性相关的字段顺序与 JVMS 第4.7节一致。
 
   /**
-   * The access_flags field of the field_info JVMS structure. This field can contain ASM specific
-   * access flags, such as {@link Opcodes#ACC_DEPRECATED}, which are removed when generating the
-   * ClassFile structure.
+   * field_info 结构中的 access_flags 字段。  
+   * 该字段可包含 ASM 特定的访问标志，如 {@link Opcodes#ACC_DEPRECATED}，  
+   * 生成 ClassFile 结构时会移除这些标志。  
    */
   private final int accessFlags;
 
-  /** The name_index field of the field_info JVMS structure. */
+  /** field_info 结构中的 name_index 字段。 */
   private final int nameIndex;
 
-  /** The descriptor_index field of the field_info JVMS structure. */
+  /** field_info 结构中的 descriptor_index 字段。 */
   private final int descriptorIndex;
 
   /**
-   * The signature_index field of the Signature attribute of this field_info, or 0 if there is no
-   * Signature attribute.
+   * 该 field_info 的 Signature 属性的 signature_index 字段，  
+   * 如果没有 Signature 属性，则为 0。  
    */
   private int signatureIndex;
 
   /**
-   * The constantvalue_index field of the ConstantValue attribute of this field_info, or 0 if there
-   * is no ConstantValue attribute.
+   * 该 field_info 的 ConstantValue 属性的 constantvalue_index 字段，  
+   * 如果没有 ConstantValue 属性，则为 0。  
    */
   private int constantValueIndex;
 
   /**
-   * The last runtime visible annotation of this field. The previous ones can be accessed with the
-   * {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 该字段的最后一个运行时可见注解。  
+   * 之前的注解可以通过 {@link AnnotationWriter#previousAnnotation} 访问，可能为 {@literal null}。  
    */
   private AnnotationWriter lastRuntimeVisibleAnnotation;
 
   /**
-   * The last runtime invisible annotation of this field. The previous ones can be accessed with the
-   * {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 该字段的最后一个运行时不可见注解。  
+   * 之前的注解可以通过 {@link AnnotationWriter#previousAnnotation} 访问，可能为 {@literal null}。  
    */
   private AnnotationWriter lastRuntimeInvisibleAnnotation;
 
   /**
-   * The last runtime visible type annotation of this field. The previous ones can be accessed with
-   * the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 该字段的最后一个运行时可见类型注解。  
+   * 之前的注解可以通过 {@link AnnotationWriter#previousAnnotation} 访问，可能为 {@literal null}。  
    */
   private AnnotationWriter lastRuntimeVisibleTypeAnnotation;
 
   /**
-   * The last runtime invisible type annotation of this field. The previous ones can be accessed
-   * with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 该字段的最后一个运行时不可见类型注解。  
+   * 之前的注解可以通过 {@link AnnotationWriter#previousAnnotation} 访问，可能为 {@literal null}。  
    */
   private AnnotationWriter lastRuntimeInvisibleTypeAnnotation;
 
   /**
-   * The first non standard attribute of this field. The next ones can be accessed with the {@link
-   * Attribute#nextAttribute} field. May be {@literal null}.
+   * 该字段的第一个非标准属性。  
+   * 后续属性可通过 {@link Attribute#nextAttribute} 访问，可能为 {@literal null}。  
    *
-   * <p><b>WARNING</b>: this list stores the attributes in the <i>reverse</i> order of their visit.
-   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The {@link
-   * #putFieldInfo} method writes the attributes in the order defined by this list, i.e. in the
-   * reverse order specified by the user.
+   * <p><b>注意：</b>此列表以访问顺序的 <i>逆序</i> 存储属性。  
+   * firstAttribute 实际上是 {@link #visitAttribute} 中访问的最后一个属性。  
+   * {@link #putFieldInfo} 方法按照此列表定义的顺序写入属性，即用户访问顺序的逆序。  
    */
   private Attribute firstAttribute;
 
   // -----------------------------------------------------------------------------------------------
-  // Constructor
+  // 构造函数
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Constructs a new {@link FieldWriter}.
+   * 构造一个新的 {@link FieldWriter} 实例。  
    *
-   * @param symbolTable where the constants used in this FieldWriter must be stored.
-   * @param access the field's access flags (see {@link Opcodes}).
-   * @param name the field's name.
-   * @param descriptor the field's descriptor (see {@link Type}).
-   * @param signature the field's signature. May be {@literal null}.
-   * @param constantValue the field's constant value. May be {@literal null}.
+   * @param symbolTable 该 FieldWriter 使用的常量存储表。  
+   * @param access 字段访问标志（见 {@link Opcodes}）。  
+   * @param name 字段名。  
+   * @param descriptor 字段描述符（见 {@link Type}）。  
+   * @param signature 字段签名，可能为 {@literal null}。  
+   * @param constantValue 字段的常量值，可能为 {@literal null}。  
    */
   FieldWriter(
       final SymbolTable symbolTable,
@@ -124,7 +122,7 @@ final class FieldWriter extends FieldVisitor {
       final String descriptor,
       final String signature,
       final Object constantValue) {
-    super(/* latest api = */ Opcodes.ASM9);
+    super(/* 最新API版本 = */ Opcodes.ASM9);
     this.symbolTable = symbolTable;
     this.accessFlags = access;
     this.nameIndex = symbolTable.addConstantUtf8(name);
@@ -138,7 +136,7 @@ final class FieldWriter extends FieldVisitor {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Implementation of the FieldVisitor abstract class
+  // FieldVisitor 抽象类的实现
   // -----------------------------------------------------------------------------------------------
 
   @Override
@@ -168,32 +166,31 @@ final class FieldWriter extends FieldVisitor {
 
   @Override
   public void visitAttribute(final Attribute attribute) {
-    // Store the attributes in the <i>reverse</i> order of their visit by this method.
+    // 将属性以访问顺序的逆序存储
     attribute.nextAttribute = firstAttribute;
     firstAttribute = attribute;
   }
 
   @Override
   public void visitEnd() {
-    // Nothing to do.
+    // 无需操作
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Utility methods
+  // 工具方法
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Returns the size of the field_info JVMS structure generated by this FieldWriter. Also adds the
-   * names of the attributes of this field in the constant pool.
+   * 返回该 FieldWriter 生成的 field_info JVMS 结构的大小，同时将字段属性名添加到常量池中。  
    *
-   * @return the size in bytes of the field_info JVMS structure.
+   * @return field_info 结构的字节大小。  
    */
   int computeFieldInfoSize() {
-    // The access_flags, name_index, descriptor_index and attributes_count fields use 8 bytes.
+    // access_flags, name_index, descriptor_index 和 attributes_count 字段共用8字节
     int size = 8;
-    // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
+    // 按照 JVMS 4.7 节属性顺序方便引用
     if (constantValueIndex != 0) {
-      // ConstantValue attributes always use 8 bytes.
+      // ConstantValue 属性固定使用8字节
       symbolTable.addConstantUtf8(Constants.CONSTANT_VALUE);
       size += 8;
     }
@@ -211,18 +208,16 @@ final class FieldWriter extends FieldVisitor {
   }
 
   /**
-   * Puts the content of the field_info JVMS structure generated by this FieldWriter into the given
-   * ByteVector.
+   * 将该 FieldWriter 生成的 field_info JVMS 结构写入给定的 ByteVector。  
    *
-   * @param output where the field_info structure must be put.
+   * @param output 存放 field_info 结构的 ByteVector。  
    */
   void putFieldInfo(final ByteVector output) {
     boolean useSyntheticAttribute = symbolTable.getMajorVersion() < Opcodes.V1_5;
-    // Put the access_flags, name_index and descriptor_index fields.
+    // 写入 access_flags, name_index 和 descriptor_index 字段
     int mask = useSyntheticAttribute ? Opcodes.ACC_SYNTHETIC : 0;
     output.putShort(accessFlags & ~mask).putShort(nameIndex).putShort(descriptorIndex);
-    // Compute and put the attributes_count field.
-    // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
+    // 计算并写入 attributes_count 字段
     int attributesCount = 0;
     if (constantValueIndex != 0) {
       ++attributesCount;
@@ -252,8 +247,7 @@ final class FieldWriter extends FieldVisitor {
       attributesCount += firstAttribute.getAttributeCount();
     }
     output.putShort(attributesCount);
-    // Put the field_info attributes.
-    // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
+    // 写入 field_info 的属性，按照 JVMS 4.7 节的顺序
     if (constantValueIndex != 0) {
       output
           .putShort(symbolTable.addConstantUtf8(Constants.CONSTANT_VALUE))
@@ -274,9 +268,9 @@ final class FieldWriter extends FieldVisitor {
   }
 
   /**
-   * Collects the attributes of this field into the given set of attribute prototypes.
+   * 收集该字段的属性到给定的属性原型集合中。  
    *
-   * @param attributePrototypes a set of attribute prototypes.
+   * @param attributePrototypes 属性原型集合。  
    */
   final void collectAttributePrototypes(final Attribute.Set attributePrototypes) {
     attributePrototypes.addAttributes(firstAttribute);

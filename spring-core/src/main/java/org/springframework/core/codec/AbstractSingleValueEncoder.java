@@ -16,11 +16,7 @@
 
 package org.springframework.core.codec;
 
-import java.util.Map;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -28,14 +24,16 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.PooledDataBuffer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
+import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 /**
- * Abstract base class for {@link org.springframework.core.codec.Encoder}
- * classes that can only deal with a single value.
+ * 抽象基类，用于只能处理单个值的 {@link org.springframework.core.codec.Encoder} 类。
  *
  * @author Arjen Poutsma
  * @since 5.0
- * @param <T> the element type
+ * @param <T> 元素类型
  */
 public abstract class AbstractSingleValueEncoder<T> extends AbstractEncoder<T> {
 
@@ -56,13 +54,13 @@ public abstract class AbstractSingleValueEncoder<T> extends AbstractEncoder<T> {
 	}
 
 	/**
-	 * Encode {@code T} to an output {@link DataBuffer} stream.
-	 * @param t the value to process
-	 * @param dataBufferFactory a buffer factory used to create the output
-	 * @param type the stream element type to process
-	 * @param mimeType the mime type to process
-	 * @param hints additional information about how to do decode, optional
-	 * @return the output stream
+	 * 将 {@code T} 编码为输出 {@link DataBuffer} 流。
+	 * @param t 要处理的值
+	 * @param dataBufferFactory 用于创建输出的缓冲区工厂
+	 * @param type 要处理的流元素类型
+	 * @param mimeType 要处理的 MIME 类型
+	 * @param hints 关于如何解码的附加信息，可选
+	 * @return 输出流
 	 */
 	protected abstract Flux<DataBuffer> encode(T t, DataBufferFactory dataBufferFactory,
 			ResolvableType type, @Nullable MimeType mimeType, @Nullable Map<String, Object> hints);

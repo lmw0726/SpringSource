@@ -16,6 +16,12 @@
 
 package org.springframework.core.type;
 
+import org.springframework.core.annotation.*;
+import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.ReflectionUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -23,19 +29,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.annotation.MergedAnnotation;
-import org.springframework.core.annotation.MergedAnnotations;
-import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
-import org.springframework.core.annotation.RepeatableContainers;
-import org.springframework.lang.Nullable;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.ReflectionUtils;
-
 /**
- * {@link AnnotationMetadata} implementation that uses standard reflection
- * to introspect a given {@link Class}.
+ * {@link AnnotationMetadata} 的实现，使用标准反射机制来分析给定的 {@link Class}。
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -55,10 +50,10 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 
 
 	/**
-	 * Create a new {@code StandardAnnotationMetadata} wrapper for the given Class.
-	 * @param introspectedClass the Class to introspect
+	 * 为给定的类创建一个新的 {@code StandardAnnotationMetadata} 包装器。
+	 * @param introspectedClass 要分析的类
 	 * @see #StandardAnnotationMetadata(Class, boolean)
-	 * @deprecated since 5.2 in favor of the factory method {@link AnnotationMetadata#introspect(Class)}
+	 * @deprecated 自 5.2 起，推荐使用工厂方法 {@link AnnotationMetadata#introspect(Class)} 获取实例
 	 */
 	@Deprecated
 	public StandardAnnotationMetadata(Class<?> introspectedClass) {
@@ -66,24 +61,23 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 	}
 
 	/**
-	 * Create a new {@link StandardAnnotationMetadata} wrapper for the given Class,
-	 * providing the option to return any nested annotations or annotation arrays in the
-	 * form of {@link org.springframework.core.annotation.AnnotationAttributes} instead
-	 * of actual {@link Annotation} instances.
-	 * @param introspectedClass the Class to introspect
-	 * @param nestedAnnotationsAsMap return nested annotations and annotation arrays as
-	 * {@link org.springframework.core.annotation.AnnotationAttributes} for compatibility
-	 * with ASM-based {@link AnnotationMetadata} implementations
+	 * 为给定的类创建一个新的 {@link StandardAnnotationMetadata} 包装器，
+	 * 并可选择将任何嵌套注解或注解数组以
+	 * {@link org.springframework.core.annotation.AnnotationAttributes} 形式返回，
+	 * 而非实际的 {@link Annotation} 实例。
+	 * @param introspectedClass 要分析的类
+	 * @param nestedAnnotationsAsMap 是否将嵌套注解和注解数组作为 {@link org.springframework.core.annotation.AnnotationAttributes} 返回，
+	 * 以兼容基于 ASM 的 {@link AnnotationMetadata} 实现
 	 * @since 3.1.1
-	 * @deprecated since 5.2 in favor of the factory method {@link AnnotationMetadata#introspect(Class)}.
-	 * Use {@link MergedAnnotation#asMap(org.springframework.core.annotation.MergedAnnotation.Adapt...) MergedAnnotation.asMap}
-	 * from {@link #getAnnotations()} rather than {@link #getAnnotationAttributes(String)}
-	 * if {@code nestedAnnotationsAsMap} is {@code false}
+	 * @deprecated 自 5.2 起，推荐使用工厂方法 {@link AnnotationMetadata#introspect(Class)} 获取实例。
+	 * 如果 {@code nestedAnnotationsAsMap} 为 {@code false}，建议通过 {@link #getAnnotations()} 返回的
+	 * {@link MergedAnnotation#asMap(org.springframework.core.annotation.MergedAnnotation.Adapt...) MergedAnnotation.asMap} 方法
+	 * 替代 {@link #getAnnotationAttributes(String)}。
 	 */
 	@Deprecated
 	public StandardAnnotationMetadata(Class<?> introspectedClass, boolean nestedAnnotationsAsMap) {
 		super(introspectedClass);
-		//合并注解，MergedAnnotations会包含来自指定元素的所有注释和元注释，
+		// 合并注解，MergedAnnotations 会包含来自指定元素的所有注解和元注解，
 		this.mergedAnnotations = MergedAnnotations.from(introspectedClass,
 				SearchStrategy.INHERITED_ANNOTATIONS, RepeatableContainers.none());
 		this.nestedAnnotationsAsMap = nestedAnnotationsAsMap;

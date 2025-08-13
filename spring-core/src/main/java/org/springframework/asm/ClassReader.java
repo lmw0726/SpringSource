@@ -32,10 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A parser to make a {@link ClassVisitor} visit a ClassFile structure, as defined in the Java
- * Virtual Machine Specification (JVMS). This class parses the ClassFile content and calls the
- * appropriate visit methods of a given {@link ClassVisitor} for each field, method and bytecode
- * instruction encountered.
+ * 一个解析器，用于使 {@link ClassVisitor} 访问按照 Java 虚拟机规范（JVMS）定义的 ClassFile 结构。
+ * 该类解析 ClassFile 的内容，并在遇到每个字段、方法和字节码指令时，调用给定 {@link ClassVisitor} 的相应访问方法。
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html">JVMS 4</a>
  * @author Eric Bruneton
@@ -44,175 +42,155 @@ import java.io.InputStream;
 public class ClassReader {
 
   /**
-   * A flag to skip the Code attributes. If this flag is set the Code attributes are neither parsed
-   * nor visited.
+   * 用于跳过 Code 属性的标志。如果设置了此标志，则不会解析或访问 Code 属性。
    */
   public static final int SKIP_CODE = 1;
 
   /**
-   * A flag to skip the SourceFile, SourceDebugExtension, LocalVariableTable,
-   * LocalVariableTypeTable, LineNumberTable and MethodParameters attributes. If this flag is set
-   * these attributes are neither parsed nor visited (i.e. {@link ClassVisitor#visitSource}, {@link
-   * MethodVisitor#visitLocalVariable}, {@link MethodVisitor#visitLineNumber} and {@link
-   * MethodVisitor#visitParameter} are not called).
+   * 用于跳过 SourceFile、SourceDebugExtension、LocalVariableTable、LocalVariableTypeTable、
+   * LineNumberTable 和 MethodParameters 属性的标志。如果设置了此标志，这些属性将不会被解析或访问
+   * （即不会调用 {@link ClassVisitor#visitSource}、{@link MethodVisitor#visitLocalVariable}、
+   * {@link MethodVisitor#visitLineNumber} 和 {@link MethodVisitor#visitParameter}）。
    */
   public static final int SKIP_DEBUG = 2;
 
   /**
-   * A flag to skip the StackMap and StackMapTable attributes. If this flag is set these attributes
-   * are neither parsed nor visited (i.e. {@link MethodVisitor#visitFrame} is not called). This flag
-   * is useful when the {@link ClassWriter#COMPUTE_FRAMES} option is used: it avoids visiting frames
-   * that will be ignored and recomputed from scratch.
+   * 用于跳过 StackMap 和 StackMapTable 属性的标志。如果设置了此标志，这些属性将不会被解析或访问
+   * （即不会调用 {@link MethodVisitor#visitFrame}）。此标志在使用 {@link ClassWriter#COMPUTE_FRAMES}
+   * 选项时非常有用：可以避免访问那些将被忽略并重新计算的帧信息。
    */
   public static final int SKIP_FRAMES = 4;
 
   /**
-   * A flag to expand the stack map frames. By default stack map frames are visited in their
-   * original format (i.e. "expanded" for classes whose version is less than V1_6, and "compressed"
-   * for the other classes). If this flag is set, stack map frames are always visited in expanded
-   * format (this option adds a decompression/compression step in ClassReader and ClassWriter which
-   * degrades performance quite a lot).
+   * 用于展开栈映射帧（stack map frames）的标志。默认情况下，栈映射帧以其原始格式访问
+   * （即版本低于 V1_6 的类使用“展开”格式，其他类使用“压缩”格式）。
+   * 如果设置了此标志，栈映射帧将始终以展开格式访问（此选项会在 ClassReader 和 ClassWriter 中增加解压/压缩步骤，
+   * 会显著降低性能）。
    */
   public static final int EXPAND_FRAMES = 8;
 
   /**
-   * A flag to expand the ASM specific instructions into an equivalent sequence of standard bytecode
-   * instructions. When resolving a forward jump it may happen that the signed 2 bytes offset
-   * reserved for it is not sufficient to store the bytecode offset. In this case the jump
-   * instruction is replaced with a temporary ASM specific instruction using an unsigned 2 bytes
-   * offset (see {@link Label#resolve}). This internal flag is used to re-read classes containing
-   * such instructions, in order to replace them with standard instructions. In addition, when this
-   * flag is used, goto_w and jsr_w are <i>not</i> converted into goto and jsr, to make sure that
-   * infinite loops where a goto_w is replaced with a goto in ClassReader and converted back to a
-   * goto_w in ClassWriter cannot occur.
+   * 用于将 ASM 特有的指令扩展为等效的标准字节码指令序列的标志。
+   * 在解析前向跳转时，可能用于存储偏移量的有符号 2 字节空间不足以容纳实际的字节码偏移量。
+   * 此时，跳转指令会被替换为一个使用无符号 2 字节偏移量的临时 ASM 特有指令（参见 {@link Label#resolve}）。
+   * 此内部标志用于重新读取包含此类指令的类，以便将其替换为标准指令。
+   * 此外，当使用此标志时，goto_w 和 jsr_w 指令将 <i>不会</i> 被转换为 goto 和 jsr，
+   * 以防止在 ClassReader 中将 goto_w 替换为 goto，而在 ClassWriter 中又转换回 goto_w 所导致的无限循环。
    */
   static final int EXPAND_ASM_INSNS = 256;
 
-  /** The maximum size of array to allocate. */
+  /** 可分配数组的最大大小。 */
   private static final int MAX_BUFFER_SIZE = 1024 * 1024;
 
-  /** The size of the temporary byte array used to read class input streams chunk by chunk. */
+  /** 用于逐块读取类输入流的临时字节数组的大小。 */
   private static final int INPUT_STREAM_DATA_CHUNK_SIZE = 4096;
 
   /**
-   * A byte array containing the JVMS ClassFile structure to be parsed.
+   * 一个包含待解析的 JVMS ClassFile 结构的字节数组。
    *
-   * @deprecated Use {@link #readByte(int)} and the other read methods instead. This field will
-   *     eventually be deleted.
+   * @deprecated 使用 {@link #readByte(int)} 及其他读取方法代替。此字段最终将被删除。
    */
   @Deprecated
-  // DontCheck(MemberName): can't be renamed (for backward binary compatibility).
+  // DontCheck(MemberName): 为保持向后二进制兼容性，不能重命名。
   public final byte[] b;
 
-  /** The offset in bytes of the ClassFile's access_flags field. */
+  /** ClassFile 的 access_flags 字段的字节偏移量。 */
   public final int header;
 
   /**
-   * A byte array containing the JVMS ClassFile structure to be parsed. <i>The content of this array
-   * must not be modified. This field is intended for {@link Attribute} sub classes, and is normally
-   * not needed by class visitors.</i>
+   * 一个包含待解析的 JVMS ClassFile 结构的字节数组。<i>此数组的内容不得被修改。该字段主要供 {@link Attribute} 子类使用，
+   * 通常不需要被类访问器（class visitors）直接访问。</i>
    *
-   * <p>NOTE: the ClassFile structure can start at any offset within this array, i.e. it does not
-   * necessarily start at offset 0. Use {@link #getItem} and {@link #header} to get correct
-   * ClassFile element offsets within this byte array.
+   * <p>注意：ClassFile 结构可以从此数组的任意偏移量开始，即不一定从偏移 0 开始。请使用 {@link #getItem} 和 {@link #header}
+   * 方法来获取此字节数组中 ClassFile 各元素的正确偏移量。
    */
   final byte[] classFileBuffer;
 
   /**
-   * The offset in bytes, in {@link #classFileBuffer}, of each cp_info entry of the ClassFile's
-   * constant_pool array, <i>plus one</i>. In other words, the offset of constant pool entry i is
-   * given by cpInfoOffsets[i] - 1, i.e. its cp_info's tag field is given by b[cpInfoOffsets[i] -
-   * 1].
+   * 在 {@link #classFileBuffer} 中，ClassFile 的 constant_pool 数组中每个 cp_info 项的字节偏移量，<i>加一</i>。
+   * 换句话说，常量池第 i 项的偏移量为 cpInfoOffsets[i] - 1，即其 cp_info 的标签字段（tag）位于 b[cpInfoOffsets[i] - 1]。
    */
   private final int[] cpInfoOffsets;
 
   /**
-   * The String objects corresponding to the CONSTANT_Utf8 constant pool items. This cache avoids
-   * multiple parsing of a given CONSTANT_Utf8 constant pool item.
+   * 与常量池中 CONSTANT_Utf8 项对应的 String 对象缓存。此缓存避免对同一个 CONSTANT_Utf8 项进行多次解析。
    */
   private final String[] constantUtf8Values;
 
   /**
-   * The ConstantDynamic objects corresponding to the CONSTANT_Dynamic constant pool items. This
-   * cache avoids multiple parsing of a given CONSTANT_Dynamic constant pool item.
+   * 与常量池中 CONSTANT_Dynamic 项对应的 ConstantDynamic 对象缓存。此缓存避免对同一个 CONSTANT_Dynamic 项进行多次解析。
    */
   private final ConstantDynamic[] constantDynamicValues;
 
   /**
-   * The start offsets in {@link #classFileBuffer} of each element of the bootstrap_methods array
-   * (in the BootstrapMethods attribute).
+   * BootstrapMethods 属性中 bootstrap_methods 数组每个元素在 {@link #classFileBuffer} 中的起始偏移量。
    *
-   * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.23">JVMS
-   *     4.7.23</a>
+   * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.23">JVMS 4.7.23</a>
    */
   private final int[] bootstrapMethodOffsets;
 
   /**
-   * A conservative estimate of the maximum length of the strings contained in the constant pool of
-   * the class.
+   * 类的常量池中包含的字符串最大长度的一个保守估计值。
    */
   private final int maxStringLength;
 
   // -----------------------------------------------------------------------------------------------
-  // Constructors
+  // 构造器（Constructors）
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Constructs a new {@link ClassReader} object.
+   * 构造一个新的 {@link ClassReader} 对象。
    *
-   * @param classFile the JVMS ClassFile structure to be read.
+   * @param classFile 要读取的JVMS类文件结构。
    */
   public ClassReader(final byte[] classFile) {
     this(classFile, 0, classFile.length);
   }
 
   /**
-   * Constructs a new {@link ClassReader} object.
+   * 构造一个新的 {@link ClassReader} 对象。
    *
-   * @param classFileBuffer a byte array containing the JVMS ClassFile structure to be read.
-   * @param classFileOffset the offset in byteBuffer of the first byte of the ClassFile to be read.
-   * @param classFileLength the length in bytes of the ClassFile to be read.
+   * @param classFileBuffer 包含要读取的 JVMS ClassFile 结构的字节数组。
+   * @param classFileOffset ClassFile 起始字节在字节数组中的偏移量。
+   * @param classFileLength 要读取的 ClassFile 的字节长度。
    */
   public ClassReader(
       final byte[] classFileBuffer,
       final int classFileOffset,
-      final int classFileLength) { // NOPMD(UnusedFormalParameter) used for backward compatibility.
+      final int classFileLength) { // NOPMD(UnusedFormalParameter) 为了向后兼容而保留
     this(classFileBuffer, classFileOffset, /* checkClassVersion = */ true);
   }
 
   /**
-   * Constructs a new {@link ClassReader} object. <i>This internal constructor must not be exposed
-   * as a public API</i>.
+   * 构造一个新的 {@link ClassReader} 对象。<i>此内部构造函数不得作为公共 API 暴露</i>。
    *
-   * @param classFileBuffer a byte array containing the JVMS ClassFile structure to be read.
-   * @param classFileOffset the offset in byteBuffer of the first byte of the ClassFile to be read.
-   * @param checkClassVersion whether to check the class version or not.
+   * @param classFileBuffer 包含待读取的 JVMS ClassFile 结构的字节数组。
+   * @param classFileOffset byteBuffer 中待读取 ClassFile 第一个字节的偏移量。
+   * @param checkClassVersion 是否检查类版本号。
    */
   ClassReader(
       final byte[] classFileBuffer, final int classFileOffset, final boolean checkClassVersion) {
     this.classFileBuffer = classFileBuffer;
     this.b = classFileBuffer;
-    // Check the class' major_version. This field is after the magic and minor_version fields, which
-    // use 4 and 2 bytes respectively.
+    // 检查类的 major_version。该字段位于 magic 和 minor_version 字段之后，分别占用 4 和 2 个字节。
     if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V19) {
       throw new IllegalArgumentException(
           "Unsupported class file major version " + readShort(classFileOffset + 6));
     }
-    // Create the constant pool arrays. The constant_pool_count field is after the magic,
-    // minor_version and major_version fields, which use 4, 2 and 2 bytes respectively.
+    // 创建常量池数组。constant_pool_count 字段位于 magic、minor_version 和 major_version 字段之后，
+    // 分别占用 4、2 和 2 个字节。
     int constantPoolCount = readUnsignedShort(classFileOffset + 8);
     cpInfoOffsets = new int[constantPoolCount];
     constantUtf8Values = new String[constantPoolCount];
-    // Compute the offset of each constant pool entry, as well as a conservative estimate of the
-    // maximum length of the constant pool strings. The first constant pool entry is after the
-    // magic, minor_version, major_version and constant_pool_count fields, which use 4, 2, 2 and 2
-    // bytes respectively.
+    // 计算每个常量池项的偏移量，以及常量池字符串最大长度的保守估计值。
+    // 第一个常量池项位于 magic、minor_version、major_version 和 constant_pool_count 字段之后，
+    // 分别占用 4、2、2 和 2 个字节。
     int currentCpInfoIndex = 1;
     int currentCpInfoOffset = classFileOffset + 10;
     int currentMaxStringLength = 0;
     boolean hasBootstrapMethods = false;
     boolean hasConstantDynamic = false;
-    // The offset of the other entries depend on the total size of all the previous entries.
+    // 其他项的偏移量取决于所有前驱项的总大小。
     while (currentCpInfoIndex < constantPoolCount) {
       cpInfoOffsets[currentCpInfoIndex++] = currentCpInfoOffset + 1;
       int cpInfoSize;
@@ -237,14 +215,13 @@ public class ClassReader {
         case Symbol.CONSTANT_LONG_TAG:
         case Symbol.CONSTANT_DOUBLE_TAG:
           cpInfoSize = 9;
-          currentCpInfoIndex++;
+          currentCpInfoIndex++;  // long 和 double 占两个常量池槽位
           break;
         case Symbol.CONSTANT_UTF8_TAG:
           cpInfoSize = 3 + readUnsignedShort(currentCpInfoOffset + 1);
           if (cpInfoSize > currentMaxStringLength) {
-            // The size in bytes of this CONSTANT_Utf8 structure provides a conservative estimate
-            // of the length in characters of the corresponding string, and is much cheaper to
-            // compute than this exact length.
+            // CONSTANT_Utf8 结构的字节大小可作为对应字符串字符长度的保守估计，
+            // 相比精确计算长度，这种方式开销更小。
             currentMaxStringLength = cpInfoSize;
           }
           break;
@@ -264,35 +241,34 @@ public class ClassReader {
       currentCpInfoOffset += cpInfoSize;
     }
     maxStringLength = currentMaxStringLength;
-    // The Classfile's access_flags field is just after the last constant pool entry.
+    // ClassFile 的 access_flags 字段紧接在最后一个常量池项之后。
     header = currentCpInfoOffset;
 
-    // Allocate the cache of ConstantDynamic values, if there is at least one.
+    // 如果存在至少一个 ConstantDynamic，则分配其缓存数组。
     constantDynamicValues = hasConstantDynamic ? new ConstantDynamic[constantPoolCount] : null;
 
-    // Read the BootstrapMethods attribute, if any (only get the offset of each method).
+    // 读取 BootstrapMethods 属性（如果存在），仅获取每个引导方法的偏移量。
     bootstrapMethodOffsets =
         hasBootstrapMethods ? readBootstrapMethodsAttribute(currentMaxStringLength) : null;
   }
 
   /**
-   * Constructs a new {@link ClassReader} object.
+   * 构造一个新的 {@link ClassReader} 对象。
    *
-   * @param inputStream an input stream of the JVMS ClassFile structure to be read. This input
-   *     stream must contain nothing more than the ClassFile structure itself. It is read from its
-   *     current position to its end.
-   * @throws IOException if a problem occurs during reading.
+   * @param inputStream 要读取的 JVMS ClassFile 结构的输入流。该输入流中只能包含 ClassFile 结构本身，
+   *     从当前指针位置读取到结束。
+   * @throws IOException 如果读取过程中发生问题。
    */
   public ClassReader(final InputStream inputStream) throws IOException {
     this(readStream(inputStream, false));
   }
 
   /**
-   * Constructs a new {@link ClassReader} object.
+   * 构造一个新的 {@link ClassReader} 对象。
    *
-   * @param className the fully qualified name of the class to be read. The ClassFile structure is
-   *     retrieved with the current class loader's {@link ClassLoader#getSystemResourceAsStream}.
-   * @throws IOException if an exception occurs during reading.
+   * @param className 要读取的类的完全限定名。ClassFile 结构通过当前类加载器的
+   *     {@link ClassLoader#getSystemResourceAsStream} 获取。
+   * @throws IOException 如果读取过程中发生异常。
    */
   public ClassReader(final String className) throws IOException {
     this(
@@ -301,12 +277,12 @@ public class ClassReader {
   }
 
   /**
-   * Reads the given input stream and returns its content as a byte array.
+   * 读取给定的输入流，并将其内容以字节数组形式返回。
    *
-   * @param inputStream an input stream.
-   * @param close true to close the input stream after reading.
-   * @return the content of the given input stream.
-   * @throws IOException if a problem occurs during reading.
+   * @param inputStream 输入流。
+   * @param close 是否在读取完成后关闭输入流。
+   * @return 给定输入流的内容字节数组。
+   * @throws IOException 如果读取过程中发生问题。
    */
   private static byte[] readStream(final InputStream inputStream, final boolean close)
       throws IOException {
@@ -324,9 +300,9 @@ public class ClassReader {
       }
       outputStream.flush();
       if (readCount == 1) {
-        // SPRING PATCH: some misbehaving InputStreams return -1 but still write to buffer (gh-27429)
+        // SPRING 补丁：某些行为异常的 InputStream 虽返回 -1 但仍会写入缓冲区（gh-27429）
         // return data;
-        // END OF PATCH
+        // 补丁结束
       }
       return outputStream.toByteArray();
     } finally {
@@ -339,9 +315,8 @@ public class ClassReader {
   private static int computeBufferSize(final InputStream inputStream) throws IOException {
     int expectedLength = inputStream.available();
     /*
-     * Some implementations can return 0 while holding available data (e.g. new
-     * FileInputStream("/proc/a_file")). Also in some pathological cases a very small number might
-     * be returned, and in this case we use a default size.
+     * 某些实现可能在仍有可用数据时返回 0（例如 new FileInputStream("/proc/a_file")）。
+     * 此外，在某些极端情况下可能返回非常小的数值，此时我们使用默认大小。
      */
     if (expectedLength < 256) {
       return INPUT_STREAM_DATA_CHUNK_SIZE;
@@ -350,14 +325,14 @@ public class ClassReader {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Accessors
+  // 访问器方法（Accessors）
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Returns the class's access flags (see {@link Opcodes}). This value may not reflect Deprecated
-   * and Synthetic flags when bytecode is before 1.5 and those flags are represented by attributes.
+   * 返回类的访问标志（参见 {@link Opcodes}）。当字节码版本低于 1.5 时，如果 Deprecated 和 Synthetic 标志通过属性表示，
+   * 则此值可能不包含这两个标志。
    *
-   * @return the class access flags.
+   * @return 类的访问标志。
    * @see ClassVisitor#visit(int, int, String, String, String, String[])
    */
   public int getAccess() {
@@ -365,37 +340,35 @@ public class ClassReader {
   }
 
   /**
-   * Returns the internal name of the class (see {@link Type#getInternalName()}).
+   * 返回类的内部名称（参见 {@link Type#getInternalName()}）。
    *
-   * @return the internal class name.
+   * @return 类的内部名称。
    * @see ClassVisitor#visit(int, int, String, String, String, String[])
    */
   public String getClassName() {
-    // this_class is just after the access_flags field (using 2 bytes).
+    // this_class 紧随 access_flags 字段之后（占用 2 个字节）。
     return readClass(header + 2, new char[maxStringLength]);
   }
 
   /**
-   * Returns the internal of name of the super class (see {@link Type#getInternalName()}). For
-   * interfaces, the super class is {@link Object}.
+   * 返回超类的内部名称（参见 {@link Type#getInternalName()}）。对于接口，超类为 {@link Object}。
    *
-   * @return the internal name of the super class, or {@literal null} for {@link Object} class.
+   * @return 超类的内部名称，如果是 {@link Object} 类则返回 {@literal null}。
    * @see ClassVisitor#visit(int, int, String, String, String, String[])
    */
   public String getSuperName() {
-    // super_class is after the access_flags and this_class fields (2 bytes each).
+    // super_class 位于 access_flags 和 this_class 字段之后（每个字段 2 字节）。
     return readClass(header + 4, new char[maxStringLength]);
   }
 
   /**
-   * Returns the internal names of the implemented interfaces (see {@link Type#getInternalName()}).
+   * 返回实现的接口的内部名称（参见 {@link Type#getInternalName()}）。
    *
-   * @return the internal names of the directly implemented interfaces. Inherited implemented
-   *     interfaces are not returned.
+   * @return 直接实现的接口的内部名称。继承来的接口不返回。
    * @see ClassVisitor#visit(int, int, String, String, String, String[])
    */
   public String[] getInterfaces() {
-    // interfaces_count is after the access_flags, this_class and super_class fields (2 bytes each).
+    // interfaces_count 位于 access_flags、this_class 和 super_class 字段之后（每个字段 2 字节）。
     int currentOffset = header + 6;
     int interfacesCount = readUnsignedShort(currentOffset);
     String[] interfaces = new String[interfacesCount];
@@ -410,34 +383,29 @@ public class ClassReader {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Public methods
+  // 公共方法
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Makes the given visitor visit the JVMS ClassFile structure passed to the constructor of this
-   * {@link ClassReader}.
+   * 让给定的访问者访问传入构造函数的 JVMS ClassFile 结构。
    *
-   * @param classVisitor the visitor that must visit this class.
-   * @param parsingOptions the options to use to parse this class. One or more of {@link
-   *     #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or {@link #EXPAND_FRAMES}.
+   * @param classVisitor 必须访问该类的访问者。
+   * @param parsingOptions 用于解析该类的选项，可包含一个或多个 {@link #SKIP_CODE}、
+   *     {@link #SKIP_DEBUG}、{@link #SKIP_FRAMES} 或 {@link #EXPAND_FRAMES}。
    */
   public void accept(final ClassVisitor classVisitor, final int parsingOptions) {
     accept(classVisitor, new Attribute[0], parsingOptions);
   }
 
   /**
-   * Makes the given visitor visit the JVMS ClassFile structure passed to the constructor of this
-   * {@link ClassReader}.
+   * 使给定的访问器访问传递给此类 {@link ClassReader} 构造函数的 JVMS ClassFile 结构。
    *
-   * @param classVisitor the visitor that must visit this class.
-   * @param attributePrototypes prototypes of the attributes that must be parsed during the visit of
-   *     the class. Any attribute whose type is not equal to the type of one the prototypes will not
-   *     be parsed: its byte array value will be passed unchanged to the ClassWriter. <i>This may
-   *     corrupt it if this value contains references to the constant pool, or has syntactic or
-   *     semantic links with a class element that has been transformed by a class adapter between
-   *     the reader and the writer</i>.
-   * @param parsingOptions the options to use to parse this class. One or more of {@link
-   *     #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or {@link #EXPAND_FRAMES}.
+   * @param classVisitor 必须访问此类的访问器。
+   * @param attributePrototypes 在访问类期间需要解析的属性原型。任何类型不等于这些原型之一的属性将不会被解析：
+   *     其字节数组值将原样传递给 ClassWriter。<i>如果该值包含对常量池的引用，或与已被类适配器转换的类元素存在语法或语义关联，
+   *     则可能导致数据损坏</i>。
+   * @param parsingOptions 解析此类时使用的选项。可以是 {@link #SKIP_CODE}、{@link #SKIP_DEBUG}、{@link #SKIP_FRAMES}
+   *     或 {@link #EXPAND_FRAMES} 中的一个或多个组合。
    */
   public void accept(
       final ClassVisitor classVisitor,
@@ -448,7 +416,7 @@ public class ClassReader {
     context.parsingOptions = parsingOptions;
     context.charBuffer = new char[maxStringLength];
 
-    // Read the access_flags, this_class, super_class, interface_count and interfaces fields.
+    // 读取 access_flags、this_class、super_class、interface_count 和 interfaces 字段。
     char[] charBuffer = context.charBuffer;
     int currentOffset = header;
     int accessFlags = readUnsignedShort(currentOffset);
@@ -461,52 +429,50 @@ public class ClassReader {
       currentOffset += 2;
     }
 
-    // Read the class attributes (the variables are ordered as in Section 4.7 of the JVMS).
-    // Attribute offsets exclude the attribute_name_index and attribute_length fields.
-    // - The offset of the InnerClasses attribute, or 0.
+    // 读取类的属性（变量顺序遵循 JVMS 第 4.7 节的定义）。
+    // 属性偏移量不包括 attribute_name_index 和 attribute_length 字段。
+    // - InnerClasses 属性的偏移量，若不存在则为 0。
     int innerClassesOffset = 0;
-    // - The offset of the EnclosingMethod attribute, or 0.
+    // - EnclosingMethod 属性的偏移量，若不存在则为 0。
     int enclosingMethodOffset = 0;
-    // - The string corresponding to the Signature attribute, or null.
+    // - 对应 Signature 属性的字符串，若不存在则为 null。
     String signature = null;
-    // - The string corresponding to the SourceFile attribute, or null.
+    // - 对应 SourceFile 属性的字符串，若不存在则为 null。
     String sourceFile = null;
-    // - The string corresponding to the SourceDebugExtension attribute, or null.
+    // - 对应 SourceDebugExtension 属性的字符串，若不存在则为 null。
     String sourceDebugExtension = null;
-    // - The offset of the RuntimeVisibleAnnotations attribute, or 0.
+    // - RuntimeVisibleAnnotations 属性的偏移量，若不存在则为 0。
     int runtimeVisibleAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleAnnotations attribute, or 0.
+    // - RuntimeInvisibleAnnotations 属性的偏移量，若不存在则为 0。
     int runtimeInvisibleAnnotationsOffset = 0;
-    // - The offset of the RuntimeVisibleTypeAnnotations attribute, or 0.
+    // - RuntimeVisibleTypeAnnotations 属性的偏移量，若不存在则为 0。
     int runtimeVisibleTypeAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleTypeAnnotations attribute, or 0.
+    // - RuntimeInvisibleTypeAnnotations 属性的偏移量，若不存在则为 0。
     int runtimeInvisibleTypeAnnotationsOffset = 0;
-    // - The offset of the Module attribute, or 0.
+    // - Module 属性的偏移量，若不存在则为 0。
     int moduleOffset = 0;
-    // - The offset of the ModulePackages attribute, or 0.
+    // - ModulePackages 属性的偏移量，若不存在则为 0。
     int modulePackagesOffset = 0;
-    // - The string corresponding to the ModuleMainClass attribute, or null.
+    // - 对应 ModuleMainClass 属性的字符串，若不存在则为 null。
     String moduleMainClass = null;
-    // - The string corresponding to the NestHost attribute, or null.
+    // - 对应 NestHost 属性的字符串，若不存在则为 null。
     String nestHostClass = null;
-    // - The offset of the NestMembers attribute, or 0.
+    // - NestMembers 属性的偏移量，若不存在则为 0。
     int nestMembersOffset = 0;
-    // - The offset of the PermittedSubclasses attribute, or 0
+    // - PermittedSubclasses 属性的偏移量，若不存在则为 0。
     int permittedSubclassesOffset = 0;
-    // - The offset of the Record attribute, or 0.
+    // - Record 属性的偏移量，若不存在则为 0。
     int recordOffset = 0;
-    // - The non standard attributes (linked with their {@link Attribute#nextAttribute} field).
-    //   This list in the <i>reverse order</i> or their order in the ClassFile structure.
+    // - 非标准属性（通过 {@link Attribute#nextAttribute} 字段链接）。该列表顺序为 ClassFile 中属性顺序的 <i>逆序</i>。
     Attribute attributes = null;
 
     int currentAttributeOffset = getFirstAttributeOffset();
     for (int i = readUnsignedShort(currentAttributeOffset - 2); i > 0; --i) {
-      // Read the attribute_info's attribute_name and attribute_length fields.
+      // 读取 attribute_info 的 attribute_name 和 attribute_length 字段。
       String attributeName = readUTF8(currentAttributeOffset, charBuffer);
       int attributeLength = readInt(currentAttributeOffset + 2);
       currentAttributeOffset += 6;
-      // The tests are sorted in decreasing frequency order (based on frequencies observed on
-      // typical classes).
+      // 测试按出现频率降序排列（基于典型类中的观察频率）。
       if (Constants.SOURCE_FILE.equals(attributeName)) {
         sourceFile = readUTF8(currentAttributeOffset, charBuffer);
       } else if (Constants.INNER_CLASSES.equals(attributeName)) {
@@ -549,7 +515,7 @@ public class ClassReader {
       } else if (Constants.MODULE_PACKAGES.equals(attributeName)) {
         modulePackagesOffset = currentAttributeOffset;
       } else if (!Constants.BOOTSTRAP_METHODS.equals(attributeName)) {
-        // The BootstrapMethods attribute is read in the constructor.
+        // BootstrapMethods 属性已在构造函数中读取。
         Attribute attribute =
             readAttribute(
                 attributePrototypes,
@@ -565,29 +531,29 @@ public class ClassReader {
       currentAttributeOffset += attributeLength;
     }
 
-    // Visit the class declaration. The minor_version and major_version fields start 6 bytes before
-    // the first constant pool entry, which itself starts at cpInfoOffsets[1] - 1 (by definition).
+    // 访问类声明。minor_version 和 major_version 字段位于第一个常量池条目前 6 字节处，
+    // 而常量池条目本身从 cpInfoOffsets[1] - 1 开始（根据定义）。
     classVisitor.visit(
         readInt(cpInfoOffsets[1] - 7), accessFlags, thisClass, signature, superClass, interfaces);
 
-    // Visit the SourceFile and SourceDebugExtenstion attributes.
+    // 访问 SourceFile 和 SourceDebugExtension 属性。
     if ((parsingOptions & SKIP_DEBUG) == 0
         && (sourceFile != null || sourceDebugExtension != null)) {
       classVisitor.visitSource(sourceFile, sourceDebugExtension);
     }
 
-    // Visit the Module, ModulePackages and ModuleMainClass attributes.
+    // 访问 Module、ModulePackages 和 ModuleMainClass 属性。
     if (moduleOffset != 0) {
       readModuleAttributes(
           classVisitor, context, moduleOffset, modulePackagesOffset, moduleMainClass);
     }
 
-    // Visit the NestHost attribute.
+    // 访问 NestHost 属性。
     if (nestHostClass != null) {
       classVisitor.visitNestHost(nestHostClass);
     }
 
-    // Visit the EnclosingMethod attribute.
+    // 访问 EnclosingMethod 属性。
     if (enclosingMethodOffset != 0) {
       String className = readClass(enclosingMethodOffset, charBuffer);
       int methodIndex = readUnsignedShort(enclosingMethodOffset + 2);
@@ -596,15 +562,15 @@ public class ClassReader {
       classVisitor.visitOuterClass(className, name, type);
     }
 
-    // Visit the RuntimeVisibleAnnotations attribute.
+    // 访问 RuntimeVisibleAnnotations 属性。
     if (runtimeVisibleAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeVisibleAnnotationsOffset);
       int currentAnnotationOffset = runtimeVisibleAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 classVisitor.visitAnnotation(annotationDescriptor, /* visible = */ true),
@@ -614,15 +580,15 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeInvisibleAnnotations attribute.
+    // 访问 RuntimeInvisibleAnnotations 属性。
     if (runtimeInvisibleAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeInvisibleAnnotationsOffset);
       int currentAnnotationOffset = runtimeInvisibleAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 classVisitor.visitAnnotation(annotationDescriptor, /* visible = */ false),
@@ -632,17 +598,17 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeVisibleTypeAnnotations attribute.
+    // 访问 RuntimeVisibleTypeAnnotations 属性。
     if (runtimeVisibleTypeAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeVisibleTypeAnnotationsOffset);
       int currentAnnotationOffset = runtimeVisibleTypeAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the target_type, target_info and target_path fields.
+        // 解析 target_type、target_info 和 target_path 字段。
         currentAnnotationOffset = readTypeAnnotationTarget(context, currentAnnotationOffset);
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 classVisitor.visitTypeAnnotation(
@@ -656,17 +622,17 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeInvisibleTypeAnnotations attribute.
+    // 访问 RuntimeInvisibleTypeAnnotations 属性。
     if (runtimeInvisibleTypeAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeInvisibleTypeAnnotationsOffset);
       int currentAnnotationOffset = runtimeInvisibleTypeAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the target_type, target_info and target_path fields.
+        // 解析 target_type、target_info 和 target_path 字段。
         currentAnnotationOffset = readTypeAnnotationTarget(context, currentAnnotationOffset);
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 classVisitor.visitTypeAnnotation(
@@ -680,16 +646,16 @@ public class ClassReader {
       }
     }
 
-    // Visit the non standard attributes.
+    // 访问非标准属性。
     while (attributes != null) {
-      // Copy and reset the nextAttribute field so that it can also be used in ClassWriter.
+      // 复制并重置 nextAttribute 字段，以便其也可在 ClassWriter 中使用。
       Attribute nextAttribute = attributes.nextAttribute;
       attributes.nextAttribute = null;
       classVisitor.visitAttribute(attributes);
       attributes = nextAttribute;
     }
 
-    // Visit the NestedMembers attribute.
+    // 访问 NestedMembers 属性。
     if (nestMembersOffset != 0) {
       int numberOfNestMembers = readUnsignedShort(nestMembersOffset);
       int currentNestMemberOffset = nestMembersOffset + 2;
@@ -699,7 +665,7 @@ public class ClassReader {
       }
     }
 
-    // Visit the PermittedSubclasses attribute.
+    // 访问 PermittedSubclasses 属性。
     if (permittedSubclassesOffset != 0) {
       int numberOfPermittedSubclasses = readUnsignedShort(permittedSubclassesOffset);
       int currentPermittedSubclassesOffset = permittedSubclassesOffset + 2;
@@ -710,7 +676,7 @@ public class ClassReader {
       }
     }
 
-    // Visit the InnerClasses attribute.
+    // 访问 InnerClasses 属性。
     if (innerClassesOffset != 0) {
       int numberOfClasses = readUnsignedShort(innerClassesOffset);
       int currentClassesOffset = innerClassesOffset + 2;
@@ -724,7 +690,7 @@ public class ClassReader {
       }
     }
 
-    // Visit Record components.
+    // 访问 Record 组件。
     if (recordOffset != 0) {
       int recordComponentsCount = readUnsignedShort(recordOffset);
       recordOffset += 2;
@@ -733,7 +699,7 @@ public class ClassReader {
       }
     }
 
-    // Visit the fields and methods.
+    // 访问字段和方法。
     int fieldsCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (fieldsCount-- > 0) {
@@ -745,25 +711,22 @@ public class ClassReader {
       currentOffset = readMethod(classVisitor, context, currentOffset);
     }
 
-    // Visit the end of the class.
+    // 访问类的结束部分。
     classVisitor.visitEnd();
   }
 
   // ----------------------------------------------------------------------------------------------
-  // Methods to parse modules, fields and methods
+  // 用于解析模块、字段和方法的方法
   // ----------------------------------------------------------------------------------------------
 
   /**
-   * Reads the Module, ModulePackages and ModuleMainClass attributes and visit them.
+   * 读取 Module、ModulePackages 和 ModuleMainClass 属性并访问它们。
    *
-   * @param classVisitor the current class visitor
-   * @param context information about the class being parsed.
-   * @param moduleOffset the offset of the Module attribute (excluding the attribute_info's
-   *     attribute_name_index and attribute_length fields).
-   * @param modulePackagesOffset the offset of the ModulePackages attribute (excluding the
-   *     attribute_info's attribute_name_index and attribute_length fields), or 0.
-   * @param moduleMainClass the string corresponding to the ModuleMainClass attribute, or {@literal
-   *     null}.
+   * @param classVisitor 当前的类访问器
+   * @param context 正在解析的类的相关信息
+   * @param moduleOffset Module 属性的偏移量（不包括 attribute_info 中的 attribute_name_index 和 attribute_length 字段）
+   * @param modulePackagesOffset ModulePackages 属性的偏移量（不包括 attribute_info 中的 attribute_name_index 和 attribute_length 字段），若不存在则为 0
+   * @param moduleMainClass 对应 ModuleMainClass 属性的字符串，若不存在则为 {@literal null}
    */
   private void readModuleAttributes(
       final ClassVisitor classVisitor,
@@ -773,7 +736,7 @@ public class ClassReader {
       final String moduleMainClass) {
     char[] buffer = context.charBuffer;
 
-    // Read the module_name_index, module_flags and module_version_index fields and visit them.
+    // 读取 module_name_index、module_flags 和 module_version_index 字段，并进行访问。
     int currentOffset = moduleOffset;
     String moduleName = readModule(currentOffset, buffer);
     int moduleFlags = readUnsignedShort(currentOffset + 2);
@@ -784,12 +747,12 @@ public class ClassReader {
       return;
     }
 
-    // Visit the ModuleMainClass attribute.
+    // 访问 ModuleMainClass 属性。
     if (moduleMainClass != null) {
       moduleVisitor.visitMainClass(moduleMainClass);
     }
 
-    // Visit the ModulePackages attribute.
+    // 访问 ModulePackages 属性。
     if (modulePackagesOffset != 0) {
       int packageCount = readUnsignedShort(modulePackagesOffset);
       int currentPackageOffset = modulePackagesOffset + 2;
@@ -799,11 +762,11 @@ public class ClassReader {
       }
     }
 
-    // Read the 'requires_count' and 'requires' fields.
+    // 读取 'requires_count' 和 'requires' 字段。
     int requiresCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (requiresCount-- > 0) {
-      // Read the requires_index, requires_flags and requires_version fields and visit them.
+      // 读取 requires_index、requires_flags 和 requires_version 字段，并进行访问。
       String requires = readModule(currentOffset, buffer);
       int requiresFlags = readUnsignedShort(currentOffset + 2);
       String requiresVersion = readUTF8(currentOffset + 4, buffer);
@@ -811,12 +774,11 @@ public class ClassReader {
       moduleVisitor.visitRequire(requires, requiresFlags, requiresVersion);
     }
 
-    // Read the 'exports_count' and 'exports' fields.
+    // 读取 'exports_count' 和 'exports' 字段。
     int exportsCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (exportsCount-- > 0) {
-      // Read the exports_index, exports_flags, exports_to_count and exports_to_index fields
-      // and visit them.
+      // 读取 exports_index、exports_flags、exports_to_count 和 exports_to_index 字段，并进行访问。
       String exports = readPackage(currentOffset, buffer);
       int exportsFlags = readUnsignedShort(currentOffset + 2);
       int exportsToCount = readUnsignedShort(currentOffset + 4);
@@ -832,11 +794,11 @@ public class ClassReader {
       moduleVisitor.visitExport(exports, exportsFlags, exportsTo);
     }
 
-    // Reads the 'opens_count' and 'opens' fields.
+    // 读取 'opens_count' 和 'opens' 字段。
     int opensCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (opensCount-- > 0) {
-      // Read the opens_index, opens_flags, opens_to_count and opens_to_index fields and visit them.
+      // 读取 opens_index、opens_flags、opens_to_count 和 opens_to_index 字段，并进行访问。
       String opens = readPackage(currentOffset, buffer);
       int opensFlags = readUnsignedShort(currentOffset + 2);
       int opensToCount = readUnsignedShort(currentOffset + 4);
@@ -852,7 +814,7 @@ public class ClassReader {
       moduleVisitor.visitOpen(opens, opensFlags, opensTo);
     }
 
-    // Read the 'uses_count' and 'uses' fields.
+    // 读取 'uses_count' 和 'uses' 字段。
     int usesCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (usesCount-- > 0) {
@@ -860,11 +822,11 @@ public class ClassReader {
       currentOffset += 2;
     }
 
-    // Read the 'provides_count' and 'provides' fields.
+    // 读取 'provides_count' 和 'provides' 字段。
     int providesCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (providesCount-- > 0) {
-      // Read the provides_index, provides_with_count and provides_with_index fields and visit them.
+      // 读取 provides_index、provides_with_count 和 provides_with_index 字段，并进行访问。
       String provides = readClass(currentOffset, buffer);
       int providesWithCount = readUnsignedShort(currentOffset + 2);
       currentOffset += 4;
@@ -876,17 +838,17 @@ public class ClassReader {
       moduleVisitor.visitProvide(provides, providesWith);
     }
 
-    // Visit the end of the module attributes.
+    // 访问模块属性的结束部分。
     moduleVisitor.visitEnd();
   }
 
   /**
-   * Reads a record component and visit it.
+   * 读取一个记录组件并访问它。
    *
-   * @param classVisitor the current class visitor
-   * @param context information about the class being parsed.
-   * @param recordComponentOffset the offset of the current record component.
-   * @return the offset of the first byte following the record component.
+   * @param classVisitor 当前的类访问者
+   * @param context 关于正在解析的类的信息
+   * @param recordComponentOffset 当前记录组件的偏移量
+   * @return 记录组件之后的第一个字节的偏移量
    */
   private int readRecordComponent(
       final ClassVisitor classVisitor, final Context context, final int recordComponentOffset) {
@@ -897,33 +859,31 @@ public class ClassReader {
     String descriptor = readUTF8(currentOffset + 2, charBuffer);
     currentOffset += 4;
 
-    // Read the record component attributes (the variables are ordered as in Section 4.7 of the
-    // JVMS).
+    // 读取记录组件的属性（变量顺序与 JVMS 第 4.7 节一致）。
 
-    // Attribute offsets exclude the attribute_name_index and attribute_length fields.
-    // - The string corresponding to the Signature attribute, or null.
+    // 属性偏移量不包括 attribute_name_index 和 attribute_length 字段。
+    // - 对应 Signature 属性的字符串，或 null。
     String signature = null;
-    // - The offset of the RuntimeVisibleAnnotations attribute, or 0.
+    // - RuntimeVisibleAnnotations 属性的偏移量，或 0。
     int runtimeVisibleAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleAnnotations attribute, or 0.
+    // - RuntimeInvisibleAnnotations 属性的偏移量，或 0。
     int runtimeInvisibleAnnotationsOffset = 0;
-    // - The offset of the RuntimeVisibleTypeAnnotations attribute, or 0.
+    // - RuntimeVisibleTypeAnnotations 属性的偏移量，或 0。
     int runtimeVisibleTypeAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleTypeAnnotations attribute, or 0.
+    // - RuntimeInvisibleTypeAnnotations 属性的偏移量，或 0。
     int runtimeInvisibleTypeAnnotationsOffset = 0;
-    // - The non standard attributes (linked with their {@link Attribute#nextAttribute} field).
-    //   This list in the <i>reverse order</i> or their order in the ClassFile structure.
+    // - 非标准属性（通过其 {@link Attribute#nextAttribute} 字段连接）。
+    //   该列表按照 ClassFile 结构中的顺序 <i>逆序</i> 链接。
     Attribute attributes = null;
 
     int attributesCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (attributesCount-- > 0) {
-      // Read the attribute_info's attribute_name and attribute_length fields.
+      // 读取 attribute_info 的 attribute_name 和 attribute_length 字段。
       String attributeName = readUTF8(currentOffset, charBuffer);
       int attributeLength = readInt(currentOffset + 2);
       currentOffset += 6;
-      // The tests are sorted in decreasing frequency order (based on frequencies observed on
-      // typical classes).
+      // 以下判断按出现频率从高到低排序（基于典型类的观察频率）。
       if (Constants.SIGNATURE.equals(attributeName)) {
         signature = readUTF8(currentOffset, charBuffer);
       } else if (Constants.RUNTIME_VISIBLE_ANNOTATIONS.equals(attributeName)) {
@@ -956,15 +916,15 @@ public class ClassReader {
       return currentOffset;
     }
 
-    // Visit the RuntimeVisibleAnnotations attribute.
+    // 访问 RuntimeVisibleAnnotations 属性。
     if (runtimeVisibleAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeVisibleAnnotationsOffset);
       int currentAnnotationOffset = runtimeVisibleAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 recordComponentVisitor.visitAnnotation(annotationDescriptor, /* visible = */ true),
@@ -974,15 +934,15 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeInvisibleAnnotations attribute.
+    // 访问 RuntimeInvisibleAnnotations 属性。
     if (runtimeInvisibleAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeInvisibleAnnotationsOffset);
       int currentAnnotationOffset = runtimeInvisibleAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 recordComponentVisitor.visitAnnotation(annotationDescriptor, /* visible = */ false),
@@ -992,17 +952,17 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeVisibleTypeAnnotations attribute.
+    // 访问 RuntimeVisibleTypeAnnotations 属性。
     if (runtimeVisibleTypeAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeVisibleTypeAnnotationsOffset);
       int currentAnnotationOffset = runtimeVisibleTypeAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the target_type, target_info and target_path fields.
+        // 解析 target_type、target_info 和 target_path 字段。
         currentAnnotationOffset = readTypeAnnotationTarget(context, currentAnnotationOffset);
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 recordComponentVisitor.visitTypeAnnotation(
@@ -1016,17 +976,17 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeInvisibleTypeAnnotations attribute.
+    // 访问 RuntimeInvisibleTypeAnnotations 属性。
     if (runtimeInvisibleTypeAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeInvisibleTypeAnnotationsOffset);
       int currentAnnotationOffset = runtimeInvisibleTypeAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the target_type, target_info and target_path fields.
+        // 解析 target_type、target_info 和 target_path 字段。
         currentAnnotationOffset = readTypeAnnotationTarget(context, currentAnnotationOffset);
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 recordComponentVisitor.visitTypeAnnotation(
@@ -1040,66 +1000,65 @@ public class ClassReader {
       }
     }
 
-    // Visit the non standard attributes.
+    // 访问非标准属性。
     while (attributes != null) {
-      // Copy and reset the nextAttribute field so that it can also be used in FieldWriter.
+      // 复制并重置 nextAttribute 字段，以便在 FieldWriter 中也能使用。
       Attribute nextAttribute = attributes.nextAttribute;
       attributes.nextAttribute = null;
       recordComponentVisitor.visitAttribute(attributes);
       attributes = nextAttribute;
     }
 
-    // Visit the end of the field.
+    // 访问记录组件结束。
     recordComponentVisitor.visitEnd();
     return currentOffset;
   }
 
   /**
-   * Reads a JVMS field_info structure and makes the given visitor visit it.
+   * 读取 JVMS 的 field_info 结构，并让给定的访问器访问它。
    *
-   * @param classVisitor the visitor that must visit the field.
-   * @param context information about the class being parsed.
-   * @param fieldInfoOffset the start offset of the field_info structure.
-   * @return the offset of the first byte following the field_info structure.
+   * @param classVisitor      必须访问该字段的访问器。
+   * @param context           有关正在解析的类的信息。
+   * @param fieldInfoOffset   field_info 结构的起始偏移量。
+   * @return 返回紧随 field_info 结构之后的第一个字节的偏移量。
    */
   private int readField(
       final ClassVisitor classVisitor, final Context context, final int fieldInfoOffset) {
     char[] charBuffer = context.charBuffer;
 
-    // Read the access_flags, name_index and descriptor_index fields.
+    // 读取 access_flags、name_index 和 descriptor_index 字段。
     int currentOffset = fieldInfoOffset;
     int accessFlags = readUnsignedShort(currentOffset);
     String name = readUTF8(currentOffset + 2, charBuffer);
     String descriptor = readUTF8(currentOffset + 4, charBuffer);
     currentOffset += 6;
 
-    // Read the field attributes (the variables are ordered as in Section 4.7 of the JVMS).
-    // Attribute offsets exclude the attribute_name_index and attribute_length fields.
-    // - The value corresponding to the ConstantValue attribute, or null.
+    // 读取字段属性（变量顺序与 JVMS 第 4.7 节中一致）。
+    // 属性偏移量不包括 attribute_name_index 和 attribute_length 字段。
+    // - 对应 ConstantValue 属性的值，或 null。
     Object constantValue = null;
-    // - The string corresponding to the Signature attribute, or null.
+    // - 对应 Signature 属性的字符串，或 null。
     String signature = null;
-    // - The offset of the RuntimeVisibleAnnotations attribute, or 0.
+    // - RuntimeVisibleAnnotations 属性的偏移量，或 0。
     int runtimeVisibleAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleAnnotations attribute, or 0.
+    // - RuntimeInvisibleAnnotations 属性的偏移量，或 0。
     int runtimeInvisibleAnnotationsOffset = 0;
-    // - The offset of the RuntimeVisibleTypeAnnotations attribute, or 0.
+    // - RuntimeVisibleTypeAnnotations 属性的偏移量，或 0。
     int runtimeVisibleTypeAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleTypeAnnotations attribute, or 0.
+    // - RuntimeInvisibleTypeAnnotations 属性的偏移量，或 0。
     int runtimeInvisibleTypeAnnotationsOffset = 0;
-    // - The non standard attributes (linked with their {@link Attribute#nextAttribute} field).
-    //   This list in the <i>reverse order</i> or their order in the ClassFile structure.
+    // - 非标准属性（通过其 {@link Attribute#nextAttribute} 字段连接）。
+    //   该列表按照 ClassFile 结构中的顺序 <i>逆序</i> 链接。
     Attribute attributes = null;
 
     int attributesCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (attributesCount-- > 0) {
-      // Read the attribute_info's attribute_name and attribute_length fields.
+      // 读取 attribute_info 的 attribute_name 和 attribute_length 字段。
       String attributeName = readUTF8(currentOffset, charBuffer);
       int attributeLength = readInt(currentOffset + 2);
       currentOffset += 6;
-      // The tests are sorted in decreasing frequency order (based on frequencies observed on
-      // typical classes).
+      // 以下判断按出现频率从高到低排序（基于典型类的观察频率）。
       if (Constants.CONSTANT_VALUE.equals(attributeName)) {
         int constantvalueIndex = readUnsignedShort(currentOffset);
         constantValue = constantvalueIndex == 0 ? null : readConst(constantvalueIndex, charBuffer);
@@ -1133,22 +1092,22 @@ public class ClassReader {
       currentOffset += attributeLength;
     }
 
-    // Visit the field declaration.
+    // 访问字段声明。
     FieldVisitor fieldVisitor =
         classVisitor.visitField(accessFlags, name, descriptor, signature, constantValue);
     if (fieldVisitor == null) {
       return currentOffset;
     }
 
-    // Visit the RuntimeVisibleAnnotations attribute.
+    // 访问 RuntimeVisibleAnnotations 属性。
     if (runtimeVisibleAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeVisibleAnnotationsOffset);
       int currentAnnotationOffset = runtimeVisibleAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 fieldVisitor.visitAnnotation(annotationDescriptor, /* visible = */ true),
@@ -1158,15 +1117,15 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeInvisibleAnnotations attribute.
+    // 访问 RuntimeInvisibleAnnotations 属性。
     if (runtimeInvisibleAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeInvisibleAnnotationsOffset);
       int currentAnnotationOffset = runtimeInvisibleAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 fieldVisitor.visitAnnotation(annotationDescriptor, /* visible = */ false),
@@ -1176,17 +1135,17 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeVisibleTypeAnnotations attribute.
+    // 访问 RuntimeVisibleTypeAnnotations 属性。
     if (runtimeVisibleTypeAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeVisibleTypeAnnotationsOffset);
       int currentAnnotationOffset = runtimeVisibleTypeAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the target_type, target_info and target_path fields.
+        // 解析 target_type、target_info 和 target_path 字段。
         currentAnnotationOffset = readTypeAnnotationTarget(context, currentAnnotationOffset);
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 fieldVisitor.visitTypeAnnotation(
@@ -1200,17 +1159,17 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeInvisibleTypeAnnotations attribute.
+    // 访问 RuntimeInvisibleTypeAnnotations 属性。
     if (runtimeInvisibleTypeAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeInvisibleTypeAnnotationsOffset);
       int currentAnnotationOffset = runtimeInvisibleTypeAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the target_type, target_info and target_path fields.
+        // 解析 target_type、target_info 和 target_path 字段。
         currentAnnotationOffset = readTypeAnnotationTarget(context, currentAnnotationOffset);
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs，并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 fieldVisitor.visitTypeAnnotation(
@@ -1224,80 +1183,79 @@ public class ClassReader {
       }
     }
 
-    // Visit the non standard attributes.
+    // 访问非标准属性。
     while (attributes != null) {
-      // Copy and reset the nextAttribute field so that it can also be used in FieldWriter.
+      // 复制并重置 nextAttribute 字段，以便在 FieldWriter 中也能使用。
       Attribute nextAttribute = attributes.nextAttribute;
       attributes.nextAttribute = null;
       fieldVisitor.visitAttribute(attributes);
       attributes = nextAttribute;
     }
 
-    // Visit the end of the field.
+    // 访问字段结束。
     fieldVisitor.visitEnd();
     return currentOffset;
   }
 
   /**
-   * Reads a JVMS method_info structure and makes the given visitor visit it.
+   * 读取 JVMS 的 method_info 结构，并让给定的访问器访问它。
    *
-   * @param classVisitor the visitor that must visit the method.
-   * @param context information about the class being parsed.
-   * @param methodInfoOffset the start offset of the method_info structure.
-   * @return the offset of the first byte following the method_info structure.
+   * @param classVisitor      必须访问该方法的访问器。
+   * @param context           有关正在解析的类的信息。
+   * @param methodInfoOffset  method_info 结构的起始偏移量。
+   * @return 返回紧随 method_info 结构之后的第一个字节的偏移量。
    */
   private int readMethod(
       final ClassVisitor classVisitor, final Context context, final int methodInfoOffset) {
     char[] charBuffer = context.charBuffer;
 
-    // Read the access_flags, name_index and descriptor_index fields.
+    // 读取 access_flags、name_index 和 descriptor_index 字段。
     int currentOffset = methodInfoOffset;
     context.currentMethodAccessFlags = readUnsignedShort(currentOffset);
     context.currentMethodName = readUTF8(currentOffset + 2, charBuffer);
     context.currentMethodDescriptor = readUTF8(currentOffset + 4, charBuffer);
     currentOffset += 6;
 
-    // Read the method attributes (the variables are ordered as in Section 4.7 of the JVMS).
-    // Attribute offsets exclude the attribute_name_index and attribute_length fields.
-    // - The offset of the Code attribute, or 0.
+    // 读取方法属性（变量顺序遵循 JVMS 第 4.7 节）。
+    // 属性偏移量不包括 attribute_name_index 和 attribute_length 字段。
+    // - Code 属性的偏移量，或 0。
     int codeOffset = 0;
-    // - The offset of the Exceptions attribute, or 0.
+    // - Exceptions 属性的偏移量，或 0。
     int exceptionsOffset = 0;
-    // - The strings corresponding to the Exceptions attribute, or null.
+    // - 对应 Exceptions 属性的字符串，或 null。
     String[] exceptions = null;
-    // - Whether the method has a Synthetic attribute.
+    // - 方法是否有 Synthetic 属性。
     boolean synthetic = false;
-    // - The constant pool index contained in the Signature attribute, or 0.
+    // - Signature 属性中包含的常量池索引，或 0。
     int signatureIndex = 0;
-    // - The offset of the RuntimeVisibleAnnotations attribute, or 0.
+    // - RuntimeVisibleAnnotations 属性的偏移量，或 0。
     int runtimeVisibleAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleAnnotations attribute, or 0.
+    // - RuntimeInvisibleAnnotations 属性的偏移量，或 0。
     int runtimeInvisibleAnnotationsOffset = 0;
-    // - The offset of the RuntimeVisibleParameterAnnotations attribute, or 0.
+    // - RuntimeVisibleParameterAnnotations 属性的偏移量，或 0。
     int runtimeVisibleParameterAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleParameterAnnotations attribute, or 0.
+    // - RuntimeInvisibleParameterAnnotations 属性的偏移量，或 0。
     int runtimeInvisibleParameterAnnotationsOffset = 0;
-    // - The offset of the RuntimeVisibleTypeAnnotations attribute, or 0.
+    // - RuntimeVisibleTypeAnnotations 属性的偏移量，或 0。
     int runtimeVisibleTypeAnnotationsOffset = 0;
-    // - The offset of the RuntimeInvisibleTypeAnnotations attribute, or 0.
+    // - RuntimeInvisibleTypeAnnotations 属性的偏移量，或 0。
     int runtimeInvisibleTypeAnnotationsOffset = 0;
-    // - The offset of the AnnotationDefault attribute, or 0.
+    // - AnnotationDefault 属性的偏移量，或 0。
     int annotationDefaultOffset = 0;
-    // - The offset of the MethodParameters attribute, or 0.
+    // - MethodParameters 属性的偏移量，或 0。
     int methodParametersOffset = 0;
-    // - The non standard attributes (linked with their {@link Attribute#nextAttribute} field).
-    //   This list in the <i>reverse order</i> or their order in the ClassFile structure.
+    // - 非标准属性（通过 {@link Attribute#nextAttribute} 链接）。
+    //   此列表按 ClassFile 结构中的顺序的 <i>逆序</i>。
     Attribute attributes = null;
 
     int attributesCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (attributesCount-- > 0) {
-      // Read the attribute_info's attribute_name and attribute_length fields.
+      // 读取 attribute_info 的 attribute_name 和 attribute_length 字段。
       String attributeName = readUTF8(currentOffset, charBuffer);
       int attributeLength = readInt(currentOffset + 2);
       currentOffset += 6;
-      // The tests are sorted in decreasing frequency order (based on frequencies observed on
-      // typical classes).
+      // 按出现频率降序排序（基于典型类观察到的频率）。
       if (Constants.CODE.equals(attributeName)) {
         if ((context.parsingOptions & SKIP_CODE) == 0) {
           codeOffset = currentOffset;
@@ -1349,7 +1307,7 @@ public class ClassReader {
       currentOffset += attributeLength;
     }
 
-    // Visit the method declaration.
+    // 访问方法声明。
     MethodVisitor methodVisitor =
         classVisitor.visitMethod(
             context.currentMethodAccessFlags,
@@ -1361,10 +1319,8 @@ public class ClassReader {
       return currentOffset;
     }
 
-    // If the returned MethodVisitor is in fact a MethodWriter, it means there is no method
-    // adapter between the reader and the writer. In this case, it might be possible to copy
-    // the method attributes directly into the writer. If so, return early without visiting
-    // the content of these attributes.
+    // 如果返回的 MethodVisitor 实际上是 MethodWriter，表示 reader 与 writer 之间没有方法适配器。
+    // 在这种情况下，可能直接将方法属性复制到 writer 中。如果可以，则提前返回而不访问这些属性的内容。
     if (methodVisitor instanceof MethodWriter) {
       MethodWriter methodWriter = (MethodWriter) methodVisitor;
       if (methodWriter.canCopyMethodAttributes(
@@ -1379,12 +1335,13 @@ public class ClassReader {
       }
     }
 
-    // Visit the MethodParameters attribute.
+
+    // 访问 MethodParameters 属性。
     if (methodParametersOffset != 0 && (context.parsingOptions & SKIP_DEBUG) == 0) {
       int parametersCount = readByte(methodParametersOffset);
       int currentParameterOffset = methodParametersOffset + 1;
       while (parametersCount-- > 0) {
-        // Read the name_index and access_flags fields and visit them.
+        // 读取 name_index 和 access_flags 字段并访问它们。
         methodVisitor.visitParameter(
             readUTF8(currentParameterOffset, charBuffer),
             readUnsignedShort(currentParameterOffset + 2));
@@ -1392,7 +1349,7 @@ public class ClassReader {
       }
     }
 
-    // Visit the AnnotationDefault attribute.
+    // 访问 AnnotationDefault 属性。
     if (annotationDefaultOffset != 0) {
       AnnotationVisitor annotationVisitor = methodVisitor.visitAnnotationDefault();
       readElementValue(annotationVisitor, annotationDefaultOffset, null, charBuffer);
@@ -1401,15 +1358,15 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeVisibleAnnotations attribute.
+    // 访问 RuntimeVisibleAnnotations 属性。
     if (runtimeVisibleAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeVisibleAnnotationsOffset);
       int currentAnnotationOffset = runtimeVisibleAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs 并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 methodVisitor.visitAnnotation(annotationDescriptor, /* visible = */ true),
@@ -1419,15 +1376,15 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeInvisibleAnnotations attribute.
+    // 访问 RuntimeInvisibleAnnotations 属性。
     if (runtimeInvisibleAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeInvisibleAnnotationsOffset);
       int currentAnnotationOffset = runtimeInvisibleAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs 并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 methodVisitor.visitAnnotation(annotationDescriptor, /* visible = */ false),
@@ -1437,17 +1394,17 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeVisibleTypeAnnotations attribute.
+    // 访问 RuntimeVisibleTypeAnnotations 属性。
     if (runtimeVisibleTypeAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeVisibleTypeAnnotationsOffset);
       int currentAnnotationOffset = runtimeVisibleTypeAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the target_type, target_info and target_path fields.
+        // 解析 target_type、target_info 和 target_path 字段。
         currentAnnotationOffset = readTypeAnnotationTarget(context, currentAnnotationOffset);
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs 并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 methodVisitor.visitTypeAnnotation(
@@ -1461,17 +1418,18 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeInvisibleTypeAnnotations attribute.
+
+    // 访问 RuntimeInvisibleTypeAnnotations 属性。
     if (runtimeInvisibleTypeAnnotationsOffset != 0) {
       int numAnnotations = readUnsignedShort(runtimeInvisibleTypeAnnotationsOffset);
       int currentAnnotationOffset = runtimeInvisibleTypeAnnotationsOffset + 2;
       while (numAnnotations-- > 0) {
-        // Parse the target_type, target_info and target_path fields.
+        // 解析 target_type、target_info 和 target_path 字段。
         currentAnnotationOffset = readTypeAnnotationTarget(context, currentAnnotationOffset);
-        // Parse the type_index field.
+        // 解析 type_index 字段。
         String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
         currentAnnotationOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析 num_element_value_pairs 和 element_value_pairs 并访问这些值。
         currentAnnotationOffset =
             readElementValues(
                 methodVisitor.visitTypeAnnotation(
@@ -1485,13 +1443,13 @@ public class ClassReader {
       }
     }
 
-    // Visit the RuntimeVisibleParameterAnnotations attribute.
+    // 访问 RuntimeVisibleParameterAnnotations 属性。
     if (runtimeVisibleParameterAnnotationsOffset != 0) {
       readParameterAnnotations(
           methodVisitor, context, runtimeVisibleParameterAnnotationsOffset, /* visible = */ true);
     }
 
-    // Visit the RuntimeInvisibleParameterAnnotations attribute.
+    // 访问 RuntimeInvisibleParameterAnnotations 属性。
     if (runtimeInvisibleParameterAnnotationsOffset != 0) {
       readParameterAnnotations(
           methodVisitor,
@@ -1500,37 +1458,37 @@ public class ClassReader {
           /* visible = */ false);
     }
 
-    // Visit the non standard attributes.
+    // 访问非标准属性。
     while (attributes != null) {
-      // Copy and reset the nextAttribute field so that it can also be used in MethodWriter.
+      // 复制并重置 nextAttribute 字段，以便在 MethodWriter 中也可以使用。
       Attribute nextAttribute = attributes.nextAttribute;
       attributes.nextAttribute = null;
       methodVisitor.visitAttribute(attributes);
       attributes = nextAttribute;
     }
 
-    // Visit the Code attribute.
+    // 访问 Code 属性。
     if (codeOffset != 0) {
       methodVisitor.visitCode();
       readCode(methodVisitor, context, codeOffset);
     }
 
-    // Visit the end of the method.
+    // 访问方法结束。
     methodVisitor.visitEnd();
     return currentOffset;
   }
 
   // ----------------------------------------------------------------------------------------------
-  // Methods to parse a Code attribute
+  // 解析 Code 属性的方法
   // ----------------------------------------------------------------------------------------------
 
   /**
-   * Reads a JVMS 'Code' attribute and makes the given visitor visit it.
+   * 读取 JVMS 的 “Code” 属性，并让给定的访问器访问它。
    *
-   * @param methodVisitor the visitor that must visit the Code attribute.
-   * @param context information about the class being parsed.
-   * @param codeOffset the start offset in {@link #classFileBuffer} of the Code attribute, excluding
-   *     its attribute_name_index and attribute_length fields.
+   * @param methodVisitor 必须访问 Code 属性的访问器。
+   * @param context       有关正在解析的类的信息。
+   * @param codeOffset    Code 属性在 {@link #classFileBuffer} 中的起始偏移量，
+   *                      不包括 attribute_name_index 和 attribute_length 字段。
    */
   private void readCode(
       final MethodVisitor methodVisitor, final Context context, final int codeOffset) {
@@ -1547,7 +1505,7 @@ public class ClassReader {
       throw new IllegalArgumentException();
     }
 
-    // Read the bytecode 'code' array to create a label for each referenced instruction.
+// 读取字节码中的 'code' 数组，为每个被引用的指令创建一个标签。
     final int bytecodeStartOffset = currentOffset;
     final int bytecodeEndOffset = currentOffset + codeLength;
     final Label[] labels = context.currentMethodLabels = new Label[codeLength + 1];
@@ -1775,26 +1733,26 @@ public class ClassReader {
           }
           break;
         case Opcodes.TABLESWITCH:
-          // Skip 0 to 3 padding bytes.
+          // 跳过 0 到 3 个填充字节。
           currentOffset += 4 - (bytecodeOffset & 3);
-          // Read the default label and the number of table entries.
+          // 读取默认标签和表项数量。
           createLabel(bytecodeOffset + readInt(currentOffset), labels);
           int numTableEntries = readInt(currentOffset + 8) - readInt(currentOffset + 4) + 1;
           currentOffset += 12;
-          // Read the table labels.
+          // 读取表的标签。
           while (numTableEntries-- > 0) {
             createLabel(bytecodeOffset + readInt(currentOffset), labels);
             currentOffset += 4;
           }
           break;
         case Opcodes.LOOKUPSWITCH:
-          // Skip 0 to 3 padding bytes.
+          // 跳过 0 到 3 个填充字节。
           currentOffset += 4 - (bytecodeOffset & 3);
-          // Read the default label and the number of switch cases.
+          // 读取默认标签和 switch 分支数量。
           createLabel(bytecodeOffset + readInt(currentOffset), labels);
           int numSwitchCases = readInt(currentOffset + 4);
           currentOffset += 8;
-          // Read the switch labels.
+          // 读取 switch 的标签。
           while (numSwitchCases-- > 0) {
             createLabel(bytecodeOffset + readInt(currentOffset + 4), labels);
             currentOffset += 8;
@@ -1845,8 +1803,8 @@ public class ClassReader {
       }
     }
 
-    // Read the 'exception_table_length' and 'exception_table' field to create a label for each
-    // referenced instruction, and to make methodVisitor visit the corresponding try catch blocks.
+// 读取 'exception_table_length' 和 'exception_table' 字段，为每个被引用的指令创建一个 Label，
+// 并让 methodVisitor 访问相应的 try-catch 块。
     int exceptionTableLength = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (exceptionTableLength-- > 0) {
@@ -1858,42 +1816,38 @@ public class ClassReader {
       methodVisitor.visitTryCatchBlock(start, end, handler, catchType);
     }
 
-    // Read the Code attributes to create a label for each referenced instruction (the variables
-    // are ordered as in Section 4.7 of the JVMS). Attribute offsets exclude the
-    // attribute_name_index and attribute_length fields.
-    // - The offset of the current 'stack_map_frame' in the StackMap[Table] attribute, or 0.
-    // Initially, this is the offset of the first 'stack_map_frame' entry. Then this offset is
-    // updated after each stack_map_frame is read.
+    // 读取 Code 属性，为每个被引用的指令创建一个 Label
+    // 变量顺序参考 JVMS 第 4.7 节。属性偏移量不包括 attribute_name_index 和 attribute_length 字段。
+    // - 当前 StackMap[Table] 属性中 'stack_map_frame' 的偏移量，初始为第一个 'stack_map_frame' 条目的偏移量。
+    //   每次读取完一个 stack_map_frame 后会更新此偏移量。
     int stackMapFrameOffset = 0;
-    // - The end offset of the StackMap[Table] attribute, or 0.
+    // - StackMap[Table] 属性的结束偏移量，或为 0。
     int stackMapTableEndOffset = 0;
-    // - Whether the stack map frames are compressed (i.e. in a StackMapTable) or not.
+    // - 标记 stack map frame 是否被压缩（即在 StackMapTable 中）。
     boolean compressedFrames = true;
-    // - The offset of the LocalVariableTable attribute, or 0.
+    // - LocalVariableTable 属性的偏移量，或为 0。
     int localVariableTableOffset = 0;
-    // - The offset of the LocalVariableTypeTable attribute, or 0.
+    // - LocalVariableTypeTable 属性的偏移量，或为 0。
     int localVariableTypeTableOffset = 0;
-    // - The offset of each 'type_annotation' entry in the RuntimeVisibleTypeAnnotations
-    // attribute, or null.
+    // - RuntimeVisibleTypeAnnotations 属性中每个 'type_annotation' 条目的偏移量，或为 null。
     int[] visibleTypeAnnotationOffsets = null;
-    // - The offset of each 'type_annotation' entry in the RuntimeInvisibleTypeAnnotations
-    // attribute, or null.
+    // - RuntimeInvisibleTypeAnnotations 属性中每个 'type_annotation' 条目的偏移量，或为 null。
     int[] invisibleTypeAnnotationOffsets = null;
-    // - The non standard attributes (linked with their {@link Attribute#nextAttribute} field).
-    //   This list in the <i>reverse order</i> or their order in the ClassFile structure.
+    // - 非标准属性（通过 {@link Attribute#nextAttribute} 链接）。
+    //   列表按其在 ClassFile 结构中的顺序的 <i>反向</i> 链接。
     Attribute attributes = null;
 
     int attributesCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (attributesCount-- > 0) {
-      // Read the attribute_info's attribute_name and attribute_length fields.
+      // 读取 attribute_info 的 attribute_name 和 attribute_length 字段
       String attributeName = readUTF8(currentOffset, charBuffer);
       int attributeLength = readInt(currentOffset + 2);
       currentOffset += 6;
       if (Constants.LOCAL_VARIABLE_TABLE.equals(attributeName)) {
         if ((context.parsingOptions & SKIP_DEBUG) == 0) {
           localVariableTableOffset = currentOffset;
-          // Parse the attribute to find the corresponding (debug only) labels.
+          // 解析属性以找到对应的（仅调试）标签
           int currentLocalVariableTableOffset = currentOffset;
           int localVariableTableLength = readUnsignedShort(currentLocalVariableTableOffset);
           currentLocalVariableTableOffset += 2;
@@ -1902,17 +1856,16 @@ public class ClassReader {
             createDebugLabel(startPc, labels);
             int length = readUnsignedShort(currentLocalVariableTableOffset + 2);
             createDebugLabel(startPc + length, labels);
-            // Skip the name_index, descriptor_index and index fields (2 bytes each).
+            // 跳过 name_index、descriptor_index 和 index 字段（每个 2 字节）
             currentLocalVariableTableOffset += 10;
           }
         }
       } else if (Constants.LOCAL_VARIABLE_TYPE_TABLE.equals(attributeName)) {
         localVariableTypeTableOffset = currentOffset;
-        // Here we do not extract the labels corresponding to the attribute content. We assume they
-        // are the same or a subset of those of the LocalVariableTable attribute.
+        // 这里不提取与属性内容对应的标签，假设它们与 LocalVariableTable 的标签相同或为其子集
       } else if (Constants.LINE_NUMBER_TABLE.equals(attributeName)) {
         if ((context.parsingOptions & SKIP_DEBUG) == 0) {
-          // Parse the attribute to find the corresponding (debug only) labels.
+          // 解析属性以找到对应的（仅调试）标签
           int currentLineNumberTableOffset = currentOffset;
           int lineNumberTableLength = readUnsignedShort(currentLineNumberTableOffset);
           currentLineNumberTableOffset += 2;
@@ -1927,40 +1880,28 @@ public class ClassReader {
       } else if (Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
         visibleTypeAnnotationOffsets =
             readTypeAnnotations(methodVisitor, context, currentOffset, /* visible = */ true);
-        // Here we do not extract the labels corresponding to the attribute content. This would
-        // require a full parsing of the attribute, which would need to be repeated when parsing
-        // the bytecode instructions (see below). Instead, the content of the attribute is read one
-        // type annotation at a time (i.e. after a type annotation has been visited, the next type
-        // annotation is read), and the labels it contains are also extracted one annotation at a
-        // time. This assumes that type annotations are ordered by increasing bytecode offset.
+        // 这里不提取与属性内容对应的标签。每次读取一个类型注解后，再提取它包含的标签。
+        // 假设类型注解按字节码偏移量递增排序。
       } else if (Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
         invisibleTypeAnnotationOffsets =
             readTypeAnnotations(methodVisitor, context, currentOffset, /* visible = */ false);
-        // Same comment as above for the RuntimeVisibleTypeAnnotations attribute.
+        // 与 RuntimeVisibleTypeAnnotations 属性相同的处理方式
       } else if (Constants.STACK_MAP_TABLE.equals(attributeName)) {
         if ((context.parsingOptions & SKIP_FRAMES) == 0) {
           stackMapFrameOffset = currentOffset + 2;
           stackMapTableEndOffset = currentOffset + attributeLength;
         }
-        // Here we do not extract the labels corresponding to the attribute content. This would
-        // require a full parsing of the attribute, which would need to be repeated when parsing
-        // the bytecode instructions (see below). Instead, the content of the attribute is read one
-        // frame at a time (i.e. after a frame has been visited, the next frame is read), and the
-        // labels it contains are also extracted one frame at a time. Thanks to the ordering of
-        // frames, having only a "one frame lookahead" is not a problem, i.e. it is not possible to
-        // see an offset smaller than the offset of the current instruction and for which no Label
-        // exist. Except for UNINITIALIZED type offsets. We solve this by parsing the stack map
-        // table without a full decoding (see below).
+        // 这里不提取与属性内容对应的标签。每次读取一个 frame 后再提取其标签。
+        // 由于 frame 按顺序排列，只需“前瞻一个 frame”，即可保证正确。
+        // UNINITIALIZED 类型偏移量除外，通过解析 stack map table 时处理。
       } else if ("StackMap".equals(attributeName)) {
         if ((context.parsingOptions & SKIP_FRAMES) == 0) {
           stackMapFrameOffset = currentOffset + 2;
           stackMapTableEndOffset = currentOffset + attributeLength;
           compressedFrames = false;
         }
-        // IMPORTANT! Here we assume that the frames are ordered, as in the StackMapTable attribute,
-        // although this is not guaranteed by the attribute format. This allows an incremental
-        // extraction of the labels corresponding to this attribute (see the comment above for the
-        // StackMapTable attribute).
+        // 注意！这里假设 frame 按 StackMapTable 属性顺序排列，
+        // 以便增量提取对应的标签
       } else {
         Attribute attribute =
             readAttribute(
@@ -1977,13 +1918,11 @@ public class ClassReader {
       currentOffset += attributeLength;
     }
 
-    // Initialize the context fields related to stack map frames, and generate the first
-    // (implicit) stack map frame, if needed.
+    // 初始化与栈映射帧（stack map frames）相关的上下文字段，并在需要时生成第一个（隐式）栈映射帧。
     final boolean expandFrames = (context.parsingOptions & EXPAND_FRAMES) != 0;
     if (stackMapFrameOffset != 0) {
-      // The bytecode offset of the first explicit frame is not offset_delta + 1 but only
-      // offset_delta. Setting the implicit frame offset to -1 allows us to use of the
-      // "offset_delta + 1" rule in all cases.
+      // 第一个显式 frame 的字节码偏移量不是 offset_delta + 1，而只是 offset_delta。
+      // 将隐式 frame 的偏移量设置为 -1，使得在所有情况下都可以使用 "offset_delta + 1" 规则。
       context.currentFrameOffset = -1;
       context.currentFrameType = 0;
       context.currentFrameLocalCount = 0;
@@ -1994,13 +1933,11 @@ public class ClassReader {
       if (expandFrames) {
         computeImplicitFrame(context);
       }
-      // Find the labels for UNINITIALIZED frame types. Instead of decoding each element of the
-      // stack map table, we look for 3 consecutive bytes that "look like" an UNINITIALIZED type
-      // (tag ITEM_Uninitialized, offset within bytecode bounds, NEW instruction at this offset).
-      // We may find false positives (i.e. not real UNINITIALIZED types), but this should be rare,
-      // and the only consequence will be the creation of an unneeded label. This is better than
-      // creating a label for each NEW instruction, and faster than fully decoding the whole stack
-      // map table.
+      // 查找 UNINITIALIZED frame 类型对应的标签。
+      // 与其完全解码整个 stack map table，不如查找 3 个连续字节“看起来像” UNINITIALIZED 类型
+      // （标记 ITEM_Uninitialized、偏移在字节码范围内、该偏移处是 NEW 指令）。
+      // 可能会有误报（即不是实际的 UNINITIALIZED 类型），但这种情况很少见，
+      // 唯一的后果是创建一个多余的标签。这比为每个 NEW 指令创建标签更高效，也比完全解码整个 stack map table 更快。
       for (int offset = stackMapFrameOffset; offset < stackMapTableEndOffset - 2; ++offset) {
         if (classBuffer[offset] == Frame.ITEM_UNINITIALIZED) {
           int potentialBytecodeOffset = readUnsignedShort(offset + 1);
@@ -2014,37 +1951,32 @@ public class ClassReader {
       }
     }
     if (expandFrames && (context.parsingOptions & EXPAND_ASM_INSNS) != 0) {
-      // Expanding the ASM specific instructions can introduce F_INSERT frames, even if the method
-      // does not currently have any frame. These inserted frames must be computed by simulating the
-      // effect of the bytecode instructions, one by one, starting from the implicit first frame.
-      // For this, MethodWriter needs to know maxLocals before the first instruction is visited. To
-      // ensure this, we visit the implicit first frame here (passing only maxLocals - the rest is
-      // computed in MethodWriter).
+      // 展开 ASM 特定指令可能会引入 F_INSERT frame，即使方法当前没有任何 frame。
+      // 这些插入的 frame 必须通过模拟字节码指令的效果逐条计算，从隐式的第一个 frame 开始。
+      // 为此，MethodWriter 需要在访问第一条指令之前知道 maxLocals。
+      // 为保证这一点，这里访问隐式的第一个 frame（只传递 maxLocals，其他由 MethodWriter 计算）。
       methodVisitor.visitFrame(Opcodes.F_NEW, maxLocals, null, 0, null);
     }
 
-    // Visit the bytecode instructions. First, introduce state variables for the incremental parsing
-    // of the type annotations.
+    // 访问字节码指令。首先，初始化用于类型注解增量解析的状态变量。
 
-    // Index of the next runtime visible type annotation to read (in the
-    // visibleTypeAnnotationOffsets array).
+    // 下一个要读取的 runtime visible 类型注解在 visibleTypeAnnotationOffsets 数组中的索引
     int currentVisibleTypeAnnotationIndex = 0;
-    // The bytecode offset of the next runtime visible type annotation to read, or -1.
+    // 下一个要读取的 runtime visible 类型注解的字节码偏移量，或者为 -1
     int currentVisibleTypeAnnotationBytecodeOffset =
         getTypeAnnotationBytecodeOffset(visibleTypeAnnotationOffsets, 0);
-    // Index of the next runtime invisible type annotation to read (in the
-    // invisibleTypeAnnotationOffsets array).
+
+    // 下一个要读取的 runtime invisible 类型注解在 invisibleTypeAnnotationOffsets 数组中的索引
     int currentInvisibleTypeAnnotationIndex = 0;
-    // The bytecode offset of the next runtime invisible type annotation to read, or -1.
+    // 下一个要读取的 runtime invisible 类型注解的字节码偏移量，或者为 -1
     int currentInvisibleTypeAnnotationBytecodeOffset =
         getTypeAnnotationBytecodeOffset(invisibleTypeAnnotationOffsets, 0);
 
-    // Whether a F_INSERT stack map frame must be inserted before the current instruction.
+    // 当前指令之前是否需要插入 F_INSERT 栈映射帧
     boolean insertFrame = false;
 
-    // The delta to subtract from a goto_w or jsr_w opcode to get the corresponding goto or jsr
-    // opcode, or 0 if goto_w and jsr_w must be left unchanged (i.e. when expanding ASM specific
-    // instructions).
+    // 用于从 goto_w 或 jsr_w 指令中减去得到对应的 goto 或 jsr 指令的偏移量
+    // 如果为 0，则 goto_w 和 jsr_w 保持不变（即展开 ASM 特定指令时）。
     final int wideJumpOpcodeDelta =
         (context.parsingOptions & EXPAND_ASM_INSNS) == 0 ? Constants.WIDE_JUMP_OPCODE_DELTA : 0;
 
@@ -2052,18 +1984,17 @@ public class ClassReader {
     while (currentOffset < bytecodeEndOffset) {
       final int currentBytecodeOffset = currentOffset - bytecodeStartOffset;
 
-      // Visit the label and the line number(s) for this bytecode offset, if any.
+// 访问此字节码偏移量对应的标签和行号（如果有的话）。
       Label currentLabel = labels[currentBytecodeOffset];
       if (currentLabel != null) {
         currentLabel.accept(methodVisitor, (context.parsingOptions & SKIP_DEBUG) == 0);
       }
 
-      // Visit the stack map frame for this bytecode offset, if any.
+      // 访问此字节码偏移量对应的栈映射帧（如果有的话）。
       while (stackMapFrameOffset != 0
           && (context.currentFrameOffset == currentBytecodeOffset
               || context.currentFrameOffset == -1)) {
-        // If there is a stack map frame for this offset, make methodVisitor visit it, and read the
-        // next stack map frame if there is one.
+        // 如果该偏移量有栈映射帧，则让 methodVisitor 访问它，并读取下一个栈映射帧（如果存在）。
         if (context.currentFrameOffset != -1) {
           if (!compressedFrames || expandFrames) {
             methodVisitor.visitFrame(
@@ -2080,8 +2011,7 @@ public class ClassReader {
                 context.currentFrameStackCount,
                 context.currentFrameStackTypes);
           }
-          // Since there is already a stack map frame for this bytecode offset, there is no need to
-          // insert a new one.
+          // 由于此字节码偏移量已有栈映射帧，因此无需插入新的帧。
           insertFrame = false;
         }
         if (stackMapFrameOffset < stackMapTableEndOffset) {
@@ -2092,8 +2022,8 @@ public class ClassReader {
         }
       }
 
-      // Insert a stack map frame for this bytecode offset, if requested by setting insertFrame to
-      // true during the previous iteration. The actual frame content is computed in MethodWriter.
+      // 如果在前一次迭代中通过将 insertFrame 设置为 true 请求，则为此字节码偏移量插入栈映射帧。
+      // 实际的帧内容由 MethodWriter 计算。
       if (insertFrame) {
         if ((context.parsingOptions & EXPAND_FRAMES) != 0) {
           methodVisitor.visitFrame(Constants.F_INSERT, 0, null, 0, null);
@@ -2101,7 +2031,7 @@ public class ClassReader {
         insertFrame = false;
       }
 
-      // Visit the instruction at this bytecode offset.
+      // 访问此字节码偏移量处的指令。
       int opcode = classBuffer[currentOffset] & 0xFF;
       switch (opcode) {
         case Opcodes.NOP:
@@ -2310,42 +2240,40 @@ public class ClassReader {
         case Constants.ASM_IFNULL:
         case Constants.ASM_IFNONNULL:
           {
-            // A forward jump with an offset > 32767. In this case we automatically replace ASM_GOTO
-            // with GOTO_W, ASM_JSR with JSR_W and ASM_IFxxx <l> with IFNOTxxx <L> GOTO_W <l> L:...,
-            // where IFNOTxxx is the "opposite" opcode of ASMS_IFxxx (e.g. IFNE for ASM_IFEQ) and
-            // where <L> designates the instruction just after the GOTO_W.
-            // First, change the ASM specific opcodes ASM_IFEQ ... ASM_JSR, ASM_IFNULL and
-            // ASM_IFNONNULL to IFEQ ... JSR, IFNULL and IFNONNULL.
+            // 前向跳转的偏移量大于 32767。在这种情况下，我们会自动将 ASM_GOTO 替换为 GOTO_W，
+            // 将 ASM_JSR 替换为 JSR_W，并将 ASM_IFxxx <l> 替换为 IFNOTxxx <L> GOTO_W <l> L:...
+            // 其中 IFNOTxxx 是 ASM_IFxxx 的“相反”操作码（例如 ASM_IFEQ 对应 IFNE），
+            // <L> 表示紧跟 GOTO_W 后的指令位置。
+            // 首先，将 ASM 特定操作码 ASM_IFEQ ... ASM_JSR、ASM_IFNULL 和 ASM_IFNONNULL
+            // 转换为标准操作码 IFEQ ... JSR、IFNULL 和 IFNONNULL。
             opcode =
                 opcode < Constants.ASM_IFNULL
                     ? opcode - Constants.ASM_OPCODE_DELTA
                     : opcode - Constants.ASM_IFNULL_OPCODE_DELTA;
             Label target = labels[currentBytecodeOffset + readUnsignedShort(currentOffset + 1)];
             if (opcode == Opcodes.GOTO || opcode == Opcodes.JSR) {
-              // Replace GOTO with GOTO_W and JSR with JSR_W.
+              // 将 GOTO 替换为 GOTO_W，将 JSR 替换为 JSR_W。
               methodVisitor.visitJumpInsn(opcode + Constants.WIDE_JUMP_OPCODE_DELTA, target);
             } else {
-              // Compute the "opposite" of opcode. This can be done by flipping the least
-              // significant bit for IFNULL and IFNONNULL, and similarly for IFEQ ... IF_ACMPEQ
-              // (with a pre and post offset by 1).
+              // 计算 opcode 的“相反操作码”。对于 IFNULL 和 IFNONNULL，可以通过翻转最低有效位实现，
+              // 对于 IFEQ ... IF_ACMPEQ 也类似（加减 1 进行偏移）。
               opcode = opcode < Opcodes.GOTO ? ((opcode + 1) ^ 1) - 1 : opcode ^ 1;
               Label endif = createLabel(currentBytecodeOffset + 3, labels);
               methodVisitor.visitJumpInsn(opcode, endif);
               methodVisitor.visitJumpInsn(Constants.GOTO_W, target);
-              // endif designates the instruction just after GOTO_W, and is visited as part of the
-              // next instruction. Since it is a jump target, we need to insert a frame here.
+              // endif 表示紧跟 GOTO_W 之后的指令，并将在下一条指令中访问。
+              // 由于它是跳转目标，因此需要在此插入栈映射帧。
               insertFrame = true;
             }
             currentOffset += 3;
             break;
           }
         case Constants.ASM_GOTO_W:
-          // Replace ASM_GOTO_W with GOTO_W.
+          // 将 ASM_GOTO_W 替换为 GOTO_W。
           methodVisitor.visitJumpInsn(
               Constants.GOTO_W, labels[currentBytecodeOffset + readInt(currentOffset + 1)]);
-          // The instruction just after is a jump target (because ASM_GOTO_W is used in patterns
-          // IFNOTxxx <L> ASM_GOTO_W <l> L:..., see MethodWriter), so we need to insert a frame
-          // here.
+          // 紧跟其后的指令是跳转目标（因为 ASM_GOTO_W 用于 IFNOTxxx <L> ASM_GOTO_W <l> L:... 模式，
+          // 参见 MethodWriter），因此需要在此插入栈映射帧。
           insertFrame = true;
           currentOffset += 5;
           break;
@@ -2362,9 +2290,9 @@ public class ClassReader {
           break;
         case Opcodes.TABLESWITCH:
           {
-            // Skip 0 to 3 padding bytes.
+            // 跳过 0 到 3 个填充字节。
             currentOffset += 4 - (currentBytecodeOffset & 3);
-            // Read the instruction.
+            // 读取指令。
             Label defaultLabel = labels[currentBytecodeOffset + readInt(currentOffset)];
             int low = readInt(currentOffset + 4);
             int high = readInt(currentOffset + 8);
@@ -2379,9 +2307,9 @@ public class ClassReader {
           }
         case Opcodes.LOOKUPSWITCH:
           {
-            // Skip 0 to 3 padding bytes.
+            // 跳过 0 到 3 个填充字节。
             currentOffset += 4 - (currentBytecodeOffset & 3);
-            // Read the instruction.
+            // 读取指令。
             Label defaultLabel = labels[currentBytecodeOffset + readInt(currentOffset)];
             int numPairs = readInt(currentOffset + 4);
             currentOffset += 8;
@@ -2498,19 +2426,19 @@ public class ClassReader {
           throw new AssertionError();
       }
 
-      // Visit the runtime visible instruction annotations, if any.
+        // 访问运行时可见的指令注解（如果有）。
       while (visibleTypeAnnotationOffsets != null
           && currentVisibleTypeAnnotationIndex < visibleTypeAnnotationOffsets.length
           && currentVisibleTypeAnnotationBytecodeOffset <= currentBytecodeOffset) {
         if (currentVisibleTypeAnnotationBytecodeOffset == currentBytecodeOffset) {
-          // Parse the target_type, target_info and target_path fields.
+          // 解析 target_type、target_info 和 target_path 字段。
           int currentAnnotationOffset =
               readTypeAnnotationTarget(
                   context, visibleTypeAnnotationOffsets[currentVisibleTypeAnnotationIndex]);
-          // Parse the type_index field.
+          // 解析 type_index 字段。
           String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
           currentAnnotationOffset += 2;
-          // Parse num_element_value_pairs and element_value_pairs and visit these values.
+          // 解析 num_element_value_pairs 和 element_value_pairs 并访问这些值。
           readElementValues(
               methodVisitor.visitInsnAnnotation(
                   context.currentTypeAnnotationTarget,
@@ -2526,19 +2454,19 @@ public class ClassReader {
                 visibleTypeAnnotationOffsets, ++currentVisibleTypeAnnotationIndex);
       }
 
-      // Visit the runtime invisible instruction annotations, if any.
+      // 访问运行时不可见的指令注解（如果有）。
       while (invisibleTypeAnnotationOffsets != null
           && currentInvisibleTypeAnnotationIndex < invisibleTypeAnnotationOffsets.length
           && currentInvisibleTypeAnnotationBytecodeOffset <= currentBytecodeOffset) {
         if (currentInvisibleTypeAnnotationBytecodeOffset == currentBytecodeOffset) {
-          // Parse the target_type, target_info and target_path fields.
+          // 解析 target_type、target_info 和 target_path 字段。
           int currentAnnotationOffset =
               readTypeAnnotationTarget(
                   context, invisibleTypeAnnotationOffsets[currentInvisibleTypeAnnotationIndex]);
-          // Parse the type_index field.
+          // 解析 type_index 字段。
           String annotationDescriptor = readUTF8(currentAnnotationOffset, charBuffer);
           currentAnnotationOffset += 2;
-          // Parse num_element_value_pairs and element_value_pairs and visit these values.
+          // 解析 num_element_value_pairs 和 element_value_pairs 并访问这些值。
           readElementValues(
               methodVisitor.visitInsnAnnotation(
                   context.currentTypeAnnotationTarget,
@@ -2558,16 +2486,16 @@ public class ClassReader {
       methodVisitor.visitLabel(labels[codeLength]);
     }
 
-    // Visit LocalVariableTable and LocalVariableTypeTable attributes.
+    // 访问 LocalVariableTable 和 LocalVariableTypeTable 属性。
     if (localVariableTableOffset != 0 && (context.parsingOptions & SKIP_DEBUG) == 0) {
-      // The (start_pc, index, signature_index) fields of each entry of the LocalVariableTypeTable.
+      // LocalVariableTypeTable 每个条目的 (start_pc, index, signature_index) 字段。
       int[] typeTable = null;
       if (localVariableTypeTableOffset != 0) {
         typeTable = new int[readUnsignedShort(localVariableTypeTableOffset) * 3];
         currentOffset = localVariableTypeTableOffset + 2;
         int typeTableIndex = typeTable.length;
         while (typeTableIndex > 0) {
-          // Store the offset of 'signature_index', and the value of 'index' and 'start_pc'.
+          // 存储 'signature_index' 的偏移量，以及 'index' 和 'start_pc' 的值。
           typeTable[--typeTableIndex] = currentOffset + 6;
           typeTable[--typeTableIndex] = readUnsignedShort(currentOffset + 8);
           typeTable[--typeTableIndex] = readUnsignedShort(currentOffset);
@@ -2597,18 +2525,18 @@ public class ClassReader {
       }
     }
 
-    // Visit the local variable type annotations of the RuntimeVisibleTypeAnnotations attribute.
+    // 访问 RuntimeVisibleTypeAnnotations 属性的局部变量类型注解。
     if (visibleTypeAnnotationOffsets != null) {
       for (int typeAnnotationOffset : visibleTypeAnnotationOffsets) {
         int targetType = readByte(typeAnnotationOffset);
         if (targetType == TypeReference.LOCAL_VARIABLE
             || targetType == TypeReference.RESOURCE_VARIABLE) {
-          // Parse the target_type, target_info and target_path fields.
+          // 解析 target_type、target_info 和 target_path 字段。
           currentOffset = readTypeAnnotationTarget(context, typeAnnotationOffset);
-          // Parse the type_index field.
+          // 解析 type_index 字段。
           String annotationDescriptor = readUTF8(currentOffset, charBuffer);
           currentOffset += 2;
-          // Parse num_element_value_pairs and element_value_pairs and visit these values.
+          // 解析 num_element_value_pairs 和 element_value_pairs 并访问这些值。
           readElementValues(
               methodVisitor.visitLocalVariableAnnotation(
                   context.currentTypeAnnotationTarget,
@@ -2625,18 +2553,18 @@ public class ClassReader {
       }
     }
 
-    // Visit the local variable type annotations of the RuntimeInvisibleTypeAnnotations attribute.
+    // 访问 RuntimeInvisibleTypeAnnotations 属性的局部变量类型注解。
     if (invisibleTypeAnnotationOffsets != null) {
       for (int typeAnnotationOffset : invisibleTypeAnnotationOffsets) {
         int targetType = readByte(typeAnnotationOffset);
         if (targetType == TypeReference.LOCAL_VARIABLE
             || targetType == TypeReference.RESOURCE_VARIABLE) {
-          // Parse the target_type, target_info and target_path fields.
+          // 解析 target_type、target_info 和 target_path 字段。
           currentOffset = readTypeAnnotationTarget(context, typeAnnotationOffset);
-          // Parse the type_index field.
+          // 解析 type_index 字段。
           String annotationDescriptor = readUTF8(currentOffset, charBuffer);
           currentOffset += 2;
-          // Parse num_element_value_pairs and element_value_pairs and visit these values.
+          // 解析 num_element_value_pairs 和 element_value_pairs 并访问这些值。
           readElementValues(
               methodVisitor.visitLocalVariableAnnotation(
                   context.currentTypeAnnotationTarget,
@@ -2653,35 +2581,33 @@ public class ClassReader {
       }
     }
 
-    // Visit the non standard attributes.
+    // 访问非标准属性。
     while (attributes != null) {
-      // Copy and reset the nextAttribute field so that it can also be used in MethodWriter.
+      // 复制并重置 nextAttribute 字段，以便在 MethodWriter 中也可以使用。
       Attribute nextAttribute = attributes.nextAttribute;
       attributes.nextAttribute = null;
       methodVisitor.visitAttribute(attributes);
       attributes = nextAttribute;
     }
 
-    // Visit the max stack and max locals values.
+    // 访问最大栈深度和最大局部变量数。
     methodVisitor.visitMaxs(maxStack, maxLocals);
   }
 
   /**
-   * Returns the label corresponding to the given bytecode offset. The default implementation of
-   * this method creates a label for the given offset if it has not been already created.
+   * 返回与给定字节码偏移量对应的标签。此方法的默认实现在给定偏移量尚未创建标签时为其创建一个标签。
    *
-   * @param bytecodeOffset a bytecode offset in a method.
-   * @param labels the already created labels, indexed by their offset. If a label already exists
-   *     for bytecodeOffset this method must not create a new one. Otherwise it must store the new
-   *     label in this array.
-   * @return a non null Label, which must be equal to labels[bytecodeOffset].
+   * @param bytecodeOffset 方法中的字节码偏移量。
+   * @param labels 已创建的标签，按其偏移量索引。如果bytecodeOffset已存在标签，
+   *     此方法不得创建新标签。否则必须将新标签存储在此数组中。
+   * @return 非空的Label，必须等于labels[bytecodeOffset]。
    */
   protected Label readLabel(final int bytecodeOffset, final Label[] labels) {
-    // SPRING PATCH: leniently handle offset mismatch
+    // SPRING补丁：宽容地处理偏移量不匹配
     if (bytecodeOffset >= labels.length) {
       return new Label();
     }
-    // END OF PATCH
+    // 补丁结束
     if (labels[bytecodeOffset] == null) {
       labels[bytecodeOffset] = new Label();
     }
@@ -2689,13 +2615,12 @@ public class ClassReader {
   }
 
   /**
-   * Creates a label without the {@link Label#FLAG_DEBUG_ONLY} flag set, for the given bytecode
-   * offset. The label is created with a call to {@link #readLabel} and its {@link
-   * Label#FLAG_DEBUG_ONLY} flag is cleared.
+   * 为给定的字节码偏移量创建一个未设置{@link Label#FLAG_DEBUG_ONLY}标志的标签。
+   * 标签通过调用{@link #readLabel}创建，并清除其{@link Label#FLAG_DEBUG_ONLY}标志。
    *
-   * @param bytecodeOffset a bytecode offset in a method.
-   * @param labels the already created labels, indexed by their offset.
-   * @return a Label without the {@link Label#FLAG_DEBUG_ONLY} flag set.
+   * @param bytecodeOffset 方法中的字节码偏移量。
+   * @param labels 已创建的标签，按其偏移量索引。
+   * @return 未设置{@link Label#FLAG_DEBUG_ONLY}标志的Label。
    */
   private Label createLabel(final int bytecodeOffset, final Label[] labels) {
     Label label = readLabel(bytecodeOffset, labels);
@@ -2704,12 +2629,11 @@ public class ClassReader {
   }
 
   /**
-   * Creates a label with the {@link Label#FLAG_DEBUG_ONLY} flag set, if there is no already
-   * existing label for the given bytecode offset (otherwise does nothing). The label is created
-   * with a call to {@link #readLabel}.
+   * 如果给定的字节码偏移量尚不存在标签，则创建一个设置了{@link Label#FLAG_DEBUG_ONLY}标志的标签
+   * （否则不执行任何操作）。标签通过调用{@link #readLabel}创建。
    *
-   * @param bytecodeOffset a bytecode offset in a method.
-   * @param labels the already created labels, indexed by their offset.
+   * @param bytecodeOffset 方法中的字节码偏移量。
+   * @param labels 已创建的标签，按其偏移量索引。
    */
   private void createDebugLabel(final int bytecodeOffset, final Label[] labels) {
     if (labels[bytecodeOffset] == null) {
@@ -2718,22 +2642,20 @@ public class ClassReader {
   }
 
   // ----------------------------------------------------------------------------------------------
-  // Methods to parse annotations, type annotations and parameter annotations
+  // 解析注解、类型注解和参数注解的方法
   // ----------------------------------------------------------------------------------------------
 
   /**
-   * Parses a Runtime[In]VisibleTypeAnnotations attribute to find the offset of each type_annotation
-   * entry it contains, to find the corresponding labels, and to visit the try catch block
-   * annotations.
+   * 解析Runtime[In]VisibleTypeAnnotations属性以找到其包含的每个type_annotation条目的偏移量，
+   * 找到相应的标签，并访问try catch块注解。
    *
-   * @param methodVisitor the method visitor to be used to visit the try catch block annotations.
-   * @param context information about the class being parsed.
-   * @param runtimeTypeAnnotationsOffset the start offset of a Runtime[In]VisibleTypeAnnotations
-   *     attribute, excluding the attribute_info's attribute_name_index and attribute_length fields.
-   * @param visible true if the attribute to parse is a RuntimeVisibleTypeAnnotations attribute,
-   *     false it is a RuntimeInvisibleTypeAnnotations attribute.
-   * @return the start offset of each entry of the Runtime[In]VisibleTypeAnnotations_attribute's
-   *     'annotations' array field.
+   * @param methodVisitor 用于访问try catch块注解的方法访问者。
+   * @param context 关于正在解析的类的信息。
+   * @param runtimeTypeAnnotationsOffset Runtime[In]VisibleTypeAnnotations属性的起始偏移量，
+   *     不包括attribute_info的attribute_name_index和attribute_length字段。
+   * @param visible 如果要解析的属性是RuntimeVisibleTypeAnnotations属性则为true，
+   *     如果是RuntimeInvisibleTypeAnnotations属性则为false。
+   * @return Runtime[In]VisibleTypeAnnotations_attribute的'annotations'数组字段每个条目的起始偏移量。
    */
   private int[] readTypeAnnotations(
       final MethodVisitor methodVisitor,
@@ -2742,26 +2664,24 @@ public class ClassReader {
       final boolean visible) {
     char[] charBuffer = context.charBuffer;
     int currentOffset = runtimeTypeAnnotationsOffset;
-    // Read the num_annotations field and create an array to store the type_annotation offsets.
+    // 读取num_annotations字段并创建数组来存储type_annotation偏移量。
     int[] typeAnnotationsOffsets = new int[readUnsignedShort(currentOffset)];
     currentOffset += 2;
-    // Parse the 'annotations' array field.
+    // 解析'annotations'数组字段。
     for (int i = 0; i < typeAnnotationsOffsets.length; ++i) {
       typeAnnotationsOffsets[i] = currentOffset;
-      // Parse the type_annotation's target_type and the target_info fields. The size of the
-      // target_info field depends on the value of target_type.
+      // 解析type_annotation的target_type和target_info字段。target_info字段的大小取决于target_type的值。
       int targetType = readInt(currentOffset);
       switch (targetType >>> 24) {
         case TypeReference.LOCAL_VARIABLE:
         case TypeReference.RESOURCE_VARIABLE:
-          // A localvar_target has a variable size, which depends on the value of their table_length
-          // field. It also references bytecode offsets, for which we need labels.
+          // localvar_target具有可变大小，取决于其table_length字段的值。它还引用字节码偏移量，我们需要为其创建标签。
           int tableLength = readUnsignedShort(currentOffset + 1);
           currentOffset += 3;
           while (tableLength-- > 0) {
             int startPc = readUnsignedShort(currentOffset);
             int length = readUnsignedShort(currentOffset + 2);
-            // Skip the index field (2 bytes).
+            // 跳过index字段（2字节）。
             currentOffset += 6;
             createLabel(startPc, context.currentMethodLabels);
             createLabel(startPc + length, context.currentMethodLabels);
@@ -2792,20 +2712,19 @@ public class ClassReader {
         case TypeReference.METHOD_RETURN:
         case TypeReference.METHOD_RECEIVER:
         default:
-          // TypeReference type which can't be used in Code attribute, or which is unknown.
+          // 不能在Code属性中使用的TypeReference类型，或未知类型。
           throw new IllegalArgumentException();
       }
-      // Parse the rest of the type_annotation structure, starting with the target_path structure
-      // (whose size depends on its path_length field).
+      // 解析type_annotation结构的其余部分，从target_path结构开始（其大小取决于其path_length字段）。
       int pathLength = readByte(currentOffset);
       if ((targetType >>> 24) == TypeReference.EXCEPTION_PARAMETER) {
-        // Parse the target_path structure and create a corresponding TypePath.
+        // 解析target_path结构并创建相应的TypePath。
         TypePath path = pathLength == 0 ? null : new TypePath(classFileBuffer, currentOffset);
         currentOffset += 1 + 2 * pathLength;
-        // Parse the type_index field.
+        // 解析type_index字段。
         String annotationDescriptor = readUTF8(currentOffset, charBuffer);
         currentOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析num_element_value_pairs和element_value_pairs并访问这些值。
         currentOffset =
             readElementValues(
                 methodVisitor.visitTryCatchAnnotation(
@@ -2814,12 +2733,11 @@ public class ClassReader {
                 /* named = */ true,
                 charBuffer);
       } else {
-        // We don't want to visit the other target_type annotations, so we just skip them (which
-        // requires some parsing because the element_value_pairs array has a variable size). First,
-        // skip the target_path structure:
+        // 我们不想访问其他target_type注解，所以我们跳过它们（这需要一些解析，
+        // 因为element_value_pairs数组具有可变大小）。首先，跳过target_path结构：
         currentOffset += 3 + 2 * pathLength;
-        // Then skip the num_element_value_pairs and element_value_pairs fields (by reading them
-        // with a null AnnotationVisitor).
+        // 然后跳过num_element_value_pairs和element_value_pairs字段
+        // （通过使用null AnnotationVisitor读取它们）。
         currentOffset =
             readElementValues(
                 /* annotationVisitor = */ null, currentOffset, /* named = */ true, charBuffer);
@@ -2829,14 +2747,14 @@ public class ClassReader {
   }
 
   /**
-   * Returns the bytecode offset corresponding to the specified JVMS 'type_annotation' structure, or
-   * -1 if there is no such type_annotation of if it does not have a bytecode offset.
+   * 返回与指定JVMS 'type_annotation'结构对应的字节码偏移量，
+   * 如果没有此类type_annotation或它没有字节码偏移量，则返回-1。
    *
-   * @param typeAnnotationOffsets the offset of each 'type_annotation' entry in a
-   *     Runtime[In]VisibleTypeAnnotations attribute, or {@literal null}.
-   * @param typeAnnotationIndex the index a 'type_annotation' entry in typeAnnotationOffsets.
-   * @return bytecode offset corresponding to the specified JVMS 'type_annotation' structure, or -1
-   *     if there is no such type_annotation of if it does not have a bytecode offset.
+   * @param typeAnnotationOffsets Runtime[In]VisibleTypeAnnotations属性中每个'type_annotation'条目的偏移量，
+   *     或{@literal null}。
+   * @param typeAnnotationIndex typeAnnotationOffsets中'type_annotation'条目的索引。
+   * @return 与指定JVMS 'type_annotation'结构对应的字节码偏移量，
+   *     如果没有此类type_annotation或它没有字节码偏移量，则返回-1。
    */
   private int getTypeAnnotationBytecodeOffset(
       final int[] typeAnnotationOffsets, final int typeAnnotationIndex) {
@@ -2849,18 +2767,16 @@ public class ClassReader {
   }
 
   /**
-   * Parses the header of a JVMS type_annotation structure to extract its target_type, target_info
-   * and target_path (the result is stored in the given context), and returns the start offset of
-   * the rest of the type_annotation structure.
+   * 解析JVMS type_annotation结构的头部以提取其target_type、target_info和target_path
+   * （结果存储在给定的上下文中），并返回type_annotation结构其余部分的起始偏移量。
    *
-   * @param context information about the class being parsed. This is where the extracted
-   *     target_type and target_path must be stored.
-   * @param typeAnnotationOffset the start offset of a type_annotation structure.
-   * @return the start offset of the rest of the type_annotation structure.
+   * @param context 关于正在解析的类的信息。这是提取的target_type和target_path必须存储的地方。
+   * @param typeAnnotationOffset type_annotation结构的起始偏移量。
+   * @return type_annotation结构其余部分的起始偏移量。
    */
   private int readTypeAnnotationTarget(final Context context, final int typeAnnotationOffset) {
     int currentOffset = typeAnnotationOffset;
-    // Parse and store the target_type structure.
+    // 解析并存储target_type结构。
     int targetType = readInt(typeAnnotationOffset);
     switch (targetType >>> 24) {
       case TypeReference.CLASS_TYPE_PARAMETER:
@@ -2922,24 +2838,23 @@ public class ClassReader {
         throw new IllegalArgumentException();
     }
     context.currentTypeAnnotationTarget = targetType;
-    // Parse and store the target_path structure.
+    // 解析并存储target_path结构。
     int pathLength = readByte(currentOffset);
     context.currentTypeAnnotationTargetPath =
         pathLength == 0 ? null : new TypePath(classFileBuffer, currentOffset);
-    // Return the start offset of the rest of the type_annotation structure.
+    // 返回type_annotation结构其余部分的起始偏移量。
     return currentOffset + 1 + 2 * pathLength;
   }
 
   /**
-   * Reads a Runtime[In]VisibleParameterAnnotations attribute and makes the given visitor visit it.
+   * 读取Runtime[In]VisibleParameterAnnotations属性并让给定的访问者访问它。
    *
-   * @param methodVisitor the visitor that must visit the parameter annotations.
-   * @param context information about the class being parsed.
-   * @param runtimeParameterAnnotationsOffset the start offset of a
-   *     Runtime[In]VisibleParameterAnnotations attribute, excluding the attribute_info's
-   *     attribute_name_index and attribute_length fields.
-   * @param visible true if the attribute to parse is a RuntimeVisibleParameterAnnotations
-   *     attribute, false it is a RuntimeInvisibleParameterAnnotations attribute.
+   * @param methodVisitor 必须访问参数注解的访问者。
+   * @param context 关于正在解析的类的信息。
+   * @param runtimeParameterAnnotationsOffset Runtime[In]VisibleParameterAnnotations属性的起始偏移量，
+   *     不包括attribute_info的attribute_name_index和attribute_length字段。
+   * @param visible 如果要解析的属性是RuntimeVisibleParameterAnnotations属性则为true，
+   *     如果是RuntimeInvisibleParameterAnnotations属性则为false。
    */
   private void readParameterAnnotations(
       final MethodVisitor methodVisitor,
@@ -2954,10 +2869,10 @@ public class ClassReader {
       int numAnnotations = readUnsignedShort(currentOffset);
       currentOffset += 2;
       while (numAnnotations-- > 0) {
-        // Parse the type_index field.
+        // 解析type_index字段。
         String annotationDescriptor = readUTF8(currentOffset, charBuffer);
         currentOffset += 2;
-        // Parse num_element_value_pairs and element_value_pairs and visit these values.
+        // 解析num_element_value_pairs和element_value_pairs并访问这些值。
         currentOffset =
             readElementValues(
                 methodVisitor.visitParameterAnnotation(i, annotationDescriptor, visible),
@@ -2969,18 +2884,15 @@ public class ClassReader {
   }
 
   /**
-   * Reads the element values of a JVMS 'annotation' structure and makes the given visitor visit
-   * them. This method can also be used to read the values of the JVMS 'array_value' field of an
-   * annotation's 'element_value'.
+   * 读取JVMS 'annotation'结构的元素值并让给定的访问者访问它们。
+   * 此方法也可用于读取注解的'element_value'的JVMS 'array_value'字段的值。
    *
-   * @param annotationVisitor the visitor that must visit the values.
-   * @param annotationOffset the start offset of an 'annotation' structure (excluding its type_index
-   *     field) or of an 'array_value' structure.
-   * @param named if the annotation values are named or not. This should be true to parse the values
-   *     of a JVMS 'annotation' structure, and false to parse the JVMS 'array_value' of an
-   *     annotation's element_value.
-   * @param charBuffer the buffer used to read strings in the constant pool.
-   * @return the end offset of the JVMS 'annotation' or 'array_value' structure.
+   * @param annotationVisitor 必须访问这些值的访问者。
+   * @param annotationOffset 'annotation'结构（不包括其type_index字段）或'array_value'结构的起始偏移量。
+   * @param named 注解值是否有名称。解析JVMS 'annotation'结构的值时应为true，
+   *     解析注解element_value的JVMS 'array_value'时应为false。
+   * @param charBuffer 用于读取常量池中字符串的缓冲区。
+   * @return JVMS 'annotation'或'array_value'结构的结束偏移量。
    */
   private int readElementValues(
       final AnnotationVisitor annotationVisitor,
@@ -2988,18 +2900,18 @@ public class ClassReader {
       final boolean named,
       final char[] charBuffer) {
     int currentOffset = annotationOffset;
-    // Read the num_element_value_pairs field (or num_values field for an array_value).
+    // 读取num_element_value_pairs字段（或array_value的num_values字段）。
     int numElementValuePairs = readUnsignedShort(currentOffset);
     currentOffset += 2;
     if (named) {
-      // Parse the element_value_pairs array.
+      // 解析element_value_pairs数组。
       while (numElementValuePairs-- > 0) {
         String elementName = readUTF8(currentOffset, charBuffer);
         currentOffset =
             readElementValue(annotationVisitor, currentOffset + 2, elementName, charBuffer);
       }
     } else {
-      // Parse the array_value array.
+      // 解析array_value数组。
       while (numElementValuePairs-- > 0) {
         currentOffset =
             readElementValue(annotationVisitor, currentOffset, /* elementName= */ null, charBuffer);
@@ -3012,14 +2924,13 @@ public class ClassReader {
   }
 
   /**
-   * Reads a JVMS 'element_value' structure and makes the given visitor visit it.
+   * 读取JVMS 'element_value'结构并让给定的访问者访问它。
    *
-   * @param annotationVisitor the visitor that must visit the element_value structure.
-   * @param elementValueOffset the start offset in {@link #classFileBuffer} of the element_value
-   *     structure to be read.
-   * @param elementName the name of the element_value structure to be read, or {@literal null}.
-   * @param charBuffer the buffer used to read strings in the constant pool.
-   * @return the end offset of the JVMS 'element_value' structure.
+   * @param annotationVisitor 必须访问element_value结构的访问者。
+   * @param elementValueOffset {@link #classFileBuffer}中要读取的element_value结构的起始偏移量。
+   * @param elementName 要读取的element_value结构的名称，或{@literal null}。
+   * @param charBuffer 用于读取常量池中字符串的缓冲区。
+   * @return JVMS 'element_value'结构的结束偏移量。
    */
   private int readElementValue(
       final AnnotationVisitor annotationVisitor,
@@ -3191,14 +3102,13 @@ public class ClassReader {
   }
 
   // ----------------------------------------------------------------------------------------------
-  // Methods to parse stack map frames
+  // 解析栈映射帧的方法
   // ----------------------------------------------------------------------------------------------
 
   /**
-   * Computes the implicit frame of the method currently being parsed (as defined in the given
-   * {@link Context}) and stores it in the given context.
+   * 计算当前正在解析的方法的隐式帧（如给定的{@link Context}中定义的）并将其存储在给定的上下文中。
    *
-   * @param context information about the class being parsed.
+   * @param context 关于正在解析的类的信息。
    */
   private void computeImplicitFrame(final Context context) {
     String methodDescriptor = context.currentMethodDescriptor;
@@ -3211,8 +3121,7 @@ public class ClassReader {
         locals[numLocal++] = readClass(header + 2, context.charBuffer);
       }
     }
-    // Parse the method descriptor, one argument type descriptor at each iteration. Start by
-    // skipping the first method descriptor character, which is always '('.
+    // 解析方法描述符，每次迭代处理一个参数类型描述符。首先跳过第一个方法描述符字符，它总是'('。
     int currentMethodDescritorOffset = 1;
     while (true) {
       int currentArgumentDescriptorStartOffset = currentMethodDescritorOffset;
@@ -3263,18 +3172,15 @@ public class ClassReader {
   }
 
   /**
-   * Reads a JVMS 'stack_map_frame' structure and stores the result in the given {@link Context}
-   * object. This method can also be used to read a full_frame structure, excluding its frame_type
-   * field (this is used to parse the legacy StackMap attributes).
+   * 读取JVMS 'stack_map_frame'结构并将结果存储在给定的{@link Context}对象中。
+   * 此方法也可用于读取full_frame结构，但排除其frame_type字段（用于解析传统的StackMap属性）。
    *
-   * @param stackMapFrameOffset the start offset in {@link #classFileBuffer} of the
-   *     stack_map_frame_value structure to be read, or the start offset of a full_frame structure
-   *     (excluding its frame_type field).
-   * @param compressed true to read a 'stack_map_frame' structure, false to read a 'full_frame'
-   *     structure without its frame_type field.
-   * @param expand if the stack map frame must be expanded. See {@link #EXPAND_FRAMES}.
-   * @param context where the parsed stack map frame must be stored.
-   * @return the end offset of the JVMS 'stack_map_frame' or 'full_frame' structure.
+   * @param stackMapFrameOffset {@link #classFileBuffer}中要读取的stack_map_frame_value结构的起始偏移量，
+   *     或full_frame结构的起始偏移量（排除其frame_type字段）。
+   * @param compressed true表示读取'stack_map_frame'结构，false表示读取不含frame_type字段的'full_frame'结构。
+   * @param expand 是否必须扩展栈映射帧。参见{@link #EXPAND_FRAMES}。
+   * @param context 解析后的栈映射帧必须存储的位置。
+   * @return JVMS 'stack_map_frame'或'full_frame'结构的结束偏移量。
    */
   private int readStackMapFrame(
       final int stackMapFrameOffset,
@@ -3286,7 +3192,7 @@ public class ClassReader {
     final Label[] labels = context.currentMethodLabels;
     int frameType;
     if (compressed) {
-      // Read the frame_type field.
+      // 读取frame_type字段。
       frameType = classFileBuffer[currentOffset++] & 0xFF;
     } else {
       frameType = Frame.FULL_FRAME;
@@ -3362,18 +3268,15 @@ public class ClassReader {
   }
 
   /**
-   * Reads a JVMS 'verification_type_info' structure and stores it at the given index in the given
-   * array.
+   * 读取JVMS 'verification_type_info'结构并将其存储在给定数组的指定索引处。
    *
-   * @param verificationTypeInfoOffset the start offset of the 'verification_type_info' structure to
-   *     read.
-   * @param frame the array where the parsed type must be stored.
-   * @param index the index in 'frame' where the parsed type must be stored.
-   * @param charBuffer the buffer used to read strings in the constant pool.
-   * @param labels the labels of the method currently being parsed, indexed by their offset. If the
-   *     parsed type is an ITEM_Uninitialized, a new label for the corresponding NEW instruction is
-   *     stored in this array if it does not already exist.
-   * @return the end offset of the JVMS 'verification_type_info' structure.
+   * @param verificationTypeInfoOffset 要读取的'verification_type_info'结构的起始偏移量。
+   * @param frame 解析后的类型必须存储的数组。
+   * @param index 解析后的类型必须存储在'frame'中的索引。
+   * @param charBuffer 用于读取常量池中字符串的缓冲区。
+   * @param labels 当前正在解析的方法的标签，按其偏移量索引。如果解析的类型是ITEM_Uninitialized，
+   *     则如果对应NEW指令的新标签不存在，将在此数组中存储该标签。
+   * @return JVMS 'verification_type_info'结构的结束偏移量。
    */
   private int readVerificationTypeInfo(
       final int verificationTypeInfoOffset,
@@ -3420,42 +3323,39 @@ public class ClassReader {
   }
 
   // ----------------------------------------------------------------------------------------------
-  // Methods to parse attributes
+  // 解析属性的方法
   // ----------------------------------------------------------------------------------------------
 
   /**
-   * Returns the offset in {@link #classFileBuffer} of the first ClassFile's 'attributes' array
-   * field entry.
+   * 返回 {@link #classFileBuffer} 中，第一个 ClassFile 的 'attributes' 数组字段条目的偏移量。
    *
-   * @return the offset in {@link #classFileBuffer} of the first ClassFile's 'attributes' array
-   *     field entry.
+   * @return {@link #classFileBuffer} 中，第一个 ClassFile 的 'attributes' 数组字段条目的偏移量。
    */
   final int getFirstAttributeOffset() {
-    // Skip the access_flags, this_class, super_class, and interfaces_count fields (using 2 bytes
-    // each), as well as the interfaces array field (2 bytes per interface).
+    // 跳过 access_flags、this_class、super_class 和 interfaces_count 字段（各占 2 字节），
+    // 以及 interfaces 数组字段（每个接口占 2 字节）。
     int currentOffset = header + 8 + readUnsignedShort(header + 6) * 2;
 
-    // Read the fields_count field.
+    // 读取 fields_count 字段。
     int fieldsCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
-    // Skip the 'fields' array field.
+    // 跳过 'fields' 数组字段。
     while (fieldsCount-- > 0) {
-      // Invariant: currentOffset is the offset of a field_info structure.
-      // Skip the access_flags, name_index and descriptor_index fields (2 bytes each), and read the
-      // attributes_count field.
+      // 不变量：currentOffset 为 field_info 结构的偏移量。
+      // 跳过 access_flags、name_index 和 descriptor_index 字段（各占 2 字节），并读取 attributes_count 字段。
       int attributesCount = readUnsignedShort(currentOffset + 6);
       currentOffset += 8;
-      // Skip the 'attributes' array field.
+      // 跳过 'attributes' 数组字段。
       while (attributesCount-- > 0) {
-        // Invariant: currentOffset is the offset of an attribute_info structure.
-        // Read the attribute_length field (2 bytes after the start of the attribute_info) and skip
-        // this many bytes, plus 6 for the attribute_name_index and attribute_length fields
-        // (yielding the total size of the attribute_info structure).
+        // 不变量：currentOffset 为 attribute_info 结构的偏移量。
+        // 读取 attribute_length 字段（attribute_info 起始位置之后的第 2 个字节），
+        // 并跳过该长度的字节，再加上 attribute_name_index 和 attribute_length 字段的 6 个字节
+        // （得到整个 attribute_info 结构的总大小）。
         currentOffset += 6 + readInt(currentOffset + 2);
       }
     }
 
-    // Skip the methods_count and 'methods' fields, using the same method as above.
+    // 按同样的方式跳过 methods_count 和 'methods' 字段。
     int methodsCount = readUnsignedShort(currentOffset);
     currentOffset += 2;
     while (methodsCount-- > 0) {
@@ -3466,34 +3366,33 @@ public class ClassReader {
       }
     }
 
-    // Skip the ClassFile's attributes_count field.
+    // 跳过 ClassFile 的 attributes_count 字段。
     return currentOffset + 2;
   }
 
   /**
-   * Reads the BootstrapMethods attribute to compute the offset of each bootstrap method.
+   * 读取 BootstrapMethods 属性，用于计算每个引导方法的偏移量。
    *
-   * @param maxStringLength a conservative estimate of the maximum length of the strings contained
-   *     in the constant pool of the class.
-   * @return the offsets of the bootstrap methods.
+   * @param maxStringLength 类的常量池中字符串的最大长度的保守估计值。
+   * @return 引导方法的偏移量数组。
    */
   private int[] readBootstrapMethodsAttribute(final int maxStringLength) {
     char[] charBuffer = new char[maxStringLength];
     int currentAttributeOffset = getFirstAttributeOffset();
     for (int i = readUnsignedShort(currentAttributeOffset - 2); i > 0; --i) {
-      // Read the attribute_info's attribute_name and attribute_length fields.
+      // 读取 attribute_info 的 attribute_name 和 attribute_length 字段。
       String attributeName = readUTF8(currentAttributeOffset, charBuffer);
       int attributeLength = readInt(currentAttributeOffset + 2);
       currentAttributeOffset += 6;
       if (Constants.BOOTSTRAP_METHODS.equals(attributeName)) {
-        // Read the num_bootstrap_methods field and create an array of this size.
+        // 读取 num_bootstrap_methods 字段并创建对应大小的数组。
         int[] result = new int[readUnsignedShort(currentAttributeOffset)];
-        // Compute and store the offset of each 'bootstrap_methods' array field entry.
+        // 计算并存储每个 'bootstrap_methods' 数组字段条目的偏移量。
         int currentBootstrapMethodOffset = currentAttributeOffset + 2;
         for (int j = 0; j < result.length; ++j) {
           result[j] = currentBootstrapMethodOffset;
-          // Skip the bootstrap_method_ref and num_bootstrap_arguments fields (2 bytes each),
-          // as well as the bootstrap_arguments array field (of size num_bootstrap_arguments * 2).
+          // 跳过 bootstrap_method_ref 和 num_bootstrap_arguments 字段（各 2 字节），
+          // 以及 bootstrap_arguments 数组字段（大小为 num_bootstrap_arguments * 2 字节）。
           currentBootstrapMethodOffset +=
               4 + readUnsignedShort(currentBootstrapMethodOffset + 2) * 2;
         }
@@ -3505,24 +3404,19 @@ public class ClassReader {
   }
 
   /**
-   * Reads a non standard JVMS 'attribute' structure in {@link #classFileBuffer}.
+   * 读取 {@link #classFileBuffer} 中的非标准 JVMS 'attribute' 结构。
    *
-   * @param attributePrototypes prototypes of the attributes that must be parsed during the visit of
-   *     the class. Any attribute whose type is not equal to the type of one the prototypes will not
-   *     be parsed: its byte array value will be passed unchanged to the ClassWriter.
-   * @param type the type of the attribute.
-   * @param offset the start offset of the JVMS 'attribute' structure in {@link #classFileBuffer}.
-   *     The 6 attribute header bytes (attribute_name_index and attribute_length) are not taken into
-   *     account here.
-   * @param length the length of the attribute's content (excluding the 6 attribute header bytes).
-   * @param charBuffer the buffer to be used to read strings in the constant pool.
-   * @param codeAttributeOffset the start offset of the enclosing Code attribute in {@link
-   *     #classFileBuffer}, or -1 if the attribute to be read is not a code attribute. The 6
-   *     attribute header bytes (attribute_name_index and attribute_length) are not taken into
-   *     account here.
-   * @param labels the labels of the method's code, or {@literal null} if the attribute to be read
-   *     is not a code attribute.
-   * @return the attribute that has been read.
+   * @param attributePrototypes 在类访问过程中需要解析的属性原型。
+   *     任何类型不等于这些原型类型的属性将不会被解析：其字节数组值会原封不动地传递给 ClassWriter。
+   * @param type 属性类型。
+   * @param offset {@link #classFileBuffer} 中 JVMS 'attribute' 结构的起始偏移量。
+   *     这里不包括 6 字节的属性头（attribute_name_index 和 attribute_length）。
+   * @param length 属性内容的长度（不包括 6 字节的属性头）。
+   * @param charBuffer 用于读取常量池中字符串的缓冲区。
+   * @param codeAttributeOffset {@link #classFileBuffer} 中包含该属性的 Code 属性的起始偏移量，
+   *     如果该属性不是 code 属性则为 -1。这里不包括 6 字节的属性头。
+   * @param labels 方法代码的标签数组，如果该属性不是 code 属性则为 {@literal null}。
+   * @return 读取到的属性。
    */
   private Attribute readAttribute(
       final Attribute[] attributePrototypes,
@@ -3542,60 +3436,55 @@ public class ClassReader {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Utility methods: low level parsing
+  // 工具方法：底层解析
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Returns the number of entries in the class's constant pool table.
+   * 返回类的常量池表中的条目数量。
    *
-   * @return the number of entries in the class's constant pool table.
+   * @return 常量池表中的条目数量。
    */
   public int getItemCount() {
     return cpInfoOffsets.length;
   }
 
   /**
-   * Returns the start offset in this {@link ClassReader} of a JVMS 'cp_info' structure (i.e. a
-   * constant pool entry), plus one. <i>This method is intended for {@link Attribute} sub classes,
-   * and is normally not needed by class generators or adapters.</i>
+   * 返回此 {@link ClassReader} 中指定 JVMS 'cp_info' 结构（即常量池条目）的起始偏移量加 1。
+   * <i>此方法供 {@link Attribute} 子类使用，通常类生成器或适配器不需要使用。</i>
    *
-   * @param constantPoolEntryIndex the index a constant pool entry in the class's constant pool
-   *     table.
-   * @return the start offset in this {@link ClassReader} of the corresponding JVMS 'cp_info'
-   *     structure, plus one.
+   * @param constantPoolEntryIndex 常量池表中某条目的索引。
+   * @return 对应 JVMS 'cp_info' 结构的起始偏移量加 1。
    */
   public int getItem(final int constantPoolEntryIndex) {
     return cpInfoOffsets[constantPoolEntryIndex];
   }
 
   /**
-   * Returns a conservative estimate of the maximum length of the strings contained in the class's
-   * constant pool table.
+   * 返回类的常量池表中字符串的最大长度的保守估计值。
    *
-   * @return a conservative estimate of the maximum length of the strings contained in the class's
-   *     constant pool table.
+   * @return 类的常量池表中字符串的最大长度的保守估计值。
    */
   public int getMaxStringLength() {
     return maxStringLength;
   }
 
   /**
-   * Reads a byte value in this {@link ClassReader}. <i>This method is intended for {@link
-   * Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * 读取此 {@link ClassReader} 中的一个字节值。
+   * <i>此方法用于 {@link Attribute} 子类，通常类生成器或适配器不需要使用。</i>
    *
-   * @param offset the start offset of the value to be read in this {@link ClassReader}.
-   * @return the read value.
+   * @param offset 要读取的值在 {@link ClassReader} 中的起始偏移量。
+   * @return 读取到的值。
    */
   public int readByte(final int offset) {
     return classFileBuffer[offset] & 0xFF;
   }
 
   /**
-   * Reads an unsigned short value in this {@link ClassReader}. <i>This method is intended for
-   * {@link Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * 读取此 {@link ClassReader} 中的一个无符号 short 值。
+   * <i>此方法用于 {@link Attribute} 子类，通常类生成器或适配器不需要使用。</i>
    *
-   * @param offset the start index of the value to be read in this {@link ClassReader}.
-   * @return the read value.
+   * @param offset 要读取的值在 {@link ClassReader} 中的起始索引。
+   * @return 读取到的值。
    */
   public int readUnsignedShort(final int offset) {
     byte[] classBuffer = classFileBuffer;
@@ -3603,11 +3492,11 @@ public class ClassReader {
   }
 
   /**
-   * Reads a signed short value in this {@link ClassReader}. <i>This method is intended for {@link
-   * Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * 读取此 {@link ClassReader} 中的一个有符号 short 值。
+   * <i>此方法用于 {@link Attribute} 子类，通常类生成器或适配器不需要使用。</i>
    *
-   * @param offset the start offset of the value to be read in this {@link ClassReader}.
-   * @return the read value.
+   * @param offset 要读取的值在 {@link ClassReader} 中的起始偏移量。
+   * @return 读取到的值。
    */
   public short readShort(final int offset) {
     byte[] classBuffer = classFileBuffer;
@@ -3615,11 +3504,11 @@ public class ClassReader {
   }
 
   /**
-   * Reads a signed int value in this {@link ClassReader}. <i>This method is intended for {@link
-   * Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * 读取此 {@link ClassReader} 中的一个有符号 int 值。
+   * <i>此方法用于 {@link Attribute} 子类，通常类生成器或适配器不需要使用。</i>
    *
-   * @param offset the start offset of the value to be read in this {@link ClassReader}.
-   * @return the read value.
+   * @param offset 要读取的值在 {@link ClassReader} 中的起始偏移量。
+   * @return 读取到的值。
    */
   public int readInt(final int offset) {
     byte[] classBuffer = classFileBuffer;
@@ -3630,11 +3519,11 @@ public class ClassReader {
   }
 
   /**
-   * Reads a signed long value in this {@link ClassReader}. <i>This method is intended for {@link
-   * Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * 读取此 {@link ClassReader} 中的一个有符号 long 值。
+   * <i>此方法用于 {@link Attribute} 子类，通常类生成器或适配器不需要使用。</i>
    *
-   * @param offset the start offset of the value to be read in this {@link ClassReader}.
-   * @return the read value.
+   * @param offset 要读取的值在 {@link ClassReader} 中的起始偏移量。
+   * @return 读取到的值。
    */
   public long readLong(final int offset) {
     long l1 = readInt(offset);
@@ -3643,17 +3532,15 @@ public class ClassReader {
   }
 
   /**
-   * Reads a CONSTANT_Utf8 constant pool entry in this {@link ClassReader}. <i>This method is
-   * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
-   * adapters.</i>
+   * 读取此 {@link ClassReader} 中的 CONSTANT_Utf8 常量池项。
+   * <i>此方法用于 {@link Attribute} 子类，通常类生成器或适配器不需要使用。</i>
    *
-   * @param offset the start offset of an unsigned short value in this {@link ClassReader}, whose
-   *     value is the index of a CONSTANT_Utf8 entry in the class's constant pool table.
-   * @param charBuffer the buffer to be used to read the string. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the String corresponding to the specified CONSTANT_Utf8 entry.
+   * @param offset {@link ClassReader} 中的一个无符号 short 值的起始偏移量，
+   *     该值是类的常量池表中 CONSTANT_Utf8 项的索引。
+   * @param charBuffer 用于读取字符串的缓冲区。此缓冲区必须足够大，不会自动调整大小。
+   * @return 指定 CONSTANT_Utf8 项对应的字符串。
    */
-  // DontCheck(AbbreviationAsWordInName): can't be renamed (for backward binary compatibility).
+  // DontCheck(AbbreviationAsWordInName): 不能重命名（为了二进制向后兼容性）。
   public String readUTF8(final int offset, final char[] charBuffer) {
     int constantPoolEntryIndex = readUnsignedShort(offset);
     if (offset == 0 || constantPoolEntryIndex == 0) {
@@ -3663,13 +3550,11 @@ public class ClassReader {
   }
 
   /**
-   * Reads a CONSTANT_Utf8 constant pool entry in {@link #classFileBuffer}.
+   * 读取 {@link #classFileBuffer} 中的 CONSTANT_Utf8 常量池项。
    *
-   * @param constantPoolEntryIndex the index of a CONSTANT_Utf8 entry in the class's constant pool
-   *     table.
-   * @param charBuffer the buffer to be used to read the string. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the String corresponding to the specified CONSTANT_Utf8 entry.
+   * @param constantPoolEntryIndex 类的常量池表中 CONSTANT_Utf8 项的索引。
+   * @param charBuffer 用于读取字符串的缓冲区。此缓冲区必须足够大，不会自动调整大小。
+   * @return 指定 CONSTANT_Utf8 项对应的字符串。
    */
   final String readUtf(final int constantPoolEntryIndex, final char[] charBuffer) {
     String value = constantUtf8Values[constantPoolEntryIndex];
@@ -3682,13 +3567,12 @@ public class ClassReader {
   }
 
   /**
-   * Reads an UTF8 string in {@link #classFileBuffer}.
+   * 读取 {@link #classFileBuffer} 中的 UTF8 字符串。
    *
-   * @param utfOffset the start offset of the UTF8 string to be read.
-   * @param utfLength the length of the UTF8 string to be read.
-   * @param charBuffer the buffer to be used to read the string. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the String corresponding to the specified UTF8 string.
+   * @param utfOffset 要读取的 UTF8 字符串的起始偏移量。
+   * @param utfLength 要读取的 UTF8 字符串的长度。
+   * @param charBuffer 用于读取字符串的缓冲区。此缓冲区必须足够大，不会自动调整大小。
+   * @return 指定 UTF8 字符串对应的字符串。
    */
   private String readUtf(final int utfOffset, final int utfLength, final char[] charBuffer) {
     int currentOffset = utfOffset;
@@ -3714,77 +3598,66 @@ public class ClassReader {
   }
 
   /**
-   * Reads a CONSTANT_Class, CONSTANT_String, CONSTANT_MethodType, CONSTANT_Module or
-   * CONSTANT_Package constant pool entry in {@link #classFileBuffer}. <i>This method is intended
-   * for {@link Attribute} sub classes, and is normally not needed by class generators or
-   * adapters.</i>
+   * 从 {@link #classFileBuffer} 中读取 CONSTANT_Class、CONSTANT_String、CONSTANT_MethodType、
+   * CONSTANT_Module 或 CONSTANT_Package 常量池项。<i>此方法主要供 {@link Attribute} 的子类使用，
+   * 通常类生成器或适配器不需要调用。</i>
    *
-   * @param offset the start offset of an unsigned short value in {@link #classFileBuffer}, whose
-   *     value is the index of a CONSTANT_Class, CONSTANT_String, CONSTANT_MethodType,
-   *     CONSTANT_Module or CONSTANT_Package entry in class's constant pool table.
-   * @param charBuffer the buffer to be used to read the item. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the String corresponding to the specified constant pool entry.
+   * @param offset {@link #classFileBuffer} 中无符号短整型值的起始偏移量，该值是类常量池表中
+   *     CONSTANT_Class、CONSTANT_String、CONSTANT_MethodType、CONSTANT_Module 或
+   *     CONSTANT_Package 项的索引。
+   * @param charBuffer 用于读取条目的字符缓冲区，必须足够大，且不会自动调整大小。
+   * @return 与指定常量池项对应的字符串。
    */
   private String readStringish(final int offset, final char[] charBuffer) {
-    // Get the start offset of the cp_info structure (plus one), and read the CONSTANT_Utf8 entry
-    // designated by the first two bytes of this cp_info.
+    // 获取 cp_info 结构的起始偏移量（加 1），并读取由该 cp_info 的前两个字节所指定的 CONSTANT_Utf8 项。
     return readUTF8(cpInfoOffsets[readUnsignedShort(offset)], charBuffer);
   }
 
   /**
-   * Reads a CONSTANT_Class constant pool entry in this {@link ClassReader}. <i>This method is
-   * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
-   * adapters.</i>
+   * 从当前 {@link ClassReader} 中读取 CONSTANT_Class 常量池项。
+   * <i>此方法主要供 {@link Attribute} 的子类使用，通常类生成器或适配器不需要调用。</i>
    *
-   * @param offset the start offset of an unsigned short value in this {@link ClassReader}, whose
-   *     value is the index of a CONSTANT_Class entry in class's constant pool table.
-   * @param charBuffer the buffer to be used to read the item. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the String corresponding to the specified CONSTANT_Class entry.
+   * @param offset 当前 {@link ClassReader} 中无符号短整型值的起始偏移量，
+   *     该值是类常量池表中 CONSTANT_Class 项的索引。
+   * @param charBuffer 用于读取条目的字符缓冲区，必须足够大，且不会自动调整大小。
+   * @return 与指定 CONSTANT_Class 项对应的字符串。
    */
   public String readClass(final int offset, final char[] charBuffer) {
     return readStringish(offset, charBuffer);
   }
 
   /**
-   * Reads a CONSTANT_Module constant pool entry in this {@link ClassReader}. <i>This method is
-   * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
-   * adapters.</i>
+   * 从当前 {@link ClassReader} 中读取 CONSTANT_Module 常量池项。
+   * <i>此方法主要供 {@link Attribute} 的子类使用，通常类生成器或适配器不需要调用。</i>
    *
-   * @param offset the start offset of an unsigned short value in this {@link ClassReader}, whose
-   *     value is the index of a CONSTANT_Module entry in class's constant pool table.
-   * @param charBuffer the buffer to be used to read the item. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the String corresponding to the specified CONSTANT_Module entry.
+   * @param offset 当前 {@link ClassReader} 中无符号短整型值的起始偏移量，
+   *     该值是类常量池表中 CONSTANT_Module 项的索引。
+   * @param charBuffer 用于读取条目的字符缓冲区，必须足够大，且不会自动调整大小。
+   * @return 与指定 CONSTANT_Module 项对应的字符串。
    */
   public String readModule(final int offset, final char[] charBuffer) {
     return readStringish(offset, charBuffer);
   }
 
   /**
-   * Reads a CONSTANT_Package constant pool entry in this {@link ClassReader}. <i>This method is
-   * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
-   * adapters.</i>
+   * 从当前 {@link ClassReader} 中读取 CONSTANT_Package 常量池项。
+   * <i>此方法主要供 {@link Attribute} 的子类使用，通常类生成器或适配器不需要调用。</i>
    *
-   * @param offset the start offset of an unsigned short value in this {@link ClassReader}, whose
-   *     value is the index of a CONSTANT_Package entry in class's constant pool table.
-   * @param charBuffer the buffer to be used to read the item. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the String corresponding to the specified CONSTANT_Package entry.
+   * @param offset 当前 {@link ClassReader} 中无符号短整型值的起始偏移量，
+   *     该值是类常量池表中 CONSTANT_Package 项的索引。
+   * @param charBuffer 用于读取条目的字符缓冲区，必须足够大，且不会自动调整大小。
+   * @return 与指定 CONSTANT_Package 项对应的字符串。
    */
   public String readPackage(final int offset, final char[] charBuffer) {
     return readStringish(offset, charBuffer);
   }
 
   /**
-   * Reads a CONSTANT_Dynamic constant pool entry in {@link #classFileBuffer}.
+   * 从 {@link #classFileBuffer} 中读取 CONSTANT_Dynamic 常量池项。
    *
-   * @param constantPoolEntryIndex the index of a CONSTANT_Dynamic entry in the class's constant
-   *     pool table.
-   * @param charBuffer the buffer to be used to read the string. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the ConstantDynamic corresponding to the specified CONSTANT_Dynamic entry.
+   * @param constantPoolEntryIndex 类常量池表中 CONSTANT_Dynamic 项的索引。
+   * @param charBuffer 用于读取字符串的字符缓冲区，必须足够大，且不会自动调整大小。
+   * @return 与指定 CONSTANT_Dynamic 项对应的 ConstantDynamic 实例。
    */
   private ConstantDynamic readConstantDynamic(
       final int constantPoolEntryIndex, final char[] charBuffer) {
@@ -3809,18 +3682,15 @@ public class ClassReader {
   }
 
   /**
-   * Reads a numeric or string constant pool entry in this {@link ClassReader}. <i>This method is
-   * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
-   * adapters.</i>
+   * 从当前 {@link ClassReader} 中读取数值或字符串类型的常量池项。
+   * <i>此方法主要供 {@link Attribute} 的子类使用，通常类生成器或适配器不需要调用。</i>
    *
-   * @param constantPoolEntryIndex the index of a CONSTANT_Integer, CONSTANT_Float, CONSTANT_Long,
-   *     CONSTANT_Double, CONSTANT_Class, CONSTANT_String, CONSTANT_MethodType,
-   *     CONSTANT_MethodHandle or CONSTANT_Dynamic entry in the class's constant pool.
-   * @param charBuffer the buffer to be used to read strings. This buffer must be sufficiently
-   *     large. It is not automatically resized.
-   * @return the {@link Integer}, {@link Float}, {@link Long}, {@link Double}, {@link String},
-   *     {@link Type}, {@link Handle} or {@link ConstantDynamic} corresponding to the specified
-   *     constant pool entry.
+   * @param constantPoolEntryIndex 类常量池表中 CONSTANT_Integer、CONSTANT_Float、CONSTANT_Long、
+   *     CONSTANT_Double、CONSTANT_Class、CONSTANT_String、CONSTANT_MethodType、
+   *     CONSTANT_MethodHandle 或 CONSTANT_Dynamic 项的索引。
+   * @param charBuffer 用于读取字符串的字符缓冲区，必须足够大，且不会自动调整大小。
+   * @return 与指定常量池项对应的 {@link Integer}、{@link Float}、{@link Long}、{@link Double}、
+   *     {@link String}、{@link Type}、{@link Handle} 或 {@link ConstantDynamic}。
    */
   public Object readConst(final int constantPoolEntryIndex, final char[] charBuffer) {
     int cpInfoOffset = cpInfoOffsets[constantPoolEntryIndex];

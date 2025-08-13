@@ -16,17 +16,17 @@
 
 package org.springframework.core.annotation;
 
-import java.lang.annotation.Annotation;
-
 import org.springframework.lang.Nullable;
 
+import java.lang.annotation.Annotation;
+
 /**
- * Callback interface used to process annotations.
+ * 可用于处理注解的回调接口。
  *
  * @author Phillip Webb
  * @since 5.2
- * @param <C> the context type
- * @param <R> the result type
+ * @param <C> 上下文类型
+ * @param <R> 结果类型
  * @see AnnotationsScanner
  * @see TypeMappedAnnotations
  */
@@ -34,11 +34,10 @@ import org.springframework.lang.Nullable;
 interface AnnotationsProcessor<C, R> {
 
 	/**
-	 * Called when an aggregate is about to be processed. This method may return
-	 * a {@code non-null} result to short-circuit any further processing.
-	 * @param context the context information relevant to the processor
-	 * @param aggregateIndex the aggregate index about to be processed
-	 * @return a {@code non-null} result if no further processing is required
+	 * 在即将处理聚合时调用。此方法可以返回一个非 {@code null} 结果以短路任何进一步的处理。
+	 * @param context 与处理器相关的上下文信息
+	 * @param aggregateIndex 即将处理的聚合索引
+	 * @return 如果不需要进一步处理，则为非 {@code null} 结果
 	 */
 	@Nullable
 	default R doWithAggregate(C context, int aggregateIndex) {
@@ -46,23 +45,20 @@ interface AnnotationsProcessor<C, R> {
 	}
 
 	/**
-	 * Called when an array of annotations can be processed. This method may
-	 * return a {@code non-null} result to short-circuit any further processing.
-	 * @param context the context information relevant to the processor
-	 * @param aggregateIndex the aggregate index of the provided annotations
-	 * @param source the original source of the annotations, if known
-	 * @param annotations the annotations to process (this array may contain
-	 * {@code null} elements)
-	 * @return a {@code non-null} result if no further processing is required
+	 * 在可以处理注解数组时调用。此方法可以返回一个非 {@code null} 结果以短路任何进一步的处理。
+	 * @param context 与处理器相关的上下文信息
+	 * @param aggregateIndex 提供的注解的聚合索引
+	 * @param source 注解的原始源，如果已知
+	 * @param annotations 要处理的注解（此数组可能包含 {@code null} 元素）
+	 * @return 如果不需要进一步处理，则为非 {@code null} 结果
 	 */
 	@Nullable
 	R doWithAnnotations(C context, int aggregateIndex, @Nullable Object source, Annotation[] annotations);
 
 	/**
-	 * Get the final result to be returned. By default this method returns
-	 * the last process result.
-	 * @param result the last early exit result, or {@code null} if none
-	 * @return the final result to be returned to the caller
+	 * 获取要返回的最终结果。默认情况下，此方法返回最后一个处理结果。
+	 * @param result 最后一个提前退出结果，如果无则为 {@code null}
+	 * @return 将返回给调用者的最终结果
 	 */
 	@Nullable
 	default R finish(@Nullable R result) {

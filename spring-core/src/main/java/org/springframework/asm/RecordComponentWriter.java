@@ -28,73 +28,63 @@
 package org.springframework.asm;
 
 final class RecordComponentWriter extends RecordComponentVisitor {
-  /** Where the constants used in this RecordComponentWriter must be stored. */
+  /** 该 RecordComponentWriter 使用的常量存储表。 */
   private final SymbolTable symbolTable;
 
-  // Note: fields are ordered as in the record_component_info structure, and those related to
-  // attributes are ordered as in Section 4.7 of the JVMS.
+  // 注意：字段顺序按照 record_component_info 结构排列，属性相关字段按照 JVMS 4.7 节排序。
 
-  /** The name_index field of the Record attribute. */
+  /** Record 组件的 name_index 字段。 */
   private final int nameIndex;
 
-  /** The descriptor_index field of the the Record attribute. */
+  /** Record 组件的 descriptor_index 字段。 */
   private final int descriptorIndex;
 
   /**
-   * The signature_index field of the Signature attribute of this record component, or 0 if there is
-   * no Signature attribute.
+   * Signature 属性的 signature_index 字段，如果没有 Signature 属性则为 0。
    */
   private int signatureIndex;
 
   /**
-   * The last runtime visible annotation of this record component. The previous ones can be accessed
-   * with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 最后一个运行时可见注解。之前的注解通过 {@link AnnotationWriter#previousAnnotation} 链接访问，可能为 null。
    */
   private AnnotationWriter lastRuntimeVisibleAnnotation;
 
   /**
-   * The last runtime invisible annotation of this record component. The previous ones can be
-   * accessed with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 最后一个运行时不可见注解。之前的注解通过 {@link AnnotationWriter#previousAnnotation} 链接访问，可能为 null。
    */
   private AnnotationWriter lastRuntimeInvisibleAnnotation;
 
   /**
-   * The last runtime visible type annotation of this record component. The previous ones can be
-   * accessed with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 最后一个运行时可见类型注解。之前的注解通过 {@link AnnotationWriter#previousAnnotation} 链接访问，可能为 null。
    */
   private AnnotationWriter lastRuntimeVisibleTypeAnnotation;
 
   /**
-   * The last runtime invisible type annotation of this record component. The previous ones can be
-   * accessed with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 最后一个运行时不可见类型注解。之前的注解通过 {@link AnnotationWriter#previousAnnotation} 链接访问，可能为 null。
    */
   private AnnotationWriter lastRuntimeInvisibleTypeAnnotation;
 
   /**
-   * The first non standard attribute of this record component. The next ones can be accessed with
-   * the {@link Attribute#nextAttribute} field. May be {@literal null}.
-   *
-   * <p><b>WARNING</b>: this list stores the attributes in the <i>reverse</i> order of their visit.
-   * firstAttribute is actually the last attribute visited in {@link #visitAttribute(Attribute)}.
-   * The {@link #putRecordComponentInfo(ByteVector)} method writes the attributes in the order
-   * defined by this list, i.e. in the reverse order specified by the user.
+   * 第一个非标准属性。后续属性通过 {@link Attribute#nextAttribute} 链接访问，可能为 null。
+   * <p><b>注意：</b>该链表以访问顺序的逆序存储属性，即 {@link #visitAttribute(Attribute)} 访问的最后一个属性是链表首元素。
+   * {@link #putRecordComponentInfo(ByteVector)} 方法会按链表顺序写入属性，从而实现用户指定的顺序。
    */
   private Attribute firstAttribute;
 
   /**
-   * Constructs a new {@link RecordComponentWriter}.
+   * 构造新的 RecordComponentWriter。
    *
-   * @param symbolTable where the constants used in this RecordComponentWriter must be stored.
-   * @param name the record component name.
-   * @param descriptor the record component descriptor (see {@link Type}).
-   * @param signature the record component signature. May be {@literal null}.
+   * @param symbolTable 用于存储常量的符号表。
+   * @param name 记录组件名称。
+   * @param descriptor 记录组件描述符（参见 {@link Type}）。
+   * @param signature 记录组件签名，可为 null。
    */
   RecordComponentWriter(
       final SymbolTable symbolTable,
       final String name,
       final String descriptor,
       final String signature) {
-    super(/* latest api = */ Opcodes.ASM9);
+    super(/* 最新 ASM 版本 */ Opcodes.ASM9);
     this.symbolTable = symbolTable;
     this.nameIndex = symbolTable.addConstantUtf8(name);
     this.descriptorIndex = symbolTable.addConstantUtf8(descriptor);
@@ -103,9 +93,9 @@ final class RecordComponentWriter extends RecordComponentVisitor {
     }
   }
 
-  // -----------------------------------------------------------------------------------------------
-  // Implementation of the FieldVisitor abstract class
-  // -----------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------
+  // FieldVisitor 抽象类的方法实现
+  // -------------------------------------------------------------------------------
 
   @Override
   public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
@@ -134,29 +124,28 @@ final class RecordComponentWriter extends RecordComponentVisitor {
 
   @Override
   public void visitAttribute(final Attribute attribute) {
-    // Store the attributes in the <i>reverse</i> order of their visit by this method.
+    // 按访问顺序逆序存储属性链表
     attribute.nextAttribute = firstAttribute;
     firstAttribute = attribute;
   }
 
   @Override
   public void visitEnd() {
-    // Nothing to do.
+    // 无需处理
   }
 
-  // -----------------------------------------------------------------------------------------------
-  // Utility methods
-  // -----------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------
+  // 工具方法
+  // -------------------------------------------------------------------------------
 
   /**
-   * Returns the size of the record component JVMS structure generated by this
-   * RecordComponentWriter. Also adds the names of the attributes of this record component in the
-   * constant pool.
+   * 计算此记录组件对应的 record_component_info 结构大小。
+   * 同时将该组件的属性名称添加到常量池。
    *
-   * @return the size in bytes of the record_component_info of the Record attribute.
+   * @return record_component_info 结构的字节大小。
    */
   int computeRecordComponentInfoSize() {
-    // name_index, descriptor_index and attributes_count fields use 6 bytes.
+    // name_index, descriptor_index 和 attributes_count 字段共 6 字节。
     int size = 6;
     size += Attribute.computeAttributesSize(symbolTable, 0, signatureIndex);
     size +=
@@ -172,15 +161,13 @@ final class RecordComponentWriter extends RecordComponentVisitor {
   }
 
   /**
-   * Puts the content of the record component generated by this RecordComponentWriter into the given
-   * ByteVector.
+   * 将此记录组件的内容写入指定的 ByteVector 中。
    *
-   * @param output where the record_component_info structure must be put.
+   * @param output 目标 ByteVector，写入 record_component_info 结构。
    */
   void putRecordComponentInfo(final ByteVector output) {
     output.putShort(nameIndex).putShort(descriptorIndex);
-    // Compute and put the attributes_count field.
-    // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
+    // 计算并写入 attributes_count 字段。
     int attributesCount = 0;
     if (signatureIndex != 0) {
       ++attributesCount;
@@ -215,9 +202,9 @@ final class RecordComponentWriter extends RecordComponentVisitor {
   }
 
   /**
-   * Collects the attributes of this record component into the given set of attribute prototypes.
+   * 将此记录组件的所有属性添加到给定的属性原型集合中。
    *
-   * @param attributePrototypes a set of attribute prototypes.
+   * @param attributePrototypes 属性原型集合。
    */
   final void collectAttributePrototypes(final Attribute.Set attributePrototypes) {
     attributePrototypes.addAttributes(firstAttribute);

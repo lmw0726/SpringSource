@@ -16,21 +16,20 @@
 
 package org.springframework.core.codec;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
+import reactor.core.publisher.Flux;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
- * Encoder for {@link ByteBuffer ByteBuffers}.
+ * {@link ByteBuffer ByteBuffers} 的编码器。
  *
  * @author Sebastien Deleuze
  * @since 5.0

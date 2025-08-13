@@ -16,28 +16,26 @@
 
 package org.springframework.util.xml;
 
+import org.springframework.lang.Nullable;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.sax.SAXSource;
 
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-
-import org.springframework.lang.Nullable;
-
 /**
- * Implementation of the {@code Source} tagging interface for StAX readers. Can be constructed with
- * an {@code XMLEventReader} or an {@code XMLStreamReader}.
+ * 实现{@code Source}标记接口的StAX读取器包装类。可以使用{@code XMLEventReader}
+ * 或{@code XMLStreamReader}构造。
  *
- * <p>This class is necessary because there is no implementation of {@code Source} for StAX Readers
- * in JAXP 1.3. There is a {@code StAXSource} in JAXP 1.4 (JDK 1.6), but this class is kept around
- * for backwards compatibility reasons.
+ * <p>由于JAXP 1.3中没有为StAX读取器提供{@code Source}实现，所以需要此类。
+ * JAXP 1.4(JDK 1.6)中提供了{@code StAXSource}，但保留此类以保持向后兼容。
  *
- * <p>Even though {@code StaxSource} extends from {@code SAXSource}, calling the methods of
- * {@code SAXSource} is <strong>not supported</strong>. In general, the only supported operation
- * on this class is to use the {@code XMLReader} obtained via {@link #getXMLReader()} to parse the
- * input source obtained via {@link #getInputSource()}. Calling {@link #setXMLReader(XMLReader)}
- * or {@link #setInputSource(InputSource)} will result in {@code UnsupportedOperationException #setInputSource(InputSource)} will result in {@code UnsupportedOperationExceptions}.
+ * <p>尽管{@code StaxSource}继承自{@code SAXSource}，但<strong>不支持</strong>
+ * 调用{@code SAXSource}的方法。通常，此类唯一支持的操作是通过{@link #getXMLReader()}
+ * 获取的{@code XMLReader}来解析通过{@link #getInputSource()}获取的输入源。
+ * 调用{@link #setXMLReader(XMLReader)}或{@link #setInputSource(InputSource)}
+ * 将导致{@code UnsupportedOperationException}。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -55,11 +53,11 @@ class StaxSource extends SAXSource {
 
 
 	/**
-	 * Construct a new instance of the {@code StaxSource} with the specified {@code XMLEventReader}.
-	 * The supplied event reader must be in {@code XMLStreamConstants.START_DOCUMENT} or
-	 * {@code XMLStreamConstants.START_ELEMENT} state.
-	 * @param eventReader the {@code XMLEventReader} to read from
-	 * @throws IllegalStateException if the reader is not at the start of a document or element
+	 * 使用指定的{@code XMLEventReader}构造新的{@code StaxSource}实例。
+	 * 提供的事件读取器必须处于{@code XMLStreamConstants.START_DOCUMENT}或
+	 * {@code XMLStreamConstants.START_ELEMENT}状态。
+	 * @param eventReader 要读取的{@code XMLEventReader}
+	 * @throws IllegalStateException 如果读取器不处于文档或元素的开始位置
 	 */
 	StaxSource(XMLEventReader eventReader) {
 		super(new StaxEventXMLReader(eventReader), new InputSource());
@@ -67,11 +65,11 @@ class StaxSource extends SAXSource {
 	}
 
 	/**
-	 * Construct a new instance of the {@code StaxSource} with the specified {@code XMLStreamReader}.
-	 * The supplied stream reader must be in {@code XMLStreamConstants.START_DOCUMENT} or
-	 * {@code XMLStreamConstants.START_ELEMENT} state.
-	 * @param streamReader the {@code XMLStreamReader} to read from
-	 * @throws IllegalStateException if the reader is not at the start of a document or element
+	 * 使用指定的{@code XMLStreamReader}构造新的{@code StaxSource}实例。
+	 * 提供的流读取器必须处于{@code XMLStreamConstants.START_DOCUMENT}或
+	 * {@code XMLStreamConstants.START_ELEMENT}状态。
+	 * @param streamReader 要读取的{@code XMLStreamReader}
+	 * @throws IllegalStateException 如果读取器不处于文档或元素的开始位置
 	 */
 	StaxSource(XMLStreamReader streamReader) {
 		super(new StaxStreamXMLReader(streamReader), new InputSource());
@@ -80,10 +78,10 @@ class StaxSource extends SAXSource {
 
 
 	/**
-	 * Return the {@code XMLEventReader} used by this {@code StaxSource}.
-	 * <p>If this {@code StaxSource} was created with an {@code XMLStreamReader},
-	 * the result will be {@code null}.
-	 * @return the StAX event reader used by this source
+	 * 返回此{@code StaxSource}使用的{@code XMLEventReader}。
+	 * <p>如果此{@code StaxSource}是用{@code XMLStreamReader}创建的，
+	 * 则结果为{@code null}。
+	 * @return 此源使用的StAX事件读取器
 	 * @see StaxSource#StaxSource(javax.xml.stream.XMLEventReader)
 	 */
 	@Nullable
@@ -92,10 +90,10 @@ class StaxSource extends SAXSource {
 	}
 
 	/**
-	 * Return the {@code XMLStreamReader} used by this {@code StaxSource}.
-	 * <p>If this {@code StaxSource} was created with an {@code XMLEventReader},
-	 * the result will be {@code null}.
-	 * @return the StAX event reader used by this source
+	 * 返回此{@code StaxSource}使用的{@code XMLStreamReader}。
+	 * <p>如果此{@code StaxSource}是用{@code XMLEventReader}创建的，
+	 * 则结果为{@code null}。
+	 * @return 此源使用的StAX流读取器
 	 * @see StaxSource#StaxSource(javax.xml.stream.XMLEventReader)
 	 */
 	@Nullable
@@ -105,8 +103,8 @@ class StaxSource extends SAXSource {
 
 
 	/**
-	 * Throws an {@code UnsupportedOperationException}.
-	 * @throws UnsupportedOperationException always
+	 * 抛出{@code UnsupportedOperationException}。
+	 * @throws UnsupportedOperationException 总是抛出
 	 */
 	@Override
 	public void setInputSource(InputSource inputSource) {
@@ -114,8 +112,8 @@ class StaxSource extends SAXSource {
 	}
 
 	/**
-	 * Throws an {@code UnsupportedOperationException}.
-	 * @throws UnsupportedOperationException always
+	 * 抛出{@code UnsupportedOperationException}。
+	 * @throws UnsupportedOperationException 总是抛出
 	 */
 	@Override
 	public void setXMLReader(XMLReader reader) {

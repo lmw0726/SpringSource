@@ -31,13 +31,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * A description of a JavaBeans Property that allows us to avoid a dependency on
- * {@code java.beans.PropertyDescriptor}. The {@code java.beans} package
- * is not available in a number of environments (e.g. Android, Java ME), so this is
- * desirable for portability of Spring's core conversion facility.
+ * JavaBeans 属性的描述，使我们能够避免对 {@code java.beans.PropertyDescriptor} 的依赖。
+ * {@code java.beans} 包在许多环境中不可用（例如 Android、Java ME），
+ * 因此这对于 Spring 核心转换工具的可移植性是理想的。
  *
- * <p>Used to build a {@link TypeDescriptor} from a property location. The built
- * {@code TypeDescriptor} can then be used to convert from/to the property type.
+ * <p>用于从属性位置构建 {@link TypeDescriptor}。构建的 {@code TypeDescriptor}
+ * 然后可以用于转换到/从属性类型。
  *
  * @author Keith Donald
  * @author Phillip Webb
@@ -81,28 +80,28 @@ public final class Property {
 
 
 	/**
-	 * The object declaring this property, either directly or in a superclass the object extends.
+	 * 声明此属性的对象，直接声明或在对象扩展的超类中声明。
 	 */
 	public Class<?> getObjectType() {
 		return this.objectType;
 	}
 
 	/**
-	 * The name of the property: e.g. 'foo'
+	 * 属性的名称：例如 'foo'
 	 */
 	public String getName() {
 		return this.name;
 	}
 
 	/**
-	 * The property type: e.g. {@code java.lang.String}
+	 * 属性类型：例如 {@code java.lang.String}
 	 */
 	public Class<?> getType() {
 		return this.methodParameter.getParameterType();
 	}
 
 	/**
-	 * The property getter method: e.g. {@code getFoo()}
+	 * 属性的获取方法：例如 {@code getFoo()}
 	 */
 	@Nullable
 	public Method getReadMethod() {
@@ -110,7 +109,7 @@ public final class Property {
 	}
 
 	/**
-	 * The property setter method: e.g. {@code setFoo(String)}
+	 * 属性的设置方法：例如 {@code setFoo(String)}
 	 */
 	@Nullable
 	public Method getWriteMethod() {
@@ -118,7 +117,7 @@ public final class Property {
 	}
 
 
-	// Package private
+	// 私有包
 
 	MethodParameter getMethodParameter() {
 		return this.methodParameter;
@@ -132,7 +131,7 @@ public final class Property {
 	}
 
 
-	// Internal helpers
+	// 内部帮手
 
 	private String resolveName() {
 		if (this.readMethod != null) {
@@ -144,7 +143,7 @@ public final class Property {
 				if (index != -1) {
 					index += 2;
 				} else {
-					// Record-style plain accessor method, e.g. name()
+					// 记录风格的普通访问器方法，例如name()
 					index = 0;
 				}
 			}
@@ -236,7 +235,7 @@ public final class Property {
 		if (declaringClass != null) {
 			field = ReflectionUtils.findField(declaringClass, name);
 			if (field == null) {
-				// Same lenient fallback checking as in CachedIntrospectionResults...
+				// 与 CachedIntrospectionResults 中相同的宽松回退检查...
 				field = ReflectionUtils.findField(declaringClass, StringUtils.uncapitalize(name));
 				if (field == null) {
 					field = ReflectionUtils.findField(declaringClass, StringUtils.capitalize(name));

@@ -23,15 +23,13 @@ import java.io.FileNotFoundException;
 import java.net.*;
 
 /**
- * Utility methods for resolving resource locations to files in the
- * file system. Mainly for internal use within the framework.
+ * 用于将资源位置解析为文件系统中的文件的工具方法。主要供框架内部使用。
  *
- * <p>Consider using Spring's Resource abstraction in the core package
- * for handling all kinds of file resources in a uniform manner.
- * {@link org.springframework.core.io.ResourceLoader}'s {@code getResource()}
- * method can resolve any location to a {@link org.springframework.core.io.Resource}
- * object, which in turn allows one to obtain a {@code java.io.File} in the
- * file system through its {@code getFile()} method.
+ * <p>建议使用 Spring 核心包中的 Resource 抽象，
+ * 以统一的方式处理各种文件资源。
+ * {@link org.springframework.core.io.ResourceLoader} 的 {@code getResource()} 方法
+ * 可以将任意位置解析为 {@link org.springframework.core.io.Resource} 对象，
+ * 该对象又可以通过其 {@code getFile()} 方法获取文件系统中的 {@code java.io.File}。
  *
  * @author Juergen Hoeller
  * @see org.springframework.core.io.Resource
@@ -44,87 +42,87 @@ import java.net.*;
 public abstract class ResourceUtils {
 
 	/**
-	 * Pseudo URL prefix for loading from the class path: "classpath:".
+	 * 用于从类路径加载的伪 URL 前缀："classpath:"。
 	 */
 	public static final String CLASSPATH_URL_PREFIX = "classpath:";
 
 	/**
-	 * URL prefix for loading from the file system: "file:".
+	 * 用于从文件系统加载的 URL 前缀："file:"。
 	 */
 	public static final String FILE_URL_PREFIX = "file:";
 
 	/**
-	 * URL prefix for loading from a jar file: "jar:".
+	 * 用于从 jar 文件加载的 URL 前缀："jar:"。
 	 */
 	public static final String JAR_URL_PREFIX = "jar:";
 
 	/**
-	 * URL prefix for loading from a war file on Tomcat: "war:".
+	 * 用于从 Tomcat 上的 war 文件加载的 URL 前缀："war:"。
 	 */
 	public static final String WAR_URL_PREFIX = "war:";
 
 	/**
-	 * URL protocol for a file in the file system: "file".
+	 * 文件系统中文件的 URL 协议："file"。
 	 */
 	public static final String URL_PROTOCOL_FILE = "file";
 
 	/**
-	 * URL protocol for an entry from a jar file: "jar".
+	 * jar 文件中的条目的 URL 协议："jar"。
 	 */
 	public static final String URL_PROTOCOL_JAR = "jar";
 
 	/**
-	 * URL protocol for an entry from a war file: "war".
+	 * war 文件中的条目的 URL 协议："war"。
 	 */
 	public static final String URL_PROTOCOL_WAR = "war";
 
 	/**
-	 * URL protocol for an entry from a zip file: "zip".
+	 * zip 文件中的条目的 URL 协议："zip"。
 	 */
 	public static final String URL_PROTOCOL_ZIP = "zip";
 
 	/**
-	 * URL protocol for an entry from a WebSphere jar file: "wsjar".
+	 * WebSphere jar 文件中的条目的 URL 协议："wsjar"。
 	 */
 	public static final String URL_PROTOCOL_WSJAR = "wsjar";
 
 	/**
-	 * URL protocol for an entry from a JBoss jar file: "vfszip".
+	 * JBoss jar 文件中的条目的 URL 协议："vfszip"。
 	 */
 	public static final String URL_PROTOCOL_VFSZIP = "vfszip";
 
 	/**
-	 * URL protocol for a JBoss file system resource: "vfsfile".
+	 * JBoss 文件系统资源的 URL 协议："vfsfile"。
 	 */
 	public static final String URL_PROTOCOL_VFSFILE = "vfsfile";
 
 	/**
-	 * URL protocol for a general JBoss VFS resource: "vfs".
+	 * 通用 JBoss VFS 资源的 URL 协议："vfs"。
 	 */
 	public static final String URL_PROTOCOL_VFS = "vfs";
 
 	/**
-	 * File extension for a regular jar file: ".jar".
+	 * 常规 jar 文件的扩展名：".jar"。
 	 */
 	public static final String JAR_FILE_EXTENSION = ".jar";
 
 	/**
-	 * Separator between JAR URL and file path within the JAR: "!/".
+	 * JAR URL 与 JAR 内部文件路径之间的分隔符："!/"。
 	 */
 	public static final String JAR_URL_SEPARATOR = "!/";
 
 	/**
-	 * Special separator between WAR URL and jar part on Tomcat.
+	 * Tomcat 上 WAR URL 与 jar 部分之间的特殊分隔符。
 	 */
 	public static final String WAR_URL_SEPARATOR = "*/";
 
 
 	/**
-	 * Return whether the given resource location is a URL:
-	 * either a special "classpath" pseudo URL or a standard URL.
+	 * 判断给定的资源位置是否是 URL：
+	 * 可能是特殊的 "classpath" 伪 URL，或者是标准的 URL。
 	 *
-	 * @param resourceLocation the location String to check
-	 * @return whether the location qualifies as a URL
+	 * @param resourceLocation 要检查的位置字符串
+	 * @return 该位置是否符合 URL 的条件
 	 * @see #CLASSPATH_URL_PREFIX
 	 * @see java.net.URL
 	 */
@@ -144,14 +142,12 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Resolve the given resource location to a {@code java.net.URL}.
-	 * <p>Does not check whether the URL actually exists; simply returns
-	 * the URL that the given location would correspond to.
+	 * 将给定的资源位置解析为 {@code java.net.URL}。
+	 * <p>不检查 URL 是否实际存在；仅返回该位置对应的 URL。
 	 *
-	 * @param resourceLocation the resource location to resolve: either a
-	 *                         "classpath:" pseudo URL, a "file:" URL, or a plain file path
-	 * @return a corresponding URL object
-	 * @throws FileNotFoundException if the resource cannot be resolved to a URL
+	 * @param resourceLocation 要解析的资源位置：可能是 "classpath:" 伪 URL、"file:" URL，或普通文件路径
+	 * @return 对应的 URL 对象
+	 * @throws FileNotFoundException 如果资源无法解析为 URL
 	 */
 	public static URL getURL(String resourceLocation) throws FileNotFoundException {
 		Assert.notNull(resourceLocation, "Resource location must not be null");
@@ -167,10 +163,10 @@ public abstract class ResourceUtils {
 			return url;
 		}
 		try {
-			// try URL
+			// 尝试作为 URL 处理
 			return new URL(resourceLocation);
 		} catch (MalformedURLException ex) {
-			// no URL -> treat as file path
+			// 不是 URL -> 作为文件路径处理
 			try {
 				return new File(resourceLocation).toURI().toURL();
 			} catch (MalformedURLException ex2) {
@@ -181,16 +177,13 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Resolve the given resource location to a {@code java.io.File},
-	 * i.e. to a file in the file system.
-	 * <p>Does not check whether the file actually exists; simply returns
-	 * the File that the given location would correspond to.
+	 * 将给定的资源位置解析为 {@code java.io.File}，
+	 * 即文件系统中的文件。
+	 * <p>不检查文件是否实际存在；仅返回该位置对应的 File。
 	 *
-	 * @param resourceLocation the resource location to resolve: either a
-	 *                         "classpath:" pseudo URL, a "file:" URL, or a plain file path
-	 * @return a corresponding File object
-	 * @throws FileNotFoundException if the resource cannot be resolved to
-	 *                               a file in the file system
+	 * @param resourceLocation 要解析的资源位置：可能是 "classpath:" 伪 URL、"file:" URL，或普通文件路径
+	 * @return 对应的 File 对象
+	 * @throws FileNotFoundException 如果资源无法解析为文件系统中的文件
 	 */
 	public static File getFile(String resourceLocation) throws FileNotFoundException {
 		Assert.notNull(resourceLocation, "Resource location must not be null");
@@ -206,37 +199,34 @@ public abstract class ResourceUtils {
 			return getFile(url, description);
 		}
 		try {
-			// try URL
+			// 尝试作为 URL 处理
 			return getFile(new URL(resourceLocation));
 		} catch (MalformedURLException ex) {
-			// no URL -> treat as file path
+			// 不是 URL -> 作为文件路径处理
 			return new File(resourceLocation);
 		}
 	}
 
 	/**
-	 * Resolve the given resource URL to a {@code java.io.File},
-	 * i.e. to a file in the file system.
+	 * 将给定的资源 URL 解析为 {@code java.io.File}，
+	 * 即文件系统中的文件。
 	 *
-	 * @param resourceUrl the resource URL to resolve
-	 * @return a corresponding File object
-	 * @throws FileNotFoundException if the URL cannot be resolved to
-	 *                               a file in the file system
+	 * @param resourceUrl 要解析的资源 URL
+	 * @return 对应的 File 对象
+	 * @throws FileNotFoundException 如果 URL 无法解析为文件系统中的文件
 	 */
 	public static File getFile(URL resourceUrl) throws FileNotFoundException {
 		return getFile(resourceUrl, "URL");
 	}
 
 	/**
-	 * Resolve the given resource URL to a {@code java.io.File},
-	 * i.e. to a file in the file system.
+	 * 将给定的资源 URL 解析为 {@code java.io.File}，
+	 * 即文件系统中的文件。
 	 *
-	 * @param resourceUrl the resource URL to resolve
-	 * @param description a description of the original resource that
-	 *                    the URL was created for (for example, a class path location)
-	 * @return a corresponding File object
-	 * @throws FileNotFoundException if the URL cannot be resolved to
-	 *                               a file in the file system
+	 * @param resourceUrl 要解析的资源 URL
+	 * @param description 创建该 URL 的原始资源描述（例如，类路径位置）
+	 * @return 对应的 File 对象
+	 * @throws FileNotFoundException 如果 URL 无法解析为文件系统中的文件
 	 */
 	public static File getFile(URL resourceUrl, String description) throws FileNotFoundException {
 		Assert.notNull(resourceUrl, "Resource URL must not be null");
@@ -248,19 +238,18 @@ public abstract class ResourceUtils {
 		try {
 			return new File(toURI(resourceUrl).getSchemeSpecificPart());
 		} catch (URISyntaxException ex) {
-			// Fallback for URLs that are not valid URIs (should hardly ever happen).
+			// 对于无效 URI 的 URL 的回退处理（极少发生）
 			return new File(resourceUrl.getFile());
 		}
 	}
 
 	/**
-	 * Resolve the given resource URI to a {@code java.io.File},
-	 * i.e. to a file in the file system.
+	 * 将给定的资源 URI 解析为 {@code java.io.File}，
+	 * 即文件系统中的文件。
 	 *
-	 * @param resourceUri the resource URI to resolve
-	 * @return a corresponding File object
-	 * @throws FileNotFoundException if the URL cannot be resolved to
-	 *                               a file in the file system
+	 * @param resourceUri 要解析的资源 URI
+	 * @return 对应的 File 对象
+	 * @throws FileNotFoundException 如果 URI 无法解析为文件系统中的文件
 	 * @since 2.5
 	 */
 	public static File getFile(URI resourceUri) throws FileNotFoundException {
@@ -268,15 +257,13 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Resolve the given resource URI to a {@code java.io.File},
-	 * i.e. to a file in the file system.
+	 * 将给定的资源 URI 解析为 {@code java.io.File}，
+	 * 即文件系统中的文件。
 	 *
-	 * @param resourceUri the resource URI to resolve
-	 * @param description a description of the original resource that
-	 *                    the URI was created for (for example, a class path location)
-	 * @return a corresponding File object
-	 * @throws FileNotFoundException if the URL cannot be resolved to
-	 *                               a file in the file system
+	 * @param resourceUri 要解析的资源 URI
+	 * @param description 创建该 URI 的原始资源描述（例如，类路径位置）
+	 * @return 对应的 File 对象
+	 * @throws FileNotFoundException 如果 URI 无法解析为文件系统中的文件
 	 * @since 2.5
 	 */
 	public static File getFile(URI resourceUri, String description) throws FileNotFoundException {
@@ -290,11 +277,11 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Determine whether the given URL points to a resource in the file system,
-	 * i.e. has protocol "file", "vfsfile" or "vfs".
+	 * 判断给定的 URL 是否指向文件系统中的资源，
+	 * 即协议是否为 "file"、"vfsfile" 或 "vfs"。
 	 *
-	 * @param url the URL to check
-	 * @return whether the URL has been identified as a file system URL
+	 * @param url 要检查的 URL
+	 * @return 是否被识别为文件系统 URL
 	 */
 	public static boolean isFileURL(URL url) {
 		String protocol = url.getProtocol();
@@ -303,11 +290,11 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Determine whether the given URL points to a resource in a jar file.
-	 * i.e. has protocol "jar", "war, ""zip", "vfszip" or "wsjar".
+	 * 判断给定的 URL 是否指向 jar 文件中的资源，
+	 * 即协议是否为 "jar"、"war"、"zip"、"vfszip" 或 "wsjar"。
 	 *
-	 * @param url the URL to check
-	 * @return whether the URL has been identified as a JAR URL
+	 * @param url 要检查的 URL
+	 * @return 是否被识别为 JAR URL
 	 */
 	public static boolean isJarURL(URL url) {
 		String protocol = url.getProtocol();
@@ -317,11 +304,11 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Determine whether the given URL points to a jar file itself,
-	 * that is, has protocol "file" and ends with the ".jar" extension.
+	 * 判断给定的 URL 是否指向一个 jar 文件本身，
+	 * 即协议为 "file" 且路径以 ".jar" 结尾。
 	 *
-	 * @param url the URL to check
-	 * @return whether the URL has been identified as a JAR file URL
+	 * @param url 要检查的 URL
+	 * @return 是否被识别为 JAR 文件 URL
 	 * @since 4.1
 	 */
 	public static boolean isJarFileURL(URL url) {
@@ -330,12 +317,12 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Extract the URL for the actual jar file from the given URL
-	 * (which may point to a resource in a jar file or to a jar file itself).
+	 * 从给定的 URL 中提取实际的 jar 文件 URL
+	 * （该 URL 可能指向 jar 文件中的资源或 jar 文件本身）。
 	 *
-	 * @param jarUrl the original URL
-	 * @return the URL for the actual jar file
-	 * @throws MalformedURLException if no valid jar file URL could be extracted
+	 * @param jarUrl 原始的 URL
+	 * @return 实际 jar 文件的 URL
+	 * @throws MalformedURLException 如果无法提取有效的 jar 文件 URL
 	 */
 	public static URL extractJarFileURL(URL jarUrl) throws MalformedURLException {
 		String urlFile = jarUrl.getFile();
@@ -345,8 +332,8 @@ public abstract class ResourceUtils {
 			try {
 				return new URL(jarFile);
 			} catch (MalformedURLException ex) {
-				// Probably no protocol in original jar URL, like "jar:C:/mypath/myjar.jar".
-				// This usually indicates that the jar file resides in the file system.
+				// 原始 jar URL 中可能没有协议，比如 "jar:C:/mypath/myjar.jar"。
+				// 这通常表示 jar 文件位于文件系统中。
 				if (!jarFile.startsWith("/")) {
 					jarFile = "/" + jarFile;
 				}
@@ -358,14 +345,14 @@ public abstract class ResourceUtils {
 	}
 
 	/**
-	 * Extract the URL for the outermost archive from the given jar/war URL
-	 * (which may point to a resource in a jar file or to a jar file itself).
-	 * <p>In the case of a jar file nested within a war file, this will return
-	 * a URL to the war file since that is the one resolvable in the file system.
+	 * 从给定的 jar/war URL 中提取最外层归档文件的 URL
+	 * （该 URL 可能指向 jar 文件中的资源或 jar 文件本身）。
+	 * <p>对于嵌套在 war 文件中的 jar 文件，该方法将返回指向 war 文件的 URL，
+	 * 因为 war 文件是可以在文件系统中解析的。
 	 *
-	 * @param jarUrl the original URL
-	 * @return the URL for the actual jar file
-	 * @throws MalformedURLException if no valid jar file URL could be extracted
+	 * @param jarUrl 原始 URL
+	 * @return 实际的 jar 文件 URL
+	 * @throws MalformedURLException 如果无法提取有效的 jar 文件 URL
 	 * @see #extractJarFileURL(URL)
 	 * @since 4.1.8
 	 */
@@ -374,7 +361,7 @@ public abstract class ResourceUtils {
 
 		int endIndex = urlFile.indexOf(WAR_URL_SEPARATOR);
 		if (endIndex != -1) {
-			// Tomcat's "war:file:...mywar.war*/WEB-INF/lib/myjar.jar!/myentry.txt"
+			// Tomcat 的 "war:file:...mywar.war*/WEB-INF/lib/myjar.jar!/myentry.txt"
 			String warFile = urlFile.substring(0, endIndex);
 			if (URL_PROTOCOL_WAR.equals(jarUrl.getProtocol())) {
 				return new URL(warFile);
@@ -385,17 +372,17 @@ public abstract class ResourceUtils {
 			}
 		}
 
-		// Regular "jar:file:...myjar.jar!/myentry.txt"
+		// 常规的 "jar:file:...myjar.jar!/myentry.txt"
 		return extractJarFileURL(jarUrl);
 	}
 
 	/**
-	 * Create a URI instance for the given URL,
-	 * replacing spaces with "%20" URI encoding first.
+	 * 为给定的 URL 创建一个 URI 实例，
+	 * 先将空格替换为 "%20" 的 URI 编码。
 	 *
-	 * @param url the URL to convert into a URI instance
-	 * @return the URI instance
-	 * @throws URISyntaxException if the URL wasn't a valid URI
+	 * @param url 要转换为 URI 实例的 URL
+	 * @return URI 实例
+	 * @throws URISyntaxException 如果 URL 不是有效的 URI
 	 * @see java.net.URL#toURI()
 	 */
 	public static URI toURI(URL url) throws URISyntaxException {

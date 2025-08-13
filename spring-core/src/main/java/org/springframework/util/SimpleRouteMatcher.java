@@ -16,18 +16,17 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.util.Comparator;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-
 /**
- * {@code RouteMatcher} that delegates to a {@link PathMatcher}.
+ * {@code RouteMatcher}，委托给 {@link PathMatcher}。
  *
- * <p><strong>Note:</strong> This implementation is not efficient since
- * {@code PathMatcher} treats paths and patterns as Strings. For more optimized
- * performance use the {@code PathPatternRouteMatcher} from {@code spring-web}
- * which enables use of parsed routes and patterns.
+ * <p><strong>注意：</strong>此实现效率不高，因为 {@code PathMatcher} 将路径和模式视为字符串。
+ * 若需更优性能，请使用 {@code spring-web} 中的 {@code PathPatternRouteMatcher}，
+ * 它支持解析后的路由和模式。
  *
  * @author Rossen Stoyanchev
  * @since 5.2
@@ -38,8 +37,7 @@ public class SimpleRouteMatcher implements RouteMatcher {
 
 
 	/**
-	 * Create a new {@code SimpleRouteMatcher} for the given
-	 * {@link PathMatcher} delegate.
+	 * 为指定的 {@link PathMatcher} 委托创建新的 {@code SimpleRouteMatcher}。
 	 */
 	public SimpleRouteMatcher(PathMatcher pathMatcher) {
 		Assert.notNull(pathMatcher, "PathMatcher is required");
@@ -47,7 +45,7 @@ public class SimpleRouteMatcher implements RouteMatcher {
 	}
 
 	/**
-	 * Return the underlying {@link PathMatcher} delegate.
+	 * 返回底层的 {@link PathMatcher} 委托对象。
 	 */
 	public PathMatcher getPathMatcher() {
 		return this.pathMatcher;

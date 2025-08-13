@@ -16,17 +16,17 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Utility to work with generic type parameters.
+ * 用于处理泛型类型参数的工具类。
  *
- * <p>Mainly for internal use within the framework.
+ * <p>主要用于框架内部使用。
  *
  * @author Ramnivas Laddad
  * @author Juergen Hoeller
@@ -36,17 +36,17 @@ import org.springframework.lang.Nullable;
 public abstract class TypeUtils {
 
 	/**
-	 * Check if the right-hand side type may be assigned to the left-hand side
-	 * type following the Java generics rules.
-	 * @param lhsType the target type
-	 * @param rhsType the value type that should be assigned to the target type
-	 * @return true if rhs is assignable to lhs
+	 * 根据 Java 泛型规则，检查右侧类型是否可以赋值给左侧类型。
+	 *
+	 * @param lhsType 目标类型（左值）
+	 * @param rhsType 要赋值的类型（右值）
+	 * @return 如果右侧类型可以赋值给左侧类型，则返回 true
 	 */
 	public static boolean isAssignable(Type lhsType, Type rhsType) {
 		Assert.notNull(lhsType, "Left-hand side type must not be null");
 		Assert.notNull(rhsType, "Right-hand side type must not be null");
 
-		// all types are assignable to themselves and to class Object
+		// 所有类型都可以赋值给它自身以及 Object.class
 		if (lhsType.equals(rhsType) || Object.class == lhsType) {
 			return true;
 		}
@@ -54,7 +54,7 @@ public abstract class TypeUtils {
 		if (lhsType instanceof Class) {
 			Class<?> lhsClass = (Class<?>) lhsType;
 
-			// just comparing two classes
+			// 两个都是普通类的比较
 			if (rhsType instanceof Class) {
 				return ClassUtils.isAssignable(lhsClass, (Class<?>) rhsType);
 			}
@@ -62,7 +62,7 @@ public abstract class TypeUtils {
 			if (rhsType instanceof ParameterizedType) {
 				Type rhsRaw = ((ParameterizedType) rhsType).getRawType();
 
-				// a parameterized type is always assignable to its raw class type
+				// 参数化类型始终可以赋值给其原始类类型
 				if (rhsRaw instanceof Class) {
 					return ClassUtils.isAssignable(lhsClass, (Class<?>) rhsRaw);
 				}
@@ -74,7 +74,7 @@ public abstract class TypeUtils {
 			}
 		}
 
-		// parameterized types are only assignable to other parameterized types and class types
+		// 参数化类型只能赋值给其他参数化类型或类类型
 		if (lhsType instanceof ParameterizedType) {
 			if (rhsType instanceof Class) {
 				Type lhsRaw = ((ParameterizedType) lhsType).getRawType();
@@ -140,22 +140,20 @@ public abstract class TypeUtils {
 	private static boolean isAssignable(WildcardType lhsType, Type rhsType) {
 		Type[] lUpperBounds = lhsType.getUpperBounds();
 
-		// supply the implicit upper bound if none are specified
+		// 如果未指定上界，则默认为 Object
 		if (lUpperBounds.length == 0) {
 			lUpperBounds = new Type[] { Object.class };
 		}
 
 		Type[] lLowerBounds = lhsType.getLowerBounds();
 
-		// supply the implicit lower bound if none are specified
+		// 如果未指定下界，则默认为 null
 		if (lLowerBounds.length == 0) {
 			lLowerBounds = new Type[] { null };
 		}
 
 		if (rhsType instanceof WildcardType) {
-			// both the upper and lower bounds of the right-hand side must be
-			// completely enclosed in the upper and lower bounds of the left-
-			// hand side.
+			// 如果右侧也是通配符类型，则要求其上下界完全包含在左侧的上下界中
 			WildcardType rhsWcType = (WildcardType) rhsType;
 			Type[] rUpperBounds = rhsWcType.getUpperBounds();
 

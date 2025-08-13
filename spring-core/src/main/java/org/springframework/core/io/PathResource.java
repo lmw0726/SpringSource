@@ -27,17 +27,16 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.*;
 
 /**
- * {@link Resource} implementation for {@link java.nio.file.Path} handles,
- * performing all operations and transformations via the {@code Path} API.
- * Supports resolution as a {@link File} and also as a {@link URL}.
- * Implements the extended {@link WritableResource} interface.
+ * 基于 {@link java.nio.file.Path} 句柄的 {@link Resource} 实现，
+ * 通过 {@code Path} API 执行所有操作和转换。
+ * 支持解析为 {@link File} 以及 {@link URL}。
+ * 实现了扩展的 {@link WritableResource} 接口。
  *
- * <p>Note: As of 5.1, {@link java.nio.file.Path} support is also available
- * in {@link FileSystemResource#FileSystemResource(Path) FileSystemResource},
- * applying Spring's standard String-based path transformations but
- * performing all operations via the {@link java.nio.file.Files} API.
- * This {@code PathResource} is effectively a pure {@code java.nio.path.Path}
- * based alternative with different {@code createRelative} behavior.
+ * <p>注意：从 5.1 版本开始，{@link FileSystemResource#FileSystemResource(Path)}
+ * 也支持 {@link java.nio.file.Path}，采用 Spring 标准的基于字符串的路径转换，
+ * 但所有操作均通过 {@link java.nio.file.Files} API 实现。
+ * 而此 {@code PathResource} 是一个纯粹基于 {@code java.nio.path.Path} 的替代方案，
+ * 在 {@code createRelative} 行为上有所不同。
  *
  * @author Philippe Marschall
  * @author Juergen Hoeller

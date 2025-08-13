@@ -23,16 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * {@link Resource} implementation for a given {@link InputStream}.
- * <p>Should only be used if no other specific {@code Resource} implementation
- * is applicable. In particular, prefer {@link ByteArrayResource} or any of the
- * file-based {@code Resource} implementations where possible.
+ * 基于给定 {@link InputStream} 的 {@link Resource} 实现。
+ * <p>仅当没有其他特定的 {@code Resource} 实现适用时使用。
+ * 特别是在可能的情况下，应优先使用 {@link ByteArrayResource} 或任何基于文件的 {@code Resource} 实现。
  *
- * <p>In contrast to other {@code Resource} implementations, this is a descriptor
- * for an <i>already opened</i> resource - therefore returning {@code true} from
- * {@link #isOpen()}. Do not use an {@code InputStreamResource} if you need to
- * keep the resource descriptor somewhere, or if you need to read from a stream
- * multiple times.
+ * <p>与其他 {@code Resource} 实现不同，这是一个 <i>已打开</i> 资源的描述符，
+ * 因此 {@link #isOpen()} 返回 {@code true}。
+ * 如果需要在某处持有资源描述符，或需要多次读取流，请勿使用 {@code InputStreamResource}。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen

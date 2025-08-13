@@ -16,24 +16,18 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.lang.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.springframework.lang.Nullable;
-
 /**
- * {@link MergedAnnotations} implementation that searches for and adapts
- * annotations and meta-annotations using {@link AnnotationTypeMappings}.
+ * {@link MergedAnnotations} 实现，用于使用 {@link AnnotationTypeMappings} 搜索和适配注解和元注解。
  *
  * @author Phillip Webb
  * @since 5.2
@@ -41,7 +35,7 @@ import org.springframework.lang.Nullable;
 final class TypeMappedAnnotations implements MergedAnnotations {
 
 	/**
-	 * Shared instance that can be used when there are no annotations.
+	 * 当没有注解时可使用的共享实例。
 	 */
 	static final MergedAnnotations NONE = new TypeMappedAnnotations(
 			null, new Annotation[0], RepeatableContainers.none(), AnnotationFilter.ALL);
@@ -276,14 +270,12 @@ final class TypeMappedAnnotations implements MergedAnnotations {
 
 
 	/**
-	 * {@link AnnotationsProcessor} used to detect if an annotation is directly
-	 * present or meta-present.
+	 * {@link AnnotationsProcessor} 用于检测注解是直接存在还是元存在。
 	 */
 	private static final class IsPresent implements AnnotationsProcessor<Object, Boolean> {
 
 		/**
-		 * Shared instances that save us needing to create a new processor for
-		 * the common combinations.
+		 * 共享实例，省去了我们为常用组合创建新处理器的需要。
 		 */
 		private static final IsPresent[] SHARED;
 		static {
@@ -347,7 +339,6 @@ final class TypeMappedAnnotations implements MergedAnnotations {
 		static IsPresent get(RepeatableContainers repeatableContainers,
 				AnnotationFilter annotationFilter, boolean directOnly) {
 
-			// Use a single shared instance for common combinations
 			//使用单个共享实例进行常见组合
 			if (annotationFilter == AnnotationFilter.PLAIN) {
 				if (repeatableContainers == RepeatableContainers.none()) {
@@ -363,7 +354,7 @@ final class TypeMappedAnnotations implements MergedAnnotations {
 
 
 	/**
-	 * {@link AnnotationsProcessor} that finds a single {@link MergedAnnotation}.
+	 * {@link AnnotationsProcessor}，用于查找单个 {@link MergedAnnotation}。
 	 */
 	private class MergedAnnotationFinder<A extends Annotation>
 			implements AnnotationsProcessor<Object, MergedAnnotation<A>> {
@@ -448,7 +439,7 @@ final class TypeMappedAnnotations implements MergedAnnotations {
 
 
 	/**
-	 * {@link AnnotationsProcessor} that collects {@link Aggregate} instances.
+	 * {@link AnnotationsProcessor}，用于收集 {@link Aggregate} 实例。
 	 */
 	private class AggregatesCollector implements AnnotationsProcessor<Object, List<Aggregate>> {
 
@@ -542,8 +533,7 @@ final class TypeMappedAnnotations implements MergedAnnotations {
 
 
 	/**
-	 * {@link Spliterator} used to consume merged annotations from the
-	 * aggregates in distance fist order.
+	 * {@link Spliterator} 用于以距离优先顺序从聚合中消费合并的注解。
 	 */
 	private class AggregatesSpliterator<A extends Annotation> implements Spliterator<MergedAnnotation<A>> {
 

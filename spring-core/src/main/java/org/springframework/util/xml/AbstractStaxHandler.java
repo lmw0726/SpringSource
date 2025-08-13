@@ -16,27 +16,24 @@
 
 package org.springframework.util.xml;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
+import org.springframework.lang.Nullable;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
-import org.springframework.lang.Nullable;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Abstract base class for SAX {@code ContentHandler} and {@code LexicalHandler}
- * implementations that use StAX as a basis. All methods delegate to internal template
- * methods, capable of throwing a {@code XMLStreamException}. Additionally, an namespace
- * context stack is used to keep track of declared namespaces.
+ * 基于StAX实现的SAX {@code ContentHandler}和{@code LexicalHandler}抽象基类。
+ * 所有方法都委托给内部模板方法，这些方法可能抛出{@code XMLStreamException}。
+ * 此外，使用命名空间上下文栈来跟踪已声明的命名空间。
  *
  * @author Arjen Poutsma
  * @since 4.0.3
@@ -205,11 +202,12 @@ abstract class AbstractStaxHandler implements ContentHandler, LexicalHandler {
 	}
 
 	/**
-	 * Convert a namespace URI and DOM or SAX qualified name to a {@code QName}. The
-	 * qualified name can have the form {@code prefix:localname} or {@code localName}.
-	 * @param namespaceUri the namespace URI
-	 * @param qualifiedName the qualified name
-	 * @return a QName
+	 * 将命名空间URI和DOM/SAX限定名称转换为{@code QName}对象。
+	 * 限定名称可以是{@code prefix:localname}或{@code localName}格式。
+	 *
+	 * @param namespaceUri 命名空间URI
+	 * @param qualifiedName 限定名称(可能包含前缀)
+	 * @return 转换后的QName对象
 	 */
 	protected QName toQName(String namespaceUri, String qualifiedName) {
 		int idx = qualifiedName.indexOf(':');

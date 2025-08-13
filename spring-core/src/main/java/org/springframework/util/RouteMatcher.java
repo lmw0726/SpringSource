@@ -16,18 +16,16 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.util.Comparator;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Contract for matching routes to patterns.
+ * 路由匹配模式的契约接口。
  *
- * <p>Equivalent to {@link PathMatcher}, but enables use of parsed representations
- * of routes and patterns for efficiency reasons in scenarios where routes from
- * incoming messages are continuously matched against a large number of message
- * handler patterns.
+ * <p>相当于 {@link PathMatcher}，但为了效率原因，支持使用解析后的路由和模式表示，
+ * 适用于来自传入消息的路由持续匹配大量消息处理器模式的场景。
  *
  * @author Rossen Stoyanchev
  * @since 5.2
@@ -36,64 +34,62 @@ import org.springframework.lang.Nullable;
 public interface RouteMatcher {
 
 	/**
-	 * Return a parsed representation of the given route.
-	 * @param routeValue the route to parse
-	 * @return the parsed representation of the route
+	 * 返回给定路由的解析表示。
+	 * @param routeValue 要解析的路由
+	 * @return 路由的解析表示
 	 */
 	Route parseRoute(String routeValue);
 
 	/**
-	 * Whether the given {@code route} contains pattern syntax which requires
-	 * the {@link #match(String, Route)} method, or if it is a regular String
-	 * that could be compared directly to others.
-	 * @param route the route to check
-	 * @return {@code true} if the given {@code route} represents a pattern
+	 * 判断给定的 {@code route} 是否包含需要使用 {@link #match(String, Route)} 方法的模式语法，
+	 * 或者它是一个可直接比较的普通字符串。
+	 * @param route 要检查的路由
+	 * @return 如果给定的 {@code route} 表示一个模式，则返回 {@code true}
 	 */
 	boolean isPattern(String route);
 
 	/**
-	 * Combines two patterns into a single pattern.
-	 * @param pattern1 the first pattern
-	 * @param pattern2 the second pattern
-	 * @return the combination of the two patterns
-	 * @throws IllegalArgumentException when the two patterns cannot be combined
+	 * 将两个模式合并成一个单一模式。
+	 * @param pattern1 第一个模式
+	 * @param pattern2 第二个模式
+	 * @return 两个模式的合并结果
+	 * @throws IllegalArgumentException 当两个模式无法合并时抛出
 	 */
 	String combine(String pattern1, String pattern2);
 
 	/**
-	 * Match the given route against the given pattern.
-	 * @param pattern the pattern to try to match
-	 * @param route the route to test against
-	 * @return {@code true} if there is a match, {@code false} otherwise
+	 * 将给定的路由与指定的模式进行匹配。
+	 * @param pattern 要尝试匹配的模式
+	 * @param route 要测试的路由
+	 * @return 如果匹配成功返回 {@code true}，否则返回 {@code false}
 	 */
 	boolean match(String pattern, Route route);
 
 	/**
-	 * Match the pattern to the route and extract template variables.
-	 * @param pattern the pattern, possibly containing templates variables
-	 * @param route the route to extract template variables from
-	 * @return a map with template variables and values
+	 * 将模式与路由匹配并提取模板变量。
+	 * @param pattern 可能包含模板变量的模式
+	 * @param route 用于提取模板变量的路由
+	 * @return 包含模板变量及其对应值的映射
 	 */
 	@Nullable
 	Map<String, String> matchAndExtract(String pattern, Route route);
 
 	/**
-	 * Given a route, return a {@link Comparator} suitable for sorting patterns
-	 * in order of explicitness for that route, so that more specific patterns
-	 * come before more generic ones.
-	 * @param route the full path to use for comparison
-	 * @return a comparator capable of sorting patterns in order of explicitness
+	 * 根据给定路由，返回一个 {@link Comparator}，用于对模式进行显式性排序，
+	 * 使得更具体的模式排在更通用的模式之前。
+	 * @param route 用于比较的完整路径
+	 * @return 能够按显式性排序模式的比较器
 	 */
 	Comparator<String> getPatternComparator(Route route);
 
 
 	/**
-	 * A parsed representation of a route.
- 	 */
+	 * 路由的解析表示。
+	 */
 	interface Route {
 
 		/**
-		 * The original route value.
+		 * 原始路由值。
 		 */
 		String value();
 	}

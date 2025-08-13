@@ -16,10 +16,6 @@
 
 package org.springframework.util.xml;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
@@ -29,10 +25,13 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * Implementation of the {@link javax.xml.stream.XMLStreamWriter} interface
- * that wraps an {@link XMLEventWriter}.
+ * {@link javax.xml.stream.XMLStreamWriter}接口的实现类，
+ * 用于包装{@link XMLEventWriter}。
  *
  * @author Arjen Poutsma
  * @since 3.0.5

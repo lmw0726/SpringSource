@@ -19,8 +19,8 @@ package org.springframework.util;
 import org.springframework.lang.Nullable;
 
 /**
- * Utility methods for simple pattern matching, in particular for
- * Spring's typical "xxx*", "*xxx" and "*xxx*" pattern styles.
+ * 用于简单模式匹配的工具方法，特别适用于
+ * Spring典型的"xxx*"、"*xxx"和"*xxx*"模式样式。
  *
  * @author Juergen Hoeller
  * @since 2.0

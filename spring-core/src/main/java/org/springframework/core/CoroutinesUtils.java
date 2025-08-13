@@ -40,7 +40,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Utilities for working with Kotlin Coroutines.
+ * Kotlin 协程相关工具类。
  *
  * @author Sebastien Deleuze
  * @author Phillip Webb
@@ -50,7 +50,7 @@ import reactor.core.publisher.Mono;
 public abstract class CoroutinesUtils {
 
 	/**
-	 * Convert a {@link Deferred} instance to a {@link Mono}.
+	 * 将 {@link Deferred} 实例转换为 {@link Mono}。
 	 */
 	public static <T> Mono<T> deferredToMono(Deferred<T> source) {
 		return MonoKt.mono(Dispatchers.getUnconfined(),
@@ -58,7 +58,7 @@ public abstract class CoroutinesUtils {
 	}
 
 	/**
-	 * Convert a {@link Mono} instance to a {@link Deferred}.
+	 * 将 {@link Mono} 实例转换为 {@link Deferred}。
 	 */
 	public static <T> Deferred<T> monoToDeferred(Mono<T> source) {
 		return BuildersKt.async(GlobalScope.INSTANCE, Dispatchers.getUnconfined(),
@@ -67,8 +67,7 @@ public abstract class CoroutinesUtils {
 	}
 
 	/**
-	 * Invoke a suspending function and converts it to {@link Mono} or
-	 * {@link Flux}.
+	 * 调用挂起函数并将其转换为 {@link Mono} 或 {@link Flux}。
 	 */
 	public static Publisher<?> invokeSuspendingFunction(Method method, Object target, Object... args) {
 		KFunction<?> function = Objects.requireNonNull(ReflectJvmMapping.getKotlinFunction(method));

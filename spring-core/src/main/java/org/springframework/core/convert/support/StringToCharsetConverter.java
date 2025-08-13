@@ -16,12 +16,12 @@
 
 package org.springframework.core.convert.support;
 
-import java.nio.charset.Charset;
-
 import org.springframework.core.convert.converter.Converter;
 
+import java.nio.charset.Charset;
+
 /**
- * Convert a String to a {@link Charset}.
+ * 将字符串转换为 {@link Charset}。
  *
  * @author Stephane Nicoll
  * @since 4.2

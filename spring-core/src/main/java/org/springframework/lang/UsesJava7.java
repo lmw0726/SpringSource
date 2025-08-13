@@ -23,12 +23,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated element uses Java 7 specific API constructs,
- * without implying that it strictly requires Java 7.
+ * 表示被注解的元素使用了Java 7特有的API结构，但并不严格要求Java 7环境。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @deprecated as of 5.0 since the framework is based on Java 8+ now
+ * @deprecated 自5.0版本起弃用，因为框架现已基于Java 8+
  */
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.TYPE})

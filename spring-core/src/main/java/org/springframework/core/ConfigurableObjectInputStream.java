@@ -16,19 +16,14 @@
 
 package org.springframework.core;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamClass;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
+import java.io.*;
+
 /**
- * Special ObjectInputStream subclass that resolves class names
- * against a specific ClassLoader. Serves as base class for
- * {@link org.springframework.remoting.rmi.CodebaseAwareObjectInputStream}.
+ * 特殊的 ObjectInputStream 子类，用于针对特定 ClassLoader 解析类名。
+ * 作为 {@link org.springframework.remoting.rmi.CodebaseAwareObjectInputStream} 的基类。
  *
  * @author Juergen Hoeller
  * @since 2.5.5
@@ -42,9 +37,9 @@ public class ConfigurableObjectInputStream extends ObjectInputStream {
 
 
 	/**
-	 * Create a new ConfigurableObjectInputStream for the given InputStream and ClassLoader.
-	 * @param in the InputStream to read from
-	 * @param classLoader the ClassLoader to use for loading local classes
+	 * 为给定的 InputStream 和 ClassLoader 创建新的 ConfigurableObjectInputStream。
+	 * @param in 读取的 InputStream
+	 * @param classLoader 用于加载本地类的 ClassLoader
 	 * @see java.io.ObjectInputStream#ObjectInputStream(java.io.InputStream)
 	 */
 	public ConfigurableObjectInputStream(InputStream in, @Nullable ClassLoader classLoader) throws IOException {
@@ -52,11 +47,10 @@ public class ConfigurableObjectInputStream extends ObjectInputStream {
 	}
 
 	/**
-	 * Create a new ConfigurableObjectInputStream for the given InputStream and ClassLoader.
-	 * @param in the InputStream to read from
-	 * @param classLoader the ClassLoader to use for loading local classes
-	 * @param acceptProxyClasses whether to accept deserialization of proxy classes
-	 * (may be deactivated as a security measure)
+	 * 为给定的 InputStream 和 ClassLoader 创建新的 ConfigurableObjectInputStream。
+	 * @param in 读取的 InputStream
+	 * @param classLoader 用于加载本地类的 ClassLoader
+	 * @param acceptProxyClasses 是否接受代理类的反序列化（可能作为安全措施被禁用）
 	 * @see java.io.ObjectInputStream#ObjectInputStream(java.io.InputStream)
 	 */
 	public ConfigurableObjectInputStream(
@@ -72,11 +66,11 @@ public class ConfigurableObjectInputStream extends ObjectInputStream {
 	protected Class<?> resolveClass(ObjectStreamClass classDesc) throws IOException, ClassNotFoundException {
 		try {
 			if (this.classLoader != null) {
-				// Use the specified ClassLoader to resolve local classes.
+				// 使用指定的 ClassLoader 解析本地类。
 				return ClassUtils.forName(classDesc.getName(), this.classLoader);
 			}
 			else {
-				// Use the default ClassLoader...
+				// 使用默认的 ClassLoader...
 				return super.resolveClass(classDesc);
 			}
 		}
@@ -91,7 +85,7 @@ public class ConfigurableObjectInputStream extends ObjectInputStream {
 			throw new NotSerializableException("Not allowed to accept serialized proxy classes");
 		}
 		if (this.classLoader != null) {
-			// Use the specified ClassLoader to resolve local proxy classes.
+			// 使用指定的 ClassLoader 解析本地代理类。
 			Class<?>[] resolvedInterfaces = new Class<?>[interfaces.length];
 			for (int i = 0; i < interfaces.length; i++) {
 				try {
@@ -109,7 +103,7 @@ public class ConfigurableObjectInputStream extends ObjectInputStream {
 			}
 		}
 		else {
-			// Use ObjectInputStream's default ClassLoader...
+			// 使用 ObjectInputStream 默认的 ClassLoader...
 			try {
 				return super.resolveProxyClass(interfaces);
 			}
@@ -125,12 +119,11 @@ public class ConfigurableObjectInputStream extends ObjectInputStream {
 
 
 	/**
-	 * Resolve the given class name against a fallback class loader.
-	 * <p>The default implementation simply rethrows the original exception,
-	 * since there is no fallback available.
-	 * @param className the class name to resolve
-	 * @param ex the original exception thrown when attempting to load the class
-	 * @return the newly resolved class (never {@code null})
+	 * 使用回退 ClassLoader 解析给定的类名。
+	 * <p>默认实现直接重新抛出原始异常，因为没有可用的回退。
+	 * @param className 需要解析的类名
+	 * @param ex 尝试加载类时抛出的原始异常
+	 * @return 解析得到的类（绝不会为 {@code null}）
 	 */
 	protected Class<?> resolveFallbackIfPossible(String className, ClassNotFoundException ex)
 			throws IOException, ClassNotFoundException{
@@ -139,10 +132,9 @@ public class ConfigurableObjectInputStream extends ObjectInputStream {
 	}
 
 	/**
-	 * Return the fallback ClassLoader to use when no ClassLoader was specified
-	 * and ObjectInputStream's own default class loader failed.
-	 * <p>The default implementation simply returns {@code null}, indicating
-	 * that no specific fallback is available.
+	 * 当未指定 ClassLoader 且 ObjectInputStream 自身的默认 ClassLoader 解析失败时，
+	 * 返回使用的回退 ClassLoader。
+	 * <p>默认实现返回 {@code null}，表示没有特定的回退可用。
 	 */
 	@Nullable
 	protected ClassLoader getFallbackClassLoader() throws IOException {

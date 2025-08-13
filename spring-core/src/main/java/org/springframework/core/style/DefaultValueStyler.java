@@ -16,23 +16,19 @@
 
 package org.springframework.core.style;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.lang.reflect.Method;
+import java.util.*;
+
 /**
- * Converts objects to String form, generally for debugging purposes,
- * using Spring's {@code toString} styling conventions.
+ * 将对象转换为字符串形式，通常用于调试目的，
+ * 使用 Spring 的 {@code toString} 样式约定。
  *
- * <p>Uses the reflective visitor pattern underneath the hood to nicely
- * encapsulate styling algorithms for each type of styled object.
+ * <p>底层采用反射访问者模式，
+ * 优雅地封装每种类型对象的样式算法。
  *
  * @author Keith Donald
  * @author Juergen Hoeller

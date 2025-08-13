@@ -22,8 +22,7 @@ import org.springframework.util.Assert;
 import java.util.function.Function;
 
 /**
- * Interface defining a generic contract for attaching and accessing metadata
- * to/from arbitrary objects.
+ * 定义一个通用接口，用于向任意对象附加和访问元数据。
  *
  * @author Rob Harrop
  * @author Sam Brannen

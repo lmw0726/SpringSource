@@ -19,7 +19,7 @@ package org.springframework.core.convert;
 import org.springframework.core.NestedRuntimeException;
 
 /**
- * Base class for exceptions thrown by the conversion system.
+ * 转换系统抛出的异常的基类。
  *
  * @author Keith Donald
  * @since 3.0
@@ -28,17 +28,17 @@ import org.springframework.core.NestedRuntimeException;
 public abstract class ConversionException extends NestedRuntimeException {
 
 	/**
-	 * Construct a new conversion exception.
-	 * @param message the exception message
+	 * 构造新的转换异常。
+	 * @param message 异常消息
 	 */
 	public ConversionException(String message) {
 		super(message);
 	}
 
 	/**
-	 * Construct a new conversion exception.
-	 * @param message the exception message
-	 * @param cause the cause
+	 * 构造新的转换异常。
+	 * @param message 异常消息
+	 * @param cause 原因
 	 */
 	public ConversionException(String message, Throwable cause) {
 		super(message, cause);

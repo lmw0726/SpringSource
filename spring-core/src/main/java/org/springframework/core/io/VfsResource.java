@@ -16,22 +16,21 @@
 
 package org.springframework.core.io;
 
+import org.springframework.core.NestedIOException;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
-import org.springframework.core.NestedIOException;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * JBoss VFS based {@link Resource} implementation.
+ * 基于 JBoss VFS 的 {@link Resource} 实现。
  *
- * <p>As of Spring 4.0, this class supports VFS 3.x on JBoss AS 6+
- * (package {@code org.jboss.vfs}) and is in particular compatible with
- * JBoss AS 7 and WildFly 8+.
+ * <p>自 Spring 4.0 起，本类支持 JBoss AS 6 及以上版本的 VFS 3.x
+ * （包名为 {@code org.jboss.vfs}），特别兼容 JBoss AS 7 和 WildFly 8 及以上版本。
  *
  * @author Ales Justin
  * @author Juergen Hoeller
@@ -46,9 +45,9 @@ public class VfsResource extends AbstractResource {
 
 
 	/**
-	 * Create a new {@code VfsResource} wrapping the given resource handle.
-	 * @param resource a {@code org.jboss.vfs.VirtualFile} instance
-	 * (untyped in order to avoid a static dependency on the VFS API)
+	 * 创建一个新的 {@code VfsResource}，包装给定的资源句柄。
+	 * @param resource 一个 {@code org.jboss.vfs.VirtualFile} 实例
+	 * （未强类型以避免对 VFS API 的静态依赖）
 	 */
 	public VfsResource(Object resource) {
 		Assert.notNull(resource, "VirtualFile must not be null");
@@ -113,7 +112,7 @@ public class VfsResource extends AbstractResource {
 				return new VfsResource(VfsUtils.getChild(this.resource, relativePath));
 			}
 			catch (IOException ex) {
-				// fall back to getRelative
+				// 回退到getRelative
 			}
 		}
 

@@ -16,20 +16,18 @@
 
 package org.springframework.core.log;
 
-import java.util.function.Function;
-import java.util.regex.Pattern;
-
 import org.apache.commons.logging.Log;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
+import java.util.function.Function;
+import java.util.regex.Pattern;
+
 /**
- * Utility methods for formatting and logging messages.
+ * 用于格式化和日志消息的工具方法类。
  *
- * <p>Mainly for internal use within the framework with Apache Commons Logging,
- * typically in the form of the {@code spring-jcl} bridge but also compatible
- * with other Commons Logging bridges.
+ * <p>主要供框架内部与 Apache Commons Logging 配合使用，
+ * 通常通过 {@code spring-jcl} 桥接实现，但也兼容其他 Commons Logging 桥接实现。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -43,26 +41,26 @@ public abstract class LogFormatUtils {
 
 
 	/**
-	 * Convenience variant of {@link #formatValue(Object, int, boolean)} that
-	 * limits the length of a log message to 100 characters and also replaces
-	 * newline and control characters if {@code limitLength} is set to "true".
-	 * @param value the value to format
-	 * @param limitLength whether to truncate the value at a length of 100
-	 * @return the formatted value
+	 * {@link #formatValue(Object, int, boolean)} 的便捷版本，
+	 * 当 {@code limitLength} 为 true 时，限制日志消息长度为 100 字符，
+	 * 并且替换换行和控制字符。
+	 * @param value 要格式化的值
+	 * @param limitLength 是否限制长度为 100
+	 * @return 格式化后的字符串
 	 */
 	public static String formatValue(@Nullable Object value, boolean limitLength) {
 		return formatValue(value, (limitLength ? 100 : -1), limitLength);
 	}
 
 	/**
-	 * Format the given value via {@code toString()}, quoting it if it is a
-	 * {@link CharSequence}, truncating at the specified {@code maxLength}, and
-	 * compacting it into a single line when {@code replaceNewLines} is set.
-	 * @param value the value to be formatted
-	 * @param maxLength the max length, after which to truncate, or -1 for unlimited
-	 * @param replaceNewlinesAndControlCharacters whether to replace newline and
-	 * control characters with placeholders
-	 * @return the formatted value
+	 * 通过 {@code toString()} 格式化给定值，
+	 * 如果值是 {@link CharSequence}，则加引号包裹；
+	 * 超过指定 {@code maxLength} 截断；
+	 * 并在 {@code replaceNewlinesAndControlCharacters} 为 true 时，将换行和控制字符替换为占位符。
+	 * @param value 要格式化的值
+	 * @param maxLength 最大长度，超过则截断，-1 表示无限制
+	 * @param replaceNewlinesAndControlCharacters 是否替换换行和控制字符
+	 * @return 格式化后的字符串
 	 */
 	public static String formatValue(
 			@Nullable Object value, int maxLength, boolean replaceNewlinesAndControlCharacters) {
@@ -91,8 +89,8 @@ public abstract class LogFormatUtils {
 	}
 
 	/**
-	 * Use this to log a message with different levels of detail (or different
-	 * messages) at TRACE vs DEBUG log levels. Effectively, a substitute for:
+	 * 该方法用来在 TRACE 与 DEBUG 两种日志级别下，根据不同的细节级别（或不同消息内容）
+	 * 记录日志。相当于以下写法的简化版本：
 	 * <pre class="code">
 	 * if (logger.isDebugEnabled()) {
 	 *   String str = logger.isTraceEnabled() ? "..." : "...";
@@ -104,9 +102,8 @@ public abstract class LogFormatUtils {
 	 *   }
 	 * }
 	 * </pre>
-	 * @param logger the logger to use to log the message
-	 * @param messageFactory function that accepts a boolean set to the value
-	 * of {@link Log#isTraceEnabled()}
+	 * @param logger 用于记录日志的 Logger
+	 * @param messageFactory 接收一个 boolean（值为 {@link Log#isTraceEnabled()}）并返回日志消息的函数
 	 */
 	public static void traceDebug(Log logger, Function<Boolean, String> messageFactory) {
 		if (logger.isDebugEnabled()) {

@@ -16,34 +16,32 @@
 
 package org.springframework.util.comparator;
 
-import java.util.Comparator;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.Comparator;
+
 /**
- * A Comparator that will safely compare nulls to be lower or higher than
- * other objects. Can decorate a given Comparator or work on Comparables.
+ * 一个安全比较null值的比较器，可以将null视为比其他对象小或大。
+ * 可以装饰给定的Comparator或直接比较Comparable对象。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @since 1.2.2
- * @param <T> the type of objects that may be compared by this comparator
+ * @param <T> 此比较器可以比较的对象类型
  * @see Comparable
  */
 public class NullSafeComparator<T> implements Comparator<T> {
 
 	/**
-	 * A shared default instance of this comparator, treating nulls lower
-	 * than non-null objects.
+	 * 此比较器的共享默认实例，将null视为比非null对象小。
 	 * @see Comparators#nullsLow()
 	 */
 	@SuppressWarnings("rawtypes")
 	public static final NullSafeComparator NULLS_LOW = new NullSafeComparator<>(true);
 
 	/**
-	 * A shared default instance of this comparator, treating nulls higher
-	 * than non-null objects.
+	 * 此比较器的共享默认实例，将null视为比非null对象大。
 	 * @see Comparators#nullsHigh()
 	 */
 	@SuppressWarnings("rawtypes")
@@ -56,15 +54,13 @@ public class NullSafeComparator<T> implements Comparator<T> {
 
 
 	/**
-	 * Create a NullSafeComparator that sorts {@code null} based on
-	 * the provided flag, working on Comparables.
-	 * <p>When comparing two non-null objects, their Comparable implementation
-	 * will be used: this means that non-null elements (that this Comparator
-	 * will be applied to) need to implement Comparable.
-	 * <p>As a convenience, you can use the default shared instances:
-	 * {@code NullSafeComparator.NULLS_LOW} and
-	 * {@code NullSafeComparator.NULLS_HIGH}.
-	 * @param nullsLow whether to treat nulls lower or higher than non-null objects
+	 * 创建一个NullSafeComparator，根据提供的标志对null进行排序，适用于Comparable对象。
+	 * <p>当比较两个非null对象时，将使用它们的Comparable实现：这意味着此比较器
+	 * 将要应用的非null元素需要实现Comparable接口。
+	 * <p>为了方便，您可以使用默认的共享实例：
+	 * {@code NullSafeComparator.NULLS_LOW}和
+	 * {@code NullSafeComparator.NULLS_HIGH}。
+	 * @param nullsLow 是否将null视为比非null对象小
 	 * @see Comparable
 	 * @see #NULLS_LOW
 	 * @see #NULLS_HIGH
@@ -76,13 +72,11 @@ public class NullSafeComparator<T> implements Comparator<T> {
 	}
 
 	/**
-	 * Create a NullSafeComparator that sorts {@code null} based on the
-	 * provided flag, decorating the given Comparator.
-	 * <p>When comparing two non-null objects, the specified Comparator will be used.
-	 * The given underlying Comparator must be able to handle the elements that this
-	 * Comparator will be applied to.
-	 * @param comparator the comparator to use when comparing two non-null objects
-	 * @param nullsLow whether to treat nulls lower or higher than non-null objects
+	 * 创建一个NullSafeComparator，根据提供的标志对null进行排序，装饰给定的Comparator。
+	 * <p>当比较两个非null对象时，将使用指定的Comparator。
+	 * 给定的底层Comparator必须能够处理此比较器将要应用的元素。
+	 * @param comparator 用于比较两个非null对象的比较器
+	 * @param nullsLow 是否将null视为比非null对象小
 	 */
 	public NullSafeComparator(Comparator<T> comparator, boolean nullsLow) {
 		Assert.notNull(comparator, "Non-null Comparator is required");

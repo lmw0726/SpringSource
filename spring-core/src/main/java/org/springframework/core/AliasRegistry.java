@@ -25,7 +25,7 @@ package org.springframework.core;
 public interface AliasRegistry {
 
 	/**
-	 * 给定一个名字，为它注册一个别名。
+	 * 为给定的名称注册一个别名。
 	 *
 	 * @param name  规范名称
 	 * @param alias 要注册的别名

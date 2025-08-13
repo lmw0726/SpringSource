@@ -16,17 +16,16 @@
 
 package org.springframework.core.serializer;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-
 import org.springframework.core.ConfigurableObjectInputStream;
 import org.springframework.core.NestedIOException;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+
 /**
- * A default {@link Deserializer} implementation that reads an input stream
- * using Java serialization.
+ * 默认的 {@link Deserializer} 实现，使用 Java 序列化读取输入流。
  *
  * @author Gary Russell
  * @author Mark Fisher
@@ -41,16 +40,15 @@ public class DefaultDeserializer implements Deserializer<Object> {
 
 
 	/**
-	 * Create a {@code DefaultDeserializer} with default {@link ObjectInputStream}
-	 * configuration, using the "latest user-defined ClassLoader".
+	 * 使用默认的 {@link ObjectInputStream} 配置创建一个 {@code DefaultDeserializer}，
+	 * 使用“最新的用户定义的 ClassLoader”。
 	 */
 	public DefaultDeserializer() {
 		this.classLoader = null;
 	}
 
 	/**
-	 * Create a {@code DefaultDeserializer} for using an {@link ObjectInputStream}
-	 * with the given {@code ClassLoader}.
+	 * 创建一个 {@code DefaultDeserializer}，用于使用带有指定 {@code ClassLoader} 的 {@link ObjectInputStream}。
 	 * @since 4.2.1
 	 * @see ConfigurableObjectInputStream#ConfigurableObjectInputStream(InputStream, ClassLoader)
 	 */
@@ -60,8 +58,7 @@ public class DefaultDeserializer implements Deserializer<Object> {
 
 
 	/**
-	 * Read from the supplied {@code InputStream} and deserialize the contents
-	 * into an object.
+	 * 从提供的 {@code InputStream} 中读取并将内容反序列化为对象。
 	 * @see ObjectInputStream#readObject()
 	 */
 	@Override

@@ -16,10 +16,6 @@
 
 package org.springframework.core.codec;
 
-import java.util.Map;
-
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -30,9 +26,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StreamUtils;
+import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 /**
- * Encoder for {@link Resource Resources}.
+ * {@link Resource Resources} 的编码器。
  *
  * @author Arjen Poutsma
  * @since 5.0
@@ -40,7 +39,7 @@ import org.springframework.util.StreamUtils;
 public class ResourceEncoder extends AbstractSingleValueEncoder<Resource> {
 
 	/**
-	 * The default buffer size used by the encoder.
+	 * 编码器使用的默认缓冲区大小。
 	 */
 	public static final int DEFAULT_BUFFER_SIZE = StreamUtils.BUFFER_SIZE;
 

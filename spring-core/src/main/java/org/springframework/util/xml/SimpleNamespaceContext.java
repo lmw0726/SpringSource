@@ -16,23 +16,17 @@
 
 package org.springframework.util.xml;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
+import java.util.*;
+
 /**
- * Simple {@code javax.xml.namespace.NamespaceContext} implementation.
- * Follows the standard {@code NamespaceContext} contract, and is loadable
- * via a {@code java.util.Map} or {@code java.util.Properties} object
+ * 简单的{@code javax.xml.namespace.NamespaceContext}实现。
+ * 遵循标准{@code NamespaceContext}契约，并可通过{@code java.util.Map}
+ * 或{@code java.util.Properties}对象加载。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -96,25 +90,25 @@ public class SimpleNamespaceContext implements NamespaceContext {
 
 
 	/**
-	 * Set the bindings for this namespace context.
-	 * The supplied map must consist of string key value pairs.
+	 * 设置此命名空间上下文的绑定关系。
+	 * 提供的映射必须包含字符串键值对。
 	 */
 	public void setBindings(Map<String, String> bindings) {
 		bindings.forEach(this::bindNamespaceUri);
 	}
 
 	/**
-	 * Bind the given namespace as default namespace.
-	 * @param namespaceUri the namespace uri
+	 * 将给定的命名空间URI绑定为默认命名空间。
+	 * @param namespaceUri 命名空间URI
 	 */
 	public void bindDefaultNamespaceUri(String namespaceUri) {
 		bindNamespaceUri(XMLConstants.DEFAULT_NS_PREFIX, namespaceUri);
 	}
 
 	/**
-	 * Bind the given prefix to the given namespace.
-	 * @param prefix the namespace prefix
-	 * @param namespaceUri the namespace uri
+	 * 将给定的前缀绑定到指定的命名空间URI。
+	 * @param prefix 命名空间前缀
+	 * @param namespaceUri 命名空间URI
 	 */
 	public void bindNamespaceUri(String prefix, String namespaceUri) {
 		Assert.notNull(prefix, "No prefix given");
@@ -131,8 +125,8 @@ public class SimpleNamespaceContext implements NamespaceContext {
 	}
 
 	/**
-	 * Remove the given prefix from this context.
-	 * @param prefix the prefix to be removed
+	 * 从此上下文中移除指定的前缀绑定。
+	 * @param prefix 要移除的前缀
 	 */
 	public void removeBinding(@Nullable String prefix) {
 		if (XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) {
@@ -153,7 +147,7 @@ public class SimpleNamespaceContext implements NamespaceContext {
 	}
 
 	/**
-	 * Remove all declared prefixes.
+	 * 清除所有已声明的命名空间前缀。
 	 */
 	public void clear() {
 		this.prefixToNamespaceUri.clear();
@@ -161,7 +155,8 @@ public class SimpleNamespaceContext implements NamespaceContext {
 	}
 
 	/**
-	 * Return all declared prefixes.
+	 * 获取所有已绑定的命名空间前缀的迭代器。
+	 * @return 包含所有已绑定前缀的迭代器
 	 */
 	public Iterator<String> getBoundPrefixes() {
 		return this.prefixToNamespaceUri.keySet().iterator();

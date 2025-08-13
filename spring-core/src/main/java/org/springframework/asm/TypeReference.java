@@ -29,201 +29,175 @@
 package org.springframework.asm;
 
 /**
- * A reference to a type appearing in a class, field or method declaration, or on an instruction.
- * Such a reference designates the part of the class where the referenced type is appearing (e.g. an
- * 'extends', 'implements' or 'throws' clause, a 'new' instruction, a 'catch' clause, a type cast, a
- * local variable declaration, etc).
+ * 类、字段或方法声明中，或在指令上的类型引用。
+ * 此类引用指定了该类型在类中的出现位置（例如 'extends'、'implements' 或 'throws' 子句，
+ * 'new' 指令、'catch' 子句、类型转换、局部变量声明等）。
  *
  * @author Eric Bruneton
  */
 public class TypeReference {
 
   /**
-   * The sort of type references that target a type parameter of a generic class. See {@link
-   * #getSort}.
+   * 针对泛型类类型参数的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int CLASS_TYPE_PARAMETER = 0x00;
 
   /**
-   * The sort of type references that target a type parameter of a generic method. See {@link
-   * #getSort}.
+   * 针对泛型方法类型参数的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int METHOD_TYPE_PARAMETER = 0x01;
 
   /**
-   * The sort of type references that target the super class of a class or one of the interfaces it
-   * implements. See {@link #getSort}.
+   * 针对类的超类或其实现的接口的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int CLASS_EXTENDS = 0x10;
 
   /**
-   * The sort of type references that target a bound of a type parameter of a generic class. See
-   * {@link #getSort}.
+   * 针对泛型类类型参数的边界的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int CLASS_TYPE_PARAMETER_BOUND = 0x11;
 
   /**
-   * The sort of type references that target a bound of a type parameter of a generic method. See
-   * {@link #getSort}.
+   * 针对泛型方法类型参数的边界的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int METHOD_TYPE_PARAMETER_BOUND = 0x12;
 
-  /** The sort of type references that target the type of a field. See {@link #getSort}. */
+  /** 针对字段类型的类型引用 sort。参见 {@link #getSort}。 */
   public static final int FIELD = 0x13;
 
-  /** The sort of type references that target the return type of a method. See {@link #getSort}. */
+  /** 针对方法返回值类型的类型引用 sort。参见 {@link #getSort}。 */
   public static final int METHOD_RETURN = 0x14;
 
   /**
-   * The sort of type references that target the receiver type of a method. See {@link #getSort}.
+   * 针对方法接收者类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int METHOD_RECEIVER = 0x15;
 
   /**
-   * The sort of type references that target the type of a formal parameter of a method. See {@link
-   * #getSort}.
+   * 针对方法形参类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int METHOD_FORMAL_PARAMETER = 0x16;
 
   /**
-   * The sort of type references that target the type of an exception declared in the throws clause
-   * of a method. See {@link #getSort}.
+   * 针对方法 throws 子句中声明的异常类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int THROWS = 0x17;
 
   /**
-   * The sort of type references that target the type of a local variable in a method. See {@link
-   * #getSort}.
+   * 针对方法中局部变量类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int LOCAL_VARIABLE = 0x40;
 
   /**
-   * The sort of type references that target the type of a resource variable in a method. See {@link
-   * #getSort}.
+   * 针对方法中资源变量类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int RESOURCE_VARIABLE = 0x41;
 
   /**
-   * The sort of type references that target the type of the exception of a 'catch' clause in a
-   * method. See {@link #getSort}.
+   * 针对方法中 'catch' 子句异常类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int EXCEPTION_PARAMETER = 0x42;
 
   /**
-   * The sort of type references that target the type declared in an 'instanceof' instruction. See
-   * {@link #getSort}.
+   * 针对 'instanceof' 指令中声明的类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int INSTANCEOF = 0x43;
 
   /**
-   * The sort of type references that target the type of the object created by a 'new' instruction.
-   * See {@link #getSort}.
+   * 针对 'new' 指令创建的对象类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int NEW = 0x44;
 
   /**
-   * The sort of type references that target the receiver type of a constructor reference. See
-   * {@link #getSort}.
+   * 针对构造函数引用接收者类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int CONSTRUCTOR_REFERENCE = 0x45;
 
   /**
-   * The sort of type references that target the receiver type of a method reference. See {@link
-   * #getSort}.
+   * 针对方法引用接收者类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int METHOD_REFERENCE = 0x46;
 
   /**
-   * The sort of type references that target the type declared in an explicit or implicit cast
-   * instruction. See {@link #getSort}.
+   * 针对显式或隐式类型转换（cast）指令中声明类型的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int CAST = 0x47;
 
   /**
-   * The sort of type references that target a type parameter of a generic constructor in a
-   * constructor call. See {@link #getSort}.
+   * 针对构造函数调用中泛型构造函数的类型参数的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT = 0x48;
 
   /**
-   * The sort of type references that target a type parameter of a generic method in a method call.
-   * See {@link #getSort}.
+   * 针对方法调用中泛型方法的类型参数的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int METHOD_INVOCATION_TYPE_ARGUMENT = 0x49;
 
   /**
-   * The sort of type references that target a type parameter of a generic constructor in a
-   * constructor reference. See {@link #getSort}.
+   * 针对构造函数引用中泛型构造函数的类型参数的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT = 0x4A;
 
   /**
-   * The sort of type references that target a type parameter of a generic method in a method
-   * reference. See {@link #getSort}.
+   * 针对方法引用中泛型方法的类型参数的类型引用 sort。参见 {@link #getSort}。
    */
   public static final int METHOD_REFERENCE_TYPE_ARGUMENT = 0x4B;
 
   /**
-   * The target_type and target_info structures - as defined in the Java Virtual Machine
-   * Specification (JVMS) - corresponding to this type reference. target_type uses one byte, and all
-   * the target_info union fields use up to 3 bytes (except localvar_target, handled with the
-   * specific method {@link MethodVisitor#visitLocalVariableAnnotation}). Thus, both structures can
-   * be stored in an int.
+   * 与此类型引用对应的 target_type 和 target_info 结构 —— 按照 Java 虚拟机规范（JVMS）的定义。
+   * target_type 占用 1 个字节，所有 target_info 联合体字段最多占用 3 个字节（除了 localvar_target，
+   * 它通过特定方法 {@link MethodVisitor#visitLocalVariableAnnotation} 处理）。
+   * 因此，这两个结构可以存储在一个 int 中。
    *
-   * <p>This int field stores target_type (called the TypeReference 'sort' in the public API of this
-   * class) in its most significant byte, followed by the target_info fields. Depending on
-   * target_type, 1, 2 or even 3 least significant bytes of this field are unused. target_info
-   * fields which reference bytecode offsets are set to 0 (these offsets are ignored in ClassReader,
-   * and recomputed in MethodWriter).
+   * <p>该 int 字段在最高有效字节中存储 target_type（在该类的公共 API 中称为 TypeReference 的“sort”），
+   * 后面依次是 target_info 字段。根据 target_type 的不同，该字段最低有效字节中的 1、2 或甚至 3 个字节可能未使用。
+   * 引用字节码偏移量的 target_info 字段会被设置为 0（这些偏移量在 ClassReader 中会被忽略，
+   * 并在 MethodWriter 中重新计算）。
    *
-   * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20">JVMS
-   *     4.7.20</a>
-   * @see <a
-   *     href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.1">JVMS
-   *     4.7.20.1</a>
+   * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20">JVMS 4.7.20</a>
+   * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.1">JVMS 4.7.20.1</a>
    */
   private final int targetTypeAndInfo;
 
   /**
-   * Constructs a new TypeReference.
+   * 构造一个新的 TypeReference。
    *
-   * @param typeRef the int encoded value of the type reference, as received in a visit method
-   *     related to type annotations, such as {@link ClassVisitor#visitTypeAnnotation}.
+   * @param typeRef 类型引用的 int 编码值，在访问与类型注解相关的方法（如 {@link ClassVisitor#visitTypeAnnotation}）时接收。
    */
   public TypeReference(final int typeRef) {
     this.targetTypeAndInfo = typeRef;
   }
 
   /**
-   * Returns a type reference of the given sort.
+   * 返回指定 sort 的类型引用。
    *
-   * @param sort one of {@link #FIELD}, {@link #METHOD_RETURN}, {@link #METHOD_RECEIVER}, {@link
-   *     #LOCAL_VARIABLE}, {@link #RESOURCE_VARIABLE}, {@link #INSTANCEOF}, {@link #NEW}, {@link
-   *     #CONSTRUCTOR_REFERENCE}, or {@link #METHOD_REFERENCE}.
-   * @return a type reference of the given sort.
+   * @param sort 取值可以是 {@link #FIELD}、{@link #METHOD_RETURN}、{@link #METHOD_RECEIVER}、
+   *             {@link #LOCAL_VARIABLE}、{@link #RESOURCE_VARIABLE}、{@link #INSTANCEOF}、
+   *             {@link #NEW}、{@link #CONSTRUCTOR_REFERENCE} 或 {@link #METHOD_REFERENCE}。
+   * @return 指定 sort 的类型引用。
    */
   public static TypeReference newTypeReference(final int sort) {
     return new TypeReference(sort << 24);
   }
 
   /**
-   * Returns a reference to a type parameter of a generic class or method.
+   * 返回对泛型类或方法的某个类型参数的引用。
    *
-   * @param sort one of {@link #CLASS_TYPE_PARAMETER} or {@link #METHOD_TYPE_PARAMETER}.
-   * @param paramIndex the type parameter index.
-   * @return a reference to the given generic class or method type parameter.
+   * @param sort 取值可以是 {@link #CLASS_TYPE_PARAMETER} 或 {@link #METHOD_TYPE_PARAMETER}。
+   * @param paramIndex 类型参数索引。
+   * @return 对指定泛型类或方法类型参数的引用。
    */
   public static TypeReference newTypeParameterReference(final int sort, final int paramIndex) {
     return new TypeReference((sort << 24) | (paramIndex << 16));
   }
 
   /**
-   * Returns a reference to a type parameter bound of a generic class or method.
+   * 返回对泛型类或方法的某个类型参数边界的引用。
    *
-   * @param sort one of {@link #CLASS_TYPE_PARAMETER} or {@link #METHOD_TYPE_PARAMETER}.
-   * @param paramIndex the type parameter index.
-   * @param boundIndex the type bound index within the above type parameters.
-   * @return a reference to the given generic class or method type parameter bound.
+   * @param sort 取值可以是 {@link #CLASS_TYPE_PARAMETER} 或 {@link #METHOD_TYPE_PARAMETER}。
+   * @param paramIndex 类型参数索引。
+   * @param boundIndex 在上述类型参数中的类型边界索引。
+   * @return 对指定泛型类或方法类型参数边界的引用。
    */
   public static TypeReference newTypeParameterBoundReference(
       final int sort, final int paramIndex, final int boundIndex) {
@@ -231,173 +205,161 @@ public class TypeReference {
   }
 
   /**
-   * Returns a reference to the super class or to an interface of the 'implements' clause of a
-   * class.
+   * 返回对超类或类的 implements 子句中接口的引用。
    *
-   * @param itfIndex the index of an interface in the 'implements' clause of a class, or -1 to
-   *     reference the super class of the class.
-   * @return a reference to the given super type of a class.
+   * @param itfIndex 类的 implements 子句中接口的索引，若为 -1 则引用该类的超类。
+   * @return 对指定类的超类型的引用。
    */
   public static TypeReference newSuperTypeReference(final int itfIndex) {
     return new TypeReference((CLASS_EXTENDS << 24) | ((itfIndex & 0xFFFF) << 8));
   }
 
   /**
-   * Returns a reference to the type of a formal parameter of a method.
+   * 返回对方法形参类型的引用。
    *
-   * @param paramIndex the formal parameter index.
-   * @return a reference to the type of the given method formal parameter.
+   * @param paramIndex 方法形参索引。
+   * @return 对指定方法形参类型的引用。
    */
   public static TypeReference newFormalParameterReference(final int paramIndex) {
     return new TypeReference((METHOD_FORMAL_PARAMETER << 24) | (paramIndex << 16));
   }
 
   /**
-   * Returns a reference to the type of an exception, in a 'throws' clause of a method.
+   * 返回对方法'throws'子句中异常类型的引用。
    *
-   * @param exceptionIndex the index of an exception in a 'throws' clause of a method.
-   * @return a reference to the type of the given exception.
+   * @param exceptionIndex 方法'throws'子句中异常的索引。
+   * @return 对给定异常类型的引用。
    */
   public static TypeReference newExceptionReference(final int exceptionIndex) {
     return new TypeReference((THROWS << 24) | (exceptionIndex << 8));
   }
 
   /**
-   * Returns a reference to the type of the exception declared in a 'catch' clause of a method.
+   * 返回对方法'catch'子句中声明的异常类型的引用。
    *
-   * @param tryCatchBlockIndex the index of a try catch block (using the order in which they are
-   *     visited with visitTryCatchBlock).
-   * @return a reference to the type of the given exception.
+   * @param tryCatchBlockIndex try catch块的索引（使用visitTryCatchBlock访问它们的顺序）。
+   * @return 对给定异常类型的引用。
    */
   public static TypeReference newTryCatchReference(final int tryCatchBlockIndex) {
     return new TypeReference((EXCEPTION_PARAMETER << 24) | (tryCatchBlockIndex << 8));
   }
 
   /**
-   * Returns a reference to the type of a type argument in a constructor or method call or
-   * reference.
+   * 返回对构造函数或方法调用或引用中类型参数的类型引用。
    *
-   * @param sort one of {@link #CAST}, {@link #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}, {@link
-   *     #METHOD_INVOCATION_TYPE_ARGUMENT}, {@link #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or {@link
-   *     #METHOD_REFERENCE_TYPE_ARGUMENT}.
-   * @param argIndex the type argument index.
-   * @return a reference to the type of the given type argument.
+   * @param sort {@link #CAST}、{@link #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}、
+   *     {@link #METHOD_INVOCATION_TYPE_ARGUMENT}、{@link #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}
+   *     或{@link #METHOD_REFERENCE_TYPE_ARGUMENT}中的一个。
+   * @param argIndex 类型参数索引。
+   * @return 对给定类型参数的类型引用。
    */
   public static TypeReference newTypeArgumentReference(final int sort, final int argIndex) {
     return new TypeReference((sort << 24) | argIndex);
   }
 
   /**
-   * Returns the sort of this type reference.
+   * 返回此类型引用的排序。
    *
-   * @return one of {@link #CLASS_TYPE_PARAMETER}, {@link #METHOD_TYPE_PARAMETER}, {@link
-   *     #CLASS_EXTENDS}, {@link #CLASS_TYPE_PARAMETER_BOUND}, {@link #METHOD_TYPE_PARAMETER_BOUND},
-   *     {@link #FIELD}, {@link #METHOD_RETURN}, {@link #METHOD_RECEIVER}, {@link
-   *     #METHOD_FORMAL_PARAMETER}, {@link #THROWS}, {@link #LOCAL_VARIABLE}, {@link
-   *     #RESOURCE_VARIABLE}, {@link #EXCEPTION_PARAMETER}, {@link #INSTANCEOF}, {@link #NEW},
-   *     {@link #CONSTRUCTOR_REFERENCE}, {@link #METHOD_REFERENCE}, {@link #CAST}, {@link
-   *     #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}, {@link #METHOD_INVOCATION_TYPE_ARGUMENT}, {@link
-   *     #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or {@link #METHOD_REFERENCE_TYPE_ARGUMENT}.
+   * @return {@link #CLASS_TYPE_PARAMETER}、{@link #METHOD_TYPE_PARAMETER}、{@link #CLASS_EXTENDS}、
+   *     {@link #CLASS_TYPE_PARAMETER_BOUND}、{@link #METHOD_TYPE_PARAMETER_BOUND}、{@link #FIELD}、
+   *     {@link #METHOD_RETURN}、{@link #METHOD_RECEIVER}、{@link #METHOD_FORMAL_PARAMETER}、
+   *     {@link #THROWS}、{@link #LOCAL_VARIABLE}、{@link #RESOURCE_VARIABLE}、
+   *     {@link #EXCEPTION_PARAMETER}、{@link #INSTANCEOF}、{@link #NEW}、
+   *     {@link #CONSTRUCTOR_REFERENCE}、{@link #METHOD_REFERENCE}、{@link #CAST}、
+   *     {@link #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}、{@link #METHOD_INVOCATION_TYPE_ARGUMENT}、
+   *     {@link #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}或{@link #METHOD_REFERENCE_TYPE_ARGUMENT}中的一个。
    */
   public int getSort() {
     return targetTypeAndInfo >>> 24;
   }
 
   /**
-   * Returns the index of the type parameter referenced by this type reference. This method must
-   * only be used for type references whose sort is {@link #CLASS_TYPE_PARAMETER}, {@link
-   * #METHOD_TYPE_PARAMETER}, {@link #CLASS_TYPE_PARAMETER_BOUND} or {@link
-   * #METHOD_TYPE_PARAMETER_BOUND}.
+   * 返回此类型引用所引用的类型参数的索引。此方法只能用于排序为{@link #CLASS_TYPE_PARAMETER}、
+   * {@link #METHOD_TYPE_PARAMETER}、{@link #CLASS_TYPE_PARAMETER_BOUND}或
+   * {@link #METHOD_TYPE_PARAMETER_BOUND}的类型引用。
    *
-   * @return a type parameter index.
+   * @return 类型参数索引。
    */
   public int getTypeParameterIndex() {
     return (targetTypeAndInfo & 0x00FF0000) >> 16;
   }
 
   /**
-   * Returns the index of the type parameter bound, within the type parameter {@link
-   * #getTypeParameterIndex}, referenced by this type reference. This method must only be used for
-   * type references whose sort is {@link #CLASS_TYPE_PARAMETER_BOUND} or {@link
-   * #METHOD_TYPE_PARAMETER_BOUND}.
+   * 返回类型参数绑定的索引，该绑定在此类型引用所引用的类型参数{@link #getTypeParameterIndex}内。
+   * 此方法只能用于排序为{@link #CLASS_TYPE_PARAMETER_BOUND}或{@link #METHOD_TYPE_PARAMETER_BOUND}的类型引用。
    *
-   * @return a type parameter bound index.
+   * @return 类型参数绑定索引。
    */
   public int getTypeParameterBoundIndex() {
     return (targetTypeAndInfo & 0x0000FF00) >> 8;
   }
 
   /**
-   * Returns the index of the "super type" of a class that is referenced by this type reference.
-   * This method must only be used for type references whose sort is {@link #CLASS_EXTENDS}.
+   * 返回此类型引用所引用的类的"超类型"的索引。
+   * 此方法只能用于排序为{@link #CLASS_EXTENDS}的类型引用。
    *
-   * @return the index of an interface in the 'implements' clause of a class, or -1 if this type
-   *     reference references the type of the super class.
+   * @return 类的'implements'子句中接口的索引，如果此类型引用引用超类的类型，则返回-1。
    */
   public int getSuperTypeIndex() {
     return (short) ((targetTypeAndInfo & 0x00FFFF00) >> 8);
   }
 
   /**
-   * Returns the index of the formal parameter whose type is referenced by this type reference. This
-   * method must only be used for type references whose sort is {@link #METHOD_FORMAL_PARAMETER}.
+   * 返回此类型引用所引用的形式参数的索引。此方法只能用于排序为
+   * {@link #METHOD_FORMAL_PARAMETER}的类型引用。
    *
-   * @return a formal parameter index.
+   * @return 形式参数索引。
    */
   public int getFormalParameterIndex() {
     return (targetTypeAndInfo & 0x00FF0000) >> 16;
   }
 
   /**
-   * Returns the index of the exception, in a 'throws' clause of a method, whose type is referenced
-   * by this type reference. This method must only be used for type references whose sort is {@link
-   * #THROWS}.
+   * 返回方法'throws'子句中异常的索引，该异常的类型由此类型引用所引用。
+   * 此方法只能用于排序为{@link #THROWS}的类型引用。
    *
-   * @return the index of an exception in the 'throws' clause of a method.
+   * @return 方法'throws'子句中异常的索引。
    */
   public int getExceptionIndex() {
     return (targetTypeAndInfo & 0x00FFFF00) >> 8;
   }
 
   /**
-   * Returns the index of the try catch block (using the order in which they are visited with
-   * visitTryCatchBlock), whose 'catch' type is referenced by this type reference. This method must
-   * only be used for type references whose sort is {@link #EXCEPTION_PARAMETER} .
+   * 返回try catch块的索引（使用visitTryCatchBlock访问它们的顺序），其'catch'类型由此类型引用所引用。
+   * 此方法只能用于排序为{@link #EXCEPTION_PARAMETER}的类型引用。
    *
-   * @return the index of an exception in the 'throws' clause of a method.
+   * @return 方法'throws'子句中异常的索引。
    */
   public int getTryCatchBlockIndex() {
     return (targetTypeAndInfo & 0x00FFFF00) >> 8;
   }
 
   /**
-   * Returns the index of the type argument referenced by this type reference. This method must only
-   * be used for type references whose sort is {@link #CAST}, {@link
-   * #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}, {@link #METHOD_INVOCATION_TYPE_ARGUMENT}, {@link
-   * #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or {@link #METHOD_REFERENCE_TYPE_ARGUMENT}.
+   * 返回此类型引用所引用的类型参数的索引。此方法只能用于排序为{@link #CAST}、
+   * {@link #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}、{@link #METHOD_INVOCATION_TYPE_ARGUMENT}、
+   * {@link #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}或{@link #METHOD_REFERENCE_TYPE_ARGUMENT}的类型引用。
    *
-   * @return a type parameter index.
+   * @return 类型参数索引。
    */
   public int getTypeArgumentIndex() {
     return targetTypeAndInfo & 0xFF;
   }
 
   /**
-   * Returns the int encoded value of this type reference, suitable for use in visit methods related
-   * to type annotations, like visitTypeAnnotation.
+   * 返回此类型引用的int编码值，适合在与类型注解相关的访问方法中使用，如visitTypeAnnotation。
    *
-   * @return the int encoded value of this type reference.
+   * @return 此类型引用的int编码值。
    */
   public int getValue() {
     return targetTypeAndInfo;
   }
 
   /**
-   * Puts the given target_type and target_info JVMS structures into the given ByteVector.
+   * 将给定的target_type和target_info JVMS结构放入给定的ByteVector中。
    *
-   * @param targetTypeAndInfo a target_type and a target_info structures encoded as in {@link
-   *     #targetTypeAndInfo}. LOCAL_VARIABLE and RESOURCE_VARIABLE target types are not supported.
-   * @param output where the type reference must be put.
+   * @param targetTypeAndInfo 按照{@link #targetTypeAndInfo}编码的target_type和target_info结构。
+   *     不支持LOCAL_VARIABLE和RESOURCE_VARIABLE目标类型。
+   * @param output 必须放入类型引用的地方。
    */
   static void putTarget(final int targetTypeAndInfo, final ByteVector output) {
     switch (targetTypeAndInfo >>> 24) {

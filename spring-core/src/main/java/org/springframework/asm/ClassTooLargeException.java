@@ -28,8 +28,7 @@
 package org.springframework.asm;
 
 /**
- * Exception thrown when the constant pool of a class produced by a {@link ClassWriter} is too
- * large.
+ * 当{@link ClassWriter}生成的类的常量池过大时抛出的异常。
  *
  * @author Jason Zaugg
  */
@@ -40,10 +39,10 @@ public final class ClassTooLargeException extends IndexOutOfBoundsException {
   private final int constantPoolCount;
 
   /**
-   * Constructs a new {@link ClassTooLargeException}.
+   * 构造一个新的{@link ClassTooLargeException}。
    *
-   * @param className the internal name of the class.
-   * @param constantPoolCount the number of constant pool items of the class.
+   * @param className 类的内部名称。
+   * @param constantPoolCount 类的常量池项数量。
    */
   public ClassTooLargeException(final String className, final int constantPoolCount) {
     super("Class too large: " + className);
@@ -52,18 +51,18 @@ public final class ClassTooLargeException extends IndexOutOfBoundsException {
   }
 
   /**
-   * Returns the internal name of the class.
+   * 返回类的内部名称。
    *
-   * @return the internal name of the class.
+   * @return 类的内部名称。
    */
   public String getClassName() {
     return className;
   }
 
   /**
-   * Returns the number of constant pool items of the class.
+   * 返回类的常量池项数量。
    *
-   * @return the number of constant pool items of the class.
+   * @return 类的常量池项数量。
    */
   public int getConstantPoolCount() {
     return constantPoolCount;

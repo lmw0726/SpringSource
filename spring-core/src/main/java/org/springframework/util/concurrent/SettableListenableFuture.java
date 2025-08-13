@@ -16,26 +16,22 @@
 
 package org.springframework.util.concurrent;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.concurrent.*;
+
 /**
- * A {@link ListenableFuture} whose value can be set via {@link #set(Object)}
- * or {@link #setException(Throwable)}. It may also get cancelled.
+ * 一个可通过{@link #set(Object)}或{@link #setException(Throwable)}设置值的
+ * {@link ListenableFuture}。它也可以被取消。
  *
- * <p>Inspired by {@code com.google.common.util.concurrent.SettableFuture}.
+ * <p>灵感来自{@code com.google.common.util.concurrent.SettableFuture}。
  *
  * @author Mattias Severson
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
  * @since 4.1
- * @param <T> the result type returned by this Future's {@code get} method
+ * @param <T> 此Future的{@code get}方法返回的结果类型
  */
 public class SettableListenableFuture<T> implements ListenableFuture<T> {
 
@@ -48,22 +44,21 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 
 
 	/**
-	 * Set the value of this future. This method will return {@code true} if the
-	 * value was set successfully, or {@code false} if the future has already been
-	 * set or cancelled.
-	 * @param value the value that will be set
-	 * @return {@code true} if the value was successfully set, else {@code false}
+	 * 设置此future的值。如果值设置成功则返回{@code true}，
+	 * 如果future已被设置或取消则返回{@code false}。
+	 * @param value 要设置的值
+	 * @return 如果值设置成功返回{@code true}，否则返回{@code false}
 	 */
 	public boolean set(@Nullable T value) {
 		return this.settableTask.setResultValue(value);
 	}
 
 	/**
-	 * Set the exception of this future. This method will return {@code true} if the
-	 * exception was set successfully, or {@code false} if the future has already been
-	 * set or cancelled.
-	 * @param exception the value that will be set
-	 * @return {@code true} if the exception was successfully set, else {@code false}
+	 * 设置此future的异常。如果异常设置成功则返回{@code true}，
+	 * 如果future已被设置或取消则返回{@code false}。
+	 * @param exception 要设置的异常
+	 * @return 如果异常设置成功返回{@code true}，否则返回{@code false}
+	 * @throws IllegalArgumentException 如果异常参数为null
 	 */
 	public boolean setException(Throwable exception) {
 		Assert.notNull(exception, "Exception must not be null");
@@ -107,12 +102,13 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 	}
 
 	/**
-	 * Retrieve the value.
-	 * <p>This method returns the value if it has been set via {@link #set(Object)},
-	 * throws an {@link java.util.concurrent.ExecutionException} if an exception has
-	 * been set via {@link #setException(Throwable)}, or throws a
-	 * {@link java.util.concurrent.CancellationException} if the future has been cancelled.
-	 * @return the value associated with this future
+	 * 获取结果值。
+	 * <p>如果值已通过{@link #set(Object)}设置，则返回该值；
+	 * 如果已通过{@link #setException(Throwable)}设置异常，则抛出
+	 * {@link java.util.concurrent.ExecutionException}；
+	 * 如果future已被取消，则抛出
+	 * {@link java.util.concurrent.CancellationException}。
+	 * @return 与此future关联的值
 	 */
 	@Override
 	public T get() throws InterruptedException, ExecutionException {
@@ -120,14 +116,15 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 	}
 
 	/**
-	 * Retrieve the value.
-	 * <p>This method returns the value if it has been set via {@link #set(Object)},
-	 * throws an {@link java.util.concurrent.ExecutionException} if an exception has
-	 * been set via {@link #setException(Throwable)}, or throws a
-	 * {@link java.util.concurrent.CancellationException} if the future has been cancelled.
-	 * @param timeout the maximum time to wait
-	 * @param unit the unit of the timeout argument
-	 * @return the value associated with this future
+	 * 获取结果值。
+	 * <p>如果值已通过{@link #set(Object)}设置，则返回该值；
+	 * 如果已通过{@link #setException(Throwable)}设置异常，则抛出
+	 * {@link java.util.concurrent.ExecutionException}；
+	 * 如果future已被取消，则抛出
+	 * {@link java.util.concurrent.CancellationException}。
+	 * @param timeout 最大等待时间
+	 * @param unit 时间单位
+	 * @return 与此future关联的值
 	 */
 	@Override
 	public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
@@ -135,10 +132,9 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 	}
 
 	/**
-	 * Subclasses can override this method to implement interruption of the future's
-	 * computation. The method is invoked automatically by a successful call to
-	 * {@link #cancel(boolean) cancel(true)}.
-	 * <p>The default implementation is empty.
+	 * 子类可以重写此方法以实现future计算的中断。
+	 * 此方法会在成功调用{@link #cancel(boolean) cancel(true)}时自动调用。
+	 * <p>默认实现为空。
 	 */
 	protected void interruptTask() {
 	}
@@ -167,9 +163,9 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 		@Override
 		protected void done() {
 			if (!isCancelled()) {
-				// Implicitly invoked by set/setException: store current thread for
-				// determining whether the given result has actually triggered completion
-				// (since FutureTask.set/setException unfortunately don't expose that)
+				// 由set/setException隐式调用：存储当前线程用于判断
+				// 给定的结果是否实际触发了完成状态（因为FutureTask.set/setException
+				// 不幸地没有暴露这个信息）
 				this.completingThread = Thread.currentThread();
 			}
 			super.done();
@@ -178,7 +174,7 @@ public class SettableListenableFuture<T> implements ListenableFuture<T> {
 		private boolean checkCompletingThread() {
 			boolean check = (this.completingThread == Thread.currentThread());
 			if (check) {
-				this.completingThread = null;  // only first match actually counts
+				this.completingThread = null;  // 只有第一个匹配项才是真正的计数
 			}
 			return check;
 		}

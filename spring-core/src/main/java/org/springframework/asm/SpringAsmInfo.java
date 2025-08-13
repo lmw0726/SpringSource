@@ -17,11 +17,11 @@
 package org.springframework.asm;
 
 /**
- * Utility class exposing constants related to Spring's internal repackaging
- * of the ASM bytecode library: currently based on ASM 9.x plus minor patches.
+ * 工具类，暴露与Spring内部重新打包的ASM字节码库相关的常量：
+ * 目前基于ASM 9.x版本加上少量补丁。
  *
- * <p>See <a href="package-summary.html">package-level javadocs</a> for more
- * information on {@code org.springframework.asm}.
+ * <p>有关{@code org.springframework.asm}的更多信息，
+ * 请参见<a href="package-summary.html">包级别javadocs</a>。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -30,8 +30,8 @@ package org.springframework.asm;
 public final class SpringAsmInfo {
 
 	/**
-	 * The ASM compatibility version for Spring's ASM visitor implementations:
-	 * currently {@link Opcodes#ASM10_EXPERIMENTAL}, as of Spring Framework 5.3.
+	 * Spring的ASM访问者实现的ASM兼容性版本：
+	 * 从Spring Framework 5.3开始，当前为{@link Opcodes#ASM10_EXPERIMENTAL}。
 	 */
 	public static final int ASM_VERSION = Opcodes.ASM10_EXPERIMENTAL;
 

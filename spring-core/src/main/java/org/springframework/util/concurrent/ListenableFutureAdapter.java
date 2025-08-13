@@ -16,27 +16,27 @@
 
 package org.springframework.util.concurrent;
 
-import java.util.concurrent.ExecutionException;
-
 import org.springframework.lang.Nullable;
 
+import java.util.concurrent.ExecutionException;
+
 /**
- * Abstract class that adapts a {@link ListenableFuture} parameterized over S into a
- * {@code ListenableFuture} parameterized over T. All methods are delegated to the
- * adaptee, where {@link #get()}, {@link #get(long, java.util.concurrent.TimeUnit)},
- * and {@link ListenableFutureCallback#onSuccess(Object)} call {@link #adapt(Object)}
- * on the adaptee's result.
+ * 抽象适配器类，将参数化为S类型的{@link ListenableFuture}适配为参数化为T类型的
+ * {@code ListenableFuture}。所有方法都委托给adaptee，其中{@link #get()}、
+ * {@link #get(long, java.util.concurrent.TimeUnit)}和
+ * {@link ListenableFutureCallback#onSuccess(Object)}会调用{@link #adapt(Object)}
+ * 方法来处理adaptee的结果。
  *
  * @author Arjen Poutsma
  * @since 4.0
- * @param <T> the type of this {@code Future}
- * @param <S> the type of the adaptee's {@code Future}
+ * @param <T> 此{@code Future}的类型参数
+ * @param <S> adaptee的{@code Future}的类型参数
  */
 public abstract class ListenableFutureAdapter<T, S> extends FutureAdapter<T, S> implements ListenableFuture<T> {
 
 	/**
-	 * Construct a new {@code ListenableFutureAdapter} with the given adaptee.
-	 * @param adaptee the future to adapt to
+	 * 使用给定的adaptee构造新的{@code ListenableFutureAdapter}。
+	 * @param adaptee 要适配的future
 	 */
 	protected ListenableFutureAdapter(ListenableFuture<S> adaptee) {
 		super(adaptee);

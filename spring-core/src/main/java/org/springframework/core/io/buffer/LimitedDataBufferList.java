@@ -16,26 +16,23 @@
 
 package org.springframework.core.io.buffer;
 
+import reactor.core.publisher.Flux;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import reactor.core.publisher.Flux;
-
 /**
- * Custom {@link List} to collect data buffers with and enforce a
- * limit on the total number of bytes buffered. For use with "collect" or
- * other buffering operators in declarative APIs, e.g. {@link Flux}.
+ * 自定义的 {@link List}，用于收集数据缓冲区，并对缓冲的总字节数强制限制。
+ * 适用于声明式 API 中的“collect”或其他缓冲操作符，例如 {@link Flux}。
  *
- * <p>Adding elements increases the byte count and if the limit is exceeded,
- * {@link DataBufferLimitException} is raised.  {@link #clear()} resets the
- * count. Remove and set are not supported.
+ * <p>添加元素会增加字节计数，如果超过限制，将抛出 {@link DataBufferLimitException}。
+ * 调用 {@link #clear()} 会重置计数。不支持 remove 和 set 操作。
  *
- * <p><strong>Note:</strong> This class does not automatically release the
- * buffers it contains. It is usually preferable to use hooks such as
- * {@link Flux#doOnDiscard} that also take care of cancel and error signals,
- * or otherwise {@link #releaseAndClear()} can be used.
+ * <p><strong>注意：</strong>该类不会自动释放其包含的缓冲区。
+ * 通常建议使用诸如 {@link Flux#doOnDiscard} 之类的钩子，这些钩子也能处理取消和错误信号，
+ * 或者可以使用 {@link #releaseAndClear()} 方法。
  *
  * @author Rossen Stoyanchev
  * @since 5.1.11
@@ -95,7 +92,7 @@ public class LimitedDataBufferList extends ArrayList<DataBuffer> {
 	}
 
 	private void raiseLimitException() {
-		// Do not release here, it's likely down via doOnDiscard..
+		// 这里不要释放，通常会通过 doOnDiscard 进行释放……
 		throw new DataBufferLimitException(
 				"Exceeded limit on max bytes to buffer : " + this.maxByteCount);
 	}
@@ -137,8 +134,8 @@ public class LimitedDataBufferList extends ArrayList<DataBuffer> {
 	}
 
 	/**
-	 * Shortcut to {@link DataBufferUtils#release release} all data buffers and
-	 * then {@link #clear()}.
+	 * 快捷方法，释放所有数据缓冲区（调用 {@link DataBufferUtils#release release}），
+	 * 然后执行 {@link #clear()} 清空操作。
 	 */
 	public void releaseAndClear() {
 		forEach(buf -> {
@@ -146,7 +143,7 @@ public class LimitedDataBufferList extends ArrayList<DataBuffer> {
 				DataBufferUtils.release(buf);
 			}
 			catch (Throwable ex) {
-				// Keep going..
+				// 继续执行，忽略异常
 			}
 		});
 		clear();

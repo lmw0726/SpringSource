@@ -16,13 +16,13 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.TimeZone;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.StringUtils;
 
+import java.util.TimeZone;
+
 /**
- * Convert a String to a {@link TimeZone}.
+ * 将字符串转换为 {@link TimeZone}。
  *
  * @author Stephane Nicoll
  * @since 4.2

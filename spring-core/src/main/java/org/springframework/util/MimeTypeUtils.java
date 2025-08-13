@@ -16,24 +16,16 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Miscellaneous {@link MimeType} utility methods.
+ * 各种 {@link MimeType} 的工具方法。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -51,120 +43,122 @@ public abstract class MimeTypeUtils {
 					'V', 'W', 'X', 'Y', 'Z'};
 
 	/**
-	 * Comparator used by {@link #sortBySpecificity(List)}.
+	 * {@link #sortBySpecificity(List)} 使用的比较器。
 	 */
 	public static final Comparator<MimeType> SPECIFICITY_COMPARATOR = new MimeType.SpecificityComparator<>();
 
 	/**
-	 * Public constant mime type that includes all media ranges (i.e. "&#42;/&#42;").
+	 * 表示所有媒体类型（即  "&#42;/&#42;"）的公共 MIME 类型常量。
 	 */
 	public static final MimeType ALL;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#ALL}.
+	 * {@link MimeTypeUtils#ALL} 的字符串形式。
 	 */
 	public static final String ALL_VALUE = "*/*";
 
 	/**
-	 * Public constant mime type for {@code application/graphql+json}.
+	 * {@code application/graphql+json} 的公共 MIME 类型常量。
+	 *
 	 * @since 5.3.19
-	 * @see <a href="https://github.com/graphql/graphql-over-http">GraphQL over HTTP spec</a>
+	 * @see <a href="https://github.com/graphql/graphql-over-http">GraphQL over HTTP 规范</a>
 	 */
 	public static final MimeType APPLICATION_GRAPHQL;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#APPLICATION_GRAPHQL}.
+	 * {@link MimeTypeUtils#APPLICATION_GRAPHQL} 的字符串形式。
+	 *
 	 * @since 5.3.19
 	 */
 	public static final String APPLICATION_GRAPHQL_VALUE = "application/graphql+json";
 
 	/**
-	 * Public constant mime type for {@code application/json}.
+	 * {@code application/json} 的公共 MIME 类型常量。
 	 */
 	public static final MimeType APPLICATION_JSON;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#APPLICATION_JSON}.
+	 * {@link MimeTypeUtils#APPLICATION_JSON} 的字符串形式。
 	 */
 	public static final String APPLICATION_JSON_VALUE = "application/json";
 
 	/**
-	 * Public constant mime type for {@code application/octet-stream}.
-	 *  */
+	 * {@code application/octet-stream} 的公共 MIME 类型常量。
+	 */
 	public static final MimeType APPLICATION_OCTET_STREAM;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#APPLICATION_OCTET_STREAM}.
+	 * {@link MimeTypeUtils#APPLICATION_OCTET_STREAM} 的字符串形式。
 	 */
 	public static final String APPLICATION_OCTET_STREAM_VALUE = "application/octet-stream";
 
 	/**
-	 * Public constant mime type for {@code application/xml}.
+	 * {@code application/xml} 的公共 MIME 类型常量。
 	 */
 	public static final MimeType APPLICATION_XML;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#APPLICATION_XML}.
+	 * 字符串形式的 {@link MimeTypeUtils#APPLICATION_XML} 常量。
 	 */
 	public static final String APPLICATION_XML_VALUE = "application/xml";
 
 	/**
-	 * Public constant mime type for {@code image/gif}.
+	 * {@code image/gif} 的公共 MIME 类型常量。
 	 */
 	public static final MimeType IMAGE_GIF;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#IMAGE_GIF}.
+	 * 字符串形式的 {@link MimeTypeUtils#IMAGE_GIF} 常量。
 	 */
 	public static final String IMAGE_GIF_VALUE = "image/gif";
 
 	/**
-	 * Public constant mime type for {@code image/jpeg}.
+	 * {@code image/jpeg} 的公共 MIME 类型常量。
 	 */
 	public static final MimeType IMAGE_JPEG;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#IMAGE_JPEG}.
+	 * 字符串形式的 {@link MimeTypeUtils#IMAGE_JPEG} 常量。
 	 */
 	public static final String IMAGE_JPEG_VALUE = "image/jpeg";
 
 	/**
-	 * Public constant mime type for {@code image/png}.
+	 * {@code image/png} 的公共 MIME 类型常量。
 	 */
 	public static final MimeType IMAGE_PNG;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#IMAGE_PNG}.
+	 * 字符串形式的 {@link MimeTypeUtils#IMAGE_PNG} 常量。
 	 */
 	public static final String IMAGE_PNG_VALUE = "image/png";
 
 	/**
-	 * Public constant mime type for {@code text/html}.
-	 *  */
+	 * {@code text/html} 的公共 MIME 类型常量。
+	 */
 	public static final MimeType TEXT_HTML;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#TEXT_HTML}.
+	 * 字符串形式的 {@link MimeTypeUtils#TEXT_HTML} 常量。
 	 */
 	public static final String TEXT_HTML_VALUE = "text/html";
 
 	/**
-	 * Public constant mime type for {@code text/plain}.
-	 *  */
+	 * {@code text/plain} 的公共 MIME 类型常量。
+	 */
 	public static final MimeType TEXT_PLAIN;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#TEXT_PLAIN}.
+	 * 字符串形式的 {@link MimeTypeUtils#TEXT_PLAIN} 常量。
 	 */
 	public static final String TEXT_PLAIN_VALUE = "text/plain";
 
 	/**
-	 * Public constant mime type for {@code text/xml}.
-	 *  */
+	 * {@code text/xml} 的公共 MIME 类型常量。
+	 */
 	public static final MimeType TEXT_XML;
 
 	/**
-	 * A String equivalent of {@link MimeTypeUtils#TEXT_XML}.
+	 * 字符串形式的 {@link MimeTypeUtils#TEXT_XML} 常量。
 	 */
 	public static final String TEXT_XML_VALUE = "text/xml";
 
@@ -176,7 +170,7 @@ public abstract class MimeTypeUtils {
 	private static volatile Random random;
 
 	static {
-		// Not using "parseMimeType" to avoid static init cost
+		// 不使用 "parseMimeType" 是为了避免静态初始化开销
 		ALL = new MimeType("*", "*");
 		APPLICATION_GRAPHQL = new MimeType("application", "graphql+json");
 		APPLICATION_JSON = new MimeType("application", "json");
@@ -192,17 +186,18 @@ public abstract class MimeTypeUtils {
 
 
 	/**
-	 * Parse the given String into a single {@code MimeType}.
-	 * Recently parsed {@code MimeType} are cached for further retrieval.
-	 * @param mimeType the string to parse
-	 * @return the mime type
-	 * @throws InvalidMimeTypeException if the string cannot be parsed
+	 * 将给定的字符串解析为单个 {@code MimeType}。
+	 * 最近解析的 {@code MimeType} 会被缓存以供后续使用。
+	 *
+	 * @param mimeType 要解析的字符串
+	 * @return 解析得到的 MIME 类型对象
+	 * @throws InvalidMimeTypeException 如果字符串无法被正确解析
 	 */
 	public static MimeType parseMimeType(String mimeType) {
 		if (!StringUtils.hasLength(mimeType)) {
 			throw new InvalidMimeTypeException(mimeType, "'mimeType' must not be empty");
 		}
-		// do not cache multipart mime types with random boundaries
+		// 不缓存包含随机边界的 multipart MIME 类型
 		if (mimeType.startsWith("multipart")) {
 			return parseMimeTypeInternal(mimeType);
 		}
@@ -216,7 +211,7 @@ public abstract class MimeTypeUtils {
 			throw new InvalidMimeTypeException(mimeType, "'mimeType' must not be empty");
 		}
 
-		// java.net.HttpURLConnection returns a *; q=.2 Accept header
+		// java.net.HttpURLConnection 返回 a *; q=.2 接受标头
 		if (MimeType.WILDCARD_TYPE.equals(fullType)) {
 			fullType = "*/*";
 		}
@@ -277,10 +272,11 @@ public abstract class MimeTypeUtils {
 	}
 
 	/**
-	 * Parse the comma-separated string into a list of {@code MimeType} objects.
-	 * @param mimeTypes the string to parse
-	 * @return the list of mime types
-	 * @throws InvalidMimeTypeException if the string cannot be parsed
+	 * 将以逗号分隔的字符串解析为 {@code MimeType} 对象列表。
+	 *
+	 * @param mimeTypes 要解析的字符串
+	 * @return MIME 类型列表
+	 * @throws InvalidMimeTypeException 如果字符串无法解析为有效的 MIME 类型
 	 */
 	public static List<MimeType> parseMimeTypes(String mimeTypes) {
 		if (!StringUtils.hasLength(mimeTypes)) {
@@ -293,11 +289,11 @@ public abstract class MimeTypeUtils {
 	}
 
 	/**
-	 * Tokenize the given comma-separated string of {@code MimeType} objects
-	 * into a {@code List<String>}. Unlike simple tokenization by ",", this
-	 * method takes into account quoted parameters.
-	 * @param mimeTypes the string to tokenize
-	 * @return the list of tokens
+	 * 将以逗号分隔的 {@code MimeType} 字符串拆分为 {@code List<String>}。
+	 * 与直接使用 "," 分隔不同，此方法会考虑带引号的参数。
+	 *
+	 * @param mimeTypes 要分词的字符串
+	 * @return 拆分后的字符串列表
 	 * @since 5.1.3
 	 */
 	public static List<String> tokenize(String mimeTypes) {
@@ -330,10 +326,11 @@ public abstract class MimeTypeUtils {
 	}
 
 	/**
-	 * Return a string representation of the given list of {@code MimeType} objects.
-	 * @param mimeTypes the string to parse
-	 * @return the list of mime types
-	 * @throws IllegalArgumentException if the String cannot be parsed
+	 * 返回指定 {@code MimeType} 对象列表的字符串表示形式。
+	 *
+	 * @param mimeTypes 要格式化为字符串的 MIME 类型集合
+	 * @return 拼接后的字符串
+	 * @throws IllegalArgumentException 如果 MIME 类型集合无法转换为字符串
 	 */
 	public static String toString(Collection<? extends MimeType> mimeTypes) {
 		StringBuilder builder = new StringBuilder();
@@ -348,28 +345,26 @@ public abstract class MimeTypeUtils {
 	}
 
 	/**
-	 * Sorts the given list of {@code MimeType} objects by specificity.
-	 * <p>Given two mime types:
+	 * 按特异性对给定的 {@code MimeType} 列表进行排序。
+	 * <p>对于两个 MIME 类型，排序规则如下：
 	 * <ol>
-	 * <li>if either mime type has a {@linkplain MimeType#isWildcardType() wildcard type},
-	 * then the mime type without the wildcard is ordered before the other.</li>
-	 * <li>if the two mime types have different {@linkplain MimeType#getType() types},
-	 * then they are considered equal and remain their current order.</li>
-	 * <li>if either mime type has a {@linkplain MimeType#isWildcardSubtype() wildcard subtype}
-	 * , then the mime type without the wildcard is sorted before the other.</li>
-	 * <li>if the two mime types have different {@linkplain MimeType#getSubtype() subtypes},
-	 * then they are considered equal and remain their current order.</li>
-	 * <li>if the two mime types have a different amount of
-	 * {@linkplain MimeType#getParameter(String) parameters}, then the mime type with the most
-	 * parameters is ordered before the other.</li>
+	 * <li>如果其中一个 MIME 类型是 {@linkplain MimeType#isWildcardType() 通配主类型}，
+	 * 那么非通配类型排在前面。</li>
+	 * <li>如果两个 MIME 类型具有不同的 {@linkplain MimeType#getType() 主类型}，
+	 * 则视为相等，保持原有顺序。</li>
+	 * <li>如果其中一个 MIME 类型是 {@linkplain MimeType#isWildcardSubtype() 通配子类型}，
+	 * 那么非通配类型排在前面。</li>
+	 * <li>如果两个 MIME 类型具有不同的 {@linkplain MimeType#getSubtype() 子类型}，
+	 * 则视为相等，保持原有顺序。</li>
+	 * <li>如果两个 MIME 类型具有不同数量的 {@linkplain MimeType#getParameter(String) 参数}，
+	 * 则参数数量较多的排在前面。</li>
 	 * </ol>
-	 * <p>For example: <blockquote>audio/basic &lt; audio/* &lt; *&#047;*</blockquote>
+	 * <p>例如： <blockquote>audio/basic &lt; audio/* &lt; *&#047;*</blockquote>
 	 * <blockquote>audio/basic;level=1 &lt; audio/basic</blockquote>
 	 * <blockquote>audio/basic == text/html</blockquote> <blockquote>audio/basic ==
 	 * audio/wave</blockquote>
-	 * @param mimeTypes the list of mime types to be sorted
-	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">HTTP 1.1: Semantics
-	 * and Content, section 5.3.2</a>
+	 * @param mimeTypes 要排序的 MIME 类型列表
+	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">HTTP 1.1: 语义与内容，第 5.3.2 节</a>
 	 */
 	public static void sortBySpecificity(List<MimeType> mimeTypes) {
 		Assert.notNull(mimeTypes, "'mimeTypes' must not be null");
@@ -380,7 +375,7 @@ public abstract class MimeTypeUtils {
 
 
 	/**
-	 * Lazily initialize the {@link SecureRandom} for {@link #generateMultipartBoundary()}.
+	 * 延迟初始化 {@link #generateMultipartBoundary()} 所使用的 {@link SecureRandom} 实例。
 	 */
 	private static Random initRandom() {
 		Random randomToUse = random;
@@ -397,7 +392,7 @@ public abstract class MimeTypeUtils {
 	}
 
 	/**
-	 * Generate a random MIME boundary as bytes, often used in multipart mime types.
+	 * 生成一个随机的 MIME 边界（byte 数组），常用于 multipart MIME 类型中。
 	 */
 	public static byte[] generateMultipartBoundary() {
 		Random randomToUse = initRandom();
@@ -409,7 +404,7 @@ public abstract class MimeTypeUtils {
 	}
 
 	/**
-	 * Generate a random MIME boundary as String, often used in multipart mime types.
+	 * 生成一个随机的 MIME 边界（字符串形式），常用于 multipart MIME 类型中。
 	 */
 	public static String generateMultipartBoundaryString() {
 		return new String(generateMultipartBoundary(), StandardCharsets.US_ASCII);

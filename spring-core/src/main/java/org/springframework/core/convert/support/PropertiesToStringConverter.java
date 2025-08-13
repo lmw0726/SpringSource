@@ -16,15 +16,15 @@
 
 package org.springframework.core.convert.support;
 
+import org.springframework.core.convert.converter.Converter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.springframework.core.convert.converter.Converter;
-
 /**
- * Converts from a Properties to a String by calling {@link Properties#store(java.io.OutputStream, String)}.
- * Decodes with the ISO-8859-1 charset before returning the String.
+ * 将 Properties 对象转换为字符串，通过调用 {@link Properties#store(java.io.OutputStream, String)} 方法实现。
+ * 在返回字符串之前，使用 ISO-8859-1 字符集进行解码。
  *
  * @author Keith Donald
  * @since 3.0
@@ -39,7 +39,7 @@ final class PropertiesToStringConverter implements Converter<Properties, String>
 			return os.toString("ISO-8859-1");
 		}
 		catch (IOException ex) {
-			// Should never happen.
+			// 不应该发生
 			throw new IllegalArgumentException("Failed to store [" + source + "] into String", ex);
 		}
 	}

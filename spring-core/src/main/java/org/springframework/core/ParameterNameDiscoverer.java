@@ -16,18 +16,17 @@
 
 package org.springframework.core;
 
+import org.springframework.lang.Nullable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Interface to discover parameter names for methods and constructors.
+ * 用于发现方法和构造函数参数名的接口。
  *
- * <p>Parameter name discovery is not always possible, but various strategies are
- * available to try, such as looking for debug information that may have been
- * emitted at compile time, and looking for argname annotation values optionally
- * accompanying AspectJ annotated methods.
+ * <p>参数名发现并不总是可能，但有多种策略可尝试，
+ * 例如查找编译时可能生成的调试信息，以及查找
+ * 附带 AspectJ 注解方法的 argname 注解值。
  *
  * @author Rod Johnson
  * @author Adrian Colyer
@@ -36,25 +35,21 @@ import org.springframework.lang.Nullable;
 public interface ParameterNameDiscoverer {
 
 	/**
-	 * Return parameter names for a method, or {@code null} if they cannot be determined.
-	 * <p>Individual entries in the array may be {@code null} if parameter names are only
-	 * available for some parameters of the given method but not for others. However,
-	 * it is recommended to use stub parameter names instead wherever feasible.
-	 * @param method the method to find parameter names for
-	 * @return an array of parameter names if the names can be resolved,
-	 * or {@code null} if they cannot
+	 * 返回方法的参数名，如果无法确定则返回 {@code null}。
+	 * <p>数组中的单个条目可能为 {@code null}，如果只对某些参数可用参数名而对其他不可用。
+	 * 但建议尽可能使用占位参数名。
+	 * @param method 需要查找参数名的方法
+	 * @return 参数名数组（如果能解析到），否则 {@code null}
 	 */
 	@Nullable
 	String[] getParameterNames(Method method);
 
 	/**
-	 * Return parameter names for a constructor, or {@code null} if they cannot be determined.
-	 * <p>Individual entries in the array may be {@code null} if parameter names are only
-	 * available for some parameters of the given constructor but not for others. However,
-	 * it is recommended to use stub parameter names instead wherever feasible.
-	 * @param ctor the constructor to find parameter names for
-	 * @return an array of parameter names if the names can be resolved,
-	 * or {@code null} if they cannot
+	 * 返回构造函数的参数名，如果无法确定则返回 {@code null}。
+	 * <p>数组中的单个条目可能为 {@code null}，如果只对某些参数可用参数名而对其他不可用。
+	 * 但建议尽可能使用占位参数名。
+	 * @param ctor 需要查找参数名的构造函数
+	 * @return 参数名数组（如果能解析到），否则 {@code null}
 	 */
 	@Nullable
 	String[] getParameterNames(Constructor<?> ctor);

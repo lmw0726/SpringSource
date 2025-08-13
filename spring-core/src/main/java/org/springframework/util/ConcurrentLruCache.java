@@ -23,17 +23,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 /**
- * Simple LRU (Least Recently Used) cache, bounded by a specified cache limit.
+ * 简单的 LRU（最近最少使用）缓存，受指定缓存限制约束。
  *
- * <p>This implementation is backed by a {@code ConcurrentHashMap} for storing
- * the cached values and a {@code ConcurrentLinkedDeque} for ordering the keys
- * and choosing the least recently used key when the cache is at full capacity.
+ * <p>此实现由 {@code ConcurrentHashMap} 支持用于存储缓存值，
+ * 由 {@code ConcurrentLinkedDeque} 用于排序键并在缓存达到满容量时选择最近最少使用的键。
  *
  * @author Brian Clozel
  * @author Juergen Hoeller
  * @since 5.3
- * @param <K> the type of the key used for cache retrieval
- * @param <V> the type of the cached values
+ * @param <K> 用于缓存检索的键类型
+ * @param <V> 缓存值的类型
  * @see #get
  */
 public class ConcurrentLruCache<K, V> {
@@ -52,10 +51,10 @@ public class ConcurrentLruCache<K, V> {
 
 
 	/**
-	 * Create a new cache instance with the given limit and generator function.
-	 * @param sizeLimit the maximum number of entries in the cache
-	 * (0 indicates no caching, always generating a new value)
-	 * @param generator a function to generate a new value for a given key
+	 * 使用给定的限制和生成器函数创建新的缓存实例。
+	 * @param sizeLimit 缓存中的最大条目数
+	 * （0 表示不缓存，总是生成新值）
+	 * @param generator 为给定键生成新值的函数
 	 */
 	public ConcurrentLruCache(int sizeLimit, Function<K, V> generator) {
 		Assert.isTrue(sizeLimit >= 0, "Cache size limit must not be negative");
@@ -66,10 +65,9 @@ public class ConcurrentLruCache<K, V> {
 
 
 	/**
-	 * Retrieve an entry from the cache, potentially triggering generation
-	 * of the value.
-	 * @param key the key to retrieve the entry for
-	 * @return the cached or newly generated value
+	 * 从缓存中检索条目，可能触发值的生成。
+	 * @param key 要检索条目的键
+	 * @return 缓存的或新生成的值
 	 */
 	public V get(K key) {
 		if (this.sizeLimit == 0) {
@@ -95,7 +93,7 @@ public class ConcurrentLruCache<K, V> {
 
 		this.lock.writeLock().lock();
 		try {
-			// Retrying in case of concurrent reads on the same key
+			// 在同一键的并发读取情况下重试
 			cached = this.cache.get(key);
 			if (cached != null) {
 				if (this.queue.removeLastOccurrence(key)) {
@@ -103,7 +101,7 @@ public class ConcurrentLruCache<K, V> {
 				}
 				return cached;
 			}
-			// Generate value first, to prevent size inconsistency
+			// 首先生成值，以防止大小不一致
 			V value = this.generator.apply(key);
 			if (this.size == this.sizeLimit) {
 				K leastUsed = this.queue.poll();
@@ -122,20 +120,20 @@ public class ConcurrentLruCache<K, V> {
 	}
 
 	/**
-	 * Determine whether the given key is present in this cache.
-	 * @param key the key to check for
-	 * @return {@code true} if the key is present,
-	 * {@code false} if there was no matching key
+	 * 确定给定键是否存在于此缓存中。
+	 * @param key 要检查的键
+	 * @return 如果键存在则返回 {@code true}，
+	 * 如果没有匹配的键则返回 {@code false}
 	 */
 	public boolean contains(K key) {
 		return this.cache.containsKey(key);
 	}
 
 	/**
-	 * Immediately remove the given key and any associated value.
-	 * @param key the key to evict the entry for
-	 * @return {@code true} if the key was present before,
-	 * {@code false} if there was no matching key
+	 * 立即删除给定键及其关联的值。
+	 * @param key 要驱逐条目的键
+	 * @return 如果键之前存在则返回 {@code true}，
+	 * 如果没有匹配的键则返回 {@code false}
 	 */
 	public boolean remove(K key) {
 		this.lock.writeLock().lock();
@@ -151,7 +149,7 @@ public class ConcurrentLruCache<K, V> {
 	}
 
 	/**
-	 * Immediately remove all entries from this cache.
+	 * 立即从此缓存中删除所有条目。
 	 */
 	public void clear() {
 		this.lock.writeLock().lock();
@@ -166,7 +164,7 @@ public class ConcurrentLruCache<K, V> {
 	}
 
 	/**
-	 * Return the current size of the cache.
+	 * 返回缓存的当前大小。
 	 * @see #sizeLimit()
 	 */
 	public int size() {
@@ -174,8 +172,8 @@ public class ConcurrentLruCache<K, V> {
 	}
 
 	/**
-	 * Return the maximum number of entries in the cache
-	 * (0 indicates no caching, always generating a new value).
+	 * 返回缓存中的最大条目数
+	 * （0 表示不缓存，总是生成新值）。
 	 * @see #size()
 	 */
 	public int sizeLimit() {

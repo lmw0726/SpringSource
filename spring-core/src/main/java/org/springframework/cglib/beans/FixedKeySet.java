@@ -18,7 +18,7 @@ package org.springframework.cglib.beans;
 import java.util.*;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public /* need it for class loading  */ class FixedKeySet extends AbstractSet {
+public /* 需要它用于类加载 */ class FixedKeySet extends AbstractSet {
     private Set set;
     private int size;
 

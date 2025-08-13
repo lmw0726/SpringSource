@@ -19,7 +19,7 @@ package org.springframework.util;
 import java.util.UUID;
 
 /**
- * Contract for generating universally unique identifiers ({@link UUID UUIDs}).
+ * 生成全局唯一标识符({@link UUID UUID})的契约接口。
  *
  * @author Rossen Stoyanchev
  * @since 4.0
@@ -28,8 +28,8 @@ import java.util.UUID;
 public interface IdGenerator {
 
 	/**
-	 * Generate a new identifier.
-	 * @return the generated identifier
+	 * 生成一个新的唯一标识符。
+	 * @return 生成的唯一标识符
 	 */
 	UUID generateId();
 

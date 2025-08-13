@@ -16,16 +16,15 @@
 
 package org.springframework.core.log;
 
-import java.util.List;
-import java.util.function.Predicate;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.NoOpLog;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 
 /**
- * Implementation of {@link Log} that wraps a list of loggers and delegates
- * to the first one for which logging is enabled at the given level.
+ * {@link Log} 的实现，封装了一组日志记录器，并将日志委托给在指定级别启用日志记录的第一个记录器。
  *
  * @author Rossen Stoyanchev
  * @since 5.1
@@ -40,8 +39,8 @@ final class CompositeLog implements Log {
 
 
 	/**
-	 * Package-private constructor with list of loggers.
-	 * @param loggers the loggers to use
+	 * 包级私有构造函数，接收日志记录器列表。
+	 * @param loggers 要使用的日志记录器列表
 	 */
 	CompositeLog(List<Log> loggers) {
 		this.loggers = loggers;

@@ -16,39 +16,25 @@
 
 package org.springframework.util.xml;
 
-import java.util.Iterator;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.Comment;
-import javax.xml.stream.events.DTD;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.EntityDeclaration;
-import javax.xml.stream.events.EntityReference;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.NotationDeclaration;
-import javax.xml.stream.events.ProcessingInstruction;
-import javax.xml.stream.events.StartDocument;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.Locator2;
 import org.xml.sax.helpers.AttributesImpl;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
+import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.*;
+import java.util.Iterator;
 
 /**
- * SAX {@code XMLReader} that reads from a StAX {@code XMLEventReader}. Consumes {@code XMLEvents} from
- * an {@code XMLEventReader}, and calls the corresponding methods on the SAX callback interfaces.
+ * 从StAX {@code XMLEventReader}读取的SAX {@code XMLReader}实现。
+ * 从{@code XMLEventReader}消费{@code XMLEvent}事件，并调用SAX回调接口的相应方法。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -72,11 +58,11 @@ class StaxEventXMLReader extends AbstractStaxXMLReader {
 
 
 	/**
-	 * Constructs a new instance of the {@code StaxEventXmlReader} that reads from
-	 * the given {@code XMLEventReader}. The supplied event reader must be in
-	 * {@code XMLStreamConstants.START_DOCUMENT} or {@code XMLStreamConstants.START_ELEMENT} state.
-	 * @param reader the {@code XMLEventReader} to read from
-	 * @throws IllegalStateException if the reader is not at the start of a document or element
+	 * 构造一个新的{@code StaxEventXmlReader}实例，从给定的{@code XMLEventReader}读取。
+	 * 提供的事件读取器必须处于{@code XMLStreamConstants.START_DOCUMENT}或
+	 * {@code XMLStreamConstants.START_ELEMENT}状态。
+	 * @param reader 要读取的{@code XMLEventReader}
+	 * @throws IllegalStateException 如果读取器不处于文档或元素的开始位置
 	 */
 	StaxEventXMLReader(XMLEventReader reader) {
 		try {

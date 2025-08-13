@@ -30,15 +30,16 @@ import java.nio.file.FileSystem;
 import java.nio.file.*;
 
 /**
- * {@link Resource} implementation for {@code java.io.File} and
- * {@code java.nio.file.Path} handles with a file system target.
- * Supports resolution as a {@code File} and also as a {@code URL}.
- * Implements the extended {@link WritableResource} interface.
+ * 针对 {@code java.io.File} 和 {@code java.nio.file.Path} 的
+ * {@link Resource} 实现，表示文件系统中的目标文件。
+ * 支持解析为 {@code File} 以及 {@code URL}。
+ * 实现了扩展接口 {@link WritableResource}。
  *
- * <p>Note: As of Spring Framework 5.0, this {@link Resource} implementation uses
- * NIO.2 API for read/write interactions. As of 5.1, it may be constructed with a
- * {@link java.nio.file.Path} handle in which case it will perform all file system
- * interactions via NIO.2, only resorting to {@link File} on {@link #getFile()}.
+ * <p>注意：从 Spring Framework 5.0 开始，
+ * 该 {@link Resource} 实现使用 NIO.2 API 进行读写交互。
+ * 从 5.1 开始，可以使用 {@link java.nio.file.Path} 句柄构造，
+ * 在这种情况下，所有文件系统交互都会通过 NIO.2 执行，
+ * 仅在调用 {@link #getFile()} 时才会退回到 {@link File}。
  *
  * @author Juergen Hoeller
  * @see #FileSystemResource(String)

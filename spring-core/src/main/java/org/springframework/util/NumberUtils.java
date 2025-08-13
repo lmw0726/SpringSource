@@ -16,6 +16,8 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -25,12 +27,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Miscellaneous utility methods for number conversion and parsing.
- * <p>Mainly for internal use within the framework; consider Apache's
- * Commons Lang for a more comprehensive suite of number utilities.
+ * 数字转换和解析的杂项实用方法。
+ * <p>主要用于框架内部使用；如需更全面的数字工具集，请考虑使用Apache的Commons Lang。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -43,8 +42,8 @@ public abstract class NumberUtils {
 	private static final BigInteger LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
 
 	/**
-	 * Standard number types (all immutable):
-	 * Byte, Short, Integer, Long, BigInteger, Float, Double, BigDecimal.
+	 * 标准数字类型（全部不可变）：
+	 * Byte, Short, Integer, Long, BigInteger, Float, Double, BigDecimal。
 	 */
 	public static final Set<Class<?>> STANDARD_NUMBER_TYPES;
 
@@ -63,12 +62,12 @@ public abstract class NumberUtils {
 
 
 	/**
-	 * Convert the given number into an instance of the given target class.
-	 * @param number the number to convert
-	 * @param targetClass the target class to convert to
-	 * @return the converted number
-	 * @throws IllegalArgumentException if the target class is not supported
-	 * (i.e. not a standard Number subclass as included in the JDK)
+	 * 将给定数字转换为目标类的实例。
+	 * @param number 要转换的数字
+	 * @param targetClass 要转换成的目标类
+	 * @return 转换后的数字
+	 * @throws IllegalArgumentException 如果目标类不被支持
+	 * （即不是JDK包含的标准Number子类）
 	 * @see java.lang.Byte
 	 * @see java.lang.Short
 	 * @see java.lang.Integer
@@ -115,11 +114,11 @@ public abstract class NumberUtils {
 		}
 		else if (BigInteger.class == targetClass) {
 			if (number instanceof BigDecimal) {
-				// do not lose precision - use BigDecimal's own conversion
+				// 不丢失精度 - 使用BigDecimal自身的转换方法
 				return (T) ((BigDecimal) number).toBigInteger();
 			}
 			else {
-				// original value is not a Big* number - use standard long conversion
+				// 原始值不是Big*数字 - 使用标准long转换
 				return (T) BigInteger.valueOf(number.longValue());
 			}
 		}
@@ -130,8 +129,8 @@ public abstract class NumberUtils {
 			return (T) Double.valueOf(number.doubleValue());
 		}
 		else if (BigDecimal.class == targetClass) {
-			// always use BigDecimal(String) here to avoid unpredictability of BigDecimal(double)
-			// (see BigDecimal javadoc for details)
+			// 始终使用BigDecimal(String)以避免BigDecimal(double)的不确定性
+			// (详见BigDecimal的Java文档)
 			return (T) new BigDecimal(number.toString());
 		}
 		else {
@@ -141,12 +140,11 @@ public abstract class NumberUtils {
 	}
 
 	/**
-	 * Check for a {@code BigInteger}/{@code BigDecimal} long overflow
-	 * before returning the given number as a long value.
-	 * @param number the number to convert
-	 * @param targetClass the target class to convert to
-	 * @return the long value, if convertible without overflow
-	 * @throws IllegalArgumentException if there is an overflow
+	 * 在将给定数字作为long值返回前，检查{@code BigInteger}/{@code BigDecimal}是否会发生long溢出。
+	 * @param number 要转换的数字
+	 * @param targetClass 要转换成的目标类
+	 * @return 若无溢出则可转换的long值
+	 * @throws IllegalArgumentException 如果发生溢出
 	 * @see #raiseOverflowException
 	 */
 	private static long checkedLongValue(Number number, Class<? extends Number> targetClass) {
@@ -157,7 +155,7 @@ public abstract class NumberUtils {
 		else if (number instanceof BigDecimal) {
 			bigInt = ((BigDecimal) number).toBigInteger();
 		}
-		// Effectively analogous to JDK 8's BigInteger.longValueExact()
+		// 效果等同于JDK 8的BigInteger.longValueExact()
 		if (bigInt != null && (bigInt.compareTo(LONG_MIN) < 0 || bigInt.compareTo(LONG_MAX) > 0)) {
 			raiseOverflowException(number, targetClass);
 		}
@@ -165,10 +163,10 @@ public abstract class NumberUtils {
 	}
 
 	/**
-	 * Raise an <em>overflow</em> exception for the given number and target class.
-	 * @param number the number we tried to convert
-	 * @param targetClass the target class we tried to convert to
-	 * @throws IllegalArgumentException if there is an overflow
+	 * 对给定数字和目标类抛出<em>溢出</em>异常。
+	 * @param number 尝试转换的数字
+	 * @param targetClass 尝试转换的目标类
+	 * @throws IllegalArgumentException 如果发生溢出
 	 */
 	private static void raiseOverflowException(Number number, Class<?> targetClass) {
 		throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" +
@@ -176,16 +174,16 @@ public abstract class NumberUtils {
 	}
 
 	/**
-	 * Parse the given {@code text} into a {@link Number} instance of the given
-	 * target class, using the corresponding {@code decode} / {@code valueOf} method.
-	 * <p>Trims all whitespace (leading, trailing, and in between characters) from
-	 * the input {@code String} before attempting to parse the number.
-	 * <p>Supports numbers in hex format (with leading "0x", "0X", or "#") as well.
-	 * @param text the text to convert
-	 * @param targetClass the target class to parse into
-	 * @return the parsed number
-	 * @throws IllegalArgumentException if the target class is not supported
-	 * (i.e. not a standard Number subclass as included in the JDK)
+	 * 将给定的{@code text}解析为目标类的{@link Number}实例，
+	 * 使用对应的{@code decode}/{@code valueOf}方法。
+	 * <p>在尝试解析数字前，会去除输入{@code String}中的所有空白字符
+	 * （包括前导、尾部和中间的空白字符）。
+	 * <p>同时支持十六进制格式的数字（以"0x"、"0X"或"#"开头）。
+	 * @param text 要转换的文本
+	 * @param targetClass 要解析成的目标类
+	 * @return 解析后的数字
+	 * @throws IllegalArgumentException 如果目标类不被支持
+	 * （即不是JDK包含的标准Number子类）
 	 * @see Byte#decode
 	 * @see Short#decode
 	 * @see Integer#decode
@@ -232,16 +230,16 @@ public abstract class NumberUtils {
 	}
 
 	/**
-	 * Parse the given {@code text} into a {@link Number} instance of the
-	 * given target class, using the supplied {@link NumberFormat}.
-	 * <p>Trims the input {@code String} before attempting to parse the number.
-	 * @param text the text to convert
-	 * @param targetClass the target class to parse into
-	 * @param numberFormat the {@code NumberFormat} to use for parsing (if
-	 * {@code null}, this method falls back to {@link #parseNumber(String, Class)})
-	 * @return the parsed number
-	 * @throws IllegalArgumentException if the target class is not supported
-	 * (i.e. not a standard Number subclass as included in the JDK)
+	 * 使用指定的{@link NumberFormat}将给定{@code text}解析为
+	 * 目标类的{@link Number}实例。
+	 * <p>在尝试解析数字前，会去除输入{@code String}的空白字符。
+	 * @param text 要转换的文本
+	 * @param targetClass 要解析成的目标类
+	 * @param numberFormat 用于解析的{@code NumberFormat}
+	 * （如果为{@code null}，则回退到{@link #parseNumber(String, Class)}）
+	 * @return 解析后的数字
+	 * @throws IllegalArgumentException 如果目标类不被支持
+	 * （即不是JDK包含的标准Number子类）
 	 * @see java.text.NumberFormat#parse
 	 * @see #convertNumberToTargetClass
 	 * @see #parseNumber(String, Class)
@@ -280,9 +278,8 @@ public abstract class NumberUtils {
 	}
 
 	/**
-	 * Determine whether the given {@code value} String indicates a hex number,
-	 * i.e. needs to be passed into {@code Integer.decode} instead of
-	 * {@code Integer.valueOf}, etc.
+	 * 判断给定的{@code value}字符串是否表示十六进制数字，
+	 * 即需要传递给{@code Integer.decode}而非{@code Integer.valueOf}等。
 	 */
 	private static boolean isHexNumber(String value) {
 		int index = (value.startsWith("-") ? 1 : 0);
@@ -290,8 +287,8 @@ public abstract class NumberUtils {
 	}
 
 	/**
-	 * Decode a {@link java.math.BigInteger} from the supplied {@link String} value.
-	 * <p>Supports decimal, hex, and octal notation.
+	 * 从提供的{@link String}值解码{@link java.math.BigInteger}。
+	 * <p>支持十进制、十六进制和八进制表示法。
 	 * @see BigInteger#BigInteger(String, int)
 	 */
 	private static BigInteger decodeBigInteger(String value) {
@@ -299,13 +296,13 @@ public abstract class NumberUtils {
 		int index = 0;
 		boolean negative = false;
 
-		// Handle minus sign, if present.
+		// 处理减号（如果存在）
 		if (value.startsWith("-")) {
 			negative = true;
 			index++;
 		}
 
-		// Handle radix specifier, if present.
+		// 处理基数指示符（如果存在）
 		if (value.startsWith("0x", index) || value.startsWith("0X", index)) {
 			index += 2;
 			radix = 16;

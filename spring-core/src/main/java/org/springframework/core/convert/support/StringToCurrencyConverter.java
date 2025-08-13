@@ -16,12 +16,12 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.Currency;
-
 import org.springframework.core.convert.converter.Converter;
 
+import java.util.Currency;
+
 /**
- * Convert a String to a {@link Currency}.
+ * 将字符串转换为 {@link Currency}。
  *
  * @author Stephane Nicoll
  * @since 4.2

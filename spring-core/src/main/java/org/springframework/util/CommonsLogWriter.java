@@ -16,12 +16,12 @@
 
 package org.springframework.util;
 
-import java.io.Writer;
-
 import org.apache.commons.logging.Log;
 
+import java.io.Writer;
+
 /**
- * {@code java.io.Writer} adapter for a Commons Logging {@code Log}.
+ * 用于 Commons Logging {@code Log} 的 {@code java.io.Writer} 适配器。
  *
  * @author Juergen Hoeller
  * @since 2.5.1
@@ -34,8 +34,8 @@ public class CommonsLogWriter extends Writer {
 
 
 	/**
-	 * Create a new CommonsLogWriter for the given Commons Logging logger.
-	 * @param logger the Commons Logging logger to write to
+	 * 为给定的 Commons Logging 记录器创建新的 CommonsLogWriter。
+	 * @param logger 要写入的 Commons Logging 记录器
 	 */
 	public CommonsLogWriter(Log logger) {
 		Assert.notNull(logger, "Logger must not be null");

@@ -16,14 +16,6 @@
 
 package org.springframework.core.type.classreading;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.MethodVisitor;
 import org.springframework.asm.Opcodes;
@@ -37,10 +29,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.*;
+
 /**
- * ASM class visitor which looks for the class name and implemented types as
- * well as for the annotations defined on the class, exposing them through
- * the {@link org.springframework.core.type.AnnotationMetadata} interface.
+ * ASM 类访问者，查找类名、实现的类型以及类上定义的注解，
+ * 并通过 {@link org.springframework.core.type.AnnotationMetadata} 接口暴露它们。
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -48,10 +41,8 @@ import org.springframework.util.MultiValueMap;
  * @author Phillip Webb
  * @author Sam Brannen
  * @since 2.5
- * @deprecated As of Spring Framework 5.2, this class has been replaced by
- * {@link SimpleAnnotationMetadataReadingVisitor} for internal use within the
- * framework, but there is no public replacement for
- * {@code AnnotationMetadataReadingVisitor}.
+ * @deprecated 自 Spring Framework 5.2 起，此类被 {@link SimpleAnnotationMetadataReadingVisitor} 替代，
+ * 仅供框架内部使用，但没有公开替代 {@code AnnotationMetadataReadingVisitor}。
  */
 @Deprecated
 public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor implements AnnotationMetadata {
@@ -64,8 +55,8 @@ public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisito
 	protected final Map<String, Set<String>> metaAnnotationMap = new LinkedHashMap<>(4);
 
 	/**
-	 * Declared as a {@link LinkedMultiValueMap} instead of a {@link MultiValueMap}
-	 * to ensure that the hierarchical ordering of the entries is preserved.
+	 * 声明为 {@link LinkedMultiValueMap} 而非 {@link MultiValueMap}，
+	 * 以确保条目层级顺序被保留。
 	 * @see AnnotationReadingVisitorUtils#getMergedAnnotationAttributes
 	 */
 	protected final LinkedMultiValueMap<String, AnnotationAttributes> attributesMap = new LinkedMultiValueMap<>(3);
@@ -85,8 +76,8 @@ public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisito
 
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-		// Skip bridge methods - we're only interested in original annotation-defining user methods.
-		// On JDK 8, we'd otherwise run into double detection of the same annotated method...
+		// 跳过桥接方法 —— 我们只关心原始定义注解的用户方法。
+		// 在 JDK 8 上，否则会遇到同一注解方法的重复检测……
 		if ((access & Opcodes.ACC_BRIDGE) != 0) {
 			return super.visitMethod(access, name, desc, signature, exceptions);
 		}

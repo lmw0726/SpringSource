@@ -32,10 +32,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Strategy for decoding a {@link DataBuffer} input stream into an output stream
- * of elements of type {@code <T>}.
+ * 将 {@link DataBuffer} 输入流解码为类型为 {@code <T>} 的元素输出流的策略。
  *
- * @param <T> the type of elements in the output stream
+ * @param <T> 输出流中元素的类型
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -43,13 +42,12 @@ import java.util.concurrent.ExecutionException;
 public interface Decoder<T> {
 
 	/**
-	 * Whether the decoder supports the given target element type and the MIME
-	 * type of the source stream.
+	 * 判断解码器是否支持给定的目标元素类型和源流的 MIME 类型。
 	 *
-	 * @param elementType the target element type for the output stream
-	 * @param mimeType    the mime type associated with the stream to decode
-	 *                    (can be {@code null} if not specified)
-	 * @return {@code true} if supported, {@code false} otherwise
+	 * @param elementType 输出流的目标元素类型
+	 * @param mimeType    与要解码的流关联的 MIME 类型
+	 * （如果未指定，可以为 {@code null}）
+	 * @return 如果支持则返回 {@code true}，否则返回 {@code false}
 	 */
 	boolean canDecode(ResolvableType elementType, @Nullable MimeType mimeType);
 
@@ -84,15 +82,14 @@ public interface Decoder<T> {
 						 @Nullable Map<String, Object> hints);
 
 	/**
-	 * Decode a data buffer to an Object of type T. This is useful for scenarios,
-	 * that distinct messages (or events) are decoded and handled individually,
-	 * in fully aggregated form.
+	 * 将数据缓冲区解码为类型为 T 的对象。这对于以下场景非常有用：
+	 * 独立的（或事件）消息以完全聚合的形式被解码和单独处理。
 	 *
-	 * @param buffer     the {@code DataBuffer} to decode
-	 * @param targetType the expected output type
-	 * @param mimeType   the MIME type associated with the data
-	 * @param hints      additional information about how to do decode
-	 * @return the decoded value, possibly {@code null}
+	 * @param buffer     要解码的 {@code DataBuffer}
+	 * @param targetType 预期的输出类型
+	 * @param mimeType   与数据关联的 MIME 类型
+	 * @param hints      有关如何解码的附加信息
+	 * @return 解码后的值，可能为 {@code null}
 	 * @since 5.2
 	 */
 	@Nullable
@@ -115,25 +112,23 @@ public interface Decoder<T> {
 	}
 
 	/**
-	 * Return the list of MIME types supported by this Decoder. The list may not
-	 * apply to every possible target element type and calls to this method
-	 * should typically be guarded via {@link #canDecode(ResolvableType, MimeType)
-	 * canDecode(elementType, null)}. The list may also exclude MIME types
-	 * supported only for a specific element type. Alternatively, use
-	 * {@link #getDecodableMimeTypes(ResolvableType)} for a more precise list.
+	 * 返回此解码器支持的 MIME 类型列表。此列表可能不适用于
+	 * 所有可能的目​​标元素类型，并且对该方法的调用通常应通过
+	 * {@link #canDecode(ResolvableType, MimeType) canDecode(elementType, null)}
+	 * 进行保护。该列表也可能排除仅针对特定元素类型支持的 MIME 类型。
+	 * 或者，使用 {@link #getDecodableMimeTypes(ResolvableType)} 获取更精确的列表。
 	 *
-	 * @return the list of supported MIME types
+	 * @return 支持的 MIME 类型列表
 	 */
 	List<MimeType> getDecodableMimeTypes();
 
 	/**
-	 * Return the list of MIME types supported by this Decoder for the given type
-	 * of element. This list may differ from {@link #getDecodableMimeTypes()}
-	 * if the Decoder doesn't support the given element type or if it supports
-	 * it only for a subset of MIME types.
+	 * 返回此解码器针对给定元素类型支持的 MIME 类型列表。
+	 * 如果解码器不支持给定元素类型，或者仅支持其 MIME 类型的一个子集，
+	 * 则此列表可能与 {@link #getDecodableMimeTypes()} 不同。
 	 *
-	 * @param targetType the type of element to check for decoding
-	 * @return the list of MIME types supported for the given target type
+	 * @param targetType 要检查解码的元素类型
+	 * @return 给定目标类型支持的 MIME 类型列表
 	 * @since 5.3.4
 	 */
 	default List<MimeType> getDecodableMimeTypes(ResolvableType targetType) {

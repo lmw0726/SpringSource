@@ -16,15 +16,15 @@
 
 package org.springframework.core.env;
 
-import java.util.Map;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.util.Map;
+
 /**
- * {@link PropertySource} that reads keys and values from a {@code Map} object.
- * The underlying map should not contain any {@code null} values in order to
- * comply with {@link #getProperty} and {@link #containsProperty} semantics.
+ * 从 {@code Map} 对象中读取键和值的 {@link PropertySource}。
+ * 底层映射不应包含任何 {@code null} 值，以符合 {@link #getProperty} 和
+ * {@link #containsProperty} 的语义。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -34,10 +34,10 @@ import org.springframework.util.StringUtils;
 public class MapPropertySource extends EnumerablePropertySource<Map<String, Object>> {
 
 	/**
-	 * Create a new {@code MapPropertySource} with the given name and {@code Map}.
-	 * @param name the associated name
-	 * @param source the Map source (without {@code null} values in order to get
-	 * consistent {@link #getProperty} and {@link #containsProperty} behavior)
+	 * 使用给定的名称和 {@code Map} 创建一个新的 {@code MapPropertySource}。
+	 * @param name 关联的名称
+	 * @param source Map 源（为了获得一致的 {@link #getProperty} 和
+	 * {@link #containsProperty} 行为，不应包含 {@code null} 值）
 	 */
 	public MapPropertySource(String name, Map<String, Object> source) {
 		super(name, source);

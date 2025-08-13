@@ -15,12 +15,15 @@
  */
 package org.springframework.cglib.beans;
 
-import java.beans.*;
-import java.util.*;
-import org.springframework.cglib.core.*;
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.Label;
 import org.springframework.asm.Type;
+import org.springframework.cglib.core.*;
+
+import java.beans.PropertyDescriptor;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 class BeanMapEmitter extends ClassEmitter {
@@ -154,7 +157,7 @@ class BeanMapEmitter extends ClassEmitter {
     }
             
     private void generateKeySet(String[] allNames) {
-        // static initializer
+        // 静态初始值设定项
         declare_field(Constants.ACC_STATIC | Constants.ACC_PRIVATE, "keys", FIXED_KEY_SET, null);
 
         CodeEmitter e = begin_static();

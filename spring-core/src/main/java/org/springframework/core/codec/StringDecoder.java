@@ -16,22 +16,7 @@
 
 package org.springframework.core.codec;
 
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -42,14 +27,21 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
- * Decode from a data buffer stream to a {@code String} stream, either splitting
- * or aggregating incoming data chunks to realign along newlines delimiters
- * and produce a stream of strings. This is useful for streaming but is also
- * necessary to ensure that that multibyte characters can be decoded correctly,
- * avoiding split-character issues. The default delimiters used by default are
- * {@code \n} and {@code \r\n} but that can be customized.
+ * 将数据缓冲区流解码为 {@code String} 流，通过按换行符分隔符拆分或聚合传入的数据块，
+ * 并生成字符串流。这对于流式传输很有用，同时也是确保多字节字符可以正确解码，
+ * 避免字符拆分问题所必需的。默认使用的分隔符是 {@code \n} 和 {@code \r\n}，
+ * 但可以自定义。
  *
  * @author Sebastien Deleuze
  * @author Brian Clozel
@@ -60,10 +52,10 @@ import org.springframework.util.MimeTypeUtils;
  */
 public final class StringDecoder extends AbstractDataBufferDecoder<String> {
 
-	/** The default charset to use, i.e. "UTF-8". */
+	/** 默认使用的字符集，即 "UTF-8"。 */
 	public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
-	/** The default delimiter strings to use, i.e. {@code \r\n} and {@code \n}. */
+	/** 默认使用的分隔符字符串，即 {@code \r\n} 和 {@code \n}。 */
 	public static final List<String> DEFAULT_DELIMITERS = Arrays.asList("\r\n", "\n");
 
 
@@ -85,9 +77,9 @@ public final class StringDecoder extends AbstractDataBufferDecoder<String> {
 
 
 	/**
-	 * Set the default character set to fall back on if the MimeType does not specify any.
-	 * <p>By default this is {@code UTF-8}.
-	 * @param defaultCharset the charset to fall back on
+	 * 设置当 MimeType 未指定字符集时，默认回退的字符集。
+	 * <p>默认情况下，这是 {@code UTF-8}。
+	 * @param defaultCharset 要回退的字符集
 	 * @since 5.2.9
 	 */
 	public void setDefaultCharset(Charset defaultCharset) {
@@ -95,7 +87,7 @@ public final class StringDecoder extends AbstractDataBufferDecoder<String> {
 	}
 
 	/**
-	 * Return the configured {@link #setDefaultCharset(Charset) defaultCharset}.
+	 * 返回配置的 {@link #setDefaultCharset(Charset) defaultCharset}。
 	 * @since 5.2.9
 	 */
 	public Charset getDefaultCharset() {
@@ -151,7 +143,7 @@ public final class StringDecoder extends AbstractDataBufferDecoder<String> {
 				int endIndex = matcher.match(buffer);
 				if (endIndex == -1) {
 					chunks.add(buffer);
-					DataBufferUtils.retain(buffer); // retain after add (may raise DataBufferLimitException)
+					DataBufferUtils.retain(buffer); // 添加后保留 (可能引发DataBufferLimitException)
 					break;
 				}
 				int startIndex = buffer.readPosition();
@@ -208,9 +200,9 @@ public final class StringDecoder extends AbstractDataBufferDecoder<String> {
 	}
 
 	/**
-	 * Create a {@code StringDecoder} for {@code "text/plain"}.
-	 * @param stripDelimiter this flag is ignored
-	 * @deprecated as of Spring 5.0.4, in favor of {@link #textPlainOnly()} or
+	 * 创建一个 {@code StringDecoder}，仅支持 {@code "text/plain"}。
+	 * @param stripDelimiter 此参数将被忽略
+	 * @deprecated 自 Spring 5.0.4 起已弃用，推荐使用 {@link #textPlainOnly()} 或
 	 * {@link #textPlainOnly(List, boolean)}
 	 */
 	@Deprecated
@@ -219,26 +211,25 @@ public final class StringDecoder extends AbstractDataBufferDecoder<String> {
 	}
 
 	/**
-	 * Create a {@code StringDecoder} for {@code "text/plain"}.
+	 * 创建一个 {@code StringDecoder}，仅支持 {@code "text/plain"}。
 	 */
 	public static StringDecoder textPlainOnly() {
 		return textPlainOnly(DEFAULT_DELIMITERS, true);
 	}
 
 	/**
-	 * Create a {@code StringDecoder} for {@code "text/plain"}.
-	 * @param delimiters delimiter strings to use to split the input stream
-	 * @param stripDelimiter whether to remove delimiters from the resulting
-	 * input strings
+	 * 创建一个 {@code StringDecoder}，仅支持 {@code "text/plain"}。
+	 * @param delimiters       用于分割输入流的分隔符字符串
+	 * @param stripDelimiter   是否从生成的输入字符串中移除分隔符
 	 */
 	public static StringDecoder textPlainOnly(List<String> delimiters, boolean stripDelimiter) {
 		return new StringDecoder(delimiters, stripDelimiter, new MimeType("text", "plain", DEFAULT_CHARSET));
 	}
 
 	/**
-	 * Create a {@code StringDecoder} that supports all MIME types.
-	 * @param stripDelimiter this flag is ignored
-	 * @deprecated as of Spring 5.0.4, in favor of {@link #allMimeTypes()} or
+	 * 创建一个 {@code StringDecoder}，支持所有 MIME 类型。
+	 * @param stripDelimiter 此参数将被忽略
+	 * @deprecated 自 Spring 5.0.4 起已弃用，推荐使用 {@link #allMimeTypes()} 或
 	 * {@link #allMimeTypes(List, boolean)}
 	 */
 	@Deprecated
@@ -247,17 +238,16 @@ public final class StringDecoder extends AbstractDataBufferDecoder<String> {
 	}
 
 	/**
-	 * Create a {@code StringDecoder} that supports all MIME types.
+	 * 创建一个 {@code StringDecoder}，支持所有 MIME 类型。
 	 */
 	public static StringDecoder allMimeTypes() {
 		return allMimeTypes(DEFAULT_DELIMITERS, true);
 	}
 
 	/**
-	 * Create a {@code StringDecoder} that supports all MIME types.
-	 * @param delimiters delimiter strings to use to split the input stream
-	 * @param stripDelimiter whether to remove delimiters from the resulting
-	 * input strings
+	 * 创建一个 {@code StringDecoder}，支持所有 MIME 类型。
+	 * @param delimiters       用于分割输入流的分隔符字符串
+	 * @param stripDelimiter   是否从生成的输入字符串中移除分隔符
 	 */
 	public static StringDecoder allMimeTypes(List<String> delimiters, boolean stripDelimiter) {
 		return new StringDecoder(delimiters, stripDelimiter,

@@ -16,14 +16,14 @@
 
 package org.springframework.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+
 /**
- * A common delegate for detecting Kotlin's presence and for identifying Kotlin types.
+ * 用于检测Kotlin存在性及识别Kotlin类型的通用代理类。
  *
  * @author Juergen Hoeller
  * @author Sebastien Deleuze
@@ -44,7 +44,7 @@ public abstract class KotlinDetector {
 			metadata = ClassUtils.forName("kotlin.Metadata", classLoader);
 		}
 		catch (ClassNotFoundException ex) {
-			// Kotlin API not available - no Kotlin support
+			// Kotlin API 不可用 — 无Kotlin支持
 			metadata = null;
 		}
 		kotlinMetadata = (Class<? extends Annotation>) metadata;
@@ -53,14 +53,14 @@ public abstract class KotlinDetector {
 
 
 	/**
-	 * Determine whether Kotlin is present in general.
+	 * 判断Kotlin是否存在。
 	 */
 	public static boolean isKotlinPresent() {
 		return (kotlinMetadata != null);
 	}
 
 	/**
-	 * 确定是否存在Kotlin反射。
+	 * 判断是否存在Kotlin反射支持。
 	 * @since 5.1
 	 */
 	public static boolean isKotlinReflectPresent() {
@@ -68,14 +68,14 @@ public abstract class KotlinDetector {
 	}
 
 	/**
-	 * 确定给定的 {@code Class} 是否是Kotlin类型 (上面存在Kotlin元数据)。
+	 * 判断给定的 {@code Class} 是否为Kotlin类型（带有Kotlin元数据注解）。
 	 */
 	public static boolean isKotlinType(Class<?> clazz) {
 		return (kotlinMetadata != null && clazz.getDeclaredAnnotation(kotlinMetadata) != null);
 	}
 
 	/**
-	 * Return {@code true} if the method is a suspending function.
+	 * 如果方法是Kotlin的挂起函数，则返回 {@code true}。
 	 * @since 5.3
 	 */
 	public static boolean isSuspendingFunction(Method method) {

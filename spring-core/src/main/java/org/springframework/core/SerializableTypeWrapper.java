@@ -16,38 +16,30 @@
 
 package org.springframework.core;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.lang.reflect.*;
+
 /**
- * Internal utility class that can be used to obtain wrapped {@link Serializable}
- * variants of {@link java.lang.reflect.Type java.lang.reflect.Types}.
+ * 内部工具类，用于获取包装后的 {@link Serializable} 变体的
+ * {@link java.lang.reflect.Type java.lang.reflect.Types}。
  *
- * <p>{@link #forField(Field) Fields} or {@link #forMethodParameter(MethodParameter)
- * MethodParameters} can be used as the root source for a serializable type.
- * Alternatively, a regular {@link Class} can also be used as source.
+ * <p>可以使用 {@link #forField(Field) 字段} 或 {@link #forMethodParameter(MethodParameter) 方法参数}
+ * 作为可序列化类型的根源。
+ * 也可以使用普通的 {@link Class} 作为源。
  *
- * <p>The returned type will either be a {@link Class} or a serializable proxy of
- * {@link GenericArrayType}, {@link ParameterizedType}, {@link TypeVariable} or
- * {@link WildcardType}. With the exception of {@link Class} (which is final) calls
- * to methods that return further {@link Type Types} (for example
- * {@link GenericArrayType#getGenericComponentType()}) will be automatically wrapped.
+ * <p>返回的类型将是 {@link Class}，或者是
+ * {@link GenericArrayType}、{@link ParameterizedType}、{@link TypeVariable} 或
+ * {@link WildcardType} 的可序列化代理。
+ * 除了 {@link Class}（它是 final）外，调用返回进一步 {@link Type 类型} 的方法
+ * （例如 {@link GenericArrayType#getGenericComponentType()}）时，
+ * 结果也会被自动包装。
  *
  * @author Phillip Webb
  * @author Juergen Hoeller
@@ -67,7 +59,7 @@ final class SerializableTypeWrapper {
 
 
 	/**
-	 * Return a {@link Serializable} variant of {@link Field#getGenericType()}.
+	 * 返回 {@link Field#getGenericType()} 的可序列化变体。
 	 */
 	@Nullable
 	public static Type forField(Field field) {
@@ -75,8 +67,7 @@ final class SerializableTypeWrapper {
 	}
 
 	/**
-	 * Return a {@link Serializable} variant of
-	 * {@link MethodParameter#getGenericParameterType()}.
+	 * 返回 {@link MethodParameter#getGenericParameterType()} 的可序列化变体。
 	 */
 	@Nullable
 	public static Type forMethodParameter(MethodParameter methodParameter) {
@@ -84,9 +75,9 @@ final class SerializableTypeWrapper {
 	}
 
 	/**
-	 * Unwrap the given type, effectively returning the original non-serializable type.
-	 * @param type the type to unwrap
-	 * @return the original non-serializable type
+	 * 解包给定的类型，实际上返回原始的非序列化类型。
+	 * @param type 要解包的类型
+	 * @return 原始的非序列化类型
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Type> T unwrap(T type) {
@@ -98,24 +89,24 @@ final class SerializableTypeWrapper {
 	}
 
 	/**
-	 * Return a {@link Serializable} {@link Type} backed by a {@link TypeProvider} .
-	 * <p>If type artifacts are generally not serializable in the current runtime
-	 * environment, this delegate will simply return the original {@code Type} as-is.
+	 * 返回一个由 {@link TypeProvider} 支持的 {@link Serializable} {@link Type}。
+	 * <p>如果当前运行环境中类型相关对象通常不可序列化，
+	 * 则该代理会直接返回原始的 {@code Type}。
 	 */
 	@Nullable
 	static Type forTypeProvider(TypeProvider provider) {
 		Type providedType = provider.getType();
 		if (providedType == null || providedType instanceof Serializable) {
-			// No serializable type wrapping necessary (e.g. for java.lang.Class)
+			// 不需要序列化类型包装（例如 java.lang.Class）
 			return providedType;
 		}
 		if (NativeDetector.inNativeImage() || !Serializable.class.isAssignableFrom(Class.class)) {
-			// Let's skip any wrapping attempts if types are generally not serializable in
-			// the current runtime environment (even java.lang.Class itself, e.g. on GraalVM native images)
+			// 如果当前运行环境中类型通常不可序列化（比如 GraalVM 原生镜像中的 java.lang.Class），
+			// 则跳过任何包装尝试
 			return providedType;
 		}
 
-		// Obtain a serializable type proxy for the given provider...
+		// 为给定的提供者获取可序列化的类型代理...
 		Type cached = cache.get(providedType);
 		if (cached != null) {
 			return cached;
@@ -135,32 +126,32 @@ final class SerializableTypeWrapper {
 
 
 	/**
-	 * Additional interface implemented by the type proxy.
+	 * 类型代理额外实现的接口。
 	 */
 	interface SerializableTypeProxy {
 
 		/**
-		 * Return the underlying type provider.
+		 * 返回底层的类型提供者。
 		 */
 		TypeProvider getTypeProvider();
 	}
 
 
 	/**
-	 * A {@link Serializable} interface providing access to a {@link Type}.
+	 * 一个 {@link Serializable} 接口，提供对 {@link Type} 的访问。
 	 */
 	@SuppressWarnings("serial")
 	interface TypeProvider extends Serializable {
 
 		/**
-		 * Return the (possibly non {@link Serializable}) {@link Type}.
+		 * 返回（可能不是 {@link Serializable} 的）{@link Type}。
 		 */
 		@Nullable
 		Type getType();
 
 		/**
-		 * Return the source of the type, or {@code null} if not known.
-		 * <p>The default implementations returns {@code null}.
+		 * 返回类型的来源，如果未知则返回 {@code null}。
+		 * <p>默认实现返回 {@code null}。
 		 */
 		@Nullable
 		default Object getSource() {
@@ -170,9 +161,8 @@ final class SerializableTypeWrapper {
 
 
 	/**
-	 * {@link Serializable} {@link InvocationHandler} used by the proxied {@link Type}.
-	 * Provides serialization support and enhances any methods that return {@code Type}
-	 * or {@code Type[]}.
+	 * 用于被代理 {@link Type} 的 {@link Serializable} {@link InvocationHandler} 实现。
+	 * 提供序列化支持，并增强所有返回 {@code Type} 或 {@code Type[]} 的方法。
 	 */
 	@SuppressWarnings("serial")
 	private static class TypeProxyInvocationHandler implements InvocationHandler, Serializable {
@@ -189,7 +179,7 @@ final class SerializableTypeWrapper {
 			switch (method.getName()) {
 				case "equals":
 					Object other = args[0];
-					// Unwrap proxies for speed
+					// 为了性能，对代理对象进行解包
 					if (other instanceof Type) {
 						other = unwrap((Type) other);
 					}
@@ -222,7 +212,8 @@ final class SerializableTypeWrapper {
 
 
 	/**
-	 * {@link TypeProvider} for {@link Type Types} obtained from a {@link Field}.
+	 * {@link TypeProvider} 的实现，
+	 * 用于从 {@link Field} 获取 {@link Type Types}。
 	 */
 	@SuppressWarnings("serial")
 	static class FieldTypeProvider implements TypeProvider {
@@ -262,7 +253,8 @@ final class SerializableTypeWrapper {
 
 
 	/**
-	 * {@link TypeProvider} for {@link Type Types} obtained from a {@link MethodParameter}.
+	 * {@link TypeProvider} 的实现，
+	 * 用于从 {@link MethodParameter} 获取 {@link Type Types}。
 	 */
 	@SuppressWarnings("serial")
 	static class MethodParameterTypeProvider implements TypeProvider {
@@ -316,7 +308,8 @@ final class SerializableTypeWrapper {
 
 
 	/**
-	 * {@link TypeProvider} for {@link Type Types} obtained by invoking a no-arg method.
+	 * {@link TypeProvider} 的实现，
+	 * 用于通过调用无参数方法获取 {@link Type} 类型。
 	 */
 	@SuppressWarnings("serial")
 	static class MethodInvokeTypeProvider implements TypeProvider {
@@ -347,9 +340,9 @@ final class SerializableTypeWrapper {
 		public Type getType() {
 			Object result = this.result;
 			if (result == null) {
-				// Lazy invocation of the target method on the provided type
+				// 延迟调用提供类型上的目标方法
 				result = ReflectionUtils.invokeMethod(this.method, this.provider.getType());
-				// Cache the result for further calls to getType()
+				// 缓存结果，以便后续调用 getType() 时复用
 				this.result = result;
 			}
 			return (result instanceof Type[] ? ((Type[]) result)[this.index] : (Type) result);

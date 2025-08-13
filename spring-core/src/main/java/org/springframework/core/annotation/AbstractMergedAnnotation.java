@@ -16,22 +16,22 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Abstract base class for {@link MergedAnnotation} implementations.
+ * 抽象基类，用于 {@link MergedAnnotation} 实现。
  *
  * @author Phillip Webb
  * @author Juergen Hoeller
  * @since 5.2
- * @param <A> the annotation type
+ * @param <A> 注解类型
  */
 abstract class AbstractMergedAnnotation<A extends Annotation> implements MergedAnnotation<A> {
 
@@ -223,20 +223,18 @@ abstract class AbstractMergedAnnotation<A extends Annotation> implements MergedA
 	}
 
 	/**
-	 * Get the underlying attribute value.
-	 * @param attributeName the attribute name
-	 * @param type the type to return (see {@link MergedAnnotation} class
-	 * documentation for details)
-	 * @return the attribute value or {@code null} if the value is not found and
-	 * is not required
-	 * @throws IllegalArgumentException if the source type is not compatible
-	 * @throws NoSuchElementException if the value is required but not found
+	 * 获取底层属性值。
+	 * @param attributeName 属性名
+	 * @param type 返回的类型（详情请参阅 {@link MergedAnnotation} 类文档）
+	 * @return 属性值，如果未找到且不需要则为 {@code null}
+	 * @throws IllegalArgumentException 如果源类型不兼容
+	 * @throws NoSuchElementException 如果需要该值但未找到
 	 */
 	@Nullable
 	protected abstract <T> T getAttributeValue(String attributeName, Class<T> type);
 
 	/**
-	 * Factory method used to create the synthesized annotation.
+	 * 用于创建合成注解的工厂方法。
 	 */
 	protected abstract A createSynthesized();
 

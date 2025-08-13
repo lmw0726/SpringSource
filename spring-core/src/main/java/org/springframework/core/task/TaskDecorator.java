@@ -17,20 +17,16 @@
 package org.springframework.core.task;
 
 /**
- * A callback interface for a decorator to be applied to any {@link Runnable}
- * about to be executed.
+ * 用于装饰即将执行的任何 {@link Runnable} 的回调接口。
  *
- * <p>Note that such a decorator is not necessarily being applied to the
- * user-supplied {@code Runnable}/{@code Callable} but rather to the actual
- * execution callback (which may be a wrapper around the user-supplied task).
+ * <p>注意，这样的装饰器不一定直接应用于用户提供的 {@code Runnable}/{@code Callable}，
+ * 而是应用于实际的执行回调（可能是用户任务的包装）。
  *
- * <p>The primary use case is to set some execution context around the task's
- * invocation, or to provide some monitoring/statistics for task execution.
+ * <p>主要用途是在任务调用前设置一些执行上下文，或为任务执行提供监控/统计。
  *
- * <p><b>NOTE:</b> Exception handling in {@code TaskDecorator} implementations
- * may be limited. Specifically in case of a {@code Future}-based operation,
- * the exposed {@code Runnable} will be a wrapper which does not propagate
- * any exceptions from its {@code run} method.
+ * <p><b>注意：</b> {@code TaskDecorator} 实现中的异常处理可能有限。
+ * 特别是在基于 {@code Future} 的操作中，暴露的 {@code Runnable} 是一个包装器，
+ * 不会传播其 {@code run} 方法中的任何异常。
  *
  * @author Juergen Hoeller
  * @since 4.3
@@ -42,11 +38,10 @@ package org.springframework.core.task;
 public interface TaskDecorator {
 
 	/**
-	 * Decorate the given {@code Runnable}, returning a potentially wrapped
-	 * {@code Runnable} for actual execution, internally delegating to the
-	 * original {@link Runnable#run()} implementation.
-	 * @param runnable the original {@code Runnable}
-	 * @return the decorated {@code Runnable}
+	 * 装饰给定的 {@code Runnable}，返回一个可能被包装过的
+	 * {@code Runnable} 用于实际执行，内部委托给原始的 {@link Runnable#run()} 实现。
+	 * @param runnable 原始的 {@code Runnable}
+	 * @return 装饰后的 {@code Runnable}
 	 */
 	Runnable decorate(Runnable runnable);
 

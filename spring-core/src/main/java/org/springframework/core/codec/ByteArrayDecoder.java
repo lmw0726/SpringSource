@@ -16,8 +16,6 @@
 
 package org.springframework.core.codec;
 
-import java.util.Map;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -25,8 +23,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
+import java.util.Map;
+
 /**
- * Decoder for {@code byte} arrays.
+ * {@code byte} 数组的解码器。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev

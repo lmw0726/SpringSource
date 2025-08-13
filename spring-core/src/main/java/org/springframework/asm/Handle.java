@@ -29,7 +29,7 @@
 package org.springframework.asm;
 
 /**
- * A reference to a field or a method.
+ * 对字段或方法的引用。
  *
  * @author Remi Forax
  * @author Eric Bruneton
@@ -37,39 +37,36 @@ package org.springframework.asm;
 public final class Handle {
 
   /**
-   * The kind of field or method designated by this Handle. Should be {@link Opcodes#H_GETFIELD},
-   * {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC}, {@link
-   * Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL},
-   * {@link Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * 该句柄所表示的字段或方法的类型。应当是 {@link Opcodes#H_GETFIELD}、
+   * {@link Opcodes#H_GETSTATIC}、{@link Opcodes#H_PUTFIELD}、{@link Opcodes#H_PUTSTATIC}、
+   * {@link Opcodes#H_INVOKEVIRTUAL}、{@link Opcodes#H_INVOKESTATIC}、{@link Opcodes#H_INVOKESPECIAL}、
+   * {@link Opcodes#H_NEWINVOKESPECIAL} 或 {@link Opcodes#H_INVOKEINTERFACE} 之一。
    */
   private final int tag;
 
-  /** The internal name of the class that owns the field or method designated by this handle. */
+  /** 拥有该字段或方法的类的内部名称。 */
   private final String owner;
 
-  /** The name of the field or method designated by this handle. */
+  /** 该句柄所指字段或方法的名称。 */
   private final String name;
 
-  /** The descriptor of the field or method designated by this handle. */
+  /** 该字段或方法的描述符。 */
   private final String descriptor;
 
-  /** Whether the owner is an interface or not. */
+  /** 指示拥有者是否为接口。 */
   private final boolean isInterface;
 
   /**
-   * Constructs a new field or method handle.
+   * 构造一个新的字段或方法句柄。
    *
-   * @param tag the kind of field or method designated by this Handle. Must be {@link
-   *     Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link
-   *     Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC},
-   *     {@link Opcodes#H_INVOKESPECIAL}, {@link Opcodes#H_NEWINVOKESPECIAL} or {@link
-   *     Opcodes#H_INVOKEINTERFACE}.
-   * @param owner the internal name of the class that owns the field or method designated by this
-   *     handle.
-   * @param name the name of the field or method designated by this handle.
-   * @param descriptor the descriptor of the field or method designated by this handle.
-   * @deprecated this constructor has been superseded by {@link #Handle(int, String, String, String,
-   *     boolean)}.
+   * @param tag 该句柄所表示的字段或方法类型，必须是 {@link Opcodes#H_GETFIELD}、
+   *     {@link Opcodes#H_GETSTATIC}、{@link Opcodes#H_PUTFIELD}、{@link Opcodes#H_PUTSTATIC}、
+   *     {@link Opcodes#H_INVOKEVIRTUAL}、{@link Opcodes#H_INVOKESTATIC}、
+   *     {@link Opcodes#H_INVOKESPECIAL}、{@link Opcodes#H_NEWINVOKESPECIAL} 或 {@link Opcodes#H_INVOKEINTERFACE}。
+   * @param owner 拥有该字段或方法的类的内部名称。
+   * @param name 字段或方法名称。
+   * @param descriptor 字段或方法描述符。
+   * @deprecated 此构造函数已被 {@link #Handle(int, String, String, String, boolean)} 取代。
    */
   @Deprecated
   public Handle(final int tag, final String owner, final String name, final String descriptor) {
@@ -77,18 +74,16 @@ public final class Handle {
   }
 
   /**
-   * Constructs a new field or method handle.
+   * 构造一个新的字段或方法句柄。
    *
-   * @param tag the kind of field or method designated by this Handle. Must be {@link
-   *     Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link
-   *     Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC},
-   *     {@link Opcodes#H_INVOKESPECIAL}, {@link Opcodes#H_NEWINVOKESPECIAL} or {@link
-   *     Opcodes#H_INVOKEINTERFACE}.
-   * @param owner the internal name of the class that owns the field or method designated by this
-   *     handle.
-   * @param name the name of the field or method designated by this handle.
-   * @param descriptor the descriptor of the field or method designated by this handle.
-   * @param isInterface whether the owner is an interface or not.
+   * @param tag 该句柄所表示的字段或方法类型，必须是 {@link Opcodes#H_GETFIELD}、
+   *     {@link Opcodes#H_GETSTATIC}、{@link Opcodes#H_PUTFIELD}、{@link Opcodes#H_PUTSTATIC}、
+   *     {@link Opcodes#H_INVOKEVIRTUAL}、{@link Opcodes#H_INVOKESTATIC}、
+   *     {@link Opcodes#H_INVOKESPECIAL}、{@link Opcodes#H_NEWINVOKESPECIAL} 或 {@link Opcodes#H_INVOKEINTERFACE}。
+   * @param owner 拥有该字段或方法的类的内部名称。
+   * @param name 字段或方法名称。
+   * @param descriptor 字段或方法描述符。
+   * @param isInterface 拥有者是否为接口。
    */
   public Handle(
       final int tag,
@@ -104,48 +99,47 @@ public final class Handle {
   }
 
   /**
-   * Returns the kind of field or method designated by this handle.
+   * 返回该句柄所表示字段或方法的类型。
    *
-   * @return {@link Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD},
-   *     {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link
-   *     Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL}, {@link
-   *     Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * @return {@link Opcodes#H_GETFIELD}、{@link Opcodes#H_GETSTATIC}、{@link Opcodes#H_PUTFIELD}、
+   *     {@link Opcodes#H_PUTSTATIC}、{@link Opcodes#H_INVOKEVIRTUAL}、{@link Opcodes#H_INVOKESTATIC}、
+   *     {@link Opcodes#H_INVOKESPECIAL}、{@link Opcodes#H_NEWINVOKESPECIAL} 或 {@link Opcodes#H_INVOKEINTERFACE}。
    */
   public int getTag() {
     return tag;
   }
 
   /**
-   * Returns the internal name of the class that owns the field or method designated by this handle.
+   * 返回拥有该字段或方法的类的内部名称。
    *
-   * @return the internal name of the class that owns the field or method designated by this handle.
+   * @return 拥有该字段或方法的类的内部名称。
    */
   public String getOwner() {
     return owner;
   }
 
   /**
-   * Returns the name of the field or method designated by this handle.
+   * 返回该句柄指向的字段或方法的名称。
    *
-   * @return the name of the field or method designated by this handle.
+   * @return 字段或方法名称。
    */
   public String getName() {
     return name;
   }
 
   /**
-   * Returns the descriptor of the field or method designated by this handle.
+   * 返回该句柄指向字段或方法的描述符。
    *
-   * @return the descriptor of the field or method designated by this handle.
+   * @return 字段或方法描述符。
    */
   public String getDesc() {
     return descriptor;
   }
 
   /**
-   * Returns true if the owner of the field or method designated by this handle is an interface.
+   * 判断拥有者是否为接口。
    *
-   * @return true if the owner of the field or method designated by this handle is an interface.
+   * @return 如果拥有者是接口，返回 true。
    */
   public boolean isInterface() {
     return isInterface;
@@ -175,11 +169,11 @@ public final class Handle {
   }
 
   /**
-   * Returns the textual representation of this handle. The textual representation is:
+   * 返回该句柄的文本表示形式。格式如下：
    *
    * <ul>
-   *   <li>for a reference to a class: owner "." name descriptor " (" tag ")",
-   *   <li>for a reference to an interface: owner "." name descriptor " (" tag " itf)".
+   *   <li>对于类的引用：owner "." name descriptor " (" tag ")"
+   *   <li>对于接口的引用：owner "." name descriptor " (" tag " itf)"。
    * </ul>
    */
   @Override

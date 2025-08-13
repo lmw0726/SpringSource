@@ -16,20 +16,19 @@
 
 package org.springframework.core.convert.support;
 
+import org.springframework.core.convert.converter.Converter;
+
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import org.springframework.core.convert.converter.Converter;
-
 /**
- * Simple converter from Java 8's {@link java.time.ZonedDateTime} to {@link java.util.Calendar}.
+ * 从 Java 8 的 {@link java.time.ZonedDateTime} 到 {@link java.util.Calendar} 的简单转换器。
  *
- * <p>Note that Spring's default ConversionService setup understands the 'from'/'to' convention
- * that the JSR-310 {@code java.time} package consistently uses. That convention is implemented
- * reflectively in {@link ObjectToObjectConverter}, not in specific JSR-310 converters.
- * It covers {@link java.util.GregorianCalendar#toZonedDateTime()} as well, and also
- * {@link java.util.Date#from(java.time.Instant)} and {@link java.util.Date#toInstant()}.
+ * <p>请注意，Spring 的默认 ConversionService 设置理解 JSR-310 {@code java.time} 包
+ * 始终使用的“from”/“to”约定。该约定通过反射在 {@link ObjectToObjectConverter} 中实现，
+ * 而非在特定的 JSR-310 转换器中。它也涵盖了 {@link java.util.GregorianCalendar#toZonedDateTime()}，
+ * 以及 {@link java.util.Date#from(java.time.Instant)} 和 {@link java.util.Date#toInstant()}。
  *
  * @author Juergen Hoeller
  * @since 4.0.1

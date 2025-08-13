@@ -16,24 +16,24 @@
 
 package org.springframework.core.io.support;
 
-import java.util.Locale;
-
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.Locale;
+
 /**
- * Helper class for loading a localized resource,
- * specified through name, extension and current locale.
+ * 用于加载本地化资源的辅助类，
+ * 通过名称、扩展名和当前区域(locale)指定资源。
  *
  * @author Juergen Hoeller
  * @since 1.2.5
  */
 public class LocalizedResourceHelper {
 
-	/** The default separator to use in-between file name parts: an underscore. */
+	/** 文件名部分之间使用的默认分隔符：下划线。 */
 	public static final String DEFAULT_SEPARATOR = "_";
 
 
@@ -43,7 +43,7 @@ public class LocalizedResourceHelper {
 
 
 	/**
-	 * Create a new LocalizedResourceHelper with a DefaultResourceLoader.
+	 * 使用 DefaultResourceLoader 创建一个新的 LocalizedResourceHelper。
 	 * @see org.springframework.core.io.DefaultResourceLoader
 	 */
 	public LocalizedResourceHelper() {
@@ -51,8 +51,8 @@ public class LocalizedResourceHelper {
 	}
 
 	/**
-	 * Create a new LocalizedResourceHelper with the given ResourceLoader.
-	 * @param resourceLoader the ResourceLoader to use
+	 * 使用指定的 ResourceLoader 创建一个新的 LocalizedResourceHelper。
+	 * @param resourceLoader 要使用的 ResourceLoader
 	 */
 	public LocalizedResourceHelper(ResourceLoader resourceLoader) {
 		Assert.notNull(resourceLoader, "ResourceLoader must not be null");
@@ -60,8 +60,8 @@ public class LocalizedResourceHelper {
 	}
 
 	/**
-	 * Set the separator to use in-between file name parts.
-	 * Default is an underscore ("_").
+	 * 设置文件名部分之间使用的分隔符。
+	 * 默认为下划线 ("_")。
 	 */
 	public void setSeparator(@Nullable String separator) {
 		this.separator = (separator != null ? separator : DEFAULT_SEPARATOR);
@@ -69,22 +69,20 @@ public class LocalizedResourceHelper {
 
 
 	/**
-	 * Find the most specific localized resource for the given name,
-	 * extension and locale:
-	 * <p>The file will be searched with locations in the following order,
-	 * similar to {@code java.util.ResourceBundle}'s search order:
+	 * 查找给定名称、扩展名和区域的最具体的本地化资源：
+	 * <p>文件将按以下顺序查找位置，
+	 * 类似于 {@code java.util.ResourceBundle} 的搜索顺序：
 	 * <ul>
 	 * <li>[name]_[language]_[country]_[variant][extension]
 	 * <li>[name]_[language]_[country][extension]
 	 * <li>[name]_[language][extension]
 	 * <li>[name][extension]
 	 * </ul>
-	 * <p>If none of the specific files can be found, a resource
-	 * descriptor for the default location will be returned.
-	 * @param name the name of the file, without localization part nor extension
-	 * @param extension the file extension (e.g. ".xls")
-	 * @param locale the current locale (may be {@code null})
-	 * @return the most specific localized resource found
+	 * <p>如果没有找到具体文件，则返回默认位置的资源描述符。
+	 * @param name 文件名，不含本地化部分和扩展名
+	 * @param extension 文件扩展名（例如 ".xls"）
+	 * @param locale 当前区域（可以为 {@code null}）
+	 * @return 找到的最具体的本地化资源
 	 * @see java.util.ResourceBundle
 	 */
 	public Resource findLocalizedResource(String name, String extension, @Nullable Locale locale) {
@@ -98,27 +96,27 @@ public class LocalizedResourceHelper {
 			String country = locale.getCountry();
 			String variant = locale.getVariant();
 
-			// Check for file with language, country and variant localization.
+			// 检查带语言、国家和变体的本地化文件。
 			if (variant.length() > 0) {
 				String location =
 						name + this.separator + lang + this.separator + country + this.separator + variant + extension;
 				resource = this.resourceLoader.getResource(location);
 			}
 
-			// Check for file with language and country localization.
+			// 检查带语言和国家的本地化文件。
 			if ((resource == null || !resource.exists()) && country.length() > 0) {
 				String location = name + this.separator + lang + this.separator + country + extension;
 				resource = this.resourceLoader.getResource(location);
 			}
 
-			// Check for document with language localization.
+			// 检查带语言的本地化文件。
 			if ((resource == null || !resource.exists()) && lang.length() > 0) {
 				String location = name + this.separator + lang + extension;
 				resource = this.resourceLoader.getResource(location);
 			}
 		}
 
-		// Check for document without localization.
+		// 检查无本地化的文件。
 		if (resource == null || !resource.exists()) {
 			String location = name + extension;
 			resource = this.resourceLoader.getResource(location);

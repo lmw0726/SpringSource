@@ -16,18 +16,18 @@
 
 package org.springframework.core.type.classreading;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
- * Simple implementation of the {@link MetadataReaderFactory} interface,
- * creating a new ASM {@link org.springframework.asm.ClassReader} for every request.
+ * {@link MetadataReaderFactory} 接口的简单实现，
+ * 每次请求都会创建一个新的 ASM {@link org.springframework.asm.ClassReader}。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -38,24 +38,24 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 
 
 	/**
-	 * Create a new SimpleMetadataReaderFactory for the default class loader.
+	 * 为默认类加载器创建一个新的 SimpleMetadataReaderFactory。
 	 */
 	public SimpleMetadataReaderFactory() {
 		this.resourceLoader = new DefaultResourceLoader();
 	}
 
 	/**
-	 * Create a new SimpleMetadataReaderFactory for the given resource loader.
-	 * @param resourceLoader the Spring ResourceLoader to use
-	 * (also determines the ClassLoader to use)
+	 * 为指定的资源加载器创建一个新的 SimpleMetadataReaderFactory。
+	 * @param resourceLoader 要使用的 Spring ResourceLoader
+	 * （也决定了要使用的 ClassLoader）
 	 */
 	public SimpleMetadataReaderFactory(@Nullable ResourceLoader resourceLoader) {
 		this.resourceLoader = (resourceLoader != null ? resourceLoader : new DefaultResourceLoader());
 	}
 
 	/**
-	 * Create a new SimpleMetadataReaderFactory for the given class loader.
-	 * @param classLoader the ClassLoader to use
+	 * 为指定的类加载器创建一个新的 SimpleMetadataReaderFactory。
+	 * @param classLoader 要使用的 ClassLoader
 	 */
 	public SimpleMetadataReaderFactory(@Nullable ClassLoader classLoader) {
 		this.resourceLoader =
@@ -64,8 +64,7 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 
 
 	/**
-	 * Return the ResourceLoader that this MetadataReaderFactory has been
-	 * constructed with.
+	 * 返回此 MetadataReaderFactory 所使用的 ResourceLoader。
 	 */
 	public final ResourceLoader getResourceLoader() {
 		return this.resourceLoader;
@@ -81,8 +80,8 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 			return getMetadataReader(resource);
 		}
 		catch (FileNotFoundException ex) {
-			// Maybe an inner class name using the dot name syntax? Need to use the dollar syntax here...
-			// ClassUtils.forName has an equivalent check for resolution into Class references later on.
+			// 可能是使用点语法的内部类名？这里需要使用美元符号语法……
+			// ClassUtils.forName 在解析成 Class 引用时有类似的检查。
 			int lastDotIndex = className.lastIndexOf('.');
 			if (lastDotIndex != -1) {
 				String innerClassName =

@@ -16,32 +16,27 @@
 
 package org.springframework.core.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * {@link InvocationHandler} for an {@link Annotation} that Spring has
- * <em>synthesized</em> (i.e. wrapped in a dynamic proxy) with additional
- * functionality such as attribute alias handling.
+ * {@link InvocationHandler}，用于 Spring 已**合成**（即包装在动态代理中）的 {@link Annotation}，
+ * 具有附加功能，例如属性别名处理。
  *
  * @author Sam Brannen
  * @author Phillip Webb
  * @since 5.2
- * @param <A> the annotation type
+ * @param <A> 注解类型
  * @see Annotation
  * @see AnnotationUtils#synthesizeAnnotation(Annotation, AnnotatedElement)
  */
@@ -98,8 +93,8 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 	}
 
 	/**
-	 * See {@link Annotation#equals(Object)} for a definition of the required algorithm.
-	 * @param other the other object to compare against
+	 * 有关所需算法的定义，请参见 {@link Annotation#equals(Object)}。
+	 * @param other 要比较的其他对象
 	 */
 	private boolean annotationEquals(Object other) {
 		if (this == other) {
@@ -120,7 +115,7 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 	}
 
 	/**
-	 * See {@link Annotation#hashCode()} for a definition of the required algorithm.
+	 * 有关所需算法的定义，请参见 {@link Annotation#hashCode()}。
 	 */
 	private int annotationHashCode() {
 		Integer hashCode = this.hashCode;
@@ -142,8 +137,7 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 	}
 
 	private int getValueHashCode(Object value) {
-		// Use Arrays.hashCode(...) since Spring's ObjectUtils doesn't comply
-		// with the requirements specified in Annotation#hashCode().
+		// 使用 Arrays.hashCode(...)，因为 Spring 的 ObjectUtils 不符合 Annotation#hashCode() 中指定的要求。
 		if (value instanceof boolean[]) {
 			return Arrays.hashCode((boolean[]) value);
 		}
@@ -195,17 +189,14 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 	}
 
 	/**
-	 * This method currently does not address the following issues which we may
-	 * choose to address at a later point in time.
+	 * 此方法目前未解决以下问题，我们可能会在稍后解决。
 	 *
 	 * <ul>
-	 * <li>non-ASCII, non-visible, and non-printable characters within a character
-	 * or String literal are not escaped.</li>
-	 * <li>formatting for float and double values does not take into account whether
-	 * a value is not a number (NaN) or infinite.</li>
+	 * <li>字符或字符串字面量中的非 ASCII、不可见和不可打印字符未转义。</li>
+	 * <li>浮点和双精度值的格式未考虑值是否不是数字 (NaN) 或无穷大。</li>
 	 * </ul>
-	 * @param value the attribute value to format
-	 * @return the formatted string representation
+	 * @param value 要格式化的属性值
+	 * @return 格式化的字符串表示形式
 	 */
 	private String toString(Object value) {
 		if (value instanceof String) {
@@ -254,7 +245,7 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 							"' in merged annotation " + this.annotation.getType().getName()));
 		});
 
-		// Clone non-empty arrays so that users cannot alter the contents of values in our cache.
+		// 克隆非空数组，以便用户不能更改我们缓存中值的内容。
 		if (value.getClass().isArray() && Array.getLength(value) > 0) {
 			value = cloneArray(value);
 		}
@@ -263,8 +254,8 @@ final class SynthesizedMergedAnnotationInvocationHandler<A extends Annotation> i
 	}
 
 	/**
-	 * Clone the provided array, ensuring that the original component type is retained.
-	 * @param array the array to clone
+	 * 克隆提供的数组，确保保留原始组件类型。
+	 * @param array 要克隆的数组
 	 */
 	private Object cloneArray(Object array) {
 		if (array instanceof boolean[]) {

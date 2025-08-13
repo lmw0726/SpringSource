@@ -23,12 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated element uses the Http Server available in
- * {@code com.sun.*} classes, which is only available on a Sun/Oracle JVM.
+ * 表示被注解的元素使用了{@code com.sun.*}类中提供的HTTP服务器功能，
+ * 该功能仅在Sun/Oracle JVM上可用。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @deprecated as of 5.1, along with Spring's Sun HTTP Server support classes
+ * @deprecated 自5.1版本起弃用，同时弃用的还包括Spring对Sun HTTP Server的支持类
  */
 @Deprecated
 @Retention(RetentionPolicy.CLASS)

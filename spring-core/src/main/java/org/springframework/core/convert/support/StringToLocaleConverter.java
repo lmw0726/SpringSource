@@ -16,17 +16,17 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.Locale;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.util.Locale;
+
 /**
- * Converts from a String to a {@link java.util.Locale}.
+ * 将字符串转换为 {@link java.util.Locale}。
  *
- * <p>Accepts the classic {@link Locale} String format ({@link Locale#toString()})
- * as well as BCP 47 language tags ({@link Locale#forLanguageTag}.
+ * <p>接受经典的 {@link Locale} 字符串格式 ({@link Locale#toString()})
+ * 以及 BCP 47 语言标签 ({@link Locale#forLanguageTag})。
  *
  * @author Keith Donald
  * @author Juergen Hoeller

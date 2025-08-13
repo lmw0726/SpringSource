@@ -16,25 +16,20 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.lang.Nullable;
+
 import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.springframework.lang.Nullable;
-
 /**
- * An {@link AbstractMergedAnnotation} used as the implementation of
- * {@link MergedAnnotation#missing()}.
+ * 一个 {@link AbstractMergedAnnotation}，用作 {@link MergedAnnotation#missing()} 的实现。
  *
  * @author Phillip Webb
  * @author Juergen Hoeller
  * @since 5.2
- * @param <A> the annotation type
+ * @param <A> 注解类型
  */
 final class MissingMergedAnnotation<A extends Annotation> extends AbstractMergedAnnotation<A> {
 

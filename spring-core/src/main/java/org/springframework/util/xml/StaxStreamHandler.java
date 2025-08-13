@@ -16,21 +16,20 @@
 
 package org.springframework.util.xml;
 
-import java.util.Map;
-
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.util.Map;
+
 /**
- * SAX {@link org.xml.sax.ContentHandler} and {@link LexicalHandler}
- * that writes to an {@link XMLStreamWriter}.
+ * 实现SAX {@link org.xml.sax.ContentHandler}和{@link LexicalHandler}接口，
+ * 将数据写入{@link XMLStreamWriter}的处理器类。
  *
  * @author Arjen Poutsma
  * @since 4.0.3

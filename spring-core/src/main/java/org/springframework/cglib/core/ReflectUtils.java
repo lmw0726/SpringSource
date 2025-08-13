@@ -16,30 +16,20 @@
 
 package org.springframework.cglib.core;
 
+import org.springframework.asm.Attribute;
+import org.springframework.asm.Type;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.asm.Attribute;
-import org.springframework.asm.Type;
+import java.util.*;
 
 /**
  * @version $Id: ReflectUtils.java,v 1.30 2009/01/11 19:47:49 herbyderby Exp $
@@ -56,7 +46,7 @@ public class ReflectUtils {
 
 	private static final ClassLoader defaultLoader = ReflectUtils.class.getClassLoader();
 
-	// SPRING PATCH BEGIN
+	// SPRING补丁开始
 	private static final Method privateLookupInMethod;
 
 	private static final Method lookupDefineClassMethod;
@@ -129,7 +119,7 @@ public class ReflectUtils {
 			}
 		});
 	}
-	// SPRING PATCH END
+	// SPRING补丁结束
 
 	private static final String[] CGLIB_PACKAGES = {"java.lang"};
 
@@ -304,7 +294,7 @@ public class ReflectUtils {
 		return newInstance(getConstructor(type, parameterTypes), args);
 	}
 
-	@SuppressWarnings("deprecation")  // on JDK 9
+	@SuppressWarnings("deprecation")  // 在JDK 9上
 	public static Object newInstance(final Constructor cstruct, final Object[] args) {
 		boolean flag = cstruct.isAccessible();
 		try {
@@ -480,7 +470,7 @@ public class ReflectUtils {
 		return methods[0];
 	}
 
-	// SPRING PATCH BEGIN
+	// SPRING补丁开始
 	public static Class defineClass(String className, byte[] b, ClassLoader loader) throws Exception {
 		return defineClass(className, b, loader, null, null);
 	}
@@ -491,14 +481,14 @@ public class ReflectUtils {
 		return defineClass(className, b, loader, protectionDomain, null);
 	}
 
-	@SuppressWarnings("deprecation")  // on JDK 9
+	@SuppressWarnings("deprecation")  // JDK 9 上的警告抑制
 	public static Class defineClass(String className, byte[] b, ClassLoader loader,
 			ProtectionDomain protectionDomain, Class<?> contextClass) throws Exception {
 
 		Class c = null;
 		Throwable t = THROWABLE;
 
-		// Preferred option: JDK 9+ Lookup.defineClass API if ClassLoader matches
+		// 优选方案：如果 ClassLoader 匹配，使用 JDK 9+ 的 Lookup.defineClass API
 		if (contextClass != null && contextClass.getClassLoader() == loader &&
 				privateLookupInMethod != null && lookupDefineClassMethod != null) {
 			try {
@@ -511,9 +501,9 @@ public class ReflectUtils {
 				if (target.getClass() != LinkageError.class && target.getClass() != IllegalArgumentException.class) {
 					throw new CodeGenerationException(target);
 				}
-				// in case of plain LinkageError (class already defined)
-				// or IllegalArgumentException (class in different package):
-				// fall through to traditional ClassLoader.defineClass below
+				// 遇到普通的 LinkageError（类已定义）
+				// 或 IllegalArgumentException（类属于不同包）
+				// 则继续执行下面传统的 ClassLoader.defineClass 逻辑
 				t = target;
 			}
 			catch (Throwable ex) {
@@ -521,13 +511,13 @@ public class ReflectUtils {
 			}
 		}
 
-		// Direct defineClass attempt on the target Classloader
+		// 直接调用目标 ClassLoader 的 defineClass 方法尝试定义类
 		if (c == null) {
 			if (protectionDomain == null) {
 				protectionDomain = PROTECTION_DOMAIN;
 			}
 
-			// Look for publicDefineClass(String name, byte[] b, ProtectionDomain protectionDomain)
+			// 尝试寻找 publicDefineClass(String name, byte[] b, ProtectionDomain protectionDomain) 方法
 			try {
 				Method publicDefineClass = loader.getClass().getMethod(
 						"publicDefineClass", String.class, byte[].class, ProtectionDomain.class);
@@ -537,15 +527,15 @@ public class ReflectUtils {
 				if (!(ex.getTargetException() instanceof UnsupportedOperationException)) {
 					throw new CodeGenerationException(ex.getTargetException());
 				}
-				// in case of UnsupportedOperationException, fall through
+				// 遇到 UnsupportedOperationException，则继续尝试下面逻辑
 				t = ex.getTargetException();
 			}
 			catch (Throwable ex) {
-				// publicDefineClass method not available -> fall through
+				// publicDefineClass 方法不可用，则继续执行
 				t = ex;
 			}
 
-			// Classic option: protected ClassLoader.defineClass method
+			// 传统方案：调用受保护的 ClassLoader.defineClass 方法
 			if (c == null && classLoaderDefineClassMethod != null) {
 				Object[] args = new Object[]{className, b, 0, b.length, protectionDomain};
 				try {
@@ -558,8 +548,8 @@ public class ReflectUtils {
 					throw new CodeGenerationException(ex.getTargetException());
 				}
 				catch (Throwable ex) {
-					// Fall through if setAccessible fails with InaccessibleObjectException on JDK 9+
-					// (on the module path and/or with a JVM bootstrapped with --illegal-access=deny)
+					// 如果在 JDK 9+ 模块路径或带有 --illegal-access=deny 的 JVM 启动参数下
+					// setAccessible 调用失败并抛出 InaccessibleObjectException，则继续尝试后续逻辑
 					if (!ex.getClass().getName().endsWith("InaccessibleObjectException")) {
 						throw new CodeGenerationException(ex);
 					}
@@ -568,7 +558,7 @@ public class ReflectUtils {
 			}
 		}
 
-		// Fallback option: JDK 9+ Lookup.defineClass API even if ClassLoader does not match
+		// 备用方案：即使 ClassLoader 不匹配，仍使用 JDK 9+ Lookup.defineClass API 尝试定义类
 		if (c == null && contextClass != null && contextClass.getClassLoader() != loader &&
 				privateLookupInMethod != null && lookupDefineClassMethod != null) {
 			try {
@@ -584,16 +574,16 @@ public class ReflectUtils {
 			}
 		}
 
-		// No defineClass variant available at all?
+		// 如果完全没有找到可用的 defineClass 方法，则抛出异常
 		if (c == null) {
 			throw new CodeGenerationException(t);
 		}
 
-		// Force static initializers to run.
+		// 强制执行类的静态初始化块
 		Class.forName(className, true, loader);
 		return c;
 	}
-	// SPRING PATCH END
+	// SPRING补丁结束
 
 	public static int findPackageProtected(Class[] classes) {
 		for (int i = 0; i < classes.length; i++) {
@@ -656,7 +646,7 @@ public class ReflectUtils {
 		};
 	}
 
-	// used by MethodInterceptorGenerated generated code
+	// 被 MethodInterceptorGenerated 生成的代码调用
 	public static Method[] findMethods(String[] namesAndDescriptors, Method[] methods) {
 		Map map = new HashMap();
 		for (int i = 0; i < methods.length; i++) {
@@ -667,7 +657,7 @@ public class ReflectUtils {
 		for (int i = 0; i < result.length; i++) {
 			result[i] = (Method) map.get(namesAndDescriptors[i * 2] + namesAndDescriptors[i * 2 + 1]);
 			if (result[i] == null) {
-				// TODO: error?
+				// TODO: 错误？
 			}
 		}
 		return result;

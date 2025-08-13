@@ -20,7 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Exception thrown when required properties are not found.
+ * 当找不到所需属性时抛出的异常。
  *
  * @author Chris Beams
  * @since 3.1
@@ -45,8 +45,7 @@ public class MissingRequiredPropertiesException extends IllegalStateException {
 	}
 
 	/**
-	 * Return the set of properties marked as required but not present
-	 * upon validation.
+	 * 返回标记为必需但在验证时不存在的属性集合。
 	 * @see ConfigurablePropertyResolver#setRequiredProperties(String...)
 	 * @see ConfigurablePropertyResolver#validateRequiredProperties()
 	 */

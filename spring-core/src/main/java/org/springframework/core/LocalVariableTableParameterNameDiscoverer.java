@@ -16,6 +16,12 @@
 
 package org.springframework.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.asm.*;
+import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -25,27 +31,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.asm.ClassReader;
-import org.springframework.asm.ClassVisitor;
-import org.springframework.asm.Label;
-import org.springframework.asm.MethodVisitor;
-import org.springframework.asm.Opcodes;
-import org.springframework.asm.SpringAsmInfo;
-import org.springframework.asm.Type;
-import org.springframework.lang.Nullable;
-import org.springframework.util.ClassUtils;
-
 /**
- * Implementation of {@link ParameterNameDiscoverer} that uses the LocalVariableTable
- * information in the method attributes to discover parameter names. Returns
- * {@code null} if the class file was compiled without debug information.
+ * 使用方法属性中的 LocalVariableTable 信息来发现参数名的 {@link ParameterNameDiscoverer} 实现。
+ * 如果类文件在编译时没有包含调试信息，则返回 {@code null}。
  *
- * <p>Uses ObjectWeb's ASM library for analyzing class files. Each discoverer instance
- * caches the ASM discovered information for each introspected Class, in a thread-safe
- * manner. It is recommended to reuse ParameterNameDiscoverer instances as far as possible.
+ * <p>使用 ObjectWeb 的 ASM 库来分析类文件。每个实例会以线程安全的方式缓存每个被检查 Class 的 ASM 发现信息。
+ * 建议尽可能重用 ParameterNameDiscoverer 实例。
  *
  * @author Adrian Colyer
  * @author Costin Leau
@@ -58,10 +49,10 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 
 	private static final Log logger = LogFactory.getLog(LocalVariableTableParameterNameDiscoverer.class);
 
-	// marker object for classes that do not have any debug info
+	// 用于标记不含调试信息的类
 	private static final Map<Executable, String[]> NO_DEBUG_INFO_MAP = Collections.emptyMap();
 
-	// the cache uses a nested index (value is a map) to keep the top level cache relatively small in size
+	// 缓存结构为嵌套索引（值是一个 map），保持顶层缓存大小较小
 	private final Map<Class<?>, Map<Executable, String[]>> parameterNamesCache = new ConcurrentHashMap<>(32);
 
 
@@ -86,23 +77,20 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 	}
 
 	/**
-	 * Inspects the target class.
-	 * <p>Exceptions will be logged, and a marker map returned to indicate the
-	 * lack of debug information.
+	 * 检查目标类。
+	 * <p>异常会被记录，并返回标记 map 表示缺少调试信息。
 	 */
 	private Map<Executable, String[]> inspectClass(Class<?> clazz) {
 		InputStream is = clazz.getResourceAsStream(ClassUtils.getClassFileName(clazz));
 		if (is == null) {
-			// We couldn't load the class file, which is not fatal as it
-			// simply means this method of discovering parameter names won't work.
+			// 无法加载类文件，非致命，意味着此方法不能发现参数名
 			if (logger.isDebugEnabled()) {
 				logger.debug("Cannot find '.class' file for class [" + clazz +
 						"] - unable to determine constructor/method parameter names");
 			}
 			return NO_DEBUG_INFO_MAP;
 		}
-		// We cannot use try-with-resources here for the InputStream, since we have
-		// custom handling of the close() method in a finally-block.
+		// 不能用 try-with-resources，因为 finally 里自定义关闭流的处理
 		try {
 			ClassReader classReader = new ClassReader(is);
 			Map<Executable, String[]> map = new ConcurrentHashMap<>(32);
@@ -127,7 +115,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 				is.close();
 			}
 			catch (IOException ex) {
-				// ignore
+				// 忽略关闭异常
 			}
 		}
 		return NO_DEBUG_INFO_MAP;
@@ -135,8 +123,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 
 
 	/**
-	 * Helper class that inspects all methods and constructors and then
-	 * attempts to find the parameter names for the given {@link Executable}.
+	 * 帮助类，检查所有方法和构造函数，尝试查找给定 {@link Executable} 的参数名。
 	 */
 	private static class ParameterNameDiscoveringVisitor extends ClassVisitor {
 
@@ -155,7 +142,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 		@Override
 		@Nullable
 		public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-			// exclude synthetic + bridged && static class initialization
+			// 排除 synthetic 和 bridged 方法以及静态类初始化块
 			if (!isSyntheticOrBridged(access) && !STATIC_CLASS_INIT.equals(name)) {
 				return new LocalVariableTableVisitor(this.clazz, this.executableMap, name, desc, isStatic(access));
 			}
@@ -191,8 +178,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 		private boolean hasLvtInfo = false;
 
 		/*
-		 * The nth entry contains the slot index of the LVT table entry holding the
-		 * argument name for the nth parameter.
+		 * 第 n 个元素是本地变量表中保存第 n 个参数名称的槽索引。
 		 */
 		private final int[] lvtSlotIndex;
 
@@ -220,10 +206,8 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 		@Override
 		public void visitEnd() {
 			if (this.hasLvtInfo || (this.isStatic && this.parameterNames.length == 0)) {
-				// visitLocalVariable will never be called for static no args methods
-				// which doesn't use any local variables.
-				// This means that hasLvtInfo could be false for that kind of methods
-				// even if the class has local variable info.
+				// 对于静态无参方法，visitLocalVariable 不会被调用，因此 hasLvtInfo 可能为 false，
+				// 但类中有本地变量信息时仍然需要记录
 				this.executableMap.put(resolveExecutable(), this.parameterNames);
 			}
 		}
@@ -262,7 +246,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 		}
 
 		private static boolean isWideType(Type aType) {
-			// float is not a wide type
+			// float 不是宽类型
 			return (aType == Type.LONG_TYPE || aType == Type.DOUBLE_TYPE);
 		}
 	}

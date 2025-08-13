@@ -15,13 +15,12 @@
  */
 package org.springframework.cglib.beans;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.security.ProtectionDomain;
-import java.util.*;
-import org.springframework.cglib.core.*;
 import org.springframework.asm.ClassVisitor;
+import org.springframework.cglib.core.AbstractClassGenerator;
+import org.springframework.cglib.core.KeyFactory;
+import org.springframework.cglib.core.ReflectUtils;
+
+import java.security.ProtectionDomain;
 
 /**
  * @author Juozas Baliuka
@@ -85,9 +84,9 @@ abstract public class BulkBean
 
         public void setTarget(Class target) {
             this.target = target;
-			// SPRING PATCH BEGIN
+			// SPRING补丁开始
 			setContextClass(target);
-			// SPRING PATCH END
+			// SPRING补丁结束
         }
 
         public void setGetters(String[] getters) {

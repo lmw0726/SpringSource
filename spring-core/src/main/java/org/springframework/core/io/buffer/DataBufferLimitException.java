@@ -17,19 +17,15 @@
 package org.springframework.core.io.buffer;
 
 /**
- * Exception that indicates the cumulative number of bytes consumed from a
- * stream of {@link DataBuffer DataBuffer}'s exceeded some pre-configured limit.
- * This can be raised when data buffers are cached and aggregated, e.g.
- * {@link DataBufferUtils#join}. Or it could also be raised when data buffers
- * have been released but a parsed representation is being aggregated, e.g. async
- * parsing with Jackson, SSE parsing and aggregating lines per event.
+ * 异常，表示从 {@link DataBuffer 数据缓冲区} 流中累积消耗的字节数超过了预设的限制。
+ * 当数据缓冲区被缓存和聚合时可能会抛出此异常，例如 {@link DataBufferUtils#join}。
+ * 也可能在数据缓冲区已被释放但解析结果仍在聚合时抛出，例如使用 Jackson 的异步解析、SSE 解析并按事件聚合行等场景。
  *
  * @author Rossen Stoyanchev
  * @since 5.1.11
  */
 @SuppressWarnings("serial")
 public class DataBufferLimitException extends IllegalStateException {
-
 
 	public DataBufferLimitException(String message) {
 		super(message);

@@ -16,13 +16,6 @@
 
 package org.springframework.core.task.support;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.RejectedExecutionException;
-
 import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.core.task.TaskRejectedException;
@@ -31,11 +24,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
 
+import java.util.concurrent.*;
+
 /**
- * Adapter that takes a JDK {@code java.util.concurrent.Executor} and
- * exposes a Spring {@link org.springframework.core.task.TaskExecutor} for it.
- * Also detects an extended {@code java.util.concurrent.ExecutorService}, adapting
- * the {@link org.springframework.core.task.AsyncTaskExecutor} interface accordingly.
+ * 适配器，将 JDK 的 {@code java.util.concurrent.Executor} 包装成 Spring 的 {@link org.springframework.core.task.TaskExecutor}。
+ * 同时，如果传入的是扩展了 {@code java.util.concurrent.ExecutorService} 的实现，则适配 {@link org.springframework.core.task.AsyncTaskExecutor} 接口。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -52,9 +45,8 @@ public class TaskExecutorAdapter implements AsyncListenableTaskExecutor {
 
 
 	/**
-	 * Create a new TaskExecutorAdapter,
-	 * using the given JDK concurrent executor.
-	 * @param concurrentExecutor the JDK concurrent executor to delegate to
+	 * 使用指定的 JDK concurrent executor 创建一个新的 TaskExecutorAdapter。
+	 * @param concurrentExecutor 委托的 JDK executor，不能为空
 	 */
 	public TaskExecutorAdapter(Executor concurrentExecutor) {
 		Assert.notNull(concurrentExecutor, "Executor must not be null");
@@ -63,18 +55,13 @@ public class TaskExecutorAdapter implements AsyncListenableTaskExecutor {
 
 
 	/**
-	 * Specify a custom {@link TaskDecorator} to be applied to any {@link Runnable}
-	 * about to be executed.
-	 * <p>Note that such a decorator is not necessarily being applied to the
-	 * user-supplied {@code Runnable}/{@code Callable} but rather to the actual
-	 * execution callback (which may be a wrapper around the user-supplied task).
-	 * <p>The primary use case is to set some execution context around the task's
-	 * invocation, or to provide some monitoring/statistics for task execution.
-	 * <p><b>NOTE:</b> Exception handling in {@code TaskDecorator} implementations
-	 * is limited to plain {@code Runnable} execution via {@code execute} calls.
-	 * In case of {@code #submit} calls, the exposed {@code Runnable} will be a
-	 * {@code FutureTask} which does not propagate any exceptions; you might
-	 * have to cast it and call {@code Future#get} to evaluate exceptions.
+	 * 指定一个自定义的 {@link TaskDecorator}，用于装饰即将执行的任何 {@link Runnable}。
+	 * <p>注意，此装饰器不一定作用于用户提供的 {@code Runnable}/{@code Callable}，
+	 * 而是作用于实际执行的回调（可能是用户任务的包装）。
+	 * <p>主要用途是为任务执行设置上下文或提供监控统计。
+	 * <p><b>注意：</b> {@code TaskDecorator} 的异常处理仅限于普通的 {@code Runnable} 执行，
+	 * 对于 {@code submit} 调用，暴露的 {@code Runnable} 是 {@code FutureTask}，
+	 * 不会传播 {@code run} 中的异常；需要调用 {@code Future#get} 以捕获异常。
 	 * @since 4.3
 	 */
 	public final void setTaskDecorator(TaskDecorator taskDecorator) {
@@ -83,7 +70,7 @@ public class TaskExecutorAdapter implements AsyncListenableTaskExecutor {
 
 
 	/**
-	 * Delegates to the specified JDK concurrent executor.
+	 * 委托调用指定的 JDK concurrent executor 的 execute 方法执行任务。
 	 * @see java.util.concurrent.Executor#execute(Runnable)
 	 */
 	@Override
@@ -167,12 +154,11 @@ public class TaskExecutorAdapter implements AsyncListenableTaskExecutor {
 
 
 	/**
-	 * Actually execute the given {@code Runnable} (which may be a user-supplied task
-	 * or a wrapper around a user-supplied task) with the given executor.
-	 * @param concurrentExecutor the underlying JDK concurrent executor to delegate to
-	 * @param taskDecorator the specified decorator to be applied, if any
-	 * @param runnable the runnable to execute
-	 * @throws RejectedExecutionException if the given runnable cannot be accepted
+	 * 实际执行给定的 {@code Runnable}（可能是用户任务或用户任务的包装）并交给指定的 executor。
+	 * @param concurrentExecutor 底层 JDK executor
+	 * @param taskDecorator 任务装饰器（如果有）
+	 * @param runnable 要执行的任务
+	 * @throws RejectedExecutionException 任务无法被接受时抛出
 	 * @since 4.3
 	 */
 	protected void doExecute(Executor concurrentExecutor, @Nullable TaskDecorator taskDecorator, Runnable runnable)

@@ -20,8 +20,7 @@ import org.springframework.core.NestedRuntimeException;
 import org.springframework.lang.Nullable;
 
 /**
- * General error that indicates a problem while encoding and decoding to and
- * from an Object stream.
+ * 表示在对象流进行编码和解码过程中出现的问题的通用错误。
  *
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
@@ -31,17 +30,17 @@ import org.springframework.lang.Nullable;
 public class CodecException extends NestedRuntimeException {
 
 	/**
-	 * Create a new CodecException.
-	 * @param msg the detail message
+	 * 创建一个新的 CodecException。
+	 * @param msg 详细消息
 	 */
 	public CodecException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Create a new CodecException.
-	 * @param msg the detail message
-	 * @param cause root cause for the exception, if any
+	 * 创建一个新的 CodecException。
+	 * @param msg 详细消息
+	 * @param cause 异常的根本原因（如果有）
 	 */
 	public CodecException(String msg, @Nullable Throwable cause) {
 		super(msg, cause);

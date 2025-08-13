@@ -23,16 +23,14 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * Miscellaneous {@link String} utility methods.
+ * 各种 {@link String} 工具方法。
  *
- * <p>Mainly for internal use within the framework; consider
- * <a href="https://commons.apache.org/proper/commons-lang/">Apache's Commons Lang</a>
- * for a more comprehensive suite of {@code String} utilities.
+ * <p>主要供框架内部使用；对于更全面的 {@code String} 工具集，
+ * 请考虑使用
+ * <a href="https://commons.apache.org/proper/commons-lang/">Apache 的 Commons Lang</a>。
  *
- * <p>This class delivers some simple functionality that should really be
- * provided by the core Java {@link String} and {@link StringBuilder}
- * classes. It also provides easy-to-use methods to convert between
- * delimited strings, such as CSV strings, and collections and arrays.
+ * <p>本类提供一些简单功能，这些功能实际上应该由核心 Java 的 {@link String} 和 {@link StringBuilder}
+ * 类来提供。它还提供了便捷方法，用于在分隔字符串（如 CSV 字符串）与集合和数组之间转换。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -42,7 +40,7 @@ import java.util.*;
  * @author Arjen Poutsma
  * @author Sam Brannen
  * @author Brian Clozel
- * @since 16 April 2001
+ * @since 2001年4月16日
  */
 public abstract class StringUtils {
 
@@ -62,25 +60,23 @@ public abstract class StringUtils {
 
 
 	//---------------------------------------------------------------------
-	// General convenience methods for working with Strings
+	// 用于处理字符串的一般便捷方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * Check whether the given object (possibly a {@code String}) is empty.
-	 * This is effectively a shortcut for {@code !hasLength(String)}.
-	 * <p>This method accepts any Object as an argument, comparing it to
-	 * {@code null} and the empty String. As a consequence, this method
-	 * will never return {@code true} for a non-null non-String object.
-	 * <p>The Object signature is useful for general attribute handling code
-	 * that commonly deals with Strings but generally has to iterate over
-	 * Objects since attributes may e.g. be primitive value objects as well.
-	 * <p><b>Note: If the object is typed to {@code String} upfront, prefer
-	 * {@link #hasLength(String)} or {@link #hasText(String)} instead.</b>
+	 * 检查给定的对象（可能是 {@code String}）是否为空。
+	 * 这实际上是 {@code !hasLength(String)} 的快捷方式。
+	 * <p>该方法接受任何对象作为参数，将其与 {@code null} 和空字符串进行比较。
+	 * 因此，该方法对于非空的非字符串对象永远不会返回 {@code true}。
+	 * <p>此对象签名对通用属性处理代码很有用，
+	 * 这类代码通常处理字符串，但通常需要遍历对象，
+	 * 因为属性也可能是基本值对象等。
+	 * <p><b>注意：如果对象事先已声明为 {@code String} 类型，
+	 * 建议使用 {@link #hasLength(String)} 或 {@link #hasText(String)}。</b>
 	 *
-	 * @param str the candidate object (possibly a {@code String})
+	 * @param str 待检查的对象（可能是 {@code String}）
 	 * @since 3.2.1
-	 * @deprecated as of 5.3, in favor of {@link #hasLength(String)} and
-	 * {@link #hasText(String)} (or {@link ObjectUtils#isEmpty(Object)})
+	 * @deprecated 从5.3版本开始，建议使用 {@link #hasLength(String)} 和 {@link #hasText(String)}（或 {@link ObjectUtils#isEmpty(Object)}）
 	 */
 	@Deprecated
 	public static boolean isEmpty(@Nullable Object str) {
@@ -88,10 +84,8 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Check that the given {@code CharSequence} is neither {@code null} nor
-	 * of length 0.
-	 * <p>Note: this method returns {@code true} for a {@code CharSequence}
-	 * that purely consists of whitespace.
+	 * 检查给定的 {@code CharSequence} 是否既不为 {@code null}，也不为空长度。
+	 * <p>注意：该方法对仅由空白字符组成的 {@code CharSequence} 也返回 {@code true}。
 	 * <p><pre class="code">
 	 * StringUtils.hasLength(null) = false
 	 * StringUtils.hasLength("") = false
@@ -99,8 +93,8 @@ public abstract class StringUtils {
 	 * StringUtils.hasLength("Hello") = true
 	 * </pre>
 	 *
-	 * @param str the {@code CharSequence} to check (may be {@code null})
-	 * @return {@code true} if the {@code CharSequence} is not {@code null} and has length
+	 * @param str 要检查的 {@code CharSequence}（可能为 {@code null}）
+	 * @return 如果 {@code CharSequence} 不为 {@code null} 且长度大于0，则返回 {@code true}
 	 * @see #hasLength(String)
 	 * @see #hasText(CharSequence)
 	 */
@@ -109,12 +103,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Check that the given {@code String} is neither {@code null} nor of length 0.
-	 * <p>Note: this method returns {@code true} for a {@code String} that
-	 * purely consists of whitespace.
+	 * 检查给定的 {@code String} 是否既不为 {@code null}，也不为空长度。
+	 * <p>注意：该方法对仅由空白字符组成的 {@code String} 也返回 {@code true}。
 	 *
-	 * @param str the {@code String} to check (may be {@code null})
-	 * @return {@code true} if the {@code String} is not {@code null} and has length
+	 * @param str 要检查的 {@code String}（可能为 {@code null}）
+	 * @return 如果 {@code String} 不为 {@code null} 且长度大于0，则返回 {@code true}
 	 * @see #hasLength(CharSequence)
 	 * @see #hasText(String)
 	 */
@@ -123,10 +116,8 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Check whether the given {@code CharSequence} contains actual <em>text</em>.
-	 * <p>More specifically, this method returns {@code true} if the
-	 * {@code CharSequence} is not {@code null}, its length is greater than
-	 * 0, and it contains at least one non-whitespace character.
+	 * 检查给定的 {@code CharSequence} 是否包含实际的 <em>文本</em>。
+	 * <p>更具体地说，如果 {@code CharSequence} 不为 {@code null}，长度大于0，且包含至少一个非空白字符，则返回 {@code true}。
 	 * <p><pre class="code">
 	 * StringUtils.hasText(null) = false
 	 * StringUtils.hasText("") = false
@@ -135,9 +126,8 @@ public abstract class StringUtils {
 	 * StringUtils.hasText(" 12345 ") = true
 	 * </pre>
 	 *
-	 * @param str the {@code CharSequence} to check (may be {@code null})
-	 * @return {@code true} if the {@code CharSequence} is not {@code null},
-	 * its length is greater than 0, and it does not contain whitespace only
+	 * @param str 要检查的 {@code CharSequence}（可能为 {@code null}）
+	 * @return 如果 {@code CharSequence} 不为 {@code null}，长度大于0，且不全是空白字符，则返回 {@code true}
 	 * @see #hasText(String)
 	 * @see #hasLength(CharSequence)
 	 * @see Character#isWhitespace
@@ -171,11 +161,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Check whether the given {@code CharSequence} contains any whitespace characters.
+	 * 检查给定的 {@code CharSequence} 是否包含任何空白字符。
 	 *
-	 * @param str the {@code CharSequence} to check (may be {@code null})
-	 * @return {@code true} if the {@code CharSequence} is not empty and
-	 * contains at least 1 whitespace character
+	 * @param str 要检查的 {@code CharSequence}（可能为 {@code null}）
+	 * @return 如果 {@code CharSequence} 不为空且包含至少一个空白字符，则返回 {@code true}
 	 * @see Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(@Nullable CharSequence str) {
@@ -193,11 +182,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Check whether the given {@code String} contains any whitespace characters.
+	 * 检查给定的 {@code String} 是否包含任何空白字符。
 	 *
-	 * @param str the {@code String} to check (may be {@code null})
-	 * @return {@code true} if the {@code String} is not empty and
-	 * contains at least 1 whitespace character
+	 * @param str 要检查的 {@code String}（可能为 {@code null}）
+	 * @return 如果 {@code String} 不为空且包含至少一个空白字符，则返回 {@code true}
 	 * @see #containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(@Nullable String str) {
@@ -205,10 +193,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Trim leading and trailing whitespace from the given {@code String}.
+	 * 去除给定 {@code String} 的首尾空白字符。
 	 *
-	 * @param str the {@code String} to check
-	 * @return the trimmed {@code String}
+	 * @param str 要检查的 {@code String}
+	 * @return 去除首尾空白后的 {@code String}
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimWhitespace(String str) {
@@ -256,10 +244,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Trim leading whitespace from the given {@code String}.
+	 * 去除给定 {@code String} 开头的空白字符。
 	 *
-	 * @param str the {@code String} to check
-	 * @return the trimmed {@code String}
+	 * @param str 要检查的 {@code String}
+	 * @return 去除开头空白后的 {@code String}
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimLeadingWhitespace(String str) {
@@ -275,10 +263,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Trim trailing whitespace from the given {@code String}.
+	 * 去除给定 {@code String} 末尾的空白字符。
 	 *
-	 * @param str the {@code String} to check
-	 * @return the trimmed {@code String}
+	 * @param str 要检查的 {@code String}
+	 * @return 去除末尾空白后的 {@code String}
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static String trimTrailingWhitespace(String str) {
@@ -294,11 +282,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Trim all occurrences of the supplied leading character from the given {@code String}.
+	 * 去除给定 {@code String} 开头的所有指定字符。
 	 *
-	 * @param str              the {@code String} to check
-	 * @param leadingCharacter the leading character to be trimmed
-	 * @return the trimmed {@code String}
+	 * @param str              要检查的 {@code String}
+	 * @param leadingCharacter 要去除的开头字符
+	 * @return 去除开头指定字符后的 {@code String}
 	 */
 	public static String trimLeadingCharacter(String str, char leadingCharacter) {
 		if (!hasLength(str)) {
@@ -313,11 +301,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Trim all occurrences of the supplied trailing character from the given {@code String}.
+	 * 去除给定 {@code String} 末尾的所有指定字符。
 	 *
-	 * @param str               the {@code String} to check
-	 * @param trailingCharacter the trailing character to be trimmed
-	 * @return the trimmed {@code String}
+	 * @param str               要检查的 {@code String}
+	 * @param trailingCharacter 要去除的末尾字符
+	 * @return 去除末尾指定字符后的 {@code String}
 	 */
 	public static String trimTrailingCharacter(String str, char trailingCharacter) {
 		if (!hasLength(str)) {
@@ -332,10 +320,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Test if the given {@code String} matches the given single character.
+	 * 判断给定的 {@code String} 是否匹配给定的单个字符。
 	 *
-	 * @param str             the {@code String} to check
-	 * @param singleCharacter the character to compare to
+	 * @param str             要检查的 {@code String}
+	 * @param singleCharacter 要比较的字符
 	 * @since 5.2.9
 	 */
 	public static boolean matchesCharacter(@Nullable String str, char singleCharacter) {
@@ -343,11 +331,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Test if the given {@code String} starts with the specified prefix,
-	 * ignoring upper/lower case.
+	 * 判断给定的 {@code String} 是否以指定的前缀开始，忽略大小写。
 	 *
-	 * @param str    the {@code String} to check
-	 * @param prefix the prefix to look for
+	 * @param str    要检查的 {@code String}
+	 * @param prefix 要查找的前缀
 	 * @see java.lang.String#startsWith
 	 */
 	public static boolean startsWithIgnoreCase(@Nullable String str, @Nullable String prefix) {
@@ -356,11 +343,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Test if the given {@code String} ends with the specified suffix,
-	 * ignoring upper/lower case.
+	 * 判断给定的 {@code String} 是否以指定的后缀结束，忽略大小写。
 	 *
-	 * @param str    the {@code String} to check
-	 * @param suffix the suffix to look for
+	 * @param str    要检查的 {@code String}
+	 * @param suffix 要查找的后缀
 	 * @see java.lang.String#endsWith
 	 */
 	public static boolean endsWithIgnoreCase(@Nullable String str, @Nullable String suffix) {
@@ -390,10 +376,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Count the occurrences of the substring {@code sub} in string {@code str}.
+	 * 统计字符串 {@code str} 中子字符串 {@code sub} 出现的次数。
 	 *
-	 * @param str string to search in
-	 * @param sub string to search for
+	 * @param str 要搜索的字符串
+	 * @param sub 要查找的子字符串
 	 */
 	public static int countOccurrencesOf(String str, String sub) {
 		if (!hasLength(str) || !hasLength(sub)) {
@@ -411,12 +397,12 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Replace all occurrences of a substring within a string with another string.
+	 * 替换字符串中所有出现的子字符串为另一个字符串。
 	 *
-	 * @param inString   {@code String} to examine
-	 * @param oldPattern {@code String} to replace
-	 * @param newPattern {@code String} to insert
-	 * @return a {@code String} with the replacements
+	 * @param inString   要检查的 {@code String}
+	 * @param oldPattern 要替换的 {@code String}
+	 * @param newPattern 要插入的 {@code String}
+	 * @return 经过替换后的 {@code String}
 	 */
 	public static String replace(String inString, String oldPattern, @Nullable String newPattern) {
 		if (!hasLength(inString) || !hasLength(oldPattern) || newPattern == null) {
@@ -424,7 +410,7 @@ public abstract class StringUtils {
 		}
 		int index = inString.indexOf(oldPattern);
 		if (index == -1) {
-			// no occurrence -> can return input as-is
+			// 没有出现 -> 可以直接返回输入
 			return inString;
 		}
 
@@ -434,7 +420,7 @@ public abstract class StringUtils {
 		}
 		StringBuilder sb = new StringBuilder(capacity);
 
-		int pos = 0;  // our position in the old string
+		int pos = 0;  // 我们在旧字符串中的位置
 		int patLen = oldPattern.length();
 		while (index >= 0) {
 			sb.append(inString, pos, index);
@@ -443,17 +429,17 @@ public abstract class StringUtils {
 			index = inString.indexOf(oldPattern, pos);
 		}
 
-		// append any characters to the right of a match
+		// 追加匹配右边的所有字符
 		sb.append(inString, pos, inString.length());
 		return sb.toString();
 	}
 
 	/**
-	 * Delete all occurrences of the given substring.
+	 * 删除给定子字符串的所有出现。
 	 *
-	 * @param inString the original {@code String}
-	 * @param pattern  the pattern to delete all occurrences of
-	 * @return the resulting {@code String}
+	 * @param inString 原始 {@code String}
+	 * @param pattern  要删除所有出现的模式
+	 * @return 结果 {@code String}
 	 */
 	public static String delete(String inString, String pattern) {
 		return replace(inString, pattern, "");
@@ -490,15 +476,15 @@ public abstract class StringUtils {
 	}
 
 	//---------------------------------------------------------------------
-	// Convenience methods for working with formatted Strings
+	// 处理格式化字符串的便捷方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * Quote the given {@code String} with single quotes.
+	 * 用单引号引用给定的 {@code String}。
 	 *
-	 * @param str the input {@code String} (e.g. "myString")
-	 * @return the quoted {@code String} (e.g. "'myString'"),
-	 * or {@code null} if the input was {@code null}
+	 * @param str 输入的 {@code String}（例如 "myString"）
+	 * @return 带引号的 {@code String}（例如 "'myString'"），
+	 * 如果输入为 {@code null} 则返回 {@code null}
 	 */
 	@Nullable
 	public static String quote(@Nullable String str) {
@@ -506,12 +492,12 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Turn the given Object into a {@code String} with single quotes
-	 * if it is a {@code String}; keeping the Object as-is else.
+	 * 如果输入对象是 {@code String}，则将其转换为带单引号的 {@code String}；
+	 * 否则保持对象原样。
 	 *
-	 * @param obj the input Object (e.g. "myString")
-	 * @return the quoted {@code String} (e.g. "'myString'"),
-	 * or the input object as-is if not a {@code String}
+	 * @param obj 输入对象（例如 "myString"）
+	 * @return 带引号的 {@code String}（例如 "'myString'"），
+	 * 如果不是 {@code String} 则返回输入对象本身
 	 */
 	@Nullable
 	public static Object quoteIfString(@Nullable Object obj) {
@@ -519,33 +505,33 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Unqualify a string qualified by a '.' dot character. For example,
-	 * "this.name.is.qualified", returns "qualified".
+	 * 去除由 '.' 点字符限定的字符串的限定部分。例如，
+	 * "this.name.is.qualified" 返回 "qualified"。
 	 *
-	 * @param qualifiedName the qualified name
+	 * @param qualifiedName 限定名称
 	 */
 	public static String unqualify(String qualifiedName) {
 		return unqualify(qualifiedName, '.');
 	}
 
 	/**
-	 * Unqualify a string qualified by a separator character. For example,
-	 * "this:name:is:qualified" returns "qualified" if using a ':' separator.
+	 * 去除由指定分隔符限定的字符串的限定部分。例如，
+	 * 如果使用 ':' 作为分隔符，"this:name:is:qualified" 返回 "qualified"。
 	 *
-	 * @param qualifiedName the qualified name
-	 * @param separator     the separator
+	 * @param qualifiedName 限定名称
+	 * @param separator 分隔符
 	 */
 	public static String unqualify(String qualifiedName, char separator) {
 		return qualifiedName.substring(qualifiedName.lastIndexOf(separator) + 1);
 	}
 
 	/**
-	 * Capitalize a {@code String}, changing the first letter to
-	 * upper case as per {@link Character#toUpperCase(char)}.
-	 * No other letters are changed.
+	 * 将 {@code String} 首字母大写，
+	 * 根据 {@link Character#toUpperCase(char)} 转换首字母为大写。
+	 * 其他字母不变。
 	 *
-	 * @param str the {@code String} to capitalize
-	 * @return the capitalized {@code String}
+	 * @param str 要大写首字母的 {@code String}
+	 * @return 首字母大写的 {@code String}
 	 */
 	public static String capitalize(String str) {
 		return changeFirstCharacterCase(str, true);
@@ -583,11 +569,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Extract the filename from the given Java resource path,
-	 * e.g. {@code "mypath/myfile.txt" &rarr; "myfile.txt"}.
+	 * 从给定的 Java 资源路径中提取文件名，
+	 * 例如 {@code "mypath/myfile.txt" → "myfile.txt"}。
 	 *
-	 * @param path the file path (may be {@code null})
-	 * @return the extracted filename, or {@code null} if none
+	 * @param path 文件路径（可能为 {@code null}）
+	 * @return 提取的文件名，如果没有则返回 {@code null}
 	 */
 	@Nullable
 	public static String getFilename(@Nullable String path) {
@@ -600,11 +586,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Extract the filename extension from the given Java resource path,
-	 * e.g. "mypath/myfile.txt" &rarr; "txt".
+	 * 从给定的 Java 资源路径中提取文件扩展名，
+	 * 例如 "mypath/myfile.txt" → "txt"。
 	 *
-	 * @param path the file path (may be {@code null})
-	 * @return the extracted filename extension, or {@code null} if none
+	 * @param path 文件路径（可能为 {@code null}）
+	 * @return 提取的文件扩展名，如果没有则返回 {@code null}
 	 */
 	@Nullable
 	public static String getFilenameExtension(@Nullable String path) {
@@ -626,11 +612,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Strip the filename extension from the given Java resource path,
-	 * e.g. "mypath/myfile.txt" &rarr; "mypath/myfile".
+	 * 从给定的 Java 资源路径中剥离文件扩展名，
+	 * 例如 "mypath/myfile.txt" → "mypath/myfile"。
 	 *
-	 * @param path the file path
-	 * @return the path with stripped filename extension
+	 * @param path 文件路径
+	 * @return 剥离文件扩展名后的路径
 	 */
 	public static String stripFilenameExtension(String path) {
 		int extIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
@@ -687,15 +673,14 @@ public abstract class StringUtils {
 		String normalizedPath = replace(path, WINDOWS_FOLDER_SEPARATOR, FOLDER_SEPARATOR);
 		String pathToUse = normalizedPath;
 
-		// Shortcut if there is no work to do
+		// 如果路径中没有点，直接返回
 		if (pathToUse.indexOf('.') == -1) {
 			return pathToUse;
 		}
 
-		// Strip prefix from path to analyze, to not treat it as part of the
-		// first path element. This is necessary to correctly parse paths like
-		// "file:core/../core/io/Resource.class", where the ".." should just
-		// strip the first "core" directory while keeping the "file:" prefix.
+		// 从路径中剥离前缀，避免将其视为第一个路径元素的一部分。
+		// 这样可以正确解析像 "file:core/../core/io/Resource.class" 这样的路径，
+		// 其中 ".." 应该只去掉第一个 "core" 目录，而保留 "file:" 前缀。
 		int prefixIndex = pathToUse.indexOf(':');
 		String prefix = "";
 		if (prefixIndex != -1) {
@@ -712,70 +697,70 @@ public abstract class StringUtils {
 		}
 
 		String[] pathArray = delimitedListToStringArray(pathToUse, FOLDER_SEPARATOR);
-		// we never require more elements than pathArray and in the common case the same number
+		// 元素数量不会超过 pathArray，通常相等
 		Deque<String> pathElements = new ArrayDeque<>(pathArray.length);
 		int tops = 0;
 
 		for (int i = pathArray.length - 1; i >= 0; i--) {
 			String element = pathArray[i];
 			if (CURRENT_PATH.equals(element)) {
-				// Points to current directory - drop it.
+				// 当前目录，忽略
 			} else if (TOP_PATH.equals(element)) {
-				// Registering top path found.
+				// 记录上级路径符号 ".."
 				tops++;
 			} else {
 				if (tops > 0) {
-					// Merging path element with element corresponding to top path.
+					// 将路径元素与对应的上级路径合并
 					tops--;
 				} else {
-					// Normal path element found.
+					// 普通路径元素，添加到结果中
 					pathElements.addFirst(element);
 				}
 			}
 		}
 
-		// All path elements stayed the same - shortcut
+		// 所有路径元素保持不变，直接返回标准化路径
 		if (pathArray.length == pathElements.size()) {
 			return normalizedPath;
 		}
-		// Remaining top paths need to be retained.
+		// 还剩余的上级路径需要保留
 		for (int i = 0; i < tops; i++) {
 			pathElements.addFirst(TOP_PATH);
 		}
-		// If nothing else left, at least explicitly point to current path.
+		// 如果最终为空路径，显式添加当前路径符号
 		if (pathElements.size() == 1 && pathElements.getLast().isEmpty() && !prefix.endsWith(FOLDER_SEPARATOR)) {
 			pathElements.addFirst(CURRENT_PATH);
 		}
 
 		final String joined = collectionToDelimitedString(pathElements, FOLDER_SEPARATOR);
-		// avoid string concatenation with empty prefix
+		// 避免空前缀的字符串拼接
 		return prefix.isEmpty() ? joined : prefix + joined;
 	}
 
 	/**
-	 * Compare two paths after normalization of them.
+	 * 比较两个路径，先对其进行标准化。
 	 *
-	 * @param path1 first path for comparison
-	 * @param path2 second path for comparison
-	 * @return whether the two paths are equivalent after normalization
+	 * @param path1 第一个路径
+	 * @param path2 第二个路径
+	 * @return 两个路径标准化后是否相等
 	 */
 	public static boolean pathEquals(String path1, String path2) {
 		return cleanPath(path1).equals(cleanPath(path2));
 	}
 
 	/**
-	 * Decode the given encoded URI component value. Based on the following rules:
+	 * 解码给定的编码后的 URI 组件值。基于以下规则：
 	 * <ul>
-	 * <li>Alphanumeric characters {@code "a"} through {@code "z"}, {@code "A"} through {@code "Z"},
-	 * and {@code "0"} through {@code "9"} stay the same.</li>
-	 * <li>Special characters {@code "-"}, {@code "_"}, {@code "."}, and {@code "*"} stay the same.</li>
-	 * <li>A sequence "{@code %<i>xy</i>}" is interpreted as a hexadecimal representation of the character.</li>
+	 * <li>字母数字字符 {@code "a"} 到 {@code "z"}，{@code "A"} 到 {@code "Z"}，
+	 * 以及 {@code "0"} 到 {@code "9"} 保持不变。</li>
+	 * <li>特殊字符 {@code "-"}、{@code "_"}、{@code "."} 和 {@code "*"} 保持不变。</li>
+	 * <li>序列 "{@code %<i>xy</i>}" 被解释为该字符的十六进制表示。</li>
 	 * </ul>
 	 *
-	 * @param source  the encoded String
-	 * @param charset the character set
-	 * @return the decoded value
-	 * @throws IllegalArgumentException when the given source contains invalid encoded sequences
+	 * @param source  编码后的字符串
+	 * @param charset 字符集
+	 * @return 解码后的值
+	 * @throws IllegalArgumentException 当给定的 source 包含无效的编码序列时抛出
 	 * @see java.net.URLDecoder#decode(String, String)
 	 * @since 5.0
 	 */
@@ -813,15 +798,13 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Parse the given {@code String} value into a {@link Locale}, accepting
-	 * the {@link Locale#toString} format as well as BCP 47 language tags as
-	 * specified by {@link Locale#forLanguageTag}.
+	 * 将给定的 {@code String} 值解析为 {@link Locale}，接受
+	 * {@link Locale#toString} 格式以及由 {@link Locale#forLanguageTag} 指定的 BCP 47 语言标签。
 	 *
-	 * @param localeValue the locale value: following either {@code Locale's}
-	 *                    {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
-	 *                    separators (as an alternative to underscores), or BCP 47 (e.g. "en-UK")
-	 * @return a corresponding {@code Locale} instance, or {@code null} if none
-	 * @throws IllegalArgumentException in case of an invalid locale specification
+	 * @param localeValue locale 值：遵循 {@code Locale} 的 {@code toString()} 格式（如 "en", "en_UK" 等），
+	 *                    也接受空格作为分隔符（作为下划线的替代），或者 BCP 47 格式（例如 "en-UK"）
+	 * @return 对应的 {@code Locale} 实例，或 {@code null} 如果无效
+	 * @throws IllegalArgumentException 当 locale 规范无效时抛出
 	 * @see #parseLocaleString
 	 * @see Locale#forLanguageTag
 	 * @since 5.0.4
@@ -840,19 +823,18 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Parse the given {@code String} representation into a {@link Locale}.
-	 * <p>For many parsing scenarios, this is an inverse operation of
-	 * {@link Locale#toString Locale's toString}, in a lenient sense.
-	 * This method does not aim for strict {@code Locale} design compliance;
-	 * it is rather specifically tailored for typical Spring parsing needs.
-	 * <p><b>Note: This delegate does not accept the BCP 47 language tag format.
-	 * Please use {@link #parseLocale} for lenient parsing of both formats.</b>
+	 * 将给定的 {@code String} 表示解析为 {@link Locale}。
+	 * <p>对于许多解析场景，这相当于 {@link Locale#toString Locale 的 toString} 方法的逆操作，
+	 * 但更宽松。
+	 * 本方法不追求严格的 {@code Locale} 设计规范；
+	 * 它专为典型的 Spring 解析需求而设计。
+	 * <p><b>注意：该方法不接受 BCP 47 语言标签格式。
+	 * 请使用 {@link #parseLocale} 来宽松解析这两种格式。</b>
 	 *
-	 * @param localeString the locale {@code String}: following {@code Locale's}
-	 *                     {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
-	 *                     separators (as an alternative to underscores)
-	 * @return a corresponding {@code Locale} instance, or {@code null} if none
-	 * @throws IllegalArgumentException in case of an invalid locale specification
+	 * @param localeString locale 字符串：遵循 {@code Locale} 的 {@code toString()} 格式（如 "en", "en_UK" 等），
+	 *                     也接受空格作为分隔符（作为下划线的替代）
+	 * @return 对应的 {@code Locale} 实例，或 {@code null} 如果无效
+	 * @throws IllegalArgumentException 当 locale 规范无效时抛出
 	 */
 	@Nullable
 	public static Locale parseLocaleString(String localeString) {
@@ -872,10 +854,9 @@ public abstract class StringUtils {
 
 		String variant = "";
 		if (tokens.length > 2) {
-			// There is definitely a variant, and it is everything after the country
-			// code sans the separator between the country code and the variant.
+			// 肯定有变体，它是国家代码之后的所有内容，不包括国家代码和变体之间的分隔符
 			int endIndexOfCountryCode = localeString.indexOf(country, language.length()) + country.length();
-			// Strip off any leading '_' and whitespace, what's left is the variant.
+			// 去掉开头的 '_' 和空白，剩下的是变体
 			variant = trimLeadingWhitespace(localeString.substring(endIndexOfCountryCode));
 			if (variant.startsWith("_")) {
 				variant = trimLeadingCharacter(variant, '_');
@@ -901,12 +882,12 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Determine the RFC 3066 compliant language tag,
-	 * as used for the HTTP "Accept-Language" header.
+	 * 确定符合 RFC 3066 标准的语言标签，
+	 * 用于 HTTP 的 "Accept-Language" 头部。
 	 *
-	 * @param locale the Locale to transform to a language tag
-	 * @return the RFC 3066 compliant language tag as {@code String}
-	 * @deprecated as of 5.0.4, in favor of {@link Locale#toLanguageTag()}
+	 * @param locale 要转换为语言标签的 {@link Locale}
+	 * @return 符合 RFC 3066 标准的语言标签字符串
+	 * @deprecated 从 5.0.4 版本起，建议使用 {@link Locale#toLanguageTag()}
 	 */
 	@Deprecated
 	public static String toLanguageTag(Locale locale) {
@@ -914,17 +895,17 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Parse the given {@code timeZoneString} value into a {@link TimeZone}.
+	 * 将给定的 {@code timeZoneString} 字符串解析成一个 {@link TimeZone} 实例。
 	 *
-	 * @param timeZoneString the time zone {@code String}, following {@link TimeZone#getTimeZone(String)}
-	 *                       but throwing {@link IllegalArgumentException} in case of an invalid time zone specification
-	 * @return a corresponding {@link TimeZone} instance
-	 * @throws IllegalArgumentException in case of an invalid time zone specification
+	 * @param timeZoneString 时区字符串，符合 {@link TimeZone#getTimeZone(String)} 规范，
+	 *                       但在无效时区规范时会抛出 {@link IllegalArgumentException}
+	 * @return 对应的 {@link TimeZone} 实例
+	 * @throws IllegalArgumentException 当时区规范无效时抛出
 	 */
 	public static TimeZone parseTimeZoneString(String timeZoneString) {
 		TimeZone timeZone = TimeZone.getTimeZone(timeZoneString);
 		if ("GMT".equals(timeZone.getID()) && !timeZoneString.startsWith("GMT")) {
-			// We don't want that GMT fallback...
+			// 不希望出现 GMT 的回退行为...
 			throw new IllegalArgumentException("Invalid time zone specification '" + timeZoneString + "'");
 		}
 		return timeZone;
@@ -932,14 +913,14 @@ public abstract class StringUtils {
 
 
 	//---------------------------------------------------------------------
-	// Convenience methods for working with String arrays
+	// 处理字符串数组的便捷方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * 将给定的 {@link Collection} 复制到 {@code String} 数组中。
-	 * <p> {@code Collection} 必须仅包含 {@code String} 元素。
+	 * 将给定的 {@link Collection} 复制成 {@code String} 数组。
+	 * <p>该 {@code Collection} 必须仅包含 {@code String} 元素。
 	 *
-	 * @param collection 要复制的 {@code Collection} (可能为 {@code null} 或为空)
+	 * @param collection 要复制的 {@code Collection}（可能为 {@code null} 或空）
 	 * @return 生成的 {@code String} 数组
 	 */
 	public static String[] toStringArray(@Nullable Collection<String> collection) {
@@ -947,25 +928,24 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Copy the given {@link Enumeration} into a {@code String} array.
-	 * <p>The {@code Enumeration} must contain {@code String} elements only.
+	 * 将给定的 {@link Enumeration} 复制为一个 {@code String} 数组。
+	 * <p>该 {@code Enumeration} 中必须仅包含 {@code String} 元素。
 	 *
-	 * @param enumeration the {@code Enumeration} to copy
-	 *                    (potentially {@code null} or empty)
-	 * @return the resulting {@code String} array
+	 * @param enumeration 要复制的 {@code Enumeration}
+	 *                    （可能为 {@code null} 或空）
+	 * @return 转换后的 {@code String} 数组
 	 */
 	public static String[] toStringArray(@Nullable Enumeration<String> enumeration) {
 		return (enumeration != null ? toStringArray(Collections.list(enumeration)) : EMPTY_STRING_ARRAY);
 	}
 
 	/**
-	 * Append the given {@code String} to the given {@code String} array,
-	 * returning a new array consisting of the input array contents plus
-	 * the given {@code String}.
+	 * 将给定的 {@code String} 添加到指定的 {@code String} 数组中，
+	 * 返回一个包含原数组元素和附加字符串的新数组。
 	 *
-	 * @param array the array to append to (can be {@code null})
-	 * @param str   the {@code String} to append
-	 * @return the new array (never {@code null})
+	 * @param array 要追加的数组（可以为 {@code null}）
+	 * @param str   要追加的 {@code String}
+	 * @return 新数组（永远不为 {@code null}）
 	 */
 	public static String[] addStringToArray(@Nullable String[] array, String str) {
 		if (ObjectUtils.isEmpty(array)) {
@@ -979,13 +959,13 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Concatenate the given {@code String} arrays into one,
-	 * with overlapping array elements included twice.
-	 * <p>The order of elements in the original arrays is preserved.
+	 * 合并给定的两个 {@code String} 数组为一个数组，
+	 * 所有元素都会包含，即使存在重复。
+	 * <p>保留原数组中元素的顺序。
 	 *
-	 * @param array1 the first array (can be {@code null})
-	 * @param array2 the second array (can be {@code null})
-	 * @return the new array ({@code null} if both given arrays were {@code null})
+	 * @param array1 第一个数组（可以为 {@code null}）
+	 * @param array2 第二个数组（可以为 {@code null}）
+	 * @return 合并后的新数组（如果两个数组都为 {@code null}，则返回 {@code null}）
 	 */
 	@Nullable
 	public static String[] concatenateStringArrays(@Nullable String[] array1, @Nullable String[] array2) {
@@ -1003,17 +983,14 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Merge the given {@code String} arrays into one, with overlapping
-	 * array elements only included once.
-	 * <p>The order of elements in the original arrays is preserved
-	 * (with the exception of overlapping elements, which are only
-	 * included on their first occurrence).
+	 * 合并给定的两个 {@code String} 数组为一个，重复元素只保留一次。
+	 * <p>保留原数组中元素的顺序（重复元素仅保留首次出现的位置）。
 	 *
-	 * @param array1 the first array (can be {@code null})
-	 * @param array2 the second array (can be {@code null})
-	 * @return the new array ({@code null} if both given arrays were {@code null})
-	 * @deprecated as of 4.3.15, in favor of manual merging via {@link LinkedHashSet}
-	 * (with every entry included at most once, even entries within the first array)
+	 * @param array1 第一个数组（可以为 {@code null}）
+	 * @param array2 第二个数组（可以为 {@code null}）
+	 * @return 合并后的新数组（如果两个数组都为 {@code null}，则返回 {@code null}）
+	 * @deprecated 自 4.3.15 起已弃用，建议使用 {@link LinkedHashSet} 手动合并，
+	 * 以确保所有元素最多出现一次（包括第一个数组中的重复项）
 	 */
 	@Deprecated
 	@Nullable
@@ -1035,10 +1012,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Sort the given {@code String} array if necessary.
+	 * 如有必要，对给定的 {@code String} 数组进行排序。
 	 *
-	 * @param array the original array (potentially empty)
-	 * @return the array in sorted form (never {@code null})
+	 * @param array 原始数组（可能为空）
+	 * @return 排序后的数组（永不为 {@code null}）
 	 */
 	public static String[] sortStringArray(String[] array) {
 		if (ObjectUtils.isEmpty(array)) {
@@ -1050,11 +1027,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Trim the elements of the given {@code String} array, calling
-	 * {@code String.trim()} on each non-null element.
+	 * 去除给定 {@code String} 数组中每个元素的首尾空白，
+	 * 对每个非 null 元素调用 {@code String.trim()}。
 	 *
-	 * @param array the original {@code String} array (potentially empty)
-	 * @return the resulting array (of the same size) with trimmed elements
+	 * @param array 原始 {@code String} 数组（可能为空）
+	 * @return 处理后的数组（与原数组长度相同），元素已去除空白
 	 */
 	public static String[] trimArrayElements(String[] array) {
 		if (ObjectUtils.isEmpty(array)) {
@@ -1070,11 +1047,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Remove duplicate strings from the given array.
-	 * <p>As of 4.2, it preserves the original order, as it uses a {@link LinkedHashSet}.
+	 * 移除给定数组中的重复字符串。
+	 * <p>自 4.2 起，该方法使用 {@link LinkedHashSet}，因此可以保留原始顺序。
 	 *
-	 * @param array the {@code String} array (potentially empty)
-	 * @return an array without duplicates, in natural sort order
+	 * @param array {@code String} 数组（可能为空）
+	 * @return 去重后的数组，按自然顺序排列
 	 */
 	public static String[] removeDuplicateStrings(String[] array) {
 		if (ObjectUtils.isEmpty(array)) {
@@ -1086,14 +1063,13 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Split a {@code String} at the first occurrence of the delimiter.
-	 * Does not include the delimiter in the result.
+	 * 在第一次出现指定分隔符的位置将 {@code String} 拆分。
+	 * 返回的结果不包含分隔符本身。
 	 *
-	 * @param toSplit   the string to split (potentially {@code null} or empty)
-	 * @param delimiter to split the string up with (potentially {@code null} or empty)
-	 * @return a two element array with index 0 being before the delimiter, and
-	 * index 1 being after the delimiter (neither element includes the delimiter);
-	 * or {@code null} if the delimiter wasn't found in the given input {@code String}
+	 * @param toSplit   要拆分的字符串（可能为 {@code null} 或空）
+	 * @param delimiter 用作拆分依据的分隔符（可能为 {@code null} 或空）
+	 * @return 包含两个元素的数组：索引 0 为分隔符前的部分，索引 1 为分隔符后的部分（两部分均不包含分隔符）；
+	 * 如果输入字符串中未找到分隔符，则返回 {@code null}
 	 */
 	@Nullable
 	public static String[] split(@Nullable String toSplit, @Nullable String delimiter) {
@@ -1111,15 +1087,14 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Take an array of strings and split each element based on the given delimiter.
-	 * A {@code Properties} instance is then generated, with the left of the delimiter
-	 * providing the key, and the right of the delimiter providing the value.
-	 * <p>Will trim both the key and value before adding them to the {@code Properties}.
+	 * 将字符串数组中每个元素根据给定分隔符进行拆分。
+	 * 然后构建一个 {@code Properties} 实例，分隔符左侧作为 key，右侧作为 value。
+	 * <p>添加到 {@code Properties} 之前，会对 key 和 value 都进行去除首尾空白处理。
 	 *
-	 * @param array     the array to process
-	 * @param delimiter to split each element using (typically the equals symbol)
-	 * @return a {@code Properties} instance representing the array contents,
-	 * or {@code null} if the array to process was {@code null} or empty
+	 * @param array     要处理的字符串数组
+	 * @param delimiter 用于拆分每个元素的分隔符（通常是等号符号）
+	 * @return 表示数组内容的 {@code Properties} 实例；
+	 * 如果输入数组为 {@code null} 或空，则返回 {@code null}
 	 */
 	@Nullable
 	public static Properties splitArrayElementsIntoProperties(String[] array, String delimiter) {
@@ -1127,19 +1102,16 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Take an array of strings and split each element based on the given delimiter.
-	 * A {@code Properties} instance is then generated, with the left of the
-	 * delimiter providing the key, and the right of the delimiter providing the value.
-	 * <p>Will trim both the key and value before adding them to the
-	 * {@code Properties} instance.
+	 * 将字符串数组中每个元素根据给定分隔符进行拆分。
+	 * 然后构建一个 {@code Properties} 实例，分隔符左侧作为 key，右侧作为 value。
+	 * <p>添加到 {@code Properties} 之前，会对 key 和 value 都进行去除首尾空白处理。
 	 *
-	 * @param array         the array to process
-	 * @param delimiter     to split each element using (typically the equals symbol)
-	 * @param charsToDelete one or more characters to remove from each element
-	 *                      prior to attempting the split operation (typically the quotation mark
-	 *                      symbol), or {@code null} if no removal should occur
-	 * @return a {@code Properties} instance representing the array contents,
-	 * or {@code null} if the array to process was {@code null} or empty
+	 * @param array         要处理的字符串数组
+	 * @param delimiter     用于拆分每个元素的分隔符（通常是等号符号）
+	 * @param charsToDelete 在尝试拆分前，需要从每个元素中移除的字符（通常是引号等特殊符号），
+	 *                      如果不需要删除字符则为 {@code null}
+	 * @return 表示数组内容的 {@code Properties} 实例；
+	 * 如果输入数组为 {@code null} 或空，则返回 {@code null}
 	 */
 	@Nullable
 	public static Properties splitArrayElementsIntoProperties(
@@ -1293,12 +1265,12 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Convert a comma delimited list (e.g., a row from a CSV file) into a set.
-	 * <p>Note that this will suppress duplicates, and as of 4.2, the elements in
-	 * the returned set will preserve the original order in a {@link LinkedHashSet}.
+	 * 将逗号分隔的列表（例如 CSV 文件中的一行）转换为一个集合。
+	 * <p>请注意，该方法会去除重复项；自 4.2 起，返回的集合使用 {@link LinkedHashSet}，
+	 * 能够保留原始字符串中元素的顺序。
 	 *
-	 * @param str the input {@code String} (potentially {@code null} or empty)
-	 * @return a set of {@code String} entries in the list
+	 * @param str 输入的 {@code String}（可能为 {@code null} 或空）
+	 * @return 字符串列表中的元素组成的集合
 	 * @see #removeDuplicateStrings(String[])
 	 */
 	public static Set<String> commaDelimitedListToSet(@Nullable String str) {
@@ -1307,14 +1279,14 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Convert a {@link Collection} to a delimited {@code String} (e.g. CSV).
-	 * <p>Useful for {@code toString()} implementations.
+	 * 将 {@link Collection} 转换为使用分隔符连接的 {@code String}（例如 CSV）。
+	 * <p>可用于实现 {@code toString()} 方法时的字符串构建。
 	 *
-	 * @param coll   the {@code Collection} to convert (potentially {@code null} or empty)
-	 * @param delim  the delimiter to use (typically a ",")
-	 * @param prefix the {@code String} to start each element with
-	 * @param suffix the {@code String} to end each element with
-	 * @return the delimited {@code String}
+	 * @param coll   要转换的 {@code Collection}（可能为 {@code null} 或空）
+	 * @param delim  要使用的分隔符（通常是 ","）
+	 * @param prefix 每个元素前缀字符串
+	 * @param suffix 每个元素后缀字符串
+	 * @return 用分隔符连接的字符串
 	 */
 	public static String collectionToDelimitedString(
 			@Nullable Collection<?> coll, String delim, String prefix, String suffix) {
@@ -1340,35 +1312,35 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Convert a {@code Collection} into a delimited {@code String} (e.g. CSV).
-	 * <p>Useful for {@code toString()} implementations.
+	 * 将 {@code Collection} 转换为使用分隔符连接的 {@code String}（例如 CSV）。
+	 * <p>可用于实现 {@code toString()} 方法时的字符串构建。
 	 *
-	 * @param coll  the {@code Collection} to convert (potentially {@code null} or empty)
-	 * @param delim the delimiter to use (typically a ",")
-	 * @return the delimited {@code String}
+	 * @param coll  要转换的 {@code Collection}（可能为 {@code null} 或空）
+	 * @param delim 要使用的分隔符（通常是 ","）
+	 * @return 用分隔符连接的字符串
 	 */
 	public static String collectionToDelimitedString(@Nullable Collection<?> coll, String delim) {
 		return collectionToDelimitedString(coll, delim, "", "");
 	}
 
 	/**
-	 * Convert a {@code Collection} into a delimited {@code String} (e.g., CSV).
-	 * <p>Useful for {@code toString()} implementations.
+	 * 将 {@code Collection} 转换为使用分隔符连接的 {@code String}（例如 CSV 格式）。
+	 * <p>可用于实现 {@code toString()} 方法时的字符串构建。
 	 *
-	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
-	 * @return the delimited {@code String}
+	 * @param coll 要转换的 {@code Collection}（可能为 {@code null} 或空）
+	 * @return 用分隔符连接的字符串
 	 */
 	public static String collectionToCommaDelimitedString(@Nullable Collection<?> coll) {
 		return collectionToDelimitedString(coll, ",");
 	}
 
 	/**
-	 * Convert a {@code String} array into a delimited {@code String} (e.g. CSV).
-	 * <p>Useful for {@code toString()} implementations.
+	 * 将 {@code String} 数组转换为使用指定分隔符连接的 {@code String}（例如 CSV）。
+	 * <p>可用于实现 {@code toString()} 方法时的字符串构建。
 	 *
-	 * @param arr   the array to display (potentially {@code null} or empty)
-	 * @param delim the delimiter to use (typically a ",")
-	 * @return the delimited {@code String}
+	 * @param arr   要展示的数组（可能为 {@code null} 或空）
+	 * @param delim 要使用的分隔符（通常是 ","）
+	 * @return 用分隔符连接的字符串
 	 */
 	public static String arrayToDelimitedString(@Nullable Object[] arr, String delim) {
 		if (ObjectUtils.isEmpty(arr)) {
@@ -1386,12 +1358,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Convert a {@code String} array into a comma delimited {@code String}
-	 * (i.e., CSV).
-	 * <p>Useful for {@code toString()} implementations.
+	 * 将 {@code String} 数组转换为逗号分隔的 {@code String}（即 CSV 格式）。
+	 * <p>可用于实现 {@code toString()} 方法时的字符串构建。
 	 *
-	 * @param arr the array to display (potentially {@code null} or empty)
-	 * @return the delimited {@code String}
+	 * @param arr 要展示的数组（可能为 {@code null} 或空）
+	 * @return 逗号分隔的字符串
 	 */
 	public static String arrayToCommaDelimitedString(@Nullable Object[] arr) {
 		return arrayToDelimitedString(arr, ",");

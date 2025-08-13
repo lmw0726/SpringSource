@@ -16,6 +16,14 @@
 
 package org.springframework.core.io.buffer;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.ByteBufUtil;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -23,18 +31,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.function.IntPredicate;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
-import io.netty.buffer.ByteBufUtil;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
-
 /**
- * Implementation of the {@code DataBuffer} interface that wraps a Netty
- * {@link ByteBuf}. Typically constructed with {@link NettyDataBufferFactory}.
+ * {@code DataBuffer} 接口的实现，封装了 Netty 的 {@link ByteBuf}。
+ * 通常由 {@link NettyDataBufferFactory} 构造。
  *
  * @author Arjen Poutsma
  * @author Brian Clozel
@@ -48,8 +47,9 @@ public class NettyDataBuffer implements PooledDataBuffer {
 
 
 	/**
-	 * Create a new {@code NettyDataBuffer} based on the given {@code ByteBuff}.
-	 * @param byteBuf the buffer to base this buffer on
+	 * 基于给定的 {@code ByteBuf} 创建一个新的 {@code NettyDataBuffer}。
+	 * @param byteBuf 用作此缓冲区基础的 ByteBuf
+	 * @param dataBufferFactory 创建该缓冲区的工厂
 	 */
 	NettyDataBuffer(ByteBuf byteBuf, NettyDataBufferFactory dataBufferFactory) {
 		Assert.notNull(byteBuf, "ByteBuf must not be null");
@@ -60,8 +60,8 @@ public class NettyDataBuffer implements PooledDataBuffer {
 
 
 	/**
-	 * Directly exposes the native {@code ByteBuf} that this buffer is based on.
-	 * @return the wrapped byte buffer
+	 * 直接暴露此缓冲区所基于的原生 {@code ByteBuf}。
+	 * @return 封装的 ByteBuf
 	 */
 	public ByteBuf getNativeBuffer() {
 		return this.byteBuf;
@@ -226,10 +226,10 @@ public class NettyDataBuffer implements PooledDataBuffer {
 	}
 
 	/**
-	 * Writes one or more Netty {@link ByteBuf ByteBufs} to this buffer,
-	 * starting at the current writing position.
-	 * @param byteBufs the buffers to write into this buffer
-	 * @return this buffer
+	 * 将一个或多个 Netty {@link ByteBuf ByteBufs} 写入此缓冲区，
+	 * 从当前写入位置开始。
+	 * @param byteBufs 要写入此缓冲区的 ByteBuf 数组
+	 * @return 当前缓冲区实例
 	 */
 	public NettyDataBuffer write(ByteBuf... byteBufs) {
 		if (!ObjectUtils.isEmpty(byteBufs)) {

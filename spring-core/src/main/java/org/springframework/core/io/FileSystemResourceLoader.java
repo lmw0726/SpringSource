@@ -17,18 +17,15 @@
 package org.springframework.core.io;
 
 /**
- * {@link ResourceLoader} implementation that resolves plain paths as
- * file system resources rather than as class path resources
- * (the latter is {@link DefaultResourceLoader}'s default strategy).
+ * {@link ResourceLoader} 的实现类，将普通路径解析为文件系统资源，
+ * 而不是类路径资源（后者是 {@link DefaultResourceLoader} 的默认策略）。
  *
- * <p><b>NOTE:</b> Plain paths will always be interpreted as relative
- * to the current VM working directory, even if they start with a slash.
- * (This is consistent with the semantics in a Servlet container.)
- * <b>Use an explicit "file:" prefix to enforce an absolute file path.</b>
+ * <p><b>注意：</b> 普通路径始终会被解释为相对于当前 VM 工作目录的路径，
+ * 即使它们以斜杠开头也是如此。（这与 Servlet 容器中的语义一致。）
+ * <b>使用显式的 "file:" 前缀可强制使用绝对文件路径。</b>
  *
  * <p>{@link org.springframework.context.support.FileSystemXmlApplicationContext}
- * is a full-fledged ApplicationContext implementation that provides
- * the same resource path resolution strategy.
+ * 是一个功能完整的 ApplicationContext 实现，提供了相同的资源路径解析策略。
  *
  * @author Juergen Hoeller
  * @since 1.1.3
@@ -38,11 +35,11 @@ package org.springframework.core.io;
 public class FileSystemResourceLoader extends DefaultResourceLoader {
 
 	/**
-	 * Resolve resource paths as file system paths.
-	 * <p>Note: Even if a given path starts with a slash, it will get
-	 * interpreted as relative to the current VM working directory.
-	 * @param path the path to the resource
-	 * @return the corresponding Resource handle
+	 * 将资源路径解析为文件系统路径。
+	 * <p>注意：即使给定路径以斜杠开头，
+	 * 也会被解释为相对于当前 VM 工作目录的路径。
+	 * @param path 资源路径
+	 * @return 对应的 Resource 句柄
 	 * @see FileSystemResource
 	 * @see org.springframework.web.context.support.ServletContextResourceLoader#getResourceByPath
 	 */
@@ -56,8 +53,8 @@ public class FileSystemResourceLoader extends DefaultResourceLoader {
 
 
 	/**
-	 * FileSystemResource that explicitly expresses a context-relative path
-	 * through implementing the ContextResource interface.
+	 * 明确表达上下文相对路径的 FileSystemResource，
+	 * 通过实现 ContextResource 接口来实现。
 	 */
 	private static class FileSystemContextResource extends FileSystemResource implements ContextResource {
 

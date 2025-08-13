@@ -16,16 +16,7 @@
 
 package org.springframework.core.type.classreading;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.asm.AnnotationVisitor;
-import org.springframework.asm.ClassVisitor;
-import org.springframework.asm.MethodVisitor;
-import org.springframework.asm.Opcodes;
-import org.springframework.asm.SpringAsmInfo;
+import org.springframework.asm.*;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.type.MethodMetadata;
@@ -34,8 +25,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
- * ASM class visitor that creates {@link SimpleAnnotationMetadata}.
+ * ASM 类访问者，用于创建 {@link SimpleAnnotationMetadata}。
  *
  * @author Phillip Webb
  * @since 5.2
@@ -125,9 +121,9 @@ final class SimpleAnnotationMetadataReadingVisitor extends ClassVisitor {
 	public MethodVisitor visitMethod(
 			int access, String name, String descriptor, String signature, String[] exceptions) {
 
-		// Skip bridge methods - we're only interested in original
-		// annotation-defining user methods. On JDK 8, we'd otherwise run into
-		// double detection of the same annotated method...
+		// 跳过桥接方法 —— 我们只关心原始的
+		// 定义注解的用户方法。在 JDK 8 上，否则会遇到
+		// 对同一注解方法的重复检测…
 		if (isBridge(access)) {
 			return null;
 		}

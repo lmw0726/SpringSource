@@ -16,28 +16,18 @@
 
 package org.springframework.core.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.core.annotation.AnnotationTypeMapping.MirrorSets.MirrorSet;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.*;
+
 /**
- * Provides mapping information for a single annotation (or meta-annotation) in
- * the context of a root annotation type.
+ * 在根注解类型的上下文中，为单个注解（或元注解）提供映射信息。
  *
  * @author Phillip Webb
  * @author Sam Brannen
@@ -312,29 +302,29 @@ final class AnnotationTypeMapping {
 
 	@SuppressWarnings("unchecked")
 	private boolean computeSynthesizableFlag(Set<Class<? extends Annotation>> visitedAnnotationTypes) {
-		// Track that we have visited the current annotation type.
+		// 记录当前注解类型已被访问
 		visitedAnnotationTypes.add(this.annotationType);
 
-		// Uses @AliasFor for local aliases?
+		// 是否在本地别名中使用了 @AliasFor？
 		for (int index : this.aliasMappings) {
 			if (index != -1) {
 				return true;
 			}
 		}
 
-		// Uses @AliasFor for attribute overrides in meta-annotations?
+		// 是否在元注解中使用了 @AliasFor 进行属性覆盖？
 		if (!this.aliasedBy.isEmpty()) {
 			return true;
 		}
 
-		// Uses convention-based attribute overrides in meta-annotations?
+		// 是否在元注解中使用了基于约定的属性覆盖？
 		for (int index : this.conventionMappings) {
 			if (index != -1) {
 				return true;
 			}
 		}
 
-		// Has nested annotations or arrays of annotations that are synthesizable?
+		// 是否存在可合成的嵌套注解或注解数组？
 		if (getAttributes().hasNestedAnnotation()) {
 			AttributeMethods attributeMethods = getAttributes();
 			for (int i = 0; i < attributeMethods.size(); i++) {
@@ -343,9 +333,7 @@ final class AnnotationTypeMapping {
 				if (type.isAnnotation() || (type.isArray() && type.getComponentType().isAnnotation())) {
 					Class<? extends Annotation> annotationType =
 							(Class<? extends Annotation>) (type.isAnnotation() ? type : type.getComponentType());
-					// Ensure we have not yet visited the current nested annotation type, in order
-					// to avoid infinite recursion for JVM languages other than Java that support
-					// recursive annotation definitions.
+					// 确保当前嵌套注解类型尚未访问过，以避免在支持递归注解定义的 Java 以外 JVM 语言中出现无限递归
 					if (visitedAnnotationTypes.add(annotationType)) {
 						AnnotationTypeMapping mapping =
 								AnnotationTypeMappings.forAnnotationType(annotationType, visitedAnnotationTypes).get(0);
@@ -361,8 +349,8 @@ final class AnnotationTypeMapping {
 	}
 
 	/**
-	 * Method called after all mappings have been set. At this point no further
-	 * lookups from child mappings will occur.
+	 * 在所有映射都设置完成后调用的方法。
+	 * 在此时不会再发生来自子映射的查找。
 	 */
 	void afterAllMappingsSet() {
 		validateAllAliasesClaimed();
@@ -405,16 +393,16 @@ final class AnnotationTypeMapping {
 	}
 
 	/**
-	 * Get the root mapping.
-	 * @return the root mapping
+	 * 获取根映射。
+	 * @return 根映射
 	 */
 	AnnotationTypeMapping getRoot() {
 		return this.root;
 	}
 
 	/**
-	 * Get the source of the mapping or {@code null}.
-	 * @return the source of the mapping
+	 * 获取映射的来源，如果没有则返回 {@code null}。
+	 * @return 映射的来源
 	 */
 	@Nullable
 	AnnotationTypeMapping getSource() {
@@ -422,16 +410,16 @@ final class AnnotationTypeMapping {
 	}
 
 	/**
-	 * Get the distance of this mapping.
-	 * @return the distance of the mapping
+	 * 获取此映射的距离。
+	 * @return 映射的距离
 	 */
 	int getDistance() {
 		return this.distance;
 	}
 
 	/**
-	 * Get the type of the mapped annotation.
-	 * @return the annotation type
+	 * 获取映射的注解类型。
+	 * @return 注解类型
 	 */
 	Class<? extends Annotation> getAnnotationType() {
 		return this.annotationType;
@@ -442,9 +430,8 @@ final class AnnotationTypeMapping {
 	}
 
 	/**
-	 * Get the source annotation for this mapping. This will be the
-	 * meta-annotation, or {@code null} if this is the root mapping.
-	 * @return the source annotation of the mapping
+	 * 获取此映射的源注解。它可能是元注解，如果这是根映射则返回 {@code null}。
+	 * @return 映射的源注解
 	 */
 	@Nullable
 	Annotation getAnnotation() {
@@ -452,48 +439,43 @@ final class AnnotationTypeMapping {
 	}
 
 	/**
-	 * Get the annotation attributes for the mapping annotation type.
-	 * @return the attribute methods
+	 * 获取映射注解类型的注解属性。
+	 * @return 属性方法集合
 	 */
 	AttributeMethods getAttributes() {
 		return this.attributes;
 	}
 
 	/**
-	 * Get the related index of an alias mapped attribute, or {@code -1} if
-	 * there is no mapping. The resulting value is the index of the attribute on
-	 * the root annotation that can be invoked in order to obtain the actual
-	 * value.
-	 * @param attributeIndex the attribute index of the source attribute
-	 * @return the mapped attribute index or {@code -1}
+	 * 获取别名映射属性的相关索引；如果没有映射，则返回 {@code -1}。
+	 * 返回的值是根注解中某个属性的索引，可以调用该属性来获取实际值。
+	 * @param attributeIndex 源属性的属性索引
+	 * @return 映射的属性索引，或 {@code -1}
 	 */
 	int getAliasMapping(int attributeIndex) {
 		return this.aliasMappings[attributeIndex];
 	}
 
 	/**
-	 * Get the related index of a convention mapped attribute, or {@code -1}
-	 * if there is no mapping. The resulting value is the index of the attribute
-	 * on the root annotation that can be invoked in order to obtain the actual
-	 * value.
-	 * @param attributeIndex the attribute index of the source attribute
-	 * @return the mapped attribute index or {@code -1}
+	 * 获取约定映射属性的相关索引；如果没有映射，则返回 {@code -1}。
+	 * 返回的值是根注解中某个属性的索引，可以调用该属性来获取实际值。
+	 * @param attributeIndex 源属性的属性索引
+	 * @return 映射的属性索引，或 {@code -1}
 	 */
 	int getConventionMapping(int attributeIndex) {
 		return this.conventionMappings[attributeIndex];
 	}
 
 	/**
-	 * Get a mapped attribute value from the most suitable
-	 * {@link #getAnnotation() meta-annotation}.
-	 * <p>The resulting value is obtained from the closest meta-annotation,
-	 * taking into consideration both convention and alias based mapping rules.
-	 * For root mappings, this method will always return {@code null}.
-	 * @param attributeIndex the attribute index of the source attribute
-	 * @param metaAnnotationsOnly if only meta annotations should be considered.
-	 * If this parameter is {@code false} then aliases within the annotation will
-	 * also be considered.
-	 * @return the mapped annotation value, or {@code null}
+	 * 从最适合的 {@link #getAnnotation() 元注解} 获取映射的属性值。
+	 *
+	 * <p>结果值从最接近的元注解中获取，同时考虑基于约定和别名的映射规则。
+	 * 对于根映射，此方法将始终返回 {@code null}。
+	 *
+	 * @param attributeIndex 源属性的属性索引
+	 * @param metaAnnotationsOnly 是否仅应考虑元注解。
+	 * 如果此参数为 {@code false}，那么注解内的别名也会被考虑。
+	 * @return 映射的注解值，或 {@code null}
 	 */
 	@Nullable
 	Object getMappedAnnotationValue(int attributeIndex, boolean metaAnnotationsOnly) {
@@ -509,13 +491,12 @@ final class AnnotationTypeMapping {
 	}
 
 	/**
-	 * Determine if the specified value is equivalent to the default value of the
-	 * attribute at the given index.
-	 * @param attributeIndex the attribute index of the source attribute
-	 * @param value the value to check
-	 * @param valueExtractor the value extractor used to extract values from any
-	 * nested annotations
-	 * @return {@code true} if the value is equivalent to the default value
+	 * 确定指定的值是否等效于给定索引处属性的默认值。
+	 *
+	 * @param attributeIndex 源属性的属性索引
+	 * @param value 要检查的值
+	 * @param valueExtractor 用于从任何嵌套注解中提取值的值提取器
+	 * @return 如果值等效于默认值则返回 {@code true}
 	 */
 	boolean isEquivalentToDefaultValue(int attributeIndex, Object value, ValueExtractor valueExtractor) {
 
@@ -524,18 +505,21 @@ final class AnnotationTypeMapping {
 	}
 
 	/**
-	 * Get the mirror sets for this type mapping.
-	 * @return the attribute mirror sets
+	 * 获取此类型映射的镜像集合。
+	 *
+	 * @return 属性镜像集合
 	 */
 	MirrorSets getMirrorSets() {
 		return this.mirrorSets;
 	}
 
 	/**
-	 * Determine if the mapped annotation is <em>synthesizable</em>.
-	 * <p>Consult the documentation for {@link MergedAnnotation#synthesize()}
-	 * for an explanation of what is considered synthesizable.
-	 * @return {@code true} if the mapped annotation is synthesizable
+	 * 确定映射的注解是否<em>可合成</em>。
+	 *
+	 * <p>请查阅 {@link MergedAnnotation#synthesize()} 的文档
+	 * 以了解什么被认为是可合成的。
+	 *
+	 * @return 如果映射的注解是可合成的则返回 {@code true}
 	 * @since 5.2.6
 	 */
 	boolean isSynthesizable() {
@@ -612,8 +596,7 @@ final class AnnotationTypeMapping {
 
 
 	/**
-	 * A collection of {@link MirrorSet} instances that provides details of all
-	 * defined mirrors.
+	 * {@link MirrorSet} 实例的集合，提供所有已定义镜像的详细信息。
 	 */
 	class MirrorSets {
 
@@ -682,7 +665,7 @@ final class AnnotationTypeMapping {
 
 
 		/**
-		 * A single set of mirror attributes.
+		 *一组镜像属性。
 		 */
 		class MirrorSet {
 

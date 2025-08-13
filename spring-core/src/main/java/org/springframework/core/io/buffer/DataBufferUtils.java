@@ -16,17 +16,22 @@
 
 package org.springframework.core.io.buffer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
+import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import reactor.core.publisher.*;
+import reactor.util.context.Context;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.Channel;
-import java.nio.channels.Channels;
-import java.nio.channels.CompletionHandler;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
+import java.nio.channels.*;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -38,23 +43,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
-import reactor.core.publisher.BaseSubscriber;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.SynchronousSink;
-import reactor.util.context.Context;
-
-import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Utility class for working with {@link DataBuffer DataBuffers}.
+ * 用于操作 {@link DataBuffer 数据缓冲区} 的工具类。
  *
  * @author Arjen Poutsma
  * @author Brian Clozel
@@ -68,17 +58,16 @@ public abstract class DataBufferUtils {
 
 
 	//---------------------------------------------------------------------
-	// Reading
+	// 读取相关方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * Obtain an {@link InputStream} from the given supplier, and read it into a
-	 * {@code Flux} of {@code DataBuffer}s. Closes the input stream when the
-	 * Flux is terminated.
-	 * @param inputStreamSupplier the supplier for the input stream to read from
-	 * @param bufferFactory the factory to create data buffers with
-	 * @param bufferSize the maximum size of the data buffers
-	 * @return a Flux of data buffers read from the given channel
+	 * 从给定的供应者获取 {@link InputStream}，并读取为 {@code DataBuffer} 的 {@code Flux}。
+	 * 在 Flux 终止时关闭输入流。
+	 * @param inputStreamSupplier 输入流供应者
+	 * @param bufferFactory 用于创建数据缓冲区的工厂
+	 * @param bufferSize 数据缓冲区的最大大小
+	 * @return 从指定通道读取的数据缓冲区的 Flux
 	 */
 	public static Flux<DataBuffer> readInputStream(
 			Callable<InputStream> inputStreamSupplier, DataBufferFactory bufferFactory, int bufferSize) {
@@ -88,13 +77,12 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Obtain a {@link ReadableByteChannel} from the given supplier, and read
-	 * it into a {@code Flux} of {@code DataBuffer}s. Closes the channel when
-	 * the Flux is terminated.
-	 * @param channelSupplier the supplier for the channel to read from
-	 * @param bufferFactory the factory to create data buffers with
-	 * @param bufferSize the maximum size of the data buffers
-	 * @return a Flux of data buffers read from the given channel
+	 * 从给定的供应者获取 {@link ReadableByteChannel}，并读取为 {@code DataBuffer} 的 {@code Flux}。
+	 * 在 Flux 终止时关闭通道。
+	 * @param channelSupplier 通道供应者
+	 * @param bufferFactory 用于创建数据缓冲区的工厂
+	 * @param bufferSize 数据缓冲区的最大大小
+	 * @return 从指定通道读取的数据缓冲区的 Flux
 	 */
 	public static Flux<DataBuffer> readByteChannel(
 			Callable<ReadableByteChannel> channelSupplier, DataBufferFactory bufferFactory, int bufferSize) {
@@ -107,17 +95,16 @@ public abstract class DataBufferUtils {
 				channel -> Flux.generate(new ReadableByteChannelGenerator(channel, bufferFactory, bufferSize)),
 				DataBufferUtils::closeChannel);
 
-		// No doOnDiscard as operators used do not cache
+		// 没有使用 doOnDiscard，因为所用操作符不会缓存
 	}
 
 	/**
-	 * Obtain a {@code AsynchronousFileChannel} from the given supplier, and read
-	 * it into a {@code Flux} of {@code DataBuffer}s. Closes the channel when
-	 * the Flux is terminated.
-	 * @param channelSupplier the supplier for the channel to read from
-	 * @param bufferFactory the factory to create data buffers with
-	 * @param bufferSize the maximum size of the data buffers
-	 * @return a Flux of data buffers read from the given channel
+	 * 从给定的供应者获取 {@code AsynchronousFileChannel}，并读取为 {@code DataBuffer} 的 {@code Flux}。
+	 * 在 Flux 终止时关闭通道。
+	 * @param channelSupplier 通道供应者
+	 * @param bufferFactory 用于创建数据缓冲区的工厂
+	 * @param bufferSize 数据缓冲区的最大大小
+	 * @return 从指定通道读取的数据缓冲区的 Flux
 	 */
 	public static Flux<DataBuffer> readAsynchronousFileChannel(
 			Callable<AsynchronousFileChannel> channelSupplier, DataBufferFactory bufferFactory, int bufferSize) {
@@ -126,14 +113,14 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Obtain an {@code AsynchronousFileChannel} from the given supplier, and
-	 * read it into a {@code Flux} of {@code DataBuffer}s, starting at the given
-	 * position. Closes the channel when the Flux is terminated.
-	 * @param channelSupplier the supplier for the channel to read from
-	 * @param position the position to start reading from
-	 * @param bufferFactory the factory to create data buffers with
-	 * @param bufferSize the maximum size of the data buffers
-	 * @return a Flux of data buffers read from the given channel
+	 * 从给定的供应者获取 {@code AsynchronousFileChannel}，并从指定位置开始读取为
+	 * {@code DataBuffer} 的 {@code Flux}。
+	 * 在 Flux 终止时关闭通道。
+	 * @param channelSupplier 通道供应者
+	 * @param position 开始读取的位置
+	 * @param bufferFactory 用于创建数据缓冲区的工厂
+	 * @param bufferSize 数据缓冲区的最大大小
+	 * @return 从指定通道读取的数据缓冲区的 Flux
 	 */
 	public static Flux<DataBuffer> readAsynchronousFileChannel(
 			Callable<AsynchronousFileChannel> channelSupplier, long position,
@@ -152,20 +139,21 @@ public abstract class DataBufferUtils {
 					sink.onRequest(handler::request);
 				}),
 				channel -> {
-					// Do not close channel from here, rather wait for the current read callback
-					// and then complete after releasing the DataBuffer.
+					// 不在此处关闭通道，而是等待当前读回调完成，
+					// 然后在释放 DataBuffer 后完成。
 				});
 
 		return flux.doOnDiscard(PooledDataBuffer.class, DataBufferUtils::release);
 	}
 
 	/**
-	 * Read bytes from the given file {@code Path} into a {@code Flux} of {@code DataBuffer}s.
-	 * The method ensures that the file is closed when the flux is terminated.
-	 * @param path the path to read bytes from
-	 * @param bufferFactory the factory to create data buffers with
-	 * @param bufferSize the maximum size of the data buffers
-	 * @return a Flux of data buffers read from the given channel
+	 * 从指定的文件 {@code Path} 中读取字节，转换为 {@code DataBuffer} 的 {@code Flux}。
+	 * 该方法确保在 Flux 终止时关闭文件。
+	 * @param path 要读取的文件路径
+	 * @param bufferFactory 用于创建数据缓冲区的工厂
+	 * @param bufferSize 数据缓冲区的最大大小
+	 * @param options 文件打开选项
+	 * @return 从指定通道读取的数据缓冲区的 Flux
 	 * @since 5.2
 	 */
 	public static Flux<DataBuffer> read(
@@ -186,34 +174,32 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Read the given {@code Resource} into a {@code Flux} of {@code DataBuffer}s.
-	 * <p>If the resource is a file, it is read into an
-	 * {@code AsynchronousFileChannel} and turned to {@code Flux} via
-	 * {@link #readAsynchronousFileChannel(Callable, DataBufferFactory, int)} or else
-	 * fall back to {@link #readByteChannel(Callable, DataBufferFactory, int)}.
-	 * Closes the channel when the flux is terminated.
-	 * @param resource the resource to read from
-	 * @param bufferFactory the factory to create data buffers with
-	 * @param bufferSize the maximum size of the data buffers
-	 * @return a Flux of data buffers read from the given channel
+	 * 读取给定的 {@code Resource}，转换为 {@code DataBuffer} 的 {@code Flux}。
+	 * <p>如果资源是文件，则读取为 {@code AsynchronousFileChannel}，
+	 * 并通过 {@link #readAsynchronousFileChannel(Callable, DataBufferFactory, int)} 转换为 Flux，
+	 * 否则回退至 {@link #readByteChannel(Callable, DataBufferFactory, int)}。
+	 * 在 Flux 终止时关闭通道。
+	 * @param resource 要读取的资源
+	 * @param bufferFactory 用于创建数据缓冲区的工厂
+	 * @param bufferSize 数据缓冲区的最大大小
+	 * @return 从指定通道读取的数据缓冲区的 Flux
 	 */
 	public static Flux<DataBuffer> read(Resource resource, DataBufferFactory bufferFactory, int bufferSize) {
 		return read(resource, 0, bufferFactory, bufferSize);
 	}
 
 	/**
-	 * Read the given {@code Resource} into a {@code Flux} of {@code DataBuffer}s
-	 * starting at the given position.
-	 * <p>If the resource is a file, it is read into an
-	 * {@code AsynchronousFileChannel} and turned to {@code Flux} via
-	 * {@link #readAsynchronousFileChannel(Callable, DataBufferFactory, int)} or else
-	 * fall back on {@link #readByteChannel(Callable, DataBufferFactory, int)}.
-	 * Closes the channel when the flux is terminated.
-	 * @param resource the resource to read from
-	 * @param position the position to start reading from
-	 * @param bufferFactory the factory to create data buffers with
-	 * @param bufferSize the maximum size of the data buffers
-	 * @return a Flux of data buffers read from the given channel
+	 * 从指定的 {@code Resource} 中读取数据，转换为 {@code DataBuffer} 的 {@code Flux}，
+	 * 从指定位置开始读取。
+	 * <p>如果资源是文件，则读取为 {@code AsynchronousFileChannel}，
+	 * 并通过 {@link #readAsynchronousFileChannel(Callable, DataBufferFactory, int)} 转换为 Flux，
+	 * 否则回退至 {@link #readByteChannel(Callable, DataBufferFactory, int)}。
+	 * 在 Flux 终止时关闭通道。
+	 * @param resource 要读取的资源
+	 * @param position 读取起始位置
+	 * @param bufferFactory 用于创建数据缓冲区的工厂
+	 * @param bufferSize 数据缓冲区的最大大小
+	 * @return 从指定通道读取的数据缓冲区的 Flux
 	 */
 	public static Flux<DataBuffer> read(
 			Resource resource, long position, DataBufferFactory bufferFactory, int bufferSize) {
@@ -227,7 +213,7 @@ public abstract class DataBufferUtils {
 			}
 		}
 		catch (IOException ignore) {
-			// fallback to resource.readableChannel(), below
+			// 回退至 resource.readableChannel()，见下方
 		}
 		Flux<DataBuffer> result = readByteChannel(resource::readableChannel, bufferFactory, bufferSize);
 		return position == 0 ? result : skipUntilByteCount(result, position);
@@ -235,23 +221,19 @@ public abstract class DataBufferUtils {
 
 
 	//---------------------------------------------------------------------
-	// Writing
+	// 写入相关方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * Write the given stream of {@link DataBuffer DataBuffers} to the given
-	 * {@code OutputStream}. Does <strong>not</strong> close the output stream
-	 * when the flux is terminated, and does <strong>not</strong>
-	 * {@linkplain #release(DataBuffer) release} the data buffers in the source.
-	 * If releasing is required, then subscribe to the returned {@code Flux}
-	 * with a {@link #releaseConsumer()}.
-	 * <p>Note that the writing process does not start until the returned
-	 * {@code Flux} is subscribed to.
-	 * @param source the stream of data buffers to be written
-	 * @param outputStream the output stream to write to
-	 * @return a Flux containing the same buffers as in {@code source}, that
-	 * starts the writing process when subscribed to, and that publishes any
-	 * writing errors and the completion signal
+	 * 将给定的 {@link DataBuffer DataBuffers} 流写入指定的 {@code OutputStream}。
+	 * 该方法<strong>不会</strong>在 Flux 终止时关闭输出流，
+	 * 也<strong>不会</strong>释放源中的数据缓冲区。
+	 * 如果需要释放缓冲区，应当使用 {@link #releaseConsumer()} 订阅返回的 {@code Flux}。
+	 * <p>注意，写入过程直到订阅返回的 {@code Flux} 时才开始。
+	 * @param source 要写入的数据缓冲区流
+	 * @param outputStream 要写入的输出流
+	 * @return 包含与 {@code source} 相同缓冲区的 Flux，在订阅时启动写入过程，
+	 * 并发布任何写入错误及完成信号
 	 */
 	public static Flux<DataBuffer> write(Publisher<DataBuffer> source, OutputStream outputStream) {
 		Assert.notNull(source, "'source' must not be null");
@@ -262,19 +244,15 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Write the given stream of {@link DataBuffer DataBuffers} to the given
-	 * {@code WritableByteChannel}. Does <strong>not</strong> close the channel
-	 * when the flux is terminated, and does <strong>not</strong>
-	 * {@linkplain #release(DataBuffer) release} the data buffers in the source.
-	 * If releasing is required, then subscribe to the returned {@code Flux}
-	 * with a {@link #releaseConsumer()}.
-	 * <p>Note that the writing process does not start until the returned
-	 * {@code Flux} is subscribed to.
-	 * @param source the stream of data buffers to be written
-	 * @param channel the channel to write to
-	 * @return a Flux containing the same buffers as in {@code source}, that
-	 * starts the writing process when subscribed to, and that publishes any
-	 * writing errors and the completion signal
+	 * 将给定的 {@link DataBuffer DataBuffers} 流写入指定的 {@code WritableByteChannel}。
+	 * 该方法<strong>不会</strong>在 Flux 终止时关闭通道，
+	 * 也<strong>不会</strong>释放源中的数据缓冲区。
+	 * 如果需要释放缓冲区，应当使用 {@link #releaseConsumer()} 订阅返回的 {@code Flux}。
+	 * <p>注意，写入过程直到订阅返回的 {@code Flux} 时才开始。
+	 * @param source 要写入的数据缓冲区流
+	 * @param channel 要写入的通道
+	 * @return 包含与 {@code source} 相同缓冲区的 Flux，在订阅时启动写入过程，
+	 * 并发布任何写入错误及完成信号
 	 */
 	public static Flux<DataBuffer> write(Publisher<DataBuffer> source, WritableByteChannel channel) {
 		Assert.notNull(source, "'source' must not be null");
@@ -289,19 +267,15 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Write the given stream of {@link DataBuffer DataBuffers} to the given
-	 * {@code AsynchronousFileChannel}. Does <strong>not</strong> close the
-	 * channel when the flux is terminated, and does <strong>not</strong>
-	 * {@linkplain #release(DataBuffer) release} the data buffers in the source.
-	 * If releasing is required, then subscribe to the returned {@code Flux}
-	 * with a {@link #releaseConsumer()}.
-	 * <p>Note that the writing process does not start until the returned
-	 * {@code Flux} is subscribed to.
-	 * @param source the stream of data buffers to be written
-	 * @param channel the channel to write to
-	 * @return a Flux containing the same buffers as in {@code source}, that
-	 * starts the writing process when subscribed to, and that publishes any
-	 * writing errors and the completion signal
+	 * 将给定的 {@link DataBuffer} 流写入指定的 {@code AsynchronousFileChannel}。
+	 * <strong>不会</strong>在 Flux 终止时关闭通道，
+	 * 也 <strong>不会</strong>释放源中的数据缓冲区。
+	 * 如果需要释放，请订阅返回的 {@code Flux} 并使用 {@link #releaseConsumer()}。
+	 * <p>注意，写入过程直到订阅返回的 {@code Flux} 后才开始。
+	 * @param source 要写入的数据缓冲区流
+	 * @param channel 写入的通道
+	 * @return 包含与 {@code source} 相同缓冲区的 Flux，
+	 *         订阅时开始写入，发布任何写入错误和完成信号
 	 * @since 5.0.10
 	 */
 	public static Flux<DataBuffer> write(Publisher<DataBuffer> source, AsynchronousFileChannel channel) {
@@ -309,20 +283,16 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Write the given stream of {@link DataBuffer DataBuffers} to the given
-	 * {@code AsynchronousFileChannel}. Does <strong>not</strong> close the channel
-	 * when the flux is terminated, and does <strong>not</strong>
-	 * {@linkplain #release(DataBuffer) release} the data buffers in the source.
-	 * If releasing is required, then subscribe to the returned {@code Flux} with a
-	 * {@link #releaseConsumer()}.
-	 * <p>Note that the writing process does not start until the returned
-	 * {@code Flux} is subscribed to.
-	 * @param source the stream of data buffers to be written
-	 * @param channel the channel to write to
-	 * @param position the file position where writing is to begin; must be non-negative
-	 * @return a flux containing the same buffers as in {@code source}, that
-	 * starts the writing process when subscribed to, and that publishes any
-	 * writing errors and the completion signal
+	 * 将给定的 {@link DataBuffer} 流写入指定的 {@code AsynchronousFileChannel}。
+	 * <strong>不会</strong>在 Flux 终止时关闭通道，
+	 * 也 <strong>不会</strong>释放源中的数据缓冲区。
+	 * 如果需要释放，请订阅返回的 {@code Flux} 并使用 {@link #releaseConsumer()}。
+	 * <p>注意，写入过程直到订阅返回的 {@code Flux} 后才开始。
+	 * @param source 要写入的数据缓冲区流
+	 * @param channel 写入的通道
+	 * @param position 写入开始的文件位置，必须为非负数
+	 * @return 包含与 {@code source} 相同缓冲区的 Flux，
+	 *         订阅时开始写入，发布任何写入错误和完成信号
 	 */
 	public static Flux<DataBuffer> write(
 			Publisher<? extends DataBuffer> source, AsynchronousFileChannel channel, long position) {
@@ -342,16 +312,15 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Write the given stream of {@link DataBuffer DataBuffers} to the given
-	 * file {@link Path}. The optional {@code options} parameter specifies
-	 * how the file is created or opened (defaults to
-	 * {@link StandardOpenOption#CREATE CREATE},
-	 * {@link StandardOpenOption#TRUNCATE_EXISTING TRUNCATE_EXISTING}, and
-	 * {@link StandardOpenOption#WRITE WRITE}).
-	 * @param source the stream of data buffers to be written
-	 * @param destination the path to the file
-	 * @param options the options specifying how the file is opened
-	 * @return a {@link Mono} that indicates completion or error
+	 * 将给定的 {@link DataBuffer} 流写入指定的文件 {@link Path}。
+	 * 可选的 {@code options} 参数指定文件的创建或打开方式
+	 * （默认是 {@link StandardOpenOption#CREATE CREATE}，
+	 * {@link StandardOpenOption#TRUNCATE_EXISTING TRUNCATE_EXISTING}，
+	 * 和 {@link StandardOpenOption#WRITE WRITE}）。
+	 * @param source 要写入的数据缓冲区流
+	 * @param destination 文件路径
+	 * @param options 指定如何打开文件的选项
+	 * @return 表示完成或错误的 {@link Mono}
 	 * @since 5.2
 	 */
 	public static Mono<Void> write(Publisher<DataBuffer> source, Path destination, OpenOption... options) {
@@ -405,16 +374,16 @@ public abstract class DataBufferUtils {
 
 
 	//---------------------------------------------------------------------
-	// Various
+	// 各种方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * Relay buffers from the given {@link Publisher} until the total
-	 * {@linkplain DataBuffer#readableByteCount() byte count} reaches
-	 * the given maximum byte count, or until the publisher is complete.
-	 * @param publisher the publisher to filter
-	 * @param maxByteCount the maximum byte count
-	 * @return a flux whose maximum byte count is {@code maxByteCount}
+	 * 从给定的 {@link Publisher} 中转发缓冲区，直到总的
+	 * {@linkplain DataBuffer#readableByteCount() 可读字节数}达到指定的最大字节数，
+	 * 或直到发布者完成。
+	 * @param publisher 要过滤的发布者
+	 * @param maxByteCount 最大字节数
+	 * @return 最大字节数为 {@code maxByteCount} 的 Flux
 	 */
 	public static Flux<DataBuffer> takeUntilByteCount(Publisher<? extends DataBuffer> publisher, long maxByteCount) {
 		Assert.notNull(publisher, "Publisher must not be null");
@@ -436,16 +405,16 @@ public abstract class DataBufferUtils {
 					.takeUntil(buffer -> countDown.get() <= 0);
 		});
 
-		// No doOnDiscard as operators used do not cache (and drop) buffers
+		// 没有使用 doOnDiscard，因为所用操作符不会缓存（且丢弃）缓冲区
 	}
 
 	/**
-	 * Skip buffers from the given {@link Publisher} until the total
-	 * {@linkplain DataBuffer#readableByteCount() byte count} reaches
-	 * the given maximum byte count, or until the publisher is complete.
-	 * @param publisher the publisher to filter
-	 * @param maxByteCount the maximum byte count
-	 * @return a flux with the remaining part of the given publisher
+	 * 跳过给定 {@link Publisher} 中的缓冲区，直到总的
+	 * {@linkplain DataBuffer#readableByteCount() 可读字节数}达到指定的最大字节数，
+	 * 或直到发布者完成。
+	 * @param publisher 要过滤的发布者
+	 * @param maxByteCount 最大字节数
+	 * @return 发布者剩余部分的 Flux
 	 */
 	public static Flux<DataBuffer> skipUntilByteCount(Publisher<? extends DataBuffer> publisher, long maxByteCount) {
 		Assert.notNull(publisher, "Publisher must not be null");
@@ -474,9 +443,9 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Retain the given data buffer, if it is a {@link PooledDataBuffer}.
-	 * @param dataBuffer the data buffer to retain
-	 * @return the retained buffer
+	 * 保留给定的数据缓冲区（如果它是 {@link PooledDataBuffer} 类型）。
+	 * @param dataBuffer 要保留的数据缓冲区
+	 * @return 保留后的缓冲区
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends DataBuffer> T retain(T dataBuffer) {
@@ -489,11 +458,10 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Associate the given hint with the data buffer if it is a pooled buffer
-	 * and supports leak tracking.
-	 * @param dataBuffer the data buffer to attach the hint to
-	 * @param hint the hint to attach
-	 * @return the input buffer
+	 * 如果给定的数据缓冲区是池化缓冲区且支持泄漏追踪，则关联一个提示信息。
+	 * @param dataBuffer 要附加提示的数据缓冲区
+	 * @param hint 要附加的提示信息
+	 * @return 输入的数据缓冲区
 	 * @since 5.3.2
 	 */
 	@SuppressWarnings("unchecked")
@@ -507,10 +475,10 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Release the given data buffer, if it is a {@link PooledDataBuffer} and
-	 * has been {@linkplain PooledDataBuffer#isAllocated() allocated}.
-	 * @param dataBuffer the data buffer to release
-	 * @return {@code true} if the buffer was released; {@code false} otherwise.
+	 * 释放给定的数据缓冲区（如果它是 {@link PooledDataBuffer} 且已经被
+	 * {@linkplain PooledDataBuffer#isAllocated() 分配}）。
+	 * @param dataBuffer 要释放的数据缓冲区
+	 * @return 如果成功释放则返回 {@code true}，否则返回 {@code false}
 	 */
 	public static boolean release(@Nullable DataBuffer dataBuffer) {
 		if (dataBuffer instanceof PooledDataBuffer) {
@@ -520,7 +488,7 @@ public abstract class DataBufferUtils {
 					return pooledDataBuffer.release();
 				}
 				catch (IllegalStateException ex) {
-					// Avoid dependency on Netty: IllegalReferenceCountException
+					// 避免依赖 Netty 的 IllegalReferenceCountException
 					if (logger.isDebugEnabled()) {
 						logger.debug("Failed to release PooledDataBuffer: " + dataBuffer, ex);
 					}
@@ -532,26 +500,22 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Return a consumer that calls {@link #release(DataBuffer)} on all
-	 * passed data buffers.
+	 * 返回一个消费者，该消费者会对传入的所有数据缓冲区调用 {@link #release(DataBuffer)}。
 	 */
 	public static Consumer<DataBuffer> releaseConsumer() {
 		return RELEASE_CONSUMER;
 	}
 
 	/**
-	 * Return a new {@code DataBuffer} composed from joining together the given
-	 * {@code dataBuffers} elements. Depending on the {@link DataBuffer} type,
-	 * the returned buffer may be a single buffer containing all data of the
-	 * provided buffers, or it may be a zero-copy, composite with references to
-	 * the given buffers.
-	 * <p>If {@code dataBuffers} produces an error or if there is a cancel
-	 * signal, then all accumulated buffers will be
-	 * {@linkplain #release(DataBuffer) released}.
-	 * <p>Note that the given data buffers do <strong>not</strong> have to be
-	 * released. They will be released as part of the returned composite.
-	 * @param dataBuffers the data buffers that are to be composed
-	 * @return a buffer that is composed from the {@code dataBuffers} argument
+	 * 返回一个新的 {@code DataBuffer}，由给定的 {@code dataBuffers} 元素合并组成。
+	 * 根据 {@link DataBuffer} 的类型，返回的缓冲区可能是包含所有数据的单个缓冲区，
+	 * 也可能是一个零拷贝的复合缓冲区，引用了给定的缓冲区。
+	 * <p>如果 {@code dataBuffers} 产生错误或取消信号，则所有累积的缓冲区将被
+	 * {@linkplain #release(DataBuffer) 释放}。
+	 * <p>注意，给定的数据缓冲区<strong>无需</strong>手动释放，
+	 * 它们会作为返回的复合缓冲区的一部分被释放。
+	 * @param dataBuffers 要合成的多个数据缓冲区
+	 * @return 由 {@code dataBuffers} 合成的缓冲区
 	 * @since 5.0.3
 	 */
 	public static Mono<DataBuffer> join(Publisher<? extends DataBuffer> dataBuffers) {
@@ -559,14 +523,12 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Variant of {@link #join(Publisher)} that behaves the same way up until
-	 * the specified max number of bytes to buffer. Once the limit is exceeded,
-	 * {@link DataBufferLimitException} is raised.
-	 * @param buffers the data buffers that are to be composed
-	 * @param maxByteCount the max number of bytes to buffer, or -1 for unlimited
-	 * @return a buffer with the aggregated content, possibly an empty Mono if
-	 * the max number of bytes to buffer is exceeded.
-	 * @throws DataBufferLimitException if maxByteCount is exceeded
+	 * {@link #join(Publisher)} 的变体，行为相同，但会限制缓冲的最大字节数。
+	 * 一旦超过限制，将抛出 {@link DataBufferLimitException}。
+	 * @param buffers 要合成的多个数据缓冲区
+	 * @param maxByteCount 最大缓冲字节数，-1 表示无限制
+	 * @return 聚合内容的缓冲区，若超出最大字节数可能返回空的 Mono。
+	 * @throws DataBufferLimitException 当超过 maxByteCount 时抛出
 	 * @since 5.1.11
 	 */
 	@SuppressWarnings("unchecked")
@@ -585,10 +547,10 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Return a {@link Matcher} for the given delimiter.
-	 * The matcher can be used to find the delimiters in a stream of data buffers.
-	 * @param delimiter the delimiter bytes to find
-	 * @return the matcher
+	 * 返回给定分隔符的 {@link Matcher}。
+	 * 该匹配器可用于在数据缓冲区流中查找分隔符。
+	 * @param delimiter 要查找的分隔符字节数组
+	 * @return 匹配器实例
 	 * @since 5.2
 	 */
 	public static Matcher matcher(byte[] delimiter) {
@@ -596,10 +558,10 @@ public abstract class DataBufferUtils {
 	}
 
 	/**
-	 * Return a {@link Matcher} for the given delimiters.
-	 * The matcher can be used to find the delimiters in a stream of data buffers.
-	 * @param delimiters the delimiters bytes to find
-	 * @return the matcher
+	 * 返回给定多个分隔符的 {@link Matcher}。
+	 * 该匹配器可用于在数据缓冲区流中查找分隔符。
+	 * @param delimiters 要查找的多个分隔符字节数组
+	 * @return 匹配器实例
 	 * @since 5.2
 	 */
 	public static Matcher matcher(byte[]... delimiters) {
@@ -621,8 +583,8 @@ public abstract class DataBufferUtils {
 
 
 	/**
-	 * Contract to find delimiter(s) against one or more data buffers that can
-	 * be passed one at a time to the {@link #match(DataBuffer)} method.
+	 * 在一个或多个数据缓冲区中查找分隔符的契约接口，
+	 * 这些数据缓冲区可以逐个传递给 {@link #match(DataBuffer)} 方法进行匹配。
 	 *
 	 * @since 5.2
 	 * @see #match(DataBuffer)
@@ -630,25 +592,24 @@ public abstract class DataBufferUtils {
 	public interface Matcher {
 
 		/**
-		 * Find the first matching delimiter and return the index of the last
-		 * byte of the delimiter, or {@code -1} if not found.
+		 * 查找第一个匹配的分隔符，并返回分隔符最后一个字节的索引，未找到则返回 {@code -1}。
 		 */
 		int match(DataBuffer dataBuffer);
 
 		/**
-		 * Return the delimiter from the last invocation of {@link #match(DataBuffer)}.
+		 * 返回上一次 {@link #match(DataBuffer)} 调用时匹配的分隔符。
 		 */
 		byte[] delimiter();
 
 		/**
-		 * Reset the state of this matcher.
+		 * 重置此匹配器的状态。
 		 */
 		void reset();
 	}
 
 
 	/**
-	 * Matcher that supports searching for multiple delimiters.
+	 * 支持搜索多个分隔符的匹配器。
 	 */
 	private static class CompositeMatcher implements Matcher {
 
@@ -708,14 +669,13 @@ public abstract class DataBufferUtils {
 
 
 	/**
-	 * Matcher that can be nested within {@link CompositeMatcher} where multiple
-	 * matchers advance together using the same index, one byte at a time.
+	 * 可嵌套在 {@link CompositeMatcher} 中的匹配器，
+	 * 多个匹配器使用相同索引逐字节共同前进。
 	 */
 	private interface NestedMatcher extends Matcher {
 
 		/**
-		 * Perform a match against the next byte of the stream and return true
-		 * if the delimiter is fully matched.
+		 * 对流中的下一个字节执行匹配，如果分隔符完全匹配则返回 true。
 		 */
 		boolean match(byte b);
 
@@ -723,7 +683,7 @@ public abstract class DataBufferUtils {
 
 
 	/**
-	 * Matcher for a single byte delimiter.
+	 * 单字节分隔符的匹配器。
 	 */
 	private static class SingleByteMatcher implements NestedMatcher {
 
@@ -764,7 +724,7 @@ public abstract class DataBufferUtils {
 
 
 	/**
-	 * Base class for a {@link NestedMatcher}.
+	 * {@link NestedMatcher} 的基类。
 	 */
 	private static abstract class AbstractNestedMatcher implements NestedMatcher {
 
@@ -819,8 +779,7 @@ public abstract class DataBufferUtils {
 
 
 	/**
-	 * Matcher with a 2 byte delimiter that does not benefit from a
-	 * Knuth-Morris-Pratt suffix-prefix table.
+	 * 使用2字节分隔符的匹配器，不适用 Knuth-Morris-Pratt 后缀-前缀表优化。
 	 */
 	private static class TwoByteMatcher extends AbstractNestedMatcher {
 
@@ -832,8 +791,8 @@ public abstract class DataBufferUtils {
 
 
 	/**
-	 * Implementation of {@link Matcher} that uses the Knuth-Morris-Pratt algorithm.
-	 * @see <a href="https://www.nayuki.io/page/knuth-morris-pratt-string-matching">Knuth-Morris-Pratt string matching</a>
+	 * {@link Matcher} 的实现，使用 Knuth-Morris-Pratt 算法。
+	 * @see <a href="https://www.nayuki.io/page/knuth-morris-pratt-string-matching">Knuth-Morris-Pratt 字符串匹配算法</a>
 	 */
 	private static class KnuthMorrisPrattMatcher extends AbstractNestedMatcher {
 
@@ -939,22 +898,22 @@ public abstract class DataBufferUtils {
 		}
 
 		/**
-		 * Invoked when Reactive Streams consumer signals demand.
+		 * 当 Reactive Streams 消费者发出请求需求时调用。
 		 */
 		public void request(long n) {
 			tryRead();
 		}
 
 		/**
-		 * Invoked when Reactive Streams consumer cancels.
+		 * 当 Reactive Streams 消费者取消时调用。
 		 */
 		public void cancel() {
 			this.state.getAndSet(State.DISPOSED);
 
-			// According java.nio.channels.AsynchronousChannel "if an I/O operation is outstanding
-			// on the channel and the channel's close method is invoked, then the I/O operation
-			// fails with the exception AsynchronousCloseException". That should invoke the failed
-			// callback below and the current DataBuffer should be released.
+			// 根据 java.nio.channels.AsynchronousChannel 的规定，
+			// 如果通道上有未完成的 I/O 操作且调用了通道的 close 方法，
+			// 则该 I/O 操作会以 AsynchronousCloseException 异常失败。
+			// 这应当触发下面的 failed 回调，同时释放当前的 DataBuffer。
 
 			closeChannel(this.channel);
 		}
@@ -991,13 +950,13 @@ public abstract class DataBufferUtils {
 			dataBuffer.writePosition(read);
 			this.sink.next(dataBuffer);
 
-			// Stay in READING mode if there is demand
+			// 如果下游还有请求，则保持 READING 状态
 			if (this.sink.requestedFromDownstream() > 0) {
 				read();
 				return;
 			}
 
-			// Release READING mode and then try again in case of concurrent "request"
+			// 释放 READING 状态，然后在存在并发“request”时尝试重新读取
 			if (this.state.compareAndSet(State.READING, State.IDLE)) {
 				tryRead();
 			}

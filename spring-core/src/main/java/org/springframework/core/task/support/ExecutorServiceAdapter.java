@@ -16,27 +16,22 @@
 
 package org.springframework.core.task.support;
 
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.util.Assert;
+
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.util.Assert;
-
 /**
- * Adapter that takes a Spring {@link org.springframework.core.task.TaskExecutor}
- * and exposes a full {@code java.util.concurrent.ExecutorService} for it.
+ * 适配器，将 Spring 的 {@link org.springframework.core.task.TaskExecutor} 包装成完整的 {@code java.util.concurrent.ExecutorService}。
  *
- * <p>This is primarily for adapting to client components that communicate via the
- * {@code java.util.concurrent.ExecutorService} API. It can also be used as
- * common ground between a local Spring {@code TaskExecutor} backend and a
- * JNDI-located {@code ManagedExecutorService} in a Java EE 7 environment.
+ * <p>主要用于适配那些基于 {@code java.util.concurrent.ExecutorService} API 进行通信的客户端组件。
+ * 也可用作本地 Spring {@code TaskExecutor} 后端与 Java EE 7 环境中通过 JNDI 查找的 {@code ManagedExecutorService} 之间的桥梁。
  *
- * <p><b>NOTE:</b> This ExecutorService adapter does <em>not</em> support the
- * lifecycle methods in the {@code java.util.concurrent.ExecutorService} API
- * ("shutdown()" etc), similar to a server-wide {@code ManagedExecutorService}
- * in a Java EE 7 environment. The lifecycle is always up to the backend pool,
- * with this adapter acting as an access-only proxy for that target pool.
+ * <p><b>注意：</b>此 ExecutorService 适配器不支持 {@code java.util.concurrent.ExecutorService} API 中的生命周期方法（如 shutdown() 等），
+ * 这类似于 Java EE 7 环境中的服务器范围 {@code ManagedExecutorService}。
+ * 生命周期由后端线程池管理，本适配器仅作为该线程池的访问代理。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -48,8 +43,8 @@ public class ExecutorServiceAdapter extends AbstractExecutorService {
 
 
 	/**
-	 * Create a new ExecutorServiceAdapter, using the given target executor.
-	 * @param taskExecutor the target executor to delegate to
+	 * 使用指定的 TaskExecutor 创建新的 ExecutorServiceAdapter。
+	 * @param taskExecutor 目标 TaskExecutor，不能为空
 	 */
 	public ExecutorServiceAdapter(TaskExecutor taskExecutor) {
 		Assert.notNull(taskExecutor, "TaskExecutor must not be null");

@@ -16,9 +16,10 @@
 
 package org.springframework.util.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.springframework.lang.Nullable;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.ext.LexicalHandler;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -27,16 +28,13 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.ext.LexicalHandler;
-
-import org.springframework.lang.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
- * SAX {@link org.xml.sax.ContentHandler} and {@link LexicalHandler}
- * that writes to a {@link javax.xml.stream.util.XMLEventConsumer}.
+ * 实现SAX {@link org.xml.sax.ContentHandler}和{@link LexicalHandler}接口，
+ * 将数据写入{@link javax.xml.stream.util.XMLEventConsumer}的处理器类。
  *
  * @author Arjen Poutsma
  * @since 4.0.3
@@ -49,9 +47,9 @@ class StaxEventHandler extends AbstractStaxHandler {
 
 
 	/**
-	 * Construct a new instance of the {@code StaxEventContentHandler} that writes to the
-	 * given {@code XMLEventWriter}. A default {@code XMLEventFactory} will be created.
-	 * @param eventWriter the writer to write events to
+	 * 构造一个新的{@code StaxEventContentHandler}实例，将事件写入指定的
+	 * {@code XMLEventWriter}。将创建一个默认的{@code XMLEventFactory}。
+	 * @param eventWriter 要写入事件的事件写入器
 	 */
 	public StaxEventHandler(XMLEventWriter eventWriter) {
 		this.eventFactory = XMLEventFactory.newInstance();
@@ -59,10 +57,10 @@ class StaxEventHandler extends AbstractStaxHandler {
 	}
 
 	/**
-	 * Construct a new instance of the {@code StaxEventContentHandler} that uses the given
-	 * event factory to create events and writes to the given {@code XMLEventConsumer}.
-	 * @param eventWriter the writer to write events to
-	 * @param factory the factory used to create events
+	 * 构造一个新的{@code StaxEventContentHandler}实例，使用指定的事件工厂创建事件，
+	 * 并将事件写入指定的{@code XMLEventConsumer}。
+	 * @param eventWriter 要写入事件的事件写入器
+	 * @param factory 用于创建事件的事件工厂
 	 */
 	public StaxEventHandler(XMLEventWriter eventWriter, XMLEventFactory factory) {
 		this.eventFactory = factory;

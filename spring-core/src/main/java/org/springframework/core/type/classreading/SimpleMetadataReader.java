@@ -27,8 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * {@link MetadataReader} implementation based on an ASM
- * {@link org.springframework.asm.ClassReader}.
+ * 基于 ASM {@link org.springframework.asm.ClassReader} 的 {@link MetadataReader} 实现。
  *
  * @author Juergen Hoeller
  * @author Costin Leau

@@ -17,8 +17,7 @@
 package org.springframework.util.backoff;
 
 /**
- * A simple {@link BackOff} implementation that provides a fixed interval
- * between two attempts and a maximum number of retries.
+ * 简单的{@link BackOff}实现，提供固定的重试间隔和最大重试次数。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -26,12 +25,12 @@ package org.springframework.util.backoff;
 public class FixedBackOff implements BackOff {
 
 	/**
-	 * The default recovery interval: 5000 ms = 5 seconds.
+	 * 默认的重试间隔：5000毫秒（5秒）。
 	 */
 	public static final long DEFAULT_INTERVAL = 5000;
 
 	/**
-	 * Constant value indicating an unlimited number of attempts.
+	 * 表示无限次重试尝试的常量值。
 	 */
 	public static final long UNLIMITED_ATTEMPTS = Long.MAX_VALUE;
 
@@ -41,16 +40,15 @@ public class FixedBackOff implements BackOff {
 
 
 	/**
-	 * Create an instance with an interval of {@value #DEFAULT_INTERVAL}
-	 * ms and an unlimited number of attempts.
+	 * 创建实例，使用{@value #DEFAULT_INTERVAL}毫秒的间隔和无限次重试。
 	 */
 	public FixedBackOff() {
 	}
 
 	/**
-	 * Create an instance.
-	 * @param interval the interval between two attempts
-	 * @param maxAttempts the maximum number of attempts
+	 * 创建实例。
+	 * @param interval 两次重试之间的间隔（毫秒）
+	 * @param maxAttempts 最大重试次数
 	 */
 	public FixedBackOff(long interval, long maxAttempts) {
 		this.interval = interval;
@@ -59,28 +57,32 @@ public class FixedBackOff implements BackOff {
 
 
 	/**
-	 * Set the interval between two attempts in milliseconds.
+	 * 设置两次重试之间的间隔（毫秒）。
+	 * @param interval 重试间隔（毫秒）
 	 */
 	public void setInterval(long interval) {
 		this.interval = interval;
 	}
 
 	/**
-	 * Return the interval between two attempts in milliseconds.
+	 * 获取两次重试之间的间隔（毫秒）。
+	 * @return 重试间隔（毫秒）
 	 */
 	public long getInterval() {
 		return this.interval;
 	}
 
 	/**
-	 * Set the maximum number of attempts in milliseconds.
+	 * 设置最大重试次数。
+	 * @param maxAttempts 最大重试次数
 	 */
 	public void setMaxAttempts(long maxAttempts) {
 		this.maxAttempts = maxAttempts;
 	}
 
 	/**
-	 * Return the maximum number of attempts in milliseconds.
+	 * 获取最大重试次数。
+	 * @return 最大重试次数
 	 */
 	public long getMaxAttempts() {
 		return this.maxAttempts;

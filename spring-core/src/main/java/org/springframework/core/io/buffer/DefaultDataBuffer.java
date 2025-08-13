@@ -16,6 +16,10 @@
 
 package org.springframework.core.io.buffer;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,17 +29,13 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.function.IntPredicate;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
-
 /**
- * Default implementation of the {@link DataBuffer} interface that uses a
- * {@link ByteBuffer} internally. with separate read and write positions.
- * Constructed using the {@link DefaultDataBufferFactory}.
+ * {@link DataBuffer} 接口的默认实现，内部使用 {@link ByteBuffer}，
+ * 并且读写位置分开。
+ * 通过 {@link DefaultDataBufferFactory} 构造。
  *
- * <p>Inspired by Netty's {@code ByteBuf}. Introduced so that non-Netty runtimes
- * (i.e. Servlet) do not require Netty on the classpath.
+ * <p>灵感来源于 Netty 的 {@code ByteBuf}，设计目的是让非 Netty 运行时（例如 Servlet）
+ * 不必在类路径中依赖 Netty。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -82,10 +82,9 @@ public class DefaultDataBuffer implements DataBuffer {
 
 
 	/**
-	 * Directly exposes the native {@code ByteBuffer} that this buffer is based
-	 * on also updating the {@code ByteBuffer's} position and limit to match
-	 * the current {@link #readPosition()} and {@link #readableByteCount()}.
-	 * @return the wrapped byte buffer
+	 * 直接暴露此缓冲区所基于的原生 {@code ByteBuffer}，
+	 * 并将该 {@code ByteBuffer} 的 position 和 limit 更新为当前的 {@link #readPosition()} 和 {@link #readableByteCount()}。
+	 * @return 包装的字节缓冲区
 	 */
 	public ByteBuffer getNativeBuffer() {
 		this.byteBuffer.position(this.readPosition);
@@ -333,13 +332,12 @@ public class DefaultDataBuffer implements DataBuffer {
 	public DefaultDataBuffer slice(int index, int length) {
 		checkIndex(index, length);
 		int oldPosition = this.byteBuffer.position();
-		// Explicit access via Buffer base type for compatibility
-		// with covariant return type on JDK 9's ByteBuffer...
+		// 通过 Buffer 基类显式访问，以兼容 JDK 9 中 ByteBuffer 的协变返回类型...
 		Buffer buffer = this.byteBuffer;
 		try {
 			buffer.position(index);
 			ByteBuffer slice = this.byteBuffer.slice();
-			// Explicit cast for compatibility with covariant return type on JDK 9's ByteBuffer
+			// 显式设置限制，兼容 JDK 9 中 ByteBuffer 的协变返回类型
 			slice.limit(length);
 			return new SlicedDefaultDataBuffer(slice, this.dataBufferFactory, length);
 		}
@@ -358,8 +356,7 @@ public class DefaultDataBuffer implements DataBuffer {
 		checkIndex(index, length);
 
 		ByteBuffer duplicate = this.byteBuffer.duplicate();
-		// Explicit access via Buffer base type for compatibility
-		// with covariant return type on JDK 9's ByteBuffer...
+		// 通过 Buffer 基类显式访问，以兼容 JDK 9 中 ByteBuffer 的协变返回类型...
 		Buffer buffer = duplicate;
 		buffer.position(index);
 		buffer.limit(index + length);
@@ -405,7 +402,7 @@ public class DefaultDataBuffer implements DataBuffer {
 	}
 
 	/**
-	 * Calculate the capacity of the buffer.
+	 * 计算缓冲区的容量。
 	 * @see io.netty.buffer.AbstractByteBufAllocator#calculateNewCapacity(int, int)
 	 */
 	private int calculateCapacity(int neededCapacity) {

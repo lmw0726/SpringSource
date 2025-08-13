@@ -16,56 +16,55 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Extension of the {@code Map} interface that stores multiple values.
+ * {@code Map}接口的扩展，用于存储多个值。
  *
  * @author Arjen Poutsma
  * @since 3.0
- * @param <K> the key type
- * @param <V> the value element type
+ * @param <K> 键类型
+ * @param <V> 值元素类型
  */
 public interface MultiValueMap<K, V> extends Map<K, List<V>> {
 
 	/**
-	 * Return the first value for the given key.
-	 * @param key the key
-	 * @return the first value for the specified key, or {@code null} if none
+	 * 返回给定键的第一个值。
+	 * @param key 键
+	 * @return 指定键的第一个值，如果没有则返回{@code null}
 	 */
 	@Nullable
 	V getFirst(K key);
 
 	/**
-	 * Add the given single value to the current list of values for the given key.
-	 * @param key the key
-	 * @param value the value to be added
+	 * 将给定的单个值添加到指定键的当前值列表中。
+	 * @param key 键
+	 * @param value 要添加的值
 	 */
 	void add(K key, @Nullable V value);
 
 	/**
-	 * Add all the values of the given list to the current list of values for the given key.
-	 * @param key they key
-	 * @param values the values to be added
+	 * 将给定列表的所有值添加到指定键的当前值列表中。
+	 * @param key 键
+	 * @param values 要添加的值列表
 	 * @since 5.0
 	 */
 	void addAll(K key, List<? extends V> values);
 
 	/**
-	 * Add all the values of the given {@code MultiValueMap} to the current values.
-	 * @param values the values to be added
+	 * 将给定{@code MultiValueMap}的所有值添加到当前值中。
+	 * @param values 要添加的值
 	 * @since 5.0
 	 */
 	void addAll(MultiValueMap<K, V> values);
 
 	/**
-	 * {@link #add(Object, Object) Add} the given value, only when the map does not
-	 * {@link #containsKey(Object) contain} the given key.
-	 * @param key the key
-	 * @param value the value to be added
+	 * 仅当映射不包含给定键时，才{@link #add(Object, Object) 添加}给定值。
+	 * @param key 键
+	 * @param value 要添加的值
 	 * @since 5.2
 	 */
 	default void addIfAbsent(K key, @Nullable V value) {
@@ -75,21 +74,21 @@ public interface MultiValueMap<K, V> extends Map<K, List<V>> {
 	}
 
 	/**
-	 * Set the given single value under the given key.
-	 * @param key the key
-	 * @param value the value to set
+	 * 为给定键设置单个值。
+	 * @param key 键
+	 * @param value 要设置的值
 	 */
 	void set(K key, @Nullable V value);
 
 	/**
-	 * Set the given values under.
-	 * @param values the values.
+	 * 批量设置键值对。
+	 * @param values 要设置的键值对
 	 */
 	void setAll(Map<K, V> values);
 
 	/**
-	 * Return a {@code Map} with the first values contained in this {@code MultiValueMap}.
-	 * @return a single value representation of this map
+	 * 返回包含此{@code MultiValueMap}中第一个值的{@code Map}。
+	 * @return 此映射的单值表示形式
 	 */
 	Map<K, V> toSingleValueMap();
 

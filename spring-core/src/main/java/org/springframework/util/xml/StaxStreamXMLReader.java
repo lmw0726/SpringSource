@@ -16,24 +16,23 @@
 
 package org.springframework.util.xml;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.Locator2;
 import org.xml.sax.helpers.AttributesImpl;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
+import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 /**
- * SAX {@code XMLReader} that reads from a StAX {@code XMLStreamReader}. Reads from an
- * {@code XMLStreamReader}, and calls the corresponding methods on the SAX callback interfaces.
+ * 从StAX {@code XMLStreamReader}读取的SAX {@code XMLReader}实现。
+ * 从{@code XMLStreamReader}读取数据，并调用SAX回调接口的相应方法。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -56,11 +55,11 @@ class StaxStreamXMLReader extends AbstractStaxXMLReader {
 
 
 	/**
-	 * Construct a new instance of the {@code StaxStreamXmlReader} that reads from the given
-	 * {@code XMLStreamReader}. The supplied stream reader must be in {@code XMLStreamConstants.START_DOCUMENT}
-	 * or {@code XMLStreamConstants.START_ELEMENT} state.
-	 * @param reader the {@code XMLEventReader} to read from
-	 * @throws IllegalStateException if the reader is not at the start of a document or element
+	 * 构造一个新的{@code StaxStreamXmlReader}实例，从给定的{@code XMLStreamReader}读取。
+	 * 提供的流读取器必须处于{@code XMLStreamConstants.START_DOCUMENT}或
+	 * {@code XMLStreamConstants.START_ELEMENT}状态。
+	 * @param reader 要读取的{@code XMLEventReader}
+	 * @throws IllegalStateException 如果读取器不处于文档或元素的开始位置
 	 */
 	StaxStreamXMLReader(XMLStreamReader reader) {
 		int event = reader.getEventType();

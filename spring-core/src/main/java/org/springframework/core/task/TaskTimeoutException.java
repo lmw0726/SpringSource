@@ -17,33 +17,30 @@
 package org.springframework.core.task;
 
 /**
- * Exception thrown when a {@link AsyncTaskExecutor} rejects to accept
- * a given task for execution because of the specified timeout.
+ * 当 {@link AsyncTaskExecutor} 因指定的超时时间拒绝接受某个任务执行时抛出的异常。
  *
  * @author Juergen Hoeller
  * @since 2.0.3
  * @see AsyncTaskExecutor#execute(Runnable, long)
- * @deprecated as of 5.3.16 since the common executors do not support start timeouts
+ * @deprecated 自 5.3.16 版本起废弃，因为常用的执行器不支持启动超时。
  */
 @Deprecated
 @SuppressWarnings("serial")
 public class TaskTimeoutException extends TaskRejectedException {
 
 	/**
-	 * Create a new {@code TaskTimeoutException}
-	 * with the specified detail message and no root cause.
-	 * @param msg the detail message
+	 * 使用指定的详细消息创建一个新的 {@code TaskTimeoutException}，
+	 * 无根因。
+	 * @param msg 详细消息
 	 */
 	public TaskTimeoutException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Create a new {@code TaskTimeoutException}
-	 * with the specified detail message and the given root cause.
-	 * @param msg the detail message
-	 * @param cause the root cause (usually from using an underlying
-	 * API such as the {@code java.util.concurrent} package)
+	 * 使用指定的详细消息和给定的根因创建一个新的 {@code TaskTimeoutException}。
+	 * @param msg 详细消息
+	 * @param cause 根因（通常来自于使用诸如 {@code java.util.concurrent} 包的底层 API）
 	 * @see java.util.concurrent.RejectedExecutionException
 	 */
 	public TaskTimeoutException(String msg, Throwable cause) {

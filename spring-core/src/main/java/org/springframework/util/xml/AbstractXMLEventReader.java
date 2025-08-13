@@ -16,15 +16,14 @@
 
 package org.springframework.util.xml;
 
-import java.util.NoSuchElementException;
+import org.springframework.util.ClassUtils;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-
-import org.springframework.util.ClassUtils;
+import java.util.NoSuchElementException;
 
 /**
- * Abstract base class for {@code XMLEventReader}s.
+ * {@code XMLEventReader}的抽象基类。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -52,8 +51,8 @@ abstract class AbstractXMLEventReader implements XMLEventReader {
 	}
 
 	/**
-	 * This implementation throws an {@code IllegalArgumentException} for any property.
-	 * @throws IllegalArgumentException when called
+	 * 此实现对于任何属性都会抛出{@code IllegalArgumentException}。
+	 * @throws IllegalArgumentException 当调用时抛出
 	 */
 	@Override
 	public Object getProperty(String name) throws IllegalArgumentException {
@@ -66,8 +65,8 @@ abstract class AbstractXMLEventReader implements XMLEventReader {
 	}
 
 	/**
-	 * Check if the reader is closed, and throws a {@code XMLStreamException} if so.
-	 * @throws XMLStreamException if the reader is closed
+	 * 检查读取器是否已关闭，如果已关闭则抛出{@code XMLStreamException}。
+	 * @throws XMLStreamException 如果读取器已关闭
 	 * @see #close()
 	 */
 	protected void checkIfClosed() throws XMLStreamException {

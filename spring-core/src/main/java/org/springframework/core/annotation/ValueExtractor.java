@@ -16,16 +16,15 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.lang.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Strategy API for extracting a value for an annotation attribute from a given
- * source object which is typically an {@link Annotation}, {@link Map}, or
- * {@link TypeMappedAnnotation}.
+ * 用于从给定源对象（通常是 {@link Annotation}、{@link Map} 或
+ * {@link TypeMappedAnnotation}）中提取注解属性值的策略 API。
  *
  * @author Sam Brannen
  * @since 5.2.4
@@ -34,8 +33,7 @@ import org.springframework.lang.Nullable;
 interface ValueExtractor {
 
 	/**
-	 * Extract the annotation attribute represented by the supplied {@link Method}
-	 * from the supplied source {@link Object}.
+	 * 从提供的源 {@link Object} 中提取由提供的 {@link Method} 表示的注解属性。
 	 */
 	@Nullable
 	Object extract(Method attribute, @Nullable Object object);

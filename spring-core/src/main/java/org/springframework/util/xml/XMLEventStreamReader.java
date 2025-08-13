@@ -16,26 +16,20 @@
 
 package org.springframework.util.xml;
 
-import java.util.Iterator;
+import org.springframework.lang.Nullable;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Comment;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.ProcessingInstruction;
-import javax.xml.stream.events.StartDocument;
-import javax.xml.stream.events.XMLEvent;
-
-import org.springframework.lang.Nullable;
+import javax.xml.stream.events.*;
+import java.util.Iterator;
 
 /**
- * Implementation of the {@link javax.xml.stream.XMLStreamReader} interface that wraps a
- * {@link XMLEventReader}. Useful because the StAX {@link javax.xml.stream.XMLInputFactory}
- * allows one to create a event reader from a stream reader, but not vice-versa.
+ * {@link javax.xml.stream.XMLStreamReader}接口的实现类，
+ * 用于包装{@link XMLEventReader}。由于StAX的{@link javax.xml.stream.XMLInputFactory}
+ * 允许从流读取器创建事件读取器，但不支持反向操作，因此本类非常有用。
  *
  * @author Arjen Poutsma
  * @since 3.0

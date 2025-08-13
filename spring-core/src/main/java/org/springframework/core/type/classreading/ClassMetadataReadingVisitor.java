@@ -16,25 +16,18 @@
 
 package org.springframework.core.type.classreading;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.springframework.asm.AnnotationVisitor;
-import org.springframework.asm.Attribute;
-import org.springframework.asm.ClassVisitor;
-import org.springframework.asm.FieldVisitor;
-import org.springframework.asm.MethodVisitor;
-import org.springframework.asm.Opcodes;
-import org.springframework.asm.SpringAsmInfo;
+import org.springframework.asm.*;
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
- * ASM class visitor which looks only for the class name and implemented types,
- * exposing them through the {@link org.springframework.core.type.ClassMetadata}
- * interface.
+ * ASM 类访问者，仅查找类名和实现的类型，
+ * 并通过 {@link org.springframework.core.type.ClassMetadata} 接口暴露它们。
  *
  * @author Rod Johnson
  * @author Costin Leau
@@ -42,9 +35,9 @@ import org.springframework.util.StringUtils;
  * @author Ramnivas Laddad
  * @author Chris Beams
  * @since 2.5
- * @deprecated As of Spring Framework 5.2, this class and related classes in this
- * package have been replaced by {@link SimpleAnnotationMetadataReadingVisitor}
- * and related classes for internal use within the framework.
+ * @deprecated 自 Spring Framework 5.2 起，此类及本包中相关类
+ * 已被 {@link SimpleAnnotationMetadataReadingVisitor} 及其相关类替代，
+ * 仅供框架内部使用。
  */
 @Deprecated
 class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata {
@@ -117,36 +110,36 @@ class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata 
 
 	@Override
 	public void visitSource(String source, String debug) {
-		// no-op
+		// 无操作
 	}
 
 	@Override
 	@Nullable
 	public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-		// no-op
+		// 无操作
 		return new EmptyAnnotationVisitor();
 	}
 
 	@Override
 	public void visitAttribute(Attribute attr) {
-		// no-op
+		// 无操作
 	}
 
 	@Override
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-		// no-op
+		// 无操作
 		return new EmptyFieldVisitor();
 	}
 
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-		// no-op
+		// 无操作
 		return new EmptyMethodVisitor();
 	}
 
 	@Override
 	public void visitEnd() {
-		// no-op
+		// 无操作
 	}
 
 

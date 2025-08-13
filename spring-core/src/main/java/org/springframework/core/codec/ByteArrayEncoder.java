@@ -16,20 +16,19 @@
 
 package org.springframework.core.codec;
 
-import java.util.Map;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
+import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 /**
- * Encoder for {@code byte} arrays.
+ * {@code byte} 数组的编码器。
  *
  * @author Arjen Poutsma
  * @since 5.0
@@ -52,7 +51,7 @@ public class ByteArrayEncoder extends AbstractEncoder<byte[]> {
 			DataBufferFactory bufferFactory, ResolvableType elementType, @Nullable MimeType mimeType,
 			@Nullable Map<String, Object> hints) {
 
-		// Use (byte[] bytes) for Eclipse
+		// 为Eclipse使用 (byte[] bytes)
 		return Flux.from(inputStream).map((byte[] bytes) ->
 				encodeValue(bytes, bufferFactory, elementType, mimeType, hints));
 	}

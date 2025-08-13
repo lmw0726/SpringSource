@@ -16,18 +16,16 @@
 
 package org.springframework.core;
 
-import java.security.ProtectionDomain;
-
 import org.springframework.lang.Nullable;
 
+import java.security.ProtectionDomain;
+
 /**
- * Interface to be implemented by a reloading-aware ClassLoader
- * (e.g. a Groovy-based ClassLoader). Detected for example by
- * Spring's CGLIB proxy factory for making a caching decision.
+ * 由支持重新加载的 ClassLoader（例如基于 Groovy 的 ClassLoader）实现的接口。
+ * 例如，Spring 的 CGLIB 代理工厂会检测此接口以决定是否进行缓存。
  *
- * <p>If a ClassLoader does <i>not</i> implement this interface,
- * then all of the classes obtained from it should be considered
- * as not reloadable (i.e. cacheable).
+ * <p>如果某个 ClassLoader <i>没有</i> 实现此接口，
+ * 那么从该 ClassLoader 获取的所有类都应被视为不可重新加载（即可缓存）。
  *
  * @author Juergen Hoeller
  * @since 2.5.1
@@ -35,32 +33,31 @@ import org.springframework.lang.Nullable;
 public interface SmartClassLoader {
 
 	/**
-	 * Determine whether the given class is reloadable (in this ClassLoader).
-	 * <p>Typically used to check whether the result may be cached (for this
-	 * ClassLoader) or whether it should be reobtained every time.
-	 * The default implementation always returns {@code false}.
-	 * @param clazz the class to check (usually loaded from this ClassLoader)
-	 * @return whether the class should be expected to appear in a reloaded
-	 * version (with a different {@code Class} object) later on
+	 * 判断给定的类在此 ClassLoader 中是否可重新加载。
+	 * <p>通常用于判断结果是否可以缓存（对于此 ClassLoader 而言），
+	 * 或是每次都需要重新获取。
+	 * 默认实现始终返回 {@code false}。
+	 * @param clazz 要检查的类（通常从该 ClassLoader 加载）
+	 * @return 是否预期该类稍后会以重新加载的版本（不同的 {@code Class} 对象）出现
 	 */
 	default boolean isClassReloadable(Class<?> clazz) {
 		return false;
 	}
 
 	/**
-	 * Return the original ClassLoader for this SmartClassLoader, or potentially
-	 * the present loader itself if it is self-sufficient.
-	 * <p>The default implementation returns the local ClassLoader reference as-is.
-	 * In case of a reloadable or other selectively overriding ClassLoader which
-	 * commonly deals with unaffected classes from a base application class loader,
-	 * this should get implemented to return the original ClassLoader that the
-	 * present loader got derived from (e.g. through {@code return getParent();}).
-	 * <p>This gets specifically used in Spring's AOP framework to determine the
-	 * class loader for a specific proxy in case the target class has not been
-	 * defined in the present class loader. In case of a reloadable class loader,
-	 * we prefer the base application class loader for proxying general classes
-	 * not defined in the reloadable class loader itself.
-	 * @return the original ClassLoader (the same reference by default)
+	 * 返回此 SmartClassLoader 的原始 ClassLoader，
+	 * 或者如果它是自给自足的，则可能返回自身。
+	 * <p>默认实现按原样返回本地 ClassLoader 引用。
+	 * 对于可重新加载或有选择性覆盖的 ClassLoader，
+	 * 如果通常需要处理来自基础应用类加载器的未受影响的类，
+	 * 则应实现该方法以返回此加载器派生自的原始 ClassLoader
+	 * （例如 {@code return getParent();}）。
+	 * <p>该方法会在 Spring 的 AOP 框架中被特别使用，
+	 * 以便在目标类未在当前类加载器中定义时，
+	 * 决定特定代理应使用的类加载器。
+	 * 对于可重新加载的类加载器，
+	 * 我们更倾向于使用基础应用类加载器来代理那些不在可重新加载类加载器中定义的普通类。
+	 * @return 原始 ClassLoader（默认情况下为同一引用）
 	 * @since 5.3.5
 	 * @see ClassLoader#getParent()
 	 * @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator
@@ -70,25 +67,25 @@ public interface SmartClassLoader {
 	}
 
 	/**
-	 * Define a custom class (typically a CGLIB proxy class) in this class loader.
-	 * <p>This is a public equivalent of the protected
-	 * {@code defineClass(String, byte[], int, int, ProtectionDomain)} method
-	 * in {@link ClassLoader} which is traditionally invoked via reflection.
-	 * A concrete implementation in a custom class loader should simply delegate
-	 * to that protected method in order to make classloader-specific definitions
-	 * publicly available without "illegal access" warnings on JDK 9+:
-	 * {@code return defineClass(name, b, 0, b.length, protectionDomain)}.
-	 * Note that the JDK 9+ {@code Lookup#defineClass} method does not support
-	 * a custom target class loader for the new definition; it rather always
-	 * defines the class in the same class loader as the lookup's context class.
-	 * @param name the name of the class
-	 * @param b the bytes defining the class
-	 * @param protectionDomain the protection domain for the class, if any
-	 * @return the newly created class
-	 * @throws LinkageError in case of a bad class definition
-	 * @throws SecurityException in case of an invalid definition attempt
-	 * @throws UnsupportedOperationException in case of a custom definition attempt
-	 * not being possible (thrown by the default implementation in this interface)
+	 * 在此类加载器中定义自定义类（通常是 CGLIB 代理类）。
+	 * <p>这是 {@link ClassLoader} 中受保护方法
+	 * {@code defineClass(String, byte[], int, int, ProtectionDomain)}
+	 * 的公共等价方法，该方法传统上通过反射调用。
+	 * 自定义类加载器的具体实现应简单地委托给该受保护方法，
+	 * 以便在 JDK 9+ 中公开类加载器特定的定义，
+	 * 而不会出现“非法访问”警告：
+	 * {@code return defineClass(name, b, 0, b.length, protectionDomain)}。
+	 * 请注意，JDK 9+ 的 {@code Lookup#defineClass} 方法
+	 * 不支持为新定义指定自定义目标类加载器；
+	 * 它始终会在与查找上下文类相同的类加载器中定义类。
+	 * @param name 类的名称
+	 * @param b 定义类的字节数组
+	 * @param protectionDomain 类的保护域（如果有）
+	 * @return 新创建的类
+	 * @throws LinkageError 如果类定义有问题
+	 * @throws SecurityException 如果定义尝试无效
+	 * @throws UnsupportedOperationException 如果无法进行自定义定义尝试
+	 * （此接口中的默认实现会抛出该异常）
 	 * @since 5.3.4
 	 * @see ClassLoader#defineClass(String, byte[], int, int, ProtectionDomain)
 	 */

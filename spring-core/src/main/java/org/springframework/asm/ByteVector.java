@@ -28,37 +28,37 @@
 package org.springframework.asm;
 
 /**
- * A dynamically extensible vector of bytes. This class is roughly equivalent to a DataOutputStream
- * on top of a ByteArrayOutputStream, but is more efficient.
+ * 一个动态可扩展的字节向量。此类大致等价于基于 ByteArrayOutputStream 的 DataOutputStream，
+ * 但性能更优。
  *
  * @author Eric Bruneton
  */
 public class ByteVector {
 
-  /** The content of this vector. Only the first {@link #length} bytes contain real data. */
+  /** 该向量的内容，只有前 {@link #length} 个字节是有效数据。 */
   byte[] data;
 
-  /** The actual number of bytes in this vector. */
+  /** 该向量中实际包含的字节数。 */
   int length;
 
-  /** Constructs a new {@link ByteVector} with a default initial capacity. */
+  /** 使用默认初始容量构造新的 {@link ByteVector} 实例。 */
   public ByteVector() {
     data = new byte[64];
   }
 
   /**
-   * Constructs a new {@link ByteVector} with the given initial capacity.
+   * 使用指定的初始容量构造新的 {@link ByteVector} 实例。
    *
-   * @param initialCapacity the initial capacity of the byte vector to be constructed.
+   * @param initialCapacity 初始容量大小。
    */
   public ByteVector(final int initialCapacity) {
     data = new byte[initialCapacity];
   }
 
   /**
-   * Constructs a new {@link ByteVector} from the given initial data.
+   * 用给定的初始数据构造新的 {@link ByteVector} 实例。
    *
-   * @param data the initial data of the new byte vector.
+   * @param data 初始数据。
    */
   ByteVector(final byte[] data) {
     this.data = data;
@@ -66,19 +66,19 @@ public class ByteVector {
   }
 
   /**
-   * Returns the actual number of bytes in this vector.
+   * 返回该向量实际包含的字节数。
    *
-   * @return the actual number of bytes in this vector.
+   * @return 向量中实际包含的字节数。
    */
   public int size() {
     return length;
   }
 
   /**
-   * Puts a byte into this byte vector. The byte vector is automatically enlarged if necessary.
+   * 向字节向量中写入一个字节。必要时自动扩容。
    *
-   * @param byteValue a byte.
-   * @return this byte vector.
+   * @param byteValue 一个字节。
+   * @return 当前的字节向量实例。
    */
   public ByteVector putByte(final int byteValue) {
     int currentLength = length;
@@ -91,11 +91,11 @@ public class ByteVector {
   }
 
   /**
-   * Puts two bytes into this byte vector. The byte vector is automatically enlarged if necessary.
+   * 向字节向量中写入两个字节。必要时自动扩容。
    *
-   * @param byteValue1 a byte.
-   * @param byteValue2 another byte.
-   * @return this byte vector.
+   * @param byteValue1 第一个字节。
+   * @param byteValue2 第二个字节。
+   * @return 当前的字节向量实例。
    */
   final ByteVector put11(final int byteValue1, final int byteValue2) {
     int currentLength = length;
@@ -110,10 +110,10 @@ public class ByteVector {
   }
 
   /**
-   * Puts a short into this byte vector. The byte vector is automatically enlarged if necessary.
+   * 向字节向量中写入一个短整型（2字节）。必要时自动扩容。
    *
-   * @param shortValue a short.
-   * @return this byte vector.
+   * @param shortValue 短整型数值。
+   * @return 当前的字节向量实例。
    */
   public ByteVector putShort(final int shortValue) {
     int currentLength = length;
@@ -128,12 +128,11 @@ public class ByteVector {
   }
 
   /**
-   * Puts a byte and a short into this byte vector. The byte vector is automatically enlarged if
-   * necessary.
+   * 向字节向量中写入一个字节和一个短整型。必要时自动扩容。
    *
-   * @param byteValue a byte.
-   * @param shortValue a short.
-   * @return this byte vector.
+   * @param byteValue 字节值。
+   * @param shortValue 短整型值。
+   * @return 当前的字节向量实例。
    */
   final ByteVector put12(final int byteValue, final int shortValue) {
     int currentLength = length;
@@ -149,13 +148,12 @@ public class ByteVector {
   }
 
   /**
-   * Puts two bytes and a short into this byte vector. The byte vector is automatically enlarged if
-   * necessary.
+   * 向字节向量中写入两个字节和一个短整型。必要时自动扩容。
    *
-   * @param byteValue1 a byte.
-   * @param byteValue2 another byte.
-   * @param shortValue a short.
-   * @return this byte vector.
+   * @param byteValue1 第一个字节。
+   * @param byteValue2 第二个字节。
+   * @param shortValue 短整型值。
+   * @return 当前的字节向量实例。
    */
   final ByteVector put112(final int byteValue1, final int byteValue2, final int shortValue) {
     int currentLength = length;
@@ -172,10 +170,10 @@ public class ByteVector {
   }
 
   /**
-   * Puts an int into this byte vector. The byte vector is automatically enlarged if necessary.
+   * 向字节向量中写入一个整型（4字节）。必要时自动扩容。
    *
-   * @param intValue an int.
-   * @return this byte vector.
+   * @param intValue 整型数值。
+   * @return 当前的字节向量实例。
    */
   public ByteVector putInt(final int intValue) {
     int currentLength = length;
@@ -192,13 +190,12 @@ public class ByteVector {
   }
 
   /**
-   * Puts one byte and two shorts into this byte vector. The byte vector is automatically enlarged
-   * if necessary.
+   * 向字节向量中写入一个字节和两个短整型。字节向量会在必要时自动扩容。
    *
-   * @param byteValue a byte.
-   * @param shortValue1 a short.
-   * @param shortValue2 another short.
-   * @return this byte vector.
+   * @param byteValue 一个字节。
+   * @param shortValue1 第一个短整型。
+   * @param shortValue2 第二个短整型。
+   * @return 当前的字节向量实例。
    */
   final ByteVector put122(final int byteValue, final int shortValue1, final int shortValue2) {
     int currentLength = length;
@@ -216,10 +213,10 @@ public class ByteVector {
   }
 
   /**
-   * Puts a long into this byte vector. The byte vector is automatically enlarged if necessary.
+   * 向字节向量中写入一个 long 类型数值。字节向量会在必要时自动扩容。
    *
-   * @param longValue a long.
-   * @return this byte vector.
+   * @param longValue 一个 long 类型值。
+   * @return 当前的字节向量实例。
    */
   public ByteVector putLong(final long longValue) {
     int currentLength = length;
@@ -242,13 +239,12 @@ public class ByteVector {
   }
 
   /**
-   * Puts an UTF8 string into this byte vector. The byte vector is automatically enlarged if
-   * necessary.
+   * 向字节向量中写入一个 UTF8 编码的字符串。字节向量会在必要时自动扩容。
    *
-   * @param stringValue a String whose UTF8 encoded length must be less than 65536.
-   * @return this byte vector.
+   * @param stringValue 一个 UTF8 编码字符串，长度必须小于 65536。
+   * @return 当前的字节向量实例。
    */
-  // DontCheck(AbbreviationAsWordInName): can't be renamed (for backward binary compatibility).
+// DontCheck(AbbreviationAsWordInName): 无法重命名（为保持二进制兼容性）。
   public ByteVector putUTF8(final String stringValue) {
     int charLength = stringValue.length();
     if (charLength > 65535) {
@@ -259,10 +255,7 @@ public class ByteVector {
       enlarge(2 + charLength);
     }
     byte[] currentData = data;
-    // Optimistic algorithm: instead of computing the byte length and then serializing the string
-    // (which requires two loops), we assume the byte length is equal to char length (which is the
-    // most frequent case), and we start serializing the string right away. During the
-    // serialization, if we find that this assumption is wrong, we continue with the general method.
+    // 乐观算法：假设字符长度即为字节长度（大多数情况成立），先写长度信息并尝试直接写字符。
     currentData[currentLength++] = (byte) (charLength >>> 8);
     currentData[currentLength++] = (byte) charLength;
     for (int i = 0; i < charLength; ++i) {
@@ -279,16 +272,13 @@ public class ByteVector {
   }
 
   /**
-   * Puts an UTF8 string into this byte vector. The byte vector is automatically enlarged if
-   * necessary. The string length is encoded in two bytes before the encoded characters, if there is
-   * space for that (i.e. if this.length - offset - 2 &gt;= 0).
+   * 向字节向量中写入一个 UTF8 编码的字符串，字符串长度以两字节编码（如果有空间）。
+   * 从 offset 索引的字符开始编码，前面的字符假定已编码为单字节。
    *
-   * @param stringValue the String to encode.
-   * @param offset the index of the first character to encode. The previous characters are supposed
-   *     to have already been encoded, using only one byte per character.
-   * @param maxByteLength the maximum byte length of the encoded string, including the already
-   *     encoded characters.
-   * @return this byte vector.
+   * @param stringValue 需要编码的字符串。
+   * @param offset 第一个需要编码字符的索引，之前字符假定已编码。
+   * @param maxByteLength 最大编码字节数（包含已编码部分）。
+   * @return 当前的字节向量实例。
    */
   final ByteVector encodeUtf8(final String stringValue, final int offset, final int maxByteLength) {
     int charLength = stringValue.length();
@@ -306,7 +296,7 @@ public class ByteVector {
     if (byteLength > maxByteLength) {
       throw new IllegalArgumentException("UTF8 string too large");
     }
-    // Compute where 'byteLength' must be stored in 'data', and store it at this location.
+    // 计算并写入字节长度
     int byteLengthOffset = length - offset - 2;
     if (byteLengthOffset >= 0) {
       data[byteLengthOffset] = (byte) (byteLength >>> 8);
@@ -334,14 +324,12 @@ public class ByteVector {
   }
 
   /**
-   * Puts an array of bytes into this byte vector. The byte vector is automatically enlarged if
-   * necessary.
+   * 向字节向量中写入一个字节数组。字节向量会在必要时自动扩容。
    *
-   * @param byteArrayValue an array of bytes. May be {@literal null} to put {@code byteLength} null
-   *     bytes into this byte vector.
-   * @param byteOffset index of the first byte of byteArrayValue that must be copied.
-   * @param byteLength number of bytes of byteArrayValue that must be copied.
-   * @return this byte vector.
+   * @param byteArrayValue 目标字节数组。可能为 {@literal null}，此时写入 {@code byteLength} 个 0 字节。
+   * @param byteOffset 要复制的字节数组的起始索引。
+   * @param byteLength 要复制的字节数量。
+   * @return 当前的字节向量实例。
    */
   public ByteVector putByteArray(
       final byte[] byteArrayValue, final int byteOffset, final int byteLength) {
@@ -356,13 +344,13 @@ public class ByteVector {
   }
 
   /**
-   * Enlarges this byte vector so that it can receive 'size' more bytes.
+   * 扩容字节向量，使其至少能容纳额外的 size 个字节。
    *
-   * @param size number of additional bytes that this byte vector should be able to receive.
+   * @param size 需要额外容纳的字节数。
    */
   private void enlarge(final int size) {
     if (length > data.length) {
-      throw new AssertionError("Internal error");
+      throw new AssertionError("内部错误");
     }
     int doubleCapacity = 2 * data.length;
     int minimalCapacity = length + size;

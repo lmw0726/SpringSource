@@ -16,36 +16,26 @@
 
 package org.springframework.util.xml;
 
-import java.util.List;
-import java.util.function.Supplier;
+import org.springframework.lang.Nullable;
+import org.springframework.util.StreamUtils;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.XMLReader;
 
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLResolver;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.*;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stax.StAXResult;
 import javax.xml.transform.stax.StAXSource;
-
-import org.xml.sax.ContentHandler;
-import org.xml.sax.XMLReader;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.StreamUtils;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
- * Convenience methods for working with the StAX API. Partly historic due to JAXP 1.3
- * compatibility; as of Spring 4.0, relying on JAXP 1.4 as included in JDK 1.6 and higher.
+ * 用于简化StAX API操作的工具类。部分方法因JAXP 1.3兼容性而保留；
+ * 从Spring 4.0开始，依赖于JDK 1.6及以上版本内置的JAXP 1.4。
  *
- * <p>In particular, methods for using StAX ({@code javax.xml.stream}) in combination with
- * the TrAX API ({@code javax.xml.transform}), and converting StAX readers/writers into SAX
- * readers/handlers and vice-versa.
+ * <p>特别提供了将StAX ({@code javax.xml.stream})与TrAX API ({@code javax.xml.transform})
+ * 结合使用的方法，以及StAX读写器与SAX读写器/处理器之间的转换方法。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -58,9 +48,9 @@ public abstract class StaxUtils {
 
 
 	/**
-	 * Create an {@link XMLInputFactory} with Spring's defensive setup,
-	 * i.e. no support for the resolution of DTDs and external entities.
-	 * @return a new defensively initialized input factory instance to use
+	 * 创建具有Spring防御性配置的{@link XMLInputFactory}，
+	 * 即不支持DTD和外部实体解析。
+	 * @return 新创建并经过防御性初始化的输入工厂实例
 	 * @since 5.0
 	 */
 	public static XMLInputFactory createDefensiveInputFactory() {
@@ -68,9 +58,9 @@ public abstract class StaxUtils {
 	}
 
 	/**
-	 * Variant of {@link #createDefensiveInputFactory()} with a custom instance.
-	 * @param instanceSupplier supplier for the input factory instance
-	 * @return a new defensively initialized input factory instance to use
+	 * {@link #createDefensiveInputFactory()}的变体，支持自定义实例创建。
+	 * @param instanceSupplier 输入工厂实例的供应商
+	 * @return 新创建并经过防御性初始化的输入工厂实例
 	 * @since 5.0.12
 	 */
 	public static <T extends XMLInputFactory> T createDefensiveInputFactory(Supplier<T> instanceSupplier) {
@@ -82,57 +72,58 @@ public abstract class StaxUtils {
 	}
 
 	/**
-	 * Create a JAXP 1.4 {@link StAXSource} for the given {@link XMLStreamReader}.
-	 * @param streamReader the StAX stream reader
-	 * @return a source wrapping the {@code streamReader}
+	 * 为给定的{@link XMLStreamReader}创建JAXP 1.4 {@link StAXSource}。
+	 * @param streamReader StAX流读取器
+	 * @return 包装{@code streamReader}的源对象
 	 */
 	public static Source createStaxSource(XMLStreamReader streamReader) {
 		return new StAXSource(streamReader);
 	}
 
 	/**
-	 * Create a JAXP 1.4 {@link StAXSource} for the given {@link XMLEventReader}.
-	 * @param eventReader the StAX event reader
-	 * @return a source wrapping the {@code eventReader}
+	 * 为给定的{@link XMLEventReader}创建JAXP 1.4 {@link StAXSource}。
+	 * @param eventReader StAX事件读取器
+	 * @return 包装{@code eventReader}的源对象
+	 * @throws XMLStreamException 如果创建源时出错
 	 */
 	public static Source createStaxSource(XMLEventReader eventReader) throws XMLStreamException {
 		return new StAXSource(eventReader);
 	}
 
 	/**
-	 * Create a custom, non-JAXP 1.4 StAX {@link Source} for the given {@link XMLStreamReader}.
-	 * @param streamReader the StAX stream reader
-	 * @return a source wrapping the {@code streamReader}
+	 * 为给定的{@link XMLStreamReader}创建自定义的非JAXP 1.4 StAX {@link Source}。
+	 * @param streamReader StAX流读取器
+	 * @return 包装{@code streamReader}的源对象
 	 */
 	public static Source createCustomStaxSource(XMLStreamReader streamReader) {
 		return new StaxSource(streamReader);
 	}
 
 	/**
-	 * Create a custom, non-JAXP 1.4 StAX {@link Source} for the given {@link XMLEventReader}.
-	 * @param eventReader the StAX event reader
-	 * @return a source wrapping the {@code eventReader}
+	 * 为给定的{@link XMLEventReader}创建自定义的非JAXP 1.4 StAX {@link Source}。
+	 * @param eventReader StAX事件读取器
+	 * @return 包装{@code eventReader}的源对象
 	 */
 	public static Source createCustomStaxSource(XMLEventReader eventReader) {
 		return new StaxSource(eventReader);
 	}
 
 	/**
-	 * Indicate whether the given {@link Source} is a JAXP 1.4 StAX Source or
-	 * custom StAX Source.
-	 * @return {@code true} if {@code source} is a JAXP 1.4 {@link StAXSource} or
-	 * custom StAX Source; {@code false} otherwise
+	 * 判断给定的{@link Source}是否是JAXP 1.4 StAX Source或自定义StAX Source。
+	 * @param source 要检查的源对象
+	 * @return 如果{@code source}是JAXP 1.4 {@link StAXSource}或自定义StAX Source则返回{@code true}；
+	 * 否则返回{@code false}
 	 */
 	public static boolean isStaxSource(Source source) {
 		return (source instanceof StAXSource || source instanceof StaxSource);
 	}
 
 	/**
-	 * Return the {@link XMLStreamReader} for the given StAX Source.
-	 * @param source a JAXP 1.4 {@link StAXSource}
-	 * @return the {@link XMLStreamReader}
-	 * @throws IllegalArgumentException if {@code source} isn't a JAXP 1.4 {@link StAXSource}
-	 * or custom StAX Source
+	 * 获取给定StAX Source的{@link XMLStreamReader}。
+	 * @param source JAXP 1.4 {@link StAXSource}源对象
+	 * @return 对应的{@link XMLStreamReader}
+	 * @throws IllegalArgumentException 如果{@code source}不是JAXP 1.4 {@link StAXSource}
+	 * 或自定义StAX Source
 	 */
 	@Nullable
 	public static XMLStreamReader getXMLStreamReader(Source source) {
@@ -148,11 +139,11 @@ public abstract class StaxUtils {
 	}
 
 	/**
-	 * Return the {@link XMLEventReader} for the given StAX Source.
-	 * @param source a JAXP 1.4 {@link StAXSource}
-	 * @return the {@link XMLEventReader}
-	 * @throws IllegalArgumentException if {@code source} isn't a JAXP 1.4 {@link StAXSource}
-	 * or custom StAX Source
+	 * 获取给定StAX Source的{@link XMLEventReader}。
+	 * @param source JAXP 1.4 {@link StAXSource}源对象
+	 * @return 对应的{@link XMLEventReader}
+	 * @throws IllegalArgumentException 如果{@code source}不是JAXP 1.4 {@link StAXSource}
+	 * 或自定义StAX Source
 	 */
 	@Nullable
 	public static XMLEventReader getXMLEventReader(Source source) {
@@ -168,57 +159,57 @@ public abstract class StaxUtils {
 	}
 
 	/**
-	 * Create a JAXP 1.4 {@link StAXResult} for the given {@link XMLStreamWriter}.
-	 * @param streamWriter the StAX stream writer
-	 * @return a result wrapping the {@code streamWriter}
+	 * 为给定的{@link XMLStreamWriter}创建JAXP 1.4 {@link StAXResult}。
+	 * @param streamWriter StAX流写入器
+	 * @return 包装{@code streamWriter}的结果对象
 	 */
 	public static Result createStaxResult(XMLStreamWriter streamWriter) {
 		return new StAXResult(streamWriter);
 	}
 
 	/**
-	 * Create a JAXP 1.4 {@link StAXResult} for the given {@link XMLEventWriter}.
-	 * @param eventWriter the StAX event writer
-	 * @return a result wrapping {@code streamReader}
+	 * 为给定的{@link XMLEventWriter}创建JAXP 1.4 {@link StAXResult}。
+	 * @param eventWriter StAX事件写入器
+	 * @return 包装{@code streamReader}的结果对象
 	 */
 	public static Result createStaxResult(XMLEventWriter eventWriter) {
 		return new StAXResult(eventWriter);
 	}
 
 	/**
-	 * Create a custom, non-JAXP 1.4 StAX {@link Result} for the given {@link XMLStreamWriter}.
-	 * @param streamWriter the StAX stream writer
-	 * @return a source wrapping the {@code streamWriter}
+	 * 为给定的{@link XMLStreamWriter}创建自定义的非JAXP 1.4 StAX {@link Result}。
+	 * @param streamWriter StAX流写入器
+	 * @return 包装{@code streamWriter}的结果对象
 	 */
 	public static Result createCustomStaxResult(XMLStreamWriter streamWriter) {
 		return new StaxResult(streamWriter);
 	}
 
 	/**
-	 * Create a custom, non-JAXP 1.4 StAX {@link Result} for the given {@link XMLEventWriter}.
-	 * @param eventWriter the StAX event writer
-	 * @return a source wrapping the {@code eventWriter}
+	 * 为给定的{@link XMLEventWriter}创建自定义的非JAXP 1.4 StAX {@link Result}。
+	 * @param eventWriter StAX事件写入器
+	 * @return 包装{@code eventWriter}的结果对象
 	 */
 	public static Result createCustomStaxResult(XMLEventWriter eventWriter) {
 		return new StaxResult(eventWriter);
 	}
 
 	/**
-	 * Indicate whether the given {@link Result} is a JAXP 1.4 StAX Result or
-	 * custom StAX Result.
-	 * @return {@code true} if {@code result} is a JAXP 1.4 {@link StAXResult} or
-	 * custom StAX Result; {@code false} otherwise
+	 * 判断给定的{@link Result}是否是JAXP 1.4 StAX Result或自定义StAX Result。
+	 * @param result 要检查的结果对象
+	 * @return 如果{@code result}是JAXP 1.4 {@link StAXResult}或自定义StAX Result则返回{@code true}；
+	 * 否则返回{@code false}
 	 */
 	public static boolean isStaxResult(Result result) {
 		return (result instanceof StAXResult || result instanceof StaxResult);
 	}
 
 	/**
-	 * Return the {@link XMLStreamWriter} for the given StAX Result.
-	 * @param result a JAXP 1.4 {@link StAXResult}
-	 * @return the {@link XMLStreamReader}
-	 * @throws IllegalArgumentException if {@code source} isn't a JAXP 1.4 {@link StAXResult}
-	 * or custom StAX Result
+	 * 获取给定StAX Result的{@link XMLStreamWriter}。
+	 * @param result JAXP 1.4 {@link StAXResult}结果对象
+	 * @return 对应的{@link XMLStreamWriter}
+	 * @throws IllegalArgumentException 如果{@code source}不是JAXP 1.4 {@link StAXResult}
+	 * 或自定义StAX Result
 	 */
 	@Nullable
 	public static XMLStreamWriter getXMLStreamWriter(Result result) {
@@ -234,11 +225,11 @@ public abstract class StaxUtils {
 	}
 
 	/**
-	 * Return the {@link XMLEventWriter} for the given StAX Result.
-	 * @param result a JAXP 1.4 {@link StAXResult}
-	 * @return the {@link XMLStreamReader}
-	 * @throws IllegalArgumentException if {@code source} isn't a JAXP 1.4 {@link StAXResult}
-	 * or custom StAX Result
+	 * 获取给定StAX Result的{@link XMLEventWriter}。
+	 * @param result JAXP 1.4 {@link StAXResult}结果对象
+	 * @return 对应的{@link XMLEventWriter}
+	 * @throws IllegalArgumentException 如果{@code source}不是JAXP 1.4 {@link StAXResult}
+	 * 或自定义StAX Result
 	 */
 	@Nullable
 	public static XMLEventWriter getXMLEventWriter(Result result) {
@@ -254,9 +245,9 @@ public abstract class StaxUtils {
 	}
 
 	/**
-	 * Create a {@link XMLEventReader} from the given list of {@link XMLEvent}.
-	 * @param events the list of {@link XMLEvent XMLEvents}.
-	 * @return an {@code XMLEventReader} that reads from the given events
+	 * 从给定的{@link XMLEvent}列表创建{@link XMLEventReader}。
+	 * @param events {@link XMLEvent}事件列表
+	 * @return 从给定事件读取的{@code XMLEventReader}
 	 * @since 5.0
 	 */
 	public static XMLEventReader createXMLEventReader(List<XMLEvent> events) {
@@ -264,54 +255,57 @@ public abstract class StaxUtils {
 	}
 
 	/**
-	 * Create a SAX {@link ContentHandler} that writes to the given StAX {@link XMLStreamWriter}.
-	 * @param streamWriter the StAX stream writer
-	 * @return a content handler writing to the {@code streamWriter}
+	 * 创建一个向给定StAX {@link XMLStreamWriter}写入的SAX {@link ContentHandler}。
+	 * @param streamWriter StAX流写入器
+	 * @return 向{@code streamWriter}写入的内容处理器
 	 */
 	public static ContentHandler createContentHandler(XMLStreamWriter streamWriter) {
 		return new StaxStreamHandler(streamWriter);
 	}
 
 	/**
-	 * Create a SAX {@link ContentHandler} that writes events to the given StAX {@link XMLEventWriter}.
-	 * @param eventWriter the StAX event writer
-	 * @return a content handler writing to the {@code eventWriter}
+	 * 创建一个向给定StAX {@link XMLEventWriter}写入事件的SAX {@link ContentHandler}。
+	 * @param eventWriter StAX事件写入器
+	 * @return 向{@code eventWriter}写入的内容处理器
 	 */
 	public static ContentHandler createContentHandler(XMLEventWriter eventWriter) {
 		return new StaxEventHandler(eventWriter);
 	}
 
 	/**
-	 * Create a SAX {@link XMLReader} that reads from the given StAX {@link XMLStreamReader}.
-	 * @param streamReader the StAX stream reader
-	 * @return a XMLReader reading from the {@code streamWriter}
+	 * 创建一个从给定StAX {@link XMLStreamReader}读取的SAX {@link XMLReader}。
+	 * @param streamReader StAX流读取器
+	 * @return 从{@code streamWriter}读取的XML读取器
 	 */
 	public static XMLReader createXMLReader(XMLStreamReader streamReader) {
 		return new StaxStreamXMLReader(streamReader);
 	}
 
 	/**
-	 * Create a SAX {@link XMLReader} that reads from the given StAX {@link XMLEventReader}.
-	 * @param eventReader the StAX event reader
-	 * @return a XMLReader reading from the {@code eventWriter}
+	 * 创建一个从给定StAX {@link XMLEventReader}读取的SAX {@link XMLReader}。
+	 * @param eventReader StAX事件读取器
+	 * @return 从{@code eventWriter}读取的XMLReader
 	 */
 	public static XMLReader createXMLReader(XMLEventReader eventReader) {
 		return new StaxEventXMLReader(eventReader);
 	}
 
 	/**
-	 * Return a {@link XMLStreamReader} that reads from a {@link XMLEventReader}.
-	 * Useful because the StAX {@code XMLInputFactory} allows one to create an
-	 * event reader from a stream reader, but not vice-versa.
-	 * @return a stream reader that reads from an event reader
+	 * 返回从{@link XMLEventReader}读取的{@link XMLStreamReader}。
+	 * 这个方法很有用，因为StAX {@code XMLInputFactory}允许从流读取器创建事件读取器，
+	 * 但不支持反向操作。
+	 * @param eventReader 事件读取器
+	 * @return 从事件读取器读取的流读取器
+	 * @throws XMLStreamException 如果创建流读取器时出错
 	 */
 	public static XMLStreamReader createEventStreamReader(XMLEventReader eventReader) throws XMLStreamException {
 		return new XMLEventStreamReader(eventReader);
 	}
 
 	/**
-	 * Return a {@link XMLStreamWriter} that writes to a {@link XMLEventWriter}.
-	 * @return a stream writer that writes to an event writer
+	 * 返回写入到{@link XMLEventWriter}的{@link XMLStreamWriter}。
+	 * @param eventWriter 事件写入器
+	 * @return 写入到事件写入器的流写入器
 	 * @since 3.2
 	 */
 	public static XMLStreamWriter createEventStreamWriter(XMLEventWriter eventWriter) {
@@ -319,8 +313,10 @@ public abstract class StaxUtils {
 	}
 
 	/**
-	 * Return a {@link XMLStreamWriter} that writes to a {@link XMLEventWriter}.
-	 * @return a stream writer that writes to an event writer
+	 * 返回写入到{@link XMLEventWriter}的{@link XMLStreamWriter}。
+	 * @param eventWriter 事件写入器
+	 * @param eventFactory 用于创建事件的工厂
+	 * @return 写入到事件写入器的流写入器
 	 * @since 3.0.5
 	 */
 	public static XMLStreamWriter createEventStreamWriter(XMLEventWriter eventWriter, XMLEventFactory eventFactory) {

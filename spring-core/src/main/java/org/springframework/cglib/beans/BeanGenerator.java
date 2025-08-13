@@ -15,12 +15,15 @@
  */
 package org.springframework.cglib.beans;
 
-import java.beans.PropertyDescriptor;
-import java.security.ProtectionDomain;
-import java.util.*;
-import org.springframework.cglib.core.*;
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.Type;
+import org.springframework.cglib.core.*;
+
+import java.beans.PropertyDescriptor;
+import java.security.ProtectionDomain;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Juozas Baliuka, Chris Nokleberg
@@ -44,20 +47,19 @@ public class BeanGenerator extends AbstractClassGenerator
         super(SOURCE);
     }
 
-    /**
-     * Set the class which the generated class will extend. The class
-     * must not be declared as final, and must have a non-private
-     * no-argument constructor.
-     * @param superclass class to extend, or null to extend Object
-     */
-    public void setSuperclass(Class superclass) {
+	/**
+	 * 设置生成的类将继承的父类。
+	 * 该类不能声明为 final，且必须有一个非私有的无参构造函数。
+	 * @param superclass 要继承的类，传入 null 表示继承 Object 类
+	 */
+	public void setSuperclass(Class superclass) {
         if (superclass != null && superclass.equals(Object.class)) {
             superclass = null;
         }
         this.superclass = superclass;
-		// SPRING PATCH BEGIN
+		// SPRING补丁开始
 		setContextClass(superclass);
-		// SPRING PATCH END
+		// SPRING补丁结束
     }
 
     public void addProperty(String name, Class type) {

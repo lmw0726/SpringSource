@@ -17,16 +17,15 @@
 package org.springframework.util.unit;
 
 /**
- * A standard set of {@link DataSize} units.
+ * 一组标准的{@link DataSize}数据单位。
  *
- * <p>The unit prefixes used in this class are
- * <a href="https://en.wikipedia.org/wiki/Binary_prefix">binary prefixes</a>
- * indicating multiplication by powers of 2. The following table displays the
- * enum constants defined in this class and corresponding values.
+ * <p>本类中使用的单位前缀是表示乘以2的幂次的
+ * <a href="https://en.wikipedia.org/wiki/Binary_prefix">二进制前缀</a>。
+ * 下表展示了本类中定义的枚举常量及其对应值：
  *
  * <p>
  * <table border="1">
- * <tr><th>Constant</th><th>Data Size</th><th>Power&nbsp;of&nbsp;2</th><th>Size in Bytes</th></tr>
+ * <tr><th>常量</th><th>数据大小</th><th>2的幂次</th><th>字节大小</th></tr>
  * <tr><td>{@link #BYTES}</td><td>1B</td><td>2^0</td><td>1</td></tr>
  * <tr><td>{@link #KILOBYTES}</td><td>1KB</td><td>2^10</td><td>1,024</td></tr>
  * <tr><td>{@link #MEGABYTES}</td><td>1MB</td><td>2^20</td><td>1,048,576</td></tr>
@@ -42,27 +41,27 @@ package org.springframework.util.unit;
 public enum DataUnit {
 
 	/**
-	 * Bytes, represented by suffix {@code B}.
+	 * 字节，用后缀{@code B}表示。
 	 */
 	BYTES("B", DataSize.ofBytes(1)),
 
 	/**
-	 * Kilobytes, represented by suffix {@code KB}.
+	 * 千字节，用后缀{@code KB}表示。
 	 */
 	KILOBYTES("KB", DataSize.ofKilobytes(1)),
 
 	/**
-	 * Megabytes, represented by suffix {@code MB}.
+	 * 兆字节，用后缀{@code MB}表示。
 	 */
 	MEGABYTES("MB", DataSize.ofMegabytes(1)),
 
 	/**
-	 * Gigabytes, represented by suffix {@code GB}.
+	 * 吉字节，用后缀{@code GB}表示。
 	 */
 	GIGABYTES("GB", DataSize.ofGigabytes(1)),
 
 	/**
-	 * Terabytes, represented by suffix {@code TB}.
+	 * 太字节，用后缀{@code TB}表示。
 	 */
 	TERABYTES("TB", DataSize.ofTerabytes(1));
 
@@ -82,11 +81,10 @@ public enum DataUnit {
 	}
 
 	/**
-	 * Return the {@link DataUnit} matching the specified {@code suffix}.
-	 * @param suffix one of the standard suffixes
-	 * @return the {@link DataUnit} matching the specified {@code suffix}
-	 * @throws IllegalArgumentException if the suffix does not match the suffix
-	 * of any of this enum's constants
+	 * 返回与指定{@code suffix}匹配的{@link DataUnit}。
+	 * @param suffix 标准后缀之一
+	 * @return 匹配指定{@code suffix}的{@link DataUnit}
+	 * @throws IllegalArgumentException 如果后缀不匹配本枚举任何常量的后缀
 	 */
 	public static DataUnit fromSuffix(String suffix) {
 		for (DataUnit candidate : values()) {

@@ -16,15 +16,15 @@
 
 package org.springframework.core;
 
+import org.springframework.util.Assert;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import org.springframework.util.Assert;
-
 /**
- * Comparator capable of sorting exceptions based on their depth from the thrown exception type.
+ * 能根据异常类型距离抛出异常的层级深度进行排序的比较器。
  *
  * @author Juergen Hoeller
  * @author Arjen Poutsma
@@ -36,8 +36,8 @@ public class ExceptionDepthComparator implements Comparator<Class<? extends Thro
 
 
 	/**
-	 * Create a new ExceptionDepthComparator for the given exception.
-	 * @param exception the target exception to compare to when sorting by depth
+	 * 为给定异常创建新的 ExceptionDepthComparator。
+	 * @param exception 目标异常，用于比较层级深度
 	 */
 	public ExceptionDepthComparator(Throwable exception) {
 		Assert.notNull(exception, "Target exception must not be null");
@@ -45,8 +45,8 @@ public class ExceptionDepthComparator implements Comparator<Class<? extends Thro
 	}
 
 	/**
-	 * Create a new ExceptionDepthComparator for the given exception type.
-	 * @param exceptionType the target exception type to compare to when sorting by depth
+	 * 为给定异常类型创建新的 ExceptionDepthComparator。
+	 * @param exceptionType 目标异常类型，用于比较层级深度
 	 */
 	public ExceptionDepthComparator(Class<? extends Throwable> exceptionType) {
 		Assert.notNull(exceptionType, "Target exception type must not be null");
@@ -63,10 +63,10 @@ public class ExceptionDepthComparator implements Comparator<Class<? extends Thro
 
 	private int getDepth(Class<?> declaredException, Class<?> exceptionToMatch, int depth) {
 		if (exceptionToMatch.equals(declaredException)) {
-			// Found it!
+			// 找到了！
 			return depth;
 		}
-		// If we've gone as far as we can go and haven't found it...
+		// 如果已经到达最顶层但仍未找到...
 		if (exceptionToMatch == Throwable.class) {
 			return Integer.MAX_VALUE;
 		}
@@ -75,10 +75,10 @@ public class ExceptionDepthComparator implements Comparator<Class<? extends Thro
 
 
 	/**
-	 * Obtain the closest match from the given exception types for the given target exception.
-	 * @param exceptionTypes the collection of exception types
-	 * @param targetException the target exception to find a match for
-	 * @return the closest matching exception type from the given collection
+	 * 从给定异常类型集合中获取与目标异常最接近的匹配异常类型。
+	 * @param exceptionTypes  异常类型集合
+	 * @param targetException 目标异常，查找最接近匹配
+	 * @return 从集合中最接近匹配的异常类型
 	 */
 	public static Class<? extends Throwable> findClosestMatch(
 			Collection<Class<? extends Throwable>> exceptionTypes, Throwable targetException) {

@@ -16,25 +16,25 @@
 
 package org.springframework.core;
 
+import org.springframework.lang.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Static holder for local Spring properties, i.e. defined at the Spring library level.
+ * Spring 本地属性的静态持有类，即在 Spring 库级别定义的属性。
  *
- * <p>Reads a {@code spring.properties} file from the root of the Spring library classpath,
- * and also allows for programmatically setting properties through {@link #setProperty}.
- * When checking a property, local entries are being checked first, then falling back
- * to JVM-level system properties through a {@link System#getProperty} check.
+ * <p>从 Spring 库类路径根目录读取 {@code spring.properties} 文件，
+ * 同时允许通过 {@link #setProperty} 方法以编程方式设置属性。
+ * 在检查属性时，会优先检查本地属性，如果本地不存在，则回退到
+ * JVM 级别的系统属性（通过 {@link System#getProperty} 检查）。
  *
- * <p>This is an alternative way to set Spring-related system properties such as
- * "spring.getenv.ignore" and "spring.beaninfo.ignore", in particular for scenarios
- * where JVM system properties are locked on the target platform (e.g. WebSphere).
- * See {@link #setFlag} for a convenient way to locally set such flags to "true".
+ * <p>这是一种设置 Spring 相关系统属性的替代方式，例如
+ * "spring.getenv.ignore" 和 "spring.beaninfo.ignore"。
+ * 特别适用于某些目标平台（如 WebSphere）中 JVM 系统属性被锁定的场景。
+ * 参见 {@link #setFlag}，它提供了一种将此类标志本地设置为 "true" 的便捷方式。
  *
  * @author Juergen Hoeller
  * @since 3.2.7
@@ -78,10 +78,9 @@ public final class SpringProperties {
 
 
 	/**
-	 * Programmatically set a local property, overriding an entry in the
-	 * {@code spring.properties} file (if any).
-	 * @param key the property key
-	 * @param value the associated property value, or {@code null} to reset it
+	 * 以编程方式设置本地属性，覆盖 {@code spring.properties} 文件中的条目（如果存在）。
+	 * @param key 属性键
+	 * @param value 属性值，如果为 {@code null} 则重置该属性
 	 */
 	public static void setProperty(String key, @Nullable String value) {
 		if (value != null) {
@@ -93,10 +92,10 @@ public final class SpringProperties {
 	}
 
 	/**
-	 * Retrieve the property value for the given key, checking local Spring
-	 * properties first and falling back to JVM-level system properties.
-	 * @param key the property key
-	 * @return the associated property value, or {@code null} if none found
+	 * 获取指定属性键的属性值，优先检查本地 Spring 属性，
+	 * 如果本地不存在，则回退到 JVM 级别的系统属性。
+	 * @param key 属性键
+	 * @return 对应的属性值，如果未找到则返回 {@code null}
 	 */
 	@Nullable
 	public static String getProperty(String key) {
@@ -113,19 +112,18 @@ public final class SpringProperties {
 	}
 
 	/**
-	 * Programmatically set a local flag to "true", overriding an
-	 * entry in the {@code spring.properties} file (if any).
-	 * @param key the property key
+	 * 以编程方式将本地标志设置为 "true"，覆盖 {@code spring.properties} 文件中的条目（如果存在）。
+	 * @param key 属性键
 	 */
 	public static void setFlag(String key) {
 		localProperties.put(key, Boolean.TRUE.toString());
 	}
 
 	/**
-	 * Retrieve the flag for the given property key.
-	 * @param key the property key
-	 * @return {@code true} if the property is set to "true",
-	 * {@code} false otherwise
+	 * 获取指定属性键对应的标志。
+	 * @param key 属性键
+	 * @return 如果属性值为 "true" 则返回 {@code true}，
+	 * 否则返回 {@code false}
 	 */
 	public static boolean getFlag(String key) {
 		return Boolean.parseBoolean(getProperty(key));

@@ -16,15 +16,15 @@
 
 package org.springframework.util.xml;
 
+import org.apache.commons.logging.Log;
+
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.logging.Log;
-
 /**
- * Simple {@code javax.xml.transform.ErrorListener} implementation:
- * logs warnings using the given Commons Logging logger instance,
- * and rethrows errors to discontinue the XML transformation.
+ * 简单的{@code javax.xml.transform.ErrorListener}实现：
+ * 使用给定的Commons Logging日志记录器实例记录警告信息，
+ * 并重新抛出错误以终止XML转换过程。
  *
  * @author Juergen Hoeller
  * @since 1.2
@@ -35,8 +35,7 @@ public class SimpleTransformErrorListener implements ErrorListener {
 
 
 	/**
-	 * Create a new SimpleTransformErrorListener for the given
-	 * Commons Logging logger instance.
+	 * 为指定的Commons Logging日志记录器实例创建新的SimpleTransformErrorListener。
 	 */
 	public SimpleTransformErrorListener(Log logger) {
 		this.logger = logger;

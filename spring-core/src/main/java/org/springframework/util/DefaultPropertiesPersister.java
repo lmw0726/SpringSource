@@ -24,29 +24,26 @@ import java.io.Writer;
 import java.util.Properties;
 
 /**
- * Default implementation of the {@link PropertiesPersister} interface.
- * Follows the native parsing of {@code java.util.Properties}.
+ * {@link PropertiesPersister} 接口的默认实现。
+ * 遵循 {@code java.util.Properties} 的原生解析方式。
  *
- * <p>Allows for reading from any Reader and writing to any Writer, for example
- * to specify a charset for a properties file. This is a capability that standard
- * {@code java.util.Properties} unfortunately lacked up until JDK 5:
- * You were only able to load files using the ISO-8859-1 charset there.
+ * <p>允许从任意 {@code Reader} 读取并写入到任意 {@code Writer}，
+ * 例如可以为属性文件指定字符集。这是标准的 {@code java.util.Properties}
+ * 在 JDK 5 之前所不具备的功能：当时只能使用 ISO-8859-1 字符集加载文件。
  *
- * <p>Loading from and storing to a stream delegates to {@code Properties.load}
- * and {@code Properties.store}, respectively, to be fully compatible with
- * the Unicode conversion as implemented by the JDK Properties class. As of JDK 6,
- * {@code Properties.load/store} is also used for readers/writers, effectively
- * turning this class into a plain backwards compatibility adapter.
+ * <p>从流中加载和写入流时，分别委托给 {@code Properties.load} 和 {@code Properties.store}，
+ * 以完全兼容 JDK Properties 类实现的 Unicode 转换。从 JDK 6 开始，
+ * {@code Properties.load/store} 也用于 Reader/Writer，
+ * 实际上使该类成为一个纯粹的向后兼容适配器。
  *
- * <p>The persistence code that works with Reader/Writer follows the JDK's parsing
- * strategy but does not implement Unicode conversion, because the Reader/Writer
- * should already apply proper decoding/encoding of characters. If you prefer
- * to escape unicode characters in your properties files, do <i>not</i> specify
- * an encoding for a Reader/Writer (like ReloadableResourceBundleMessageSource's
- * "defaultEncoding" and "fileEncodings" properties).
+ * <p>使用 Reader/Writer 的持久化代码遵循 JDK 的解析策略，
+ * 但不实现 Unicode 转换，因为 Reader/Writer 应该已经正确进行字符的解码/编码。
+ * 如果你希望在属性文件中使用 Unicode 转义字符，
+ * 请不要为 Reader/Writer 指定编码（例如 ReloadableResourceBundleMessageSource 的
+ * "defaultEncoding" 和 "fileEncodings" 属性）。
  *
  * @author Juergen Hoeller
- * @since 10.03.2004
+ * @since 2004-03-10
  * @see java.util.Properties
  * @see java.util.Properties#load
  * @see java.util.Properties#store

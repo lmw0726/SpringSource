@@ -16,20 +16,20 @@
 
 package org.springframework.core.serializer.support;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.springframework.core.serializer.DefaultDeserializer;
 import org.springframework.core.serializer.DefaultSerializer;
 import org.springframework.core.serializer.Deserializer;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
- * A convenient delegate with pre-arranged configuration state for common
- * serialization needs. Implements {@link Serializer} and {@link Deserializer}
- * itself, so can also be passed into such more specific callback methods.
+ * 一个方便的委托类，预设了常用序列化需求的配置状态。
+ * 同时实现了 {@link Serializer} 和 {@link Deserializer} 接口，
+ * 因此也可以传递给更具体的回调方法。
  *
  * @author Juergen Hoeller
  * @since 4.3
@@ -42,8 +42,7 @@ public class SerializationDelegate implements Serializer<Object>, Deserializer<O
 
 
 	/**
-	 * Create a {@code SerializationDelegate} with a default serializer/deserializer
-	 * for the given {@code ClassLoader}.
+	 * 使用给定的 {@code ClassLoader} 创建一个带有默认序列化器/反序列化器的 {@code SerializationDelegate}。
 	 * @see DefaultDeserializer
 	 * @see DefaultDeserializer#DefaultDeserializer(ClassLoader)
 	 */
@@ -53,9 +52,9 @@ public class SerializationDelegate implements Serializer<Object>, Deserializer<O
 	}
 
 	/**
-	 * Create a {@code SerializationDelegate} with the given serializer/deserializer.
-	 * @param serializer the {@link Serializer} to use (never {@code null)}
-	 * @param deserializer the {@link Deserializer} to use (never {@code null)}
+	 * 使用给定的序列化器和反序列化器创建一个 {@code SerializationDelegate}。
+	 * @param serializer 要使用的 {@link Serializer}（不能为空）
+	 * @param deserializer 要使用的 {@link Deserializer}（不能为空）
 	 */
 	public SerializationDelegate(Serializer<Object> serializer, Deserializer<Object> deserializer) {
 		Assert.notNull(serializer, "Serializer must not be null");

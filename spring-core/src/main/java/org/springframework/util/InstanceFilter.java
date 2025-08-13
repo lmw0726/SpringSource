@@ -16,21 +16,19 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.util.Collection;
 import java.util.Collections;
 
-import org.springframework.lang.Nullable;
-
 /**
- * A simple instance filter that checks if a given instance match based on
- * a collection of includes and excludes element.
+ * 一个简单的实例过滤器，基于包含和排除集合来判断给定实例是否匹配。
  *
- * <p>Subclasses may want to override {@link #match(Object, Object)} to provide
- * a custom matching algorithm.
+ * <p>子类可以重写 {@link #match(Object, Object)} 方法来提供自定义的匹配算法。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @param <T> the instance type
+ * @param <T> 实例类型
  */
 public class InstanceFilter<T> {
 
@@ -42,17 +40,13 @@ public class InstanceFilter<T> {
 
 
 	/**
-	 * Create a new instance based on includes/excludes collections.
-	 * <p>A particular element will match if it "matches" the one of the element in the
-	 * includes list and  does not match one of the element in the excludes list.
-	 * <p>Subclasses may redefine what matching means. By default, an element match with
-	 * another if it is equals according to {@link Object#equals(Object)}
-	 * <p>If both collections are empty, {@code matchIfEmpty} defines if
-	 * an element matches or not.
-	 * @param includes the collection of includes
-	 * @param excludes the collection of excludes
-	 * @param matchIfEmpty the matching result if both the includes and the excludes
-	 * collections are empty
+	 * 根据包含和排除集合创建新的实例过滤器。
+	 * <p>一个元素匹配的条件是：它“匹配”包含集合中的某个元素且不匹配排除集合中的任何元素。
+	 * <p>子类可以重新定义“匹配”的含义，默认情况下，元素通过 {@link Object#equals(Object)} 判断相等。
+	 * <p>如果包含和排除集合均为空，则通过 {@code matchIfEmpty} 来决定匹配结果。
+	 * @param includes 包含的集合
+	 * @param excludes 排除的集合
+	 * @param matchIfEmpty 当包含和排除集合都为空时的匹配结果
 	 */
 	public InstanceFilter(@Nullable Collection<? extends T> includes,
 			@Nullable Collection<? extends T> excludes, boolean matchIfEmpty) {
@@ -64,7 +58,7 @@ public class InstanceFilter<T> {
 
 
 	/**
-	 * Determine if the specified {code instance} matches this filter.
+	 * 判断指定的 {@code instance} 是否匹配该过滤器。
 	 */
 	public boolean match(T instance) {
 		Assert.notNull(instance, "Instance to match must not be null");
@@ -87,22 +81,21 @@ public class InstanceFilter<T> {
 	}
 
 	/**
-	 * Determine if the specified {@code instance} is equal to the
-	 * specified {@code candidate}.
-	 * @param instance the instance to handle
-	 * @param candidate a candidate defined by this filter
-	 * @return {@code true} if the instance matches the candidate
+	 * 判断指定的 {@code instance} 是否等于指定的 {@code candidate}。
+	 * @param instance 需要判断的实例
+	 * @param candidate 过滤器定义的候选对象
+	 * @return 如果实例匹配候选对象则返回 {@code true}
 	 */
 	protected boolean match(T instance, T candidate) {
 		return instance.equals(candidate);
 	}
 
 	/**
-	 * Determine if the specified {@code instance} matches one of the candidates.
-	 * <p>If the candidates collection is {@code null}, returns {@code false}.
-	 * @param instance the instance to check
-	 * @param candidates a list of candidates
-	 * @return {@code true} if the instance match or the candidates collection is null
+	 * 判断指定的 {@code instance} 是否匹配候选集合中的某个对象。
+	 * <p>如果候选集合为 {@code null}，则返回 {@code false}。
+	 * @param instance 需要判断的实例
+	 * @param candidates 候选对象集合
+	 * @return 如果实例匹配候选集合中任一对象则返回 {@code true}，否则 {@code false}
 	 */
 	protected boolean match(T instance, Collection<? extends T> candidates) {
 		for (T candidate : candidates) {

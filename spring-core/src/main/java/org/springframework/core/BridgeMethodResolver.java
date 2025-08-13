@@ -16,6 +16,12 @@
 
 package org.springframework.core;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ConcurrentReferenceHashMap;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.MethodFilter;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -23,25 +29,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ConcurrentReferenceHashMap;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.ReflectionUtils.MethodFilter;
-
 /**
- * Helper for resolving synthetic {@link Method#isBridge bridge Methods} to the
- * {@link Method} being bridged.
+ * 用于解析合成的 {@link Method#isBridge 桥接方法} 到被桥接的 {@link Method} 的工具类。
  *
- * <p>Given a synthetic {@link Method#isBridge bridge Method} returns the {@link Method}
- * being bridged. A bridge method may be created by the compiler when extending a
- * parameterized type whose methods have parameterized arguments. During runtime
- * invocation the bridge {@link Method} may be invoked and/or used via reflection.
- * When attempting to locate annotations on {@link Method Methods}, it is wise to check
- * for bridge {@link Method Methods} as appropriate and find the bridged {@link Method}.
+ * <p>给定一个合成的 {@link Method#isBridge 桥接方法}，返回其被桥接的方法。
+ * 当编译器在扩展参数化类型且该类型的方法具有参数化参数时，可能会创建桥接方法。
+ * 在运行时调用时，桥接方法可能会被调用或通过反射使用。
+ * 在尝试查找 {@link Method 方法} 上的注解时，建议适当检查桥接方法并找到其桥接的原始方法。
  *
- * <p>See <a href="https://java.sun.com/docs/books/jls/third_edition/html/expressions.html#15.12.4.5">
- * The Java Language Specification</a> for more details on the use of bridge methods.
+ * <p>详见 <a href="https://java.sun.com/docs/books/jls/third_edition/html/expressions.html#15.12.4.5">
+ * Java语言规范</a> 中关于桥接方法的说明。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -57,13 +54,12 @@ public final class BridgeMethodResolver {
 
 
 	/**
-	 * Find the original method for the supplied {@link Method bridge Method}.
-	 * <p>It is safe to call this method passing in a non-bridge {@link Method} instance.
-	 * In such a case, the supplied {@link Method} instance is returned directly to the caller.
-	 * Callers are <strong>not</strong> required to check for bridging before calling this method.
-	 * @param bridgeMethod the method to introspect
-	 * @return the original method (either the bridged method or the passed-in method
-	 * if no more specific one could be found)
+	 * 查找指定 {@link Method 桥接方法} 对应的原始方法。
+	 * <p>调用此方法时，即使传入非桥接方法实例也是安全的。
+	 * 在这种情况下，将直接返回传入的方法实例。
+	 * 调用者<strong>不必</strong>在调用前检查是否为桥接方法。
+	 * @param bridgeMethod 需要检查的方法
+	 * @return 原始方法（如果找不到更具体的方法，则返回传入的方法）
 	 */
 	public static Method findBridgedMethod(Method bridgeMethod) {
 		if (!bridgeMethod.isBridge()) {
@@ -71,7 +67,7 @@ public final class BridgeMethodResolver {
 		}
 		Method bridgedMethod = cache.get(bridgeMethod);
 		if (bridgedMethod == null) {
-			// Gather all methods with matching name and parameter size.
+			// 收集所有名称和参数数量匹配的方法。
 			List<Method> candidateMethods = new ArrayList<>();
 			MethodFilter filter = candidateMethod ->
 					isBridgedCandidateFor(candidateMethod, bridgeMethod);
@@ -82,8 +78,8 @@ public final class BridgeMethodResolver {
 						searchCandidates(candidateMethods, bridgeMethod);
 			}
 			if (bridgedMethod == null) {
-				// A bridge method was passed in but we couldn't find the bridged method.
-				// Let's proceed with the passed-in method and hope for the best...
+				// 传入的是桥接方法，但未找到对应原始方法。
+				// 只能使用传入方法继续执行，期望不会出错...
 				bridgedMethod = bridgeMethod;
 			}
 			cache.put(bridgeMethod, bridgedMethod);
@@ -92,10 +88,8 @@ public final class BridgeMethodResolver {
 	}
 
 	/**
-	 * Returns {@code true} if the supplied '{@code candidateMethod}' can be
-	 * consider a validate candidate for the {@link Method} that is {@link Method#isBridge() bridged}
-	 * by the supplied {@link Method bridge Method}. This method performs inexpensive
-	 * checks and can be used quickly filter for a set of possible matches.
+	 * 如果传入的 'candidateMethod' 可被认为是由指定桥接方法桥接的有效候选方法，则返回 {@code true}。
+	 * 此方法执行低成本的检查，可用于快速筛选可能匹配的方法集合。
 	 */
 	private static boolean isBridgedCandidateFor(Method candidateMethod, Method bridgeMethod) {
 		return (!candidateMethod.isBridge() && !candidateMethod.equals(bridgeMethod) &&
@@ -104,10 +98,10 @@ public final class BridgeMethodResolver {
 	}
 
 	/**
-	 * Searches for the bridged method in the given candidates.
-	 * @param candidateMethods the List of candidate Methods
-	 * @param bridgeMethod the bridge method
-	 * @return the bridged method, or {@code null} if none found
+	 * 在给定候选方法列表中搜索被桥接的方法。
+	 * @param candidateMethods 候选方法列表
+	 * @param bridgeMethod 桥接方法
+	 * @return 被桥接的方法，如果未找到则返回 {@code null}
 	 */
 	@Nullable
 	private static Method searchCandidates(List<Method> candidateMethods, Method bridgeMethod) {
@@ -130,8 +124,7 @@ public final class BridgeMethodResolver {
 	}
 
 	/**
-	 * Determines whether or not the bridge {@link Method} is the bridge for the
-	 * supplied candidate {@link Method}.
+	 * 判断桥接方法是否为传入候选方法的桥接方法。
 	 */
 	static boolean isBridgeMethodFor(Method bridgeMethod, Method candidateMethod, Class<?> declaringClass) {
 		if (isResolvedTypeMatch(candidateMethod, bridgeMethod, declaringClass)) {
@@ -142,10 +135,7 @@ public final class BridgeMethodResolver {
 	}
 
 	/**
-	 * Returns {@code true} if the {@link Type} signature of both the supplied
-	 * {@link Method#getGenericParameterTypes() generic Method} and concrete {@link Method}
-	 * are equal after resolving all types against the declaringType, otherwise
-	 * returns {@code false}.
+	 * 如果传入的泛型方法和具体方法的 {@link Type} 签名在解析了声明类型后相同，则返回 {@code true}，否则返回 {@code false}。
 	 */
 	private static boolean isResolvedTypeMatch(Method genericMethod, Method candidateMethod, Class<?> declaringClass) {
 		Type[] genericParameters = genericMethod.getGenericParameterTypes();
@@ -157,12 +147,12 @@ public final class BridgeMethodResolver {
 			ResolvableType genericParameter = ResolvableType.forMethodParameter(genericMethod, i, declaringClass);
 			Class<?> candidateParameter = candidateParameters[i];
 			if (candidateParameter.isArray()) {
-				// An array type: compare the component type.
+				// 数组类型：比较组件类型。
 				if (!candidateParameter.getComponentType().equals(genericParameter.getComponentType().toClass())) {
 					return false;
 				}
 			}
-			// A non-array type: compare the type itself.
+			// 非数组类型：比较类型本身。
 			if (!ClassUtils.resolvePrimitiveIfNecessary(candidateParameter).equals(ClassUtils.resolvePrimitiveIfNecessary(genericParameter.toClass()))) {
 				return false;
 			}
@@ -171,13 +161,12 @@ public final class BridgeMethodResolver {
 	}
 
 	/**
-	 * Searches for the generic {@link Method} declaration whose erased signature
-	 * matches that of the supplied bridge method.
-	 * @throws IllegalStateException if the generic declaration cannot be found
+	 * 查找与传入桥接方法擦除签名匹配的泛型 {@link Method} 声明。
+	 * @throws IllegalStateException 如果找不到泛型声明
 	 */
 	@Nullable
 	private static Method findGenericDeclaration(Method bridgeMethod) {
-		// Search parent types for method that has same signature as bridge.
+		// 在父类中查找与桥接方法签名匹配的方法。
 		Class<?> superclass = bridgeMethod.getDeclaringClass().getSuperclass();
 		while (superclass != null && Object.class != superclass) {
 			Method method = searchForMatch(superclass, bridgeMethod);
@@ -209,9 +198,8 @@ public final class BridgeMethodResolver {
 	}
 
 	/**
-	 * If the supplied {@link Class} has a declared {@link Method} whose signature matches
-	 * that of the supplied {@link Method}, then this matching {@link Method} is returned,
-	 * otherwise {@code null} is returned.
+	 * 如果传入的 {@link Class} 中声明了与传入 {@link Method} 签名匹配的方法，
+	 * 返回该方法；否则返回 {@code null}。
 	 */
 	@Nullable
 	private static Method searchForMatch(Class<?> type, Method bridgeMethod) {
@@ -224,11 +212,10 @@ public final class BridgeMethodResolver {
 	}
 
 	/**
-	 * Compare the signatures of the bridge method and the method which it bridges. If
-	 * the parameter and return types are the same, it is a 'visibility' bridge method
-	 * introduced in Java 6 to fix https://bugs.java.com/view_bug.do?bug_id=6342411.
-	 * See also https://stas-blogspot.blogspot.com/2010/03/java-bridge-methods-explained.html
-	 * @return whether signatures match as described
+	 * 比较桥接方法和其桥接方法的签名。
+	 * 如果参数和返回类型相同，则说明这是 Java 6 引入的“可见性”桥接方法，用于修复 https://bugs.java.com/view_bug.do?bug_id=6342411。
+	 * 另见 https://stas-blogspot.blogspot.com/2010/03/java-bridge-methods-explained.html
+	 * @return 是否符合上述签名匹配
 	 */
 	public static boolean isVisibilityBridgeMethodPair(Method bridgeMethod, Method bridgedMethod) {
 		if (bridgeMethod == bridgedMethod) {

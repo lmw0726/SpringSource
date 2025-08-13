@@ -30,35 +30,33 @@ package org.springframework.asm;
 import java.util.Arrays;
 
 /**
- * A constant whose value is computed at runtime, with a bootstrap method.
+ * 一个值在运行时通过引导方法计算得到的常量。  
  *
  * @author Remi Forax
  */
 public final class ConstantDynamic {
 
-  /** The constant name (can be arbitrary). */
+  /** 常量名称（可以是任意字符串）。 */
   private final String name;
 
-  /** The constant type (must be a field descriptor). */
+  /** 常量类型（必须是字段描述符）。 */
   private final String descriptor;
 
-  /** The bootstrap method to use to compute the constant value at runtime. */
+  /** 用于在运行时计算常量值的引导方法。 */
   private final Handle bootstrapMethod;
 
   /**
-   * The arguments to pass to the bootstrap method, in order to compute the constant value at
-   * runtime.
+   * 传递给引导方法的参数，用于在运行时计算常量值。  
    */
   private final Object[] bootstrapMethodArguments;
 
   /**
-   * Constructs a new {@link ConstantDynamic}.
+   * 构造一个新的 {@link ConstantDynamic} 实例。  
    *
-   * @param name the constant name (can be arbitrary).
-   * @param descriptor the constant type (must be a field descriptor).
-   * @param bootstrapMethod the bootstrap method to use to compute the constant value at runtime.
-   * @param bootstrapMethodArguments the arguments to pass to the bootstrap method, in order to
-   *     compute the constant value at runtime.
+   * @param name 常量名称（可以是任意字符串）。  
+   * @param descriptor 常量类型（必须是字段描述符）。  
+   * @param bootstrapMethod 用于在运行时计算常量值的引导方法。  
+   * @param bootstrapMethodArguments 传递给引导方法的参数，用于计算常量值。  
    */
   public ConstantDynamic(
       final String name,
@@ -72,70 +70,65 @@ public final class ConstantDynamic {
   }
 
   /**
-   * Returns the name of this constant.
+   * 返回此常量的名称。  
    *
-   * @return the name of this constant.
+   * @return 此常量的名称。  
    */
   public String getName() {
     return name;
   }
 
   /**
-   * Returns the type of this constant.
+   * 返回此常量的类型。  
    *
-   * @return the type of this constant, as a field descriptor.
+   * @return 以字段描述符形式表示的此常量类型。  
    */
   public String getDescriptor() {
     return descriptor;
   }
 
   /**
-   * Returns the bootstrap method used to compute the value of this constant.
+   * 返回用于计算此常量值的引导方法（bootstrap method）。  
    *
-   * @return the bootstrap method used to compute the value of this constant.
+   * @return 用于计算此常量值的引导方法。  
    */
   public Handle getBootstrapMethod() {
     return bootstrapMethod;
   }
 
   /**
-   * Returns the number of arguments passed to the bootstrap method, in order to compute the value
-   * of this constant.
+   * 返回传递给引导方法以计算此常量值的参数数量。  
    *
-   * @return the number of arguments passed to the bootstrap method, in order to compute the value
-   *     of this constant.
+   * @return 传递给引导方法以计算此常量值的参数数量。  
    */
   public int getBootstrapMethodArgumentCount() {
     return bootstrapMethodArguments.length;
   }
 
   /**
-   * Returns an argument passed to the bootstrap method, in order to compute the value of this
-   * constant.
+   * 返回传递给引导方法的某个参数，用于计算此常量值。  
    *
-   * @param index an argument index, between 0 and {@link #getBootstrapMethodArgumentCount()}
-   *     (exclusive).
-   * @return the argument passed to the bootstrap method, with the given index.
+   * @param index 参数索引，范围在 0 到 {@link #getBootstrapMethodArgumentCount()}（不含）之间。  
+   * @return 传递给引导方法的指定索引的参数。  
    */
   public Object getBootstrapMethodArgument(final int index) {
     return bootstrapMethodArguments[index];
   }
 
   /**
-   * Returns the arguments to pass to the bootstrap method, in order to compute the value of this
-   * constant. WARNING: this array must not be modified, and must not be returned to the user.
+   * 返回传递给引导方法的所有参数，用于计算此常量值。  
+   * 警告：该数组不应被修改，也不应返回给用户。  
    *
-   * @return the arguments to pass to the bootstrap method, in order to compute the value of this
-   *     constant.
+   * @return 传递给引导方法的参数数组。  
    */
   Object[] getBootstrapMethodArgumentsUnsafe() {
     return bootstrapMethodArguments;
   }
 
   /**
-   * Returns the size of this constant.
+   * 返回此常量的大小。  
    *
-   * @return the size of this constant, i.e., 2 for {@code long} and {@code double}, 1 otherwise.
+   * @return 此常量的大小，即 {@code long} 和 {@code double} 为 2，其他类型为 1。  
    */
   public int getSize() {
     char firstCharOfDescriptor = descriptor.charAt(0);

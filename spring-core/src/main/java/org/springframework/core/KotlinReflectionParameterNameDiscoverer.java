@@ -16,23 +16,23 @@
 
 package org.springframework.core;
 
+import kotlin.reflect.KFunction;
+import kotlin.reflect.KParameter;
+import kotlin.reflect.jvm.ReflectJvmMapping;
+import org.springframework.lang.Nullable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import kotlin.reflect.KFunction;
-import kotlin.reflect.KParameter;
-import kotlin.reflect.jvm.ReflectJvmMapping;
-
-import org.springframework.lang.Nullable;
-
 /**
- * {@link ParameterNameDiscoverer} implementation which uses Kotlin's reflection facilities
- * for introspecting parameter names.
+ * {@link ParameterNameDiscoverer} 的实现，使用 Kotlin 的反射功能
+ * 来获取参数名。
  *
- * Compared to {@link StandardReflectionParameterNameDiscoverer}, it allows in addition to
- * determine interface parameter names without requiring Java 8 -parameters compiler flag.
+ * 与 {@link StandardReflectionParameterNameDiscoverer} 相比，
+ * 它还支持在不需要 Java 8 -parameters 编译标志的情况下，
+ * 获取接口方法的参数名。
  *
  * @author Sebastien Deleuze
  * @since 5.0
@@ -75,14 +75,14 @@ public class KotlinReflectionParameterNameDiscoverer implements ParameterNameDis
 	private String[] getParameterNames(List<KParameter> parameters) {
 		List<KParameter> filteredParameters = parameters
 				.stream()
-				// Extension receivers of extension methods must be included as they appear as normal method parameters in Java
+				// 过滤出普通参数和值扩展接收器（extension receiver）
 				.filter(p -> KParameter.Kind.VALUE.equals(p.getKind()) || KParameter.Kind.EXTENSION_RECEIVER.equals(p.getKind()))
 				.collect(Collectors.toList());
 		String[] parameterNames = new String[filteredParameters.size()];
 		for (int i = 0; i < filteredParameters.size(); i++) {
 			KParameter parameter = filteredParameters.get(i);
-			// extension receivers are not explicitly named, but require a name for Java interoperability
-			// $receiver is not a valid Kotlin identifier, but valid in Java, so it can be used here
+			// 扩展接收器没有显式的名称，但为了与 Java 互操作性需要一个名称
+			// $receiver 不是一个有效的 Kotlin 标识符，但在 Java 中是有效的，因此可以在这里使用
 			String name = KParameter.Kind.EXTENSION_RECEIVER.equals(parameter.getKind())  ? "$receiver" : parameter.getName();
 			if (name == null) {
 				return null;

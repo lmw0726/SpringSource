@@ -16,23 +16,22 @@
 
 package org.springframework.core.codec;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Abstract base class for {@link Decoder} implementations.
+ * {@link Decoder} 实现的抽象基类。
  *
  * @author Sebastien Deleuze
  * @author Arjen Poutsma
  * @since 5.0
- * @param <T> the element type
+ * @param <T> 元素类型
  */
 public abstract class AbstractEncoder<T> implements Encoder<T> {
 
@@ -47,8 +46,8 @@ public abstract class AbstractEncoder<T> implements Encoder<T> {
 
 
 	/**
-	 * Set an alternative logger to use than the one based on the class name.
-	 * @param logger the logger to use
+	 * 设置一个替代的日志记录器，而不是基于类名称的日志记录器。
+	 * @param logger 要使用的日志记录器
 	 * @since 5.1
 	 */
 	public void setLogger(Log logger) {
@@ -56,7 +55,7 @@ public abstract class AbstractEncoder<T> implements Encoder<T> {
 	}
 
 	/**
-	 * Return the currently configured Logger.
+	 * 返回当前配置的日志记录器。
 	 * @since 5.1
 	 */
 	public Log getLogger() {

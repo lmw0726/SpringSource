@@ -28,20 +28,19 @@
 package org.springframework.asm;
 
 /**
- * The JVM opcodes, access flags and array type codes. This interface does not define all the JVM
- * opcodes because some opcodes are automatically handled. For example, the xLOAD and xSTORE opcodes
- * are automatically replaced by xLOAD_n and xSTORE_n opcodes when possible. The xLOAD_n and
- * xSTORE_n opcodes are therefore not defined in this interface. Likewise for LDC, automatically
- * replaced by LDC_W or LDC2_W when necessary, WIDE, GOTO_W and JSR_W.
+ * JVM操作码、访问标志和数组类型代码。此接口没有定义所有JVM操作码，因为某些操作码是自动处理的。
+ * 例如，xLOAD和xSTORE操作码在可能的情况下会自动替换为xLOAD_n和xSTORE_n操作码。
+ * 因此xLOAD_n和xSTORE_n操作码未在此接口中定义。同样，LDC在必要时会自动替换为LDC_W或LDC2_W，
+ * 还有WIDE、GOTO_W和JSR_W。
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-6.html">JVMS 6</a>
  * @author Eric Bruneton
  * @author Eugene Kuleshov
  */
-// DontCheck(InterfaceIsType): can't be fixed (for backward binary compatibility).
+// DontCheck(InterfaceIsType): 无法修复（为了向后二进制兼容性）。
 public interface Opcodes {
 
-  // ASM API versions.
+  // ASM API版本。
 
   int ASM4 = 4 << 16 | 0 << 8;
   int ASM5 = 5 << 16 | 0 << 8;
@@ -51,23 +50,22 @@ public interface Opcodes {
   int ASM9 = 9 << 16 | 0 << 8;
 
   /**
-   * <i>Experimental, use at your own risk. This field will be renamed when it becomes stable, this
-   * will break existing code using it. Only code compiled with --enable-preview can use this.</i>
-   * <p>SPRING PATCH: no preview mode check for ASM 10 experimental, enabling it by default.
+   * <i>实验性功能，使用风险自负。当此字段变稳定时将被重命名，这将破坏使用它的现有代码。
+   * 只有使用--enable-preview编译的代码才能使用此功能。</i>
+   * <p>SPRING补丁：对ASM 10实验性功能不进行预览模式检查，默认启用。
    */
   int ASM10_EXPERIMENTAL = 1 << 24 | 10 << 16 | 0 << 8;
 
   /*
-   * Internal flags used to redirect calls to deprecated methods. For instance, if a visitOldStuff
-   * method in API_OLD is deprecated and replaced with visitNewStuff in API_NEW, then the
-   * redirection should be done as follows:
+   * 用于重定向对废弃方法调用的内部标志。例如，如果API_OLD中的visitOldStuff方法
+   * 被废弃并在API_NEW中替换为visitNewStuff，那么重定向应按以下方式进行：
    *
    * <pre>
    * public class StuffVisitor {
    *   ...
    *
    *   &#64;Deprecated public void visitOldStuff(int arg, ...) {
-   *     // SOURCE_DEPRECATED means "a call from a deprecated method using the old 'api' value".
+   *     // SOURCE_DEPRECATED表示"来自使用旧'api'值的废弃方法的调用"。
    *     visitNewStuf(arg | (api &#60; API_NEW ? SOURCE_DEPRECATED : 0), ...);
    *   }
    *
@@ -76,58 +74,55 @@ public interface Opcodes {
    *       visitOldStuff(argAndSource, ...);
    *     } else {
    *       int arg = argAndSource &#38; ~SOURCE_MASK;
-   *       [ do stuff ]
+   *       [ 执行操作 ]
    *     }
    *   }
    * }
    * </pre>
    *
-   * <p>If 'api' is equal to API_NEW, there are two cases:
+   * <p>如果'api'等于API_NEW，有两种情况：
    *
    * <ul>
-   *   <li>call visitNewStuff: the redirection test is skipped and 'do stuff' is executed directly.
-   *   <li>call visitOldSuff: the source is not set to SOURCE_DEPRECATED before calling
-   *       visitNewStuff, but the redirection test is skipped anyway in visitNewStuff, which
-   *       directly executes 'do stuff'.
+   *   <li>调用visitNewStuff：跳过重定向测试，直接执行'执行操作'。
+   *   <li>调用visitOldSuff：在调用visitNewStuff之前不会将源设置为SOURCE_DEPRECATED，
+   *       但在visitNewStuff中仍会跳过重定向测试，直接执行'执行操作'。
    * </ul>
    *
-   * <p>If 'api' is equal to API_OLD, there are two cases:
+   * <p>如果'api'等于API_OLD，有两种情况：
    *
    * <ul>
-   *   <li>call visitOldSuff: the source is set to SOURCE_DEPRECATED before calling visitNewStuff.
-   *       Because of this visitNewStuff does not redirect back to visitOldStuff, and instead
-   *       executes 'do stuff'.
-   *   <li>call visitNewStuff: the call is redirected to visitOldStuff because the source is 0.
-   *       visitOldStuff now sets the source to SOURCE_DEPRECATED and calls visitNewStuff back. This
-   *       time visitNewStuff does not redirect the call, and instead executes 'do stuff'.
+   *   <li>调用visitOldSuff：在调用visitNewStuff之前将源设置为SOURCE_DEPRECATED。
+   *       因此visitNewStuff不会重定向回visitOldStuff，而是执行'执行操作'。
+   *   <li>调用visitNewStuff：因为源为0，调用被重定向到visitOldStuff。
+   *       visitOldStuff现在将源设置为SOURCE_DEPRECATED并回调visitNewStuff。
+   *       这次visitNewStuff不会重定向调用，而是执行'执行操作'。
    * </ul>
    *
-   * <h1>User subclasses</h1>
+   * <h1>用户子类</h1>
    *
-   * <p>If a user subclass overrides one of these methods, there are only two cases: either 'api' is
-   * API_OLD and visitOldStuff is overridden (and visitNewStuff is not), or 'api' is API_NEW or
-   * more, and visitNewStuff is overridden (and visitOldStuff is not). Any other case is a user
-   * programming error.
+   * <p>如果用户子类重写了这些方法之一，只有两种情况：要么'api'是API_OLD且重写了
+   * visitOldStuff（而没有重写visitNewStuff），要么'api'是API_NEW或更高版本且重写了
+   * visitNewStuff（而没有重写visitOldStuff）。任何其他情况都是用户编程错误。
    *
-   * <p>If 'api' is equal to API_NEW, the class hierarchy is equivalent to
+   * <p>如果'api'等于API_NEW，类层次结构相当于
    *
    * <pre>
    * public class StuffVisitor {
    *   &#64;Deprecated public void visitOldStuff(int arg, ...) { visitNewStuf(arg, ...); }
-   *   public void visitNewStuff(int arg, ...) { [ do stuff ] }
+   *   public void visitNewStuff(int arg, ...) { [ 执行操作 ] }
    * }
    * class UserStuffVisitor extends StuffVisitor {
    *   &#64;Override public void visitNewStuff(int arg, ...) {
-   *     super.visitNewStuff(int arg, ...); // optional
-   *     [ do user stuff ]
+   *     super.visitNewStuff(int arg, ...); // 可选
+   *     [ 执行用户操作 ]
    *   }
    * }
    * </pre>
    *
-   * <p>It is then obvious that whether visitNewStuff or visitOldStuff is called, 'do stuff' and 'do
-   * user stuff' will be executed, in this order.
+   * <p>很明显，无论调用visitNewStuff还是visitOldStuff，'执行操作'和'执行用户操作'
+   * 都会按此顺序执行。
    *
-   * <p>If 'api' is equal to API_OLD, the class hierarchy is equivalent to
+   * <p>如果'api'等于API_OLD，类层次结构相当于
    *
    * <pre>
    * public class StuffVisitor {
@@ -139,35 +134,33 @@ public interface Opcodes {
    *       visitOldStuff(argAndSource, ...);
    *     } else {
    *       int arg = argAndSource &#38; ~SOURCE_MASK;
-   *       [ do stuff ]
+   *       [ 执行操作 ]
    *     }
    *   }
    * }
    * class UserStuffVisitor extends StuffVisitor {
    *   &#64;Override public void visitOldStuff(int arg, ...) {
-   *     super.visitOldStuff(int arg, ...); // optional
-   *     [ do user stuff ]
+   *     super.visitOldStuff(int arg, ...); // 可选
+   *     [ 执行用户操作 ]
    *   }
    * }
    * </pre>
    *
-   * <p>and there are two cases:
+   * <p>有两种情况：
    *
    * <ul>
-   *   <li>call visitOldStuff: in the call to super.visitOldStuff, the source is set to
-   *       SOURCE_DEPRECATED and visitNewStuff is called. Here 'do stuff' is run because the source
-   *       was previously set to SOURCE_DEPRECATED, and execution eventually returns to
-   *       UserStuffVisitor.visitOldStuff, where 'do user stuff' is run.
-   *   <li>call visitNewStuff: the call is redirected to UserStuffVisitor.visitOldStuff because the
-   *       source is 0. Execution continues as in the previous case, resulting in 'do stuff' and 'do
-   *       user stuff' being executed, in this order.
+   *   <li>调用visitOldStuff：在调用super.visitOldStuff时，源被设置为SOURCE_DEPRECATED
+   *       并调用visitNewStuff。这里执行'执行操作'是因为源之前被设置为SOURCE_DEPRECATED，
+   *       执行最终返回到UserStuffVisitor.visitOldStuff，在那里执行'执行用户操作'。
+   *   <li>调用visitNewStuff：因为源为0，调用被重定向到UserStuffVisitor.visitOldStuff。
+   *       执行如前一种情况继续，结果是按此顺序执行'执行操作'和'执行用户操作'。
    * </ul>
    *
-   * <h1>ASM subclasses</h1>
+   * <h1>ASM子类</h1>
    *
-   * <p>In ASM packages, subclasses of StuffVisitor can typically be sub classed again by the user,
-   * and can be used with API_OLD or API_NEW. Because of this, if such a subclass must override
-   * visitNewStuff, it must do so in the following way (and must not override visitOldStuff):
+   * <p>在ASM包中，StuffVisitor的子类通常可以被用户再次子类化，并可以与API_OLD或
+   * API_NEW一起使用。因此，如果这样的子类必须重写visitNewStuff，它必须按以下方式
+   * 执行（且不得重写visitOldStuff）：
    *
    * <pre>
    * public class AsmStuffVisitor extends StuffVisitor {
@@ -176,38 +169,37 @@ public interface Opcodes {
    *       super.visitNewStuff(argAndSource, ...);
    *       return;
    *     }
-   *     super.visitNewStuff(argAndSource, ...); // optional
+   *     super.visitNewStuff(argAndSource, ...); // 可选
    *     int arg = argAndSource &#38; ~SOURCE_MASK;
-   *     [ do other stuff ]
+   *     [ 执行其他操作 ]
    *   }
    * }
    * </pre>
    *
-   * <p>If a user class extends this with 'api' equal to API_NEW, the class hierarchy is equivalent
-   * to
+   * <p>如果用户类以'api'等于API_NEW扩展此类，类层次结构相当于
    *
    * <pre>
    * public class StuffVisitor {
    *   &#64;Deprecated public void visitOldStuff(int arg, ...) { visitNewStuf(arg, ...); }
-   *   public void visitNewStuff(int arg, ...) { [ do stuff ] }
+   *   public void visitNewStuff(int arg, ...) { [ 执行操作 ] }
    * }
    * public class AsmStuffVisitor extends StuffVisitor {
    *   &#64;Override public void visitNewStuff(int arg, ...) {
    *     super.visitNewStuff(arg, ...);
-   *     [ do other stuff ]
+   *     [ 执行其他操作 ]
    *   }
    * }
    * class UserStuffVisitor extends StuffVisitor {
    *   &#64;Override public void visitNewStuff(int arg, ...) {
    *     super.visitNewStuff(int arg, ...);
-   *     [ do user stuff ]
+   *     [ 执行用户操作 ]
    *   }
    * }
    * </pre>
    *
-   * <p>It is then obvious that whether visitNewStuff or visitOldStuff is called, 'do stuff', 'do
-   * other stuff' and 'do user stuff' will be executed, in this order. If, on the other hand, a user
-   * class extends AsmStuffVisitor with 'api' equal to API_OLD, the class hierarchy is equivalent to
+   * <p>很明显，无论调用visitNewStuff还是visitOldStuff，'执行操作'、'执行其他操作'
+   * 和'执行用户操作'都会按此顺序执行。另一方面，如果用户类以'api'等于API_OLD
+   * 扩展AsmStuffVisitor，类层次结构相当于
    *
    * <pre>
    * public class StuffVisitor {
@@ -219,7 +211,7 @@ public interface Opcodes {
    *       visitOldStuff(argAndSource, ...);
    *     } else {
    *       int arg = argAndSource &#38; ~SOURCE_MASK;
-   *       [ do stuff ]
+   *       [ 执行操作 ]
    *     }
    *   }
    * }
@@ -229,42 +221,39 @@ public interface Opcodes {
    *       super.visitNewStuff(argAndSource, ...);
    *       return;
    *     }
-   *     super.visitNewStuff(argAndSource, ...); // optional
+   *     super.visitNewStuff(argAndSource, ...); // 可选
    *     int arg = argAndSource &#38; ~SOURCE_MASK;
-   *     [ do other stuff ]
+   *     [ 执行其他操作 ]
    *   }
    * }
    * class UserStuffVisitor extends StuffVisitor {
    *   &#64;Override public void visitOldStuff(int arg, ...) {
    *     super.visitOldStuff(arg, ...);
-   *     [ do user stuff ]
+   *     [ 执行用户操作 ]
    *   }
    * }
    * </pre>
    *
-   * <p>and, here again, whether visitNewStuff or visitOldStuff is called, 'do stuff', 'do other
-   * stuff' and 'do user stuff' will be executed, in this order (exercise left to the reader).
+   * <p>同样，无论调用visitNewStuff还是visitOldStuff，'执行操作'、'执行其他操作'
+   * 和'执行用户操作'都会按此顺序执行（练习留给读者）。
    *
-   * <h1>Notes</h1>
+   * <h1>注意事项</h1>
    *
    * <ul>
-   *   <li>the SOURCE_DEPRECATED flag is set only if 'api' is API_OLD, just before calling
-   *       visitNewStuff. By hypothesis, this method is not overridden by the user. Therefore, user
-   *       classes can never see this flag. Only ASM subclasses must take care of extracting the
-   *       actual argument value by clearing the source flags.
-   *   <li>because the SOURCE_DEPRECATED flag is immediately cleared in the caller, the caller can
-   *       call visitOldStuff or visitNewStuff (in 'do stuff' and 'do user stuff') on a delegate
-   *       visitor without any risks (breaking the redirection logic, "leaking" the flag, etc).
-   *   <li>all the scenarios discussed above are unit tested in MethodVisitorTest.
+   *   <li>只有当'api'是API_OLD时，才会在调用visitNewStuff之前设置SOURCE_DEPRECATED标志。
+   *       根据假设，用户不会重写此方法。因此，用户类永远不会看到此标志。只有ASM子类必须
+   *       注意通过清除源标志来提取实际参数值。
+   *   <li>因为SOURCE_DEPRECATED标志在调用者中立即清除，调用者可以在委托访问者上调用
+   *       visitOldStuff或visitNewStuff（在'执行操作'和'执行用户操作'中）而无任何风险
+   *       （破坏重定向逻辑、"泄漏"标志等）。
+   *   <li>上述讨论的所有场景都在MethodVisitorTest中进行了单元测试。
    * </ul>
    */
 
-  int SOURCE_DEPRECATED = 0x100;
-  int SOURCE_MASK = SOURCE_DEPRECATED;
+  int SOURCE_DEPRECATED = 0x100; // 源已废弃标志
+  int SOURCE_MASK = SOURCE_DEPRECATED; // 源掩码
 
-  // Java ClassFile versions (the minor version is stored in the 16 most significant bits, and the
-  // major version in the 16 least significant bits).
-
+  // Java类文件版本（次版本号存储在最高16位，主版本号存储在最低16位）。
   int V1_1 = 3 << 16 | 45;
   int V1_2 = 0 << 16 | 46;
   int V1_3 = 0 << 16 | 47;
@@ -286,53 +275,52 @@ public interface Opcodes {
   int V19 = 0 << 16 | 63;
 
   /**
-   * Version flag indicating that the class is using 'preview' features.
+   * 版本标志，表示类正在使用'预览'特性。
    *
-   * <p>{@code version & V_PREVIEW == V_PREVIEW} tests if a version is flagged with {@code
-   * V_PREVIEW}.
+   * <p>{@code version & V_PREVIEW == V_PREVIEW} 测试版本是否标记了 {@code
+   * V_PREVIEW}。
    */
   int V_PREVIEW = 0xFFFF0000;
 
-  // Access flags values, defined in
+  // 访问标志值，定义在：
   // - https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.1-200-E.1
   // - https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.5-200-A.1
   // - https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.6-200-A.1
   // - https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.25
 
-  int ACC_PUBLIC = 0x0001; // class, field, method
-  int ACC_PRIVATE = 0x0002; // class, field, method
-  int ACC_PROTECTED = 0x0004; // class, field, method
-  int ACC_STATIC = 0x0008; // field, method
-  int ACC_FINAL = 0x0010; // class, field, method, parameter
-  int ACC_SUPER = 0x0020; // class
-  int ACC_SYNCHRONIZED = 0x0020; // method
-  int ACC_OPEN = 0x0020; // module
-  int ACC_TRANSITIVE = 0x0020; // module requires
-  int ACC_VOLATILE = 0x0040; // field
-  int ACC_BRIDGE = 0x0040; // method
-  int ACC_STATIC_PHASE = 0x0040; // module requires
-  int ACC_VARARGS = 0x0080; // method
-  int ACC_TRANSIENT = 0x0080; // field
-  int ACC_NATIVE = 0x0100; // method
-  int ACC_INTERFACE = 0x0200; // class
-  int ACC_ABSTRACT = 0x0400; // class, method
-  int ACC_STRICT = 0x0800; // method
-  int ACC_SYNTHETIC = 0x1000; // class, field, method, parameter, module *
-  int ACC_ANNOTATION = 0x2000; // class
-  int ACC_ENUM = 0x4000; // class(?) field inner
-  int ACC_MANDATED = 0x8000; // field, method, parameter, module, module *
-  int ACC_MODULE = 0x8000; // class
+  int ACC_PUBLIC = 0x0001; // 类、字段、方法
+  int ACC_PRIVATE = 0x0002; // 类、字段、方法
+  int ACC_PROTECTED = 0x0004; // 类、字段、方法
+  int ACC_STATIC = 0x0008; // 字段、方法
+  int ACC_FINAL = 0x0010; // 类、字段、方法、参数
+  int ACC_SUPER = 0x0020; // 类
+  int ACC_SYNCHRONIZED = 0x0020; // 方法
+  int ACC_OPEN = 0x0020; // 模块
+  int ACC_TRANSITIVE = 0x0020; // 模块依赖
+  int ACC_VOLATILE = 0x0040; // 字段
+  int ACC_BRIDGE = 0x0040; // 方法
+  int ACC_STATIC_PHASE = 0x0040; // 模块依赖
+  int ACC_VARARGS = 0x0080; // 方法
+  int ACC_TRANSIENT = 0x0080; // 字段
+  int ACC_NATIVE = 0x0100; // 方法
+  int ACC_INTERFACE = 0x0200; // 类
+  int ACC_ABSTRACT = 0x0400; // 类、方法
+  int ACC_STRICT = 0x0800; // 方法
+  int ACC_SYNTHETIC = 0x1000; // 类、字段、方法、参数、模块 *
+  int ACC_ANNOTATION = 0x2000; // 类
+  int ACC_ENUM = 0x4000; // 类(?) 字段 内部
+  int ACC_MANDATED = 0x8000; // 字段、方法、参数、模块、模块 *
+  int ACC_MODULE = 0x8000; // 类
 
-  // ASM specific access flags.
-  // WARNING: the 16 least significant bits must NOT be used, to avoid conflicts with standard
-  // access flags, and also to make sure that these flags are automatically filtered out when
-  // written in class files (because access flags are stored using 16 bits only).
+  // ASM特定的访问标志。
+  // 警告：最低16位不得使用，以避免与标准访问标志冲突，
+  // 并确保这些标志在写入类文件时被自动过滤掉（因为访问标志只用16位存储）。
 
-  int ACC_RECORD = 0x10000; // class
-  int ACC_DEPRECATED = 0x20000; // class, field, method
+  int ACC_RECORD = 0x10000; // 类
+  int ACC_DEPRECATED = 0x20000; // 类、字段、方法
 
-  // Possible values for the type operand of the NEWARRAY instruction.
-  // See https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.newarray.
+  // NEWARRAY指令的type操作数的可能值。
+  // 参见 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.newarray。
 
   int T_BOOLEAN = 4;
   int T_CHAR = 5;
@@ -343,9 +331,8 @@ public interface Opcodes {
   int T_INT = 10;
   int T_LONG = 11;
 
-  // Possible values for the reference_kind field of CONSTANT_MethodHandle_info structures.
-  // See https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.4.8.
-
+  // CONSTANT_MethodHandle_info结构中reference_kind字段的可能值。
+  // 参见 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.4.8。
   int H_GETFIELD = 1;
   int H_GETSTATIC = 2;
   int H_PUTFIELD = 3;
@@ -356,38 +343,35 @@ public interface Opcodes {
   int H_NEWINVOKESPECIAL = 8;
   int H_INVOKEINTERFACE = 9;
 
-  // ASM specific stack map frame types, used in {@link ClassVisitor#visitFrame}.
+  // ASM特定的栈映射帧类型，用于 {@link ClassVisitor#visitFrame}。
 
-  /** An expanded frame. See {@link ClassReader#EXPAND_FRAMES}. */
+  /** 展开帧。参见 {@link ClassReader#EXPAND_FRAMES}。 */
   int F_NEW = -1;
 
-  /** A compressed frame with complete frame data. */
+  /** 包含完整帧数据的压缩帧。 */
   int F_FULL = 0;
 
   /**
-   * A compressed frame where locals are the same as the locals in the previous frame, except that
-   * additional 1-3 locals are defined, and with an empty stack.
+   * 压缩帧，其中局部变量与前一帧的局部变量相同，除了额外定义了1-3个局部变量，且栈为空。
    */
   int F_APPEND = 1;
 
   /**
-   * A compressed frame where locals are the same as the locals in the previous frame, except that
-   * the last 1-3 locals are absent and with an empty stack.
+   * 压缩帧，其中局部变量与前一帧的局部变量相同，除了最后1-3个局部变量不存在，且栈为空。
    */
   int F_CHOP = 2;
 
   /**
-   * A compressed frame with exactly the same locals as the previous frame and with an empty stack.
+   * 压缩帧，局部变量与前一帧完全相同，且栈为空。
    */
   int F_SAME = 3;
 
   /**
-   * A compressed frame with exactly the same locals as the previous frame and with a single value
-   * on the stack.
+   * 压缩帧，局部变量与前一帧完全相同，且栈上有单个值。
    */
   int F_SAME1 = 4;
 
-  // Standard stack map frame element types, used in {@link ClassVisitor#visitFrame}.
+  // 标准栈映射帧元素类型，用于 {@link ClassVisitor#visitFrame}。
 
   Integer TOP = Frame.ITEM_TOP;
   Integer INTEGER = Frame.ITEM_INTEGER;
@@ -397,11 +381,11 @@ public interface Opcodes {
   Integer NULL = Frame.ITEM_NULL;
   Integer UNINITIALIZED_THIS = Frame.ITEM_UNINITIALIZED_THIS;
 
-  // The JVM opcode values (with the MethodVisitor method name used to visit them in comment, and
-  // where '-' means 'same method name as on the previous line').
-  // See https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html.
+  // JVM操作码值（注释中为用于访问它们的MethodVisitor方法名，
+  // 其中'-'表示'与上一行相同的方法名'）。
+  // 参见 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html。
 
-  int NOP = 0; // visitInsn
+  int NOP = 0; // visitInsn - 无操作指令
   int ACONST_NULL = 1; // -
   int ICONST_M1 = 2; // -
   int ICONST_0 = 3; // -
@@ -417,15 +401,15 @@ public interface Opcodes {
   int FCONST_2 = 13; // -
   int DCONST_0 = 14; // -
   int DCONST_1 = 15; // -
-  int BIPUSH = 16; // visitIntInsn
+  int BIPUSH = 16; // visitIntInsn - 将byte值推入栈（扩展为int）
   int SIPUSH = 17; // -
-  int LDC = 18; // visitLdcInsn
-  int ILOAD = 21; // visitVarInsn
+  int LDC = 18; // visitLdcInsn - 从常量池加载常量值
+  int ILOAD = 21; // visitVarInsn - 加载局部int变量
   int LLOAD = 22; // -
   int FLOAD = 23; // -
   int DLOAD = 24; // -
   int ALOAD = 25; // -
-  int IALOAD = 46; // visitInsn
+  int IALOAD = 46; // visitInsn - 从int数组加载元素
   int LALOAD = 47; // -
   int FALOAD = 48; // -
   int DALOAD = 49; // -
@@ -433,12 +417,12 @@ public interface Opcodes {
   int BALOAD = 51; // -
   int CALOAD = 52; // -
   int SALOAD = 53; // -
-  int ISTORE = 54; // visitVarInsn
+  int ISTORE = 54; // visitVarInsn - 存储int值到局部变量
   int LSTORE = 55; // -
   int FSTORE = 56; // -
   int DSTORE = 57; // -
   int ASTORE = 58; // -
-  int IASTORE = 79; // visitInsn
+  int IASTORE = 79; // visitInsn - 存储值到int数组
   int LASTORE = 80; // -
   int FASTORE = 81; // -
   int DASTORE = 82; // -
@@ -491,8 +475,8 @@ public interface Opcodes {
   int LOR = 129; // -
   int IXOR = 130; // -
   int LXOR = 131; // -
-  int IINC = 132; // visitIincInsn
-  int I2L = 133; // visitInsn
+  int IINC = 132; // visitIincInsn - 局部int变量自增
+  int I2L = 133; // visitInsn - int转换为long
   int I2F = 134; // -
   int I2D = 135; // -
   int L2I = 136; // -
@@ -512,7 +496,7 @@ public interface Opcodes {
   int FCMPG = 150; // -
   int DCMPL = 151; // -
   int DCMPG = 152; // -
-  int IFEQ = 153; // visitJumpInsn
+  int IFEQ = 153; // visitJumpInsn - 如果等于0则跳转
   int IFNE = 154; // -
   int IFLT = 155; // -
   int IFGE = 156; // -
@@ -528,34 +512,34 @@ public interface Opcodes {
   int IF_ACMPNE = 166; // -
   int GOTO = 167; // -
   int JSR = 168; // -
-  int RET = 169; // visitVarInsn
-  int TABLESWITCH = 170; // visiTableSwitchInsn
-  int LOOKUPSWITCH = 171; // visitLookupSwitch
-  int IRETURN = 172; // visitInsn
+  int RET = 169; // visitVarInsn - 返回指令（从子程序返回）
+  int TABLESWITCH = 170; // visiTableSwitchInsn - 表格跳转指令
+  int LOOKUPSWITCH = 171; // visitLookupSwitch - 查找跳转指令
+  int IRETURN = 172; // visitInsn - 返回int值
   int LRETURN = 173; // -
   int FRETURN = 174; // -
   int DRETURN = 175; // -
   int ARETURN = 176; // -
   int RETURN = 177; // -
-  int GETSTATIC = 178; // visitFieldInsn
+  int GETSTATIC = 178; // visitFieldInsn - 获取静态字段值
   int PUTSTATIC = 179; // -
   int GETFIELD = 180; // -
   int PUTFIELD = 181; // -
-  int INVOKEVIRTUAL = 182; // visitMethodInsn
+  int INVOKEVIRTUAL = 182; // visitMethodInsn - 调用虚方法
   int INVOKESPECIAL = 183; // -
   int INVOKESTATIC = 184; // -
   int INVOKEINTERFACE = 185; // -
-  int INVOKEDYNAMIC = 186; // visitInvokeDynamicInsn
-  int NEW = 187; // visitTypeInsn
-  int NEWARRAY = 188; // visitIntInsn
-  int ANEWARRAY = 189; // visitTypeInsn
-  int ARRAYLENGTH = 190; // visitInsn
+  int INVOKEDYNAMIC = 186; // visitInvokeDynamicInsn - 调用动态方法
+  int NEW = 187; // visitTypeInsn - 创建新对象实例
+  int NEWARRAY = 188; // visitIntInsn - 创建基本类型数组
+  int ANEWARRAY = 189; // visitTypeInsn - 创建引用类型数组
+  int ARRAYLENGTH = 190; // visitInsn - 获取数组长度
   int ATHROW = 191; // -
-  int CHECKCAST = 192; // visitTypeInsn
-  int INSTANCEOF = 193; // -
-  int MONITORENTER = 194; // visitInsn
+  int CHECKCAST = 192; // visitTypeInsn - 类型检查转换
+  int INSTANCEOF = 193; //
+  int MONITORENTER = 194; // visitInsn - 进入同步块
   int MONITOREXIT = 195; // -
-  int MULTIANEWARRAY = 197; // visitMultiANewArrayInsn
-  int IFNULL = 198; // visitJumpInsn
+  int MULTIANEWARRAY = 197; // visitMultiANewArrayInsn - 创建多维数组
+  int IFNULL = 198; // visitJumpInsn - 如果为null则跳转
   int IFNONNULL = 199; // -
 }

@@ -16,13 +16,13 @@
 
 package org.springframework.core.io.support;
 
-import java.io.IOException;
-
 import org.springframework.core.env.PropertySource;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+
 /**
- * Strategy interface for creating resource-based {@link PropertySource} wrappers.
+ * 用于创建基于资源的 {@link PropertySource} 包装器的策略接口。
  *
  * @author Juergen Hoeller
  * @since 4.3
@@ -31,13 +31,12 @@ import org.springframework.lang.Nullable;
 public interface PropertySourceFactory {
 
 	/**
-	 * Create a {@link PropertySource} that wraps the given resource.
-	 * @param name the name of the property source
-	 * (can be {@code null} in which case the factory implementation
-	 * will have to generate a name based on the given resource)
-	 * @param resource the resource (potentially encoded) to wrap
-	 * @return the new {@link PropertySource} (never {@code null})
-	 * @throws IOException if resource resolution failed
+	 * 创建一个包装给定资源的 {@link PropertySource}。
+	 * @param name 属性源的名称
+	 *             （可以为 {@code null}，此时工厂实现需要基于给定资源生成名称）
+	 * @param resource 要包装的资源（可能是编码过的）
+	 * @return 新创建的 {@link PropertySource}（绝不为 {@code null}）
+	 * @throws IOException 如果资源解析失败
 	 */
 	PropertySource<?> createPropertySource(@Nullable String name, EncodedResource resource) throws IOException;
 

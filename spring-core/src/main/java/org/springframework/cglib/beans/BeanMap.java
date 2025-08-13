@@ -16,57 +16,45 @@
 
 package org.springframework.cglib.beans;
 
-import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.asm.ClassVisitor;
 import org.springframework.cglib.core.AbstractClassGenerator;
 import org.springframework.cglib.core.KeyFactory;
 import org.springframework.cglib.core.ReflectUtils;
 
+import java.security.ProtectionDomain;
+import java.util.*;
+
 /**
- * A <code>Map</code>-based view of a JavaBean.  The default set of keys is the
- * union of all property names (getters or setters). An attempt to set
- * a read-only property will be ignored, and write-only properties will
- * be returned as <code>null</code>. Removal of objects is not a
- * supported (the key set is fixed).
+ * 基于 <code>Map</code> 的 JavaBean 视图。默认的键集合是所有属性名（getter 或 setter）的并集。
+ * 试图设置只读属性的操作会被忽略，只写属性的值将返回 <code>null</code>。
+ * 不支持移除对象（键集合是固定的）。
  * @author Chris Nokleberg
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 abstract public class BeanMap implements Map {
-    /**
-     * Limit the properties reflected in the key set of the map
-     * to readable properties.
-     * @see BeanMap.Generator#setRequire
-     */
-    public static final int REQUIRE_GETTER = 1;
+	/**
+	 * 限制映射的键集合中仅包含可读属性。
+	 * @see BeanMap.Generator#setRequire
+	 */
+	public static final int REQUIRE_GETTER = 1;
 
-    /**
-     * Limit the properties reflected in the key set of the map
-     * to writable properties.
-     * @see BeanMap.Generator#setRequire
-     */
-    public static final int REQUIRE_SETTER = 2;
-    
-    /**
-     * Helper method to create a new <code>BeanMap</code>.  For finer
-     * control over the generated instance, use a new instance of
-     * <code>BeanMap.Generator</code> instead of this static method.
-     * @param bean the JavaBean underlying the map
-     * @return a new <code>BeanMap</code> instance
-     */
-    public static BeanMap create(Object bean) {
-        Generator gen = new Generator();
-        gen.setBean(bean);
-        return gen.create();
-    }
+	/**
+	 * 限制映射的键集合中仅包含可写属性。
+	 * @see BeanMap.Generator#setRequire
+	 */
+	public static final int REQUIRE_SETTER = 2;
+
+	/**
+	 * 辅助方法，用于创建新的 <code>BeanMap</code> 实例。
+	 * 如果需要更细粒度的控制，请使用 <code>BeanMap.Generator</code> 的新实例，而非此静态方法。
+	 * @param bean 作为映射底层的 JavaBean 对象
+	 * @return 一个新的 <code>BeanMap</code> 实例
+	 */
+	public static BeanMap create(Object bean) {
+		Generator gen = new Generator();
+		gen.setBean(bean);
+		return gen.create();
+	}
 
     public static class Generator extends AbstractClassGenerator {
         private static final Source SOURCE = new Source(BeanMap.class.getName());
@@ -86,54 +74,52 @@ abstract public class BeanMap implements Map {
             super(SOURCE);
         }
 
-        /**
-         * Set the bean that the generated map should reflect. The bean may be swapped
-         * out for another bean of the same type using {@link #setBean}.
-         * Calling this method overrides any value previously set using {@link #setBeanClass}.
-         * You must call either this method or {@link #setBeanClass} before {@link #create}.
-         * @param bean the initial bean
-         */
-        public void setBean(Object bean) {
-            this.bean = bean;
-            if (bean != null) {
+		/**
+		 * 设置生成的映射应反映的 bean。可以使用 {@link #setBean} 用同一类型的另一个 bean 进行替换。
+		 * 调用此方法会覆盖之前通过 {@link #setBeanClass} 设置的值。
+		 * 在调用 {@link #create} 之前，必须调用此方法或 {@link #setBeanClass} 之一。
+		 * @param bean 初始的 bean 对象
+		 */
+		public void setBean(Object bean) {
+			this.bean = bean;
+			if (bean != null) {
 				beanClass = bean.getClass();
-				// SPRING PATCH BEGIN
+				// SPRING 修补开始
 				setContextClass(beanClass);
-				// SPRING PATCH END
+				// SPRING 修补结束
 			}
         }
 
-        /**
-         * Set the class of the bean that the generated map should support.
-         * You must call either this method or {@link #setBeanClass} before {@link #create}.
-         * @param beanClass the class of the bean
-         */
-        public void setBeanClass(Class beanClass) {
-            this.beanClass = beanClass;
-        }
+		/**
+		 * 设置生成的映射所支持的 bean 的类。
+		 * 在调用 {@link #create} 之前，必须调用此方法或 {@link #setBean} 之一。
+		 * @param beanClass bean 的类
+		 */
+		public void setBeanClass(Class beanClass) {
+			this.beanClass = beanClass;
+		}
 
-        /**
-         * Limit the properties reflected by the generated map.
-         * @param require any combination of {@link #REQUIRE_GETTER} and
-         * {@link #REQUIRE_SETTER}; default is zero (any property allowed)
-         */
-        public void setRequire(int require) {
-            this.require = require;
-        }
+		/**
+		 * 限制生成的映射所反映的属性范围。
+		 * @param require 可使用 {@link #REQUIRE_GETTER} 和 {@link #REQUIRE_SETTER} 的任意组合；
+		 *                默认为零（允许任何属性）
+		 */
+		public void setRequire(int require) {
+			this.require = require;
+		}
 
-        protected ClassLoader getDefaultClassLoader() {
-            return beanClass.getClassLoader();
-        }
+		protected ClassLoader getDefaultClassLoader() {
+			return beanClass.getClassLoader();
+		}
 
-        protected ProtectionDomain getProtectionDomain() {
-        	return ReflectUtils.getProtectionDomain(beanClass);
-        }
+		protected ProtectionDomain getProtectionDomain() {
+			return ReflectUtils.getProtectionDomain(beanClass);
+		}
 
-        /**
-         * Create a new instance of the <code>BeanMap</code>. An existing
-         * generated class will be reused if possible.
-         */
-        public BeanMap create() {
+		/**
+		 * 创建一个新的 <code>BeanMap</code> 实例。如果可能，将重用已有的生成类。
+		 */
+		public BeanMap create() {
             if (beanClass == null)
                 throw new IllegalArgumentException("Class of bean unknown");
             setNamePrefix(beanClass.getName());
@@ -153,20 +139,20 @@ abstract public class BeanMap implements Map {
         }
     }
 
-    /**
-     * Create a new <code>BeanMap</code> instance using the specified bean.
-     * This is faster than using the {@link #create} static method.
-     * @param bean the JavaBean underlying the map
-     * @return a new <code>BeanMap</code> instance
-     */
-    abstract public BeanMap newInstance(Object bean);
+	/**
+	 * 使用指定的 bean 创建一个新的 <code>BeanMap</code> 实例。
+	 * 这种方式比使用 {@link #create} 静态方法更快。
+	 * @param bean 作为 Map 底层数据的 JavaBean 对象
+	 * @return 一个新的 <code>BeanMap</code> 实例
+	 */
+	abstract public BeanMap newInstance(Object bean);
 
-    /**
-     * Get the type of a property.
-     * @param name the name of the JavaBean property
-     * @return the type of the property, or null if the property does not exist
-     */
-    abstract public Class getPropertyType(String name);
+	/**
+	 * 获取属性的类型。
+	 * @param name JavaBean 属性的名称
+	 * @return 属性的类型，如果属性不存在则返回 null
+	 */
+	abstract public Class getPropertyType(String name);
 
     protected Object bean;
 
@@ -185,43 +171,42 @@ abstract public class BeanMap implements Map {
         return put(bean, key, value);
     }
 
-    /**
-     * Get the property of a bean. This allows a <code>BeanMap</code>
-     * to be used statically for multiple beans--the bean instance tied to the
-     * map is ignored and the bean passed to this method is used instead.
-     * @param bean the bean to query; must be compatible with the type of
-     * this <code>BeanMap</code>
-     * @param key must be a String
-     * @return the current value, or null if there is no matching property
-     */
-    abstract public Object get(Object bean, Object key);
+	/**
+	 * 获取指定 bean 的属性值。这使得一个 <code>BeanMap</code>
+	 * 可以静态地用于多个 bean —— 忽略与映射关联的 bean 实例，而使用此方法传入的 bean。
+	 * @param bean 要查询的 bean；必须与该 <code>BeanMap</code> 的类型兼容
+	 * @param key 必须是一个 String
+	 * @return 当前属性值，如果没有匹配的属性则返回 null
+	 */
+	abstract public Object get(Object bean, Object key);
 
-    /**
-     * Set the property of a bean. This allows a <code>BeanMap</code>
-     * to be used statically for multiple beans--the bean instance tied to the
-     * map is ignored and the bean passed to this method is used instead.
-     * @param key must be a String
-     * @return the old value, if there was one, or null
-     */
-    abstract public Object put(Object bean, Object key, Object value);
+	/**
+	 * 设置指定 bean 的属性值。这使得一个 <code>BeanMap</code>
+	 * 可以静态地用于多个 bean —— 忽略与映射关联的 bean 实例，而使用此方法传入的 bean。
+	 * @param bean 要设置属性的 bean
+	 * @param key 必须是一个 String
+	 * @param value 要设置的新值
+	 * @return 旧的属性值（如果存在），否则返回 null
+	 */
+	abstract public Object put(Object bean, Object key, Object value);
 
-    /**
-     * Change the underlying bean this map should use.
-     * @param bean the new JavaBean
-     * @see #getBean
-     */
-    public void setBean(Object bean) {
-        this.bean = bean;
-    }
+	/**
+	 * 更改此映射当前使用的底层 bean。
+	 * @param bean 新的 JavaBean
+	 * @see #getBean
+	 */
+	public void setBean(Object bean) {
+		this.bean = bean;
+	}
 
-    /**
-     * Return the bean currently in use by this map.
-     * @return the current JavaBean
-     * @see #setBean
-     */
-    public Object getBean() {
-        return bean;
-    }
+	/**
+	 * 返回当前由该映射使用的 bean。
+	 * @return 当前的 JavaBean
+	 * @see #setBean
+	 */
+	public Object getBean() {
+		return bean;
+	}
 
     public void clear() {
         throw new UnsupportedOperationException();

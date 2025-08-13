@@ -15,13 +15,15 @@
  */
 package org.springframework.cglib.beans;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.*;
-import java.security.ProtectionDomain;
-import org.springframework.cglib.core.*;
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.Type;
-import java.util.*;
+import org.springframework.cglib.core.*;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Modifier;
+import java.security.ProtectionDomain;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Chris Nokleberg
@@ -76,9 +78,9 @@ abstract public class BeanCopier
                setNamePrefix(target.getName());
             }
             this.target = target;
-			// SPRING PATCH BEGIN
+			// SPRING补丁开始
 			setContextClass(target);
-			// SPRING PATCH END
+			// SPRING补丁结束
         }
 
         public void setUseConverter(boolean useConverter) {

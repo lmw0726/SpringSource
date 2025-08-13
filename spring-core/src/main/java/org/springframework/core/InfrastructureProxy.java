@@ -17,17 +17,16 @@
 package org.springframework.core;
 
 /**
- * Interface to be implemented by transparent resource proxies that need to be
- * considered as equal to the underlying resource, for example for consistent
- * lookup key comparisons. Note that this interface does imply such special
- * semantics and does not constitute a general-purpose mixin!
+ * 透明资源代理需要实现的接口，用于在比较时被视为与底层资源相等，
+ * 例如在一致性查找键比较中。注意，此接口并不意味着通用的混入功能，
+ * 而是具有特定语义的。
  *
- * <p>Such wrappers will automatically be unwrapped for key comparisons in
- * {@link org.springframework.transaction.support.TransactionSynchronizationManager}.
+ * <p>此类包装器会在
+ * {@link org.springframework.transaction.support.TransactionSynchronizationManager}
+ * 中自动解包以用于键比较。
  *
- * <p>Only fully transparent proxies, e.g. for redirection or service lookups,
- * are supposed to implement this interface. Proxies that decorate the target
- * object with new behavior, such as AOP proxies, do <i>not</i> qualify here!
+ * <p>只有完全透明的代理，例如重定向或服务查找代理，才应实现此接口。
+ * 装饰目标对象并添加新行为的代理（如AOP代理）不属于此类。
  *
  * @author Juergen Hoeller
  * @since 2.5.4
@@ -36,7 +35,7 @@ package org.springframework.core;
 public interface InfrastructureProxy {
 
 	/**
-	 * Return the underlying resource (never {@code null}).
+	 * 返回底层资源（绝不为 {@code null}）。
 	 */
 	Object getWrappedObject();
 

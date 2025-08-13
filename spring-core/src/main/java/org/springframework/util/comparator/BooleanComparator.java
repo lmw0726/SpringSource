@@ -16,14 +16,13 @@
 
 package org.springframework.util.comparator;
 
+import org.springframework.lang.Nullable;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.springframework.lang.Nullable;
-
 /**
- * A {@link Comparator} for {@link Boolean} objects that can sort either
- * {@code true} or {@code false} first.
+ * 用于{@link Boolean}对象的{@link Comparator}，可以设置将{@code true}或{@code false}排在前面。
  *
  * @author Keith Donald
  * @since 1.2.2
@@ -32,14 +31,12 @@ import org.springframework.lang.Nullable;
 public class BooleanComparator implements Comparator<Boolean>, Serializable {
 
 	/**
-	 * A shared default instance of this comparator,
-	 * treating {@code true} lower than {@code false}.
+	 * 此比较器的共享默认实例，将{@code true}视为比{@code false}小。
 	 */
 	public static final BooleanComparator TRUE_LOW = new BooleanComparator(true);
 
 	/**
-	 * A shared default instance of this comparator,
-	 * treating {@code true} higher than {@code false}.
+	 * 此比较器的共享默认实例，将{@code true}视为比{@code false}大。
 	 */
 	public static final BooleanComparator TRUE_HIGH = new BooleanComparator(false);
 
@@ -48,12 +45,11 @@ public class BooleanComparator implements Comparator<Boolean>, Serializable {
 
 
 	/**
-	 * Create a BooleanComparator that sorts boolean values based on
-	 * the provided flag.
-	 * <p>Alternatively, you can use the default shared instances:
-	 * {@code BooleanComparator.TRUE_LOW} and
-	 * {@code BooleanComparator.TRUE_HIGH}.
-	 * @param trueLow whether to treat true as lower or higher than false
+	 * 创建一个BooleanComparator，根据提供的标志对布尔值进行排序。
+	 * <p>或者，您可以使用默认的共享实例：
+	 * {@code BooleanComparator.TRUE_LOW}和
+	 * {@code BooleanComparator.TRUE_HIGH}。
+	 * @param trueLow 是否将true视为比false小
 	 * @see #TRUE_LOW
 	 * @see #TRUE_HIGH
 	 */

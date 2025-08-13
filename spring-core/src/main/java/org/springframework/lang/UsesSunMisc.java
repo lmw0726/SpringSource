@@ -23,8 +23,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated element uses an API from the {@code sun.misc}
- * package.
+ * 表示被注解的元素使用了来自{@code sun.misc}包的API。
+ *
+ * <p>此注解用于标记那些依赖于Sun/Oracle JDK内部API的代码元素，
+ * 提醒这些API可能在不同JDK实现或未来版本中不可用。
  *
  * @author Stephane Nicoll
  * @since 4.3

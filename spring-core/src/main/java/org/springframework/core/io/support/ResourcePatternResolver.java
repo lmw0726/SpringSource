@@ -22,30 +22,23 @@ import org.springframework.core.io.ResourceLoader;
 import java.io.IOException;
 
 /**
- * Strategy interface for resolving a location pattern (for example,
- * an Ant-style path pattern) into {@link Resource} objects.
+ * 用于将位置模式（例如 Ant 风格的路径模式）解析为 {@link Resource} 对象的策略接口。
  *
- * <p>This is an extension to the {@link org.springframework.core.io.ResourceLoader}
- * interface. A passed-in {@code ResourceLoader} (for example, an
- * {@link org.springframework.context.ApplicationContext} passed in via
- * {@link org.springframework.context.ResourceLoaderAware} when running in a context)
- * can be checked whether it implements this extended interface too.
+ * <p>这是对 {@link org.springframework.core.io.ResourceLoader} 接口的扩展。
+ * 传入的 {@code ResourceLoader}（例如通过
+ * {@link org.springframework.context.ResourceLoaderAware} 在上下文中传入的
+ * {@link org.springframework.context.ApplicationContext}）可以检查它是否也实现了此扩展接口。
  *
- * <p>{@link PathMatchingResourcePatternResolver} is a standalone implementation
- * that is usable outside an {@code ApplicationContext}, also used by
- * {@link ResourceArrayPropertyEditor} for populating {@code Resource} array bean
- * properties.
+ * <p>{@link PathMatchingResourcePatternResolver} 是一个独立实现，
+ * 可在 {@code ApplicationContext} 之外使用，也被
+ * {@link ResourceArrayPropertyEditor} 用于填充 {@code Resource} 数组类型的 Bean 属性。
  *
- * <p>Can be used with any sort of location pattern &mdash; for example,
- * {@code "/WEB-INF/*-context.xml"}. However, input patterns have to match the
- * strategy implementation. This interface just specifies the conversion method
- * rather than a specific pattern format.
+ * <p>可以用于任何类型的位置模式 —— 例如 {@code "/WEB-INF/*-context.xml"}。
+ * 但输入的模式必须符合策略实现的规则。此接口仅定义转换方法，而不限定具体的模式格式。
  *
- * <p>This interface also defines a {@code "classpath*:"} resource prefix for all
- * matching resources from the class path. Note that the resource location may
- * also contain placeholders &mdash; for example {@code "/beans-*.xml"}. JAR files
- * or different directories in the class path can contain multiple files of the
- * same name.
+ * <p>该接口还定义了 {@code "classpath*:"} 资源前缀，用于匹配类路径中所有符合条件的资源。
+ * 注意资源位置也可以包含占位符 —— 例如 {@code "/beans-*.xml"}。
+ * 类路径中的 JAR 文件或不同目录中可能包含多个同名文件。
  *
  * @author Juergen Hoeller
  * @see org.springframework.core.io.Resource

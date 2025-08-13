@@ -16,20 +16,19 @@
 
 package org.springframework.core;
 
-import java.io.IOException;
-
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+
 /**
- * Subclass of {@link IOException} that properly handles a root cause,
- * exposing the root cause just like NestedChecked/RuntimeException does.
+ * {@link IOException} 的子类，能够正确处理根本原因，
+ * 并像 NestedChecked/RuntimeException 一样暴露根本原因。
  *
- * <p>Proper root cause handling was added to the standard {@code IOException} in
- * Java 6, which is why Spring originally introduced {@code NestedIOException}
- * for compatibility with versions prior to Java 6.
+ * <p>Java 6 开始，标准的 {@code IOException} 添加了对根本原因的支持，
+ * 因此 Spring 最初引入 {@code NestedIOException} 以兼容 Java 6 之前的版本。
  *
- * <p>The similarity between this class and the NestedChecked/RuntimeException
- * class is unavoidable, as this class needs to derive from IOException.
+ * <p>由于本类需要继承自 IOException，因此和 NestedChecked/RuntimeException
+ * 之间的相似性是不可避免的。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -42,25 +41,24 @@ import org.springframework.lang.Nullable;
 public class NestedIOException extends IOException {
 
 	static {
-		// Eagerly load the NestedExceptionUtils class to avoid classloader deadlock
-		// issues on OSGi when calling getMessage(). Reported by Don Brown; SPR-5607.
+		// 预先加载 NestedExceptionUtils 类，避免在 OSGi 环境调用 getMessage() 时发生类加载死锁问题。
+		// 该问题由 Don Brown 报告；SPR-5607。
 		NestedExceptionUtils.class.getName();
 	}
 
 
 	/**
-	 * Construct a {@code NestedIOException} with the specified detail message.
-	 * @param msg the detail message
+	 * 使用指定的详细消息构造 {@code NestedIOException}。
+	 * @param msg 详细消息
 	 */
 	public NestedIOException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Construct a {@code NestedIOException} with the specified detail message
-	 * and nested exception.
-	 * @param msg the detail message
-	 * @param cause the nested exception
+	 * 使用指定的详细消息和嵌套异常构造 {@code NestedIOException}。
+	 * @param msg 详细消息
+	 * @param cause 嵌套异常
 	 */
 	public NestedIOException(@Nullable String msg, @Nullable Throwable cause) {
 		super(msg, cause);
@@ -68,8 +66,7 @@ public class NestedIOException extends IOException {
 
 
 	/**
-	 * Return the detail message, including the message from the nested exception
-	 * if there is one.
+	 * 返回详细消息，包括嵌套异常的消息（如果有）。
 	 */
 	@Override
 	@Nullable

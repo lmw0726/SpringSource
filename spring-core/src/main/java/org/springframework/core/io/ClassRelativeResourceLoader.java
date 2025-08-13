@@ -20,8 +20,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link ResourceLoader} implementation that interprets plain resource paths
- * as relative to a given {@code java.lang.Class}.
+ * {@link ResourceLoader} 的实现类，用于将普通的资源路径解析为
+ * 相对于指定 {@code java.lang.Class} 的路径。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -34,8 +34,8 @@ public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 
 
 	/**
-	 * Create a new ClassRelativeResourceLoader for the given class.
-	 * @param clazz the class to load resources through
+	 * 为给定的 Class 创建一个新的 ClassRelativeResourceLoader。
+	 * @param clazz 用于加载资源的 Class
 	 */
 	public ClassRelativeResourceLoader(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
@@ -50,8 +50,8 @@ public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 
 
 	/**
-	 * ClassPathResource that explicitly expresses a context-relative path
-	 * through implementing the ContextResource interface.
+	 * 一种特殊的 ClassPathResource 实现，
+	 * 通过实现 ContextResource 接口来显式表达上下文相对路径。
 	 */
 	private static class ClassRelativeContextResource extends ClassPathResource implements ContextResource {
 

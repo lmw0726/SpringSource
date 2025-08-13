@@ -26,8 +26,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Provides methods to support various naming and other conventions used
- * throughout the framework. Mainly for internal use within the framework.
+ * 提供支持框架中使用的各种命名及其他约定的方法。
+ * 主要供框架内部使用。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -37,7 +37,7 @@ import java.util.Iterator;
 public final class Conventions {
 
 	/**
-	 * Suffix added to names when using arrays.
+	 * 用于数组名的后缀。
 	 */
 	private static final String PLURAL_SUFFIX = "List";
 
@@ -47,20 +47,17 @@ public final class Conventions {
 
 
 	/**
-	 * Determine the conventional variable name for the supplied {@code Object}
-	 * based on its concrete type. The convention used is to return the
-	 * un-capitalized short name of the {@code Class}, according to JavaBeans
-	 * property naming rules.
-	 * <p>For example:<br>
-	 * {@code com.myapp.Product} becomes {@code "product"}<br>
-	 * {@code com.myapp.MyProduct} becomes {@code "myProduct"}<br>
-	 * {@code com.myapp.UKProduct} becomes {@code "UKProduct"}<br>
-	 * <p>For arrays the pluralized version of the array component type is used.
-	 * For {@code Collection}s an attempt is made to 'peek ahead' to determine
-	 * the component type and return its pluralized version.
+	 * 根据具体类型确定给定 {@code Object} 的惯用变量名。
+	 * 命名约定是根据 JavaBeans 属性命名规则返回类名的小写开头简短名。
+	 * <p>例如：<br>
+	 * {@code com.myapp.Product} 返回 {@code "product"}<br>
+	 * {@code com.myapp.MyProduct} 返回 {@code "myProduct"}<br>
+	 * {@code com.myapp.UKProduct} 返回 {@code "UKProduct"}<br>
+	 * <p>对于数组，使用数组组件类型的复数形式。
+	 * 对于 {@code Collection}，尝试“提前查看”以确定组件类型并返回其复数形式。
 	 *
-	 * @param value the value to generate a variable name for
-	 * @return the generated variable name
+	 * @param value 要生成变量名的值
+	 * @return 生成的变量名
 	 */
 	public static String getVariableName(Object value) {
 		Assert.notNull(value, "Value must not be null");
@@ -148,44 +145,41 @@ public final class Conventions {
 	}
 
 	/**
-	 * Determine the conventional variable name for the return type of the
-	 * given method, taking the generic collection type, if any, into account.
+	 * 确定给定方法返回类型的常规变量名，考虑泛型集合类型（如果有）。
 	 *
-	 * @param method the method to generate a variable name for
-	 * @return the generated variable name
+	 * @param method 要生成变量名的方法
+	 * @return 生成的变量名
 	 */
 	public static String getVariableNameForReturnType(Method method) {
 		return getVariableNameForReturnType(method, method.getReturnType(), null);
 	}
 
 	/**
-	 * Determine the conventional variable name for the return type of the given
-	 * method, taking the generic collection type, if any, into account, falling
-	 * back on the given actual return value if the method declaration is not
-	 * specific enough, e.g. {@code Object} return type or untyped collection.
+	 * 确定给定方法返回类型的常规变量名，考虑泛型集合类型（如果有）。
+	 * 如果方法声明不够具体（如返回类型为 {@code Object} 或未指定类型的集合），
+	 * 则退回到给定的实际返回值。
 	 *
-	 * @param method the method to generate a variable name for
-	 * @param value  the return value (may be {@code null} if not available)
-	 * @return the generated variable name
+	 * @param method 要生成变量名的方法
+	 * @param value  返回值（如果不可用，可能为 {@code null}）
+	 * @return 生成的变量名
 	 */
 	public static String getVariableNameForReturnType(Method method, @Nullable Object value) {
 		return getVariableNameForReturnType(method, method.getReturnType(), value);
 	}
 
 	/**
-	 * Determine the conventional variable name for the return type of the given
-	 * method, taking the generic collection type, if any, into account, falling
-	 * back on the given return value if the method declaration is not specific
-	 * enough, e.g. {@code Object} return type or untyped collection.
-	 * <p>As of 5.0 this method supports reactive types:<br>
-	 * {@code Mono<com.myapp.Product>} becomes {@code "productMono"}<br>
-	 * {@code Flux<com.myapp.MyProduct>} becomes {@code "myProductFlux"}<br>
-	 * {@code Observable<com.myapp.MyProduct>} becomes {@code "myProductObservable"}<br>
+	 * 确定给定方法返回类型的常规变量名，考虑泛型集合类型（如果有）。
+	 * 如果方法声明不够具体（如返回类型为 {@code Object} 或未指定类型的集合），
+	 * 则退回到给定的返回值。
+	 * <p>从 5.0 版本开始，此方法支持响应式类型：<br>
+	 * {@code Mono<com.myapp.Product>} 变为 {@code "productMono"}<br>
+	 * {@code Flux<com.myapp.MyProduct>} 变为 {@code "myProductFlux"}<br>
+	 * {@code Observable<com.myapp.MyProduct>} 变为 {@code "myProductObservable"}<br>
 	 *
-	 * @param method       the method to generate a variable name for
-	 * @param resolvedType the resolved return type of the method
-	 * @param value        the return value (may be {@code null} if not available)
-	 * @return the generated variable name
+	 * @param method       要生成变量名的方法
+	 * @param resolvedType 方法的已解析返回类型
+	 * @param value        返回值（如果不可用，可能为 {@code null}）
+	 * @return 生成的变量名
 	 */
 	public static String getVariableNameForReturnType(Method method, Class<?> resolvedType, @Nullable Object value) {
 		Assert.notNull(method, "Method must not be null");
@@ -263,9 +257,9 @@ public final class Conventions {
 	}
 
 	/**
-	 * Return an attribute name qualified by the given enclosing {@link Class}.
-	 * For example the attribute name '{@code foo}' qualified by {@link Class}
-	 * '{@code com.myapp.SomeClass}' would be '{@code com.myapp.SomeClass.foo}'
+	 * 返回由给定包围 {@link Class} 限定的属性名。
+	 * 例如，属性名 '{@code foo}' 由类 '{@code com.myapp.SomeClass}' 限定后
+	 * 应为 '{@code com.myapp.SomeClass.foo}'。
 	 */
 	public static String getQualifiedAttributeName(Class<?> enclosingClass, String attributeName) {
 		Assert.notNull(enclosingClass, "'enclosingClass' must not be null");
@@ -275,13 +269,12 @@ public final class Conventions {
 
 
 	/**
-	 * Determine the class to use for naming a variable containing the given value.
-	 * <p>Will return the class of the given value, except when encountering a
-	 * JDK proxy, in which case it will determine the 'primary' interface
-	 * implemented by that proxy.
+	 * 确定用于命名包含给定值的变量的类。
+	 * <p>通常返回给定值的类，遇到 JDK 动态代理时，
+	 * 则返回该代理实现的“主”接口。
 	 *
-	 * @param value the value to check
-	 * @return the class to use for naming a variable
+	 * @param value 要检查的值
+	 * @return 用于命名变量的类
 	 */
 	private static Class<?> getClassForValue(Object value) {
 		Class<?> valueClass = value.getClass();
@@ -293,8 +286,8 @@ public final class Conventions {
 				}
 			}
 		} else if (valueClass.getName().lastIndexOf('$') != -1 && valueClass.getDeclaringClass() == null) {
-			// '$' in the class name but no inner class -
-			// assuming it's a special subclass (e.g. by OpenJPA)
+			// 类名中包含 '$' 但无内部类声明，
+			// 假设这是一个特殊子类（例如由 OpenJPA 生成）
 			valueClass = valueClass.getSuperclass();
 		}
 		return valueClass;
@@ -308,9 +301,8 @@ public final class Conventions {
 	}
 
 	/**
-	 * Retrieve the {@code Class} of an element in the {@code Collection}.
-	 * The exact element for which the {@code Class} is retrieved will depend
-	 * on the concrete {@code Collection} implementation.
+	 * 获取 {@code Collection} 中元素的 {@code Class}。
+	 * 具体获取哪个元素的 {@code Class} 取决于具体的 {@code Collection} 实现。
 	 */
 	private static <E> E peekAhead(Collection<E> collection) {
 		Iterator<E> it = collection.iterator();

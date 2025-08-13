@@ -16,6 +16,10 @@
 
 package org.springframework.cglib.core;
 
+import org.springframework.asm.ClassReader;
+import org.springframework.cglib.core.internal.Function;
+import org.springframework.cglib.core.internal.LoadingCache;
+
 import java.lang.ref.WeakReference;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
@@ -23,15 +27,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import org.springframework.asm.ClassReader;
-import org.springframework.cglib.core.internal.Function;
-import org.springframework.cglib.core.internal.LoadingCache;
-
 /**
- * Abstract class for all code-generating CGLIB utilities.
- * In addition to caching generated classes for performance, it provides hooks for
- * customizing the <code>ClassLoader</code>, name of the generated class, and transformations
- * applied before generation.
+ * 所有用于代码生成的CGLIB工具的抽象类。
+ * 除了为提升性能而缓存已生成的类之外，它还提供了用于自定义
+ * <code>ClassLoader</code>、生成类的名称以及在生成前应用的转换操作的钩子方法。
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 abstract public class AbstractClassGenerator<T> implements ClassGenerator {
@@ -70,20 +69,18 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 		private final Set<String> reservedClassNames = new HashSet<String>();
 
 		/**
-		 * {@link AbstractClassGenerator} here holds "cache key" (e.g. {@link org.springframework.cglib.proxy.Enhancer}
-		 * configuration), and the value is the generated class plus some additional values
-		 * (see {@link #unwrapCachedValue(Object)}.
-		 * <p>The generated classes can be reused as long as their classloader is reachable.</p>
-		 * <p>Note: the only way to access a class is to find it through generatedClasses cache, thus
-		 * the key should not expire as long as the class itself is alive (its classloader is alive).</p>
+		 * 这里的 {@link AbstractClassGenerator} 作为“缓存键”（例如 {@link org.springframework.cglib.proxy.Enhancer} 的配置），
+		 * 值是生成的类加上一些附加值（见 {@link #unwrapCachedValue(Object)}）。
+		 * <p>只要生成类的类加载器可达，这些类就可以被重用。</p>
+		 * <p>注意：访问类的唯一方式是通过 generatedClasses 缓存查找，
+		 * 因此只要类本身（及其类加载器）存活，缓存键就不应失效。</p>
 		 */
 		private final LoadingCache<AbstractClassGenerator, Object, Object> generatedClasses;
 
 		/**
-		 * Note: ClassLoaderData object is stored as a value of {@code WeakHashMap<ClassLoader, ...>} thus
-		 * this classLoader reference should be weak otherwise it would make classLoader strongly reachable
-		 * and alive forever.
-		 * Reference queue is not required since the cleanup is handled by {@link WeakHashMap}.
+		 * 注意：ClassLoaderData 对象作为 {@code WeakHashMap<ClassLoader, ...>} 的值存储，
+		 * 因此这里的 classLoader 引用应为弱引用，否则会导致 classLoader 强引用并永久存活。
+		 * 不需要引用队列，因为 {@link WeakHashMap} 会负责清理。
 		 */
 		private final WeakReference<ClassLoader> classLoader;
 
@@ -178,27 +175,28 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 	}
 
 	/**
-	 * Set the <code>ClassLoader</code> in which the class will be generated.
-	 * Concrete subclasses of <code>AbstractClassGenerator</code> (such as <code>Enhancer</code>)
-	 * will try to choose an appropriate default if this is unset.
+	 * 设置生成类所使用的 <code>ClassLoader</code>。
+	 * 如果未设置，<code>AbstractClassGenerator</code> 的具体子类（如 <code>Enhancer</code>）
+	 * 会尝试选择一个合适的默认值。
 	 * <p>
-	 * Classes are cached per-<code>ClassLoader</code> using a <code>WeakHashMap</code>, to allow
-	 * the generated classes to be removed when the associated loader is garbage collected.
-	 * @param classLoader the loader to generate the new class with, or null to use the default
+	 * 类会按照每个 <code>ClassLoader</code> 进行缓存，
+	 * 缓存使用 <code>WeakHashMap</code>，
+	 * 以便在关联的类加载器被垃圾回收时移除生成的类。
+	 * @param classLoader 用于生成新类的类加载器，传入 null 则使用默认值
 	 */
 	public void setClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
 
-	// SPRING PATCH BEGIN
+	// SPRING补丁开始
 	public void setContextClass(Class contextClass) {
 		this.contextClass = contextClass;
 	}
-	// SPRING PATCH END
+	// SPRING补丁结束
 
 	/**
-	 * Override the default naming policy.
-	 * @param namingPolicy the custom policy, or null to use the default
+	 * 覆盖默认的命名策略。
+	 * @param namingPolicy 自定义的命名策略，传入 null 则使用默认策略
 	 * @see DefaultNamingPolicy
 	 */
 	public void setNamingPolicy(NamingPolicy namingPolicy) {
@@ -215,8 +213,8 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 	}
 
 	/**
-	 * Whether use and update the static cache of generated classes
-	 * for a class with the same properties. Default is <code>true</code>.
+	 * 是否使用并更新针对具有相同属性的类生成的静态缓存。
+	 * 默认值为 <code>true</code>。
 	 */
 	public void setUseCache(boolean useCache) {
 		this.useCache = useCache;
@@ -230,9 +228,8 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 	}
 
 	/**
-	 * If set, CGLIB will attempt to load classes from the specified
-	 * <code>ClassLoader</code> before generating them. Because generated
-	 * class names are not guaranteed to be unique, the default is <code>false</code>.
+	 * 如果设置，CGLIB 会尝试在生成类之前，从指定的 <code>ClassLoader</code> 加载类。
+	 * 由于生成的类名不能保证唯一，默认值为 <code>false</code>。
 	 */
 	public void setAttemptLoad(boolean attemptLoad) {
 		this.attemptLoad = attemptLoad;
@@ -243,8 +240,8 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 	}
 
 	/**
-	 * Set the strategy to use to create the bytecode from this generator.
-	 * By default an instance of {@link DefaultGeneratorStrategy} is used.
+	 * 设置用于从该生成器创建字节码的策略。
+	 * 默认使用 {@link DefaultGeneratorStrategy} 的实例。
 	 */
 	public void setStrategy(GeneratorStrategy strategy) {
 		if (strategy == null)
@@ -260,8 +257,8 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 	}
 
 	/**
-	 * Used internally by CGLIB. Returns the <code>AbstractClassGenerator</code>
-	 * that is being used to generate a class in the current thread.
+	 * CGLIB 内部使用。返回当前线程中用于生成类的
+	 * {@code AbstractClassGenerator} 实例。
 	 */
 	public static AbstractClassGenerator getCurrent() {
 		return (AbstractClassGenerator) CURRENT.get();
@@ -287,12 +284,12 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 	abstract protected ClassLoader getDefaultClassLoader();
 
 	/**
-	 * Returns the protection domain to use when defining the class.
+	 * 返回定义类时使用的保护域（ProtectionDomain）。
 	 * <p>
-	 * Default implementation returns <code>null</code> for using a default protection domain. Sub-classes may
-	 * override to use a more specific protection domain.
+	 * 默认实现返回 <code>null</code>，表示使用默认的保护域。
+	 * 子类可以重写此方法以使用更具体的保护域。
 	 * </p>
-	 * @return the protection domain (<code>null</code> for using a default)
+	 * @return 保护域（返回 <code>null</code> 表示使用默认保护域）
 	 */
 	protected ProtectionDomain getProtectionDomain() {
 		return null;
@@ -358,10 +355,10 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 			byte[] b = strategy.generate(this);
 			String className = ClassNameReader.getClassName(new ClassReader(b));
 			ProtectionDomain protectionDomain = getProtectionDomain();
-			synchronized (classLoader) { // just in case
-				// SPRING PATCH BEGIN
+			synchronized (classLoader) { // 以防万一
+				// SPRING补丁结束
 				gen = ReflectUtils.defineClass(className, b, classLoader, protectionDomain, contextClass);
-				// SPRING PATCH END
+				// SPRING补丁结束
 			}
 			return gen;
 		}

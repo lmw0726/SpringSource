@@ -16,14 +16,14 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.UUID;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 /**
- * Converts from a String to a {@link java.util.UUID}.
+ * 将字符串转换为 {@link java.util.UUID}。
  *
  * @author Phillip Webb
  * @since 3.2

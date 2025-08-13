@@ -28,9 +28,9 @@
 package org.springframework.asm;
 
 /**
- * A visitor to visit a Java annotation. The methods of this class must be called in the following
- * order: ( {@code visit} | {@code visitEnum} | {@code visitAnnotation} | {@code visitArray} )*
- * {@code visitEnd}.
+ * 访问Java注解的访问者。此类的方法必须按以下顺序调用：
+ * ( {@code visit} | {@code visitEnum} | {@code visitAnnotation} | {@code visitArray} )*
+ * {@code visitEnd}。
  *
  * @author Eric Bruneton
  * @author Eugene Kuleshov
@@ -38,34 +38,33 @@ package org.springframework.asm;
 public abstract class AnnotationVisitor {
 
   /**
-   * The ASM API version implemented by this visitor. The value of this field must be one of the
-   * {@code ASM}<i>x</i> values in {@link Opcodes}.
+   * 此访问者实现的ASM API版本。此字段的值必须是{@link Opcodes}中的
+   * {@code ASM}<i>x</i>值之一。
    */
   protected final int api;
 
   /**
-   * The annotation visitor to which this visitor must delegate method calls. May be {@literal
-   * null}.
+   * 此访问者必须委托方法调用的注解访问者。可能为{@literal null}。
    */
   protected AnnotationVisitor av;
 
   /**
-   * Constructs a new {@link AnnotationVisitor}.
+   * 构造一个新的{@link AnnotationVisitor}。
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
+   * @param api 此访问者实现的ASM API版本。必须是{@link Opcodes}中的
+   *     {@code ASM}<i>x</i>值之一。
    */
   protected AnnotationVisitor(final int api) {
     this(api, null);
   }
 
   /**
-   * Constructs a new {@link AnnotationVisitor}.
+   * 构造一个新的{@link AnnotationVisitor}。
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   * @param annotationVisitor the annotation visitor to which this visitor must delegate method
-   *     calls. May be {@literal null}.
+   * @param api 此访问者实现的ASM API版本。必须是{@link Opcodes}中的
+   *     {@code ASM}<i>x</i>值之一。
+   * @param annotationVisitor 此访问者必须委托方法调用的注解访问者。
+   *     可能为{@literal null}。
    */
   protected AnnotationVisitor(final int api, final AnnotationVisitor annotationVisitor) {
     if (api != Opcodes.ASM9
@@ -77,21 +76,20 @@ public abstract class AnnotationVisitor {
         && api != Opcodes.ASM10_EXPERIMENTAL) {
       throw new IllegalArgumentException("Unsupported api " + api);
     }
-    // SPRING PATCH: no preview mode check for ASM experimental
+    // SPRING补丁：对ASM实验性功能不进行预览模式检查
     this.api = api;
     this.av = annotationVisitor;
   }
 
   /**
-   * Visits a primitive value of the annotation.
+   * 访问注解的基本类型值。
    *
-   * @param name the value name.
-   * @param value the actual value, whose type must be {@link Byte}, {@link Boolean}, {@link
-   *     Character}, {@link Short}, {@link Integer} , {@link Long}, {@link Float}, {@link Double},
-   *     {@link String} or {@link Type} of {@link Type#OBJECT} or {@link Type#ARRAY} sort. This
-   *     value can also be an array of byte, boolean, short, char, int, long, float or double values
-   *     (this is equivalent to using {@link #visitArray} and visiting each array element in turn,
-   *     but is more convenient).
+   * @param name 值名称。
+   * @param value 实际值，其类型必须是{@link Byte}、{@link Boolean}、{@link
+   *     Character}、{@link Short}、{@link Integer}、{@link Long}、{@link Float}、{@link Double}、
+   *     {@link String}或{@link Type#OBJECT}或{@link Type#ARRAY}类型的{@link Type}。
+   *     此值也可以是byte、boolean、short、char、int、long、float或double值的数组
+   *     （这相当于使用{@link #visitArray}并依次访问每个数组元素，但更方便）。
    */
   public void visit(final String name, final Object value) {
     if (av != null) {
@@ -100,11 +98,11 @@ public abstract class AnnotationVisitor {
   }
 
   /**
-   * Visits an enumeration value of the annotation.
+   * 访问注解的枚举值。
    *
-   * @param name the value name.
-   * @param descriptor the class descriptor of the enumeration class.
-   * @param value the actual enumeration value.
+   * @param name 值名称。
+   * @param descriptor 枚举类的类描述符。
+   * @param value 实际枚举值。
    */
   public void visitEnum(final String name, final String descriptor, final String value) {
     if (av != null) {
@@ -113,13 +111,12 @@ public abstract class AnnotationVisitor {
   }
 
   /**
-   * Visits a nested annotation value of the annotation.
+   * 访问注解的嵌套注解值。
    *
-   * @param name the value name.
-   * @param descriptor the class descriptor of the nested annotation class.
-   * @return a visitor to visit the actual nested annotation value, or {@literal null} if this
-   *     visitor is not interested in visiting this nested annotation. <i>The nested annotation
-   *     value must be fully visited before calling other methods on this annotation visitor</i>.
+   * @param name 值名称。
+   * @param descriptor 嵌套注解类的类描述符。
+   * @return 用于访问实际嵌套注解值的访问者，如果此访问者不感兴趣访问此嵌套注解则返回{@literal null}。
+   *     <i>在调用此注解访问者的其他方法之前，必须完全访问嵌套注解值</i>。
    */
   public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
     if (av != null) {
@@ -129,15 +126,13 @@ public abstract class AnnotationVisitor {
   }
 
   /**
-   * Visits an array value of the annotation. Note that arrays of primitive values (such as byte,
-   * boolean, short, char, int, long, float or double) can be passed as value to {@link #visit
-   * visit}. This is what {@link ClassReader} does for non empty arrays of primitive values.
+   * 访问注解的数组值。注意基本类型值的数组（如byte、boolean、short、char、int、long、float或double）
+   * 可以作为值传递给{@link #visit visit}。这就是{@link ClassReader}对非空基本类型值数组的处理方式。
    *
-   * @param name the value name.
-   * @return a visitor to visit the actual array value elements, or {@literal null} if this visitor
-   *     is not interested in visiting these values. The 'name' parameters passed to the methods of
-   *     this visitor are ignored. <i>All the array values must be visited before calling other
-   *     methods on this annotation visitor</i>.
+   * @param name 值名称。
+   * @return 用于访问实际数组值元素的访问者，如果此访问者不感兴趣访问这些值则返回{@literal null}。
+   *     传递给此访问者方法的'name'参数被忽略。<i>在调用此注解访问者的其他方法之前，
+   *     必须访问所有数组值</i>。
    */
   public AnnotationVisitor visitArray(final String name) {
     if (av != null) {
@@ -146,7 +141,7 @@ public abstract class AnnotationVisitor {
     return null;
   }
 
-  /** Visits the end of the annotation. */
+  /** 访问注解的结束。 */
   public void visitEnd() {
     if (av != null) {
       av.visitEnd();

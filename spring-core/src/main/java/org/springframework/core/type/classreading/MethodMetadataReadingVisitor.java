@@ -16,16 +16,7 @@
 
 package org.springframework.core.type.classreading;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.asm.AnnotationVisitor;
-import org.springframework.asm.MethodVisitor;
-import org.springframework.asm.Opcodes;
-import org.springframework.asm.SpringAsmInfo;
-import org.springframework.asm.Type;
+import org.springframework.asm.*;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.type.MethodMetadata;
@@ -33,10 +24,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
- * ASM method visitor which looks for the annotations defined on a method,
- * exposing them through the {@link org.springframework.core.type.MethodMetadata}
- * interface.
+ * ASM 方法访问者，用于查找方法上定义的注解，
+ * 并通过 {@link org.springframework.core.type.MethodMetadata} 接口暴露它们。
  *
  * @author Juergen Hoeller
  * @author Mark Pollack
@@ -44,9 +39,9 @@ import org.springframework.util.MultiValueMap;
  * @author Chris Beams
  * @author Phillip Webb
  * @since 3.0
- * @deprecated As of Spring Framework 5.2, this class and related classes in this
- * package have been replaced by {@link SimpleAnnotationMetadataReadingVisitor}
- * and related classes for internal use within the framework.
+ * @deprecated 自 Spring Framework 5.2 起，此类及本包中相关类
+ * 已被 {@link SimpleAnnotationMetadataReadingVisitor} 及其相关类替代，
+ * 仅供框架内部使用。
  */
 @Deprecated
 public class MethodMetadataReadingVisitor extends MethodVisitor implements MethodMetadata {

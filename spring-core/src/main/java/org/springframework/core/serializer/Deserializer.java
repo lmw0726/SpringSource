@@ -21,34 +21,33 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A strategy interface for converting from data in an InputStream to an Object.
+ * 从输入流中的数据转换为对象的策略接口。
  *
  * @author Gary Russell
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @since 3.0.5
- * @param <T> the object type
+ * @param <T> 对象类型
  * @see Serializer
  */
 @FunctionalInterface
 public interface Deserializer<T> {
 
 	/**
-	 * Read (assemble) an object of type T from the given InputStream.
-	 * <p>Note: Implementations should not close the given InputStream
-	 * (or any decorators of that InputStream) but rather leave this up
-	 * to the caller.
-	 * @param inputStream the input stream
-	 * @return the deserialized object
-	 * @throws IOException in case of errors reading from the stream
+	 * 从给定的 InputStream 中读取（组装）类型为 T 的对象。
+	 * <p>注意：实现类不应关闭给定的 InputStream（或其任何装饰者），
+	 * 关闭流的责任应由调用方负责。
+	 * @param inputStream 输入流
+	 * @return 反序列化得到的对象
+	 * @throws IOException 读取流时发生错误
 	 */
 	T deserialize(InputStream inputStream) throws IOException;
 
 	/**
-	 * Read (assemble) an object of type T from the given byte array.
-	 * @param serialized the byte array
-	 * @return the deserialized object
-	 * @throws IOException in case of deserialization failure
+	 * 从给定的字节数组读取（组装）类型为 T 的对象。
+	 * @param serialized 字节数组
+	 * @return 反序列化得到的对象
+	 * @throws IOException 反序列化失败时抛出
 	 * @since 5.2.7
 	 */
 	default T deserializeFromByteArray(byte[] serialized) throws IOException {

@@ -16,25 +16,23 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
 /**
- * {@link LinkedHashMap} subclass representing annotation attribute
- * <em>key-value</em> pairs as read by {@link AnnotationUtils},
- * {@link AnnotatedElementUtils}, and Spring's reflection- and ASM-based
- * {@link org.springframework.core.type.AnnotationMetadata} implementations.
+ * {@link LinkedHashMap} 的子类，代表由 {@link AnnotationUtils}、
+ * {@link AnnotatedElementUtils} 以及 Spring 基于反射和 ASM 的
+ * {@link org.springframework.core.type.AnnotationMetadata} 实现所读取的注解属性
+ * *键值对*。
  *
- * <p>Provides 'pseudo-reification' to avoid noisy Map generics in the calling
- * code as well as convenience methods for looking up annotation attributes
- * in a type-safe fashion.
+ * <p>提供“伪具体化”以避免调用代码中泛型 Map 的噪音，并提供便捷方法以类型安全的方式查找注解属性。
  *
  * @author Chris Beams
  * @author Sam Brannen
@@ -57,7 +55,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 
 
 	/**
-	 * Create a new, empty {@link AnnotationAttributes} instance.
+	 * 创建一个新的、空的 {@link AnnotationAttributes} 实例。
 	 */
 	public AnnotationAttributes() {
 		this.annotationType = null;
@@ -65,9 +63,8 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Create a new, empty {@link AnnotationAttributes} instance with the
-	 * given initial capacity to optimize performance.
-	 * @param initialCapacity initial size of the underlying map
+	 * 创建一个新的、空的 {@link AnnotationAttributes} 实例，具有给定的初始容量以优化性能。
+	 * @param initialCapacity 底层 map 的初始大小
 	 */
 	public AnnotationAttributes(int initialCapacity) {
 		super(initialCapacity);
@@ -76,9 +73,9 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Create a new {@link AnnotationAttributes} instance, wrapping the provided
-	 * map and all its <em>key-value</em> pairs.
-	 * @param map original source of annotation attribute <em>key-value</em> pairs
+	 * 创建一个新的 {@link AnnotationAttributes} 实例，包装提供的
+	 * map 及其所有的 *键值对*。
+	 * @param map 注解属性 *键值对* 的原始来源
 	 * @see #fromMap(Map)
 	 */
 	public AnnotationAttributes(Map<String, Object> map) {
@@ -88,9 +85,9 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Create a new {@link AnnotationAttributes} instance, wrapping the provided
-	 * map and all its <em>key-value</em> pairs.
-	 * @param other original source of annotation attribute <em>key-value</em> pairs
+	 * 创建一个新的 {@link AnnotationAttributes} 实例，包装提供的
+	 * map 及其所有的 *键值对*。
+	 * @param other 注解属性 *键值对* 的原始来源
 	 * @see #fromMap(Map)
 	 */
 	public AnnotationAttributes(AnnotationAttributes other) {
@@ -101,10 +98,8 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Create a new, empty {@link AnnotationAttributes} instance for the
-	 * specified {@code annotationType}.
-	 * @param annotationType the type of annotation represented by this
-	 * {@code AnnotationAttributes} instance; never {@code null}
+	 * 为指定的 {@code annotationType} 创建一个新的、空的 {@link AnnotationAttributes} 实例。
+	 * @param annotationType 此 {@code AnnotationAttributes} 实例所代表的注解类型；永不为 {@code null}
 	 * @since 4.2
 	 */
 	public AnnotationAttributes(Class<? extends Annotation> annotationType) {
@@ -114,12 +109,10 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Create a possibly already validated new, empty
-	 * {@link AnnotationAttributes} instance for the specified
-	 * {@code annotationType}.
-	 * @param annotationType the type of annotation represented by this
-	 * {@code AnnotationAttributes} instance; never {@code null}
-	 * @param validated if the attributes are considered already validated
+	 * 为指定的 {@code annotationType} 创建一个可能已经验证过的新的、空的
+	 * {@link AnnotationAttributes} 实例。
+	 * @param annotationType 此 {@code AnnotationAttributes} 实例所代表的注解类型；永不为 {@code null}
+	 * @param validated 属性是否被认为是已验证的
 	 * @since 5.2
 	 */
 	AnnotationAttributes(Class<? extends Annotation> annotationType, boolean validated) {
@@ -130,12 +123,10 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Create a new, empty {@link AnnotationAttributes} instance for the
-	 * specified {@code annotationType}.
-	 * @param annotationType the annotation type name represented by this
-	 * {@code AnnotationAttributes} instance; never {@code null}
-	 * @param classLoader the ClassLoader to try to load the annotation type on,
-	 * or {@code null} to just store the annotation type name
+	 * 为指定的 {@code annotationType} 创建一个新的、空的 {@link AnnotationAttributes} 实例。
+	 * @param annotationType 此 {@code AnnotationAttributes} 实例所代表的注解类型名称；永不为 {@code null}
+	 * @param classLoader 尝试加载注解类型的 ClassLoader，
+	 * 或为 {@code null} 以仅存储注解类型名称
 	 * @since 4.3.2
 	 */
 	public AnnotationAttributes(String annotationType, @Nullable ClassLoader classLoader) {
@@ -152,7 +143,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 				return (Class<? extends Annotation>) classLoader.loadClass(annotationType);
 			}
 			catch (ClassNotFoundException ex) {
-				// Annotation Class not resolvable
+				// 注解类无法解析
 			}
 		}
 		return null;
@@ -160,8 +151,8 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 
 
 	/**
-	 * Get the type of annotation represented by this {@code AnnotationAttributes}.
-	 * @return the annotation type, or {@code null} if unknown
+	 * 获取此 {@code AnnotationAttributes} 所代表的注解类型。
+	 * @return 注解类型，如果未知则返回 {@code null}
 	 * @since 4.2
 	 */
 	@Nullable
@@ -170,52 +161,43 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Get the value stored under the specified {@code attributeName} as a string.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the value
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 以字符串形式获取在指定 {@code attributeName} 下存储的值。
+	 * @param attributeName 要获取的属性名称；
+	 * 永不为 {@code null} 或空
+	 * @return 值
+	 * @throws IllegalArgumentException 如果属性不存在或
+	 * 如果其类型不是预期类型
 	 */
 	public String getString(String attributeName) {
 		return getRequiredAttribute(attributeName, String.class);
 	}
 
 	/**
-	 * Get the value stored under the specified {@code attributeName} as an
-	 * array of strings.
-	 * <p>If the value stored under the specified {@code attributeName} is
-	 * a string, it will be wrapped in a single-element array before
-	 * returning it.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the value
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 下存储的值，并将其作为字符串数组返回。
+	 * <p>如果存储的值是单个字符串，会在返回前将其包装成单元素数组。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @return 字符串数组
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	public String[] getStringArray(String attributeName) {
 		return getRequiredAttribute(attributeName, String[].class);
 	}
 
 	/**
-	 * Get the value stored under the specified {@code attributeName} as a boolean.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the value
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 下存储的值，并将其作为布尔值返回。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @return 布尔值
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	public boolean getBoolean(String attributeName) {
 		return getRequiredAttribute(attributeName, Boolean.class);
 	}
 
 	/**
-	 * Get the value stored under the specified {@code attributeName} as a number.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the value
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 下存储的值，并将其作为数字类型返回。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @return 数字值
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	@SuppressWarnings("unchecked")
 	public <N extends Number> N getNumber(String attributeName) {
@@ -223,12 +205,10 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Get the value stored under the specified {@code attributeName} as an enum.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the value
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 下存储的值，并将其作为枚举类型返回。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @return 枚举值
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	@SuppressWarnings("unchecked")
 	public <E extends Enum<?>> E getEnum(String attributeName) {
@@ -236,12 +216,10 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Get the value stored under the specified {@code attributeName} as a class.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the value
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 对应的值，并将其作为 Class 类型返回。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @return 属性值（Class 类型）
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> Class<? extends T> getClass(String attributeName) {
@@ -249,44 +227,33 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Get the value stored under the specified {@code attributeName} as an
-	 * array of classes.
-	 * <p>If the value stored under the specified {@code attributeName} is a class,
-	 * it will be wrapped in a single-element array before returning it.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the value
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 对应的值，并将其作为 Class 数组返回。
+	 * <p>如果存储的值是单个 Class，会被包装成单元素数组后返回。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @return 属性值（Class[] 类型）
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	public Class<?>[] getClassArray(String attributeName) {
 		return getRequiredAttribute(attributeName, Class[].class);
 	}
 
 	/**
-	 * Get the {@link AnnotationAttributes} stored under the specified
-	 * {@code attributeName}.
-	 * <p>Note: if you expect an actual annotation, invoke
-	 * {@link #getAnnotation(String, Class)} instead.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the {@code AnnotationAttributes}
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 对应的 {@link AnnotationAttributes}。
+	 * <p>注意：如果你需要的是实际的注解实例，请使用 {@link #getAnnotation(String, Class)}。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @return 对应的 {@code AnnotationAttributes}
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	public AnnotationAttributes getAnnotation(String attributeName) {
 		return getRequiredAttribute(attributeName, AnnotationAttributes.class);
 	}
 
 	/**
-	 * Get the annotation of type {@code annotationType} stored under the
-	 * specified {@code attributeName}.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @param annotationType the expected annotation type; never {@code null}
-	 * @return the annotation
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 对应的注解实例。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @param annotationType 期望的注解类型；不能为空
+	 * @return 注解实例
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 * @since 4.2
 	 */
 	public <A extends Annotation> A getAnnotation(String attributeName, Class<A> annotationType) {
@@ -294,35 +261,25 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Get the array of {@link AnnotationAttributes} stored under the specified
-	 * {@code attributeName}.
-	 * <p>If the value stored under the specified {@code attributeName} is
-	 * an instance of {@code AnnotationAttributes}, it will be wrapped in
-	 * a single-element array before returning it.
-	 * <p>Note: if you expect an actual array of annotations, invoke
-	 * {@link #getAnnotationArray(String, Class)} instead.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @return the array of {@code AnnotationAttributes}
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取指定 {@code attributeName} 对应的 {@link AnnotationAttributes} 数组。
+	 * <p>如果存储的值是单个 {@code AnnotationAttributes} 实例，会被包装成单元素数组后返回。
+	 * <p>注意：如果你需要的是实际的注解数组，请使用 {@link #getAnnotationArray(String, Class)}。
+	 * @param attributeName 要获取的属性名；不能为空或 null
+	 * @return {@code AnnotationAttributes[]} 数组
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	public AnnotationAttributes[] getAnnotationArray(String attributeName) {
 		return getRequiredAttribute(attributeName, AnnotationAttributes[].class);
 	}
 
 	/**
-	 * Get the array of type {@code annotationType} stored under the specified
-	 * {@code attributeName}.
-	 * <p>If the value stored under the specified {@code attributeName} is
-	 * an {@code Annotation}, it will be wrapped in a single-element array
-	 * before returning it.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @param annotationType the expected annotation type; never {@code null}
-	 * @return the annotation array
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取存储在指定 {@code attributeName} 下、类型为 {@code annotationType} 的数组。
+	 * <p>如果在指定 {@code attributeName} 下存储的值是一个 {@code Annotation}，
+	 * 则会在返回前将其包装成单元素数组。
+	 * @param attributeName 要获取的属性名；不能为空或 {@code null}
+	 * @param annotationType 期望的注解类型；不能为空
+	 * @return 注解数组
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 * @since 4.2
 	 */
 	@SuppressWarnings("unchecked")
@@ -332,19 +289,13 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
-	 * Get the value stored under the specified {@code attributeName},
-	 * ensuring that the value is of the {@code expectedType}.
-	 * <p>If the {@code expectedType} is an array and the value stored
-	 * under the specified {@code attributeName} is a single element of the
-	 * component type of the expected array type, the single element will be
-	 * wrapped in a single-element array of the appropriate type before
-	 * returning it.
-	 * @param attributeName the name of the attribute to get;
-	 * never {@code null} or empty
-	 * @param expectedType the expected type; never {@code null}
-	 * @return the value
-	 * @throws IllegalArgumentException if the attribute does not exist or
-	 * if it is not of the expected type
+	 * 获取存储在指定 {@code attributeName} 下的值，并确保该值是 {@code expectedType} 类型。
+	 * <p>如果 {@code expectedType} 是数组类型，而指定 {@code attributeName} 下的值
+	 * 是该数组类型的单个元素，则会在返回前将该元素包装成一个相应类型的单元素数组。
+	 * @param attributeName 要获取的属性名；不能为空或 {@code null}
+	 * @param expectedType 期望的类型；不能为空
+	 * @return 属性值
+	 * @throws IllegalArgumentException 如果属性不存在，或不是期望的类型
 	 */
 	@SuppressWarnings("unchecked")
 	private <T> T getRequiredAttribute(String attributeName, Class<T> expectedType) {
@@ -414,12 +365,12 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 
 
 	/**
-	 * Return an {@link AnnotationAttributes} instance based on the given map.
-	 * <p>If the map is already an {@code AnnotationAttributes} instance, it
-	 * will be cast and returned immediately without creating a new instance.
-	 * Otherwise a new instance will be created by passing the supplied map
-	 * to the {@link #AnnotationAttributes(Map)} constructor.
-	 * @param map original source of annotation attribute <em>key-value</em> pairs
+	 * 根据给定的 Map 返回一个 {@link AnnotationAttributes} 实例。
+	 * <p>如果该 Map 已经是 {@code AnnotationAttributes} 实例，
+	 * 则会直接进行类型转换并立即返回，而不会创建新实例。
+	 * 否则将通过调用 {@link #AnnotationAttributes(Map)} 构造方法，
+	 * 使用提供的 Map 创建一个新的实例。
+	 * @param map 注解属性键值对的原始来源
 	 */
 	@Nullable
 	public static AnnotationAttributes fromMap(@Nullable Map<String, Object> map) {

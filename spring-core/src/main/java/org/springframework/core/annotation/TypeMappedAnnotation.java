@@ -16,56 +16,42 @@
 
 package org.springframework.core.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 /**
- * {@link MergedAnnotation} that adapts attributes from a root annotation by
- * applying the mapping and mirroring rules of an {@link AnnotationTypeMapping}.
+ * {@link MergedAnnotation} 通过应用 {@link AnnotationTypeMapping} 的映射和镜像规则来适配根注解的属性。
  *
- * <p>Root attribute values are extracted from a source object using a supplied
- * {@code BiFunction}. This allows various different annotation models to be
- * supported by the same class. For example, the attributes source might be an
- * actual {@link Annotation} instance where methods on the annotation instance
- * are {@linkplain ReflectionUtils#invokeMethod(Method, Object) invoked} to extract
- * values. Equally, the source could be a simple {@link Map} with values
- * extracted using {@link Map#get(Object)}.
+ * <p>根属性值使用提供的 {@code BiFunction} 从源对象中提取。这使得同一个类可以支持各种不同的注解模型。
+ * 例如，属性源可能是一个实际的 {@link Annotation} 实例，其中注解实例上的方法被 {@linkplain ReflectionUtils#invokeMethod(Method, Object) 调用} 来提取值。
+ * 同样，源也可以是一个简单的 {@link Map}，值通过 {@link Map#get(Object)} 提取。
  *
- * <p>Extracted root attribute values must be compatible with the attribute
- * return type, namely:
+ * <p>提取的根属性值必须与属性返回类型兼容，即：
  *
  * <p><table border="1">
- * <tr><th>Return Type</th><th>Extracted Type</th></tr>
- * <tr><td>Class</td><td>Class or String</td></tr>
- * <tr><td>Class[]</td><td>Class[] or String[]</td></tr>
- * <tr><td>Annotation</td><td>Annotation, Map, or Object compatible with the value
- * extractor</td></tr>
- * <tr><td>Annotation[]</td><td>Annotation[], Map[], or Object[] where elements are
- * compatible with the value extractor</td></tr>
- * <tr><td>Other types</td><td>An exact match or the appropriate primitive wrapper</td></tr>
+ * <tr><th>返回类型</th><th>提取类型</th></tr>
+ * <tr><td>Class</td><td>Class 或 String</td></tr>
+ * <tr><td>Class[]</td><td>Class[] 或 String[]</td></tr>
+ * <tr><td>Annotation</td><td>Annotation, Map, 或与值提取器兼容的 Object</td></tr>
+ * <tr><td>Annotation[]</td><td>Annotation[], Map[], 或 Object[]，其中元素与值提取器兼容</td></tr>
+ * <tr><td>其他类型</td><td>完全匹配或适当的基本类型包装器</td></tr>
  * </table>
  *
  * @author Phillip Webb
  * @author Juergen Hoeller
  * @author Sam Brannen
  * @since 5.2
- * @param <A> the annotation type
+ * @param <A> 注解类型
  * @see TypeMappedAnnotations
  */
 final class TypeMappedAnnotation<A extends Annotation> extends AbstractMergedAnnotation<A> {
@@ -336,7 +322,7 @@ final class TypeMappedAnnotation<A extends Annotation> extends AbstractMergedAnn
 	}
 
 	private boolean isSynthesizable() {
-		// Already synthesized?
+		// 已经合成？
 		if (this.rootAttributes instanceof SynthesizedAnnotation) {
 			return false;
 		}

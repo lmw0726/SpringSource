@@ -16,24 +16,17 @@
 
 package org.springframework.lang;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
+import java.lang.annotation.*;
 
 /**
- * A common Spring annotation to declare that parameters and return values
- * are to be considered as non-nullable by default for a given package.
+ * Spring通用注解，用于声明给定包下的参数和返回值默认应视为非空。
  *
- * <p>Leverages JSR-305 meta-annotations to indicate nullability in Java to common
- * tools with JSR-305 support and used by Kotlin to infer nullability of Spring API.
+ * <p>利用JSR-305元注解在Java中向支持JSR-305的通用工具指示空值约束，
+ * 并被Kotlin用于推断Spring API的可空性。
  *
- * <p>Should be used at package level in association with {@link Nullable}
- * annotations at parameter and return value level.
+ * <p>应在包级别使用，并与参数和返回值级别的{@link Nullable}注解配合使用。
  *
  * @author Sebastien Deleuze
  * @author Juergen Hoeller

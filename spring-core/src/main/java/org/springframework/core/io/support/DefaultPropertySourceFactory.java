@@ -16,14 +16,14 @@
 
 package org.springframework.core.io.support;
 
-import java.io.IOException;
-
 import org.springframework.core.env.PropertySource;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+
 /**
- * The default implementation for {@link PropertySourceFactory},
- * wrapping every resource in a {@link ResourcePropertySource}.
+ * {@link PropertySourceFactory} 的默认实现，
+ * 将每个资源封装为 {@link ResourcePropertySource}。
  *
  * @author Juergen Hoeller
  * @since 4.3

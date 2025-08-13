@@ -16,25 +16,20 @@
 
 package org.springframework.util.xml;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.*;
+import org.xml.sax.ContentHandler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Element;
-import org.w3c.dom.EntityReference;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.ContentHandler;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Convenience methods for working with the DOM API,
- * in particular for working with DOM Nodes and DOM Elements.
+ * 提供操作DOM API的便捷方法，
+ * 特别是用于操作DOM节点和DOM元素。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -127,10 +122,11 @@ public abstract class DomUtils {
 	}
 
 	/**
-	 * Retrieves all child elements of the given DOM element.
+	 * 获取给定DOM元素的所有子元素。
 	 *
-	 * @param ele the DOM element to analyze
-	 * @return a List of child {@code org.w3c.dom.Element} instances
+	 * @param ele 要分析的DOM元素
+	 * @return 包含所有子元素{@code org.w3c.dom.Element}实例的列表
+	 * @throws IllegalArgumentException 如果元素为null
 	 */
 	public static List<Element> getChildElements(Element ele) {
 		Assert.notNull(ele, "Element must not be null");
@@ -171,9 +167,14 @@ public abstract class DomUtils {
 	}
 
 	/**
-	 * Namespace-aware equals comparison. Returns {@code true} if either
-	 * {@link Node#getLocalName} or {@link Node#getNodeName} equals
-	 * {@code desiredName}, otherwise returns {@code false}.
+	 * 支持命名空间的节点名称比较。如果{@link Node#getLocalName}或
+	 * {@link Node#getNodeName}等于{@code desiredName}则返回{@code true}，
+	 * 否则返回{@code false}。
+	 *
+	 * @param node 要比较的节点
+	 * @param desiredName 期望匹配的名称
+	 * @return 名称是否匹配
+	 * @throws IllegalArgumentException 如果节点或名称为null
 	 */
 	public static boolean nodeNameEquals(Node node, String desiredName) {
 		Assert.notNull(node, "Node must not be null");
@@ -182,10 +183,10 @@ public abstract class DomUtils {
 	}
 
 	/**
-	 * Returns a SAX {@code ContentHandler} that transforms callback calls to DOM {@code Node}s.
+	 * 创建一个将SAX回调事件转换为DOM {@code Node}的SAX {@code ContentHandler}。
 	 *
-	 * @param node the node to publish events to
-	 * @return the content handler
+	 * @param node 要接收事件的DOM节点
+	 * @return 内容处理器实例
 	 */
 	public static ContentHandler createContentHandler(Node node) {
 		return new DomContentHandler(node);

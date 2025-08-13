@@ -16,10 +16,6 @@
 
 package org.springframework.core.type;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Map;
-
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
@@ -28,9 +24,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Map;
+
 /**
- * {@link MethodMetadata} implementation that uses standard reflection
- * to introspect a given {@code Method}.
+ * {@link MethodMetadata} 的实现，使用标准反射机制来分析给定的 {@code Method}。
  *
  * @author Juergen Hoeller
  * @author Mark Pollack
@@ -49,9 +48,9 @@ public class StandardMethodMetadata implements MethodMetadata {
 
 
 	/**
-	 * Create a new StandardMethodMetadata wrapper for the given Method.
-	 * @param introspectedMethod the Method to introspect
-	 * @deprecated since 5.2 in favor of obtaining instances via {@link AnnotationMetadata}
+	 * 为给定的方法创建一个新的 StandardMethodMetadata 包装器。
+	 * @param introspectedMethod 要分析的方法
+	 * @deprecated 自 5.2 起，推荐通过 {@link AnnotationMetadata} 获取实例
 	 */
 	@Deprecated
 	public StandardMethodMetadata(Method introspectedMethod) {
@@ -59,16 +58,15 @@ public class StandardMethodMetadata implements MethodMetadata {
 	}
 
 	/**
-	 * Create a new StandardMethodMetadata wrapper for the given Method,
-	 * providing the option to return any nested annotations or annotation arrays in the
-	 * form of {@link org.springframework.core.annotation.AnnotationAttributes} instead
-	 * of actual {@link java.lang.annotation.Annotation} instances.
-	 * @param introspectedMethod the Method to introspect
-	 * @param nestedAnnotationsAsMap return nested annotations and annotation arrays as
-	 * {@link org.springframework.core.annotation.AnnotationAttributes} for compatibility
-	 * with ASM-based {@link AnnotationMetadata} implementations
+	 * 为给定的方法创建一个新的 StandardMethodMetadata 包装器，
+	 * 并可选择将任何嵌套注解或注解数组以
+	 * {@link org.springframework.core.annotation.AnnotationAttributes} 形式返回，
+	 * 而非实际的 {@link java.lang.annotation.Annotation} 实例。
+	 * @param introspectedMethod 要分析的方法
+	 * @param nestedAnnotationsAsMap 是否将嵌套注解和注解数组作为 {@link org.springframework.core.annotation.AnnotationAttributes} 返回，
+	 * 以兼容基于 ASM 的 {@link AnnotationMetadata} 实现
 	 * @since 3.1.1
-	 * @deprecated since 5.2 in favor of obtaining instances via {@link AnnotationMetadata}
+	 * @deprecated 自 5.2 起，推荐通过 {@link AnnotationMetadata} 获取实例
 	 */
 	@Deprecated
 	public StandardMethodMetadata(Method introspectedMethod, boolean nestedAnnotationsAsMap) {
@@ -86,7 +84,7 @@ public class StandardMethodMetadata implements MethodMetadata {
 	}
 
 	/**
-	 * Return the underlying Method.
+	 * 返回底层的 Method 对象。
 	 */
 	public final Method getIntrospectedMethod() {
 		return this.introspectedMethod;

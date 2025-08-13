@@ -16,42 +16,37 @@
 
 package org.springframework.cglib.core;
 
-import java.lang.reflect.Method;
-import java.security.ProtectionDomain;
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.Label;
 import org.springframework.asm.Type;
 import org.springframework.cglib.core.internal.CustomizerRegistry;
 
+import java.lang.reflect.Method;
+import java.security.ProtectionDomain;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Generates classes to handle multi-valued keys, for use in things such as Maps and Sets.
- * Code for <code>equals</code> and <code>hashCode</code> methods follow the
- * the rules laid out in <i>Effective Java</i> by Joshua Bloch.
+ * 生成用于处理多值键的类，适用于 Map 和 Set 等场景。
+ * <code>equals</code> 和 <code>hashCode</code> 方法遵循 Joshua Bloch 的《Effective Java》中的规则。
  * <p>
- * To generate a <code>KeyFactory</code>, you need to supply an interface which
- * describes the structure of the key. The interface should have a
- * single method named <code>newInstance</code>, which returns an
- * <code>Object</code>. The arguments array can be
- * <i>anything</i>--Objects, primitive values, or single or
- * multi-dimension arrays of either. For example:
+ * 要生成一个 <code>KeyFactory</code>，需要提供一个描述键结构的接口。
+ * 该接口应包含一个名为 <code>newInstance</code> 的单一方法，返回类型为 <code>Object</code>。
+ * 该方法的参数可以是任意类型——对象、基本类型，或它们的单维或多维数组。例如：
  * <p><pre>
  *     private interface IntStringKey {
  *         public Object newInstance(int i, String s);
  *     }
  * </pre><p>
- * Once you have made a <code>KeyFactory</code>, you generate a new key by calling
- * the <code>newInstance</code> method defined by your interface.
+ * 创建了 <code>KeyFactory</code> 后，可以通过调用接口定义的 <code>newInstance</code> 方法来生成新的键。
  * <p><pre>
  *     IntStringKey factory = (IntStringKey)KeyFactory.create(IntStringKey.class);
  *     Object key1 = factory.newInstance(4, "Hello");
  *     Object key2 = factory.newInstance(4, "World");
  * </pre><p>
- * <b>Note:</b>
- * <code>hashCode</code> equality between two keys <code>key1</code> and <code>key2</code> is only guaranteed if
- * <code>key1.equals(key2)</code> <i>and</i> the keys were produced by the same factory.
+ * <b>注意：</b>
+ * 只有当两个键 <code>key1</code> 和 <code>key2</code> 满足 <code>key1.equals(key2)</code> 且
+ * 它们由同一个工厂生产时，才保证它们的 <code>hashCode</code> 相等。
  * @version $Id: KeyFactory.java,v 1.26 2006/03/05 02:43:19 herbyderby Exp $
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -81,7 +76,7 @@ abstract public class KeyFactory {
 	private static final Signature GET_SORT =
 			TypeUtils.parseSignature("int getSort()");
 
-	//generated numbers:
+	// 生成的数字:
 	private final static int PRIMES[] = {
 			11, 73, 179, 331,
 			521, 787, 1213, 1823,
@@ -121,8 +116,8 @@ abstract public class KeyFactory {
 	};
 
 	/**
-	 * {@link Type#hashCode()} is very expensive as it traverses full descriptor to calculate hash code.
-	 * This customizer uses {@link Type#getSort()} as a hash code.
+	 * {@link Type#hashCode()} 方法非常耗费性能，因为它需要遍历完整的描述符来计算哈希值。
+	 * 此定制器改用 {@link Type#getSort()} 作为哈希码。
 	 */
 	public static final HashCodeCustomizer HASH_ASM_TYPE = new HashCodeCustomizer() {
 		public boolean customize(CodeEmitter e, Type type) {
@@ -135,8 +130,9 @@ abstract public class KeyFactory {
 	};
 
 	/**
-	 * @deprecated this customizer might result in unexpected class leak since key object still holds a strong reference to the Object and class.
-	 * It is recommended to have pre-processing method that would strip Objects and represent Classes as Strings
+	 * @deprecated 该定制器可能导致意外的类泄漏，
+	 * 因为键对象仍然对对象和类持有强引用。
+	 * 建议在预处理阶段去除对象，并将类表示为字符串。
 	 */
 	@Deprecated
 	public static final Customizer OBJECT_BY_CLASS = new Customizer() {
@@ -168,9 +164,9 @@ abstract public class KeyFactory {
 			List<KeyFactoryCustomizer> next) {
 		Generator gen = new Generator();
 		gen.setInterface(keyInterface);
-		// SPRING PATCH BEGIN
+		// SPRING补丁开始
 		gen.setContextClass(keyInterface);
-		// SPRING PATCH END
+		// SPRING补丁结束
 
 		if (customizer != null) {
 			gen.addCustomizer(customizer);
@@ -193,7 +189,7 @@ abstract public class KeyFactory {
 
 		private Class keyInterface;
 
-		// TODO: Make me final when deprecated methods are removed
+		// TODO: 当废弃方法被移除后，将此变量设为 final
 		private CustomizerRegistry customizers = new CustomizerRegistry(KNOWN_CUSTOMIZER_TYPES);
 
 		private int constant;
@@ -213,7 +209,7 @@ abstract public class KeyFactory {
 		}
 
 		/**
-		 * @deprecated Use {@link #addCustomizer(KeyFactoryCustomizer)} instead.
+		 * @deprecated 请使用 {@link #addCustomizer(KeyFactoryCustomizer)} 方法代替。
 		 */
 		@Deprecated
 		public void setCustomizer(Customizer customizer) {

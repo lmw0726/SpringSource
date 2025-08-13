@@ -30,15 +30,15 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
 /**
- * Subclass of {@link UrlResource} which assumes file resolution, to the degree
- * of implementing the {@link WritableResource} interface for it. This resource
- * variant also caches resolved {@link File} handles from {@link #getFile()}.
+ * {@link UrlResource} 的子类，假定为文件解析，
+ * 并为其实现了 {@link WritableResource} 接口。
+ * 该资源变体还缓存了从 {@link #getFile()} 解析出的 {@link File} 句柄。
  *
- * <p>This is the class resolved by {@link DefaultResourceLoader} for a "file:..."
- * URL location, allowing a downcast to {@link WritableResource} for it.
+ * <p>这是 {@link DefaultResourceLoader} 针对 "file:..." URL 位置解析出的类，
+ * 允许将其向下转换为 {@link WritableResource}。
  *
- * <p>Alternatively, for direct construction from a {@link java.io.File} handle
- * or NIO {@link java.nio.file.Path}, consider using {@link FileSystemResource}.
+ * <p>或者，若直接从 {@link java.io.File} 句柄或 NIO 的 {@link java.nio.file.Path} 构造，
+ * 可考虑使用 {@link FileSystemResource}。
  *
  * @author Juergen Hoeller
  * @since 5.0.2

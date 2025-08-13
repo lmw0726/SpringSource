@@ -16,18 +16,17 @@
 
 package org.springframework.core.codec;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
- * Constants and convenience methods for working with hints.
+ * 用于处理提示的常量和便捷方法。
  *
  * @author Rossen Stoyanchev
  * @since 5.1
@@ -36,43 +35,42 @@ import org.springframework.util.CollectionUtils;
 public abstract class Hints {
 
 	/**
-	 * Name of hint exposing a prefix to use for correlating log messages.
+	 * 提示的名称，用于暴露一个前缀以关联日志消息。
 	 */
 	public static final String LOG_PREFIX_HINT = Log.class.getName() + ".PREFIX";
 
 	/**
-	 * Name of boolean hint whether to avoid logging data either because it's
-	 * potentially sensitive, or because it has been logged by a composite
-	 * encoder, e.g. for multipart requests.
+	 * 布尔类型提示的名称，用于指示是否应避免记录数据，可能是因为数据具有潜在敏感性，
+	 * 或者因为它已被复合编码器（例如用于 multipart 请求的编码器）记录。
 	 */
 	public static final String SUPPRESS_LOGGING_HINT = Log.class.getName() + ".SUPPRESS_LOGGING";
 
 
 	/**
-	 * Create a map wit a single hint via {@link Collections#singletonMap}.
-	 * @param hintName the hint name
-	 * @param value the hint value
-	 * @return the created map
+	 * 通过 {@link Collections#singletonMap} 创建一个包含单个提示的 Map。
+	 * @param hintName 提示名称
+	 * @param value 提示值
+	 * @return 创建的 Map
 	 */
 	public static Map<String, Object> from(String hintName, Object value) {
 		return Collections.singletonMap(hintName, value);
 	}
 
 	/**
-	 * Return an empty map of hints via {@link Collections#emptyMap()}.
-	 * @return the empty map
+	 * 通过 {@link Collections#emptyMap()} 返回一个空的提示 Map。
+	 * @return 空的 Map
 	 */
 	public static Map<String, Object> none() {
 		return Collections.emptyMap();
 	}
 
 	/**
-	 * Obtain the value for a required hint.
-	 * @param hints the hints map
-	 * @param hintName the required hint name
-	 * @param <T> the hint type to cast to
-	 * @return the hint value
-	 * @throws IllegalArgumentException if the hint is not found
+	 * 获取所需提示的值。
+	 * @param hints 提示 Map
+	 * @param hintName 所需提示的名称
+	 * @param <T> 要强制转换的提示类型
+	 * @return 提示值
+	 * @throws IllegalArgumentException 如果未找到提示
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getRequiredHint(@Nullable Map<String, Object> hints, String hintName) {
@@ -87,29 +85,29 @@ public abstract class Hints {
 	}
 
 	/**
-	 * Obtain the hint {@link #LOG_PREFIX_HINT}, if present, or an empty String.
-	 * @param hints the hints passed to the encode method
-	 * @return the log prefix
+	 * 获取提示 {@link #LOG_PREFIX_HINT} 的值，如果存在则返回，否则返回空字符串。
+	 * @param hints 传递给 encode 方法的提示
+	 * @return 日志前缀
 	 */
 	public static String getLogPrefix(@Nullable Map<String, Object> hints) {
 		return (hints != null ? (String) hints.getOrDefault(LOG_PREFIX_HINT, "") : "");
 	}
 
 	/**
-	 * Whether to suppress logging based on the hint {@link #SUPPRESS_LOGGING_HINT}.
-	 * @param hints the hints map
-	 * @return whether logging of data is allowed
+	 * 是否根据提示 {@link #SUPPRESS_LOGGING_HINT} 抑制日志记录。
+	 * @param hints 提示 Map
+	 * @return 是否允许记录数据
 	 */
 	public static boolean isLoggingSuppressed(@Nullable Map<String, Object> hints) {
 		return (hints != null && (boolean) hints.getOrDefault(SUPPRESS_LOGGING_HINT, false));
 	}
 
 	/**
-	 * Merge two maps of hints, creating and copying into a new map if both have
-	 * values, or returning the non-empty map, or an empty map if both are empty.
-	 * @param hints1 1st map of hints
-	 * @param hints2 2nd map of hints
-	 * @return a single map with hints from both
+	 * 合并两个提示 Map，如果两者都有值，则创建并复制到一个新的 Map 中；
+	 * 如果其中一个非空，则返回非空的那个 Map；如果两者都为空，则返回一个空 Map。
+	 * @param hints1 第一个提示 Map
+	 * @param hints2 第二个提示 Map
+	 * @return 包含来自两个 Map 的提示的单个 Map
 	 */
 	public static Map<String, Object> merge(Map<String, Object> hints1, Map<String, Object> hints2) {
 		if (hints1.isEmpty() && hints2.isEmpty()) {
@@ -130,13 +128,12 @@ public abstract class Hints {
 	}
 
 	/**
-	 * Merge a single hint into a map of hints, possibly creating and copying
-	 * all hints into a new map, or otherwise if the map of hints is empty,
-	 * creating a new single entry map.
-	 * @param hints a map of hints to be merge
-	 * @param hintName the hint name to merge
-	 * @param hintValue the hint value to merge
-	 * @return a single map with all hints
+	 * 将单个提示合并到一个提示 Map 中，可能创建并复制所有提示到一个新的 Map，
+	 * 或者如果提示 Map 为空，则创建一个新的单条目 Map。
+	 * @param hints 要合并的提示 Map
+	 * @param hintName 要合并的提示名称
+	 * @param hintValue 要合并的提示值
+	 * @return 包含所有提示的单个 Map
 	 */
 	public static Map<String, Object> merge(Map<String, Object> hints, String hintName, Object hintValue) {
 		if (hints.isEmpty()) {
@@ -151,12 +148,11 @@ public abstract class Hints {
 	}
 
 	/**
-	 * If the hints contain a {@link #LOG_PREFIX_HINT} and the given logger has
-	 * DEBUG level enabled, apply the log prefix as a hint to the given buffer
-	 * via {@link DataBufferUtils#touch(DataBuffer, Object)}.
-	 * @param buffer the buffer to touch
-	 * @param hints the hints map to check for a log prefix
-	 * @param logger the logger whose level to check
+	 * 如果提示包含 {@link #LOG_PREFIX_HINT} 并且给定日志器已启用 DEBUG 级别，
+	 * 则通过 {@link DataBufferUtils#touch(DataBuffer, Object)} 将日志前缀作为提示应用于给定缓冲区。
+	 * @param buffer 要处理的缓冲区
+	 * @param hints 用于检查日志前缀的提示 Map
+	 * @param logger 要检查其级别的日志器
 	 * @since 5.3.2
 	 */
 	public static void touchDataBuffer(DataBuffer buffer, @Nullable Map<String, Object> hints, Log logger) {

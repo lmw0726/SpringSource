@@ -23,37 +23,36 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Simple implementation of {@link MultiValueMap} that wraps a {@link LinkedHashMap},
- * storing multiple values in an {@link ArrayList}.
+ * {@link MultiValueMap}的简单实现，包装了一个{@link LinkedHashMap}，
+ * 使用{@link ArrayList}存储多个值。
  *
- * <p>This Map implementation is generally not thread-safe. It is primarily designed
- * for data structures exposed from request objects, for use in a single thread only.
+ * <p>此Map实现通常不是线程安全的。它主要设计用于从请求对象暴露的数据结构，
+ * 仅在单线程中使用。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @since 3.0
- * @param <K> the key type
- * @param <V> the value element type
+ * @param <K> 键类型
+ * @param <V> 值元素类型
  */
-public class LinkedMultiValueMap<K, V> extends MultiValueMapAdapter<K, V>  // new public base class in 5.3
+public class LinkedMultiValueMap<K, V> extends MultiValueMapAdapter<K, V>  // 5.3新增的公共基类
 		implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 3801124242820219131L;
 
 
 	/**
-	 * Create a new LinkedMultiValueMap that wraps a {@link LinkedHashMap}.
+	 * 创建一个包装{@link LinkedHashMap}的新LinkedMultiValueMap。
 	 */
 	public LinkedMultiValueMap() {
 		super(new LinkedHashMap<>());
 	}
 
 	/**
-	 * Create a new LinkedMultiValueMap that wraps a {@link LinkedHashMap}
-	 * with an initial capacity that can accommodate the specified number of
-	 * elements without any immediate resize/rehash operations to be expected.
-	 * @param expectedSize the expected number of elements (with a corresponding
-	 * capacity to be derived so that no resize/rehash operations are needed)
+	 * 创建一个包装{@link LinkedHashMap}的新LinkedMultiValueMap，
+	 * 初始容量可容纳指定数量的元素，无需立即调整大小/重新哈希。
+	 * @param expectedSize 预期元素数量（对应容量将据此计算，
+	 * 以确保不需要调整大小/重新哈希操作）
 	 * @see CollectionUtils#newLinkedHashMap(int)
 	 */
 	public LinkedMultiValueMap(int expectedSize) {
@@ -61,10 +60,9 @@ public class LinkedMultiValueMap<K, V> extends MultiValueMapAdapter<K, V>  // ne
 	}
 
 	/**
-	 * Copy constructor: Create a new LinkedMultiValueMap with the same mappings as
-	 * the specified Map. Note that this will be a shallow copy; its value-holding
-	 * List entries will get reused and therefore cannot get modified independently.
-	 * @param otherMap the Map whose mappings are to be placed in this Map
+	 * 拷贝构造函数：创建一个与指定Map具有相同映射的新LinkedMultiValueMap。
+	 * 注意这是浅拷贝；其值持有的List条目将被重用，因此无法独立修改。
+	 * @param otherMap 要将其映射放入此Map的Map
 	 * @see #clone()
 	 * @see #deepCopy()
 	 */
@@ -74,10 +72,10 @@ public class LinkedMultiValueMap<K, V> extends MultiValueMapAdapter<K, V>  // ne
 
 
 	/**
-	 * Create a deep copy of this Map.
-	 * @return a copy of this Map, including a copy of each value-holding List entry
-	 * (consistently using an independent modifiable {@link ArrayList} for each entry)
-	 * along the lines of {@code MultiValueMap.addAll} semantics
+	 * 创建此Map的深拷贝。
+	 * @return 此Map的拷贝，包括每个值持有的List条目的拷贝
+	 * （每个条目都使用独立的可修改{@link ArrayList}），
+	 * 遵循{@code MultiValueMap.addAll}语义
 	 * @since 4.2
 	 * @see #addAll(MultiValueMap)
 	 * @see #clone()
@@ -89,10 +87,10 @@ public class LinkedMultiValueMap<K, V> extends MultiValueMapAdapter<K, V>  // ne
 	}
 
 	/**
-	 * Create a regular copy of this Map.
-	 * @return a shallow copy of this Map, reusing this Map's value-holding List entries
-	 * (even if some entries are shared or unmodifiable) along the lines of standard
-	 * {@code Map.put} semantics
+	 * 创建此Map的常规拷贝。
+	 * @return 此Map的浅拷贝，重用此Map的值持有List条目
+	 * （即使某些条目是共享或不可修改的），
+	 * 遵循标准{@code Map.put}语义
 	 * @since 4.2
 	 * @see #put(Object, List)
 	 * @see #putAll(Map)

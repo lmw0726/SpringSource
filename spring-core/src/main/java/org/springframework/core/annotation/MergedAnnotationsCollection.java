@@ -16,6 +16,9 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Iterator;
@@ -26,12 +29,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * {@link MergedAnnotations} implementation backed by a {@link Collection} of
- * {@link MergedAnnotation} instances that represent direct annotations.
+ * {@link MergedAnnotations} 实现，由代表直接注解的 {@link MergedAnnotation} 实例的 {@link Collection} 支持。
  *
  * @author Phillip Webb
  * @since 5.2

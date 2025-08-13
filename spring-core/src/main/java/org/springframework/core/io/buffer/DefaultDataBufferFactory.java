@@ -16,15 +16,15 @@
 
 package org.springframework.core.io.buffer;
 
-import java.nio.ByteBuffer;
-import java.util.List;
 
 import org.springframework.util.Assert;
 
+import java.nio.ByteBuffer;
+import java.util.List;
+
 /**
- * Default implementation of the {@code DataBufferFactory} interface. Allows for
- * specification of the default initial capacity at construction time, as well
- * as whether heap-based or direct buffers are to be preferred.
+ * {@code DataBufferFactory} 接口的默认实现。允许在构造时指定默认初始容量，
+ * 以及优先使用基于堆的缓冲区还是直接缓冲区。
  *
  * @author Arjen Poutsma
  * @since 5.0
@@ -32,14 +32,14 @@ import org.springframework.util.Assert;
 public class DefaultDataBufferFactory implements DataBufferFactory {
 
 	/**
-	 * The default capacity when none is specified.
+	 * 未指定时的默认容量。
 	 * @see #DefaultDataBufferFactory()
 	 * @see #DefaultDataBufferFactory(boolean)
 	 */
 	public static final int DEFAULT_INITIAL_CAPACITY = 256;
 
 	/**
-	 * Shared instance based on the default constructor.
+	 * 基于默认构造函数的共享实例。
 	 * @since 5.3
 	 */
 	public static final DefaultDataBufferFactory sharedInstance = new DefaultDataBufferFactory();
@@ -51,7 +51,7 @@ public class DefaultDataBufferFactory implements DataBufferFactory {
 
 
 	/**
-	 * Creates a new {@code DefaultDataBufferFactory} with default settings.
+	 * 创建一个使用默认设置的 {@code DefaultDataBufferFactory}。
 	 * @see #sharedInstance
 	 */
 	public DefaultDataBufferFactory() {
@@ -59,23 +59,18 @@ public class DefaultDataBufferFactory implements DataBufferFactory {
 	}
 
 	/**
-	 * Creates a new {@code DefaultDataBufferFactory}, indicating whether direct
-	 * buffers should be created by {@link #allocateBuffer()} and
-	 * {@link #allocateBuffer(int)}.
-	 * @param preferDirect {@code true} if direct buffers are to be preferred;
-	 * {@code false} otherwise
+	 * 创建一个 {@code DefaultDataBufferFactory}，指明 {@link #allocateBuffer()} 和
+	 * {@link #allocateBuffer(int)} 是否应创建直接缓冲区。
+	 * @param preferDirect 如果优先使用直接缓冲区则为 {@code true}，否则为 {@code false}
 	 */
 	public DefaultDataBufferFactory(boolean preferDirect) {
 		this(preferDirect, DEFAULT_INITIAL_CAPACITY);
 	}
 
 	/**
-	 * Creates a new {@code DefaultDataBufferFactory}, indicating whether direct
-	 * buffers should be created by {@link #allocateBuffer()} and
-	 * {@link #allocateBuffer(int)}, and what the capacity is to be used for
-	 * {@link #allocateBuffer()}.
-	 * @param preferDirect {@code true} if direct buffers are to be preferred;
-	 * {@code false} otherwise
+	 * 创建一个 {@code DefaultDataBufferFactory}，指明 {@link #allocateBuffer()} 和
+	 * {@link #allocateBuffer(int)} 是否应创建直接缓冲区，以及 {@link #allocateBuffer()} 使用的容量。
+	 * @param preferDirect 如果优先使用直接缓冲区则为 {@code true}，否则为 {@code false}
 	 */
 	public DefaultDataBufferFactory(boolean preferDirect, int defaultInitialCapacity) {
 		Assert.isTrue(defaultInitialCapacity > 0, "'defaultInitialCapacity' should be larger than 0");
@@ -109,8 +104,7 @@ public class DefaultDataBufferFactory implements DataBufferFactory {
 
 	/**
 	 * {@inheritDoc}
-	 * <p>This implementation creates a single {@link DefaultDataBuffer}
-	 * to contain the data in {@code dataBuffers}.
+	 * <p>此实现创建一个单独的 {@link DefaultDataBuffer} 来包含 {@code dataBuffers} 中的数据。
 	 */
 	@Override
 	public DefaultDataBuffer join(List<? extends DataBuffer> dataBuffers) {

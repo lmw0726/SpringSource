@@ -16,23 +16,18 @@
 
 package org.springframework.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import org.springframework.lang.Nullable;
 
+import java.io.*;
+
 /**
- * Static utilities for serialization and deserialization using
+ * 用于序列化和反序列化的静态工具类，使用
  * <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/serialization/"
- * target="_blank">Java Object Serialization</a>.
+ * target="_blank">Java 对象序列化</a>。
  *
- * <p><strong>WARNING</strong>: These utilities should be used with caution. See
+ * <p><strong>警告</strong>：这些工具应谨慎使用。详情参见
  * <a href="https://www.oracle.com/java/technologies/javase/seccodeguide.html#8"
- * target="_blank">Secure Coding Guidelines for the Java Programming Language</a>
- * for details.
+ * target="_blank">Java 编程语言安全编码指南</a>。
  *
  * @author Dave Syer
  * @author Loïc Ledoyen
@@ -42,9 +37,9 @@ import org.springframework.lang.Nullable;
 public abstract class SerializationUtils {
 
 	/**
-	 * Serialize the given object to a byte array.
-	 * @param object the object to serialize
-	 * @return an array of bytes representing the object in a portable fashion
+	 * 将给定对象序列化为字节数组。
+	 * @param object 要序列化的对象
+	 * @return 以可移植方式表示对象的字节数组
 	 */
 	@Nullable
 	public static byte[] serialize(@Nullable Object object) {
@@ -63,15 +58,13 @@ public abstract class SerializationUtils {
 	}
 
 	/**
-	 * Deserialize the byte array into an object.
-	 * <p><strong>WARNING</strong>: This utility will be deprecated in Spring
-	 * Framework 6.0 since it uses Java Object Serialization, which allows arbitrary
-	 * code to be run and is known for being the source of many Remote Code Execution
-	 * (RCE) vulnerabilities. Prefer the use of an external tool (that serializes
-	 * to JSON, XML, or any other format) which is regularly checked and updated
-	 * for not allowing RCE.
-	 * @param bytes a serialized object
-	 * @return the result of deserializing the bytes
+	 * 将字节数组反序列化为对象。
+	 * <p><strong>警告</strong>：此工具在 Spring Framework 6.0 中将被废弃，
+	 * 因为它使用 Java 对象序列化，允许运行任意代码，并且是许多远程代码执行
+	 * (RCE) 漏洞的来源。建议使用外部工具（序列化为 JSON、XML 或其他格式），
+	 * 并定期检查更新以防止 RCE。
+	 * @param bytes 序列化的对象字节数组
+	 * @return 反序列化后的对象
 	 */
 	@Nullable
 	public static Object deserialize(@Nullable byte[] bytes) {

@@ -31,51 +31,37 @@ import java.lang.reflect.*;
 import java.util.*;
 
 /**
- * General utility methods for working with annotations, handling meta-annotations,
- * bridge methods (which the compiler generates for generic declarations) as well
- * as super methods (for optional <em>annotation inheritance</em>).
+ * 用于处理注解、元注解、桥接方法（编译器为泛型声明生成的）以及
+ * 超类方法（用于可选的 <em>注解继承</em>）的通用工具方法。
  *
- * <p>Note that most of the features of this class are not provided by the
- * JDK's introspection facilities themselves.
+ * <p>请注意，此类的大多数功能不是由 JDK 的自省机制本身提供的。
  *
- * <p>As a general rule for runtime-retained application annotations (e.g. for
- * transaction control, authorization, or service exposure), always use the
- * lookup methods on this class (e.g. {@link #findAnnotation(Method, Class)} or
- * {@link #getAnnotation(Method, Class)}) instead of the plain annotation lookup
- * methods in the JDK. You can still explicitly choose between a <em>get</em>
- * lookup on the given class level only ({@link #getAnnotation(Method, Class)})
- * and a <em>find</em> lookup in the entire inheritance hierarchy of the given
- * method ({@link #findAnnotation(Method, Class)}).
+ * <p>对于运行时保留的应用程序注解（例如用于事务控制、授权或服务暴露），
+ * 一般规则是始终使用此类的查找方法（例如 {@link #findAnnotation(Method, Class)} 或
+ * {@link #getAnnotation(Method, Class)}），而不是 JDK 中普通的注解查找方法。
+ * 您仍然可以显式选择仅在给定类级别进行 <em>获取</em> 查找（{@link #getAnnotation(Method, Class)}）
+ * 和在给定方法的整个继承层次结构中进行 <em>查找</em> 查找（{@link #findAnnotation(Method, Class)}）。
  *
- * <h3>Terminology</h3>
- * The terms <em>directly present</em>, <em>indirectly present</em>, and
- * <em>present</em> have the same meanings as defined in the class-level
- * javadoc for {@link AnnotatedElement} (in Java 8).
+ * <h3>术语</h3>
+ * 术语 <em>直接存在</em>、<em>间接存在</em> 和 <em>存在</em> 的含义与
+ * {@link AnnotatedElement}（在 Java 8 中）类级别 javadoc 中定义的含义相同。
  *
- * <p>An annotation is <em>meta-present</em> on an element if the annotation
- * is declared as a meta-annotation on some other annotation which is
- * <em>present</em> on the element. Annotation {@code A} is <em>meta-present</em>
- * on another annotation if {@code A} is either <em>directly present</em> or
- * <em>meta-present</em> on the other annotation.
+ * <p>如果注解在作为元素上 <em>存在</em> 的其他注解上被声明为元注解，则该注解在元素上是 <em>元存在</em> 的。
+ * 如果注解 {@code A} 在另一个注解上 <em>直接存在</em> 或 <em>元存在</em>，则注解 {@code A} 在另一个注解上是 <em>元存在</em> 的。
  *
- * <h3>Meta-annotation Support</h3>
- * <p>Most {@code find*()} methods and some {@code get*()} methods in this class
- * provide support for finding annotations used as meta-annotations. Consult the
- * javadoc for each method in this class for details. For fine-grained support for
- * meta-annotations with <em>attribute overrides</em> in <em>composed annotations</em>,
- * consider using {@link AnnotatedElementUtils}'s more specific methods instead.
+ * <h3>元注解支持</h3>
+ * <p>此类中的大多数 {@code find*()} 方法和一些 {@code get*()} 方法都支持查找用作元注解的注解。
+ * 有关详细信息，请查阅此类中每个方法的 javadoc。对于在 <em>组合注解</em> 中具有 <em>属性覆盖</em> 的元注解的精细支持，
+ * 请考虑改用 {@link AnnotatedElementUtils} 中更具体的方法。
  *
- * <h3>Attribute Aliases</h3>
- * <p>All public methods in this class that return annotations, arrays of
- * annotations, or {@link AnnotationAttributes} transparently support attribute
- * aliases configured via {@link AliasFor @AliasFor}. Consult the various
- * {@code synthesizeAnnotation*(..)} methods for details.
+ * <h3>属性别名</h3>
+ * <p>此类中返回注解、注解数组或 {@link AnnotationAttributes} 的所有公共方法都透明地支持通过
+ * {@link AliasFor @AliasFor} 配置的属性别名。有关详细信息，请查阅各种
+ * {@code synthesizeAnnotation*(..)} 方法。
  *
- * <h3>Search Scope</h3>
- * <p>The search algorithms used by methods in this class stop searching for
- * an annotation once the first annotation of the specified type has been
- * found. As a consequence, additional annotations of the specified type will
- * be silently ignored.
+ * <h3>搜索范围</h3>
+ * <p>此类中方法使用的搜索算法一旦找到指定类型的第一个注解，就会停止搜索。
+ * 因此，指定类型的其他注解将被静默忽略。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -108,13 +94,11 @@ public abstract class AnnotationUtils {
 
 
 	/**
-	 * Determine whether the given class is a candidate for carrying one of the specified
-	 * annotations (at type, method or field level).
-	 * @param clazz the class to introspect
-	 * @param annotationTypes the searchable annotation types
-	 * @return {@code false} if the class is known to have no such annotations at any level;
-	 * {@code true} otherwise. Callers will usually perform full method/field introspection
-	 * if {@code true} is being returned here.
+	 * 确定给定类是否是承载指定注解之一（在类型、方法或字段级别）的候选。
+	 * @param clazz 要自省的类
+	 * @param annotationTypes 可搜索的注解类型
+	 * @return 如果已知该类在任何级别都没有此类注解，则返回 {@code false}；
+	 * 否则返回 {@code true}。如果此处返回 {@code true}，调用者通常会执行完整的方法/字段自省。
 	 * @since 5.2
 	 * @see #isCandidateClass(Class, Class)
 	 * @see #isCandidateClass(Class, String)
@@ -129,13 +113,11 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Determine whether the given class is a candidate for carrying the specified annotation
-	 * (at type, method or field level).
-	 * @param clazz the class to introspect
-	 * @param annotationType the searchable annotation type
-	 * @return {@code false} if the class is known to have no such annotations at any level;
-	 * {@code true} otherwise. Callers will usually perform full method/field introspection
-	 * if {@code true} is being returned here.
+	 * 确定给定类是否是承载指定注解（在类型、方法或字段级别）的候选。
+	 * @param clazz 要自省的类
+	 * @param annotationType 可搜索的注解类型
+	 * @return 如果已知该类在任何级别都没有此类注解，则返回 {@code false}；
+	 * 否则返回 {@code true}。如果此处返回 {@code true}，调用者通常会执行完整的方法/字段自省。
 	 * @since 5.2
 	 * @see #isCandidateClass(Class, String)
 	 */
@@ -144,13 +126,11 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Determine whether the given class is a candidate for carrying the specified annotation
-	 * (at type, method or field level).
-	 * @param clazz the class to introspect
-	 * @param annotationName the fully-qualified name of the searchable annotation type
-	 * @return {@code false} if the class is known to have no such annotations at any level;
-	 * {@code true} otherwise. Callers will usually perform full method/field introspection
-	 * if {@code true} is being returned here.
+	 * 确定给定类是否是承载指定注解（在类型、方法或字段级别）的候选。
+	 * @param clazz 要自省的类
+	 * @param annotationName 可搜索注解类型的完全限定名
+	 * @return 如果已知该类在任何级别都没有此类注解，则返回 {@code false}；
+	 * 否则返回 {@code true}。如果此处返回 {@code true}，调用者通常会执行完整的方法/字段自省。
 	 * @since 5.2
 	 * @see #isCandidateClass(Class, Class)
 	 */
@@ -165,54 +145,50 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get a single {@link Annotation} of {@code annotationType} from the supplied
-	 * annotation: either the given annotation itself or a direct meta-annotation
-	 * thereof.
-	 * <p>Note that this method supports only a single level of meta-annotations.
-	 * For support for arbitrary levels of meta-annotations, use one of the
-	 * {@code find*()} methods instead.
-	 * @param annotation the Annotation to check
-	 * @param annotationType the annotation type to look for, both locally and as a meta-annotation
-	 * @return the first matching annotation, or {@code null} if not found
+	 * 从提供的注解中获取一个 {@link Annotation} 类型的 {@code annotationType} 注解：
+	 * 它可以是给定注解本身，也可以是其直接的元注解。
+	 * <p>请注意，此方法仅支持单层元注解。
+	 * 若要支持任意层级的元注解，请改用 {@code find*()} 方法之一。
+	 * @param annotation 要检查的注解
+	 * @param annotationType 要查找的注解类型，包括本地和作为元注解的类型
+	 * @return 第一个匹配的注解，如果未找到则返回 {@code null}
 	 * @since 4.0
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <A extends Annotation> A getAnnotation(Annotation annotation, Class<A> annotationType) {
-		// Shortcut: directly present on the element, with no merging needed?
+		// 快捷方式：直接存在于元素上，无需合并？
 		if (annotationType.isInstance(annotation)) {
 			return synthesizeAnnotation((A) annotation, annotationType);
 		}
-		// Shortcut: no searchable annotations to be found on plain Java classes and core Spring types...
+		// 快捷方式：在普通 Java 类和核心 Spring 类型上找不到可搜索的注解...
 		if (AnnotationsScanner.hasPlainJavaAnnotationsOnly(annotation)) {
 			return null;
 		}
-		// Exhaustive retrieval of merged annotations...
+		// 详尽检索合并的注解...
 		return MergedAnnotations.from(annotation, new Annotation[] {annotation}, RepeatableContainers.none())
 				.get(annotationType).withNonMergedAttributes()
 				.synthesize(AnnotationUtils::isSingleLevelPresent).orElse(null);
 	}
 
 	/**
-	 * Get a single {@link Annotation} of {@code annotationType} from the supplied
-	 * {@link AnnotatedElement}, where the annotation is either <em>present</em> or
-	 * <em>meta-present</em> on the {@code AnnotatedElement}.
-	 * <p>Note that this method supports only a single level of meta-annotations.
-	 * For support for arbitrary levels of meta-annotations, use
-	 * {@link #findAnnotation(AnnotatedElement, Class)} instead.
-	 * @param annotatedElement the {@code AnnotatedElement} from which to get the annotation
-	 * @param annotationType the annotation type to look for, both locally and as a meta-annotation
-	 * @return the first matching annotation, or {@code null} if not found
+	 * 从提供的 {@link AnnotatedElement} 中获取一个 {@link Annotation} 类型的 {@code annotationType} 注解，
+	 * 其中该注解在 {@code AnnotatedElement} 上是 <em>存在</em> 或 <em>元存在</em> 的。
+	 * <p>请注意，此方法仅支持单层元注解。
+	 * 若要支持任意层级的元注解，请改用 {@link #findAnnotation(AnnotatedElement, Class)}。
+	 * @param annotatedElement 要从中获取注解的 {@code AnnotatedElement}
+	 * @param annotationType 要查找的注解类型，包括本地和作为元注解的类型
+	 * @return 第一个匹配的注解，如果未找到则返回 {@code null}
 	 * @since 3.1
 	 */
 	@Nullable
 	public static <A extends Annotation> A getAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType) {
-		// Shortcut: directly present on the element, with no merging needed?
+		// 快捷方式：直接存在于元素上，无需合并？
 		if (AnnotationFilter.PLAIN.matches(annotationType) ||
 				AnnotationsScanner.hasPlainJavaAnnotationsOnly(annotatedElement)) {
 			return annotatedElement.getAnnotation(annotationType);
 		}
-		// Exhaustive retrieval of merged annotations...
+		// 详尽检索合并的注解...
 		return MergedAnnotations.from(annotatedElement, SearchStrategy.INHERITED_ANNOTATIONS, RepeatableContainers.none())
 				.get(annotationType).withNonMergedAttributes()
 				.synthesize(AnnotationUtils::isSingleLevelPresent).orElse(null);
@@ -224,16 +200,14 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get a single {@link Annotation} of {@code annotationType} from the
-	 * supplied {@link Method}, where the annotation is either <em>present</em>
-	 * or <em>meta-present</em> on the method.
-	 * <p>Correctly handles bridge {@link Method Methods} generated by the compiler.
-	 * <p>Note that this method supports only a single level of meta-annotations.
-	 * For support for arbitrary levels of meta-annotations, use
-	 * {@link #findAnnotation(Method, Class)} instead.
-	 * @param method the method to look for annotations on
-	 * @param annotationType the annotation type to look for
-	 * @return the first matching annotation, or {@code null} if not found
+	 * 从提供的 {@link Method} 中获取一个 {@link Annotation} 类型的 {@code annotationType} 注解，
+	 * 其中该注解在方法上是 <em>存在</em> 或 <em>元存在</em> 的。
+	 * <p>正确处理编译器生成的桥接 {@link Method 方法}。
+	 * <p>请注意，此方法仅支持单层元注解。
+	 * 若要支持任意层级的元注解，请改用 {@link #findAnnotation(Method, Class)}。
+	 * @param method 要查找注解的方法
+	 * @param annotationType 要查找的注解类型
+	 * @return 第一个匹配的注解，如果未找到则返回 {@code null}
 	 * @see org.springframework.core.BridgeMethodResolver#findBridgedMethod(Method)
 	 * @see #getAnnotation(AnnotatedElement, Class)
 	 */
@@ -244,16 +218,14 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get all {@link Annotation Annotations} that are <em>present</em> on the
-	 * supplied {@link AnnotatedElement}.
-	 * <p>Meta-annotations will <em>not</em> be searched.
-	 * @param annotatedElement the Method, Constructor or Field to retrieve annotations from
-	 * @return the annotations found, an empty array, or {@code null} if not
-	 * resolvable (e.g. because nested Class values in annotation attributes
-	 * failed to resolve at runtime)
+	 * 获取在提供的 {@link AnnotatedElement} 上 <em>存在</em> 的所有 {@link Annotation 注解}。
+	 * <p>不会搜索元注解。
+	 * @param annotatedElement 要从中检索注解的方法、构造函数或字段
+	 * @return 找到的注解，一个空数组，如果不可解析则返回 {@code null}
+	 * （例如，因为注解属性中的嵌套 Class 值在运行时无法解析）
 	 * @since 4.0.8
 	 * @see AnnotatedElement#getAnnotations()
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	@Nullable
@@ -268,17 +240,15 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get all {@link Annotation Annotations} that are <em>present</em> on the
-	 * supplied {@link Method}.
-	 * <p>Correctly handles bridge {@link Method Methods} generated by the compiler.
-	 * <p>Meta-annotations will <em>not</em> be searched.
-	 * @param method the Method to retrieve annotations from
-	 * @return the annotations found, an empty array, or {@code null} if not
-	 * resolvable (e.g. because nested Class values in annotation attributes
-	 * failed to resolve at runtime)
+	 * 获取在提供的 {@link Method} 上 <em>存在</em> 的所有 {@link Annotation 注解}。
+	 * <p>正确处理编译器生成的桥接 {@link Method 方法}。
+	 * <p>不会搜索元注解。
+	 * @param method 要从中检索注解的方法
+	 * @return 找到的注解，一个空数组，如果不可解析则返回 {@code null}
+	 * （例如，因为注解属性中的嵌套 Class 值在运行时无法解析）
 	 * @see org.springframework.core.BridgeMethodResolver#findBridgedMethod(Method)
 	 * @see AnnotatedElement#getAnnotations()
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	@Nullable
@@ -293,24 +263,20 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get the <em>repeatable</em> {@linkplain Annotation annotations} of
-	 * {@code annotationType} from the supplied {@link AnnotatedElement}, where
-	 * such annotations are either <em>present</em>, <em>indirectly present</em>,
-	 * or <em>meta-present</em> on the element.
-	 * <p>This method mimics the functionality of Java 8's
-	 * {@link java.lang.reflect.AnnotatedElement#getAnnotationsByType(Class)}
-	 * with support for automatic detection of a <em>container annotation</em>
-	 * declared via @{@link java.lang.annotation.Repeatable} (when running on
-	 * Java 8 or higher) and with additional support for meta-annotations.
-	 * <p>Handles both single annotations and annotations nested within a
-	 * <em>container annotation</em>.
-	 * <p>Correctly handles <em>bridge methods</em> generated by the
-	 * compiler if the supplied element is a {@link Method}.
-	 * <p>Meta-annotations will be searched if the annotation is not
-	 * <em>present</em> on the supplied element.
-	 * @param annotatedElement the element to look for annotations on
-	 * @param annotationType the annotation type to look for
-	 * @return the annotations found or an empty set (never {@code null})
+	 * 从提供的 {@link AnnotatedElement} 中获取 {@code annotationType} 的
+	 * <em>可重复</em> {@linkplain Annotation 注解}，其中此类注解在元素上是
+	 * <em>存在</em>、<em>间接存在</em> 或 <em>元存在</em> 的。
+	 * <p>此方法模拟 Java 8 的
+	 * {@link java.lang.reflect.AnnotatedElement#getAnnotationsByType(Class)} 功能，
+	 * 支持自动检测通过 @{@link java.lang.annotation.Repeatable} 声明的
+	 * <em>容器注解</em>（在 Java 8 或更高版本上运行时），并附加元注解支持。
+	 * <p>处理单个注解和嵌套在 <em>容器注解</em> 中的注解。
+	 * <p>如果提供的元素是 {@link Method}，则正确处理编译器生成的
+	 * <em>桥接方法</em>。
+	 * <p>如果注解在提供的元素上不 <em>存在</em>，则会搜索元注解。
+	 * @param annotatedElement 要查找注解的元素
+	 * @param annotationType 要查找的注解类型
+	 * @return 找到的注解或一个空集（从不为 {@code null}）
 	 * @since 4.2
 	 * @see #getRepeatableAnnotations(AnnotatedElement, Class, Class)
 	 * @see #getDeclaredRepeatableAnnotations(AnnotatedElement, Class, Class)
@@ -318,7 +284,7 @@ public abstract class AnnotationUtils {
 	 * @see org.springframework.core.BridgeMethodResolver#findBridgedMethod
 	 * @see java.lang.annotation.Repeatable
 	 * @see java.lang.reflect.AnnotatedElement#getAnnotationsByType
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	public static <A extends Annotation> Set<A> getRepeatableAnnotations(AnnotatedElement annotatedElement,
@@ -328,26 +294,21 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get the <em>repeatable</em> {@linkplain Annotation annotations} of
-	 * {@code annotationType} from the supplied {@link AnnotatedElement}, where
-	 * such annotations are either <em>present</em>, <em>indirectly present</em>,
-	 * or <em>meta-present</em> on the element.
-	 * <p>This method mimics the functionality of Java 8's
-	 * {@link java.lang.reflect.AnnotatedElement#getAnnotationsByType(Class)}
-	 * with additional support for meta-annotations.
-	 * <p>Handles both single annotations and annotations nested within a
-	 * <em>container annotation</em>.
-	 * <p>Correctly handles <em>bridge methods</em> generated by the
-	 * compiler if the supplied element is a {@link Method}.
-	 * <p>Meta-annotations will be searched if the annotation is not
-	 * <em>present</em> on the supplied element.
-	 * @param annotatedElement the element to look for annotations on
-	 * @param annotationType the annotation type to look for
-	 * @param containerAnnotationType the type of the container that holds
-	 * the annotations; may be {@code null} if a container is not supported
-	 * or if it should be looked up via @{@link java.lang.annotation.Repeatable}
-	 * when running on Java 8 or higher
-	 * @return the annotations found or an empty set (never {@code null})
+	 * 从提供的 {@link AnnotatedElement} 中获取 {@code annotationType} 的
+	 * <em>可重复</em> {@linkplain Annotation 注解}，其中此类注解在元素上是
+	 * <em>存在</em>、<em>间接存在</em> 或 <em>元存在</em> 的。
+	 * <p>此方法模拟 Java 8 的
+	 * {@link java.lang.reflect.AnnotatedElement#getAnnotationsByType(Class)} 功能，
+	 * 并附加元注解支持。
+	 * <p>处理单个注解和嵌套在 <em>容器注解</em> 中的注解。
+	 * <p>如果提供的元素是 {@link Method}，则正确处理编译器生成的
+	 * <em>桥接方法</em>。
+	 * <p>如果注解在提供的元素上不 <em>存在</em>，则会搜索元注解。
+	 * @param annotatedElement 要查找注解的元素
+	 * @param annotationType 要查找的注解类型
+	 * @param containerAnnotationType 包含注解的容器类型；如果不支持容器，
+	 * 或在 Java 8 或更高版本上运行时应通过 @{@link java.lang.annotation.Repeatable} 查找，则可能为 {@code null}
+	 * @return 找到的注解或一个空集（从不为 {@code null}）
 	 * @since 4.2
 	 * @see #getRepeatableAnnotations(AnnotatedElement, Class)
 	 * @see #getDeclaredRepeatableAnnotations(AnnotatedElement, Class)
@@ -356,7 +317,7 @@ public abstract class AnnotationUtils {
 	 * @see org.springframework.core.BridgeMethodResolver#findBridgedMethod
 	 * @see java.lang.annotation.Repeatable
 	 * @see java.lang.reflect.AnnotatedElement#getAnnotationsByType
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	public static <A extends Annotation> Set<A> getRepeatableAnnotations(AnnotatedElement annotatedElement,
@@ -374,24 +335,20 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get the declared <em>repeatable</em> {@linkplain Annotation annotations}
-	 * of {@code annotationType} from the supplied {@link AnnotatedElement},
-	 * where such annotations are either <em>directly present</em>,
-	 * <em>indirectly present</em>, or <em>meta-present</em> on the element.
-	 * <p>This method mimics the functionality of Java 8's
-	 * {@link java.lang.reflect.AnnotatedElement#getDeclaredAnnotationsByType(Class)}
-	 * with support for automatic detection of a <em>container annotation</em>
-	 * declared via @{@link java.lang.annotation.Repeatable} (when running on
-	 * Java 8 or higher) and with additional support for meta-annotations.
-	 * <p>Handles both single annotations and annotations nested within a
-	 * <em>container annotation</em>.
-	 * <p>Correctly handles <em>bridge methods</em> generated by the
-	 * compiler if the supplied element is a {@link Method}.
-	 * <p>Meta-annotations will be searched if the annotation is not
-	 * <em>present</em> on the supplied element.
-	 * @param annotatedElement the element to look for annotations on
-	 * @param annotationType the annotation type to look for
-	 * @return the annotations found or an empty set (never {@code null})
+	 * 从提供的 {@link AnnotatedElement} 中获取 {@code annotationType} 的已声明的
+	 * <em>可重复</em> {@linkplain Annotation 注解}，其中此类注解在元素上是
+	 * <em>直接存在</em>、<em>间接存在</em> 或 <em>元存在</em> 的。
+	 * <p>此方法模拟 Java 8 的
+	 * {@link java.lang.reflect.AnnotatedElement#getDeclaredAnnotationsByType(Class)} 功能，
+	 * 支持自动检测通过 @{@link java.lang.annotation.Repeatable} 声明的
+	 * <em>容器注解</em>（在 Java 8 或更高版本上运行时），并附加元注解支持。
+	 * <p>处理单个注解和嵌套在 <em>容器注解</em> 中的注解。
+	 * <p>如果提供的元素是 {@link Method}，则正确处理编译器生成的
+	 * <em>桥接方法</em>。
+	 * <p>如果注解在提供的元素上不 <em>存在</em>，则会搜索元注解。
+	 * @param annotatedElement 要查找注解的元素
+	 * @param annotationType 要查找的注解类型
+	 * @return 找到的注解或一个空集（从不为 {@code null}）
 	 * @since 4.2
 	 * @see #getRepeatableAnnotations(AnnotatedElement, Class)
 	 * @see #getRepeatableAnnotations(AnnotatedElement, Class, Class)
@@ -400,7 +357,7 @@ public abstract class AnnotationUtils {
 	 * @see org.springframework.core.BridgeMethodResolver#findBridgedMethod
 	 * @see java.lang.annotation.Repeatable
 	 * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotationsByType
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	public static <A extends Annotation> Set<A> getDeclaredRepeatableAnnotations(AnnotatedElement annotatedElement,
@@ -410,26 +367,21 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get the declared <em>repeatable</em> {@linkplain Annotation annotations}
-	 * of {@code annotationType} from the supplied {@link AnnotatedElement},
-	 * where such annotations are either <em>directly present</em>,
-	 * <em>indirectly present</em>, or <em>meta-present</em> on the element.
-	 * <p>This method mimics the functionality of Java 8's
-	 * {@link java.lang.reflect.AnnotatedElement#getDeclaredAnnotationsByType(Class)}
-	 * with additional support for meta-annotations.
-	 * <p>Handles both single annotations and annotations nested within a
-	 * <em>container annotation</em>.
-	 * <p>Correctly handles <em>bridge methods</em> generated by the
-	 * compiler if the supplied element is a {@link Method}.
-	 * <p>Meta-annotations will be searched if the annotation is not
-	 * <em>present</em> on the supplied element.
-	 * @param annotatedElement the element to look for annotations on
-	 * @param annotationType the annotation type to look for
-	 * @param containerAnnotationType the type of the container that holds
-	 * the annotations; may be {@code null} if a container is not supported
-	 * or if it should be looked up via @{@link java.lang.annotation.Repeatable}
-	 * when running on Java 8 or higher
-	 * @return the annotations found or an empty set (never {@code null})
+	 * 从提供的 {@link AnnotatedElement} 中获取 {@code annotationType} 的已声明的
+	 * <em>可重复</em> {@linkplain Annotation 注解}，其中此类注解在元素上是
+	 * <em>直接存在</em>、<em>间接存在</em> 或 <em>元存在</em> 的。
+	 * <p>此方法模拟 Java 8 的
+	 * {@link java.lang.reflect.AnnotatedElement#getDeclaredAnnotationsByType(Class)} 功能，
+	 * 并附加元注解支持。
+	 * <p>处理单个注解和嵌套在 <em>容器注解</em> 中的注解。
+	 * <p>如果提供的元素是 {@link Method}，则正确处理编译器生成的
+	 * <em>桥接方法</em>。
+	 * <p>如果注解在提供的元素上不 <em>存在</em>，则会搜索元注解。
+	 * @param annotatedElement 要查找注解的元素
+	 * @param annotationType 要查找的注解类型
+	 * @param containerAnnotationType 包含注解的容器类型；如果不支持容器，
+	 * 或在 Java 8 或更高版本上运行时应通过 @{@link java.lang.annotation.Repeatable} 查找，则可能为 {@code null}
+	 * @return 找到的注解或一个空集（从不为 {@code null}）
 	 * @since 4.2
 	 * @see #getRepeatableAnnotations(AnnotatedElement, Class)
 	 * @see #getRepeatableAnnotations(AnnotatedElement, Class, Class)
@@ -438,7 +390,7 @@ public abstract class AnnotationUtils {
 	 * @see org.springframework.core.BridgeMethodResolver#findBridgedMethod
 	 * @see java.lang.annotation.Repeatable
 	 * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotationsByType
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	public static <A extends Annotation> Set<A> getDeclaredRepeatableAnnotations(AnnotatedElement annotatedElement,
@@ -455,19 +407,16 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Find a single {@link Annotation} of {@code annotationType} on the
-	 * supplied {@link AnnotatedElement}.
-	 * <p>Meta-annotations will be searched if the annotation is not
-	 * <em>directly present</em> on the supplied element.
-	 * <p><strong>Warning</strong>: this method operates generically on
-	 * annotated elements. In other words, this method does not execute
-	 * specialized search algorithms for classes or methods. If you require
-	 * the more specific semantics of {@link #findAnnotation(Class, Class)}
-	 * or {@link #findAnnotation(Method, Class)}, invoke one of those methods
-	 * instead.
-	 * @param annotatedElement the {@code AnnotatedElement} on which to find the annotation
-	 * @param annotationType the annotation type to look for, both locally and as a meta-annotation
-	 * @return the first matching annotation, or {@code null} if not found
+	 * 在提供的 {@link AnnotatedElement} 上查找单个 {@code annotationType} 类型的
+	 * {@link Annotation 注解}。
+	 * <p>如果注解未 <em>直接存在</em> 于提供的元素上，则会搜索元注解。
+	 * <p><strong>警告</strong>：此方法对带注解的元素进行泛型操作。
+	 * 换句话说，此方法不执行针对类或方法的专门搜索算法。如果您需要
+	 * {@link #findAnnotation(Class, Class)} 或 {@link #findAnnotation(Method, Class)}
+	 * 更具体的语义，请改用这些方法之一。
+	 * @param annotatedElement 要在其上查找注解的 {@code AnnotatedElement}
+	 * @param annotationType 要查找的注解类型，包括本地和作为元注解的类型
+	 * @return 第一个匹配的注解，如果未找到则返回 {@code null}
 	 * @since 4.2
 	 */
 	@Nullable
@@ -478,31 +427,28 @@ public abstract class AnnotationUtils {
 			return null;
 		}
 
-		// Shortcut: directly present on the element, with no merging needed?
+		// 快捷方式：直接存在于元素上，无需合并？
 		if (AnnotationFilter.PLAIN.matches(annotationType) ||
 				AnnotationsScanner.hasPlainJavaAnnotationsOnly(annotatedElement)) {
 			return annotatedElement.getDeclaredAnnotation(annotationType);
 		}
 
-		// Exhaustive retrieval of merged annotations...
+		// 详尽检索合并的注解...
 		return MergedAnnotations.from(annotatedElement, SearchStrategy.INHERITED_ANNOTATIONS, RepeatableContainers.none())
 				.get(annotationType).withNonMergedAttributes()
 				.synthesize(MergedAnnotation::isPresent).orElse(null);
 	}
 
 	/**
-	 * Find a single {@link Annotation} of {@code annotationType} on the supplied
-	 * {@link Method}, traversing its super methods (i.e. from superclasses and
-	 * interfaces) if the annotation is not <em>directly present</em> on the given
-	 * method itself.
-	 * <p>Correctly handles bridge {@link Method Methods} generated by the compiler.
-	 * <p>Meta-annotations will be searched if the annotation is not
-	 * <em>directly present</em> on the method.
-	 * <p>Annotations on methods are not inherited by default, so we need to handle
-	 * this explicitly.
-	 * @param method the method to look for annotations on
-	 * @param annotationType the annotation type to look for
-	 * @return the first matching annotation, or {@code null} if not found
+	 * 在提供的 {@link Method} 上查找单个 {@code annotationType} 类型的
+	 * {@link Annotation 注解}，如果注解未 <em>直接存在</em> 于给定方法本身，
+	 * 则遍历其超类方法（即来自超类和接口）。
+	 * <p>正确处理编译器生成的桥接 {@link Method 方法}。
+	 * <p>如果注解未 <em>直接存在</em> 于方法上，则会搜索元注解。
+	 * <p>方法上的注解默认不继承，因此我们需要显式处理。
+	 * @param method 要查找注解的方法
+	 * @param annotationType 要查找的注解类型
+	 * @return 第一个匹配的注解，如果未找到则返回 {@code null}
 	 * @see #getAnnotation(Method, Class)
 	 */
 	@Nullable
@@ -511,39 +457,36 @@ public abstract class AnnotationUtils {
 			return null;
 		}
 
-		// Shortcut: directly present on the element, with no merging needed?
+		// 快捷方式：直接存在于元素上，无需合并？
 		if (AnnotationFilter.PLAIN.matches(annotationType) ||
 				AnnotationsScanner.hasPlainJavaAnnotationsOnly(method)) {
 			return method.getDeclaredAnnotation(annotationType);
 		}
 
-		// Exhaustive retrieval of merged annotations...
+		// 详尽检索合并的注解...
 		return MergedAnnotations.from(method, SearchStrategy.TYPE_HIERARCHY, RepeatableContainers.none())
 				.get(annotationType).withNonMergedAttributes()
 				.synthesize(MergedAnnotation::isPresent).orElse(null);
 	}
 
 	/**
-	 * Find a single {@link Annotation} of {@code annotationType} on the
-	 * supplied {@link Class}, traversing its interfaces, annotations, and
-	 * superclasses if the annotation is not <em>directly present</em> on
-	 * the given class itself.
-	 * <p>This method explicitly handles class-level annotations which are not
-	 * declared as {@link java.lang.annotation.Inherited inherited} <em>as well
-	 * as meta-annotations and annotations on interfaces</em>.
-	 * <p>The algorithm operates as follows:
+	 * 在提供的 {@link Class} 上查找单个 {@code annotationType} 类型的
+	 * {@link Annotation 注解}，如果注解未 <em>直接存在</em> 于给定类本身，
+	 * 则遍历其接口、注解和超类。
+	 * <p>此方法显式处理未声明为 {@link java.lang.annotation.Inherited 继承} 的类级别注解，
+	 * <em>以及元注解和接口上的注解</em>。
+	 * <p>算法操作如下：
 	 * <ol>
-	 * <li>Search for the annotation on the given class and return it if found.
-	 * <li>Recursively search through all annotations that the given class declares.
-	 * <li>Recursively search through all interfaces that the given class declares.
-	 * <li>Recursively search through the superclass hierarchy of the given class.
+	 * <li>在给定类上搜索注解，如果找到则返回。
+	 * <li>递归搜索给定类声明的所有注解。
+	 * <li>递归搜索给定类声明的所有接口。
+	 * <li>递归搜索给定类的超类层次结构。
 	 * </ol>
-	 * <p>Note: in this context, the term <em>recursively</em> means that the search
-	 * process continues by returning to step #1 with the current interface,
-	 * annotation, or superclass as the class to look for annotations on.
-	 * @param clazz the class to look for annotations on
-	 * @param annotationType the type of annotation to look for
-	 * @return the first matching annotation, or {@code null} if not found
+	 * <p>注意：在此上下文中，术语 <em>递归</em> 意味着搜索过程通过返回到步骤 #1 继续，
+	 * 将当前接口、注解或超类作为要查找注解的类。
+	 * @param clazz 要查找注解的类
+	 * @param annotationType 要查找的注解类型
+	 * @return 第一个匹配的注解，如果未找到则返回 {@code null}
 	 */
 	@Nullable
 	public static <A extends Annotation> A findAnnotation(Class<?> clazz, @Nullable Class<A> annotationType) {
@@ -551,15 +494,14 @@ public abstract class AnnotationUtils {
 			return null;
 		}
 
-		// Shortcut: directly present on the element, with no merging needed?
+		// 快捷方式：直接存在于元素上，无需合并？
 		if (AnnotationFilter.PLAIN.matches(annotationType) ||
 				AnnotationsScanner.hasPlainJavaAnnotationsOnly(clazz)) {
 			A annotation = clazz.getDeclaredAnnotation(annotationType);
 			if (annotation != null) {
 				return annotation;
 			}
-			// For backwards compatibility, perform a superclass search with plain annotations
-			// even if not marked as @Inherited: e.g. a findAnnotation search for @Deprecated
+			// 为了向后兼容，即使未标记为 @Inherited，也要对普通注解执行超类搜索：例如对 @Deprecated 的 findAnnotation 搜索
 			Class<?> superclass = clazz.getSuperclass();
 			if (superclass == null || superclass == Object.class) {
 				return null;
@@ -567,32 +509,27 @@ public abstract class AnnotationUtils {
 			return findAnnotation(superclass, annotationType);
 		}
 
-		// Exhaustive retrieval of merged annotations...
+		// 详尽检索合并的注解...
 		return MergedAnnotations.from(clazz, SearchStrategy.TYPE_HIERARCHY, RepeatableContainers.none())
 				.get(annotationType).withNonMergedAttributes()
 				.synthesize(MergedAnnotation::isPresent).orElse(null);
 	}
 
 	/**
-	 * Find the first {@link Class} in the inheritance hierarchy of the
-	 * specified {@code clazz} (including the specified {@code clazz} itself)
-	 * on which an annotation of the specified {@code annotationType} is
-	 * <em>directly present</em>.
-	 * <p>If the supplied {@code clazz} is an interface, only the interface
-	 * itself will be checked; the inheritance hierarchy for interfaces will
-	 * not be traversed.
-	 * <p>Meta-annotations will <em>not</em> be searched.
-	 * <p>The standard {@link Class} API does not provide a mechanism for
-	 * determining which class in an inheritance hierarchy actually declares
-	 * an {@link Annotation}, so we need to handle this explicitly.
-	 * @param annotationType the annotation type to look for
-	 * @param clazz the class to check for the annotation on (may be {@code null})
-	 * @return the first {@link Class} in the inheritance hierarchy that
-	 * declares an annotation of the specified {@code annotationType},
-	 * or {@code null} if not found
+	 * 在指定 {@code clazz} 的继承层次结构中（包括指定的 {@code clazz} 本身）
+	 * 查找第一个 {@link Class}，该类上 <em>直接存在</em> 指定 {@code annotationType} 的注解。
+	 * <p>如果提供的 {@code clazz} 是一个接口，则只会检查接口本身；
+	 * 不会遍历接口的继承层次结构。
+	 * <p>不会搜索元注解。
+	 * <p>标准 {@link Class} API 不提供确定继承层次结构中哪个类实际声明了
+	 * {@link Annotation} 的机制，因此我们需要显式处理。
+	 * @param annotationType 要查找的注解类型
+	 * @param clazz 要检查注解的类（可能为 {@code null}）
+	 * @return 继承层次结构中声明指定 {@code annotationType} 注解的第一个 {@link Class}，
+	 * 如果未找到则返回 {@code null}
 	 * @see Class#isAnnotationPresent(Class)
 	 * @see Class#getDeclaredAnnotations()
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	@Nullable
@@ -609,27 +546,22 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Find the first {@link Class} in the inheritance hierarchy of the
-	 * specified {@code clazz} (including the specified {@code clazz} itself)
-	 * on which at least one of the specified {@code annotationTypes} is
-	 * <em>directly present</em>.
-	 * <p>If the supplied {@code clazz} is an interface, only the interface
-	 * itself will be checked; the inheritance hierarchy for interfaces will
-	 * not be traversed.
-	 * <p>Meta-annotations will <em>not</em> be searched.
-	 * <p>The standard {@link Class} API does not provide a mechanism for
-	 * determining which class in an inheritance hierarchy actually declares
-	 * one of several candidate {@linkplain Annotation annotations}, so we
-	 * need to handle this explicitly.
-	 * @param annotationTypes the annotation types to look for
-	 * @param clazz the class to check for the annotation on (may be {@code null})
-	 * @return the first {@link Class} in the inheritance hierarchy that
-	 * declares an annotation of at least one of the specified
-	 * {@code annotationTypes}, or {@code null} if not found
+	 * 在指定 {@code clazz} 的继承层次结构中（包括指定的 {@code clazz} 本身）
+	 * 查找第一个 {@link Class}，该类上 <em>直接存在</em> 至少一个指定 {@code annotationTypes} 中的注解。
+	 * <p>如果提供的 {@code clazz} 是一个接口，则只会检查接口本身；
+	 * 不会遍历接口的继承层次结构。
+	 * <p>不会搜索元注解。
+	 * <p>标准 {@link Class} API 不提供确定继承层次结构中哪个类实际声明了
+	 * 多个候选 {@linkplain Annotation 注解} 中的一个的机制，因此我们
+	 * 需要显式处理。
+	 * @param annotationTypes 要查找的注解类型
+	 * @param clazz 要检查注解的类（可能为 {@code null}）
+	 * @return 继承层次结构中声明至少一个指定 {@code annotationTypes} 中注解的第一个 {@link Class}，
+	 * 如果未找到则返回 {@code null}
 	 * @since 3.2.2
 	 * @see Class#isAnnotationPresent(Class)
 	 * @see Class#getDeclaredAnnotations()
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	@Nullable
@@ -648,17 +580,14 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Determine whether an annotation of the specified {@code annotationType}
-	 * is declared locally (i.e. <em>directly present</em>) on the supplied
-	 * {@code clazz}.
-	 * <p>The supplied {@link Class} may represent any type.
-	 * <p>Meta-annotations will <em>not</em> be searched.
-	 * <p>Note: This method does <strong>not</strong> determine if the annotation
-	 * is {@linkplain java.lang.annotation.Inherited inherited}.
-	 * @param annotationType the annotation type to look for
-	 * @param clazz the class to check for the annotation on
-	 * @return {@code true} if an annotation of the specified {@code annotationType}
-	 * is <em>directly present</em>
+	 * 确定在提供的 {@code clazz} 上是否本地（即 <em>直接存在</em>）声明了
+	 * 指定 {@code annotationType} 的注解。
+	 * <p>提供的 {@link Class} 可以表示任何类型。
+	 * <p>不会搜索元注解。
+	 * <p>注意：此方法不会确定注解是否为 {@linkplain java.lang.annotation.Inherited 继承}。
+	 * @param annotationType 要查找的注解类型
+	 * @param clazz 要检查注解的类
+	 * @return 如果指定 {@code annotationType} 的注解 <em>直接存在</em>，则返回 {@code true}
 	 * @see java.lang.Class#getDeclaredAnnotations()
 	 * @see java.lang.Class#getDeclaredAnnotation(Class)
 	 */
@@ -667,24 +596,20 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Determine whether an annotation of the specified {@code annotationType}
-	 * is <em>present</em> on the supplied {@code clazz} and is
-	 * {@linkplain java.lang.annotation.Inherited inherited}
-	 * (i.e. not <em>directly present</em>).
-	 * <p>Meta-annotations will <em>not</em> be searched.
-	 * <p>If the supplied {@code clazz} is an interface, only the interface
-	 * itself will be checked. In accordance with standard meta-annotation
-	 * semantics in Java, the inheritance hierarchy for interfaces will not
-	 * be traversed. See the {@linkplain java.lang.annotation.Inherited javadoc}
-	 * for the {@code @Inherited} meta-annotation for further details regarding
-	 * annotation inheritance.
-	 * @param annotationType the annotation type to look for
-	 * @param clazz the class to check for the annotation on
-	 * @return {@code true} if an annotation of the specified {@code annotationType}
-	 * is <em>present</em> and <em>inherited</em>
+	 * 确定指定 {@code annotationType} 的注解是否 <em>存在</em> 于提供的 {@code clazz} 上，
+	 * 并且是 {@linkplain java.lang.annotation.Inherited 继承的}
+	 * （即不是 <em>直接存在</em> 的）。
+	 * <p>不会搜索元注解。
+	 * <p>如果提供的 {@code clazz} 是一个接口，则只会检查接口本身。
+	 * 根据 Java 中的标准元注解语义，不会遍历接口的继承层次结构。
+	 * 有关注解继承的更多详细信息，请参阅 {@code @Inherited} 元注解的
+	 * {@linkplain java.lang.annotation.Inherited Javadoc}。
+	 * @param annotationType 要查找的注解类型
+	 * @param clazz 要检查注解的类
+	 * @return 如果指定 {@code annotationType} 的注解 <em>存在</em> 且 <em>继承</em>，则返回 {@code true}
 	 * @see Class#isAnnotationPresent(Class)
 	 * @see #isAnnotationDeclaredLocally(Class, Class)
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	public static boolean isAnnotationInherited(Class<? extends Annotation> annotationType, Class<?> clazz) {
@@ -696,13 +621,12 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Determine if an annotation of type {@code metaAnnotationType} is
-	 * <em>meta-present</em> on the supplied {@code annotationType}.
-	 * @param annotationType the annotation type to search on
-	 * @param metaAnnotationType the type of meta-annotation to search for
-	 * @return {@code true} if such an annotation is meta-present
+	 * 确定类型为 {@code metaAnnotationType} 的注解是否 <em>元存在</em> 于提供的 {@code annotationType} 上。
+	 * @param annotationType 要搜索的注解类型
+	 * @param metaAnnotationType 要搜索的元注解类型
+	 * @return 如果此类注解元存在，则返回 {@code true}
 	 * @since 4.2.1
-	 * @deprecated as of 5.2 since it is superseded by the {@link MergedAnnotations} API
+	 * @deprecated 自 5.2 版本起已弃用，因为它已被 {@link MergedAnnotations} API 取代
 	 */
 	@Deprecated
 	public static boolean isAnnotationMetaPresent(Class<? extends Annotation> annotationType,
@@ -711,31 +635,30 @@ public abstract class AnnotationUtils {
 		if (metaAnnotationType == null) {
 			return false;
 		}
-		// Shortcut: directly present on the element, with no merging needed?
+		// 快捷方式：直接存在于元素上，无需合并？
 		if (AnnotationFilter.PLAIN.matches(metaAnnotationType) ||
 				AnnotationsScanner.hasPlainJavaAnnotationsOnly(annotationType)) {
 			return annotationType.isAnnotationPresent(metaAnnotationType);
 		}
-		// Exhaustive retrieval of merged annotations...
+		// 详尽检索合并的注解...
 		return MergedAnnotations.from(annotationType, SearchStrategy.INHERITED_ANNOTATIONS,
 				RepeatableContainers.none()).isPresent(metaAnnotationType);
 	}
 
 	/**
-	 * Determine if the supplied {@link Annotation} is defined in the core JDK
-	 * {@code java.lang.annotation} package.
-	 * @param annotation the annotation to check
-	 * @return {@code true} if the annotation is in the {@code java.lang.annotation} package
+	 * 确定提供的 {@link Annotation} 是否在核心 JDK 的 {@code java.lang.annotation} 包中定义。
+	 * @param annotation 要检查的注解
+	 * @return 如果注解在 {@code java.lang.annotation} 包中，则返回 {@code true}
 	 */
 	public static boolean isInJavaLangAnnotationPackage(@Nullable Annotation annotation) {
 		return (annotation != null && JAVA_LANG_ANNOTATION_FILTER.matches(annotation));
 	}
 
 	/**
-	 * Determine if the {@link Annotation} with the supplied name is defined
-	 * in the core JDK {@code java.lang.annotation} package.
-	 * @param annotationType the name of the annotation type to check
-	 * @return {@code true} if the annotation is in the {@code java.lang.annotation} package
+	 * 确定具有指定名称的 {@link Annotation 注解} 是否在核心 JDK 的
+	 * {@code java.lang.annotation} 包中定义。
+	 * @param annotationType 要检查的注解类型名称
+	 * @return 如果注解在 {@code java.lang.annotation} 包中，则返回 {@code true}
 	 * @since 4.2
 	 */
 	public static boolean isInJavaLangAnnotationPackage(@Nullable String annotationType) {
@@ -743,13 +666,13 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Check the declared attributes of the given annotation, in particular covering
-	 * Google App Engine's late arrival of {@code TypeNotPresentExceptionProxy} for
-	 * {@code Class} values (instead of early {@code Class.getAnnotations() failure}.
-	 * <p>This method not failing indicates that {@link #getAnnotationAttributes(Annotation)}
-	 * won't failure either (when attempted later on).
-	 * @param annotation the annotation to validate
-	 * @throws IllegalStateException if a declared {@code Class} attribute could not be read
+	 * 检查给定注解的声明属性，特别是覆盖
+	 * Google App Engine 中 {@code Class} 值的 {@code TypeNotPresentExceptionProxy} 延迟出现的情况
+	 * （而不是早期 {@code Class.getAnnotations()} 失败）。
+	 * <p>此方法不失败表示 {@link #getAnnotationAttributes(Annotation)}
+	 * 在稍后尝试时也不会失败。
+	 * @param annotation 要验证的注解
+	 * @throws IllegalStateException 如果声明的 {@code Class} 属性无法读取
 	 * @since 4.3.15
 	 * @see Class#getAnnotations()
 	 * @see #getAnnotationAttributes(Annotation)
@@ -759,16 +682,16 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the given annotation's attributes as a {@link Map}, preserving all
-	 * attribute types.
-	 * <p>Equivalent to calling {@link #getAnnotationAttributes(Annotation, boolean, boolean)}
-	 * with the {@code classValuesAsString} and {@code nestedAnnotationsAsMap} parameters
-	 * set to {@code false}.
-	 * <p>Note: This method actually returns an {@link AnnotationAttributes} instance.
-	 * However, the {@code Map} signature has been preserved for binary compatibility.
-	 * @param annotation the annotation to retrieve the attributes for
-	 * @return the Map of annotation attributes, with attribute names as keys and
-	 * corresponding attribute values as values (never {@code null})
+	 * 将给定注解的属性作为 {@link Map} 检索，保留所有
+	 * 属性类型。
+	 * <p>等同于调用 {@link #getAnnotationAttributes(Annotation, boolean, boolean)}，
+	 * 其中 {@code classValuesAsString} 和 {@code nestedAnnotationsAsMap} 参数
+	 * 设置为 {@code false}。
+	 * <p>注意：此方法实际上返回一个 {@link AnnotationAttributes} 实例。
+	 * 但是，为了二进制兼容性，保留了 {@code Map} 签名。
+	 * @param annotation 要检索属性的注解
+	 * @return 注解属性的 Map，以属性名称作为键，
+	 * 对应的属性值作为值（从不为 {@code null}）
 	 * @see #getAnnotationAttributes(AnnotatedElement, Annotation)
 	 * @see #getAnnotationAttributes(Annotation, boolean, boolean)
 	 * @see #getAnnotationAttributes(AnnotatedElement, Annotation, boolean, boolean)
@@ -778,17 +701,17 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the given annotation's attributes as a {@link Map}.
-	 * <p>Equivalent to calling {@link #getAnnotationAttributes(Annotation, boolean, boolean)}
-	 * with the {@code nestedAnnotationsAsMap} parameter set to {@code false}.
-	 * <p>Note: This method actually returns an {@link AnnotationAttributes} instance.
-	 * However, the {@code Map} signature has been preserved for binary compatibility.
-	 * @param annotation the annotation to retrieve the attributes for
-	 * @param classValuesAsString whether to convert Class references into Strings (for
-	 * compatibility with {@link org.springframework.core.type.AnnotationMetadata})
-	 * or to preserve them as Class references
-	 * @return the Map of annotation attributes, with attribute names as keys and
-	 * corresponding attribute values as values (never {@code null})
+	 * 将给定注解的属性作为 {@link Map} 检索。
+	 * <p>等同于调用 {@link #getAnnotationAttributes(Annotation, boolean, boolean)}，
+	 * 其中 {@code nestedAnnotationsAsMap} 参数设置为 {@code false}。
+	 * <p>注意：此方法实际上返回一个 {@link AnnotationAttributes} 实例。
+	 * 但是，为了二进制兼容性，保留了 {@code Map} 签名。
+	 * @param annotation 要检索属性的注解
+	 * @param classValuesAsString 是否将 Class 引用转换为 String（为了与
+	 * {@link org.springframework.core.type.AnnotationMetadata} 兼容）
+	 * 或将其保留为 Class 引用
+	 * @return 注解属性的 Map，以属性名称作为键，
+	 * 对应的属性值作为值（从不为 {@code null}）
 	 * @see #getAnnotationAttributes(Annotation, boolean, boolean)
 	 */
 	public static Map<String, Object> getAnnotationAttributes(
@@ -798,19 +721,19 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the given annotation's attributes as an {@link AnnotationAttributes} map.
-	 * <p>This method provides fully recursive annotation reading capabilities on par with
-	 * the reflection-based {@link org.springframework.core.type.StandardAnnotationMetadata}.
-	 * @param annotation the annotation to retrieve the attributes for
-	 * @param classValuesAsString whether to convert Class references into Strings (for
-	 * compatibility with {@link org.springframework.core.type.AnnotationMetadata})
-	 * or to preserve them as Class references
-	 * @param nestedAnnotationsAsMap whether to convert nested annotations into
-	 * {@link AnnotationAttributes} maps (for compatibility with
-	 * {@link org.springframework.core.type.AnnotationMetadata}) or to preserve them as
-	 * {@code Annotation} instances
-	 * @return the annotation attributes (a specialized Map) with attribute names as keys
-	 * and corresponding attribute values as values (never {@code null})
+	 * 将给定注解的属性作为 {@link AnnotationAttributes} map 检索。
+	 * <p>此方法提供了完全递归的注解读取功能，与基于反射的
+	 * {@link org.springframework.core.type.StandardAnnotationMetadata} 相当。
+	 * @param annotation 要检索属性的注解
+	 * @param classValuesAsString 是否将 Class 引用转换为 String（为了与
+	 * {@link org.springframework.core.type.AnnotationMetadata} 兼容）
+	 * 或将其保留为 Class 引用
+	 * @param nestedAnnotationsAsMap 是否将嵌套注解转换为
+	 * {@link AnnotationAttributes} map（为了与
+	 * {@link org.springframework.core.type.AnnotationMetadata} 兼容）或将其保留为
+	 * {@code Annotation} 实例
+	 * @return 注解属性（一个专门的 Map），以属性名称作为键，
+	 * 对应的属性值作为值（从不为 {@code null}）
 	 * @since 3.1.1
 	 */
 	public static AnnotationAttributes getAnnotationAttributes(
@@ -820,15 +743,15 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the given annotation's attributes as an {@link AnnotationAttributes} map.
-	 * <p>Equivalent to calling {@link #getAnnotationAttributes(AnnotatedElement, Annotation, boolean, boolean)}
-	 * with the {@code classValuesAsString} and {@code nestedAnnotationsAsMap} parameters
-	 * set to {@code false}.
-	 * @param annotatedElement the element that is annotated with the supplied annotation;
-	 * may be {@code null} if unknown
-	 * @param annotation the annotation to retrieve the attributes for
-	 * @return the annotation attributes (a specialized Map) with attribute names as keys
-	 * and corresponding attribute values as values (never {@code null})
+	 * 将给定注解的属性作为 {@link AnnotationAttributes} map 检索。
+	 * <p>等同于调用 {@link #getAnnotationAttributes(AnnotatedElement, Annotation, boolean, boolean)}，
+	 * 其中 {@code classValuesAsString} 和 {@code nestedAnnotationsAsMap} 参数
+	 * 设置为 {@code false}。
+	 * @param annotatedElement 带有提供注解的元素；
+	 * 如果未知，则可能为 {@code null}
+	 * @param annotation 要检索属性的注解
+	 * @return 注解属性（一个专门的 Map），以属性名称作为键，
+	 * 对应的属性值作为值（从不为 {@code null}）
 	 * @since 4.2
 	 * @see #getAnnotationAttributes(AnnotatedElement, Annotation, boolean, boolean)
 	 */
@@ -839,21 +762,21 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the given annotation's attributes as an {@link AnnotationAttributes} map.
-	 * <p>This method provides fully recursive annotation reading capabilities on par with
-	 * the reflection-based {@link org.springframework.core.type.StandardAnnotationMetadata}.
-	 * @param annotatedElement the element that is annotated with the supplied annotation;
-	 * may be {@code null} if unknown
-	 * @param annotation the annotation to retrieve the attributes for
-	 * @param classValuesAsString whether to convert Class references into Strings (for
-	 * compatibility with {@link org.springframework.core.type.AnnotationMetadata})
-	 * or to preserve them as Class references
-	 * @param nestedAnnotationsAsMap whether to convert nested annotations into
-	 * {@link AnnotationAttributes} maps (for compatibility with
-	 * {@link org.springframework.core.type.AnnotationMetadata}) or to preserve them as
-	 * {@code Annotation} instances
-	 * @return the annotation attributes (a specialized Map) with attribute names as keys
-	 * and corresponding attribute values as values (never {@code null})
+	 * 将给定注解的属性作为 {@link AnnotationAttributes} map 检索。
+	 * <p>此方法提供了完全递归的注解读取功能，与基于反射的
+	 * {@link org.springframework.core.type.StandardAnnotationMetadata} 相当。
+	 * @param annotatedElement 带有提供注解的元素；
+	 * 如果未知，则可能为 {@code null}
+	 * @param annotation 要检索属性的注解
+	 * @param classValuesAsString 是否将 Class 引用转换为 String（为了与
+	 * {@link org.springframework.core.type.AnnotationMetadata} 兼容）
+	 * 或将其保留为 Class 引用
+	 * @param nestedAnnotationsAsMap 是否将嵌套注解转换为
+	 * {@link AnnotationAttributes} map（为了与
+	 * {@link org.springframework.core.type.AnnotationMetadata} 兼容）或将其保留为
+	 * {@code Annotation} 实例
+	 * @return 注解属性（一个专门的 Map），以属性名称作为键，
+	 * 对应的属性值作为值（从不为 {@code null}）
 	 * @since 4.2
 	 */
 	public static AnnotationAttributes getAnnotationAttributes(
@@ -868,9 +791,8 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Register the annotation-declared default values for the given attributes,
-	 * if available.
-	 * @param attributes the annotation attributes to process
+	 * 如果可用，注册给定属性的注解声明的默认值。
+	 * @param attributes 要处理的注解属性
 	 * @since 4.3.2
 	 */
 	public static void registerDefaultValues(AnnotationAttributes attributes) {
@@ -898,7 +820,7 @@ public abstract class AnnotationUtils {
 		}
 		Map<String, DefaultValueHolder> result = CollectionUtils.newLinkedHashMap(methods.size());
 		if (!methods.hasNestedAnnotation()) {
-			// Use simpler method if there are no nested annotations
+			// 使用更简单的方法，如果没有嵌套注解
 			for (int i = 0; i < methods.size(); i++) {
 				Method method = methods.get(i);
 				Object defaultValue = method.getDefaultValue();
@@ -908,7 +830,7 @@ public abstract class AnnotationUtils {
 			}
 		}
 		else {
-			// If we have nested annotations, we need them as nested maps
+			// 如果有嵌套注解，我们需要将它们作为嵌套映射
 			AnnotationAttributes attributes = MergedAnnotation.of(annotationType)
 					.asMap(annotation ->
 							new AnnotationAttributes(annotation.getType(), true), Adapt.ANNOTATION_TO_MAP);
@@ -920,18 +842,15 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Post-process the supplied {@link AnnotationAttributes}, preserving nested
-	 * annotations as {@code Annotation} instances.
-	 * <p>Specifically, this method enforces <em>attribute alias</em> semantics
-	 * for annotation attributes that are annotated with {@link AliasFor @AliasFor}
-	 * and replaces default value placeholders with their original default values.
-	 * @param annotatedElement the element that is annotated with an annotation or
-	 * annotation hierarchy from which the supplied attributes were created;
-	 * may be {@code null} if unknown
-	 * @param attributes the annotation attributes to post-process
-	 * @param classValuesAsString whether to convert Class references into Strings (for
-	 * compatibility with {@link org.springframework.core.type.AnnotationMetadata})
-	 * or to preserve them as Class references
+	 * 后处理提供的 {@link AnnotationAttributes}，将嵌套注解保留为 {@code Annotation} 实例。
+	 * <p>具体来说，此方法会为使用 {@link AliasFor @AliasFor} 注解的注解属性强制执行
+	 * <em>属性别名</em>语义，并将默认值占位符替换为它们的原始默认值。
+	 * @param annotatedElement 带有注解或注解层次结构的元素，从中创建了提供的属性；
+	 * 如果未知，可能为 {@code null}
+	 * @param attributes 要后处理的注解属性
+	 * @param classValuesAsString 是否将 Class 引用转换为 String（为了与
+	 * {@link org.springframework.core.type.AnnotationMetadata} 兼容），
+	 * 还是将其保留为 Class 引用
 	 * @since 4.3.2
 	 * @see #getDefaultValue(Class, String)
 	 */
@@ -1014,12 +933,10 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the <em>value</em> of the {@code value} attribute of a
-	 * single-element Annotation, given an annotation instance.
-	 * @param annotation the annotation instance from which to retrieve the value
-	 * @return the attribute value, or {@code null} if not found unless the attribute
-	 * value cannot be retrieved due to an {@link AnnotationConfigurationException},
-	 * in which case such an exception will be rethrown
+	 * 给定一个注解实例，检索单元素注解的 {@code value} 属性的 *值*。
+	 * @param annotation 要从中检索值的注解实例
+	 * @return 属性值，如果未找到则为 {@code null}，除非由于 {@link AnnotationConfigurationException}
+	 * 无法检索属性值，在这种情况下将重新抛出该异常
 	 * @see #getValue(Annotation, String)
 	 */
 	@Nullable
@@ -1028,12 +945,11 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the <em>value</em> of a named attribute, given an annotation instance.
-	 * @param annotation the annotation instance from which to retrieve the value
-	 * @param attributeName the name of the attribute value to retrieve
-	 * @return the attribute value, or {@code null} if not found unless the attribute
-	 * value cannot be retrieved due to an {@link AnnotationConfigurationException},
-	 * in which case such an exception will be rethrown
+	 * 给定一个注解实例，检索命名属性的 *值*。
+	 * @param annotation 要从中检索值的注解实例
+	 * @param attributeName 要检索的属性值的名称
+	 * @return 属性值，如果未找到则为 {@code null}，除非由于 {@link AnnotationConfigurationException}
+	 * 无法检索属性值，在这种情况下将重新抛出该异常
 	 * @see #getValue(Annotation)
 	 */
 	@Nullable
@@ -1061,11 +977,11 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * If the supplied throwable is an {@link AnnotationConfigurationException},
-	 * it will be cast to an {@code AnnotationConfigurationException} and thrown,
-	 * allowing it to propagate to the caller.
-	 * <p>Otherwise, this method does nothing.
-	 * @param ex the throwable to inspect
+	 * 如果提供的可抛出对象是 {@link AnnotationConfigurationException}，
+	 * 它将被转换为 {@code AnnotationConfigurationException} 并抛出，
+	 * 允许它传播到调用者。
+	 * <p>否则，此方法不执行任何操作。
+	 * @param ex 要检查的可抛出对象
 	 */
 	static void rethrowAnnotationConfigurationException(Throwable ex) {
 		if (ex instanceof AnnotationConfigurationException) {
@@ -1074,17 +990,13 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Handle the supplied annotation introspection exception.
-	 * <p>If the supplied exception is an {@link AnnotationConfigurationException},
-	 * it will simply be thrown, allowing it to propagate to the caller, and
-	 * nothing will be logged.
-	 * <p>Otherwise, this method logs an introspection failure (in particular for
-	 * a {@link TypeNotPresentException}) before moving on, assuming nested
-	 * {@code Class} values were not resolvable within annotation attributes and
-	 * thereby effectively pretending there were no annotations on the specified
-	 * element.
-	 * @param element the element that we tried to introspect annotations on
-	 * @param ex the exception that we encountered
+	 * 处理提供的注解自省异常。
+	 * <p>如果提供的异常是 {@link AnnotationConfigurationException}，
+	 * 它将被简单地抛出，允许它传播到调用者，并且不会记录任何内容。
+	 * <p>否则，此方法在继续之前会记录自省失败（特别是针对 {@link TypeNotPresentException}），
+	 * 假设嵌套的 {@code Class} 值在注解属性中无法解析，从而有效地假装指定元素上没有注解。
+	 * @param element 我们尝试自省注解的元素
+	 * @param ex 我们遇到的异常
 	 * @see #rethrowAnnotationConfigurationException
 	 * @see IntrospectionFailureLogger
 	 */
@@ -1093,7 +1005,7 @@ public abstract class AnnotationUtils {
 		IntrospectionFailureLogger logger = IntrospectionFailureLogger.INFO;
 		boolean meta = false;
 		if (element instanceof Class && Annotation.class.isAssignableFrom((Class<?>) element)) {
-			// Meta-annotation or (default) value lookup on an annotation type
+			// 元注解或注解类型上的（默认）值查找
 			logger = IntrospectionFailureLogger.DEBUG;
 			meta = true;
 		}
@@ -1106,10 +1018,9 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the <em>default value</em> of the {@code value} attribute
-	 * of a single-element Annotation, given an annotation instance.
-	 * @param annotation the annotation instance from which to retrieve the default value
-	 * @return the default value, or {@code null} if not found
+	 * 给定注解实例，检索单元素注解 {@code value} 属性的 *默认值*。
+	 * @param annotation 要从中检索默认值的注解实例
+	 * @return 默认值，如果未找到则为 {@code null}
 	 * @see #getDefaultValue(Annotation, String)
 	 */
 	@Nullable
@@ -1118,10 +1029,10 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the <em>default value</em> of a named attribute, given an annotation instance.
-	 * @param annotation the annotation instance from which to retrieve the default value
-	 * @param attributeName the name of the attribute value to retrieve
-	 * @return the default value of the named attribute, or {@code null} if not found
+	 * 给定注解实例，检索命名属性的 *默认值*。
+	 * @param annotation 要从中检索默认值的注解实例
+	 * @param attributeName 要检索的属性值的名称
+	 * @return 命名属性的默认值，如果未找到则为 {@code null}
 	 * @see #getDefaultValue(Class, String)
 	 */
 	@Nullable
@@ -1130,10 +1041,9 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the <em>default value</em> of the {@code value} attribute
-	 * of a single-element Annotation, given the {@link Class annotation type}.
-	 * @param annotationType the <em>annotation type</em> for which the default value should be retrieved
-	 * @return the default value, or {@code null} if not found
+	 * 给定 {@link Class 注解类型}，检索单元素注解 {@code value} 属性的 *默认值*。
+	 * @param annotationType 要检索默认值的 *注解类型*
+	 * @return 默认值，如果未找到则为 {@code null}
 	 * @see #getDefaultValue(Class, String)
 	 */
 	@Nullable
@@ -1142,11 +1052,10 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Retrieve the <em>default value</em> of a named attribute, given the
-	 * {@link Class annotation type}.
-	 * @param annotationType the <em>annotation type</em> for which the default value should be retrieved
-	 * @param attributeName the name of the attribute value to retrieve.
-	 * @return the default value of the named attribute, or {@code null} if not found
+	 * 给定 {@link Class 注解类型}，检索命名属性的 *默认值*。
+	 * @param annotationType 要检索默认值的 *注解类型*
+	 * @param attributeName 要检索的属性值的名称。
+	 * @return 命名属性的默认值，如果未找到则为 {@code null}
 	 * @see #getDefaultValue(Annotation, String)
 	 */
 	@Nullable
@@ -1160,18 +1069,15 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * <em>Synthesize</em> an annotation from the supplied {@code annotation}
-	 * by wrapping it in a dynamic proxy that transparently enforces
-	 * <em>attribute alias</em> semantics for annotation attributes that are
-	 * annotated with {@link AliasFor @AliasFor}.
-	 * @param annotation the annotation to synthesize
-	 * @param annotatedElement the element that is annotated with the supplied
-	 * annotation; may be {@code null} if unknown
-	 * @return the synthesized annotation if the supplied annotation is
-	 * <em>synthesizable</em>; {@code null} if the supplied annotation is
-	 * {@code null}; otherwise the supplied annotation unmodified
-	 * @throws AnnotationConfigurationException if invalid configuration of
-	 * {@code @AliasFor} is detected
+	 * 通过将提供的注解包装在动态代理中来<em>合成</em>注解，该代理透明地强制执行
+	 * 使用 {@link AliasFor @AliasFor} 注解的注解属性的<em>属性别名</em>语义。
+	 *
+	 * @param annotation 要合成的注解
+	 * @param annotatedElement 使用提供的注解进行注解的元素；如果未知则可以为 {@code null}
+	 * @return 如果提供的注解是<em>可合成的</em>，则返回合成的注解；
+	 *         如果提供的注解为 {@code null}，则返回 {@code null}；
+	 *         否则返回未修改的提供的注解
+	 * @throws AnnotationConfigurationException 如果检测到 {@code @AliasFor} 的无效配置
 	 * @since 4.2
 	 * @see #synthesizeAnnotation(Map, Class, AnnotatedElement)
 	 * @see #synthesizeAnnotation(Class)
@@ -1186,16 +1092,15 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * <em>Synthesize</em> an annotation from its default attributes values.
-	 * <p>This method simply delegates to
-	 * {@link #synthesizeAnnotation(Map, Class, AnnotatedElement)},
-	 * supplying an empty map for the source attribute values and {@code null}
-	 * for the {@link AnnotatedElement}.
-	 * @param annotationType the type of annotation to synthesize
-	 * @return the synthesized annotation
-	 * @throws IllegalArgumentException if a required attribute is missing
-	 * @throws AnnotationConfigurationException if invalid configuration of
-	 * {@code @AliasFor} is detected
+	 * 从注解的默认属性值<em>合成</em>注解。
+	 *
+	 * <p>此方法简单地委托给 {@link #synthesizeAnnotation(Map, Class, AnnotatedElement)}，
+	 * 为源属性值提供空映射，为 {@link AnnotatedElement} 提供 {@code null}。
+	 *
+	 * @param annotationType 要合成的注解类型
+	 * @return 合成的注解
+	 * @throws IllegalArgumentException 如果缺少必需的属性
+	 * @throws AnnotationConfigurationException 如果检测到 {@code @AliasFor} 的无效配置
 	 * @since 4.2
 	 * @see #synthesizeAnnotation(Map, Class, AnnotatedElement)
 	 * @see #synthesizeAnnotation(Annotation, AnnotatedElement)
@@ -1205,28 +1110,23 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * <em>Synthesize</em> an annotation from the supplied map of annotation
-	 * attributes by wrapping the map in a dynamic proxy that implements an
-	 * annotation of the specified {@code annotationType} and transparently
-	 * enforces <em>attribute alias</em> semantics for annotation attributes
-	 * that are annotated with {@link AliasFor @AliasFor}.
-	 * <p>The supplied map must contain a key-value pair for every attribute
-	 * defined in the supplied {@code annotationType} that is not aliased or
-	 * does not have a default value. Nested maps and nested arrays of maps
-	 * will be recursively synthesized into nested annotations or nested
-	 * arrays of annotations, respectively.
-	 * <p>Note that {@link AnnotationAttributes} is a specialized type of
-	 * {@link Map} that is an ideal candidate for this method's
-	 * {@code attributes} argument.
-	 * @param attributes the map of annotation attributes to synthesize
-	 * @param annotationType the type of annotation to synthesize
-	 * @param annotatedElement the element that is annotated with the annotation
-	 * corresponding to the supplied attributes; may be {@code null} if unknown
-	 * @return the synthesized annotation
-	 * @throws IllegalArgumentException if a required attribute is missing or if an
-	 * attribute is not of the correct type
-	 * @throws AnnotationConfigurationException if invalid configuration of
-	 * {@code @AliasFor} is detected
+	 * 通过将注解属性映射包装在动态代理中来从提供的注解属性映射<em>合成</em>注解，
+	 * 该代理实现指定 {@code annotationType} 的注解，并透明地强制执行
+	 * 使用 {@link AliasFor @AliasFor} 注解的注解属性的<em>属性别名</em>语义。
+	 *
+	 * <p>提供的映射必须包含在提供的 {@code annotationType} 中定义的每个属性的键值对，
+	 * 这些属性不是别名或没有默认值。嵌套映射和嵌套映射数组将分别递归合成为
+	 * 嵌套注解或嵌套注解数组。
+	 *
+	 * <p>请注意，{@link AnnotationAttributes} 是 {@link Map} 的专用类型，
+	 * 是此方法的 {@code attributes} 参数的理想候选者。
+	 *
+	 * @param attributes 要合成的注解属性映射
+	 * @param annotationType 要合成的注解类型
+	 * @param annotatedElement 使用与提供属性对应的注解进行注解的元素；如果未知则可以为 {@code null}
+	 * @return 合成的注解
+	 * @throws IllegalArgumentException 如果缺少必需的属性或属性类型不正确
+	 * @throws AnnotationConfigurationException 如果检测到 {@code @AliasFor} 的无效配置
 	 * @since 4.2
 	 * @see #synthesizeAnnotation(Annotation, AnnotatedElement)
 	 * @see #synthesizeAnnotation(Class)
@@ -1245,18 +1145,14 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * <em>Synthesize</em> an array of annotations from the supplied array
-	 * of {@code annotations} by creating a new array of the same size and
-	 * type and populating it with {@linkplain #synthesizeAnnotation(Annotation,
-	 * AnnotatedElement) synthesized} versions of the annotations from the input
-	 * array.
-	 * @param annotations the array of annotations to synthesize
-	 * @param annotatedElement the element that is annotated with the supplied
-	 * array of annotations; may be {@code null} if unknown
-	 * @return a new array of synthesized annotations, or {@code null} if
-	 * the supplied array is {@code null}
-	 * @throws AnnotationConfigurationException if invalid configuration of
-	 * {@code @AliasFor} is detected
+	 * 通过创建相同大小和类型的新数组并用输入数组中注解的
+	 * {@linkplain #synthesizeAnnotation(Annotation, AnnotatedElement) 合成}版本
+	 * 填充它，从提供的 {@code annotations} 数组<em>合成</em>注解数组。
+	 *
+	 * @param annotations 要合成的注解数组
+	 * @param annotatedElement 使用提供的注解数组进行注解的元素；如果未知则可以为 {@code null}
+	 * @return 新的合成注解数组，如果提供的数组为 {@code null} 则返回 {@code null}
+	 * @throws AnnotationConfigurationException 如果检测到 {@code @AliasFor} 的无效配置
 	 * @since 4.2
 	 * @see #synthesizeAnnotation(Annotation, AnnotatedElement)
 	 * @see #synthesizeAnnotation(Map, Class, AnnotatedElement)
@@ -1274,7 +1170,8 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Clear the internal annotation metadata cache.
+	 * 清除内部注解元数据缓存。
+	 *
 	 * @since 4.3.15
 	 */
 	public static void clearCache() {
@@ -1284,7 +1181,7 @@ public abstract class AnnotationUtils {
 
 
 	/**
-	 * Internal holder used to wrap default values.
+	 * 用于包装默认值的内部持有者。
 	 */
 	private static class DefaultValueHolder {
 

@@ -16,25 +16,18 @@
 
 package org.springframework.util.xml;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
+import org.xml.sax.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.SAXParseException;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * Abstract base class for SAX {@code XMLReader} implementations that use StAX as a basis.
+ * 基于StAX实现的SAX {@code XMLReader}抽象基类。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -100,25 +93,27 @@ abstract class AbstractStaxXMLReader extends AbstractXMLReader {
 	}
 
 	/**
-	 * Indicates whether the SAX feature {@code http://xml.org/sax/features/namespaces} is turned on.
+	 * 判断是否启用了SAX特性{@code http://xml.org/sax/features/namespaces}。
+	 * @return 如果启用了命名空间特性则返回true，否则返回false
 	 */
 	protected boolean hasNamespacesFeature() {
 		return this.namespacesFeature;
 	}
 
 	/**
-	 * Indicates whether the SAX feature {@code http://xml.org/sax/features/namespaces-prefixes} is turned on.
+	 * 判断是否启用了SAX特性{@code http://xml.org/sax/features/namespaces-prefixes}。
+	 * @return 如果启用了命名空间前缀特性则返回true，否则返回false
 	 */
 	protected boolean hasNamespacePrefixesFeature() {
 		return this.namespacePrefixesFeature;
 	}
 
 	/**
-	 * Convert a {@code QName} to a qualified name, as used by DOM and SAX.
-	 * The returned string has a format of {@code prefix:localName} if the
-	 * prefix is set, or just {@code localName} if not.
-	 * @param qName the {@code QName}
-	 * @return the qualified name
+	 * 将{@code QName}转换为DOM和SAX使用的限定名称。
+	 * 如果前缀已设置，返回的字符串格式为{@code prefix:localName}；
+	 * 否则只返回{@code localName}。
+	 * @param qName 要转换的{@code QName}
+	 * @return 限定名称字符串
 	 */
 	protected String toQualifiedName(QName qName) {
 		String prefix = qName.getPrefix();
@@ -132,10 +127,10 @@ abstract class AbstractStaxXMLReader extends AbstractXMLReader {
 
 
 	/**
-	 * Parse the StAX XML reader passed at construction-time.
-	 * <p><b>NOTE:</b>: The given {@code InputSource} is not read, but ignored.
-	 * @param ignored is ignored
-	 * @throws SAXException a SAX exception, possibly wrapping a {@code XMLStreamException}
+	 * 解析构造时传入的StAX XML读取器。
+	 * <p><b>注意</b>：给定的{@code InputSource}不会被读取，而是被忽略。
+	 * @param ignored 被忽略的输入源
+	 * @throws SAXException 可能包装了{@code XMLStreamException}的SAX异常
 	 */
 	@Override
 	public final void parse(InputSource ignored) throws SAXException {
@@ -143,10 +138,10 @@ abstract class AbstractStaxXMLReader extends AbstractXMLReader {
 	}
 
 	/**
-	 * Parse the StAX XML reader passed at construction-time.
-	 * <p><b>NOTE:</b>: The given system identifier is not read, but ignored.
-	 * @param ignored is ignored
-	 * @throws SAXException a SAX exception, possibly wrapping a {@code XMLStreamException}
+	 * 解析构造时传入的StAX XML读取器。
+	 * <p><b>注意</b>：给定的系统标识符不会被读取，而是被忽略。
+	 * @param ignored 被忽略的系统标识符
+	 * @throws SAXException 可能包装了{@code XMLStreamException}的SAX异常
 	 */
 	@Override
 	public final void parse(String ignored) throws SAXException {
@@ -173,13 +168,13 @@ abstract class AbstractStaxXMLReader extends AbstractXMLReader {
 	}
 
 	/**
-	 * Template method that parses the StAX reader passed at construction-time.
+	 * 模板方法，用于解析构造时传入的StAX读取器。
 	 */
 	protected abstract void parseInternal() throws SAXException, XMLStreamException;
 
 
 	/**
-	 * Start the prefix mapping for the given prefix.
+	 * 为给定的前缀启动命名空间映射。
 	 * @see org.xml.sax.ContentHandler#startPrefixMapping(String, String)
 	 */
 	protected void startPrefixMapping(@Nullable String prefix, String namespace) throws SAXException {
@@ -195,7 +190,7 @@ abstract class AbstractStaxXMLReader extends AbstractXMLReader {
 	}
 
 	/**
-	 * End the prefix mapping for the given prefix.
+	 * 结束给定前缀的命名空间映射。
 	 * @see org.xml.sax.ContentHandler#endPrefixMapping(String)
 	 */
 	protected void endPrefixMapping(String prefix) throws SAXException {
@@ -207,7 +202,7 @@ abstract class AbstractStaxXMLReader extends AbstractXMLReader {
 
 
 	/**
-	 * Implementation of the {@code Locator} interface based on a given StAX {@code Location}.
+	 * 基于给定StAX {@code Location}的{@code Locator}接口实现。
 	 * @see Locator
 	 * @see Location
 	 */

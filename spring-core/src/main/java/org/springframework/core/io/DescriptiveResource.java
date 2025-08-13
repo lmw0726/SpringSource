@@ -23,11 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Simple {@link Resource} implementation that holds a resource description
- * but does not point to an actually readable resource.
+ * 简单的 {@link Resource} 实现，保存资源描述信息，
+ * 但不指向实际可读取的资源。
  *
- * <p>To be used as placeholder if a {@code Resource} argument is
- * expected by an API but not necessarily used for actual reading.
+ * <p>可作为占位符使用，当 API 需要传入 {@code Resource} 参数，
+ * 但并不一定会实际读取资源时，可以使用此类。
  *
  * @author Juergen Hoeller
  * @since 1.2.6

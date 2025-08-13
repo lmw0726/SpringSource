@@ -16,12 +16,8 @@
 
 package org.springframework.core.type.classreading;
 
-import java.lang.reflect.Field;
-import java.security.AccessControlException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.SpringAsmInfo;
 import org.springframework.asm.Type;
@@ -30,17 +26,20 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
+import java.security.AccessControlException;
+
 /**
- * {@link AnnotationVisitor} to recursively visit annotations.
+ * 用于递归访问注解的 {@link AnnotationVisitor}。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @author Phillip Webb
  * @author Sam Brannen
  * @since 3.1.1
- * @deprecated As of Spring Framework 5.2, this class and related classes in this
- * package have been replaced by {@link SimpleAnnotationMetadataReadingVisitor}
- * and related classes for internal use within the framework.
+ * @deprecated 自 Spring Framework 5.2 起，此类及本包中相关类
+ * 已被 {@link SimpleAnnotationMetadataReadingVisitor} 及其相关类替代，
+ * 仅供框架内部使用。
  */
 @Deprecated
 abstract class AbstractRecursiveAnnotationVisitor extends AnnotationVisitor {

@@ -16,25 +16,22 @@
 
 package org.springframework.core.annotation;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.core.DecoratingProxy;
 import org.springframework.core.OrderComparator;
 import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 import org.springframework.lang.Nullable;
 
+import java.lang.reflect.AnnotatedElement;
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * {@code AnnotationAwareOrderComparator} is an extension of
- * {@link OrderComparator} that supports Spring's
- * {@link org.springframework.core.Ordered} interface as well as the
- * {@link Order @Order} and {@link javax.annotation.Priority @Priority}
- * annotations, with an order value provided by an {@code Ordered}
- * instance overriding a statically defined annotation value (if any).
+ * {@code AnnotationAwareOrderComparator} 是 {@link OrderComparator} 的扩展，
+ * 它支持 Spring 的 {@link org.springframework.core.Ordered} 接口，
+ * 以及 {@link Order @Order} 和 {@link javax.annotation.Priority @Priority} 注解，
+ * 并且当存在 {@code Ordered} 实例时，其提供的顺序值会覆盖静态定义的注解值（如果有）。
  *
- * <p>Consult the Javadoc for {@link OrderComparator} for details on the
- * sort semantics for non-ordered objects.
+ * <p>关于非有序对象的排序语义，请参考 {@link OrderComparator} 的 Javadoc。
  *
  * @author Juergen Hoeller
  * @author Oliver Gierke
@@ -47,16 +44,15 @@ import org.springframework.lang.Nullable;
 public class AnnotationAwareOrderComparator extends OrderComparator {
 
 	/**
-	 * Shared default instance of {@code AnnotationAwareOrderComparator}.
+	 * {@code AnnotationAwareOrderComparator} 的共享默认实例。
 	 */
 	public static final AnnotationAwareOrderComparator INSTANCE = new AnnotationAwareOrderComparator();
 
 
 	/**
-	 * This implementation checks for {@link Order @Order} or
-	 * {@link javax.annotation.Priority @Priority} on various kinds of
-	 * elements, in addition to the {@link org.springframework.core.Ordered}
-	 * check in the superclass.
+	 * 此实现会在父类中 {@link org.springframework.core.Ordered} 检查的基础上，
+	 * 额外检查 {@link Order @Order} 或 {@link javax.annotation.Priority @Priority}
+	 * 是否存在于各种元素上。
 	 */
 	@Override
 	@Nullable
@@ -80,10 +76,9 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 	}
 
 	/**
-	 * This implementation retrieves an @{@link javax.annotation.Priority}
-	 * value, allowing for additional semantics over the regular @{@link Order}
-	 * annotation: typically, selecting one object over another in case of
-	 * multiple matches but only one object to be returned.
+	 * 此实现会获取 @{@link javax.annotation.Priority} 的值，
+	 * 以便在常规 @{@link Order} 注解的基础上提供额外的语义：
+	 * 通常用于在多个匹配对象中选择一个对象返回的场景。
 	 */
 	@Override
 	@Nullable
@@ -100,10 +95,9 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 
 
 	/**
-	 * Sort the given list with a default {@link AnnotationAwareOrderComparator}.
-	 * <p>Optimized to skip sorting for lists with size 0 or 1,
-	 * in order to avoid unnecessary array extraction.
-	 * @param list the List to sort
+	 * 使用默认的 {@link AnnotationAwareOrderComparator} 对给定的 List 进行排序。
+	 * <p>针对大小为 0 或 1 的列表进行了优化，跳过排序以避免不必要的数组提取。
+	 * @param list 要排序的 List
 	 * @see java.util.List#sort(java.util.Comparator)
 	 */
 	public static void sort(List<?> list) {
@@ -113,10 +107,9 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 	}
 
 	/**
-	 * Sort the given array with a default AnnotationAwareOrderComparator.
-	 * <p>Optimized to skip sorting for lists with size 0 or 1,
-	 * in order to avoid unnecessary array extraction.
-	 * @param array the array to sort
+	 * 使用默认的 AnnotationAwareOrderComparator 对给定的数组进行排序。
+	 * <p>针对长度为 0 或 1 的数组进行了优化，跳过排序以避免不必要的数组提取。
+	 * @param array 要排序的数组
 	 * @see java.util.Arrays#sort(Object[], java.util.Comparator)
 	 */
 	public static void sort(Object[] array) {
@@ -126,11 +119,10 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 	}
 
 	/**
-	 * Sort the given array or List with a default AnnotationAwareOrderComparator,
-	 * if necessary. Simply skips sorting when given any other value.
-	 * <p>Optimized to skip sorting for lists with size 0 or 1,
-	 * in order to avoid unnecessary array extraction.
-	 * @param value the array or List to sort
+	 * 如果需要，使用默认的 AnnotationAwareOrderComparator 对给定的数组或 List 进行排序。
+	 * 如果传入的值不是数组或 List，则直接跳过排序。
+	 * <p>针对大小为 0 或 1 的列表进行了优化，跳过排序以避免不必要的数组提取。
+	 * @param value 要排序的数组或 List
 	 * @see java.util.Arrays#sort(Object[], java.util.Comparator)
 	 */
 	public static void sortIfNecessary(Object value) {

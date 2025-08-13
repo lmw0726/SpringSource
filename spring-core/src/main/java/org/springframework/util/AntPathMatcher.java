@@ -24,39 +24,36 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * {@link PathMatcher} implementation for Ant-style path patterns.
+ * 实现Ant风格路径模式的{@link PathMatcher}。
  *
- * <p>Part of this mapping code has been kindly borrowed from <a href="https://ant.apache.org">Apache Ant</a>.
+ * <p>部分映射代码来自<a href="https://ant.apache.org">Apache Ant</a>。
  *
- * <p>The mapping matches URLs using the following rules:<br>
+ * <p>映射规则如下：<br>
  * <ul>
- * <li>{@code ?} matches one character</li>
- * <li>{@code *} matches zero or more characters</li>
- * <li>{@code **} matches zero or more <em>directories</em> in a path</li>
- * <li>{@code {spring:[a-z]+}} matches the regexp {@code [a-z]+} as a path variable named "spring"</li>
+ * <li>{@code ?} 匹配单个字符</li>
+ * <li>{@code *} 匹配零个或多个字符</li>
+ * <li>{@code **} 匹配路径中的零个或多个<em>目录</em></li>
+ * <li>{@code {spring:[a-z]+}} 将正则表达式{@code [a-z]+}作为名为"spring"的路径变量匹配</li>
  * </ul>
  *
- * <h3>Examples</h3>
+ * <h3>示例</h3>
  * <ul>
- * <li>{@code com/t?st.jsp} &mdash; matches {@code com/test.jsp} but also
- * {@code com/tast.jsp} or {@code com/txst.jsp}</li>
- * <li>{@code com/*.jsp} &mdash; matches all {@code .jsp} files in the
- * {@code com} directory</li>
- * <li><code>com/&#42;&#42;/test.jsp</code> &mdash; matches all {@code test.jsp}
- * files underneath the {@code com} path</li>
- * <li><code>org/springframework/&#42;&#42;/*.jsp</code> &mdash; matches all
- * {@code .jsp} files underneath the {@code org/springframework} path</li>
- * <li><code>org/&#42;&#42;/servlet/bla.jsp</code> &mdash; matches
- * {@code org/springframework/servlet/bla.jsp} but also
- * {@code org/springframework/testing/servlet/bla.jsp} and {@code org/servlet/bla.jsp}</li>
- * <li>{@code com/{filename:\\w+}.jsp} will match {@code com/test.jsp} and assign the value {@code test}
- * to the {@code filename} variable</li>
+ * <li>{@code com/t?st.jsp} &mdash; 匹配{@code com/test.jsp}，也匹配
+ * {@code com/tast.jsp}或{@code com/txst.jsp}</li>
+ * <li>{@code com/*.jsp} &mdash; 匹配{@code com}目录下所有{@code .jsp}文件</li>
+ * <li><code>com/&#42;&#42;/test.jsp</code> &mdash; 匹配{@code com}路径下所有
+ * {@code test.jsp}文件</li>
+ * <li><code>org/springframework/&#42;&#42;/*.jsp</code> &mdash; 匹配
+ * {@code org/springframework}路径下所有{@code .jsp}文件</li>
+ * <li><code>org/&#42;&#42;/servlet/bla.jsp</code> &mdash; 匹配
+ * {@code org/springframework/servlet/bla.jsp}，也匹配
+ * {@code org/springframework/testing/servlet/bla.jsp}和{@code org/servlet/bla.jsp}</li>
+ * <li>{@code com/{filename:\\w+}.jsp} 将匹配{@code com/test.jsp}并将值{@code test}
+ * 赋给变量{@code filename}</li>
  * </ul>
  *
- * <p><strong>Note:</strong> a pattern and a path must both be absolute or must
- * both be relative in order for the two to match. Therefore it is recommended
- * that users of this implementation to sanitize patterns in order to prefix
- * them with "/" as it makes sense in the context in which they're used.
+ * <p><strong>注意：</strong>模式和路径必须同为绝对路径或相对路径才能匹配。因此建议
+ * 用户在使用时对模式进行清理，根据需要添加"/"前缀。
  *
  * @author Alef Arendsen
  * @author Juergen Hoeller
@@ -70,7 +67,7 @@ import java.util.regex.Pattern;
 public class AntPathMatcher implements PathMatcher {
 
 	/**
-	 * Default path separator: "/".
+	 * 默认路径分隔符："/"。
 	 */
 	public static final String DEFAULT_PATH_SEPARATOR = "/";
 
@@ -98,7 +95,7 @@ public class AntPathMatcher implements PathMatcher {
 
 
 	/**
-	 * Create a new instance with the {@link #DEFAULT_PATH_SEPARATOR}.
+	 * 使用{@link #DEFAULT_PATH_SEPARATOR}创建新实例。
 	 */
 	public AntPathMatcher() {
 		this.pathSeparator = DEFAULT_PATH_SEPARATOR;
@@ -106,9 +103,9 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * A convenient, alternative constructor to use with a custom path separator.
+	 * 使用自定义路径分隔符的便捷构造方法。
 	 *
-	 * @param pathSeparator the path separator to use, must not be {@code null}.
+	 * @param pathSeparator 要使用的路径分隔符，不能为{@code null}
 	 * @since 4.1
 	 */
 	public AntPathMatcher(String pathSeparator) {
@@ -119,8 +116,8 @@ public class AntPathMatcher implements PathMatcher {
 
 
 	/**
-	 * Set the path separator to use for pattern parsing.
-	 * <p>Default is "/", as in Ant.
+	 * 设置用于模式解析的路径分隔符。
+	 * <p>默认为"/"，与Ant相同。
 	 */
 	public void setPathSeparator(@Nullable String pathSeparator) {
 		this.pathSeparator = (pathSeparator != null ? pathSeparator : DEFAULT_PATH_SEPARATOR);
@@ -128,8 +125,8 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Specify whether to perform pattern matching in a case-sensitive fashion.
-	 * <p>Default is {@code true}. Switch this to {@code false} for case-insensitive matching.
+	 * 指定是否执行区分大小写的模式匹配。
+	 * <p>默认为{@code true}。设置为{@code false}可进行不区分大小写的匹配。
 	 *
 	 * @since 4.2
 	 */
@@ -138,22 +135,18 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Specify whether to trim tokenized paths and patterns.
-	 * <p>Default is {@code false}.
+	 * 指定是否对标记化的路径和模式进行修剪。
+	 * <p>默认为{@code false}。
 	 */
 	public void setTrimTokens(boolean trimTokens) {
 		this.trimTokens = trimTokens;
 	}
 
 	/**
-	 * Specify whether to cache parsed pattern metadata for patterns passed
-	 * into this matcher's {@link #match} method. A value of {@code true}
-	 * activates an unlimited pattern cache; a value of {@code false} turns
-	 * the pattern cache off completely.
-	 * <p>Default is for the cache to be on, but with the variant to automatically
-	 * turn it off when encountering too many patterns to cache at runtime
-	 * (the threshold is 65536), assuming that arbitrary permutations of patterns
-	 * are coming in, with little chance for encountering a recurring pattern.
+	 * 指定是否缓存传入此匹配器{@link #match}方法的模式的解析元数据。
+	 * 值为{@code true}激活无限模式缓存；值为{@code false}则完全关闭模式缓存。
+	 * <p>默认开启缓存，但当运行时遇到太多要缓存的模式（阈值为65536）时，
+	 * 会自动关闭缓存，假设模式会任意变化且重复出现的可能性很小。
 	 *
 	 * @see #getStringMatcher(String)
 	 * @since 4.0.1
@@ -202,13 +195,13 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Actually match the given {@code path} against the given {@code pattern}.
+	 * 实际匹配给定的{@code path}与{@code pattern}。
 	 *
-	 * @param pattern   the pattern to match against
-	 * @param path      the path to test
-	 * @param fullMatch whether a full pattern match is required (else a pattern match
-	 *                  as far as the given base path goes is sufficient)
-	 * @return {@code true} if the supplied {@code path} matched, {@code false} if it didn't
+	 * @param pattern 要匹配的模式
+	 * @param path 要测试的路径
+	 * @param fullMatch 是否需要完全匹配（否则匹配到给定基础路径即可）
+	 * @param uriTemplateVariables URI模板变量映射（可为{@code null}）
+	 * @return 如果{@code path}匹配则返回{@code true}，否则返回{@code false}
 	 */
 	protected boolean doMatch(String pattern, @Nullable String path, boolean fullMatch,
 							  @Nullable Map<String, String> uriTemplateVariables) {
@@ -228,7 +221,7 @@ public class AntPathMatcher implements PathMatcher {
 		int pathIdxStart = 0;
 		int pathIdxEnd = pathDirs.length - 1;
 
-		// Match all elements up to the first **
+		// 匹配第一个"**"之前的所有元素
 		while (pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd) {
 			String pattDir = pattDirs[pattIdxStart];
 			if ("**".equals(pattDir)) {
@@ -242,7 +235,7 @@ public class AntPathMatcher implements PathMatcher {
 		}
 
 		if (pathIdxStart > pathIdxEnd) {
-			// Path is exhausted, only match if rest of pattern is * or **'s
+			// Path已耗尽，仅当pattern的其余部分为 * 或 ** 时才匹配
 			if (pattIdxStart > pattIdxEnd) {
 				return (pattern.endsWith(this.pathSeparator) == path.endsWith(this.pathSeparator));
 			}
@@ -259,14 +252,14 @@ public class AntPathMatcher implements PathMatcher {
 			}
 			return true;
 		} else if (pattIdxStart > pattIdxEnd) {
-			// String not exhausted, but pattern is. Failure.
+			// 字符串没有耗尽，但模式是。失败。
 			return false;
 		} else if (!fullMatch && "**".equals(pattDirs[pattIdxStart])) {
-			// Path start definitely matches due to "**" part in pattern.
+			// 由于模式中的 “**” 部分，路径开始肯定匹配。
 			return true;
 		}
 
-		// up to last '**'
+		// 直到最后一个 '**'
 		while (pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd) {
 			String pattDir = pattDirs[pattIdxEnd];
 			if (pattDir.equals("**")) {
@@ -279,7 +272,7 @@ public class AntPathMatcher implements PathMatcher {
 			pathIdxEnd--;
 		}
 		if (pathIdxStart > pathIdxEnd) {
-			// String is exhausted
+			// 字符串耗尽
 			for (int i = pattIdxStart; i <= pattIdxEnd; i++) {
 				if (!pattDirs[i].equals("**")) {
 					return false;
@@ -297,12 +290,11 @@ public class AntPathMatcher implements PathMatcher {
 				}
 			}
 			if (patIdxTmp == pattIdxStart + 1) {
-				// '**/**' situation, so skip one
+				// '**/**' 情况，所以跳过一个
 				pattIdxStart++;
 				continue;
 			}
-			// Find the pattern between padIdxStart & padIdxTmp in str between
-			// strIdxStart & strIdxEnd
+			// 在strIdxStart和strIdxEnd之间找到padIdxStart和padIdxTmp之间的模式
 			int patLength = (patIdxTmp - pattIdxStart - 1);
 			int strLength = (pathIdxEnd - pathIdxStart + 1);
 			int foundIdx = -1;
@@ -389,12 +381,12 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Tokenize the given path pattern into parts, based on this matcher's settings.
-	 * <p>Performs caching based on {@link #setCachePatterns}, delegating to
-	 * {@link #tokenizePath(String)} for the actual tokenization algorithm.
+	 * 根据此匹配器的设置，将给定的路径模式标记为多个部分。
+	 * <p>基于{@link #setCachePatterns}执行缓存，实际的标记算法委托给
+	 * {@link #tokenizePath(String)}实现。
 	 *
-	 * @param pattern the pattern to tokenize
-	 * @return the tokenized pattern parts
+	 * @param pattern 要标记的模式
+	 * @return 标记后的模式部分
 	 */
 	protected String[] tokenizePattern(String pattern) {
 		String[] tokenized = null;
@@ -405,9 +397,9 @@ public class AntPathMatcher implements PathMatcher {
 		if (tokenized == null) {
 			tokenized = tokenizePath(pattern);
 			if (cachePatterns == null && this.tokenizedPatternCache.size() >= CACHE_TURNOFF_THRESHOLD) {
-				// Try to adapt to the runtime situation that we're encountering:
-				// There are obviously too many different patterns coming in here...
-				// So let's turn off the cache since the patterns are unlikely to be reoccurring.
+				// 尝试适应运行时遇到的情况：
+				// 显然这里有太多不同的模式...
+				// 因此关闭缓存，因为模式不太可能重复出现
 				deactivatePatternCache();
 				return tokenized;
 			}
@@ -419,21 +411,22 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Tokenize the given path into parts, based on this matcher's settings.
+	 * 根据此匹配器的设置，将给定路径标记为多个部分。
 	 *
-	 * @param path the path to tokenize
-	 * @return the tokenized path parts
+	 * @param path 要标记的路径
+	 * @return 标记后的路径部分
 	 */
 	protected String[] tokenizePath(String path) {
 		return StringUtils.tokenizeToStringArray(path, this.pathSeparator, this.trimTokens, true);
 	}
 
 	/**
-	 * Test whether or not a string matches against a pattern.
+	 * 测试字符串是否与模式匹配。
 	 *
-	 * @param pattern the pattern to match against (never {@code null})
-	 * @param str     the String which must be matched against the pattern (never {@code null})
-	 * @return {@code true} if the string matches against the pattern, or {@code false} otherwise
+	 * @param pattern 要匹配的模式（不为{@code null}）
+	 * @param str 必须与模式匹配的字符串（不为{@code null}）
+	 * @param uriTemplateVariables URI模板变量映射（可为{@code null}）
+	 * @return 如果字符串与模式匹配则返回{@code true}，否则返回{@code false}
 	 */
 	private boolean matchStrings(String pattern, String str,
 								 @Nullable Map<String, String> uriTemplateVariables) {
@@ -442,17 +435,15 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Build or retrieve an {@link AntPathStringMatcher} for the given pattern.
-	 * <p>The default implementation checks this AntPathMatcher's internal cache
-	 * (see {@link #setCachePatterns}), creating a new AntPathStringMatcher instance
-	 * if no cached copy is found.
-	 * <p>When encountering too many patterns to cache at runtime (the threshold is 65536),
-	 * it turns the default cache off, assuming that arbitrary permutations of patterns
-	 * are coming in, with little chance for encountering a recurring pattern.
-	 * <p>This method may be overridden to implement a custom cache strategy.
+	 * 构建或获取给定模式的{@link AntPathStringMatcher}。
+	 * <p>默认实现检查此AntPathMatcher的内部缓存（参见{@link #setCachePatterns}），
+	 * 如果未找到缓存副本，则创建新的AntPathStringMatcher实例。
+	 * <p>当运行时遇到太多要缓存的模式（阈值为65536）时，
+	 * 它会关闭默认缓存，假设模式会任意变化，重复遇到相同模式的机会很小。
+	 * <p>可以重写此方法以实现自定义缓存策略。
 	 *
-	 * @param pattern the pattern to match against (never {@code null})
-	 * @return a corresponding AntPathStringMatcher (never {@code null})
+	 * @param pattern 要匹配的模式（不为{@code null}）
+	 * @return 对应的AntPathStringMatcher（不为{@code null}）
 	 * @see #setCachePatterns
 	 */
 	protected AntPathStringMatcher getStringMatcher(String pattern) {
@@ -464,9 +455,9 @@ public class AntPathMatcher implements PathMatcher {
 		if (matcher == null) {
 			matcher = new AntPathStringMatcher(pattern, this.caseSensitive);
 			if (cachePatterns == null && this.stringMatcherCache.size() >= CACHE_TURNOFF_THRESHOLD) {
-				// Try to adapt to the runtime situation that we're encountering:
-				// There are obviously too many different patterns coming in here...
-				// So let's turn off the cache since the patterns are unlikely to be reoccurring.
+				// 尝试适应我们遇到的运行时情况：
+				// 显然这里有太多不同的模式...
+				// 因此我们关闭缓存，因为模式不太可能重复出现。
 				deactivatePatternCache();
 				return matcher;
 			}
@@ -478,17 +469,17 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Given a pattern and a full path, determine the pattern-mapped part. <p>For example: <ul>
-	 * <li>'{@code /docs/cvs/commit.html}' and '{@code /docs/cvs/commit.html} &rarr; ''</li>
-	 * <li>'{@code /docs/*}' and '{@code /docs/cvs/commit} &rarr; '{@code cvs/commit}'</li>
-	 * <li>'{@code /docs/cvs/*.html}' and '{@code /docs/cvs/commit.html} &rarr; '{@code commit.html}'</li>
-	 * <li>'{@code /docs/**}' and '{@code /docs/cvs/commit} &rarr; '{@code cvs/commit}'</li>
-	 * <li>'{@code /docs/**\/*.html}' and '{@code /docs/cvs/commit.html} &rarr; '{@code cvs/commit.html}'</li>
-	 * <li>'{@code /*.html}' and '{@code /docs/cvs/commit.html} &rarr; '{@code docs/cvs/commit.html}'</li>
-	 * <li>'{@code *.html}' and '{@code /docs/cvs/commit.html} &rarr; '{@code /docs/cvs/commit.html}'</li>
-	 * <li>'{@code *}' and '{@code /docs/cvs/commit.html} &rarr; '{@code /docs/cvs/commit.html}'</li> </ul>
-	 * <p>Assumes that {@link #match} returns {@code true} for '{@code pattern}' and '{@code path}', but
-	 * does <strong>not</strong> enforce this.
+	 * 给定模式和完整路径，确定模式映射的部分。<p>例如：<ul>
+	 * <li>'{@code /docs/cvs/commit.html}'和'{@code /docs/cvs/commit.html} → ''</li>
+	 * <li>'{@code /docs/*}'和'{@code /docs/cvs/commit} → '{@code cvs/commit}'</li>
+	 * <li>'{@code /docs/cvs/*.html}'和'{@code /docs/cvs/commit.html} → '{@code commit.html}'</li>
+	 * <li>'{@code /docs/**}'和'{@code /docs/cvs/commit} → '{@code cvs/commit}'</li>
+	 * <li>'{@code /docs/**\/*.html}'和'{@code /docs/cvs/commit.html} → '{@code cvs/commit.html}'</li>
+	 * <li>'{@code /*.html}'和'{@code /docs/cvs/commit.html} → '{@code docs/cvs/commit.html}'</li>
+	 * <li>'{@code *.html}'和'{@code /docs/cvs/commit.html} → '{@code /docs/cvs/commit.html}'</li>
+	 * <li>'{@code *}'和'{@code /docs/cvs/commit.html} → '{@code /docs/cvs/commit.html}'</li></ul>
+	 * <p>假设{@link #match}对于'{@code pattern}'和'{@code path}'返回{@code true}，
+	 * 但<strong>不</strong>强制执行此操作。
 	 */
 	@Override
 	public String extractPathWithinPattern(String pattern, String path) {
@@ -524,14 +515,13 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Combine two patterns into a new pattern.
-	 * <p>This implementation simply concatenates the two patterns, unless
-	 * the first pattern contains a file extension match (e.g., {@code *.html}).
-	 * In that case, the second pattern will be merged into the first. Otherwise,
-	 * an {@code IllegalArgumentException} will be thrown.
-	 * <h3>Examples</h3>
+	 * 将两个模式组合成一个新模式。
+	 * <p>此实现简单地连接两个模式，除非第一个模式包含文件扩展名匹配（如{@code *.html}）。
+	 * 在这种情况下，第二个模式将被合并到第一个模式中。否则将抛出{@code IllegalArgumentException}。
+	 *
+	 * <h3>示例</h3>
 	 * <table border="1">
-	 * <tr><th>Pattern 1</th><th>Pattern 2</th><th>Result</th></tr>
+	 * <tr><th>模式1</th><th>模式2</th><th>结果</th></tr>
 	 * <tr><td>{@code null}</td><td>{@code null}</td><td>&nbsp;</td></tr>
 	 * <tr><td>/hotels</td><td>{@code null}</td><td>/hotels</td></tr>
 	 * <tr><td>{@code null}</td><td>/hotels</td><td>/hotels</td></tr>
@@ -547,10 +537,10 @@ public class AntPathMatcher implements PathMatcher {
 	 * <tr><td>/*.html</td><td>/*.txt</td><td>{@code IllegalArgumentException}</td></tr>
 	 * </table>
 	 *
-	 * @param pattern1 the first pattern
-	 * @param pattern2 the second pattern
-	 * @return the combination of the two patterns
-	 * @throws IllegalArgumentException if the two patterns cannot be combined
+	 * @param pattern1 第一个模式
+	 * @param pattern2 第二个模式
+	 * @return 两个模式的组合结果
+	 * @throws IllegalArgumentException 如果两个模式无法组合
 	 */
 	@Override
 	public String combine(String pattern1, String pattern2) {
@@ -567,7 +557,7 @@ public class AntPathMatcher implements PathMatcher {
 		boolean pattern1ContainsUriVar = (pattern1.indexOf('{') != -1);
 		if (!pattern1.equals(pattern2) && !pattern1ContainsUriVar && match(pattern1, pattern2)) {
 			// /* + /hotel -> /hotel ; "/*.*" + "/*.html" -> /*.html
-			// However /user + /user -> /usr/user ; /{foo} + /bar -> /{foo}/bar
+			// 但 /user + /user -> /usr/user ; /{foo} + /bar -> /{foo}/bar
 			return pattern2;
 		}
 
@@ -585,7 +575,7 @@ public class AntPathMatcher implements PathMatcher {
 
 		int starDotPos1 = pattern1.indexOf("*.");
 		if (pattern1ContainsUriVar || starDotPos1 == -1 || this.pathSeparator.equals(".")) {
-			// simply concatenate the two patterns
+			// 简单连接两个模式
 			return concat(pattern1, pattern2);
 		}
 
@@ -616,22 +606,20 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Given a full path, returns a {@link Comparator} suitable for sorting patterns in order of
-	 * explicitness.
-	 * <p>This {@code Comparator} will {@linkplain java.util.List#sort(Comparator) sort}
-	 * a list so that more specific patterns (without URI templates or wild cards) come before
-	 * generic patterns. So given a list with the following patterns, the returned comparator
-	 * will sort this list so that the order will be as indicated.
+	 * 给定完整路径，返回适合按明确性排序模式的{@link Comparator}。
+	 * <p>此{@code Comparator}将{@linkplain java.util.List#sort(Comparator) 排序}列表，
+	 * 使更具体的模式（不含URI模板或通配符）排在通用模式之前。例如给定包含以下模式的列表，
+	 * 返回的比较器将按如下顺序排序：
 	 * <ol>
 	 * <li>{@code /hotels/new}</li>
 	 * <li>{@code /hotels/{hotel}}</li>
 	 * <li>{@code /hotels/*}</li>
 	 * </ol>
-	 * <p>The full path given as parameter is used to test for exact matches. So when the given path
-	 * is {@code /hotels/2}, the pattern {@code /hotels/2} will be sorted before {@code /hotels/1}.
+	 * <p>作为参数给出的完整路径用于测试精确匹配。因此当给定路径为{@code /hotels/2}时，
+	 * 模式{@code /hotels/2}将排在{@code /hotels/1}之前。
 	 *
-	 * @param path the full path to use for comparison
-	 * @return a comparator capable of sorting patterns in order of explicitness
+	 * @param path 用于比较的完整路径
+	 * @return 能够按明确性排序模式的比较器
 	 */
 	@Override
 	public Comparator<String> getPatternComparator(String path) {
@@ -640,9 +628,9 @@ public class AntPathMatcher implements PathMatcher {
 
 
 	/**
-	 * Tests whether or not a string matches against a pattern via a {@link Pattern}.
-	 * <p>The pattern may contain special characters: '*' means zero or more characters; '?' means one and
-	 * only one character; '{' and '}' indicate a URI template pattern. For example <tt>/users/{user}</tt>.
+	 * 通过{@link Pattern}测试字符串是否与模式匹配。
+	 * <p>模式可能包含特殊字符：'*'表示零个或多个字符；'?'表示且仅表示一个字符；
+	 * '{'和'}'表示URI模板模式。例如<tt>/users/{user}</tt>。
 	 */
 	protected static class AntPathStringMatcher {
 
@@ -694,7 +682,7 @@ public class AntPathMatcher implements PathMatcher {
 				}
 				end = matcher.end();
 			}
-			// No glob pattern was found, this is an exact String match
+			// 没有找到glob模式，这是一个精确的字符串匹配
 			if (end == 0) {
 				this.exactMatch = true;
 				this.pattern = null;
@@ -714,9 +702,9 @@ public class AntPathMatcher implements PathMatcher {
 		}
 
 		/**
-		 * Main entry point.
+		 * 主要入口方法。
 		 *
-		 * @return {@code true} if the string matches against the pattern, or {@code false} otherwise.
+		 * @return 如果字符串匹配模式返回{@code true}，否则返回{@code false}
 		 */
 		public boolean matchStrings(String str, @Nullable Map<String, String> uriTemplateVariables) {
 			if (this.exactMatch) {
@@ -751,16 +739,15 @@ public class AntPathMatcher implements PathMatcher {
 
 
 	/**
-	 * The default {@link Comparator} implementation returned by
-	 * {@link #getPatternComparator(String)}.
-	 * <p>In order, the most "generic" pattern is determined by the following:
+	 * {@link #getPatternComparator(String)}方法返回的默认{@link Comparator}实现。
+	 * <p>按照以下顺序确定最"通用"的模式：
 	 * <ul>
-	 * <li>if it's null or a capture all pattern (i.e. it is equal to "/**")</li>
-	 * <li>if the other pattern is an actual match</li>
-	 * <li>if it's a catch-all pattern (i.e. it ends with "**"</li>
-	 * <li>if it's got more "*" than the other pattern</li>
-	 * <li>if it's got more "{foo}" than the other pattern</li>
-	 * <li>if it's shorter than the other pattern</li>
+	 * <li>如果为null或是全匹配模式（即等于"/**"）</li>
+	 * <li>如果另一个模式是实际匹配</li>
+	 * <li>如果是通配模式（即以"**"结尾）</li>
+	 * <li>如果比另一个模式包含更多"*"</li>
+	 * <li>如果比另一个模式包含更多"{foo}"</li>
+	 * <li>如果比另一个模式更短</li>
 	 * </ul>
 	 */
 	protected static class AntPatternComparator implements Comparator<String> {
@@ -772,11 +759,9 @@ public class AntPathMatcher implements PathMatcher {
 		}
 
 		/**
-		 * Compare two patterns to determine which should match first, i.e. which
-		 * is the most specific regarding the current path.
+		 * 比较两个模式以确定哪个应该优先匹配，即相对于当前路径哪个更具体。
 		 *
-		 * @return a negative integer, zero, or a positive integer as pattern1 is
-		 * more specific, equally specific, or less specific than pattern2.
+		 * @return 负整数、零或正整数，分别表示pattern1比pattern2更具体、同等具体或不够具体
 		 */
 		@Override
 		public int compare(String pattern1, String pattern2) {
@@ -834,8 +819,8 @@ public class AntPathMatcher implements PathMatcher {
 
 
 		/**
-		 * Value class that holds information about the pattern, e.g. number of
-		 * occurrences of "*", "**", and "{" pattern elements.
+		 * 值对象类，用于保存模式相关信息，例如：
+		 * "*"、"**"和"{"等模式元素的出现次数。
 		 */
 		private static class PatternInfo {
 
@@ -916,7 +901,7 @@ public class AntPathMatcher implements PathMatcher {
 			}
 
 			/**
-			 * Returns the length of the given pattern, where template variables are considered to be 1 long.
+			 * 返回给定模式的长度，其中模板变量被视为长度为1。
 			 */
 			public int getLength() {
 				if (this.length == null) {
@@ -930,7 +915,7 @@ public class AntPathMatcher implements PathMatcher {
 
 
 	/**
-	 * A simple cache for patterns that depend on the configured path separator.
+	 * 用于缓存基于配置路径分隔符的模式的简单缓存类。
 	 */
 	private static class PathSeparatorPatternCache {
 

@@ -29,45 +29,41 @@
 package org.springframework.asm;
 
 /**
- * The path to a type argument, wildcard bound, array element type, or static inner type within an
- * enclosing type.
+ * 表示封闭类型中，指向类型参数、通配符边界、数组元素类型或静态内部类型的路径。
  *
  * @author Eric Bruneton
  */
 public final class TypePath {
 
-  /** A type path step that steps into the element type of an array type. See {@link #getStep}. */
+  /** 类型路径中的一步，进入数组类型的元素类型。参见 {@link #getStep}。 */
   public static final int ARRAY_ELEMENT = 0;
 
-  /** A type path step that steps into the nested type of a class type. See {@link #getStep}. */
+  /** 类型路径中的一步，进入类类型的嵌套类型。参见 {@link #getStep}。 */
   public static final int INNER_TYPE = 1;
 
-  /** A type path step that steps into the bound of a wildcard type. See {@link #getStep}. */
+  /** 类型路径中的一步，进入通配符类型的边界。参见 {@link #getStep}。 */
   public static final int WILDCARD_BOUND = 2;
 
-  /** A type path step that steps into a type argument of a generic type. See {@link #getStep}. */
+  /** 类型路径中的一步，进入泛型类型的某个类型参数。参见 {@link #getStep}。 */
   public static final int TYPE_ARGUMENT = 3;
 
   /**
-   * The byte array where the 'type_path' structure - as defined in the Java Virtual Machine
-   * Specification (JVMS) - corresponding to this TypePath is stored. The first byte of the
-   * structure in this array is given by {@link #typePathOffset}.
+   * 存储与此 TypePath 对应的 `type_path` 结构（如 Java 虚拟机规范 JVMS 中定义）的字节数组。
+   * 该结构在此数组中的起始位置由 {@link #typePathOffset} 指定。
    *
-   * @see <a
-   *     href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.2">JVMS
-   *     4.7.20.2</a>
+   * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.2">
+   *      JVMS 4.7.20.2</a>
    */
   private final byte[] typePathContainer;
 
-  /** The offset of the first byte of the type_path JVMS structure in {@link #typePathContainer}. */
+  /** {@link #typePathContainer} 中 type_path JVMS 结构首字节的偏移量。 */
   private final int typePathOffset;
 
   /**
-   * Constructs a new TypePath.
+   * 构造一个新的 TypePath。
    *
-   * @param typePathContainer a byte array containing a type_path JVMS structure.
-   * @param typePathOffset the offset of the first byte of the type_path structure in
-   *     typePathContainer.
+   * @param typePathContainer 包含 type_path JVMS 结构的字节数组。
+   * @param typePathOffset 该结构在 typePathContainer 中的首字节偏移量。
    */
   TypePath(final byte[] typePathContainer, final int typePathOffset) {
     this.typePathContainer = typePathContainer;
@@ -75,46 +71,42 @@ public final class TypePath {
   }
 
   /**
-   * Returns the length of this path, i.e. its number of steps.
+   * 返回此路径的长度，即路径中的步骤数。
    *
-   * @return the length of this path.
+   * @return 路径长度。
    */
   public int getLength() {
-    // path_length is stored in the first byte of a type_path.
+    // path_length 存储在 type_path 的第一个字节中。
     return typePathContainer[typePathOffset];
   }
 
   /**
-   * Returns the value of the given step of this path.
+   * 返回此路径中指定步骤的值。
    *
-   * @param index an index between 0 and {@link #getLength()}, exclusive.
-   * @return one of {@link #ARRAY_ELEMENT}, {@link #INNER_TYPE}, {@link #WILDCARD_BOUND}, or {@link
-   *     #TYPE_ARGUMENT}.
+   * @param index 步骤索引，取值范围为 0（含）到 {@link #getLength()}（不含）。
+   * @return {@link #ARRAY_ELEMENT}、{@link #INNER_TYPE}、{@link #WILDCARD_BOUND} 或 {@link #TYPE_ARGUMENT} 之一。
    */
   public int getStep(final int index) {
-    // Returns the type_path_kind of the path element of the given index.
+    // 返回给定索引的路径元素的 type_path_kind。
     return typePathContainer[typePathOffset + 2 * index + 1];
   }
 
   /**
-   * Returns the index of the type argument that the given step is stepping into. This method should
-   * only be used for steps whose value is {@link #TYPE_ARGUMENT}.
+   * 返回指定步骤所进入的类型参数索引。仅适用于步骤值为 {@link #TYPE_ARGUMENT} 的情况。
    *
-   * @param index an index between 0 and {@link #getLength()}, exclusive.
-   * @return the index of the type argument that the given step is stepping into.
+   * @param index 步骤索引，取值范围为 0（含）到 {@link #getLength()}（不含）。
+   * @return 此步骤所进入的类型参数的索引。
    */
   public int getStepArgument(final int index) {
-    // Returns the type_argument_index of the path element of the given index.
+    // 返回给定索引的路径元素的 type_argument_index。
     return typePathContainer[typePathOffset + 2 * index + 2];
   }
 
   /**
-   * Converts a type path in string form, in the format used by {@link #toString()}, into a TypePath
-   * object.
+   * 将字符串形式的类型路径（由 {@link #toString()} 使用的格式）转换为 TypePath 对象。
    *
-   * @param typePath a type path in string form, in the format used by {@link #toString()}. May be
-   *     {@literal null} or empty.
-   * @return the corresponding TypePath object, or {@literal null} if the path is empty.
+   * @param typePath 字符串形式的类型路径，可以为 {@literal null} 或空。
+   * @return 对应的 TypePath 对象，如果路径为空则返回 {@literal null}。
    */
   public static TypePath fromString(final String typePath) {
     if (typePath == null || typePath.length() == 0) {
@@ -154,9 +146,11 @@ public final class TypePath {
   }
 
   /**
-   * Returns a string representation of this type path. {@link #ARRAY_ELEMENT} steps are represented
-   * with '[', {@link #INNER_TYPE} steps with '.', {@link #WILDCARD_BOUND} steps with '*' and {@link
-   * #TYPE_ARGUMENT} steps with their type argument index in decimal form followed by ';'.
+   * 返回此类型路径的字符串表示形式。
+   * {@link #ARRAY_ELEMENT} 步骤用 '[' 表示，
+   * {@link #INNER_TYPE} 用 '.' 表示，
+   * {@link #WILDCARD_BOUND} 用 '*' 表示，
+   * {@link #TYPE_ARGUMENT} 用类型参数索引（十进制）加 ';' 表示。
    */
   @Override
   public String toString() {
@@ -184,11 +178,10 @@ public final class TypePath {
   }
 
   /**
-   * Puts the type_path JVMS structure corresponding to the given TypePath into the given
-   * ByteVector.
+   * 将给定的 TypePath 对应的 type_path JVMS 结构写入指定的 ByteVector。
    *
-   * @param typePath a TypePath instance, or {@literal null} for empty paths.
-   * @param output where the type path must be put.
+   * @param typePath TypePath 实例，若为空路径则为 {@literal null}。
+   * @param output 要写入的 ByteVector。
    */
   static void put(final TypePath typePath, final ByteVector output) {
     if (typePath == null) {

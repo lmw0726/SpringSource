@@ -16,22 +16,22 @@
 
 package org.springframework.core.metrics;
 
-import java.util.function.Supplier;
-
 import org.springframework.lang.Nullable;
 
+import java.util.function.Supplier;
+
 /**
- * Step recording metrics about a particular phase or action happening during the {@link ApplicationStartup}.
+ * 记录 {@link ApplicationStartup} 过程中某个阶段或操作的指标的步骤。
  *
- * <p>The lifecycle of a {@code StartupStep} goes as follows:
+ * <p>{@code StartupStep} 的生命周期如下：
  * <ol>
- * <li>the step is created and starts by calling {@link ApplicationStartup#start(String) the application startup}
- * and is assigned a unique {@link StartupStep#getId() id}.
- * <li>we can then attach information with {@link Tags} during processing
- * <li>we then need to mark the {@link #end()} of the step
+ * <li>步骤被创建并通过调用 {@link ApplicationStartup#start(String)} 启动，
+ * 并分配一个唯一的 {@link StartupStep#getId() id}。
+ * <li>处理过程中可以通过 {@link Tags} 添加信息标签
+ * <li>然后需要调用 {@link #end()} 标记步骤结束
  * </ol>
  *
- * <p>Implementations can track the "execution time" or other metrics for steps.
+ * <p>实现类可以跟踪步骤的“执行时间”或其他指标。
  *
  * @author Brian Clozel
  * @since 5.3
@@ -39,71 +39,69 @@ import org.springframework.lang.Nullable;
 public interface StartupStep {
 
 	/**
-	 * Return the name of the startup step.
-	 * <p>A step name describes the current action or phase. This technical
-	 * name should be "." namespaced and can be reused to describe other instances of
-	 * similar steps during application startup.
+	 * 返回启动步骤的名称。
+	 * <p>步骤名称描述当前的动作或阶段。
+	 * 该技术名称应采用“.”分隔的命名空间，可以重复用于描述应用启动期间其他类似步骤实例。
 	 */
 	String getName();
 
 	/**
-	 * Return the unique id for this step within the application startup.
+	 * 返回该步骤在应用启动过程中的唯一ID。
 	 */
 	long getId();
 
 	/**
-	 * Return, if available, the id of the parent step.
-	 * <p>The parent step is the step that was started the most recently
-	 * when the current step was created.
+	 * 返回父步骤的ID（如果存在）。
+	 * <p>父步骤是当前步骤创建时最近启动的步骤。
 	 */
 	@Nullable
 	Long getParentId();
 
 	/**
-	 * Add a {@link Tag} to the step.
-	 * @param key tag key
-	 * @param value tag value
+	 * 向步骤添加一个 {@link Tag}。
+	 * @param key 标签键
+	 * @param value 标签值
 	 */
 	StartupStep tag(String key, String value);
 
 	/**
-	 * Add a {@link Tag} to the step.
-	 * @param key tag key
-	 * @param value {@link Supplier} for the tag value
+	 * 向步骤添加一个 {@link Tag}。
+	 * @param key 标签键
+	 * @param value 标签值的 {@link Supplier}
 	 */
 	StartupStep tag(String key, Supplier<String> value);
 
 	/**
-	 * Return the {@link Tag} collection for this step.
+	 * 返回该步骤的 {@link Tag} 集合。
 	 */
 	Tags getTags();
 
 	/**
-	 * Record the state of the step and possibly other metrics like execution time.
-	 * <p>Once ended, changes on the step state are not allowed.
+	 * 记录步骤的状态及可能的其他指标，如执行时间。
+	 * <p>一旦结束，步骤状态将不可再更改。
 	 */
 	void end();
 
 
 	/**
-	 * Immutable collection of {@link Tag}.
+	 * {@link Tag} 的不可变集合。
 	 */
 	interface Tags extends Iterable<Tag> {
 	}
 
 
 	/**
-	 * Simple key/value association for storing step metadata.
+	 * 用于存储步骤元数据的简单键值对关联。
 	 */
 	interface Tag {
 
 		/**
-		 * Return the {@code Tag} name.
+		 * 返回 {@code Tag} 的名称（键）。
 		 */
 		String getKey();
 
 		/**
-		 * Return the {@code Tag} value.
+		 * 返回 {@code Tag} 的值。
 		 */
 		String getValue();
 	}

@@ -16,28 +16,22 @@
 
 package org.springframework.core.type.filter;
 
-import java.io.IOException;
-
 import org.aspectj.bridge.IMessageHandler;
 import org.aspectj.weaver.ResolvedType;
 import org.aspectj.weaver.World;
 import org.aspectj.weaver.bcel.BcelWorld;
-import org.aspectj.weaver.patterns.Bindings;
-import org.aspectj.weaver.patterns.FormalBinding;
-import org.aspectj.weaver.patterns.IScope;
-import org.aspectj.weaver.patterns.PatternParser;
-import org.aspectj.weaver.patterns.SimpleScope;
-import org.aspectj.weaver.patterns.TypePattern;
-
+import org.aspectj.weaver.patterns.*;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+
 /**
- * Type filter that uses AspectJ type pattern for matching.
+ * 使用 AspectJ 类型模式进行匹配的类型过滤器。
  *
- * <p>A critical implementation details of this type filter is that it does not
- * load the class being examined to match with a type pattern.
+ * <p>该类型过滤器的一个关键实现细节是，它在匹配类型模式时
+ * 不会加载正在检查的类。
  *
  * @author Ramnivas Laddad
  * @author Juergen Hoeller

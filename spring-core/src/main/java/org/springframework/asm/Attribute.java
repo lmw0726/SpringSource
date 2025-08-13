@@ -28,8 +28,7 @@
 package org.springframework.asm;
 
 /**
- * A non standard class, field, method or Code attribute, as defined in the Java Virtual Machine
- * Specification (JVMS).
+ * 一个非标准的类、字段、方法或Code属性，如Java虚拟机规范(JVMS)中所定义。
  *
  * @see <a href= "https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7">JVMS
  *     4.7</a>
@@ -40,83 +39,73 @@ package org.springframework.asm;
  */
 public class Attribute {
 
-  /** The type of this attribute, also called its name in the JVMS. */
+  /** 此属性的类型，在JVMS中也称为其名称。 */
   public final String type;
 
   /**
-   * The raw content of this attribute, only used for unknown attributes (see {@link #isUnknown()}).
-   * The 6 header bytes of the attribute (attribute_name_index and attribute_length) are <i>not</i>
-   * included.
+   * 此属性的原始内容，仅用于未知属性（参见{@link #isUnknown()}）。
+   * 属性的6个头字节（attribute_name_index和attribute_length）<i>不</i>包含在内。
    */
   private byte[] content;
 
   /**
-   * The next attribute in this attribute list (Attribute instances can be linked via this field to
-   * store a list of class, field, method or Code attributes). May be {@literal null}.
+   * 此属性列表中的下一个属性（Attribute实例可以通过此字段链接以存储类、字段、方法或Code属性的列表）。
+   * 可能为{@literal null}。
    */
   Attribute nextAttribute;
 
   /**
-   * Constructs a new empty attribute.
+   * 构造一个新的空属性。
    *
-   * @param type the type of the attribute.
+   * @param type 属性的类型。
    */
   protected Attribute(final String type) {
     this.type = type;
   }
 
   /**
-   * Returns {@literal true} if this type of attribute is unknown. This means that the attribute
-   * content can't be parsed to extract constant pool references, labels, etc. Instead, the
-   * attribute content is read as an opaque byte array, and written back as is. This can lead to
-   * invalid attributes, if the content actually contains constant pool references, labels, or other
-   * symbolic references that need to be updated when there are changes to the constant pool, the
-   * method bytecode, etc. The default implementation of this method always returns {@literal true}.
+   * 如果此类型的属性是未知的，则返回{@literal true}。这意味着无法解析属性内容以提取常量池引用、标签等。
+   * 相反，属性内容被作为不透明字节数组读取，并按原样写回。如果内容实际包含常量池引用、标签或其他符号引用，
+   * 且当常量池、方法字节码等发生变化时需要更新，这可能导致无效属性。此方法的默认实现始终返回{@literal true}。
    *
-   * @return {@literal true} if this type of attribute is unknown.
+   * @return 如果此类型的属性是未知的，则返回{@literal true}。
    */
   public boolean isUnknown() {
     return true;
   }
 
   /**
-   * Returns {@literal true} if this type of attribute is a Code attribute.
+   * 如果此类型的属性是Code属性，则返回{@literal true}。
    *
-   * @return {@literal true} if this type of attribute is a Code attribute.
+   * @return 如果此类型的属性是Code属性，则返回{@literal true}。
    */
   public boolean isCodeAttribute() {
     return false;
   }
 
   /**
-   * Returns the labels corresponding to this attribute.
+   * 返回对应此属性的标签。
    *
-   * @return the labels corresponding to this attribute, or {@literal null} if this attribute is not
-   *     a Code attribute that contains labels.
+   * @return 对应此属性的标签，如果此属性不是包含标签的Code属性，则返回{@literal null}。
    */
   protected Label[] getLabels() {
     return new Label[0];
   }
 
   /**
-   * Reads a {@link #type} attribute. This method must return a <i>new</i> {@link Attribute} object,
-   * of type {@link #type}, corresponding to the 'length' bytes starting at 'offset', in the given
-   * ClassReader.
+   * 读取一个{@link #type}属性。此方法必须返回一个<i>新的</i>{@link Attribute}对象，
+   * 类型为{@link #type}，对应给定ClassReader中从'offset'开始的'length'个字节。
    *
-   * @param classReader the class that contains the attribute to be read.
-   * @param offset index of the first byte of the attribute's content in {@link ClassReader}. The 6
-   *     attribute header bytes (attribute_name_index and attribute_length) are not taken into
-   *     account here.
-   * @param length the length of the attribute's content (excluding the 6 attribute header bytes).
-   * @param charBuffer the buffer to be used to call the ClassReader methods requiring a
-   *     'charBuffer' parameter.
-   * @param codeAttributeOffset index of the first byte of content of the enclosing Code attribute
-   *     in {@link ClassReader}, or -1 if the attribute to be read is not a Code attribute. The 6
-   *     attribute header bytes (attribute_name_index and attribute_length) are not taken into
-   *     account here.
-   * @param labels the labels of the method's code, or {@literal null} if the attribute to be read
-   *     is not a Code attribute.
-   * @return a <i>new</i> {@link Attribute} object corresponding to the specified bytes.
+   * @param classReader 包含要读取的属性的类。
+   * @param offset 属性内容在{@link ClassReader}中第一个字节的索引。这里不考虑6个属性头字节
+   *     （attribute_name_index和attribute_length）。
+   * @param length 属性内容的长度（不包括6个属性头字节）。
+   * @param charBuffer 用于调用需要'charBuffer'参数的ClassReader方法的缓冲区。
+   * @param codeAttributeOffset 包围此属性的Code属性内容在{@link ClassReader}中第一个字节的索引，
+   *     如果要读取的属性不是Code属性，则为-1。这里不考虑6个属性头字节
+   *     （attribute_name_index和attribute_length）。
+   * @param labels 方法代码的标签，如果要读取的属性不是Code属性，则为{@literal null}。
+   * @return 对应指定字节的<i>新</i>{@link Attribute}对象。
    */
   protected Attribute read(
       final ClassReader classReader,
@@ -132,23 +121,17 @@ public class Attribute {
   }
 
   /**
-   * Returns the byte array form of the content of this attribute. The 6 header bytes
-   * (attribute_name_index and attribute_length) must <i>not</i> be added in the returned
-   * ByteVector.
+   * 返回此属性内容的字节数组形式。返回的ByteVector中<i>不得</i>添加6个头字节
+   * （attribute_name_index和attribute_length）。
    *
-   * @param classWriter the class to which this attribute must be added. This parameter can be used
-   *     to add the items that corresponds to this attribute to the constant pool of this class.
-   * @param code the bytecode of the method corresponding to this Code attribute, or {@literal null}
-   *     if this attribute is not a Code attribute. Corresponds to the 'code' field of the Code
-   *     attribute.
-   * @param codeLength the length of the bytecode of the method corresponding to this code
-   *     attribute, or 0 if this attribute is not a Code attribute. Corresponds to the 'code_length'
-   *     field of the Code attribute.
-   * @param maxStack the maximum stack size of the method corresponding to this Code attribute, or
-   *     -1 if this attribute is not a Code attribute.
-   * @param maxLocals the maximum number of local variables of the method corresponding to this code
-   *     attribute, or -1 if this attribute is not a Code attribute.
-   * @return the byte array form of this attribute.
+   * @param classWriter 必须添加此属性的类。此参数可用于将对应此属性的项添加到此类的常量池中。
+   * @param code 对应此Code属性的方法的字节码，如果此属性不是Code属性，则为{@literal null}。
+   *     对应Code属性的'code'字段。
+   * @param codeLength 对应此Code属性的方法字节码的长度，如果此属性不是Code属性，则为0。
+   *     对应Code属性的'code_length'字段。
+   * @param maxStack 对应此Code属性的方法的最大栈大小，如果此属性不是Code属性，则为-1。
+   * @param maxLocals 对应此Code属性的方法的本地变量最大数量，如果此属性不是Code属性，则为-1。
+   * @return 此属性的字节数组形式。
    */
   protected ByteVector write(
       final ClassWriter classWriter,
@@ -160,9 +143,9 @@ public class Attribute {
   }
 
   /**
-   * Returns the number of attributes of the attribute list that begins with this attribute.
+   * 返回以此属性开始的属性列表中的属性数量。
    *
-   * @return the number of attributes of the attribute list that begins with this attribute.
+   * @return 以此属性开始的属性列表中的属性数量。
    */
   final int getAttributeCount() {
     int count = 0;
@@ -175,13 +158,11 @@ public class Attribute {
   }
 
   /**
-   * Returns the total size in bytes of all the attributes in the attribute list that begins with
-   * this attribute. This size includes the 6 header bytes (attribute_name_index and
-   * attribute_length) per attribute. Also adds the attribute type names to the constant pool.
+   * 返回以此属性开始的属性列表中所有属性的总字节大小。此大小包括每个属性的6个头字节
+   * （attribute_name_index和attribute_length）。同时将属性类型名称添加到常量池。
    *
-   * @param symbolTable where the constants used in the attributes must be stored.
-   * @return the size of all the attributes in this attribute list. This size includes the size of
-   *     the attribute headers.
+   * @param symbolTable 必须存储属性中使用的常量的地方。
+   * @return 此属性列表中所有属性的大小。此大小包括属性头的大小。
    */
   final int computeAttributesSize(final SymbolTable symbolTable) {
     final byte[] code = null;
@@ -192,23 +173,17 @@ public class Attribute {
   }
 
   /**
-   * Returns the total size in bytes of all the attributes in the attribute list that begins with
-   * this attribute. This size includes the 6 header bytes (attribute_name_index and
-   * attribute_length) per attribute. Also adds the attribute type names to the constant pool.
+   * 返回以此属性开始的属性列表中所有属性的总字节大小。此大小包括每个属性的6个头字节
+   * （attribute_name_index和attribute_length）。同时将属性类型名称添加到常量池。
    *
-   * @param symbolTable where the constants used in the attributes must be stored.
-   * @param code the bytecode of the method corresponding to these Code attributes, or {@literal
-   *     null} if they are not Code attributes. Corresponds to the 'code' field of the Code
-   *     attribute.
-   * @param codeLength the length of the bytecode of the method corresponding to these code
-   *     attributes, or 0 if they are not Code attributes. Corresponds to the 'code_length' field of
-   *     the Code attribute.
-   * @param maxStack the maximum stack size of the method corresponding to these Code attributes, or
-   *     -1 if they are not Code attributes.
-   * @param maxLocals the maximum number of local variables of the method corresponding to these
-   *     Code attributes, or -1 if they are not Code attribute.
-   * @return the size of all the attributes in this attribute list. This size includes the size of
-   *     the attribute headers.
+   * @param symbolTable 必须存储属性中使用的常量的地方。
+   * @param code 对应这些Code属性的方法的字节码，如果它们不是Code属性，则为{@literal null}。
+   *     对应Code属性的'code'字段。
+   * @param codeLength 对应这些Code属性的方法字节码的长度，如果它们不是Code属性，则为0。
+   *     对应Code属性的'code_length'字段。
+   * @param maxStack 对应这些Code属性的方法的最大栈大小，如果它们不是Code属性，则为-1。
+   * @param maxLocals 对应这些Code属性的方法的本地变量最大数量，如果它们不是Code属性，则为-1。
+   * @return 此属性列表中所有属性的大小。此大小包括属性头的大小。
    */
   final int computeAttributesSize(
       final SymbolTable symbolTable,
@@ -228,35 +203,32 @@ public class Attribute {
   }
 
   /**
-   * Returns the total size in bytes of all the attributes that correspond to the given field,
-   * method or class access flags and signature. This size includes the 6 header bytes
-   * (attribute_name_index and attribute_length) per attribute. Also adds the attribute type names
-   * to the constant pool.
+   * 返回对应给定字段、方法或类访问标志和签名的所有属性的总字节大小。此大小包括每个属性的
+   * 6个头字节（attribute_name_index和attribute_length）。同时将属性类型名称添加到常量池。
    *
-   * @param symbolTable where the constants used in the attributes must be stored.
-   * @param accessFlags some field, method or class access flags.
-   * @param signatureIndex the constant pool index of a field, method of class signature.
-   * @return the size of all the attributes in bytes. This size includes the size of the attribute
-   *     headers.
+   * @param symbolTable 必须存储属性中使用的常量的地方。
+   * @param accessFlags 一些字段、方法或类的访问标志。
+   * @param signatureIndex 字段、方法或类签名的常量池索引。
+   * @return 所有属性的字节大小。此大小包括属性头的大小。
    */
   static int computeAttributesSize(
       final SymbolTable symbolTable, final int accessFlags, final int signatureIndex) {
     int size = 0;
-    // Before Java 1.5, synthetic fields are represented with a Synthetic attribute.
+    // 在Java 1.5之前，合成字段用Synthetic属性表示。
     if ((accessFlags & Opcodes.ACC_SYNTHETIC) != 0
         && symbolTable.getMajorVersion() < Opcodes.V1_5) {
-      // Synthetic attributes always use 6 bytes.
+      // Synthetic属性始终使用6个字节。
       symbolTable.addConstantUtf8(Constants.SYNTHETIC);
       size += 6;
     }
     if (signatureIndex != 0) {
-      // Signature attributes always use 8 bytes.
+      // Signature属性始终使用8个字节。
       symbolTable.addConstantUtf8(Constants.SIGNATURE);
       size += 8;
     }
-    // ACC_DEPRECATED is ASM specific, the ClassFile format uses a Deprecated attribute instead.
+    // ACC_DEPRECATED是ASM特有的，ClassFile格式使用Deprecated属性代替。
     if ((accessFlags & Opcodes.ACC_DEPRECATED) != 0) {
-      // Deprecated attributes always use 6 bytes.
+      // Deprecated属性始终使用6个字节。
       symbolTable.addConstantUtf8(Constants.DEPRECATED);
       size += 6;
     }
@@ -264,12 +236,11 @@ public class Attribute {
   }
 
   /**
-   * Puts all the attributes of the attribute list that begins with this attribute, in the given
-   * byte vector. This includes the 6 header bytes (attribute_name_index and attribute_length) per
-   * attribute.
+   * 将以此属性开始的属性列表中的所有属性放入给定的字节向量中。这包括每个属性的
+   * 6个头字节（attribute_name_index和attribute_length）。
    *
-   * @param symbolTable where the constants used in the attributes must be stored.
-   * @param output where the attributes must be written.
+   * @param symbolTable 必须存储属性中使用的常量的地方。
+   * @param output 必须写入属性的地方。
    */
   final void putAttributes(final SymbolTable symbolTable, final ByteVector output) {
     final byte[] code = null;
@@ -280,22 +251,17 @@ public class Attribute {
   }
 
   /**
-   * Puts all the attributes of the attribute list that begins with this attribute, in the given
-   * byte vector. This includes the 6 header bytes (attribute_name_index and attribute_length) per
-   * attribute.
+   * 将以此属性开始的属性列表中的所有属性放入给定的字节向量中。这包括每个属性的
+   * 6个头字节（attribute_name_index和attribute_length）。
    *
-   * @param symbolTable where the constants used in the attributes must be stored.
-   * @param code the bytecode of the method corresponding to these Code attributes, or {@literal
-   *     null} if they are not Code attributes. Corresponds to the 'code' field of the Code
-   *     attribute.
-   * @param codeLength the length of the bytecode of the method corresponding to these code
-   *     attributes, or 0 if they are not Code attributes. Corresponds to the 'code_length' field of
-   *     the Code attribute.
-   * @param maxStack the maximum stack size of the method corresponding to these Code attributes, or
-   *     -1 if they are not Code attributes.
-   * @param maxLocals the maximum number of local variables of the method corresponding to these
-   *     Code attributes, or -1 if they are not Code attribute.
-   * @param output where the attributes must be written.
+   * @param symbolTable 必须存储属性中使用的常量的地方。
+   * @param code 对应这些Code属性的方法的字节码，如果它们不是Code属性，则为{@literal null}。
+   *     对应Code属性的'code'字段。
+   * @param codeLength 对应这些Code属性的方法字节码的长度，如果它们不是Code属性，则为0。
+   *     对应Code属性的'code_length'字段。
+   * @param maxStack 对应这些Code属性的方法的最大栈大小，如果它们不是Code属性，则为-1。
+   * @param maxLocals 对应这些Code属性的方法的本地变量最大数量，如果它们不是Code属性，则为-1。
+   * @param output 必须写入属性的地方。
    */
   final void putAttributes(
       final SymbolTable symbolTable,
@@ -309,7 +275,7 @@ public class Attribute {
     while (attribute != null) {
       ByteVector attributeContent =
           attribute.write(classWriter, code, codeLength, maxStack, maxLocals);
-      // Put attribute_name_index and attribute_length.
+      // 放入attribute_name_index和attribute_length。
       output.putShort(symbolTable.addConstantUtf8(attribute.type)).putInt(attributeContent.length);
       output.putByteArray(attributeContent.data, 0, attributeContent.length);
       attribute = attribute.nextAttribute;
@@ -317,21 +283,20 @@ public class Attribute {
   }
 
   /**
-   * Puts all the attributes that correspond to the given field, method or class access flags and
-   * signature, in the given byte vector. This includes the 6 header bytes (attribute_name_index and
-   * attribute_length) per attribute.
+   * 将对应给定字段、方法或类访问标志和签名的所有属性放入给定的字节向量中。这包括每个属性的
+   * 6个头字节（attribute_name_index和attribute_length）。
    *
-   * @param symbolTable where the constants used in the attributes must be stored.
-   * @param accessFlags some field, method or class access flags.
-   * @param signatureIndex the constant pool index of a field, method of class signature.
-   * @param output where the attributes must be written.
+   * @param symbolTable 必须存储属性中使用的常量的地方。
+   * @param accessFlags 一些字段、方法或类的访问标志。
+   * @param signatureIndex 字段、方法或类签名的常量池索引。
+   * @param output 必须写入属性的地方。
    */
   static void putAttributes(
       final SymbolTable symbolTable,
       final int accessFlags,
       final int signatureIndex,
       final ByteVector output) {
-    // Before Java 1.5, synthetic fields are represented with a Synthetic attribute.
+    // 在Java 1.5之前，合成字段用Synthetic属性表示。
     if ((accessFlags & Opcodes.ACC_SYNTHETIC) != 0
         && symbolTable.getMajorVersion() < Opcodes.V1_5) {
       output.putShort(symbolTable.addConstantUtf8(Constants.SYNTHETIC)).putInt(0);
@@ -347,7 +312,7 @@ public class Attribute {
     }
   }
 
-  /** A set of attribute prototypes (attributes with the same type are considered equal). */
+  /** 一组属性原型集合（具有相同类型的属性被认为是相等的）。 */
   static final class Set {
 
     private static final int SIZE_INCREMENT = 6;

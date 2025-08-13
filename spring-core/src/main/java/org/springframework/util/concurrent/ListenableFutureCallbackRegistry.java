@@ -16,23 +16,23 @@
 
 package org.springframework.util.concurrent;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
 /**
- * Helper class for {@link ListenableFuture} implementations that maintains a
- * of success and failure callbacks and helps to notify them.
+ * 用于{@link ListenableFuture}实现的辅助类，维护成功和失败回调列表，
+ * 并帮助通知这些回调。
  *
- * <p>Inspired by {@code com.google.common.util.concurrent.ExecutionList}.
+ * <p>灵感来自{@code com.google.common.util.concurrent.ExecutionList}。
  *
  * @author Arjen Poutsma
  * @author Sebastien Deleuze
  * @author Rossen Stoyanchev
  * @since 4.0
- * @param <T> the callback result type
+ * @param <T> 回调结果类型
  */
 public class ListenableFutureCallbackRegistry<T> {
 
@@ -49,8 +49,8 @@ public class ListenableFutureCallbackRegistry<T> {
 
 
 	/**
-	 * Add the given callback to this registry.
-	 * @param callback the callback to add
+	 * 向此注册器添加回调。
+	 * @param callback 要添加的回调
 	 */
 	public void addCallback(ListenableFutureCallback<? super T> callback) {
 		Assert.notNull(callback, "'callback' must not be null");
@@ -76,7 +76,7 @@ public class ListenableFutureCallbackRegistry<T> {
 			callback.onSuccess((T) this.result);
 		}
 		catch (Throwable ex) {
-			// Ignore
+			// 忽略
 		}
 	}
 
@@ -86,13 +86,14 @@ public class ListenableFutureCallbackRegistry<T> {
 			callback.onFailure((Throwable) this.result);
 		}
 		catch (Throwable ex) {
-			// Ignore
+			// 忽略
 		}
 	}
 
 	/**
-	 * Add the given success callback to this registry.
-	 * @param callback the success callback to add
+	 * 向此注册器添加成功回调。
+	 * @param callback 要添加的成功回调
+	 * @throws IllegalArgumentException 如果callback为null
 	 * @since 4.1
 	 */
 	public void addSuccessCallback(SuccessCallback<? super T> callback) {
@@ -110,8 +111,9 @@ public class ListenableFutureCallbackRegistry<T> {
 	}
 
 	/**
-	 * Add the given failure callback to this registry.
-	 * @param callback the failure callback to add
+	 * 向此注册器添加失败回调。
+	 * @param callback 要添加的失败回调
+	 * @throws IllegalArgumentException 如果callback为null
 	 * @since 4.1
 	 */
 	public void addFailureCallback(FailureCallback callback) {
@@ -129,9 +131,8 @@ public class ListenableFutureCallbackRegistry<T> {
 	}
 
 	/**
-	 * Trigger a {@link ListenableFutureCallback#onSuccess(Object)} call on all
-	 * added callbacks with the given result.
-	 * @param result the result to trigger the callbacks with
+	 * 使用给定结果触发所有已添加回调的{@link ListenableFutureCallback#onSuccess(Object)}调用。
+	 * @param result 用于触发回调的结果
 	 */
 	public void success(@Nullable T result) {
 		synchronized (this.mutex) {
@@ -145,9 +146,8 @@ public class ListenableFutureCallbackRegistry<T> {
 	}
 
 	/**
-	 * Trigger a {@link ListenableFutureCallback#onFailure(Throwable)} call on all
-	 * added callbacks with the given {@code Throwable}.
-	 * @param ex the exception to trigger the callbacks with
+	 * 使用给定异常触发所有已添加回调的{@link ListenableFutureCallback#onFailure(Throwable)}调用。
+	 * @param ex 用于触发回调的异常
 	 */
 	public void failure(Throwable ex) {
 		synchronized (this.mutex) {

@@ -16,15 +16,14 @@
 
 package org.springframework.core.annotation;
 
-import java.util.Arrays;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
+
 /**
- * {@link AnnotationFilter} implementation used for
- * {@link AnnotationFilter#packages(String...)}.
+ * {@link AnnotationFilter} 实现，用于 {@link AnnotationFilter#packages(String...)}。
  *
  * @author Phillip Webb
  * @since 5.2

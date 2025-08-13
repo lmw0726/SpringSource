@@ -19,16 +19,14 @@ package org.springframework.core;
 import org.springframework.lang.Nullable;
 
 /**
- * Handy class for wrapping checked {@code Exceptions} with a root cause.
+ * 用于包装带有根本原因的已检查异常（checked Exceptions）的实用类。
  *
- * <p>This class is {@code abstract} to force the programmer to extend
- * the class. {@code getMessage} will include nested exception
- * information; {@code printStackTrace} and other like methods will
- * delegate to the wrapped exception, if any.
+ * <p>该类是抽象的，强制程序员继承此类。
+ * {@code getMessage} 会包含嵌套异常的信息；
+ * {@code printStackTrace} 等类似方法会委托给被包装的异常（如果存在）。
  *
- * <p>The similarity between this class and the {@link NestedRuntimeException}
- * class is unavoidable, as Java forces these two classes to have different
- * superclasses (ah, the inflexibility of concrete inheritance!).
+ * <p>该类与 {@link NestedRuntimeException} 类的相似性是不可避免的，
+ * 因为 Java 要求这两个类必须有不同的父类（继承机制的局限性）。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -38,29 +36,28 @@ import org.springframework.lang.Nullable;
  */
 public abstract class NestedCheckedException extends Exception {
 
-	/** Use serialVersionUID from Spring 1.2 for interoperability. */
+	/** 使用 Spring 1.2 的 serialVersionUID 以保持兼容性。 */
 	private static final long serialVersionUID = 7100714597678207546L;
 
 	static {
-		// Eagerly load the NestedExceptionUtils class to avoid classloader deadlock
-		// issues on OSGi when calling getMessage(). Reported by Don Brown; SPR-5607.
+		// 预加载 NestedExceptionUtils 类，避免在 OSGi 环境中调用 getMessage() 时发生类加载死锁问题。
+		// 报告者 Don Brown; SPR-5607。
 		NestedExceptionUtils.class.getName();
 	}
 
 
 	/**
-	 * Construct a {@code NestedCheckedException} with the specified detail message.
-	 * @param msg the detail message
+	 * 使用指定详细消息构造 {@code NestedCheckedException}。
+	 * @param msg 详细消息
 	 */
 	public NestedCheckedException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Construct a {@code NestedCheckedException} with the specified detail message
-	 * and nested exception.
-	 * @param msg the detail message
-	 * @param cause the nested exception
+	 * 使用指定详细消息和嵌套异常构造 {@code NestedCheckedException}。
+	 * @param msg 详细消息
+	 * @param cause 嵌套异常
 	 */
 	public NestedCheckedException(@Nullable String msg, @Nullable Throwable cause) {
 		super(msg, cause);
@@ -68,8 +65,7 @@ public abstract class NestedCheckedException extends Exception {
 
 
 	/**
-	 * Return the detail message, including the message from the nested exception
-	 * if there is one.
+	 * 返回详细消息，包括嵌套异常的消息（如果存在）。
 	 */
 	@Override
 	@Nullable
@@ -79,8 +75,8 @@ public abstract class NestedCheckedException extends Exception {
 
 
 	/**
-	 * Retrieve the innermost cause of this exception, if any.
-	 * @return the innermost exception, or {@code null} if none
+	 * 获取该异常的最深层原因（根本原因），如果有的话。
+	 * @return 最深层的异常，若无则返回 {@code null}
 	 */
 	@Nullable
 	public Throwable getRootCause() {
@@ -88,11 +84,9 @@ public abstract class NestedCheckedException extends Exception {
 	}
 
 	/**
-	 * Retrieve the most specific cause of this exception, that is,
-	 * either the innermost cause (root cause) or this exception itself.
-	 * <p>Differs from {@link #getRootCause()} in that it falls back
-	 * to the present exception if there is no root cause.
-	 * @return the most specific cause (never {@code null})
+	 * 获取该异常的最具体原因，即最深层原因（根本原因）或该异常本身。
+	 * <p>与 {@link #getRootCause()} 不同的是，如果没有根本原因，则返回当前异常实例。
+	 * @return 最具体的原因（永不为 {@code null}）
 	 * @since 2.0.3
 	 */
 	public Throwable getMostSpecificCause() {
@@ -101,11 +95,10 @@ public abstract class NestedCheckedException extends Exception {
 	}
 
 	/**
-	 * Check whether this exception contains an exception of the given type:
-	 * either it is of the given class itself or it contains a nested cause
-	 * of the given type.
-	 * @param exType the exception type to look for
-	 * @return whether there is a nested exception of the specified type
+	 * 检查该异常是否包含指定类型的异常：
+	 * 要么是该类型本身，要么嵌套包含该类型的异常。
+	 * @param exType 要查找的异常类型
+	 * @return 是否包含指定类型的嵌套异常
 	 */
 	public boolean contains(@Nullable Class<?> exType) {
 		if (exType == null) {

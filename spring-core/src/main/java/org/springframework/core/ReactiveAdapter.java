@@ -23,10 +23,9 @@ import org.springframework.util.Assert;
 import java.util.function.Function;
 
 /**
- * Adapter for a Reactive Streams {@link Publisher} to and from an async/reactive
- * type such as {@code CompletableFuture}, RxJava {@code Observable}, and others.
+ * Reactive Streams {@link Publisher} 与异步/响应式类型（如 {@code CompletableFuture}、RxJava {@code Observable} 等）之间的适配器。
  *
- * <p>An adapter is typically obtained via {@link ReactiveAdapterRegistry}.
+ * <p>通常通过 {@link ReactiveAdapterRegistry} 获取适配器实例。
  *
  * @author Rossen Stoyanchev
  * @since 5.0
@@ -41,12 +40,11 @@ public class ReactiveAdapter {
 
 
 	/**
-	 * Constructor for an adapter with functions to convert the target reactive
-	 * or async type to and from a Reactive Streams Publisher.
+	 * 构造器，接收用于将目标响应式或异步类型转换为 Reactive Streams Publisher 及反向转换的函数。
 	 *
-	 * @param descriptor            the reactive type descriptor
-	 * @param toPublisherFunction   adapter to a Publisher
-	 * @param fromPublisherFunction adapter from a Publisher
+	 * @param descriptor            响应式类型描述符
+	 * @param toPublisherFunction   转换为 Publisher 的函数
+	 * @param fromPublisherFunction 从 Publisher 转换的函数
 	 */
 	public ReactiveAdapter(ReactiveTypeDescriptor descriptor,
 						   Function<Object, Publisher<?>> toPublisherFunction,
@@ -63,35 +61,35 @@ public class ReactiveAdapter {
 
 
 	/**
-	 * Return the descriptor of the reactive type for the adapter.
+	 * 返回该适配器对应的响应式类型描述符。
 	 */
 	public ReactiveTypeDescriptor getDescriptor() {
 		return this.descriptor;
 	}
 
 	/**
-	 * Shortcut for {@code getDescriptor().getReactiveType()}.
+	 * {@code getDescriptor().getReactiveType()} 的快捷方法。
 	 */
 	public Class<?> getReactiveType() {
 		return getDescriptor().getReactiveType();
 	}
 
 	/**
-	 * Shortcut for {@code getDescriptor().isMultiValue()}.
+	 * {@code getDescriptor().isMultiValue()} 的快捷方法。
 	 */
 	public boolean isMultiValue() {
 		return getDescriptor().isMultiValue();
 	}
 
 	/**
-	 * Shortcut for {@code getDescriptor().isNoValue()}.
+	 * {@code getDescriptor().isNoValue()} 的快捷方法。
 	 */
 	public boolean isNoValue() {
 		return getDescriptor().isNoValue();
 	}
 
 	/**
-	 * Shortcut for {@code getDescriptor().supportsEmpty()}.
+	 * {@code getDescriptor().supportsEmpty()} 的快捷方法。
 	 */
 	public boolean supportsEmpty() {
 		return getDescriptor().supportsEmpty();

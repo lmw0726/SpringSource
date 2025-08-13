@@ -16,20 +16,16 @@
 
 package org.springframework.util.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.ProcessingInstruction;
-import org.w3c.dom.Text;
+import org.w3c.dom.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * SAX {@code ContentHandler} that transforms callback calls to DOM {@code Node}s.
+ * 将SAX回调事件转换为DOM {@code Node}的SAX {@code ContentHandler}实现。
  *
  * @author Arjen Poutsma
  * @since 3.0
@@ -45,8 +41,8 @@ class DomContentHandler implements ContentHandler {
 
 
 	/**
-	 * Create a new instance of the {@code DomContentHandler} with the given node.
-	 * @param node the node to publish events to
+	 * 使用给定的节点创建新的{@code DomContentHandler}实例。
+	 * @param node 要接收事件的DOM节点
 	 */
 	DomContentHandler(Node node) {
 		this.node = node;
@@ -111,7 +107,7 @@ class DomContentHandler implements ContentHandler {
 	}
 
 
-	// Unsupported
+	// 不支持
 
 	@Override
 	public void setDocumentLocator(Locator locator) {

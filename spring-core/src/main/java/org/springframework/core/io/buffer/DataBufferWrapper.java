@@ -16,19 +16,19 @@
 
 package org.springframework.core.io.buffer;
 
+import org.springframework.util.Assert;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.function.IntPredicate;
 
-import org.springframework.util.Assert;
-
 /**
- * Provides a convenient implementation of the {@link DataBuffer} interface
- * that can be overridden to adapt the delegate.
+ * 提供了 {@link DataBuffer} 接口的便捷实现，
+ * 可通过覆盖方法来自定义委托对象的行为。
  *
- * <p>These methods default to calling through to the wrapped delegate object.
+ * <p>这些方法默认调用被包装的委托对象。
  *
  * @author Arjen Poutsma
  * @since 5.2
@@ -39,8 +39,8 @@ public class DataBufferWrapper implements DataBuffer {
 
 
 	/**
-	 * Create a new {@code DataBufferWrapper} that wraps the given buffer.
-	 * @param delegate the buffer to wrap
+	 * 创建一个新的 {@code DataBufferWrapper}，包装给定的缓冲区。
+	 * @param delegate 要包装的缓冲区
 	 */
 	public DataBufferWrapper(DataBuffer delegate) {
 		Assert.notNull(delegate, "Delegate must not be null");
@@ -48,7 +48,7 @@ public class DataBufferWrapper implements DataBuffer {
 	}
 
 	/**
-	 * Return the wrapped delegate.
+	 * 返回被包装的委托对象。
 	 */
 	public DataBuffer dataBuffer() {
 		return this.delegate;

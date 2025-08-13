@@ -20,7 +20,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 
 /**
- * Converts a String to a Character.
+ * 将字符串转换为字符。
  *
  * @author Keith Donald
  * @since 3.0

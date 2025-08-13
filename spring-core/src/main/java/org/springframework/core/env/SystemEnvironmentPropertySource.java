@@ -16,45 +16,41 @@
 
 package org.springframework.core.env;
 
-import java.util.Map;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.Map;
+
 /**
- * Specialization of {@link MapPropertySource} designed for use with
- * {@linkplain AbstractEnvironment#getSystemEnvironment() system environment variables}.
- * Compensates for constraints in Bash and other shells that do not allow for variables
- * containing the period character and/or hyphen character; also allows for uppercase
- * variations on property names for more idiomatic shell use.
+ * {@link MapPropertySource} 的一个特化实现，设计用于
+ * {@linkplain AbstractEnvironment#getSystemEnvironment() 系统环境变量}。
+ * 该类解决了 Bash 及其他 shell 对变量名中不允许包含点号（.）和/或连字符（-）的限制；
+ * 同时允许属性名称使用大写字母，以符合更惯用的 shell 习惯。
  *
- * <p>For example, a call to {@code getProperty("foo.bar")} will attempt to find a value
- * for the original property or any 'equivalent' property, returning the first found:
+ * <p>例如，调用 {@code getProperty("foo.bar")} 会尝试查找原始属性名或任何“等效”的属性，
+ * 并返回第一个找到的结果：
  * <ul>
- * <li>{@code foo.bar} - the original name</li>
- * <li>{@code foo_bar} - with underscores for periods (if any)</li>
- * <li>{@code FOO.BAR} - original, with upper case</li>
- * <li>{@code FOO_BAR} - with underscores and upper case</li>
+ * <li>{@code foo.bar} - 原始名称</li>
+ * <li>{@code foo_bar} - 将点号替换为下划线后的名称（如果有）</li>
+ * <li>{@code FOO.BAR} - 原始名称的大写形式</li>
+ * <li>{@code FOO_BAR} - 使用下划线和大写的名称</li>
  * </ul>
- * Any hyphen variant of the above would work as well, or even mix dot/hyphen variants.
+ * 上述名称的任何连字符变体也同样有效，甚至可以混合点号和连字符变体。
  *
- * <p>The same applies for calls to {@link #containsProperty(String)}, which returns
- * {@code true} if any of the above properties are present, otherwise {@code false}.
+ * <p>{@link #containsProperty(String)} 方法同样适用上述规则，
+ * 只要存在上述任一属性名就返回 {@code true}，否则返回 {@code false}。
  *
- * <p>This feature is particularly useful when specifying active or default profiles as
- * environment variables. The following is not allowable under Bash:
+ * <p>该特性在通过环境变量指定激活或默认配置文件时尤其有用。Bash 中以下写法是不允许的：
  *
  * <pre class="code">spring.profiles.active=p1 java -classpath ... MyApp</pre>
  *
- * However, the following syntax is permitted and is also more conventional:
+ * 而下面这种写法是允许的，也更符合惯例：
  *
  * <pre class="code">SPRING_PROFILES_ACTIVE=p1 java -classpath ... MyApp</pre>
  *
- * <p>Enable debug- or trace-level logging for this class (or package) for messages
- * explaining when these 'property name resolutions' occur.
+ * <p>开启该类（或其包）的调试或追踪日志级别，可以看到何时发生这些“属性名解析”的消息。
  *
- * <p>This property source is included by default in {@link StandardEnvironment}
- * and all its subclasses.
+ * <p>该属性源默认包含在 {@link StandardEnvironment} 及其所有子类中。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -66,8 +62,7 @@ import org.springframework.util.Assert;
 public class SystemEnvironmentPropertySource extends MapPropertySource {
 
 	/**
-	 * Create a new {@code SystemEnvironmentPropertySource} with the given name and
-	 * delegating to the given {@code MapPropertySource}.
+	 * 使用给定名称创建一个新的 {@code SystemEnvironmentPropertySource}，并代理给定的 {@code MapPropertySource}。
 	 */
 	public SystemEnvironmentPropertySource(String name, Map<String, Object> source) {
 		super(name, source);
@@ -75,8 +70,7 @@ public class SystemEnvironmentPropertySource extends MapPropertySource {
 
 
 	/**
-	 * Return {@code true} if a property with the given name or any underscore/uppercase variant
-	 * thereof exists in this property source.
+	 * 如果此属性源包含给定名称的属性，或其任何下划线/大写变体，则返回 {@code true}。
 	 */
 	@Override
 	public boolean containsProperty(String name) {
@@ -84,8 +78,7 @@ public class SystemEnvironmentPropertySource extends MapPropertySource {
 	}
 
 	/**
-	 * This implementation returns {@code true} if a property with the given name or
-	 * any underscore/uppercase variant thereof exists in this property source.
+	 * 实现中，如果此属性源包含给定名称的属性，或其任何下划线/大写变体，则返回 {@code true}。
 	 */
 	@Override
 	@Nullable
@@ -99,9 +92,8 @@ public class SystemEnvironmentPropertySource extends MapPropertySource {
 	}
 
 	/**
-	 * Check to see if this property source contains a property with the given name, or
-	 * any underscore / uppercase variation thereof. Return the resolved name if one is
-	 * found or otherwise the original name. Never returns {@code null}.
+	 * 检查此属性源是否包含给定名称的属性，或其任何下划线/大写变体。
+	 * 如果找到，则返回解析后的名称；否则返回原始名称。永远不返回 {@code null}。
 	 */
 	protected final String resolvePropertyName(String name) {
 		Assert.notNull(name, "Property name must not be null");
@@ -121,26 +113,26 @@ public class SystemEnvironmentPropertySource extends MapPropertySource {
 
 	@Nullable
 	private String checkPropertyName(String name) {
-		// Check name as-is
+		// 按原样检查名称
 		if (containsKey(name)) {
 			return name;
 		}
-		// Check name with just dots replaced
+		// 仅将点替换为下划线后检查名称
 		String noDotName = name.replace('.', '_');
 		if (!name.equals(noDotName) && containsKey(noDotName)) {
 			return noDotName;
 		}
-		// Check name with just hyphens replaced
+		// 仅将连字符替换为下划线后检查名称
 		String noHyphenName = name.replace('-', '_');
 		if (!name.equals(noHyphenName) && containsKey(noHyphenName)) {
 			return noHyphenName;
 		}
-		// Check name with dots and hyphens replaced
+		// 将点和连字符都替换为下划线后检查名称
 		String noDotNoHyphenName = noDotName.replace('-', '_');
 		if (!noDotName.equals(noDotNoHyphenName) && containsKey(noDotNoHyphenName)) {
 			return noDotNoHyphenName;
 		}
-		// Give up
+		// 放弃检查，返回空
 		return null;
 	}
 

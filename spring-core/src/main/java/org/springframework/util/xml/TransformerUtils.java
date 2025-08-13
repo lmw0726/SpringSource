@@ -16,14 +16,14 @@
 
 package org.springframework.util.xml;
 
+import org.springframework.util.Assert;
+
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 
-import org.springframework.util.Assert;
-
 /**
- * Contains common behavior relating to {@link javax.xml.transform.Transformer Transformers}
- * and the {@code javax.xml.transform} package in general.
+ * 包含与{@link javax.xml.transform.Transformer 转换器}及
+ * {@code javax.xml.transform}包相关的通用行为。
  *
  * @author Rick Evans
  * @author Juergen Hoeller
@@ -32,17 +32,17 @@ import org.springframework.util.Assert;
 public abstract class TransformerUtils {
 
 	/**
-	 * The indent amount of characters if {@link #enableIndenting indenting is enabled}.
-	 * <p>Defaults to "2".
+	 * 如果{@link #enableIndenting 启用缩进}时的默认缩进字符数。
+	 * <p>默认为"2"。
 	 */
 	public static final int DEFAULT_INDENT_AMOUNT = 2;
 
 
 	/**
-	 * Enable indenting for the supplied {@link javax.xml.transform.Transformer}.
-	 * <p>If the underlying XSLT engine is Xalan, then the special output key {@code indent-amount}
-	 * will be also be set to a value of {@link #DEFAULT_INDENT_AMOUNT} characters.
-	 * @param transformer the target transformer
+	 * 为指定的{@link javax.xml.transform.Transformer}启用缩进。
+	 * <p>如果底层XSLT引擎是Xalan，还会设置特殊的输出键{@code indent-amount}，
+	 * 其值为{@link #DEFAULT_INDENT_AMOUNT}个字符。
+	 * @param transformer 目标转换器
 	 * @see javax.xml.transform.Transformer#setOutputProperty(String, String)
 	 * @see javax.xml.transform.OutputKeys#INDENT
 	 */
@@ -51,11 +51,11 @@ public abstract class TransformerUtils {
 	}
 
 	/**
-	 * Enable indenting for the supplied {@link javax.xml.transform.Transformer}.
-	 * <p>If the underlying XSLT engine is Xalan, then the special output key {@code indent-amount}
-	 * will be also be set to a value of {@link #DEFAULT_INDENT_AMOUNT} characters.
-	 * @param transformer the target transformer
-	 * @param indentAmount the size of the indent (2 characters, 3 characters, etc)
+	 * 为指定的{@link javax.xml.transform.Transformer}启用缩进。
+	 * <p>如果底层XSLT引擎是Xalan，还会设置特殊的输出键{@code indent-amount}，
+	 * 其值为指定的缩进字符数。
+	 * @param transformer 目标转换器
+	 * @param indentAmount 缩进大小(2个字符、3个字符等)
 	 * @see javax.xml.transform.Transformer#setOutputProperty(String, String)
 	 * @see javax.xml.transform.OutputKeys#INDENT
 	 */
@@ -66,7 +66,7 @@ public abstract class TransformerUtils {
 		}
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		try {
-			// Xalan-specific, but this is the most common XSLT engine in any case
+			// Xalan特有的设置，但这是最常见的XSLT引擎
 			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", String.valueOf(indentAmount));
 		}
 		catch (IllegalArgumentException ignored) {
@@ -74,8 +74,8 @@ public abstract class TransformerUtils {
 	}
 
 	/**
-	 * Disable indenting for the supplied {@link javax.xml.transform.Transformer}.
-	 * @param transformer the target transformer
+	 * 为指定的{@link javax.xml.transform.Transformer}禁用缩进。
+	 * @param transformer 目标转换器
 	 * @see javax.xml.transform.OutputKeys#INDENT
 	 */
 	public static void disableIndenting(Transformer transformer) {

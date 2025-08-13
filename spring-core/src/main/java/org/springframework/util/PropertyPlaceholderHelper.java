@@ -23,12 +23,12 @@ import org.springframework.lang.Nullable;
 import java.util.*;
 
 /**
- * Utility class for working with Strings that have placeholder values in them.
- * A placeholder takes the form {@code ${name}}. Using {@code PropertyPlaceholderHelper}
- * these placeholders can be substituted for user-supplied values.
+ * 用于处理含占位符字符串的工具类。
+ * 占位符格式为 {@code ${name}}。通过 {@code PropertyPlaceholderHelper}
+ * 可以将这些占位符替换为用户提供的实际值。
  *
- * <p>Values for substitution can be supplied using a {@link Properties} instance or
- * using a {@link PlaceholderResolver}.
+ * <p>替换值可以通过 {@link Properties} 实例提供，
+ * 也可以通过 {@link PlaceholderResolver} 提供。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -60,11 +60,11 @@ public class PropertyPlaceholderHelper {
 
 
 	/**
-	 * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
-	 * Unresolvable placeholders are ignored.
+	 * 创建一个新的 {@code PropertyPlaceholderHelper} 实例，使用指定的前缀和后缀。
+	 * 无法解析的占位符将被忽略。
 	 *
-	 * @param placeholderPrefix the prefix that denotes the start of a placeholder
-	 * @param placeholderSuffix the suffix that denotes the end of a placeholder
+	 * @param placeholderPrefix 表示占位符开始的前缀
+	 * @param placeholderSuffix 表示占位符结束的后缀
 	 */
 	public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix) {
 		this(placeholderPrefix, placeholderSuffix, null, true);
@@ -105,12 +105,11 @@ public class PropertyPlaceholderHelper {
 
 
 	/**
-	 * Replaces all placeholders of format {@code ${name}} with the corresponding
-	 * property from the supplied {@link Properties}.
+	 * 将所有格式为 {@code ${name}} 的占位符替换为指定 {@link Properties} 中的对应属性值。
 	 *
-	 * @param value      the value containing the placeholders to be replaced
-	 * @param properties the {@code Properties} to use for replacement
-	 * @return the supplied value with placeholders replaced inline
+	 * @param value      包含要替换占位符的原始字符串
+	 * @param properties 用于替换的 {@code Properties} 对象
+	 * @return 替换占位符后的字符串
 	 */
 	public String replacePlaceholders(String value, final Properties properties) {
 		Assert.notNull(properties, "'properties' must not be null");
@@ -236,7 +235,7 @@ public class PropertyPlaceholderHelper {
 
 
 	/**
-	 * Strategy interface used to resolve replacement values for placeholders contained in Strings.
+	 * 用于解析字符串中占位符替换值的策略接口。
 	 */
 	@FunctionalInterface
 	public interface PlaceholderResolver {

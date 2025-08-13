@@ -21,8 +21,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 
 /**
- * Extension of {@link java.io.InputStream} that allows for optimized
- * implementations of message digesting.
+ * {@link java.io.InputStream} 的扩展，允许对消息摘要进行优化实现。
  *
  * @author Craig Andrews
  * @since 4.2
@@ -30,11 +29,10 @@ import java.security.MessageDigest;
 abstract class UpdateMessageDigestInputStream extends InputStream {
 
 	/**
-	 * Update the message digest with the rest of the bytes in this stream.
-	 * <p>Using this method is more optimized since it avoids creating new
-	 * byte arrays for each call.
-	 * @param messageDigest the message digest to update
-	 * @throws IOException when propagated from {@link #read()}
+	 * 使用该流中剩余的字节更新消息摘要。
+	 * <p>使用此方法更加高效，因为它避免了每次调用时创建新的字节数组。
+	 * @param messageDigest 要更新的消息摘要
+	 * @throws IOException 当由 {@link #read()} 抛出异常时传播
 	 */
 	public void updateMessageDigest(MessageDigest messageDigest) throws IOException {
 		int data;
@@ -44,12 +42,11 @@ abstract class UpdateMessageDigestInputStream extends InputStream {
 	}
 
 	/**
-	 * Update the message digest with the next len bytes in this stream.
-	 * <p>Using this method is more optimized since it avoids creating new
-	 * byte arrays for each call.
-	 * @param messageDigest the message digest to update
-	 * @param len how many bytes to read from this stream and use to update the message digest
-	 * @throws IOException when propagated from {@link #read()}
+	 * 使用该流中接下来的 len 个字节更新消息摘要。
+	 * <p>使用此方法更加高效，因为它避免了每次调用时创建新的字节数组。
+	 * @param messageDigest 要更新的消息摘要
+	 * @param len 从该流中读取的字节数，用于更新消息摘要
+	 * @throws IOException 当由 {@link #read()} 抛出异常时传播
 	 */
 	public void updateMessageDigest(MessageDigest messageDigest, int len) throws IOException {
 		int data;

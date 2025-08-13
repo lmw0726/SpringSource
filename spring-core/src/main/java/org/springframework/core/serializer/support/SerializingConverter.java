@@ -22,9 +22,9 @@ import org.springframework.core.serializer.Serializer;
 import org.springframework.util.Assert;
 
 /**
- * A {@link Converter} that delegates to a
+ * 一个 {@link Converter}，委托给
  * {@link org.springframework.core.serializer.Serializer}
- * to convert an object to a byte array.
+ * 将对象转换为字节数组。
  *
  * @author Gary Russell
  * @author Mark Fisher
@@ -36,14 +36,14 @@ public class SerializingConverter implements Converter<Object, byte[]> {
 
 
 	/**
-	 * Create a default {@code SerializingConverter} that uses standard Java serialization.
+	 * 创建一个默认的 {@code SerializingConverter}，使用标准的 Java 序列化。
 	 */
 	public SerializingConverter() {
 		this.serializer = new DefaultSerializer();
 	}
 
 	/**
-	 * Create a {@code SerializingConverter} that delegates to the provided {@link Serializer}.
+	 * 创建一个 {@code SerializingConverter}，委托给提供的 {@link Serializer}。
 	 */
 	public SerializingConverter(Serializer<Object> serializer) {
 		Assert.notNull(serializer, "Serializer must not be null");
@@ -52,7 +52,7 @@ public class SerializingConverter implements Converter<Object, byte[]> {
 
 
 	/**
-	 * Serializes the source object and returns the byte array result.
+	 * 序列化源对象并返回字节数组结果。
 	 */
 	@Override
 	public byte[] convert(Object source) {

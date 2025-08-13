@@ -16,6 +16,8 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,20 +26,16 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
-import org.springframework.lang.Nullable;
-
 /**
- * A speedy alternative to {@link java.io.ByteArrayOutputStream}. Note that
- * this variant does <i>not</i> extend {@code ByteArrayOutputStream}, unlike
- * its sibling {@link ResizableByteArrayOutputStream}.
+ * {@link java.io.ByteArrayOutputStream} 的高速替代实现。注意，这个类
+ * <i>不继承</i> {@code ByteArrayOutputStream}，与它的兄弟类 {@link ResizableByteArrayOutputStream} 不同。
  *
- * <p>Unlike {@link java.io.ByteArrayOutputStream}, this implementation is backed
- * by an {@link java.util.ArrayDeque} of {@code byte[]} instead of 1 constantly
- * resizing {@code byte[]}. It does not copy buffers when it gets expanded.
+ * <p>不同于 {@link java.io.ByteArrayOutputStream}，该实现由一个 {@link java.util.ArrayDeque} 管理多个 {@code byte[]} 缓冲区，
+ * 而非单一不断扩展的 {@code byte[]}。
+ * 它在扩容时不会复制已有缓冲区。
  *
- * <p>The initial buffer is only created when the stream is first written.
- * There is also no copying of the internal buffer if its contents is extracted
- * with the {@link #writeTo(OutputStream)} method.
+ * <p>初始缓冲区只在第一次写操作时创建。
+ * 使用 {@link #writeTo(OutputStream)} 方法导出内容时，也不会复制内部缓冲区。
  *
  * @author Craig Andrews
  * @author Juergen Hoeller
@@ -50,38 +48,35 @@ public class FastByteArrayOutputStream extends OutputStream {
 	private static final int DEFAULT_BLOCK_SIZE = 256;
 
 
-	// The buffers used to store the content bytes
+	// 用于存储内容字节的缓冲区队列
 	private final Deque<byte[]> buffers = new ArrayDeque<>();
 
-	// The size, in bytes, to use when allocating the first byte[]
+	// 用于分配第一个 byte[] 的大小（字节数）
 	private final int initialBlockSize;
 
-	// The size, in bytes, to use when allocating the next byte[]
+	// 用于分配下一个 byte[] 的大小（字节数）
 	private int nextBlockSize = 0;
 
-	// The number of bytes in previous buffers.
-	// (The number of bytes in the current buffer is in 'index'.)
+	// 之前所有缓冲区中已存储的字节数（当前缓冲区的字节数由 index 表示）
 	private int alreadyBufferedSize = 0;
 
-	// The index in the byte[] found at buffers.getLast() to be written next
+	// 当前缓冲区（即 buffers.getLast()）中下一个写入位置的索引
 	private int index = 0;
 
-	// Is the stream closed?
+	// 流是否已关闭
 	private boolean closed = false;
 
 
 	/**
-	 * Create a new <code>FastByteArrayOutputStream</code>
-	 * with the default initial capacity of 256 bytes.
+	 * 使用默认初始容量 256 字节创建新的 {@code FastByteArrayOutputStream}。
 	 */
 	public FastByteArrayOutputStream() {
 		this(DEFAULT_BLOCK_SIZE);
 	}
 
 	/**
-	 * Create a new <code>FastByteArrayOutputStream</code>
-	 * with the specified initial capacity.
-	 * @param initialBlockSize the initial buffer size in bytes
+	 * 使用指定的初始容量创建新的 {@code FastByteArrayOutputStream}。
+	 * @param initialBlockSize 初始缓冲区大小（字节）
 	 */
 	public FastByteArrayOutputStream(int initialBlockSize) {
 		Assert.isTrue(initialBlockSize > 0, "Initial block size must be greater than 0");
@@ -90,7 +85,7 @@ public class FastByteArrayOutputStream extends OutputStream {
 	}
 
 
-	// Overridden methods
+	// 重写的方法
 
 	@Override
 	public void write(int datum) throws IOException {
@@ -101,7 +96,7 @@ public class FastByteArrayOutputStream extends OutputStream {
 			if (this.buffers.peekLast() == null || this.buffers.getLast().length == this.index) {
 				addBuffer(1);
 			}
-			// store the byte
+			// 存储字节
 			this.buffers.getLast()[this.index++] = (byte) datum;
 		}
 	}
@@ -149,16 +144,11 @@ public class FastByteArrayOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Convert the buffer's contents into a string decoding bytes using the
-	 * platform's default character set. The length of the new <tt>String</tt>
-	 * is a function of the character set, and hence may not be equal to the
-	 * size of the buffer.
-	 * <p>This method always replaces malformed-input and unmappable-character
-	 * sequences with the default replacement string for the platform's
-	 * default character set. The {@linkplain java.nio.charset.CharsetDecoder}
-	 * class should be used when more control over the decoding process is
-	 * required.
-	 * @return a String decoded from the buffer's contents
+	 * 将缓冲区内容转换为字符串，使用平台默认字符集解码字节。
+	 * <p>新字符串的长度依赖于字符集，因此可能与缓冲区大小不相等。
+	 * <p>该方法总是用平台默认字符集的默认替代字符串替换格式错误或不可映射的字符序列。
+	 * 如果需要更精细的解码控制，应使用 {@linkplain java.nio.charset.CharsetDecoder} 类。
+	 * @return 从缓冲区内容解码得到的字符串
 	 */
 	@Override
 	public String toString() {
@@ -166,24 +156,23 @@ public class FastByteArrayOutputStream extends OutputStream {
 	}
 
 
-	// Custom methods
+	// 自定义方法
 
 	/**
-	 * Return the number of bytes stored in this <code>FastByteArrayOutputStream</code>.
+	 * 返回此 {@code FastByteArrayOutputStream} 中存储的字节数。
 	 */
 	public int size() {
 		return (this.alreadyBufferedSize + this.index);
 	}
 
 	/**
-	 * Convert the stream's data to a byte array and return the byte array.
-	 * <p>Also replaces the internal structures with the byte array to conserve memory:
-	 * if the byte array is being made anyways, mind as well as use it. This approach
-	 * also means that if this method is called twice without any writes in between,
-	 * the second call is a no-op.
-	 * <p>This method is "unsafe" as it returns the internal buffer.
-	 * Callers should not modify the returned buffer.
-	 * @return the current contents of this output stream, as a byte array.
+	 * 将流中的数据转换为字节数组并返回该数组。
+	 * <p>同时用该字节数组替换内部结构以节省内存：
+	 * 如果字节数组已经生成，不妨直接使用它。
+	 * 该方法还意味着如果连续两次调用本方法且之间无写操作，第二次调用将是无操作。
+	 * <p>此方法为“不安全”的，因为它返回内部缓冲区，
+	 * 调用者不应修改返回的缓冲区内容。
+	 * @return 当前输出流的内容，字节数组形式。
 	 * @see #size()
 	 * @see #toByteArray()
 	 */
@@ -197,11 +186,9 @@ public class FastByteArrayOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Creates a newly allocated byte array.
-	 * <p>Its size is the current
-	 * size of this output stream and the valid contents of the buffer
-	 * have been copied into it.</p>
-	 * @return the current contents of this output stream, as a byte array.
+	 * 创建一个新分配的字节数组。
+	 * <p>其大小等于当前输出流的大小，并且缓冲区中有效内容已复制到该数组中。</p>
+	 * @return 当前输出流的内容，以字节数组形式返回。
 	 * @see #size()
 	 * @see #toByteArrayUnsafe()
 	 */
@@ -211,9 +198,8 @@ public class FastByteArrayOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Reset the contents of this <code>FastByteArrayOutputStream</code>.
-	 * <p>All currently accumulated output in the output stream is discarded.
-	 * The output stream can be used again.
+	 * 重置此 {@code FastByteArrayOutputStream} 的内容。
+	 * <p>丢弃输出流中当前累积的所有数据，输出流可重新使用。</p>
 	 */
 	public void reset() {
 		this.buffers.clear();
@@ -224,20 +210,19 @@ public class FastByteArrayOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Get an {@link InputStream} to retrieve the data in this OutputStream.
-	 * <p>Note that if any methods are called on the OutputStream
-	 * (including, but not limited to, any of the write methods, {@link #reset()},
-	 * {@link #toByteArray()}, and {@link #toByteArrayUnsafe()}) then the
-	 * {@link java.io.InputStream}'s behavior is undefined.
-	 * @return {@link InputStream} of the contents of this OutputStream
+	 * 获取一个 {@link InputStream} 以读取此输出流中的数据。
+	 * <p>注意，如果在输出流上调用任何方法（包括写方法、{@link #reset()}、
+	 * {@link #toByteArray()} 和 {@link #toByteArrayUnsafe()}），则该输入流的行为未定义。</p>
+	 * @return 此输出流内容的 {@link InputStream}
 	 */
 	public InputStream getInputStream() {
 		return new FastByteArrayInputStream(this);
 	}
 
 	/**
-	 * Write the buffers content to the given OutputStream.
-	 * @param out the OutputStream to write to
+	 * 将缓冲区内容写入给定的 {@link OutputStream}。
+	 * @param out 要写入的输出流
+	 * @throws IOException 发生 I/O 错误时抛出
 	 */
 	public void writeTo(OutputStream out) throws IOException {
 		Iterator<byte[]> it = this.buffers.iterator();
@@ -253,10 +238,9 @@ public class FastByteArrayOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Resize the internal buffer size to a specified capacity.
-	 * @param targetCapacity the desired size of the buffer
-	 * @throws IllegalArgumentException if the given capacity is smaller than
-	 * the actual size of the content stored in the buffer already
+	 * 调整内部缓冲区大小到指定容量。
+	 * @param targetCapacity 目标缓冲区大小
+	 * @throws IllegalArgumentException 如果指定容量小于当前已存储内容大小
 	 * @see FastByteArrayOutputStream#size()
 	 */
 	public void resize(int targetCapacity) {
@@ -265,7 +249,7 @@ public class FastByteArrayOutputStream extends OutputStream {
 			this.nextBlockSize = targetCapacity - size();
 		}
 		else if (size() == targetCapacity && this.buffers.getFirst().length == targetCapacity) {
-			// do nothing - already at the targetCapacity
+			// 容量已满足目标，无需调整
 		}
 		else {
 			int totalSize = size();
@@ -290,8 +274,8 @@ public class FastByteArrayOutputStream extends OutputStream {
 	}
 
 	/**
-	 * Create a new buffer and store it in the ArrayDeque.
-	 * <p>Adds a new buffer that can store at least {@code minCapacity} bytes.
+	 * 创建一个新的缓冲区并存入 ArrayDeque。
+	 * <p>新增的缓冲区大小至少能存储 {@code minCapacity} 字节。
 	 */
 	private void addBuffer(int minCapacity) {
 		if (this.buffers.peekLast() != null) {
@@ -302,11 +286,11 @@ public class FastByteArrayOutputStream extends OutputStream {
 			this.nextBlockSize = nextPowerOf2(minCapacity);
 		}
 		this.buffers.add(new byte[this.nextBlockSize]);
-		this.nextBlockSize *= 2;  // block size doubles each time
+		this.nextBlockSize *= 2;  // 每次缓冲区大小翻倍
 	}
 
 	/**
-	 * Get the next power of 2 of a number (ex, the next power of 2 of 119 is 128).
+	 * 获取大于等于给定数的下一个2的幂次方（例如119的下一个2的幂是128）。
 	 */
 	private static int nextPowerOf2(int val) {
 		val--;
@@ -321,8 +305,8 @@ public class FastByteArrayOutputStream extends OutputStream {
 
 
 	/**
-	 * An implementation of {@link java.io.InputStream} that reads from a given
-	 * <code>FastByteArrayOutputStream</code>.
+	 * {@link java.io.InputStream} 的实现类，从给定的
+	 * <code>FastByteArrayOutputStream</code> 中读取数据。
 	 */
 	private static final class FastByteArrayInputStream extends UpdateMessageDigestInputStream {
 
@@ -340,8 +324,8 @@ public class FastByteArrayOutputStream extends OutputStream {
 		private int totalBytesRead = 0;
 
 		/**
-		 * Create a new <code>FastByteArrayOutputStreamInputStream</code> backed
-		 * by the given <code>FastByteArrayOutputStream</code>.
+		 * 创建一个新的由指定的 <code>FastByteArrayOutputStream</code> 支持的
+		 * <code>FastByteArrayOutputStreamInputStream</code> 实例。
 		 */
 		public FastByteArrayInputStream(FastByteArrayOutputStream fastByteArrayOutputStream) {
 			this.fastByteArrayOutputStream = fastByteArrayOutputStream;
@@ -360,7 +344,7 @@ public class FastByteArrayOutputStream extends OutputStream {
 		@Override
 		public int read() {
 			if (this.currentBuffer == null) {
-				// This stream doesn't have any data in it...
+				// 此流中没有任何数据...
 				return -1;
 			}
 			else {
@@ -397,7 +381,7 @@ public class FastByteArrayOutputStream extends OutputStream {
 			}
 			else {
 				if (this.currentBuffer == null) {
-					// This stream doesn't have any data in it...
+					// 此流中没有任何数据...
 					return -1;
 				}
 				else {
@@ -437,7 +421,7 @@ public class FastByteArrayOutputStream extends OutputStream {
 			}
 			int len = (int) n;
 			if (this.currentBuffer == null) {
-				// This stream doesn't have any data in it...
+				// 此流中没有任何数据...
 				return 0;
 			}
 			else {
@@ -467,8 +451,8 @@ public class FastByteArrayOutputStream extends OutputStream {
 		}
 
 		/**
-		 * Update the message digest with the remaining bytes in this stream.
-		 * @param messageDigest the message digest to update
+		 * 使用该流中剩余的字节更新消息摘要。
+		 * @param messageDigest 需要更新的消息摘要
 		 */
 		@Override
 		public void updateMessageDigest(MessageDigest messageDigest) {
@@ -476,15 +460,15 @@ public class FastByteArrayOutputStream extends OutputStream {
 		}
 
 		/**
-		 * Update the message digest with the next len bytes in this stream.
-		 * Avoids creating new byte arrays and use internal buffers for performance.
-		 * @param messageDigest the message digest to update
-		 * @param len how many bytes to read from this stream and use to update the message digest
+		 * 使用该流中的下一个 len 个字节更新消息摘要。
+		 * 避免创建新的字节数组，使用内部缓冲区以提升性能。
+		 * @param messageDigest 需要更新的消息摘要
+		 * @param len 从该流中读取多少字节用于更新消息摘要
 		 */
 		@Override
 		public void updateMessageDigest(MessageDigest messageDigest, int len) {
 			if (this.currentBuffer == null) {
-				// This stream doesn't have any data in it...
+				// 此流中没有任何数据...
 				return;
 			}
 			else if (len == 0) {

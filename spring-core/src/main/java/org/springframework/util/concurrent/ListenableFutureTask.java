@@ -16,19 +16,19 @@
 
 package org.springframework.util.concurrent;
 
+import org.springframework.lang.Nullable;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Extension of {@link FutureTask} that implements {@link ListenableFuture}.
+ * {@link FutureTask}的扩展实现，同时实现了{@link ListenableFuture}接口。
  *
  * @author Arjen Poutsma
  * @since 4.0
- * @param <T> the result type returned by this Future's {@code get} method
+ * @param <T> 此Future的{@code get}方法返回的结果类型
  */
 public class ListenableFutureTask<T> extends FutureTask<T> implements ListenableFuture<T> {
 
@@ -36,20 +36,18 @@ public class ListenableFutureTask<T> extends FutureTask<T> implements Listenable
 
 
 	/**
-	 * Create a new {@code ListenableFutureTask} that will, upon running,
-	 * execute the given {@link Callable}.
-	 * @param callable the callable task
+	 * 创建一个新的{@code ListenableFutureTask}，运行时将执行给定的{@link Callable}。
+	 * @param callable 可调用任务
 	 */
 	public ListenableFutureTask(Callable<T> callable) {
 		super(callable);
 	}
 
 	/**
-	 * Create a {@code ListenableFutureTask} that will, upon running,
-	 * execute the given {@link Runnable}, and arrange that {@link #get()}
-	 * will return the given result on successful completion.
-	 * @param runnable the runnable task
-	 * @param result the result to return on successful completion
+	 * 创建一个{@code ListenableFutureTask}，运行时将执行给定的{@link Runnable}，
+	 * 并安排在成功完成时{@link #get()}返回给定的结果。
+	 * @param runnable 可运行任务
+	 * @param result 成功完成时返回的结果
 	 */
 	public ListenableFutureTask(Runnable runnable, @Nullable T result) {
 		super(runnable, result);

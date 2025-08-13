@@ -19,8 +19,7 @@ package org.springframework.core.style;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy that encapsulates value String styling algorithms
- * according to Spring conventions.
+ * 封装根据 Spring 约定对值进行字符串样式处理的策略接口。
  *
  * @author Keith Donald
  * @since 1.2.2
@@ -28,9 +27,9 @@ import org.springframework.lang.Nullable;
 public interface ValueStyler {
 
 	/**
-	 * Style the given value, returning a String representation.
-	 * @param value the Object value to style
-	 * @return the styled String
+	 * 对给定的值进行样式处理，返回字符串表示。
+	 * @param value 需要样式处理的对象值
+	 * @return 样式化后的字符串
 	 */
 	String style(@Nullable Object value);
 

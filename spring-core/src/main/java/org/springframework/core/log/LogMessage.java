@@ -16,16 +16,15 @@
 
 package org.springframework.core.log;
 
-import java.util.function.Supplier;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.function.Supplier;
+
 /**
- * A simple log message type for use with Commons Logging, allowing
- * for convenient lazy resolution of a given {@link Supplier} instance
- * (typically bound to a Java 8 lambda expression) or a printf-style
- * format string ({@link String#format}) in its {@link #toString()}.
+ * 一个简单的日志消息类型，用于 Commons Logging，支持方便地对给定的 {@link Supplier} 实例
+ * （通常绑定到 Java 8 的 lambda 表达式）或 printf 风格格式字符串（{@link String#format}）进行懒解析，
+ * 解析过程在其 {@link #toString()} 方法中执行。
  *
  * @author Juergen Hoeller
  * @since 5.2
@@ -61,8 +60,8 @@ public abstract class LogMessage implements CharSequence {
 	}
 
 	/**
-	 * This will be called by the logging provider, potentially once
-	 * per log target (therefore locally caching the result here).
+	 * 此方法将由日志提供者调用，可能针对每个日志目标调用一次
+	 * （因此在此处本地缓存结果以提高效率）。
 	 */
 	@Override
 	public String toString() {
@@ -76,8 +75,8 @@ public abstract class LogMessage implements CharSequence {
 
 
 	/**
-	 * Build a lazily resolving message from the given supplier.
-	 * @param supplier the supplier (typically bound to a Java 8 lambda expression)
+	 * 根据给定的 {@link Supplier} 构建一个延迟解析的日志消息。
+	 * @param supplier 供应者（通常绑定到 Java 8 的 lambda 表达式）
 	 * @see #toString()
 	 */
 	public static LogMessage of(Supplier<? extends CharSequence> supplier) {
@@ -85,9 +84,9 @@ public abstract class LogMessage implements CharSequence {
 	}
 
 	/**
-	 * Build a lazily formatted message from the given format string and argument.
-	 * @param format the format string (following {@link String#format} rules)
-	 * @param arg1 the argument
+	 * 根据给定的格式字符串和单个参数，构建一个延迟格式化的日志消息。
+	 * @param format 格式字符串（遵循 {@link String#format} 规则）
+	 * @param arg1 参数
 	 * @see String#format(String, Object...)
 	 */
 	public static LogMessage format(String format, Object arg1) {
@@ -95,10 +94,10 @@ public abstract class LogMessage implements CharSequence {
 	}
 
 	/**
-	 * Build a lazily formatted message from the given format string and arguments.
-	 * @param format the format string (following {@link String#format} rules)
-	 * @param arg1 the first argument
-	 * @param arg2 the second argument
+	 * 根据给定的格式字符串和参数，构建一个延迟格式化的日志消息。
+	 * @param format 格式字符串（遵循 {@link String#format} 规则）
+	 * @param arg1 第一个参数
+	 * @param arg2 第二个参数
 	 * @see String#format(String, Object...)
 	 */
 	public static LogMessage format(String format, Object arg1, Object arg2) {
@@ -106,11 +105,11 @@ public abstract class LogMessage implements CharSequence {
 	}
 
 	/**
-	 * Build a lazily formatted message from the given format string and arguments.
-	 * @param format the format string (following {@link String#format} rules)
-	 * @param arg1 the first argument
-	 * @param arg2 the second argument
-	 * @param arg3 the third argument
+	 * 根据给定的格式字符串和参数，构建一个延迟格式化的日志消息。
+	 * @param format 格式字符串（遵循 {@link String#format} 规则）
+	 * @param arg1 第一个参数
+	 * @param arg2 第二个参数
+	 * @param arg3 第三个参数
 	 * @see String#format(String, Object...)
 	 */
 	public static LogMessage format(String format, Object arg1, Object arg2, Object arg3) {
@@ -118,12 +117,12 @@ public abstract class LogMessage implements CharSequence {
 	}
 
 	/**
-	 * Build a lazily formatted message from the given format string and arguments.
-	 * @param format the format string (following {@link String#format} rules)
-	 * @param arg1 the first argument
-	 * @param arg2 the second argument
-	 * @param arg3 the third argument
-	 * @param arg4 the fourth argument
+	 * 根据给定的格式字符串和参数，构建一个延迟格式化的日志消息。
+	 * @param format 格式字符串（遵循 {@link String#format} 规则）
+	 * @param arg1 第一个参数
+	 * @param arg2 第二个参数
+	 * @param arg3 第三个参数
+	 * @param arg4 第四个参数
 	 * @see String#format(String, Object...)
 	 */
 	public static LogMessage format(String format, Object arg1, Object arg2, Object arg3, Object arg4) {
@@ -131,9 +130,9 @@ public abstract class LogMessage implements CharSequence {
 	}
 
 	/**
-	 * Build a lazily formatted message from the given format string and varargs.
-	 * @param format the format string (following {@link String#format} rules)
-	 * @param args the varargs array (costly, prefer individual arguments)
+	 * 根据给定的格式字符串和可变参数，构建一个延迟格式化的日志消息。
+	 * @param format 格式字符串（遵循 {@link String#format} 规则）
+	 * @param args 可变参数数组（性能较低，建议优先使用单独参数）
 	 * @see String#format(String, Object...)
 	 */
 	public static LogMessage format(String format, Object... args) {

@@ -26,10 +26,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Support class for {@link AttributeAccessor AttributeAccessors}, providing
- * a base implementation of all methods. To be extended by subclasses.
+ * {@link AttributeAccessor} 的支持类，提供所有方法的基础实现。供子类继承。
  *
- * <p>{@link Serializable} if subclasses and all attribute values are {@link Serializable}.
+ * <p>如果子类及所有属性值均实现了 {@link Serializable}，则此类也实现 {@link Serializable}。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

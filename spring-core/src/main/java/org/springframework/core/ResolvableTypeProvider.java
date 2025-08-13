@@ -19,14 +19,14 @@ package org.springframework.core;
 import org.springframework.lang.Nullable;
 
 /**
- * Any object can implement this interface to provide its actual {@link ResolvableType}.
+ * 任何对象都可以实现此接口以提供其实际的 {@link ResolvableType}。
  *
- * <p>Such information is very useful when figuring out if the instance matches a generic
- * signature as Java does not convey the signature at runtime.
+ * <p>当判断实例是否匹配泛型签名时，这类信息非常有用，
+ * 因为 Java 在运行时不保留泛型签名信息。
  *
- * <p>Users of this interface should be careful in complex hierarchy scenarios, especially
- * when the generic type signature of the class changes in sub-classes. It is always
- * possible to return {@code null} to fallback on a default behavior.
+ * <p>此接口的使用者在复杂继承层级中应谨慎，
+ * 尤其是在子类中泛型签名发生变化时。
+ * 始终可以返回 {@code null}，以回退到默认行为。
  *
  * @author Stephane Nicoll
  * @since 4.2
@@ -34,8 +34,8 @@ import org.springframework.lang.Nullable;
 public interface ResolvableTypeProvider {
 
 	/**
-	 * Return the {@link ResolvableType} describing this instance
-	 * (or {@code null} if some sort of default should be applied instead).
+	 * 返回描述该实例的 {@link ResolvableType}，
+	 * 如果应使用某种默认处理，则返回 {@code null}。
 	 */
 	@Nullable
 	ResolvableType getResolvableType();

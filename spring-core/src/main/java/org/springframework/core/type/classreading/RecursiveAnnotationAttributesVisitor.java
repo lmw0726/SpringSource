@@ -22,14 +22,14 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link AnnotationVisitor} to recursively visit annotation attributes.
+ * 用于递归访问注解属性的 {@link AnnotationVisitor}。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1.1
- * @deprecated As of Spring Framework 5.2, this class and related classes in this
- * package have been replaced by {@link SimpleAnnotationMetadataReadingVisitor}
- * and related classes for internal use within the framework.
+ * @deprecated 自 Spring Framework 5.2 起，此类及本包中相关类
+ * 已被 {@link SimpleAnnotationMetadataReadingVisitor} 及其相关类替代，
+ * 仅供框架内部使用。
  */
 @Deprecated
 class RecursiveAnnotationAttributesVisitor extends AbstractRecursiveAnnotationVisitor {

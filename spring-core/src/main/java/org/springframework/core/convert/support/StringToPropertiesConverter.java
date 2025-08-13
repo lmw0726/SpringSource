@@ -16,15 +16,15 @@
 
 package org.springframework.core.convert.support;
 
+import org.springframework.core.convert.converter.Converter;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-import org.springframework.core.convert.converter.Converter;
-
 /**
- * Converts a String to a Properties by calling Properties#load(java.io.InputStream).
- * Uses ISO-8559-1 encoding required by Properties.
+ * 将字符串转换为 Properties 对象，通过调用 Properties#load(java.io.InputStream) 方法实现。
+ * 使用 Properties 所需的 ISO-8559-1 编码。
  *
  * @author Keith Donald
  * @since 3.0
@@ -35,12 +35,12 @@ final class StringToPropertiesConverter implements Converter<String, Properties>
 	public Properties convert(String source) {
 		try {
 			Properties props = new Properties();
-			// Must use the ISO-8859-1 encoding because Properties.load(stream) expects it.
+			// 必须使用 ISO-8859-1 编码，因为 Properties.load(stream) 需要它。
 			props.load(new ByteArrayInputStream(source.getBytes(StandardCharsets.ISO_8859_1)));
 			return props;
 		}
 		catch (Exception ex) {
-			// Should never happen.
+			// 不应该发生。
 			throw new IllegalArgumentException("Failed to parse [" + source + "] into Properties", ex);
 		}
 	}

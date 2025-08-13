@@ -28,12 +28,10 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * {@link Resource} implementation for class path resources. Uses either a
- * given {@link ClassLoader} or a given {@link Class} for loading resources.
+ * 针对类路径资源的 {@link Resource} 实现。可使用指定的 {@link ClassLoader} 或指定的 {@link Class} 来加载资源。
  *
- * <p>Supports resolution as {@code java.io.File} if the class path
- * resource resides in the file system, but not for resources in a JAR.
- * Always supports resolution as URL.
+ * <p>如果类路径资源位于文件系统中，则支持将其解析为 {@code java.io.File}；
+ * 但对于位于 JAR 包中的资源，则不支持此方式。始终支持将其解析为 URL。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen

@@ -16,28 +16,25 @@
 
 package org.springframework.core.codec;
 
-import java.util.Map;
-
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
+import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 /**
- * Simple pass-through decoder for {@link DataBuffer DataBuffers}.
+ * {@link DataBuffer DataBuffers} 的简单直通解码器。
  *
- * <p><strong>Note:</strong> The data buffers should be released via
+ * <p><strong>注意：</strong>数据缓冲区在使用后应通过
  * {@link org.springframework.core.io.buffer.DataBufferUtils#release(DataBuffer)}
- * after they have been consumed. In addition, if using {@code Flux} or
- * {@code Mono} operators such as flatMap, reduce, and others that prefetch,
- * cache, and skip or filter out data items internally, please add
- * {@code doOnDiscard(PooledDataBuffer.class, DataBufferUtils::release)} to the
- * composition chain to ensure cached data buffers are released prior to an
- * error or cancellation signal.
+ * 进行释放。此外，如果使用 {@code Flux} 或 {@code Mono} 运算符，例如 flatMap、reduce
+ * 以及其他内部预取、缓存、跳过或过滤数据项的运算符，请将
+ * {@code doOnDiscard(PooledDataBuffer.class, DataBufferUtils::release)} 添加到组合链中，
+ * 以确保在发生错误或取消信号之前释放缓存的数据缓冲区。
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev

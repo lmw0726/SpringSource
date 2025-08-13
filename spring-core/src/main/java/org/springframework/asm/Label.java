@@ -28,275 +28,228 @@
 package org.springframework.asm;
 
 /**
- * A position in the bytecode of a method. Labels are used for jump, goto, and switch instructions,
- * and for try catch blocks. A label designates the <i>instruction</i> that is just after. Note
- * however that there can be other elements between a label and the instruction it designates (such
- * as other labels, stack map frames, line numbers, etc.).
+ * 方法字节码中的一个位置。标签用于跳转（jump）、goto 和 switch 指令，以及 try-catch 块。
+ * 标签指向的是紧跟其后的 <i>指令</i>。不过，标签与其指定指令之间可能存在其他元素（如其他标签、栈映射帧、行号等）。
  *
  * @author Eric Bruneton
  */
 public class Label {
 
   /**
-   * A flag indicating that a label is only used for debug attributes. Such a label is not the start
-   * of a basic block, the target of a jump instruction, or an exception handler. It can be safely
-   * ignored in control flow graph analysis algorithms (for optimization purposes).
+   * 标记标签仅用于调试属性。这样的标签既不是基本块的开始，
+   * 也不是跳转指令的目标或异常处理程序，可在控制流图分析中安全忽略（用于优化）。
    */
   static final int FLAG_DEBUG_ONLY = 1;
 
   /**
-   * A flag indicating that a label is the target of a jump instruction, or the start of an
-   * exception handler.
+   * 标记标签是跳转指令的目标，或异常处理程序的开始。
    */
   static final int FLAG_JUMP_TARGET = 2;
 
-  /** A flag indicating that the bytecode offset of a label is known. */
+  /** 标记标签的字节码偏移量已知。 */
   static final int FLAG_RESOLVED = 4;
 
-  /** A flag indicating that a label corresponds to a reachable basic block. */
+  /** 标记标签对应的基本块可达。 */
   static final int FLAG_REACHABLE = 8;
 
   /**
-   * A flag indicating that the basic block corresponding to a label ends with a subroutine call. By
-   * construction in {@link MethodWriter#visitJumpInsn}, labels with this flag set have at least two
-   * outgoing edges:
-   *
+   * 标记标签对应的基本块以子程序调用（jsr指令）结束。
+   * 根据 {@link MethodWriter#visitJumpInsn} 的设计，带此标记的标签至少有两个出边：
    * <ul>
-   *   <li>the first one corresponds to the instruction that follows the jsr instruction in the
-   *       bytecode, i.e. where execution continues when it returns from the jsr call. This is a
-   *       virtual control flow edge, since execution never goes directly from the jsr to the next
-   *       instruction. Instead, it goes to the subroutine and eventually returns to the instruction
-   *       following the jsr. This virtual edge is used to compute the real outgoing edges of the
-   *       basic blocks ending with a ret instruction, in {@link #addSubroutineRetSuccessors}.
-   *   <li>the second one corresponds to the target of the jsr instruction,
+   *   <li>第一个出边指向 jsr 指令之后的字节码指令，即子程序返回后继续执行的位置。
+   *       这是一个虚拟控制流边，因为执行并非直接从 jsr 跳到下一条指令，
+   *       而是跳到子程序，随后通过 ret 指令返回。
+   *       这个虚拟边用于 {@link #addSubroutineRetSuccessors} 方法中计算以 ret 结尾的基本块的真实出边。
+   *   <li>第二个出边指向 jsr 指令的目标（子程序入口）。
    * </ul>
    */
   static final int FLAG_SUBROUTINE_CALLER = 16;
 
-  /**
-   * A flag indicating that the basic block corresponding to a label is the start of a subroutine.
-   */
+  /** 标记标签对应的基本块是子程序的起始位置。 */
   static final int FLAG_SUBROUTINE_START = 32;
 
-  /** A flag indicating that the basic block corresponding to a label is the end of a subroutine. */
+  /** 标记标签对应的基本块是子程序的结束位置。 */
   static final int FLAG_SUBROUTINE_END = 64;
 
   /**
-   * The number of elements to add to the {@link #otherLineNumbers} array when it needs to be
-   * resized to store a new source line number.
+   * 当 {@link #otherLineNumbers} 数组需要扩容以存储新的源代码行号时，
+   * 增加的元素数量。
    */
   static final int LINE_NUMBERS_CAPACITY_INCREMENT = 4;
 
   /**
-   * The number of elements to add to the {@link #forwardReferences} array when it needs to be
-   * resized to store a new forward reference.
+   * 当 {@link #forwardReferences} 数组需要扩容以存储新的前向引用时，
+   * 增加的元素数量。
    */
   static final int FORWARD_REFERENCES_CAPACITY_INCREMENT = 6;
 
   /**
-   * The bit mask to extract the type of a forward reference to this label. The extracted type is
-   * either {@link #FORWARD_REFERENCE_TYPE_SHORT} or {@link #FORWARD_REFERENCE_TYPE_WIDE}.
+   * 用于提取前向引用类型的位掩码。提取结果是
+   * {@link #FORWARD_REFERENCE_TYPE_SHORT} 或 {@link #FORWARD_REFERENCE_TYPE_WIDE}。
    *
    * @see #forwardReferences
    */
   static final int FORWARD_REFERENCE_TYPE_MASK = 0xF0000000;
 
   /**
-   * The type of forward references stored with two bytes in the bytecode. This is the case, for
-   * instance, of a forward reference from an ifnull instruction.
+   * 以两个字节存储的前向引用类型。例如 ifnull 指令的前向引用即为此类型。
    */
   static final int FORWARD_REFERENCE_TYPE_SHORT = 0x10000000;
 
   /**
-   * The type of forward references stored in four bytes in the bytecode. This is the case, for
-   * instance, of a forward reference from a lookupswitch instruction.
+   * 以四字节存储的前向引用类型。例如 lookupswitch 指令的前向引用即为此类型。
    */
   static final int FORWARD_REFERENCE_TYPE_WIDE = 0x20000000;
 
   /**
-   * The bit mask to extract the 'handle' of a forward reference to this label. The extracted handle
-   * is the bytecode offset where the forward reference value is stored (using either 2 or 4 bytes,
-   * as indicated by the {@link #FORWARD_REFERENCE_TYPE_MASK}).
+   * 提取前向引用“句柄”的位掩码。句柄是字节码中存储前向引用值的偏移量（2或4字节），
+   * 具体长度由 {@link #FORWARD_REFERENCE_TYPE_MASK} 指示。
    *
    * @see #forwardReferences
    */
   static final int FORWARD_REFERENCE_HANDLE_MASK = 0x0FFFFFFF;
 
   /**
-   * A sentinel element used to indicate the end of a list of labels.
+   * 标签列表结束的哨兵元素。
    *
    * @see #nextListElement
    */
   static final Label EMPTY_LIST = new Label();
 
   /**
-   * A user managed state associated with this label. Warning: this field is used by the ASM tree
-   * package. In order to use it with the ASM tree package you must override the getLabelNode method
-   * in MethodNode.
+   * 关联到该标签的用户管理状态。注意：ASM树包会用到此字段，
+   * 使用ASM树包时需在 MethodNode 中重写 getLabelNode 方法。
    */
   public Object info;
 
   /**
-   * The type and status of this label or its corresponding basic block. Must be zero or more of
-   * {@link #FLAG_DEBUG_ONLY}, {@link #FLAG_JUMP_TARGET}, {@link #FLAG_RESOLVED}, {@link
-   * #FLAG_REACHABLE}, {@link #FLAG_SUBROUTINE_CALLER}, {@link #FLAG_SUBROUTINE_START}, {@link
-   * #FLAG_SUBROUTINE_END}.
+   * 标签或其对应基本块的类型和状态。必须是以下标志的零个或多个组合：
+   * {@link #FLAG_DEBUG_ONLY}, {@link #FLAG_JUMP_TARGET}, {@link #FLAG_RESOLVED},
+   * {@link #FLAG_REACHABLE}, {@link #FLAG_SUBROUTINE_CALLER}, {@link #FLAG_SUBROUTINE_START},
+   * {@link #FLAG_SUBROUTINE_END}。
    */
   short flags;
 
   /**
-   * The source line number corresponding to this label, or 0. If there are several source line
-   * numbers corresponding to this label, the first one is stored in this field, and the remaining
-   * ones are stored in {@link #otherLineNumbers}.
+   * 此标签对应的源代码行号，若有多个行号则存储第一个，
+   * 其他行号存储在 {@link #otherLineNumbers} 中。
    */
   private short lineNumber;
 
   /**
-   * The source line numbers corresponding to this label, in addition to {@link #lineNumber}, or
-   * null. The first element of this array is the number n of source line numbers it contains, which
-   * are stored between indices 1 and n (inclusive).
+   * 除 {@link #lineNumber} 外，此标签对应的其他源代码行号数组。
+   * 数组第一个元素为行号数量 n，具体行号存储在索引 1 到 n。
    */
   private int[] otherLineNumbers;
 
   /**
-   * The offset of this label in the bytecode of its method, in bytes. This value is set if and only
-   * if the {@link #FLAG_RESOLVED} flag is set.
+   * 此标签在方法字节码中的偏移量（字节数）。
+   * 仅当 {@link #FLAG_RESOLVED} 标志设置时有效。
    */
   int bytecodeOffset;
 
   /**
-   * The forward references to this label. The first element is the number of forward references,
-   * times 2 (this corresponds to the index of the last element actually used in this array). Then,
-   * each forward reference is described with two consecutive integers noted
-   * 'sourceInsnBytecodeOffset' and 'reference':
+   * 此标签的前向引用列表。
+   * 第一个元素为前向引用数量乘2（对应数组中最后使用元素的索引）。
+   * 每个前向引用由两个连续整数组成，分别为：
+   * - sourceInsnBytecodeOffset：包含前向引用的指令的字节码偏移；
+   * - reference：存储前向引用值的字节码偏移及其类型，可用 {@link #FORWARD_REFERENCE_TYPE_MASK}
+   *   和 {@link #FORWARD_REFERENCE_HANDLE_MASK} 解析。
    *
-   * <ul>
-   *   <li>'sourceInsnBytecodeOffset' is the bytecode offset of the instruction that contains the
-   *       forward reference,
-   *   <li>'reference' contains the type and the offset in the bytecode where the forward reference
-   *       value must be stored, which can be extracted with {@link #FORWARD_REFERENCE_TYPE_MASK}
-   *       and {@link #FORWARD_REFERENCE_HANDLE_MASK}.
-   * </ul>
+   * 例如：对于偏移为 x 的 ifnull 指令，
+   * sourceInsnBytecodeOffset = x，
+   * reference 类型为 {@link #FORWARD_REFERENCE_TYPE_SHORT}，值为 x + 1（ifnull 的偏移占 2 字节，
+   * 从指令后第1字节开始存储）。
    *
-   * <p>For instance, for an ifnull instruction at bytecode offset x, 'sourceInsnBytecodeOffset' is
-   * equal to x, and 'reference' is of type {@link #FORWARD_REFERENCE_TYPE_SHORT} with value x + 1
-   * (because the ifnull instruction uses a 2 bytes bytecode offset operand stored one byte after
-   * the start of the instruction itself). For the default case of a lookupswitch instruction at
-   * bytecode offset x, 'sourceInsnBytecodeOffset' is equal to x, and 'reference' is of type {@link
-   * #FORWARD_REFERENCE_TYPE_WIDE} with value between x + 1 and x + 4 (because the lookupswitch
-   * instruction uses a 4 bytes bytecode offset operand stored one to four bytes after the start of
-   * the instruction itself).
+   * 又如：对于偏移为 x 的 lookupswitch 指令，
+   * sourceInsnBytecodeOffset = x，
+   * reference 类型为 {@link #FORWARD_REFERENCE_TYPE_WIDE}，值在 x + 1 到 x + 4 之间
+   * （lookupswitch 的偏移占 4 字节，从指令后第1到第4字节存储）。
    */
   private int[] forwardReferences;
 
   // -----------------------------------------------------------------------------------------------
-
-  // Fields for the control flow and data flow graph analysis algorithms (used to compute the
-  // maximum stack size or the stack map frames). A control flow graph contains one node per "basic
-  // block", and one edge per "jump" from one basic block to another. Each node (i.e., each basic
-  // block) is represented with the Label object that corresponds to the first instruction of this
-  // basic block. Each node also stores the list of its successors in the graph, as a linked list of
-  // Edge objects.
-  //
-  // The control flow analysis algorithms used to compute the maximum stack size or the stack map
-  // frames are similar and use two steps. The first step, during the visit of each instruction,
-  // builds information about the state of the local variables and the operand stack at the end of
-  // each basic block, called the "output frame", <i>relatively</i> to the frame state at the
-  // beginning of the basic block, which is called the "input frame", and which is <i>unknown</i>
-  // during this step. The second step, in {@link MethodWriter#computeAllFrames} and {@link
-  // MethodWriter#computeMaxStackAndLocal}, is a fix point algorithm
-  // that computes information about the input frame of each basic block, from the input state of
-  // the first basic block (known from the method signature), and by the using the previously
-  // computed relative output frames.
-  //
-  // The algorithm used to compute the maximum stack size only computes the relative output and
-  // absolute input stack heights, while the algorithm used to compute stack map frames computes
-  // relative output frames and absolute input frames.
+  // 用于控制流和数据流图分析算法的字段（用于计算最大栈大小或栈映射帧）。
+  // 控制流图由若干“基本块”节点组成，每个节点对应方法中一个基本块的第一条指令，
+  // 节点间边对应从一个基本块跳转到另一个基本块的跳转指令。
+  // 每个节点保存其后继节点链表，链表由 Edge 对象链接。
+  // 计算最大栈大小或栈映射帧的分析算法分两步：
+  // 第一步，在访问每条指令时，计算基本块结束时的局部变量和操作数栈状态（“输出帧”，
+  // 相对该基本块开始时的“输入帧”，此时输入帧未知）；
+  // 第二步，在 MethodWriter#computeAllFrames 和 MethodWriter#computeMaxStackAndLocal 中，
+  // 通过迭代计算每个基本块的输入帧信息（从方法签名已知的第一个基本块输入帧开始），
+  // 并结合第一步计算的输出帧，达到收敛。
 
   /**
-   * The number of elements in the input stack of the basic block corresponding to this label. This
-   * field is computed in {@link MethodWriter#computeMaxStackAndLocal}.
+   * 对应此标签的基本块的输入栈元素数量。
+   * 该字段由 {@link MethodWriter#computeMaxStackAndLocal} 计算。
    */
   short inputStackSize;
 
   /**
-   * The number of elements in the output stack, at the end of the basic block corresponding to this
-   * label. This field is only computed for basic blocks that end with a RET instruction.
+   * 对应此标签的基本块的输出栈元素数量（仅在以 RET 指令结尾的基本块计算）。
    */
   short outputStackSize;
 
   /**
-   * The maximum height reached by the output stack, relatively to the top of the input stack, in
-   * the basic block corresponding to this label. This maximum is always positive or {@literal
-   * null}.
+   * 对应此标签的基本块输出栈相对输入栈的最大高度，始终为正数或0。
    */
   short outputStackMax;
 
   /**
-   * The id of the subroutine to which this basic block belongs, or 0. If the basic block belongs to
-   * several subroutines, this is the id of the "oldest" subroutine that contains it (with the
-   * convention that a subroutine calling another one is "older" than the callee). This field is
-   * computed in {@link MethodWriter#computeMaxStackAndLocal}, if the method contains JSR
-   * instructions.
+   * 此基本块所属子程序ID，或0。
+   * 若基本块属于多个子程序，取最早（调用链上最上层）的子程序ID。
+   * 该字段由 {@link MethodWriter#computeMaxStackAndLocal} 计算（仅当方法含 JSR 指令时）。
    */
   short subroutineId;
 
   /**
-   * The input and output stack map frames of the basic block corresponding to this label. This
-   * field is only used when the {@link MethodWriter#COMPUTE_ALL_FRAMES} or {@link
-   * MethodWriter#COMPUTE_INSERTED_FRAMES} option is used.
+   * 此标签对应基本块的输入和输出栈映射帧。
+   * 仅在 {@link MethodWriter#COMPUTE_ALL_FRAMES} 或 {@link MethodWriter#COMPUTE_INSERTED_FRAMES} 选项启用时使用。
    */
   Frame frame;
 
   /**
-   * The successor of this label, in the order they are visited in {@link MethodVisitor#visitLabel}.
-   * This linked list does not include labels used for debug info only. If the {@link
-   * MethodWriter#COMPUTE_ALL_FRAMES} or {@link MethodWriter#COMPUTE_INSERTED_FRAMES} option is used
-   * then it does not contain either successive labels that denote the same bytecode offset (in this
-   * case only the first label appears in this list).
+   * 按访问顺序，基本块对应的下一个标签。
+   * 该链表不包含仅用于调试信息的标签。
+   * 若启用 {@link MethodWriter#COMPUTE_ALL_FRAMES} 或 {@link MethodWriter#COMPUTE_INSERTED_FRAMES}，
+   * 则不会包含对应同一字节码偏移的连续标签（仅第一个标签出现在链表中）。
    */
   Label nextBasicBlock;
 
   /**
-   * The outgoing edges of the basic block corresponding to this label, in the control flow graph of
-   * its method. These edges are stored in a linked list of {@link Edge} objects, linked to each
-   * other by their {@link Edge#nextEdge} field.
+   * 此标签对应基本块在控制流图中的出边链表，存储为 {@link Edge} 链表，
+   * 通过 {@link Edge#nextEdge} 字段链接。
    */
   Edge outgoingEdges;
 
   /**
-   * The next element in the list of labels to which this label belongs, or {@literal null} if it
-   * does not belong to any list. All lists of labels must end with the {@link #EMPTY_LIST}
-   * sentinel, in order to ensure that this field is null if and only if this label does not belong
-   * to a list of labels. Note that there can be several lists of labels at the same time, but that
-   * a label can belong to at most one list at a time (unless some lists share a common tail, but
-   * this is not used in practice).
+   * 此标签所在的标签列表中的下一个元素，或 {@literal null}（不在任何列表中）。
+   * 所有标签列表必须以 {@link #EMPTY_LIST} 作为哨兵结尾，确保此字段为空时，表示标签不在任何列表中。
+   * 允许存在多个标签列表，但标签一次最多属于一个列表（除非共享尾部，但实际不使用）。
    *
-   * <p>List of labels are used in {@link MethodWriter#computeAllFrames} and {@link
-   * MethodWriter#computeMaxStackAndLocal} to compute stack map frames and the maximum stack size,
-   * respectively, as well as in {@link #markSubroutine} and {@link #addSubroutineRetSuccessors} to
-   * compute the basic blocks belonging to subroutines and their outgoing edges. Outside of these
-   * methods, this field should be null (this property is a precondition and a postcondition of
-   * these methods).
+   * <p>标签列表在 {@link MethodWriter#computeAllFrames} 和 {@link MethodWriter#computeMaxStackAndLocal} 中使用，
+   * 用于计算栈映射帧和最大栈大小，
+   * 也在 {@link #markSubroutine} 和 {@link #addSubroutineRetSuccessors} 中用于计算子程序基本块及其出边。
+   * 除上述方法外，此字段应始终为 null（该属性是这些方法的前置和后置条件）。
    */
   Label nextListElement;
 
   // -----------------------------------------------------------------------------------------------
-  // Constructor and accessors
+  // 构造函数和访问方法
   // -----------------------------------------------------------------------------------------------
 
-  /** Constructs a new label. */
+  /** 创建一个新的标签实例。 */
   public Label() {
-    // Nothing to do.
+    // 无需额外初始化。
   }
 
   /**
-   * Returns the bytecode offset corresponding to this label. This offset is computed from the start
-   * of the method's bytecode. <i>This method is intended for {@link Attribute} sub classes, and is
-   * normally not needed by class generators or adapters.</i>
+   * 返回此标签对应的字节码偏移（相对于方法字节码起始处）。
+   * <i>此方法主要供 {@link Attribute} 子类使用，一般类生成器或适配器不需调用。</i>
    *
-   * @return the bytecode offset corresponding to this label.
-   * @throws IllegalStateException if this label is not resolved yet.
+   * @return 此标签对应的字节码偏移。
+   * @throws IllegalStateException 如果标签尚未解析（偏移未知）。
    */
   public int getOffset() {
     if ((flags & FLAG_RESOLVED) == 0) {
@@ -306,30 +259,27 @@ public class Label {
   }
 
   /**
-   * Returns the "canonical" {@link Label} instance corresponding to this label's bytecode offset,
-   * if known, otherwise the label itself. The canonical instance is the first label (in the order
-   * of their visit by {@link MethodVisitor#visitLabel}) corresponding to this bytecode offset. It
-   * cannot be known for labels which have not been visited yet.
+   * 返回此标签对应字节码偏移的“规范”标签实例（若已知），否则返回自身。
+   * 规范实例为对应该偏移的第一个被 {@link MethodVisitor#visitLabel} 访问的标签。
+   * 未访问的标签无法确定规范实例。
    *
-   * <p><i>This method should only be used when the {@link MethodWriter#COMPUTE_ALL_FRAMES} option
-   * is used.</i>
+   * <p><i>仅在启用 {@link MethodWriter#COMPUTE_ALL_FRAMES} 选项时使用此方法。</i>
    *
-   * @return the label itself if {@link #frame} is null, otherwise the Label's frame owner. This
-   *     corresponds to the "canonical" label instance described above thanks to the way the label
-   *     frame is set in {@link MethodWriter#visitLabel}.
+   * @return 若 {@link #frame} 为 null，返回自身；否则返回 {@link Frame#owner} 字段对应标签，
+   *         即“规范”标签实例。
    */
   final Label getCanonicalInstance() {
     return frame == null ? this : frame.owner;
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Methods to manage line numbers
+  // 行号管理相关方法
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Adds a source line number corresponding to this label.
+   * 添加一个与此标签对应的源代码行号。
    *
-   * @param lineNumber a source line number (which should be strictly positive).
+   * @param lineNumber 源代码行号（应严格为正数）。
    */
   final void addLineNumber(final int lineNumber) {
     if (this.lineNumber == 0) {
@@ -349,10 +299,10 @@ public class Label {
   }
 
   /**
-   * Makes the given visitor visit this label and its source line numbers, if applicable.
+   * 使给定的访问者访问此标签及其对应的源代码行号（如适用）。
    *
-   * @param methodVisitor a method visitor.
-   * @param visitLineNumbers whether to visit of the label's source line numbers, if any.
+   * @param methodVisitor 方法访问者。
+   * @param visitLineNumbers 是否访问此标签对应的源代码行号（如果存在）。
    */
   final void accept(final MethodVisitor methodVisitor, final boolean visitLineNumbers) {
     methodVisitor.visitLabel(this);
@@ -367,19 +317,17 @@ public class Label {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Methods to compute offsets and to manage forward references
+  // 计算偏移及处理前向引用相关方法
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Puts a reference to this label in the bytecode of a method. If the bytecode offset of the label
-   * is known, the relative bytecode offset between the label and the instruction referencing it is
-   * computed and written directly. Otherwise, a null relative offset is written and a new forward
-   * reference is declared for this label.
+   * 在方法字节码中为此标签放置一个引用。
+   * 如果标签的字节码偏移已知，计算并直接写入标签相对于引用指令的偏移；
+   * 否则写入空的偏移值，并声明一个新的前向引用。
    *
-   * @param code the bytecode of the method. This is where the reference is appended.
-   * @param sourceInsnBytecodeOffset the bytecode offset of the instruction that contains the
-   *     reference to be appended.
-   * @param wideReference whether the reference must be stored in 4 bytes (instead of 2 bytes).
+   * @param code 方法的字节码，引用将写入此处。
+   * @param sourceInsnBytecodeOffset 包含该引用的指令的字节码偏移。
+   * @param wideReference 是否需使用4字节（否则为2字节）存储引用。
    */
   final void put(
       final ByteVector code, final int sourceInsnBytecodeOffset, final boolean wideReference) {
@@ -401,16 +349,12 @@ public class Label {
   }
 
   /**
-   * Adds a forward reference to this label. This method must be called only for a true forward
-   * reference, i.e. only if this label is not resolved yet. For backward references, the relative
-   * bytecode offset of the reference can be, and must be, computed and stored directly.
+   * 添加一个前向引用。此方法仅应在标签尚未解析时调用（即真正的前向引用）。
+   * 对于回溯引用，偏移可直接计算存储。
    *
-   * @param sourceInsnBytecodeOffset the bytecode offset of the instruction that contains the
-   *     reference stored at referenceHandle.
-   * @param referenceType either {@link #FORWARD_REFERENCE_TYPE_SHORT} or {@link
-   *     #FORWARD_REFERENCE_TYPE_WIDE}.
-   * @param referenceHandle the offset in the bytecode where the forward reference value must be
-   *     stored.
+   * @param sourceInsnBytecodeOffset 包含该引用的指令的字节码偏移。
+   * @param referenceType {@link #FORWARD_REFERENCE_TYPE_SHORT} 或 {@link #FORWARD_REFERENCE_TYPE_WIDE}。
+   * @param referenceHandle 前向引用值应存储的字节码偏移。
    */
   private void addForwardReference(
       final int sourceInsnBytecodeOffset, final int referenceType, final int referenceHandle) {
@@ -429,18 +373,15 @@ public class Label {
   }
 
   /**
-   * Sets the bytecode offset of this label to the given value and resolves the forward references
-   * to this label, if any. This method must be called when this label is added to the bytecode of
-   * the method, i.e. when its bytecode offset becomes known. This method fills in the blanks that
-   * where left in the bytecode by each forward reference previously added to this label.
+   * 设置此标签的字节码偏移，并解析对该标签的所有前向引用（如有）。
+   * 此方法应在标签被加入方法字节码（即偏移已知）时调用。
+   * 它会填补之前为前向引用预留的空白。
    *
-   * @param code the bytecode of the method.
-   * @param bytecodeOffset the bytecode offset of this label.
-   * @return {@literal true} if a blank that was left for this label was too small to store the
-   *     offset. In such a case the corresponding jump instruction is replaced with an equivalent
-   *     ASM specific instruction using an unsigned two bytes offset. These ASM specific
-   *     instructions are later replaced with standard bytecode instructions with wider offsets (4
-   *     bytes instead of 2), in ClassReader.
+   * @param code 方法字节码。
+   * @param bytecodeOffset 此标签的字节码偏移。
+   * @return 若预留的空白区域太小以致偏移无法存储，则返回 {@literal true}。
+   *         这种情况下，对应跳转指令将被替换为ASM特定指令（使用无符号2字节偏移），
+   *         在ClassReader中再替换为4字节偏移的标准字节码指令。
    */
   final boolean resolve(final byte[] code, final int bytecodeOffset) {
     this.flags |= FLAG_RESOLVED;
@@ -456,16 +397,15 @@ public class Label {
       int handle = reference & FORWARD_REFERENCE_HANDLE_MASK;
       if ((reference & FORWARD_REFERENCE_TYPE_MASK) == FORWARD_REFERENCE_TYPE_SHORT) {
         if (relativeOffset < Short.MIN_VALUE || relativeOffset > Short.MAX_VALUE) {
-          // Change the opcode of the jump instruction, in order to be able to find it later in
-          // ClassReader. These ASM specific opcodes are similar to jump instruction opcodes, except
-          // that the 2 bytes offset is unsigned (and can therefore represent values from 0 to
-          // 65535, which is sufficient since the size of a method is limited to 65535 bytes).
+          // 修改跳转指令的操作码，使其能在 ClassReader 中被识别为 ASM 特殊指令。
+          // 这些 ASM 特殊指令类似于跳转指令，但偏移量为无符号 2 字节，范围是 0~65535，
+          // 足够表示方法内偏移，因为方法大小限制为 65535 字节。
           int opcode = code[sourceInsnBytecodeOffset] & 0xFF;
           if (opcode < Opcodes.IFNULL) {
-            // Change IFEQ ... JSR to ASM_IFEQ ... ASM_JSR.
+            // 将 IFEQ ... JSR 改为 ASM_IFEQ ... ASM_JSR。
             code[sourceInsnBytecodeOffset] = (byte) (opcode + Constants.ASM_OPCODE_DELTA);
           } else {
-            // Change IFNULL and IFNONNULL to ASM_IFNULL and ASM_IFNONNULL.
+            // 将 IFNULL 和 IFNONNULL 改为 ASM_IFNULL 和 ASM_IFNONNULL。
             code[sourceInsnBytecodeOffset] = (byte) (opcode + Constants.ASM_IFNULL_OPCODE_DELTA);
           }
           hasAsmInstructions = true;
@@ -483,36 +423,32 @@ public class Label {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Methods related to subroutines
+  // 与子程序相关的方法
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Finds the basic blocks that belong to the subroutine starting with the basic block
-   * corresponding to this label, and marks these blocks as belonging to this subroutine. This
-   * method follows the control flow graph to find all the blocks that are reachable from the
-   * current basic block WITHOUT following any jsr target.
+   * 查找属于以此标签对应的基本块为起点的子程序的所有基本块，并将这些块标记为属于该子程序。
+   * 此方法沿控制流图寻找所有从当前基本块可达的基本块，但不跟踪任何 jsr 目标。
    *
-   * <p>Note: a precondition and postcondition of this method is that all labels must have a null
-   * {@link #nextListElement}.
+   * <p>注意：此方法的前置和后置条件是所有标签的 {@link #nextListElement} 均为 null。
    *
-   * @param subroutineId the id of the subroutine starting with the basic block corresponding to
-   *     this label.
+   * @param subroutineId 以此标签对应的基本块为起点的子程序的ID。
    */
   final void markSubroutine(final short subroutineId) {
-    // Data flow algorithm: put this basic block in a list of blocks to process (which are blocks
-    // belonging to subroutine subroutineId) and, while there are blocks to process, remove one from
-    // the list, mark it as belonging to the subroutine, and add its successor basic blocks in the
-    // control flow graph to the list of blocks to process (if not already done).
+  // 数据流算法：将此基本块加入待处理列表（这些块属于子程序 subroutineId），
+  // 当待处理列表不空时，从中取出一个块，标记它属于该子程序，
+  // 并将其控制流图中的后继基本块加入待处理列表（如果尚未加入）。
+
     Label listOfBlocksToProcess = this;
     listOfBlocksToProcess.nextListElement = EMPTY_LIST;
     while (listOfBlocksToProcess != EMPTY_LIST) {
-      // Remove a basic block from the list of blocks to process.
+      // 从待处理列表中取出一个基本块。
       Label basicBlock = listOfBlocksToProcess;
       listOfBlocksToProcess = listOfBlocksToProcess.nextListElement;
       basicBlock.nextListElement = null;
 
-      // If it is not already marked as belonging to a subroutine, mark it as belonging to
-      // subroutineId and add its successors to the list of blocks to process (unless already done).
+      // 如果该块尚未标记属于任何子程序，则标记为属于 subroutineId，
+      // 并将其后继加入待处理列表（避免重复加入）。
       if (basicBlock.subroutineId == 0) {
         basicBlock.subroutineId = subroutineId;
         listOfBlocksToProcess = basicBlock.pushSuccessors(listOfBlocksToProcess);
@@ -521,56 +457,45 @@ public class Label {
   }
 
   /**
-   * Finds the basic blocks that end a subroutine starting with the basic block corresponding to
-   * this label and, for each one of them, adds an outgoing edge to the basic block following the
-   * given subroutine call. In other words, completes the control flow graph by adding the edges
-   * corresponding to the return from this subroutine, when called from the given caller basic
-   * block.
+   * 查找以此标签对应的基本块为起点的子程序的所有结束基本块，
+   * 并为每个结束块添加一条到给定子程序调用后继基本块的出边。
+   * 换言之，完善控制流图，添加对应子程序返回的边（从调用者块指定）。
    *
-   * <p>Note: a precondition and postcondition of this method is that all labels must have a null
-   * {@link #nextListElement}.
+   * <p>注意：此方法的前置和后置条件是所有标签的 {@link #nextListElement} 均为 null。
    *
-   * @param subroutineCaller a basic block that ends with a jsr to the basic block corresponding to
-   *     this label. This label is supposed to correspond to the start of a subroutine.
+   * @param subroutineCaller 以 jsr 结束且跳转至此标签对应基本块的调用者基本块，假设此标签为子程序入口。
    */
   final void addSubroutineRetSuccessors(final Label subroutineCaller) {
-    // Data flow algorithm: put this basic block in a list blocks to process (which are blocks
-    // belonging to a subroutine starting with this label) and, while there are blocks to process,
-    // remove one from the list, put it in a list of blocks that have been processed, add a return
-    // edge to the successor of subroutineCaller if applicable, and add its successor basic blocks
-    // in the control flow graph to the list of blocks to process (if not already done).
+// 数据流算法：将此基本块加入待处理块列表（属于以此标签开头的子程序的块），
+// 当待处理列表不空时，从中取出一个基本块，放入已处理块列表，
+// 如果适用，则为 subroutineCaller 的后继添加返回边，
+// 并将其控制流图中的后继基本块加入待处理列表（如果尚未加入）。
     Label listOfProcessedBlocks = EMPTY_LIST;
     Label listOfBlocksToProcess = this;
     listOfBlocksToProcess.nextListElement = EMPTY_LIST;
     while (listOfBlocksToProcess != EMPTY_LIST) {
-      // Move a basic block from the list of blocks to process to the list of processed blocks.
+      // 将一个基本块从待处理列表移至已处理列表。
       Label basicBlock = listOfBlocksToProcess;
       listOfBlocksToProcess = basicBlock.nextListElement;
       basicBlock.nextListElement = listOfProcessedBlocks;
       listOfProcessedBlocks = basicBlock;
 
-      // Add an edge from this block to the successor of the caller basic block, if this block is
-      // the end of a subroutine and if this block and subroutineCaller do not belong to the same
-      // subroutine.
+      // 如果该块是子程序结束块，且不属于同一子程序，则添加一条边连接到 subroutineCaller 的后继。
       if ((basicBlock.flags & FLAG_SUBROUTINE_END) != 0
           && basicBlock.subroutineId != subroutineCaller.subroutineId) {
         basicBlock.outgoingEdges =
             new Edge(
                 basicBlock.outputStackSize,
-                // By construction, the first outgoing edge of a basic block that ends with a jsr
-                // instruction leads to the jsr continuation block, i.e. where execution continues
-                // when ret is called (see {@link #FLAG_SUBROUTINE_CALLER}).
+                // 根据设计，以 jsr 指令结束的基本块的第一个后继是 jsr 续块，
+                // 即 ret 调用时执行继续的地方（参见 {@link #FLAG_SUBROUTINE_CALLER}）。
                 subroutineCaller.outgoingEdges.successor,
                 basicBlock.outgoingEdges);
       }
-      // Add its successors to the list of blocks to process. Note that {@link #pushSuccessors} does
-      // not push basic blocks which are already in a list. Here this means either in the list of
-      // blocks to process, or in the list of already processed blocks. This second list is
-      // important to make sure we don't reprocess an already processed block.
+      // 将该基本块的后继加入待处理列表。
+      // 注意 pushSuccessors 不会加入已在待处理或已处理列表中的块，防止重复处理。
       listOfBlocksToProcess = basicBlock.pushSuccessors(listOfBlocksToProcess);
     }
-    // Reset the {@link #nextListElement} of all the basic blocks that have been processed to null,
-    // so that this method can be called again with a different subroutine or subroutine caller.
+// 重置所有已处理块的 nextListElement 字段，方便下次调用此方法处理不同子程序或调用者。
     while (listOfProcessedBlocks != EMPTY_LIST) {
       Label newListOfProcessedBlocks = listOfProcessedBlocks.nextListElement;
       listOfProcessedBlocks.nextListElement = null;
@@ -579,25 +504,22 @@ public class Label {
   }
 
   /**
-   * Adds the successors of this label in the method's control flow graph (except those
-   * corresponding to a jsr target, and those already in a list of labels) to the given list of
-   * blocks to process, and returns the new list.
+   * 将此标签在方法控制流图中的后继基本块（除 jsr 目标和已在列表中的块）加入给定的待处理块列表，
+   * 并返回更新后的待处理列表。
    *
-   * @param listOfLabelsToProcess a list of basic blocks to process, linked together with their
-   *     {@link #nextListElement} field.
-   * @return the new list of blocks to process.
+   * @param listOfLabelsToProcess 待处理基本块列表，通过其 {@link #nextListElement} 字段链表链接。
+   * @return 更新后的待处理基本块列表。
    */
   private Label pushSuccessors(final Label listOfLabelsToProcess) {
     Label newListOfLabelsToProcess = listOfLabelsToProcess;
     Edge outgoingEdge = outgoingEdges;
     while (outgoingEdge != null) {
-      // By construction, the second outgoing edge of a basic block that ends with a jsr instruction
-      // leads to the jsr target (see {@link #FLAG_SUBROUTINE_CALLER}).
+      // 根据结构，一个以jsr指令结尾的基本块的第二个出口边
+      // 指向jsr目标（参见 {@link #FLAG_SUBROUTINE_CALLER}）。
       boolean isJsrTarget =
           (flags & Label.FLAG_SUBROUTINE_CALLER) != 0 && outgoingEdge == outgoingEdges.nextEdge;
       if (!isJsrTarget && outgoingEdge.successor.nextListElement == null) {
-        // Add this successor to the list of blocks to process, if it does not already belong to a
-        // list of labels.
+        // 如果该后继节点不在任何标签列表中，则将其添加到待处理标签列表。
         outgoingEdge.successor.nextListElement = newListOfLabelsToProcess;
         newListOfLabelsToProcess = outgoingEdge.successor;
       }
@@ -607,13 +529,13 @@ public class Label {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Overridden Object methods
+  // 重写的 Object 方法
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Returns a string representation of this label.
+   * 返回此标签的字符串表示。
    *
-   * @return a string representation of this label.
+   * @return 此标签的字符串表示。
    */
   @Override
   public String toString() {

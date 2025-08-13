@@ -15,12 +15,13 @@
  */
 package org.springframework.cglib.beans;
 
+import org.springframework.asm.ClassVisitor;
+import org.springframework.asm.Type;
+import org.springframework.cglib.core.*;
+
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
-import org.springframework.cglib.core.*;
-import org.springframework.asm.ClassVisitor;
-import org.springframework.asm.Type;
 /**
  * @author Chris Nokleberg
  */
@@ -55,9 +56,9 @@ public class ImmutableBean
         public void setBean(Object bean) {
             this.bean = bean;
             target = bean.getClass();
-			// SPRING PATCH BEGIN
+			// SPRING补丁开始
 			setContextClass(target);
-			// SPRING PATCH END
+			// SPRING补丁结束
         }
 
         protected ClassLoader getDefaultClassLoader() {

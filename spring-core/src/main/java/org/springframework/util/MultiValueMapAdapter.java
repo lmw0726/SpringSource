@@ -16,23 +16,19 @@
 
 package org.springframework.util;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.lang.Nullable;
 
+import java.io.Serializable;
+import java.util.*;
+
 /**
- * Adapts a given {@link Map} to the {@link MultiValueMap} contract.
+ * 将给定的{@link Map}适配为符合{@link MultiValueMap}契约的实现。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @since 5.3
- * @param <K> the key type
- * @param <V> the value element type
+ * @param <K> 键类型
+ * @param <V> 值元素类型
  * @see CollectionUtils#toMultiValueMap
  * @see LinkedMultiValueMap
  */
@@ -43,8 +39,8 @@ public class MultiValueMapAdapter<K, V> implements MultiValueMap<K, V>, Serializ
 
 
 	/**
-	 * Wrap the given target {@link Map} as a {@link MultiValueMap} adapter.
-	 * @param targetMap the plain target {@code Map}
+	 * 将给定的目标{@link Map}包装为{@link MultiValueMap}适配器。
+	 * @param targetMap 普通的目标{@code Map}
 	 */
 	public MultiValueMapAdapter(Map<K, List<V>> targetMap) {
 		Assert.notNull(targetMap, "'targetMap' must not be null");
@@ -52,7 +48,7 @@ public class MultiValueMapAdapter<K, V> implements MultiValueMap<K, V>, Serializ
 	}
 
 
-	// MultiValueMap implementation
+	// MultiValueMap 实现
 
 	@Override
 	@Nullable
@@ -104,7 +100,7 @@ public class MultiValueMapAdapter<K, V> implements MultiValueMap<K, V>, Serializ
 	}
 
 
-	// Map implementation
+	// Map 实现
 
 	@Override
 	public int size() {

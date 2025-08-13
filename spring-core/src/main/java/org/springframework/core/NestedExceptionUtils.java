@@ -19,11 +19,10 @@ package org.springframework.core;
 import org.springframework.lang.Nullable;
 
 /**
- * Helper class for implementing exception classes which are capable of
- * holding nested exceptions. Necessary because we can't share a base
- * class among different exception types.
+ * 用于实现能够保存嵌套异常的异常类的辅助类。
+ * 这是必要的，因为不同异常类型之间无法共享基类。
  *
- * <p>Mainly for use within the framework.
+ * <p>主要供框架内部使用。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -35,10 +34,10 @@ import org.springframework.lang.Nullable;
 public abstract class NestedExceptionUtils {
 
 	/**
-	 * Build a message for the given base message and root cause.
-	 * @param message the base message
-	 * @param cause the root cause
-	 * @return the full exception message
+	 * 构建给定基础消息和根本原因的完整消息。
+	 * @param message 基础消息
+	 * @param cause 根本原因
+	 * @return 完整的异常消息
 	 */
 	@Nullable
 	public static String buildMessage(@Nullable String message, @Nullable Throwable cause) {
@@ -54,9 +53,9 @@ public abstract class NestedExceptionUtils {
 	}
 
 	/**
-	 * Retrieve the innermost cause of the given exception, if any.
-	 * @param original the original exception to introspect
-	 * @return the innermost exception, or {@code null} if none
+	 * 获取给定异常的最深层次原因（根本原因），如果有的话。
+	 * @param original 要检查的原始异常
+	 * @return 最深层次的异常，若无则返回 {@code null}
 	 * @since 4.3.9
 	 */
 	@Nullable
@@ -74,12 +73,10 @@ public abstract class NestedExceptionUtils {
 	}
 
 	/**
-	 * Retrieve the most specific cause of the given exception, that is,
-	 * either the innermost cause (root cause) or the exception itself.
-	 * <p>Differs from {@link #getRootCause} in that it falls back
-	 * to the original exception if there is no root cause.
-	 * @param original the original exception to introspect
-	 * @return the most specific cause (never {@code null})
+	 * 获取给定异常的最具体原因，也就是最深层的原因（根本原因）或异常本身。
+	 * <p>与 {@link #getRootCause} 不同的是，如果没有根本原因，则返回原始异常。
+	 * @param original 要检查的原始异常
+	 * @return 最具体的原因（永不为 {@code null}）
 	 * @since 4.3.9
 	 */
 	public static Throwable getMostSpecificCause(Throwable original) {

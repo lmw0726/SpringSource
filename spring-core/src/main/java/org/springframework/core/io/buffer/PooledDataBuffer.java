@@ -17,8 +17,8 @@
 package org.springframework.core.io.buffer;
 
 /**
- * Extension of {@link DataBuffer} that allows for buffer that share
- * a memory pool. Introduces methods for reference counting.
+ * {@link DataBuffer} 的扩展，支持共享内存池的缓冲区。
+ * 引入了引用计数的方法。
  *
  * @author Arjen Poutsma
  * @since 5.0
@@ -26,30 +26,30 @@ package org.springframework.core.io.buffer;
 public interface PooledDataBuffer extends DataBuffer {
 
 	/**
-	 * Return {@code true} if this buffer is allocated;
-	 * {@code false} if it has been deallocated.
+	 * 如果该缓冲区已分配，返回 {@code true}；
+	 * 如果已释放，返回 {@code false}。
 	 * @since 5.1
 	 */
 	boolean isAllocated();
 
 	/**
-	 * Increase the reference count for this buffer by one.
-	 * @return this buffer
+	 * 增加该缓冲区的引用计数1。
+	 * @return 返回该缓冲区自身
 	 */
 	PooledDataBuffer retain();
 
 	/**
-	 * Associate the given hint with the data buffer for debugging purposes.
-	 * @return this buffer
+	 * 为调试目的关联给定的提示信息到数据缓冲区。
+	 * @return 返回该缓冲区自身
 	 * @since 5.3.2
 	 */
 	PooledDataBuffer touch(Object hint);
 
 	/**
-	 * Decrease the reference count for this buffer by one,
-	 * and deallocate it once the count reaches zero.
-	 * @return {@code true} if the buffer was deallocated;
-	 * {@code false} otherwise
+	 * 减少该缓冲区的引用计数1，
+	 * 当计数归零时释放缓冲区。
+	 * @return 如果缓冲区已释放返回 {@code true}；
+	 * 否则返回 {@code false}
 	 */
 	boolean release();
 

@@ -16,19 +16,17 @@
 
 package org.springframework.core.io.buffer;
 
-import java.nio.ByteBuffer;
-import java.util.List;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
-
 import org.springframework.util.Assert;
 
+import java.nio.ByteBuffer;
+import java.util.List;
+
 /**
- * Implementation of the {@code DataBufferFactory} interface based on a
- * Netty {@link ByteBufAllocator}.
+ * 基于 Netty {@link ByteBufAllocator} 实现的 {@code DataBufferFactory} 接口。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -42,8 +40,8 @@ public class NettyDataBufferFactory implements DataBufferFactory {
 
 
 	/**
-	 * Create a new {@code NettyDataBufferFactory} based on the given factory.
-	 * @param byteBufAllocator the factory to use
+	 * 使用给定的 {@code ByteBufAllocator} 创建一个新的 {@code NettyDataBufferFactory}。
+	 * @param byteBufAllocator 要使用的分配器
 	 * @see io.netty.buffer.PooledByteBufAllocator
 	 * @see io.netty.buffer.UnpooledByteBufAllocator
 	 */
@@ -54,7 +52,7 @@ public class NettyDataBufferFactory implements DataBufferFactory {
 
 
 	/**
-	 * Return the {@code ByteBufAllocator} used by this factory.
+	 * 返回此工厂使用的 {@code ByteBufAllocator}。
 	 */
 	public ByteBufAllocator getByteBufAllocator() {
 		return this.byteBufAllocator;
@@ -85,9 +83,9 @@ public class NettyDataBufferFactory implements DataBufferFactory {
 	}
 
 	/**
-	 * Wrap the given Netty {@link ByteBuf} in a {@code NettyDataBuffer}.
-	 * @param byteBuf the Netty byte buffer to wrap
-	 * @return the wrapped buffer
+	 * 将给定的 Netty {@link ByteBuf} 包装为 {@code NettyDataBuffer}。
+	 * @param byteBuf 要包装的 Netty 字节缓冲区
+	 * @return 包装后的缓冲区
 	 */
 	public NettyDataBuffer wrap(ByteBuf byteBuf) {
 		byteBuf.touch();
@@ -96,7 +94,7 @@ public class NettyDataBufferFactory implements DataBufferFactory {
 
 	/**
 	 * {@inheritDoc}
-	 * <p>This implementation uses Netty's {@link CompositeByteBuf}.
+	 * <p>该实现使用 Netty 的 {@link CompositeByteBuf}。
 	 */
 	@Override
 	public DataBuffer join(List<? extends DataBuffer> dataBuffers) {
@@ -114,12 +112,12 @@ public class NettyDataBufferFactory implements DataBufferFactory {
 	}
 
 	/**
-	 * Return the given Netty {@link DataBuffer} as a {@link ByteBuf}.
-	 * <p>Returns the {@linkplain NettyDataBuffer#getNativeBuffer() native buffer}
-	 * if {@code buffer} is a {@link NettyDataBuffer}; returns
-	 * {@link Unpooled#wrappedBuffer(ByteBuffer)} otherwise.
-	 * @param buffer the {@code DataBuffer} to return a {@code ByteBuf} for
-	 * @return the netty {@code ByteBuf}
+	 * 将给定的 Netty {@link DataBuffer} 转换为 {@link ByteBuf}。
+	 * <p>如果 {@code buffer} 是 {@link NettyDataBuffer}，则返回其
+	 * {@linkplain NettyDataBuffer#getNativeBuffer() 原生缓冲区}；
+	 * 否则返回 {@link Unpooled#wrappedBuffer(ByteBuffer)} 包装的缓冲区。
+	 * @param buffer 要转换的 {@code DataBuffer}
+	 * @return 对应的 Netty {@code ByteBuf}
 	 */
 	public static ByteBuf toByteBuf(DataBuffer buffer) {
 		if (buffer instanceof NettyDataBuffer) {

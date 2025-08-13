@@ -16,16 +16,16 @@
 
 package org.springframework.core.type.filter;
 
-import java.io.IOException;
-
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 
+import java.io.IOException;
+
 /**
- * Type filter that exposes a
- * {@link org.springframework.core.type.ClassMetadata} object
- * to subclasses, for class testing purposes.
+ * 类型过滤器，向子类暴露一个
+ * {@link org.springframework.core.type.ClassMetadata} 对象，
+ * 用于类的测试目的。
  *
  * @author Rod Johnson
  * @author Costin Leau
@@ -43,9 +43,9 @@ public abstract class AbstractClassTestingTypeFilter implements TypeFilter {
 	}
 
 	/**
-	 * Determine a match based on the given ClassMetadata object.
-	 * @param metadata the ClassMetadata object
-	 * @return whether this filter matches on the specified type
+	 * 根据给定的 ClassMetadata 对象确定是否匹配。
+	 * @param metadata ClassMetadata 对象
+	 * @return 此过滤器是否匹配指定的类型
 	 */
 	protected abstract boolean match(ClassMetadata metadata);
 

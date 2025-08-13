@@ -16,17 +16,17 @@
 
 package org.springframework.core.metrics.jfr;
 
+import org.springframework.core.metrics.StartupStep;
+import org.springframework.lang.NonNull;
+
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.springframework.core.metrics.StartupStep;
-import org.springframework.lang.NonNull;
-
 /**
- * {@link StartupStep} implementation for the Java Flight Recorder.
- * <p>This variant delegates to a {@link FlightRecorderStartupEvent JFR event extension}
- * to collect and record data in Java Flight Recorder.
+ * {@link StartupStep} 在 Java Flight Recorder (JFR) 中的实现。
+ * <p>该实现委托给 {@link FlightRecorderStartupEvent JFR 事件扩展}
+ * 来收集并记录数据到 Java Flight Recorder 中。
  *
  * @author Brian Clozel
  */

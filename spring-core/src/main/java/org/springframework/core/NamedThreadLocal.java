@@ -19,12 +19,11 @@ package org.springframework.core;
 import org.springframework.util.Assert;
 
 /**
- * {@link ThreadLocal} subclass that exposes a specified name
- * as {@link #toString()} result (allowing for introspection).
+ * {@link ThreadLocal} 子类，暴露指定的名称作为 {@link #toString()} 的结果（便于检测）。
  *
  * @author Juergen Hoeller
  * @since 2.5.2
- * @param <T> the value type
+ * @param <T> 值的类型
  * @see NamedInheritableThreadLocal
  */
 public class NamedThreadLocal<T> extends ThreadLocal<T> {

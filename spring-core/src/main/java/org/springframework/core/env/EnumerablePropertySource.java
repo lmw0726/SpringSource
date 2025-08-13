@@ -19,44 +19,36 @@ package org.springframework.core.env;
 import org.springframework.util.ObjectUtils;
 
 /**
- * A {@link PropertySource} implementation capable of interrogating its
- * underlying source object to enumerate all possible property name/value
- * pairs. Exposes the {@link #getPropertyNames()} method to allow callers
- * to introspect available properties without having to access the underlying
- * source object. This also facilitates a more efficient implementation of
- * {@link #containsProperty(String)}, in that it can call {@link #getPropertyNames()}
- * and iterate through the returned array rather than attempting a call to
- * {@link #getProperty(String)} which may be more expensive. Implementations may
- * consider caching the result of {@link #getPropertyNames()} to fully exploit this
- * performance opportunity.
+ * 一个能够查询其底层源对象以枚举所有可能的属性名/值对的 {@link PropertySource} 实现。
+ * 公开 {@link #getPropertyNames()} 方法，允许调用者在不必访问底层源对象的情况下内省可用属性。
+ * 这也有助于更高效地实现 {@link #containsProperty(String)}，它可以调用 {@link #getPropertyNames()}
+ * 并遍历返回的数组，而不是尝试调用可能更昂贵的 {@link #getProperty(String)}。
+ * 实现可以考虑缓存 {@link #getPropertyNames()} 的结果以充分利用这种性能优势。
  *
- * <p>Most framework-provided {@code PropertySource} implementations are enumerable;
- * a counter-example would be {@code JndiPropertySource} where, due to the
- * nature of JNDI it is not possible to determine all possible property names at
- * any given time; rather it is only possible to try to access a property
- * (via {@link #getProperty(String)}) in order to evaluate whether it is present
- * or not.
+ * <p>大多数框架提供的 {@code PropertySource} 实现都是可枚举的；一个反例是 {@code JndiPropertySource}，
+ * 由于 JNDI 的特性，无法在任何给定时间确定所有可能的属性名；相反，只能尝试访问一个属性
+ * （通过 {@link #getProperty(String)}）来评估它是否存在。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
- * @param <T> the source type
+ * @param <T> 源类型
  */
 public abstract class EnumerablePropertySource<T> extends PropertySource<T> {
 
 	/**
-	 * Create a new {@code EnumerablePropertySource} with the given name and source object.
-	 * @param name the associated name
-	 * @param source the source object
+	 * 使用给定的名称和源对象创建一个新的 {@code EnumerablePropertySource}。
+	 * @param name 关联的名称
+	 * @param source 源对象
 	 */
 	public EnumerablePropertySource(String name, T source) {
 		super(name, source);
 	}
 
 	/**
-	 * Create a new {@code EnumerablePropertySource} with the given name and with a new
-	 * {@code Object} instance as the underlying source.
-	 * @param name the associated name
+	 * 使用给定的名称创建一个新的 {@code EnumerablePropertySource}，并以新的
+	 * {@code Object} 实例作为底层源。
+	 * @param name 关联的名称
 	 */
 	protected EnumerablePropertySource(String name) {
 		super(name);
@@ -64,10 +56,9 @@ public abstract class EnumerablePropertySource<T> extends PropertySource<T> {
 
 
 	/**
-	 * Return whether this {@code PropertySource} contains a property with the given name.
-	 * <p>This implementation checks for the presence of the given name within the
-	 * {@link #getPropertyNames()} array.
-	 * @param name the name of the property to find
+	 * 返回此 {@code PropertySource} 是否包含具有给定名称的属性。
+	 * <p>此实现检查给定名称是否存在于 {@link #getPropertyNames()} 数组中。
+	 * @param name 要查找的属性名称
 	 */
 	@Override
 	public boolean containsProperty(String name) {
@@ -75,8 +66,7 @@ public abstract class EnumerablePropertySource<T> extends PropertySource<T> {
 	}
 
 	/**
-	 * Return the names of all properties contained by the
-	 * {@linkplain #getSource() source} object (never {@code null}).
+	 * 返回 {@linkplain #getSource() 源} 对象包含的所有属性的名称（永远不会是 {@code null}）。
 	 */
 	public abstract String[] getPropertyNames();
 

@@ -28,53 +28,50 @@
 package org.springframework.asm;
 
 /**
- * A {@link MethodVisitor} that generates a corresponding 'method_info' structure, as defined in the
- * Java Virtual Machine Specification (JVMS).
+ * 一个 {@link MethodVisitor}，用于生成对应的 'method_info' 结构，
+ * 如 Java 虚拟机规范（JVMS）中定义的那样。
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.6">JVMS
- *     4.6</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.6">JVMS 4.6</a>
  * @author Eric Bruneton
  * @author Eugene Kuleshov
  */
 final class MethodWriter extends MethodVisitor {
 
-  /** Indicates that nothing must be computed. */
+  /** 表示不需要进行任何计算。 */
   static final int COMPUTE_NOTHING = 0;
 
   /**
-   * Indicates that the maximum stack size and the maximum number of local variables must be
-   * computed, from scratch.
+   * 表示必须从头计算最大栈深和最大本地变量数量。
    */
   static final int COMPUTE_MAX_STACK_AND_LOCAL = 1;
 
   /**
-   * Indicates that the maximum stack size and the maximum number of local variables must be
-   * computed, from the existing stack map frames. This can be done more efficiently than with the
-   * control flow graph algorithm used for {@link #COMPUTE_MAX_STACK_AND_LOCAL}, by using a linear
-   * scan of the bytecode instructions.
+   * 表示必须基于已有的栈映射帧计算最大栈深和最大本地变量数量。
+   * 这种方法比 {@link #COMPUTE_MAX_STACK_AND_LOCAL} 使用的控制流图算法更高效，
+   * 通过对字节码指令的线性扫描实现。
    */
   static final int COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES = 2;
 
   /**
-   * Indicates that the stack map frames of type F_INSERT must be computed. The other frames are not
-   * computed. They should all be of type F_NEW and should be sufficient to compute the content of
-   * the F_INSERT frames, together with the bytecode instructions between a F_NEW and a F_INSERT
-   * frame - and without any knowledge of the type hierarchy (by definition of F_INSERT).
+   * 表示必须计算类型为 F_INSERT 的栈映射帧。
+   * 其他类型的帧不计算，它们都应为 F_NEW 类型，
+   * 并且足以配合 F_NEW 和 F_INSERT 帧之间的字节码指令计算 F_INSERT 帧的内容，
+   * 无需了解类型层次结构（这是 F_INSERT 的定义）。
    */
   static final int COMPUTE_INSERTED_FRAMES = 3;
 
   /**
-   * Indicates that all the stack map frames must be computed. In this case the maximum stack size
-   * and the maximum number of local variables is also computed.
+   * 表示必须计算所有的栈映射帧。
+   * 在此情况下，也会计算最大栈深和最大本地变量数量。
    */
   static final int COMPUTE_ALL_FRAMES = 4;
 
-  /** Indicates that {@link #STACK_SIZE_DELTA} is not applicable (not constant or never used). */
+  /** 表示 {@link #STACK_SIZE_DELTA} 不适用（不恒定或未使用）。 */
   private static final int NA = 0;
 
   /**
-   * The stack size variation corresponding to each JVM opcode. The stack size variation for opcode
-   * 'o' is given by the array element at index 'o'.
+   * 对应每个 JVM 操作码的栈大小变化。
+   * 操作码 'o' 的栈大小变化由数组中索引为 'o' 的元素给出。
    *
    * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html">JVMS 6</a>
    */
@@ -283,307 +280,303 @@ final class MethodWriter extends MethodVisitor {
     NA // jsr_w = 201 (0xc9)
   };
 
-  /** Where the constants used in this MethodWriter must be stored. */
+  /** 此 MethodWriter 使用到的常量存储位置。 */
   private final SymbolTable symbolTable;
 
-  // Note: fields are ordered as in the method_info structure, and those related to attributes are
-  // ordered as in Section 4.7 of the JVMS.
+  // 注意：字段的排列顺序与 method_info 结构一致，
+  // 与属性相关的字段则按 JVMS 第 4.7 节中的顺序排列。
 
   /**
-   * The access_flags field of the method_info JVMS structure. This field can contain ASM specific
-   * access flags, such as {@link Opcodes#ACC_DEPRECATED}, which are removed when generating the
-   * ClassFile structure.
+   * method_info JVMS 结构中的 access_flags 字段。
+   * 此字段可以包含 ASM 特有的访问标志，例如 {@link Opcodes#ACC_DEPRECATED}，
+   * 这些标志在生成 ClassFile 结构时会被移除。
    */
   private final int accessFlags;
 
-  /** The name_index field of the method_info JVMS structure. */
+  /** method_info JVMS 结构中的 name_index 字段。 */
   private final int nameIndex;
 
-  /** The name of this method. */
+  /** 此方法的名称。 */
   private final String name;
 
-  /** The descriptor_index field of the method_info JVMS structure. */
+  /** method_info JVMS 结构中的 descriptor_index 字段。 */
   private final int descriptorIndex;
 
-  /** The descriptor of this method. */
+  /** 此方法的描述符。 */
   private final String descriptor;
 
-  // Code attribute fields and sub attributes:
+  // Code 属性字段及其子属性：
 
-  /** The max_stack field of the Code attribute. */
+  /** Code 属性中的 max_stack 字段。 */
   private int maxStack;
 
-  /** The max_locals field of the Code attribute. */
+  /** Code 属性中的 max_locals 字段。 */
   private int maxLocals;
 
-  /** The 'code' field of the Code attribute. */
+  /** Code 属性中的 'code' 字段。 */
   private final ByteVector code = new ByteVector();
 
   /**
-   * The first element in the exception handler list (used to generate the exception_table of the
-   * Code attribute). The next ones can be accessed with the {@link Handler#nextHandler} field. May
-   * be {@literal null}.
+   * 异常处理器链表的第一个元素（用于生成 Code 属性的 exception_table）。
+   * 后续元素可通过 {@link Handler#nextHandler} 字段访问。
+   * 可能为 {@literal null}。
    */
   private Handler firstHandler;
 
   /**
-   * The last element in the exception handler list (used to generate the exception_table of the
-   * Code attribute). The next ones can be accessed with the {@link Handler#nextHandler} field. May
-   * be {@literal null}.
+   * 异常处理器链表的最后一个元素（用于生成 Code 属性的 exception_table）。
+   * 后续元素可通过 {@link Handler#nextHandler} 字段访问。
+   * 可能为 {@literal null}。
    */
   private Handler lastHandler;
 
-  /** The line_number_table_length field of the LineNumberTable code attribute. */
+  /** LineNumberTable 代码属性的 line_number_table_length 字段。 */
   private int lineNumberTableLength;
 
-  /** The line_number_table array of the LineNumberTable code attribute, or {@literal null}. */
+  /** LineNumberTable 代码属性的 line_number_table 数组，或 {@literal null}。 */
   private ByteVector lineNumberTable;
 
-  /** The local_variable_table_length field of the LocalVariableTable code attribute. */
+  /** LocalVariableTable 代码属性的 local_variable_table_length 字段。 */
   private int localVariableTableLength;
 
   /**
-   * The local_variable_table array of the LocalVariableTable code attribute, or {@literal null}.
+   * LocalVariableTable 代码属性的 local_variable_table 数组，或 {@literal null}。
    */
   private ByteVector localVariableTable;
 
-  /** The local_variable_type_table_length field of the LocalVariableTypeTable code attribute. */
+  /** LocalVariableTypeTable 代码属性的 local_variable_type_table_length 字段。 */
   private int localVariableTypeTableLength;
 
   /**
-   * The local_variable_type_table array of the LocalVariableTypeTable code attribute, or {@literal
-   * null}.
+   * LocalVariableTypeTable 代码属性的 local_variable_type_table 数组，或 {@literal null}。
    */
   private ByteVector localVariableTypeTable;
 
-  /** The number_of_entries field of the StackMapTable code attribute. */
+  /** StackMapTable 代码属性的 number_of_entries 字段。 */
   private int stackMapTableNumberOfEntries;
 
-  /** The 'entries' array of the StackMapTable code attribute. */
+  /** StackMapTable 代码属性的 'entries' 数组。 */
   private ByteVector stackMapTableEntries;
 
   /**
-   * The last runtime visible type annotation of the Code attribute. The previous ones can be
-   * accessed with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * Code 属性的最后一个运行时可见类型注解。
+   * 之前的注解可通过 {@link AnnotationWriter#previousAnnotation} 字段访问。
+   * 可能为 {@literal null}。
    */
   private AnnotationWriter lastCodeRuntimeVisibleTypeAnnotation;
 
   /**
-   * The last runtime invisible type annotation of the Code attribute. The previous ones can be
-   * accessed with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * Code 属性的最后一个运行时不可见类型注解。
+   * 之前的注解可通过 {@link AnnotationWriter#previousAnnotation} 字段访问。
+   * 可能为 {@literal null}。
    */
   private AnnotationWriter lastCodeRuntimeInvisibleTypeAnnotation;
 
   /**
-   * The first non standard attribute of the Code attribute. The next ones can be accessed with the
-   * {@link Attribute#nextAttribute} field. May be {@literal null}.
+   * Code 属性的第一个非标准属性。后续属性可通过 {@link Attribute#nextAttribute} 字段访问。
+   * 可能为 {@literal null}。
    *
-   * <p><b>WARNING</b>: this list stores the attributes in the <i>reverse</i> order of their visit.
-   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The {@link
-   * #putMethodInfo} method writes the attributes in the order defined by this list, i.e. in the
-   * reverse order specified by the user.
+   * <p><b>警告</b>：此列表按访问顺序的<i>相反</i>顺序存储属性。
+   * firstAttribute 实际上是 {@link #visitAttribute} 中最后访问的属性。
+   * {@link #putMethodInfo} 方法会按照该列表定义的顺序写出属性，
+   * 即用户指定顺序的反序。
    */
   private Attribute firstCodeAttribute;
 
-  // Other method_info attributes:
+  // 其他 method_info 属性：
 
-  /** The number_of_exceptions field of the Exceptions attribute. */
+  /** Exceptions 属性的 number_of_exceptions 字段。 */
   private final int numberOfExceptions;
 
-  /** The exception_index_table array of the Exceptions attribute, or {@literal null}. */
+  /** Exceptions 属性的 exception_index_table 数组，或 {@literal null}。 */
   private final int[] exceptionIndexTable;
 
-  /** The signature_index field of the Signature attribute. */
+  /** Signature 属性的 signature_index 字段。 */
   private final int signatureIndex;
 
   /**
-   * The last runtime visible annotation of this method. The previous ones can be accessed with the
-   * {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 此方法的最后一个运行时可见注解。
+   * 之前的注解可通过 {@link AnnotationWriter#previousAnnotation} 字段访问。
+   * 可能为 {@literal null}。
    */
   private AnnotationWriter lastRuntimeVisibleAnnotation;
 
   /**
-   * The last runtime invisible annotation of this method. The previous ones can be accessed with
-   * the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 此方法的最后一个运行时不可见注解。
+   * 之前的注解可通过 {@link AnnotationWriter#previousAnnotation} 字段访问。
+   * 可能为 {@literal null}。
    */
   private AnnotationWriter lastRuntimeInvisibleAnnotation;
 
-  /** The number of method parameters that can have runtime visible annotations, or 0. */
+  /** 可以具有运行时可见注解的方法参数数量，如果没有则为 0。 */
   private int visibleAnnotableParameterCount;
 
   /**
-   * The runtime visible parameter annotations of this method. Each array element contains the last
-   * annotation of a parameter (which can be {@literal null} - the previous ones can be accessed
-   * with the {@link AnnotationWriter#previousAnnotation} field). May be {@literal null}.
+   * 此方法的运行时可见参数注解。
+   * 每个数组元素包含某个参数的最后一个注解（可能为 {@literal null}；
+   * 之前的注解可通过 {@link AnnotationWriter#previousAnnotation} 字段访问）。
+   * 可能为 {@literal null}。
    */
   private AnnotationWriter[] lastRuntimeVisibleParameterAnnotations;
 
-  /** The number of method parameters that can have runtime visible annotations, or 0. */
+  /** 可以具有运行时不可见注解的方法参数数量，如果没有则为 0。 */
   private int invisibleAnnotableParameterCount;
 
   /**
-   * The runtime invisible parameter annotations of this method. Each array element contains the
-   * last annotation of a parameter (which can be {@literal null} - the previous ones can be
-   * accessed with the {@link AnnotationWriter#previousAnnotation} field). May be {@literal null}.
+   * 此方法的运行时不可见参数注解。
+   * 每个数组元素包含某个参数的最后一个注解（可能为 {@literal null}；
+   * 之前的注解可通过 {@link AnnotationWriter#previousAnnotation} 字段访问）。
+   * 可能为 {@literal null}。
    */
   private AnnotationWriter[] lastRuntimeInvisibleParameterAnnotations;
 
   /**
-   * The last runtime visible type annotation of this method. The previous ones can be accessed with
-   * the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 此方法的最后一个运行时可见类型注解。
+   * 之前的注解可通过 {@link AnnotationWriter#previousAnnotation} 字段访问。
+   * 可能为 {@literal null}。
    */
   private AnnotationWriter lastRuntimeVisibleTypeAnnotation;
 
   /**
-   * The last runtime invisible type annotation of this method. The previous ones can be accessed
-   * with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
+   * 此方法的最后一个运行时不可见类型注解。之前的注解可以通过 {@link AnnotationWriter#previousAnnotation} 字段访问。
+   * 可能为 {@literal null}。
    */
   private AnnotationWriter lastRuntimeInvisibleTypeAnnotation;
 
-  /** The default_value field of the AnnotationDefault attribute, or {@literal null}. */
+  /** AnnotationDefault 属性的 default_value 字段，或 {@literal null}。 */
   private ByteVector defaultValue;
 
-  /** The parameters_count field of the MethodParameters attribute. */
+  /** MethodParameters 属性的 parameters_count 字段。 */
   private int parametersCount;
 
-  /** The 'parameters' array of the MethodParameters attribute, or {@literal null}. */
+  /** MethodParameters 属性的 'parameters' 数组，或 {@literal null}。 */
   private ByteVector parameters;
 
   /**
-   * The first non standard attribute of this method. The next ones can be accessed with the {@link
-   * Attribute#nextAttribute} field. May be {@literal null}.
+   * 此方法的第一个非标准属性。后续属性可通过 {@link Attribute#nextAttribute} 字段访问。
+   * 可能为 {@literal null}。
    *
-   * <p><b>WARNING</b>: this list stores the attributes in the <i>reverse</i> order of their visit.
-   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The {@link
-   * #putMethodInfo} method writes the attributes in the order defined by this list, i.e. in the
-   * reverse order specified by the user.
+   * <p><b>警告</b>：此列表按它们访问的<i>相反</i>顺序存储属性。
+   * firstAttribute 实际上是 {@link #visitAttribute} 中最后访问的属性。
+   * {@link #putMethodInfo} 方法会按照此列表定义的顺序写出属性，即用户指定顺序的反序。
    */
   private Attribute firstAttribute;
 
   // -----------------------------------------------------------------------------------------------
-  // Fields used to compute the maximum stack size and number of locals, and the stack map frames
+  // 用于计算最大栈深、局部变量数量及栈映射帧的字段
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Indicates what must be computed. Must be one of {@link #COMPUTE_ALL_FRAMES}, {@link
-   * #COMPUTE_INSERTED_FRAMES}, {@link COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link
-   * #COMPUTE_MAX_STACK_AND_LOCAL} or {@link #COMPUTE_NOTHING}.
+   * 表示需要计算的内容。必须是 {@link #COMPUTE_ALL_FRAMES}、{@link #COMPUTE_INSERTED_FRAMES}、
+   * {@link COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}、{@link #COMPUTE_MAX_STACK_AND_LOCAL}
+   * 或 {@link #COMPUTE_NOTHING} 之一。
    */
   private final int compute;
 
   /**
-   * The first basic block of the method. The next ones (in bytecode offset order) can be accessed
-   * with the {@link Label#nextBasicBlock} field.
+   * 方法的第一个基本块。按字节码偏移顺序的下一个基本块可通过 {@link Label#nextBasicBlock} 字段访问。
    */
   private Label firstBasicBlock;
 
   /**
-   * The last basic block of the method (in bytecode offset order). This field is updated each time
-   * a basic block is encountered, and is used to append it at the end of the basic block list.
+   * 方法的最后一个基本块（按字节码偏移顺序）。
+   * 每遇到一个基本块时都会更新该字段，用于将其追加到基本块链表末尾。
    */
   private Label lastBasicBlock;
 
   /**
-   * The current basic block, i.e. the basic block of the last visited instruction. When {@link
-   * #compute} is equal to {@link #COMPUTE_MAX_STACK_AND_LOCAL} or {@link #COMPUTE_ALL_FRAMES}, this
-   * field is {@literal null} for unreachable code. When {@link #compute} is equal to {@link
-   * #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES} or {@link #COMPUTE_INSERTED_FRAMES}, this field stays
-   * unchanged throughout the whole method (i.e. the whole code is seen as a single basic block;
-   * indeed, the existing frames are sufficient by hypothesis to compute any intermediate frame -
-   * and the maximum stack size as well - without using any control flow graph).
+   * 当前基本块，即最后访问指令所在的基本块。
+   * 当 {@link #compute} 等于 {@link #COMPUTE_MAX_STACK_AND_LOCAL} 或 {@link #COMPUTE_ALL_FRAMES} 时，
+   * 对于不可达代码，该字段为 {@literal null}。
+   * 当 {@link #compute} 等于 {@link #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES} 或
+   * {@link #COMPUTE_INSERTED_FRAMES} 时，该字段在整个方法期间保持不变
+   * （即整个代码被视为单个基本块，因为假设现有帧足以计算任何中间帧以及最大栈深，
+   * 无需使用控制流图）。
    */
   private Label currentBasicBlock;
 
   /**
-   * The relative stack size after the last visited instruction. This size is relative to the
-   * beginning of {@link #currentBasicBlock}, i.e. the true stack size after the last visited
-   * instruction is equal to the {@link Label#inputStackSize} of the current basic block plus {@link
-   * #relativeStackSize}. When {@link #compute} is equal to {@link
-   * #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link #currentBasicBlock} is always the start of
-   * the method, so this relative size is also equal to the absolute stack size after the last
-   * visited instruction.
+   * 最后访问指令后的相对栈深。
+   * 该大小是相对于 {@link #currentBasicBlock} 开始位置的，
+   * 即最后访问指令后的实际栈深 = 当前基本块的 {@link Label#inputStackSize} + {@link #relativeStackSize}。
+   * 当 {@link #compute} 等于 {@link #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES} 时，
+   * {@link #currentBasicBlock} 总是方法起始位置，因此该相对大小等于最后访问指令后的绝对栈深。
    */
   private int relativeStackSize;
 
   /**
-   * The maximum relative stack size after the last visited instruction. This size is relative to
-   * the beginning of {@link #currentBasicBlock}, i.e. the true maximum stack size after the last
-   * visited instruction is equal to the {@link Label#inputStackSize} of the current basic block
-   * plus {@link #maxRelativeStackSize}.When {@link #compute} is equal to {@link
-   * #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link #currentBasicBlock} is always the start of
-   * the method, so this relative size is also equal to the absolute maximum stack size after the
-   * last visited instruction.
+   * 最后访问指令后的最大相对栈深。
+   * 该大小是相对于 {@link #currentBasicBlock} 开始位置的，
+   * 即实际最大栈深 = 当前基本块的 {@link Label#inputStackSize} + {@link #maxRelativeStackSize}。
+   * 当 {@link #compute} 等于 {@link #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES} 时，
+   * {@link #currentBasicBlock} 总是方法起始位置，因此该相对大小等于最后访问指令后的绝对最大栈深。
    */
   private int maxRelativeStackSize;
 
-  /** The number of local variables in the last visited stack map frame. */
+  /** 最后访问的栈映射帧中的局部变量数量。 */
   private int currentLocals;
 
-  /** The bytecode offset of the last frame that was written in {@link #stackMapTableEntries}. */
+  /** 在 {@link #stackMapTableEntries} 中最后写入的帧的字节码偏移量。 */
   private int previousFrameOffset;
 
   /**
-   * The last frame that was written in {@link #stackMapTableEntries}. This field has the same
-   * format as {@link #currentFrame}.
+   * 在 {@link #stackMapTableEntries} 中最后写入的帧。该字段的格式与 {@link #currentFrame} 相同。
    */
   private int[] previousFrame;
 
   /**
-   * The current stack map frame. The first element contains the bytecode offset of the instruction
-   * to which the frame corresponds, the second element is the number of locals and the third one is
-   * the number of stack elements. The local variables start at index 3 and are followed by the
-   * operand stack elements. In summary frame[0] = offset, frame[1] = numLocal, frame[2] = numStack.
-   * Local variables and operand stack entries contain abstract types, as defined in {@link Frame},
-   * but restricted to {@link Frame#CONSTANT_KIND}, {@link Frame#REFERENCE_KIND} or {@link
-   * Frame#UNINITIALIZED_KIND} abstract types. Long and double types use only one array entry.
+   * 当前的栈映射帧。第一个元素是与该帧对应的指令的字节码偏移量，第二个元素是本地变量数量，
+   * 第三个元素是操作数栈元素数量。本地变量从索引 3 开始，后面紧跟着操作数栈元素。
+   * 总结：frame[0] = offset，frame[1] = numLocal，frame[2] = numStack。
+   * 本地变量和操作数栈条目包含抽象类型（参见 {@link Frame}），但仅限于
+   * {@link Frame#CONSTANT_KIND}、{@link Frame#REFERENCE_KIND} 或
+   * {@link Frame#UNINITIALIZED_KIND} 抽象类型。long 和 double 类型只占用一个数组元素。
    */
   private int[] currentFrame;
 
-  /** Whether this method contains subroutines. */
+  /** 该方法是否包含子程序。 */
   private boolean hasSubroutines;
 
   // -----------------------------------------------------------------------------------------------
-  // Other miscellaneous status fields
+  // 其他杂项状态字段
   // -----------------------------------------------------------------------------------------------
 
-  /** Whether the bytecode of this method contains ASM specific instructions. */
+  /** 该方法的字节码是否包含 ASM 特定的指令。 */
   private boolean hasAsmInstructions;
 
   /**
-   * The start offset of the last visited instruction. Used to set the offset field of type
-   * annotations of type 'offset_target' (see <a
-   * href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.1">JVMS
-   * 4.7.20.1</a>).
+   * 最近访问的指令的起始偏移量。
+   * 用于设置类型为 "offset_target" 的类型注解的 offset 字段
+   * （参见 <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.1">JVMS 4.7.20.1</a>）。
    */
   private int lastBytecodeOffset;
 
   /**
-   * The offset in bytes in {@link SymbolTable#getSource} from which the method_info for this method
-   * (excluding its first 6 bytes) must be copied, or 0.
+   * 在 {@link SymbolTable#getSource} 中的字节偏移量，从该位置开始复制该方法的 method_info
+   * （不包括前 6 个字节），如果为 0 则表示不需要复制。
    */
   private int sourceOffset;
 
   /**
-   * The length in bytes in {@link SymbolTable#getSource} which must be copied to get the
-   * method_info for this method (excluding its first 6 bytes for access_flags, name_index and
-   * descriptor_index).
+   * 在 {@link SymbolTable#getSource} 中需要复制的字节长度，
+   * 以获取该方法的 method_info（不包括前 6 个字节，即 access_flags、name_index 和 descriptor_index）。
    */
   private int sourceLength;
 
   // -----------------------------------------------------------------------------------------------
-  // Constructor and accessors
+  // 构造方法与访问器
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Constructs a new {@link MethodWriter}.
+   * 构造一个新的 {@link MethodWriter}。
    *
-   * @param symbolTable where the constants used in this AnnotationWriter must be stored.
-   * @param access the method's access flags (see {@link Opcodes}).
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @param signature the method's signature. May be {@literal null}.
-   * @param exceptions the internal names of the method's exceptions. May be {@literal null}.
-   * @param compute indicates what must be computed (see #compute).
+   * @param symbolTable 常量池存储位置，本 AnnotationWriter 使用到的常量会存储在此处。
+   * @param access 方法的访问标志（参见 {@link Opcodes}）。
+   * @param name 方法名。
+   * @param descriptor 方法描述符（参见 {@link Type}）。
+   * @param signature 方法签名，可以为 {@literal null}。
+   * @param exceptions 方法异常的内部名称数组，可以为 {@literal null}。
+   * @param compute 需要计算的内容（参见 #compute）。
    */
   MethodWriter(
       final SymbolTable symbolTable,
@@ -593,7 +586,7 @@ final class MethodWriter extends MethodVisitor {
       final String signature,
       final String[] exceptions,
       final int compute) {
-    super(/* latest api = */ Opcodes.ASM9);
+    super(/* 最新的API = */ Opcodes.ASM9);
     this.symbolTable = symbolTable;
     this.accessFlags = "<init>".equals(name) ? access | Constants.ACC_CONSTRUCTOR : access;
     this.nameIndex = symbolTable.addConstantUtf8(name);
@@ -613,14 +606,14 @@ final class MethodWriter extends MethodVisitor {
     }
     this.compute = compute;
     if (compute != COMPUTE_NOTHING) {
-      // Update maxLocals and currentLocals.
+      // 更新maxLocals和currentLocals。
       int argumentsSize = Type.getArgumentsAndReturnSizes(descriptor) >> 2;
       if ((access & Opcodes.ACC_STATIC) != 0) {
         --argumentsSize;
       }
       maxLocals = argumentsSize;
       currentLocals = argumentsSize;
-      // Create and visit the label for the first basic block.
+      // 创建并访问第一个基本块的标签。
       firstBasicBlock = new Label();
       visitLabel(firstBasicBlock);
     }
@@ -635,7 +628,7 @@ final class MethodWriter extends MethodVisitor {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Implementation of the MethodVisitor abstract class
+  // MethodVisitor 抽象类的实现
   // -----------------------------------------------------------------------------------------------
 
   @Override
@@ -713,7 +706,7 @@ final class MethodWriter extends MethodVisitor {
 
   @Override
   public void visitAttribute(final Attribute attribute) {
-    // Store the attributes in the <i>reverse</i> order of their visit by this method.
+    // 按照该方法访问它们的<i>逆序</i>存储属性。
     if (attribute.isCodeAttribute()) {
       attribute.nextAttribute = firstCodeAttribute;
       firstCodeAttribute = attribute;
@@ -725,7 +718,7 @@ final class MethodWriter extends MethodVisitor {
 
   @Override
   public void visitCode() {
-    // Nothing to do.
+    // 无需执行任何操作。
   }
 
   @Override
@@ -741,9 +734,9 @@ final class MethodWriter extends MethodVisitor {
 
     if (compute == COMPUTE_INSERTED_FRAMES) {
       if (currentBasicBlock.frame == null) {
-        // This should happen only once, for the implicit first frame (which is explicitly visited
-        // in ClassReader if the EXPAND_ASM_INSNS option is used - and COMPUTE_INSERTED_FRAMES
-        // can't be set if EXPAND_ASM_INSNS is not used).
+        // 这种情况只会发生一次，即隐式的第一个帧（如果使用了 EXPAND_ASM_INSNS 选项，
+        // 在 ClassReader 中会显式访问它 —— 而且如果没有使用 EXPAND_ASM_INSNS 选项，
+        // 就不可能设置 COMPUTE_INSERTED_FRAMES）。
         currentBasicBlock.frame = new CurrentFrame(currentBasicBlock);
         currentBasicBlock.frame.setInputFrameFromDescriptor(
             symbolTable, accessFlags, descriptor, numLocal);
@@ -753,9 +746,9 @@ final class MethodWriter extends MethodVisitor {
           currentBasicBlock.frame.setInputFrameFromApiFormat(
               symbolTable, numLocal, local, numStack, stack);
         }
-        // If type is not F_NEW then it is F_INSERT by hypothesis, and currentBlock.frame contains
-        // the stack map frame at the current instruction, computed from the last F_NEW frame and
-        // the bytecode instructions in between (via calls to CurrentFrame#execute).
+        // 如果 type 不是 F_NEW，那么根据假设它是 F_INSERT，
+        // 而 currentBlock.frame 包含当前指令处的栈映射帧，
+        // 该帧是由上一个 F_NEW 帧以及其间的字节码指令（通过调用 CurrentFrame#execute）计算得出的。
         currentBasicBlock.frame.accept(this);
       }
     } else if (type == Opcodes.F_NEW) {
@@ -861,9 +854,9 @@ final class MethodWriter extends MethodVisitor {
   @Override
   public void visitInsn(final int opcode) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将该指令添加到方法的字节码中。
     code.putByte(opcode);
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如果需要，更新最大栈深、局部变量数量以及栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(opcode, 0, null, null);
@@ -883,18 +876,18 @@ final class MethodWriter extends MethodVisitor {
   @Override
   public void visitIntInsn(final int opcode, final int operand) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将该指令添加到方法的字节码中。
     if (opcode == Opcodes.SIPUSH) {
       code.put12(opcode, operand);
-    } else { // BIPUSH or NEWARRAY
+    } else { // BIPUSH 或 NEWARRAY
       code.put11(opcode, operand);
     }
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如果需要，更新最大栈深、局部变量数量以及栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(opcode, operand, null, null);
       } else if (opcode != Opcodes.NEWARRAY) {
-        // The stack size delta is 1 for BIPUSH or SIPUSH, and 0 for NEWARRAY.
+        // 对于 BIPUSH 或 SIPUSH，栈大小变化为 +1；对于 NEWARRAY，变化为 0。
         int size = relativeStackSize + 1;
         if (size > maxRelativeStackSize) {
           maxRelativeStackSize = size;
@@ -907,7 +900,7 @@ final class MethodWriter extends MethodVisitor {
   @Override
   public void visitVarInsn(final int opcode, final int varIndex) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将该指令添加到方法的字节码中。
     if (varIndex < 4 && opcode != Opcodes.RET) {
       int optimizedOpcode;
       if (opcode < Opcodes.ISTORE) {
@@ -921,17 +914,17 @@ final class MethodWriter extends MethodVisitor {
     } else {
       code.put11(opcode, varIndex);
     }
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如果需要，更新最大栈深度、本地变量数以及栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(opcode, varIndex, null, null);
       } else {
         if (opcode == Opcodes.RET) {
-          // No stack size delta.
+          // RET 指令不会改变栈深度。
           currentBasicBlock.flags |= Label.FLAG_SUBROUTINE_END;
           currentBasicBlock.outputStackSize = (short) relativeStackSize;
           endCurrentBasicBlockWithNoSuccessor();
-        } else { // xLOAD or xSTORE
+        } else { // xLOAD 或 xSTORE
           int size = relativeStackSize + STACK_SIZE_DELTA[opcode];
           if (size > maxRelativeStackSize) {
             maxRelativeStackSize = size;
@@ -955,13 +948,11 @@ final class MethodWriter extends MethodVisitor {
       }
     }
     if (opcode >= Opcodes.ISTORE && compute == COMPUTE_ALL_FRAMES && firstHandler != null) {
-      // If there are exception handler blocks, each instruction within a handler range is, in
-      // theory, a basic block (since execution can jump from this instruction to the exception
-      // handler). As a consequence, the local variable types at the beginning of the handler
-      // block should be the merge of the local variable types at all the instructions within the
-      // handler range. However, instead of creating a basic block for each instruction, we can
-      // get the same result in a more efficient way. Namely, by starting a new basic block after
-      // each xSTORE instruction, which is what we do here.
+      // 如果存在异常处理器块，那么处理器范围内的每一条指令在理论上都是一个基本块
+      // （因为执行可能从该指令跳转到异常处理器）。
+      // 因此，处理器块开始处的本地变量类型应该是处理器范围内所有指令的本地变量类型的合并结果。
+      // 但是，我们可以通过一种更高效的方式实现这个目的，而不必为每条指令都创建一个基本块：
+      // 在每条 xSTORE 指令之后开始一个新的基本块，这就是这里的实现。
       visitLabel(new Label());
     }
   }
@@ -969,15 +960,15 @@ final class MethodWriter extends MethodVisitor {
   @Override
   public void visitTypeInsn(final int opcode, final String type) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将该指令添加到方法的字节码中。
     Symbol typeSymbol = symbolTable.addConstantClass(type);
     code.put12(opcode, typeSymbol.index);
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如果需要，更新最大栈深度、本地变量数以及栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(opcode, lastBytecodeOffset, typeSymbol, symbolTable);
       } else if (opcode == Opcodes.NEW) {
-        // The stack size delta is 1 for NEW, and 0 for ANEWARRAY, CHECKCAST, or INSTANCEOF.
+        // 对于 NEW 指令，栈深度变化为 +1；对于 ANEWARRAY、CHECKCAST、INSTANCEOF 栈深度变化为 0。
         int size = relativeStackSize + 1;
         if (size > maxRelativeStackSize) {
           maxRelativeStackSize = size;
@@ -991,10 +982,10 @@ final class MethodWriter extends MethodVisitor {
   public void visitFieldInsn(
       final int opcode, final String owner, final String name, final String descriptor) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将该指令添加到方法的字节码中。
     Symbol fieldrefSymbol = symbolTable.addConstantFieldref(owner, name, descriptor);
     code.put12(opcode, fieldrefSymbol.index);
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如果需要，更新最大栈深度、本地变量数以及栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(opcode, 0, fieldrefSymbol, symbolTable);
@@ -1032,7 +1023,7 @@ final class MethodWriter extends MethodVisitor {
       final String descriptor,
       final boolean isInterface) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将该指令添加到方法的字节码中。
     Symbol methodrefSymbol = symbolTable.addConstantMethodref(owner, name, descriptor, isInterface);
     if (opcode == Opcodes.INVOKEINTERFACE) {
       code.put12(Opcodes.INVOKEINTERFACE, methodrefSymbol.index)
@@ -1040,7 +1031,7 @@ final class MethodWriter extends MethodVisitor {
     } else {
       code.put12(opcode, methodrefSymbol.index);
     }
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如果需要，更新最大栈深度、本地变量数，以及栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(opcode, 0, methodrefSymbol, symbolTable);
@@ -1068,13 +1059,13 @@ final class MethodWriter extends MethodVisitor {
       final Handle bootstrapMethodHandle,
       final Object... bootstrapMethodArguments) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将该指令添加到方法的字节码中。
     Symbol invokeDynamicSymbol =
         symbolTable.addConstantInvokeDynamic(
             name, descriptor, bootstrapMethodHandle, bootstrapMethodArguments);
     code.put12(Opcodes.INVOKEDYNAMIC, invokeDynamicSymbol.index);
     code.putShort(0);
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如果需要，更新最大栈深度、本地变量数，以及栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(Opcodes.INVOKEDYNAMIC, 0, invokeDynamicSymbol, symbolTable);
@@ -1093,97 +1084,92 @@ final class MethodWriter extends MethodVisitor {
   @Override
   public void visitJumpInsn(final int opcode, final Label label) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
-    // Compute the 'base' opcode, i.e. GOTO or JSR if opcode is GOTO_W or JSR_W, otherwise opcode.
+    // 将该指令添加到方法的字节码中。
+    // 计算“基础”操作码，如果 opcode 是 GOTO_W 或 JSR_W 则转为 GOTO 或 JSR，否则保持不变。
     int baseOpcode =
         opcode >= Constants.GOTO_W ? opcode - Constants.WIDE_JUMP_OPCODE_DELTA : opcode;
     boolean nextInsnIsJumpTarget = false;
     if ((label.flags & Label.FLAG_RESOLVED) != 0
         && label.bytecodeOffset - code.length < Short.MIN_VALUE) {
-      // Case of a backward jump with an offset < -32768. In this case we automatically replace GOTO
-      // with GOTO_W, JSR with JSR_W and IFxxx <l> with IFNOTxxx <L> GOTO_W <l> L:..., where
-      // IFNOTxxx is the "opposite" opcode of IFxxx (e.g. IFNE for IFEQ) and where <L> designates
-      // the instruction just after the GOTO_W.
+      // 向后跳转且偏移量小于 -32768 的情况。
+      // 此时自动将 GOTO 替换为 GOTO_W，JSR 替换为 JSR_W，
+      // IFxxx <l> 替换为 IFNOTxxx <L> GOTO_W <l> L:...
+      // 其中 IFNOTxxx 是 IFxxx 的“相反”条件码，例如 IFEQ 的相反是 IFNE，
+      // <L> 表示 GOTO_W 后的那条指令。
       if (baseOpcode == Opcodes.GOTO) {
         code.putByte(Constants.GOTO_W);
       } else if (baseOpcode == Opcodes.JSR) {
         code.putByte(Constants.JSR_W);
       } else {
-        // Put the "opposite" opcode of baseOpcode. This can be done by flipping the least
-        // significant bit for IFNULL and IFNONNULL, and similarly for IFEQ ... IF_ACMPEQ (with a
-        // pre and post offset by 1). The jump offset is 8 bytes (3 for IFNOTxxx, 5 for GOTO_W).
+        // 写入 baseOpcode 的“相反”条件码。
+        // 对于 IFNULL 和 IFNONNULL，通过翻转最低有效位得到；
+        // 对于 IFEQ 等条件码，需要加偏移再翻转。
+        // 跳转偏移固定为 8（IFNOTxxx 占 3 字节，GOTO_W 占 5 字节）。
         code.putByte(baseOpcode >= Opcodes.IFNULL ? baseOpcode ^ 1 : ((baseOpcode + 1) ^ 1) - 1);
         code.putShort(8);
-        // Here we could put a GOTO_W in theory, but if ASM specific instructions are used in this
-        // method or another one, and if the class has frames, we will need to insert a frame after
-        // this GOTO_W during the additional ClassReader -> ClassWriter round trip to remove the ASM
-        // specific instructions. To not miss this additional frame, we need to use an ASM_GOTO_W
-        // here, which has the unfortunate effect of forcing this additional round trip (which in
-        // some case would not have been really necessary, but we can't know this at this point).
+        // 理论上这里可以直接写入 GOTO_W，但考虑到 ASM 特殊指令和帧计算的问题，
+        // 为了不漏掉可能需要插入的帧，这里使用 ASM_GOTO_W，会强制进行一次额外的
+        // ClassReader -> ClassWriter 循环。
         code.putByte(Constants.ASM_GOTO_W);
         hasAsmInstructions = true;
-        // The instruction after the GOTO_W becomes the target of the IFNOT instruction.
+        // GOTO_W 后的那条指令会成为 IFNOT 指令的跳转目标。
         nextInsnIsJumpTarget = true;
       }
       label.put(code, code.length - 1, true);
     } else if (baseOpcode != opcode) {
-      // Case of a GOTO_W or JSR_W specified by the user (normally ClassReader when used to remove
-      // ASM specific instructions). In this case we keep the original instruction.
+      // 用户显式指定了 GOTO_W 或 JSR_W（通常由 ClassReader 生成以移除 ASM 特殊指令），
+      // 在这种情况下保持原指令不变。
       code.putByte(opcode);
       label.put(code, code.length - 1, true);
     } else {
-      // Case of a jump with an offset >= -32768, or of a jump with an unknown offset. In these
-      // cases we store the offset in 2 bytes (which will be increased via a ClassReader ->
-      // ClassWriter round trip if it turns out that 2 bytes are not sufficient).
+      // 跳转偏移量 >= -32768，或偏移量未知的情况。
+      // 此时用 2 字节存储（如果不够，将在 ClassReader -> ClassWriter 过程中扩展）。
       code.putByte(baseOpcode);
       label.put(code, code.length - 1, false);
     }
 
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如果需要，更新最大栈深度、本地变量数，以及栈映射帧。
     if (currentBasicBlock != null) {
       Label nextBasicBlock = null;
       if (compute == COMPUTE_ALL_FRAMES) {
         currentBasicBlock.frame.execute(baseOpcode, 0, null, null);
-        // Record the fact that 'label' is the target of a jump instruction.
+        // 记录 label 是跳转指令的目标。
         label.getCanonicalInstance().flags |= Label.FLAG_JUMP_TARGET;
-        // Add 'label' as a successor of the current basic block.
+        // 将 label 添加为当前基本块的后继。
         addSuccessorToCurrentBasicBlock(Edge.JUMP, label);
         if (baseOpcode != Opcodes.GOTO) {
-          // The next instruction starts a new basic block (except for GOTO: by default the code
-          // following a goto is unreachable - unless there is an explicit label for it - and we
-          // should not compute stack frame types for its instructions).
+          // 下一条指令开始一个新的基本块（GOTO 除外，默认 GOTO 之后的代码不可达，
+          // 除非显式有标签指向它）。
           nextBasicBlock = new Label();
         }
       } else if (compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(baseOpcode, 0, null, null);
       } else if (compute == COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES) {
-        // No need to update maxRelativeStackSize (the stack size delta is always negative).
+        // 无需更新 maxRelativeStackSize（栈深变化始终为负）。
         relativeStackSize += STACK_SIZE_DELTA[baseOpcode];
       } else {
         if (baseOpcode == Opcodes.JSR) {
-          // Record the fact that 'label' designates a subroutine, if not already done.
+          // 记录 label 表示一个子程序的起始点（如果还未标记）。
           if ((label.flags & Label.FLAG_SUBROUTINE_START) == 0) {
             label.flags |= Label.FLAG_SUBROUTINE_START;
             hasSubroutines = true;
           }
           currentBasicBlock.flags |= Label.FLAG_SUBROUTINE_CALLER;
-          // Note that, by construction in this method, a block which calls a subroutine has at
-          // least two successors in the control flow graph: the first one (added below) leads to
-          // the instruction after the JSR, while the second one (added here) leads to the JSR
-          // target. Note that the first successor is virtual (it does not correspond to a possible
-          // execution path): it is only used to compute the successors of the basic blocks ending
-          // with a ret, in {@link Label#addSubroutineRetSuccessors}.
+          // 按构造规则，调用子程序的块至少有两个后继：
+          // 第一个指向 JSR 之后的指令（虚拟后继，不是实际执行路径）；
+          // 第二个指向子程序的起点 label。
+          // 第一个后继用于计算以 ret 结束的基本块的后继。
           addSuccessorToCurrentBasicBlock(relativeStackSize + 1, label);
-          // The instruction after the JSR starts a new basic block.
+          // JSR 之后的指令开始一个新的基本块。
           nextBasicBlock = new Label();
         } else {
-          // No need to update maxRelativeStackSize (the stack size delta is always negative).
+          // 无需更新 maxRelativeStackSize（栈深变化始终为负）。
           relativeStackSize += STACK_SIZE_DELTA[baseOpcode];
           addSuccessorToCurrentBasicBlock(relativeStackSize, label);
         }
       }
-      // If the next instruction starts a new basic block, call visitLabel to add the label of this
-      // instruction as a successor of the current block, and to start a new basic block.
+      // 如果下一条指令开始新基本块，调用 visitLabel，
+      // 将该标签添加为当前块的后继并启动新基本块。
       if (nextBasicBlock != null) {
         if (nextInsnIsJumpTarget) {
           nextBasicBlock.flags |= Label.FLAG_JUMP_TARGET;
@@ -1198,38 +1184,36 @@ final class MethodWriter extends MethodVisitor {
 
   @Override
   public void visitLabel(final Label label) {
-    // Resolve the forward references to this label, if any.
+    // 解析对该标签的前向引用（如果有）。
     hasAsmInstructions |= label.resolve(code.data, code.length);
-    // visitLabel starts a new basic block (except for debug only labels), so we need to update the
-    // previous and current block references and list of successors.
+    // visitLabel 会开始一个新的基本块（除非是仅调试用的标签），
+    // 因此需要更新前一个和当前基本块引用及后继列表。
     if ((label.flags & Label.FLAG_DEBUG_ONLY) != 0) {
       return;
     }
     if (compute == COMPUTE_ALL_FRAMES) {
       if (currentBasicBlock != null) {
         if (label.bytecodeOffset == currentBasicBlock.bytecodeOffset) {
-          // We use {@link Label#getCanonicalInstance} to store the state of a basic block in only
-          // one place, but this does not work for labels which have not been visited yet.
-          // Therefore, when we detect here two labels having the same bytecode offset, we need to
-          // - consolidate the state scattered in these two instances into the canonical instance:
+          // 使用 {@link Label#getCanonicalInstance} 使基本块状态只存储一处，
+          // 但尚未访问的标签不适用。
+          // 因此当检测到两个标签有相同偏移时，需要：
+          // - 合并两实例的状态到 canonical 实例：
           currentBasicBlock.flags |= (label.flags & Label.FLAG_JUMP_TARGET);
-          // - make sure the two instances share the same Frame instance (the implementation of
-          // {@link Label#getCanonicalInstance} relies on this property; here label.frame should be
-          // null):
+          // - 确保两实例共享同一个 Frame（这里 label.frame 应为 null）：
           label.frame = currentBasicBlock.frame;
-          // - and make sure to NOT assign 'label' into 'currentBasicBlock' or 'lastBasicBlock', so
-          // that they still refer to the canonical instance for this bytecode offset.
+          // - 并确保不将 label 赋给 currentBasicBlock 或 lastBasicBlock，
+          // 以保持对该偏移 canonical 实例的引用。
           return;
         }
-        // End the current basic block (with one new successor).
+        // 结束当前基本块（有一个新后继）。
         addSuccessorToCurrentBasicBlock(Edge.JUMP, label);
       }
-      // Append 'label' at the end of the basic block list.
+      // 将 label 追加到基本块链表末尾。
       if (lastBasicBlock != null) {
         if (label.bytecodeOffset == lastBasicBlock.bytecodeOffset) {
-          // Same comment as above.
+          // 同上注释。
           lastBasicBlock.flags |= (label.flags & Label.FLAG_JUMP_TARGET);
-          // Here label.frame should be null.
+          // 此处 label.frame 应为 null。
           label.frame = lastBasicBlock.frame;
           currentBasicBlock = lastBasicBlock;
           return;
@@ -1237,38 +1221,35 @@ final class MethodWriter extends MethodVisitor {
         lastBasicBlock.nextBasicBlock = label;
       }
       lastBasicBlock = label;
-      // Make it the new current basic block.
+      // 设为新的当前基本块。
       currentBasicBlock = label;
-      // Here label.frame should be null.
+      // 此处 label.frame 应为 null。
       label.frame = new Frame(label);
     } else if (compute == COMPUTE_INSERTED_FRAMES) {
       if (currentBasicBlock == null) {
-        // This case should happen only once, for the visitLabel call in the constructor. Indeed, if
-        // compute is equal to COMPUTE_INSERTED_FRAMES, currentBasicBlock stays unchanged.
+        // 该情况应只出现一次，即构造函数中 visitLabel 调用时。
         currentBasicBlock = label;
       } else {
-        // Update the frame owner so that a correct frame offset is computed in Frame.accept().
+        // 更新帧的拥有者，以便 Frame.accept() 中计算正确的帧偏移。
         currentBasicBlock.frame.owner = label;
       }
     } else if (compute == COMPUTE_MAX_STACK_AND_LOCAL) {
       if (currentBasicBlock != null) {
-        // End the current basic block (with one new successor).
+        // 结束当前基本块（有一个新后继）。
         currentBasicBlock.outputStackMax = (short) maxRelativeStackSize;
         addSuccessorToCurrentBasicBlock(relativeStackSize, label);
       }
-      // Start a new current basic block, and reset the current and maximum relative stack sizes.
+      // 开始新的当前基本块，并重置当前及最大相对栈大小。
       currentBasicBlock = label;
       relativeStackSize = 0;
       maxRelativeStackSize = 0;
-      // Append the new basic block at the end of the basic block list.
+      // 追加新基本块到基本块链表末尾。
       if (lastBasicBlock != null) {
         lastBasicBlock.nextBasicBlock = label;
       }
       lastBasicBlock = label;
     } else if (compute == COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES && currentBasicBlock == null) {
-      // This case should happen only once, for the visitLabel call in the constructor. Indeed, if
-      // compute is equal to COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES, currentBasicBlock stays
-      // unchanged.
+      // 该情况应只出现一次，即构造函数中 visitLabel 调用时。
       currentBasicBlock = label;
     }
   }
@@ -1276,7 +1257,7 @@ final class MethodWriter extends MethodVisitor {
   @Override
   public void visitLdcInsn(final Object value) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将指令添加到方法字节码。
     Symbol constantSymbol = symbolTable.addConstant(value);
     int constantIndex = constantSymbol.index;
     char firstDescriptorChar;
@@ -1293,7 +1274,7 @@ final class MethodWriter extends MethodVisitor {
     } else {
       code.put11(Opcodes.LDC, constantIndex);
     }
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如有必要，更新最大栈大小、本地变量数量和栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(Opcodes.LDC, 0, constantSymbol, symbolTable);
@@ -1310,13 +1291,13 @@ final class MethodWriter extends MethodVisitor {
   @Override
   public void visitIincInsn(final int varIndex, final int increment) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将指令添加到方法字节码。
     if ((varIndex > 255) || (increment > 127) || (increment < -128)) {
       code.putByte(Constants.WIDE).put12(Opcodes.IINC, varIndex).putShort(increment);
     } else {
       code.putByte(Opcodes.IINC).put11(varIndex, increment);
     }
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如有必要，更新最大栈大小、本地变量数量和栈映射帧。
     if (currentBasicBlock != null
         && (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES)) {
       currentBasicBlock.frame.execute(Opcodes.IINC, varIndex, null, null);
@@ -1333,21 +1314,21 @@ final class MethodWriter extends MethodVisitor {
   public void visitTableSwitchInsn(
       final int min, final int max, final Label dflt, final Label... labels) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将指令添加到方法的字节码中。
     code.putByte(Opcodes.TABLESWITCH).putByteArray(null, 0, (4 - code.length % 4) % 4);
     dflt.put(code, lastBytecodeOffset, true);
     code.putInt(min).putInt(max);
     for (Label label : labels) {
       label.put(code, lastBytecodeOffset, true);
     }
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如有必要，更新最大栈大小、本地变量数量和栈映射帧。
     visitSwitchInsn(dflt, labels);
   }
 
   @Override
   public void visitLookupSwitchInsn(final Label dflt, final int[] keys, final Label[] labels) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将指令添加到方法的字节码中。
     code.putByte(Opcodes.LOOKUPSWITCH).putByteArray(null, 0, (4 - code.length % 4) % 4);
     dflt.put(code, lastBytecodeOffset, true);
     code.putInt(labels.length);
@@ -1355,7 +1336,7 @@ final class MethodWriter extends MethodVisitor {
       code.putInt(keys[i]);
       labels[i].put(code, lastBytecodeOffset, true);
     }
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如有必要，更新最大栈大小、本地变量数量和栈映射帧。
     visitSwitchInsn(dflt, labels);
   }
 
@@ -1363,7 +1344,7 @@ final class MethodWriter extends MethodVisitor {
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES) {
         currentBasicBlock.frame.execute(Opcodes.LOOKUPSWITCH, 0, null, null);
-        // Add all the labels as successors of the current basic block.
+        // 将所有标签作为当前基本块的后继节点添加。
         addSuccessorToCurrentBasicBlock(Edge.JUMP, dflt);
         dflt.getCanonicalInstance().flags |= Label.FLAG_JUMP_TARGET;
         for (Label label : labels) {
@@ -1371,15 +1352,15 @@ final class MethodWriter extends MethodVisitor {
           label.getCanonicalInstance().flags |= Label.FLAG_JUMP_TARGET;
         }
       } else if (compute == COMPUTE_MAX_STACK_AND_LOCAL) {
-        // No need to update maxRelativeStackSize (the stack size delta is always negative).
+        // 无需更新 maxRelativeStackSize（栈大小变化总是负数）。
         --relativeStackSize;
-        // Add all the labels as successors of the current basic block.
+        // 将所有标签作为当前基本块的后继节点添加。
         addSuccessorToCurrentBasicBlock(relativeStackSize, dflt);
         for (Label label : labels) {
           addSuccessorToCurrentBasicBlock(relativeStackSize, label);
         }
       }
-      // End the current basic block.
+      // 结束当前基本块，且无后继。
       endCurrentBasicBlockWithNoSuccessor();
     }
   }
@@ -1387,16 +1368,16 @@ final class MethodWriter extends MethodVisitor {
   @Override
   public void visitMultiANewArrayInsn(final String descriptor, final int numDimensions) {
     lastBytecodeOffset = code.length;
-    // Add the instruction to the bytecode of the method.
+    // 将指令添加到方法的字节码中。
     Symbol descSymbol = symbolTable.addConstantClass(descriptor);
     code.put12(Opcodes.MULTIANEWARRAY, descSymbol.index).putByte(numDimensions);
-    // If needed, update the maximum stack size and number of locals, and stack map frames.
+    // 如有必要，更新最大栈大小、本地变量数量和栈映射帧。
     if (currentBasicBlock != null) {
       if (compute == COMPUTE_ALL_FRAMES || compute == COMPUTE_INSERTED_FRAMES) {
         currentBasicBlock.frame.execute(
             Opcodes.MULTIANEWARRAY, numDimensions, descSymbol, symbolTable);
       } else {
-        // No need to update maxRelativeStackSize (the stack size delta is always negative).
+        // 无需更新 maxRelativeStackSize（栈大小变化总是负数）。
         relativeStackSize += 1 - numDimensions;
       }
     }
@@ -1500,10 +1481,10 @@ final class MethodWriter extends MethodVisitor {
       final int[] index,
       final String descriptor,
       final boolean visible) {
-    // Create a ByteVector to hold a 'type_annotation' JVMS structure.
-    // See https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.
+    // 创建一个 ByteVector 用于存储 'type_annotation' JVMS 结构。
+    // 参考 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20。
     ByteVector typeAnnotation = new ByteVector();
-    // Write target_type, target_info, and target_path.
+    // 写入 target_type、target_info 和 target_path。
     typeAnnotation.putByte(typeRef >>> 24).putShort(start.length);
     for (int i = 0; i < start.length; ++i) {
       typeAnnotation
@@ -1512,7 +1493,7 @@ final class MethodWriter extends MethodVisitor {
           .putShort(index[i]);
     }
     TypePath.put(typePath, typeAnnotation);
-    // Write type_index and reserve space for num_element_value_pairs.
+    // 写入 type_index 并为 num_element_value_pairs 预留空间。
     typeAnnotation.putShort(symbolTable.addConstantUtf8(descriptor)).putShort(0);
     if (visible) {
       return lastCodeRuntimeVisibleTypeAnnotation =
@@ -1555,18 +1536,20 @@ final class MethodWriter extends MethodVisitor {
     }
   }
 
-  /** Computes all the stack map frames of the method, from scratch. */
+  /**
+   * 从头开始计算方法的所有栈映射帧。
+   */
   private void computeAllFrames() {
-    // Complete the control flow graph with exception handler blocks.
+    // 用异常处理器块完善控制流图。
     Handler handler = firstHandler;
     while (handler != null) {
       String catchTypeDescriptor =
           handler.catchTypeDescriptor == null ? "java/lang/Throwable" : handler.catchTypeDescriptor;
       int catchType = Frame.getAbstractTypeFromInternalName(symbolTable, catchTypeDescriptor);
-      // Mark handlerBlock as an exception handler.
+      // 标记 handlerBlock 作为异常处理器。
       Label handlerBlock = handler.handlerPc.getCanonicalInstance();
       handlerBlock.flags |= Label.FLAG_JUMP_TARGET;
-      // Add handlerBlock as a successor of all the basic blocks in the exception handler range.
+      // 将 handlerBlock 作为异常处理范围内所有基本块的后继节点添加。
       Label handlerRangeBlock = handler.startPc.getCanonicalInstance();
       Label handlerRangeEnd = handler.endPc.getCanonicalInstance();
       while (handlerRangeBlock != handlerRangeEnd) {
@@ -1577,41 +1560,37 @@ final class MethodWriter extends MethodVisitor {
       handler = handler.nextHandler;
     }
 
-    // Create and visit the first (implicit) frame.
+    // 创建并访问第一个（隐式）栈帧。
     Frame firstFrame = firstBasicBlock.frame;
     firstFrame.setInputFrameFromDescriptor(symbolTable, accessFlags, descriptor, this.maxLocals);
     firstFrame.accept(this);
 
-    // Fix point algorithm: add the first basic block to a list of blocks to process (i.e. blocks
-    // whose stack map frame has changed) and, while there are blocks to process, remove one from
-    // the list and update the stack map frames of its successor blocks in the control flow graph
-    // (which might change them, in which case these blocks must be processed too, and are thus
-    // added to the list of blocks to process). Also compute the maximum stack size of the method,
-    // as a by-product.
+    // 不动点算法：将第一个基本块加入待处理列表（即栈映射帧发生变化的块），
+    // 当列表非空时，移除一个块，更新其后继块的栈映射帧（可能改变它们，若改变则需处理并加入列表）。
+    // 同时计算方法的最大栈大小，作为副产品。
     Label listOfBlocksToProcess = firstBasicBlock;
     listOfBlocksToProcess.nextListElement = Label.EMPTY_LIST;
     int maxStackSize = 0;
     while (listOfBlocksToProcess != Label.EMPTY_LIST) {
-      // Remove a basic block from the list of blocks to process.
+      // 从待处理列表中移除一个基本块。
       Label basicBlock = listOfBlocksToProcess;
       listOfBlocksToProcess = listOfBlocksToProcess.nextListElement;
       basicBlock.nextListElement = null;
-      // By definition, basicBlock is reachable.
+      // 根据定义，basicBlock 是可达的。
       basicBlock.flags |= Label.FLAG_REACHABLE;
-      // Update the (absolute) maximum stack size.
+      // 更新（绝对）最大栈大小。
       int maxBlockStackSize = basicBlock.frame.getInputStackSize() + basicBlock.outputStackMax;
       if (maxBlockStackSize > maxStackSize) {
         maxStackSize = maxBlockStackSize;
       }
-      // Update the successor blocks of basicBlock in the control flow graph.
+      // 更新控制流图中 basicBlock 的后继块。
       Edge outgoingEdge = basicBlock.outgoingEdges;
       while (outgoingEdge != null) {
         Label successorBlock = outgoingEdge.successor.getCanonicalInstance();
         boolean successorBlockChanged =
             basicBlock.frame.merge(symbolTable, successorBlock.frame, outgoingEdge.info);
         if (successorBlockChanged && successorBlock.nextListElement == null) {
-          // If successorBlock has changed it must be processed. Thus, if it is not already in the
-          // list of blocks to process, add it to this list.
+          // 如果后继块发生变化，需处理它。若它未在待处理列表中，则加入该列表。
           successorBlock.nextListElement = listOfBlocksToProcess;
           listOfBlocksToProcess = successorBlock;
         }
@@ -1619,9 +1598,8 @@ final class MethodWriter extends MethodVisitor {
       }
     }
 
-    // Loop over all the basic blocks and visit the stack map frames that must be stored in the
-    // StackMapTable attribute. Also replace unreachable code with NOP* ATHROW, and remove it from
-    // exception handler ranges.
+    // 遍历所有基本块，访问必须存储在 StackMapTable 属性中的栈映射帧。
+    // 还将不可达代码替换为 NOP* ATHROW，并将其从异常处理范围移除。
     Label basicBlock = firstBasicBlock;
     while (basicBlock != null) {
       if ((basicBlock.flags & (Label.FLAG_JUMP_TARGET | Label.FLAG_REACHABLE))
@@ -1629,25 +1607,25 @@ final class MethodWriter extends MethodVisitor {
         basicBlock.frame.accept(this);
       }
       if ((basicBlock.flags & Label.FLAG_REACHABLE) == 0) {
-        // Find the start and end bytecode offsets of this unreachable block.
+        // 找到该不可达块的起始和结束字节码偏移。
         Label nextBasicBlock = basicBlock.nextBasicBlock;
         int startOffset = basicBlock.bytecodeOffset;
         int endOffset = (nextBasicBlock == null ? code.length : nextBasicBlock.bytecodeOffset) - 1;
         if (endOffset >= startOffset) {
-          // Replace its instructions with NOP ... NOP ATHROW.
+          // 将其指令替换为 NOP ... NOP ATHROW。
           for (int i = startOffset; i < endOffset; ++i) {
             code.data[i] = Opcodes.NOP;
           }
           code.data[endOffset] = (byte) Opcodes.ATHROW;
-          // Emit a frame for this unreachable block, with no local and a Throwable on the stack
-          // (so that the ATHROW could consume this Throwable if it were reachable).
+          // 为该不可达块发出一个栈帧，局部变量为空，栈上有一个 Throwable
+          // （这样如果可达，ATHROW 会消费这个 Throwable）。
           int frameIndex = visitFrameStart(startOffset, /* numLocal = */ 0, /* numStack = */ 1);
           currentFrame[frameIndex] =
               Frame.getAbstractTypeFromInternalName(symbolTable, "java/lang/Throwable");
           visitFrameEnd();
-          // Remove this unreachable basic block from the exception handler ranges.
+          // 将该不可达基本块从异常处理范围移除。
           firstHandler = Handler.removeRange(firstHandler, basicBlock, nextBasicBlock);
-          // The maximum stack size is now at least one, because of the Throwable declared above.
+          // 最大栈大小现在至少为 1，因为上面声明了 Throwable。
           maxStackSize = Math.max(maxStackSize, 1);
         }
       }
@@ -1657,23 +1635,22 @@ final class MethodWriter extends MethodVisitor {
     this.maxStack = maxStackSize;
   }
 
-  /** Computes the maximum stack size of the method. */
+  /** 计算方法的最大栈大小。 */
   private void computeMaxStackAndLocal() {
-    // Complete the control flow graph with exception handler blocks.
+    // 用异常处理器块完善控制流图。
     Handler handler = firstHandler;
     while (handler != null) {
       Label handlerBlock = handler.handlerPc;
       Label handlerRangeBlock = handler.startPc;
       Label handlerRangeEnd = handler.endPc;
-      // Add handlerBlock as a successor of all the basic blocks in the exception handler range.
+      // 将 handlerBlock 作为异常处理范围内所有基本块的后继节点添加。
       while (handlerRangeBlock != handlerRangeEnd) {
         if ((handlerRangeBlock.flags & Label.FLAG_SUBROUTINE_CALLER) == 0) {
           handlerRangeBlock.outgoingEdges =
               new Edge(Edge.EXCEPTION, handlerBlock, handlerRangeBlock.outgoingEdges);
         } else {
-          // If handlerRangeBlock is a JSR block, add handlerBlock after the first two outgoing
-          // edges to preserve the hypothesis about JSR block successors order (see
-          // {@link #visitJumpInsn}).
+          // 如果 handlerRangeBlock 是 JSR 块，则在前两个出边之后插入 handlerBlock，
+          // 以保持关于 JSR 块后继顺序的假设（见 {@link #visitJumpInsn}）。
           handlerRangeBlock.outgoingEdges.nextEdge.nextEdge =
               new Edge(
                   Edge.EXCEPTION, handlerBlock, handlerRangeBlock.outgoingEdges.nextEdge.nextEdge);
@@ -1683,14 +1660,13 @@ final class MethodWriter extends MethodVisitor {
       handler = handler.nextHandler;
     }
 
-    // Complete the control flow graph with the successor blocks of subroutines, if needed.
+    // 如果需要，补全子程序的后继块到控制流图中。
     if (hasSubroutines) {
-      // First step: find the subroutines. This step determines, for each basic block, to which
-      // subroutine(s) it belongs. Start with the main "subroutine":
+      // 第一步：查找子程序。此步骤确定每个基本块属于哪个子程序。
+      // 从主“子程序”开始：
       short numSubroutines = 1;
       firstBasicBlock.markSubroutine(numSubroutines);
-      // Then, mark the subroutines called by the main subroutine, then the subroutines called by
-      // those called by the main subroutine, etc.
+      // 然后标记主子程序调用的子程序，以及被它们调用的子程序，依此类推。
       for (short currentSubroutine = 1; currentSubroutine <= numSubroutines; ++currentSubroutine) {
         Label basicBlock = firstBasicBlock;
         while (basicBlock != null) {
@@ -1698,21 +1674,19 @@ final class MethodWriter extends MethodVisitor {
               && basicBlock.subroutineId == currentSubroutine) {
             Label jsrTarget = basicBlock.outgoingEdges.nextEdge.successor;
             if (jsrTarget.subroutineId == 0) {
-              // If this subroutine has not been marked yet, find its basic blocks.
+              // 如果该子程序尚未标记，则标记其基本块。
               jsrTarget.markSubroutine(++numSubroutines);
             }
           }
           basicBlock = basicBlock.nextBasicBlock;
         }
       }
-      // Second step: find the successors in the control flow graph of each subroutine basic block
-      // 'r' ending with a RET instruction. These successors are the virtual successors of the basic
-      // blocks ending with JSR instructions (see {@link #visitJumpInsn)} that can reach 'r'.
+      // 第二步：查找以 RET 指令结束的子程序基本块 'r' 在控制流图中的后继。
+      // 这些后继是以 JSR 指令结束的基本块的虚拟后继（见 {@link #visitJumpInsn}），这些基本块可以到达 'r'。
       Label basicBlock = firstBasicBlock;
       while (basicBlock != null) {
         if ((basicBlock.flags & Label.FLAG_SUBROUTINE_CALLER) != 0) {
-          // By construction, jsr targets are stored in the second outgoing edge of basic blocks
-          // that ends with a jsr instruction (see {@link #FLAG_SUBROUTINE_CALLER}).
+          // 按结构，JSR 目标存储在以 JSR 指令结尾的基本块第二条出边中（见 {@link #FLAG_SUBROUTINE_CALLER}）。
           Label subroutine = basicBlock.outgoingEdges.nextEdge.successor;
           subroutine.addSubroutineRetSuccessors(basicBlock);
         }
@@ -1720,34 +1694,29 @@ final class MethodWriter extends MethodVisitor {
       }
     }
 
-    // Data flow algorithm: put the first basic block in a list of blocks to process (i.e. blocks
-    // whose input stack size has changed) and, while there are blocks to process, remove one
-    // from the list, update the input stack size of its successor blocks in the control flow
-    // graph, and add these blocks to the list of blocks to process (if not already done).
+    // 数据流算法：将第一个基本块放入待处理列表（即输入栈大小已改变的块），
+    // 当列表非空时，移除一个基本块，更新其后继块的输入栈大小，并将后继块加入待处理列表（若未加入）。
     Label listOfBlocksToProcess = firstBasicBlock;
     listOfBlocksToProcess.nextListElement = Label.EMPTY_LIST;
     int maxStackSize = maxStack;
     while (listOfBlocksToProcess != Label.EMPTY_LIST) {
-      // Remove a basic block from the list of blocks to process. Note that we don't reset
-      // basicBlock.nextListElement to null on purpose, to make sure we don't reprocess already
-      // processed basic blocks.
+      // 从待处理列表中移除一个基本块。注意这里没有将 basicBlock.nextListElement 置 null，
+      // 以确保不重复处理已处理的基本块。
       Label basicBlock = listOfBlocksToProcess;
       listOfBlocksToProcess = listOfBlocksToProcess.nextListElement;
-      // Compute the (absolute) input stack size and maximum stack size of this block.
+      // 计算该块的输入栈大小和最大栈大小。
       int inputStackTop = basicBlock.inputStackSize;
       int maxBlockStackSize = inputStackTop + basicBlock.outputStackMax;
-      // Update the absolute maximum stack size of the method.
+      // 更新方法的绝对最大栈大小。
       if (maxBlockStackSize > maxStackSize) {
         maxStackSize = maxBlockStackSize;
       }
-      // Update the input stack size of the successor blocks of basicBlock in the control flow
-      // graph, and add these blocks to the list of blocks to process, if not already done.
+      // 更新控制流图中 basicBlock 后继块的输入栈大小，
+      // 并将这些后继块加入待处理列表（如果未加入）。
       Edge outgoingEdge = basicBlock.outgoingEdges;
       if ((basicBlock.flags & Label.FLAG_SUBROUTINE_CALLER) != 0) {
-        // Ignore the first outgoing edge of the basic blocks ending with a jsr: these are virtual
-        // edges which lead to the instruction just after the jsr, and do not correspond to a
-        // possible execution path (see {@link #visitJumpInsn} and
-        // {@link Label#FLAG_SUBROUTINE_CALLER}).
+        // 忽略以 jsr 结尾基本块的第一条出边：这些是虚拟边，指向 jsr 之后的指令，
+        // 不对应可能的执行路径（见 {@link #visitJumpInsn} 和 {@link Label#FLAG_SUBROUTINE_CALLER}）。
         outgoingEdge = outgoingEdge.nextEdge;
       }
       while (outgoingEdge != null) {
@@ -1766,30 +1735,27 @@ final class MethodWriter extends MethodVisitor {
 
   @Override
   public void visitEnd() {
-    // Nothing to do.
+    // 无操作
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Utility methods: control flow analysis algorithm
+  // 工具方法：控制流分析算法
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Adds a successor to {@link #currentBasicBlock} in the control flow graph.
+   * 向 {@link #currentBasicBlock} 添加一个后继节点（控制流边）。
    *
-   * @param info information about the control flow edge to be added.
-   * @param successor the successor block to be added to the current basic block.
+   * @param info 要添加的控制流边信息。
+   * @param successor 要添加的后继基本块。
    */
   private void addSuccessorToCurrentBasicBlock(final int info, final Label successor) {
     currentBasicBlock.outgoingEdges = new Edge(info, successor, currentBasicBlock.outgoingEdges);
   }
 
   /**
-   * Ends the current basic block. This method must be used in the case where the current basic
-   * block does not have any successor.
+   * 结束当前基本块。用于当前基本块无后继时调用。
    *
-   * <p>WARNING: this method must be called after the currently visited instruction has been put in
-   * {@link #code} (if frames are computed, this method inserts a new Label to start a new basic
-   * block after the current instruction).
+   * <p>注意：此方法必须在当前访问指令已写入 {@link #code} 后调用（如果计算栈帧，会插入新 Label 以开始新基本块）。
    */
   private void endCurrentBasicBlockWithNoSuccessor() {
     if (compute == COMPUTE_ALL_FRAMES) {
@@ -1806,16 +1772,16 @@ final class MethodWriter extends MethodVisitor {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Utility methods: stack map frames
+  // 工具方法：栈映射帧（stack map frames）
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Starts the visit of a new stack map frame, stored in {@link #currentFrame}.
+   * 开始访问一个新的栈映射帧，保存在 {@link #currentFrame} 中。
    *
-   * @param offset the bytecode offset of the instruction to which the frame corresponds.
-   * @param numLocal the number of local variables in the frame.
-   * @param numStack the number of stack elements in the frame.
-   * @return the index of the next element to be written in this frame.
+   * @param offset 与该帧对应的指令的字节码偏移量。
+   * @param numLocal 帧中局部变量的数量。
+   * @param numStack 帧中栈元素的数量。
+   * @return 此帧中下一个待写元素的索引。
    */
   int visitFrameStart(final int offset, final int numLocal, final int numStack) {
     int frameLength = 3 + numLocal + numStack;
@@ -1829,19 +1795,19 @@ final class MethodWriter extends MethodVisitor {
   }
 
   /**
-   * Sets an abstract type in {@link #currentFrame}.
+   * 设置 {@link #currentFrame} 中的抽象类型。
    *
-   * @param frameIndex the index of the element to be set in {@link #currentFrame}.
-   * @param abstractType an abstract type.
+   * @param frameIndex {@link #currentFrame} 中待设置元素的索引。
+   * @param abstractType 一个抽象类型。
    */
   void visitAbstractType(final int frameIndex, final int abstractType) {
     currentFrame[frameIndex] = abstractType;
   }
 
   /**
-   * Ends the visit of {@link #currentFrame} by writing it in the StackMapTable entries and by
-   * updating the StackMapTable number_of_entries (except if the current frame is the first one,
-   * which is implicit in StackMapTable). Then resets {@link #currentFrame} to {@literal null}.
+   * 结束对 {@link #currentFrame} 的访问，将其写入 StackMapTable 条目，并更新 StackMapTable 的条目数量
+   * （除非当前帧是第一个帧，StackMapTable 中是隐式表示的）。
+   * 然后将 {@link #currentFrame} 重置为 {@literal null}。
    */
   void visitFrameEnd() {
     if (previousFrame != null) {
@@ -1855,12 +1821,12 @@ final class MethodWriter extends MethodVisitor {
     currentFrame = null;
   }
 
-  /** Compresses and writes {@link #currentFrame} in a new StackMapTable entry. */
+  /** 将 {@link #currentFrame} 压缩并写入新的 StackMapTable 条目。 */
   private void putFrame() {
     final int numLocal = currentFrame[1];
     final int numStack = currentFrame[2];
     if (symbolTable.getMajorVersion() < Opcodes.V1_6) {
-      // Generate a StackMap attribute entry, which are always uncompressed.
+      // 生成 StackMap 属性条目，始终不压缩。
       stackMapTableEntries.putShort(currentFrame[0]).putShort(numLocal);
       putAbstractTypes(3, 3 + numLocal);
       stackMapTableEntries.putShort(numStack);
@@ -1890,7 +1856,7 @@ final class MethodWriter extends MethodVisitor {
           type = Frame.APPEND_FRAME;
           break;
         default:
-          // Keep the FULL_FRAME type.
+          // 保持 FULL_FRAME 类型。
           break;
       }
     } else if (numLocalDelta == 0 && numStack == 1) {
@@ -1900,7 +1866,7 @@ final class MethodWriter extends MethodVisitor {
               : Frame.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED;
     }
     if (type != Frame.FULL_FRAME) {
-      // Verify if locals are the same as in the previous frame.
+      // 验证局部变量是否与前一帧相同。
       int frameIndex = 3;
       for (int i = 0; i < previousNumlocal && i < numLocal; i++) {
         if (currentFrame[frameIndex] != previousFrame[frameIndex]) {
@@ -1949,11 +1915,11 @@ final class MethodWriter extends MethodVisitor {
   }
 
   /**
-   * Puts some abstract types of {@link #currentFrame} in {@link #stackMapTableEntries} , using the
-   * JVMS verification_type_info format used in StackMapTable attributes.
+   * 使用 StackMapTable 属性中 JVMS verification_type_info 格式，
+   * 将 {@link #currentFrame} 中的部分抽象类型写入 {@link #stackMapTableEntries}。
    *
-   * @param start index of the first type in {@link #currentFrame} to write.
-   * @param end index of last type in {@link #currentFrame} to write (exclusive).
+   * @param start {@link #currentFrame} 中第一个要写入的类型的索引。
+   * @param end {@link #currentFrame} 中最后一个要写入的类型的索引（不包括该索引）。
    */
   private void putAbstractTypes(final int start, final int end) {
     for (int i = start; i < end; ++i) {
@@ -1962,14 +1928,13 @@ final class MethodWriter extends MethodVisitor {
   }
 
   /**
-   * Puts the given public API frame element type in {@link #stackMapTableEntries} , using the JVMS
-   * verification_type_info format used in StackMapTable attributes.
+   * 使用 StackMapTable 属性中 JVMS verification_type_info 格式，
+   * 将给定的公共 API 帧元素类型写入 {@link #stackMapTableEntries}。
    *
-   * @param type a frame element type described using the same format as in {@link
-   *     MethodVisitor#visitFrame}, i.e. either {@link Opcodes#TOP}, {@link Opcodes#INTEGER}, {@link
-   *     Opcodes#FLOAT}, {@link Opcodes#LONG}, {@link Opcodes#DOUBLE}, {@link Opcodes#NULL}, or
-   *     {@link Opcodes#UNINITIALIZED_THIS}, or the internal name of a class, or a Label designating
-   *     a NEW instruction (for uninitialized types).
+   * @param type 帧元素类型，格式与 {@link MethodVisitor#visitFrame} 相同，
+   *             即 {@link Opcodes#TOP}, {@link Opcodes#INTEGER}, {@link Opcodes#FLOAT},
+   *             {@link Opcodes#LONG}, {@link Opcodes#DOUBLE}, {@link Opcodes#NULL},
+   *             {@link Opcodes#UNINITIALIZED_THIS}，类的内部名称，或表示 NEW 指令（未初始化类型）的 Label。
    */
   private void putFrameType(final Object type) {
     if (type instanceof Integer) {
@@ -1986,31 +1951,22 @@ final class MethodWriter extends MethodVisitor {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Utility methods
+  // 工具方法
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Returns whether the attributes of this method can be copied from the attributes of the given
-   * method (assuming there is no method visitor between the given ClassReader and this
-   * MethodWriter). This method should only be called just after this MethodWriter has been created,
-   * and before any content is visited. It returns true if the attributes corresponding to the
-   * constructor arguments (at most a Signature, an Exception, a Deprecated and a Synthetic
-   * attribute) are the same as the corresponding attributes in the given method.
+   * 返回是否可以从给定方法的属性复制此方法的属性（假设在给定的 ClassReader 和此 MethodWriter 之间没有方法访问器）。
+   * 此方法应仅在此 MethodWriter 创建后且访问任何内容之前调用。
+   * 如果与构造函数参数对应的属性（最多包括 Signature、Exception、Deprecated 和 Synthetic 属性）
+   * 与给定方法中对应的属性相同，则返回 true。
    *
-   * @param source the source ClassReader from which the attributes of this method might be copied.
-   * @param hasSyntheticAttribute whether the method_info JVMS structure from which the attributes
-   *     of this method might be copied contains a Synthetic attribute.
-   * @param hasDeprecatedAttribute whether the method_info JVMS structure from which the attributes
-   *     of this method might be copied contains a Deprecated attribute.
-   * @param descriptorIndex the descriptor_index field of the method_info JVMS structure from which
-   *     the attributes of this method might be copied.
-   * @param signatureIndex the constant pool index contained in the Signature attribute of the
-   *     method_info JVMS structure from which the attributes of this method might be copied, or 0.
-   * @param exceptionsOffset the offset in 'source.b' of the Exceptions attribute of the method_info
-   *     JVMS structure from which the attributes of this method might be copied, or 0.
-   * @return whether the attributes of this method can be copied from the attributes of the
-   *     method_info JVMS structure in 'source.b', between 'methodInfoOffset' and 'methodInfoOffset'
-   *     + 'methodInfoLength'.
+   * @param source 可能用于复制此方法属性的源 ClassReader。
+   * @param hasSyntheticAttribute 源方法的 method_info JVMS 结构中是否包含 Synthetic 属性。
+   * @param hasDeprecatedAttribute 源方法的 method_info JVMS 结构中是否包含 Deprecated 属性。
+   * @param descriptorIndex 源方法的 method_info JVMS 结构中的 descriptor_index 字段。
+   * @param signatureIndex 源方法的 method_info JVMS 结构中 Signature 属性包含的常量池索引，或为 0。
+   * @param exceptionsOffset 源方法的 method_info JVMS 结构中 Exceptions 属性在 source.b 中的偏移，或为 0。
+   * @return 是否可以从源方法的 method_info JVMS 结构中复制此方法的属性。
    */
   boolean canCopyMethodAttributes(
       final ClassReader source,
@@ -2019,11 +1975,9 @@ final class MethodWriter extends MethodVisitor {
       final int descriptorIndex,
       final int signatureIndex,
       final int exceptionsOffset) {
-    // If the method descriptor has changed, with more locals than the max_locals field of the
-    // original Code attribute, if any, then the original method attributes can't be copied. A
-    // conservative check on the descriptor changes alone ensures this (being more precise is not
-    // worth the additional complexity, because these cases should be rare -- if a transform changes
-    // a method descriptor, most of the time it needs to change the method's code too).
+    // 如果方法描述符已更改，且局部变量数量多于原 Code 属性中的 max_locals 字段（如果有），
+    // 则不能复制原始方法属性。这里对描述符变更做保守检查，避免复杂判断，因为这种情况较少见——
+    // 大多数情况下，方法描述符变化会伴随代码变化。
     if (source != symbolTable.getSource()
         || descriptorIndex != this.descriptorIndex
         || signatureIndex != this.signatureIndex
@@ -2052,64 +2006,62 @@ final class MethodWriter extends MethodVisitor {
   }
 
   /**
-   * Sets the source from which the attributes of this method will be copied.
+   * 设置将从其复制此方法属性的源。
    *
-   * @param methodInfoOffset the offset in 'symbolTable.getSource()' of the method_info JVMS
-   *     structure from which the attributes of this method will be copied.
-   * @param methodInfoLength the length in 'symbolTable.getSource()' of the method_info JVMS
-   *     structure from which the attributes of this method will be copied.
+   * @param methodInfoOffset method_info JVMS 结构在 'symbolTable.getSource()' 中的偏移。
+   * @param methodInfoLength method_info JVMS 结构在 'symbolTable.getSource()' 中的长度。
    */
   void setMethodAttributesSource(final int methodInfoOffset, final int methodInfoLength) {
-    // Don't copy the attributes yet, instead store their location in the source class reader so
-    // they can be copied later, in {@link #putMethodInfo}. Note that we skip the 6 header bytes
-    // of the method_info JVMS structure.
+    // 先不复制属性，而是存储它们在源 ClassReader 中的位置，
+    // 以便稍后在 {@link #putMethodInfo} 中复制。
+    // 注意跳过 method_info JVMS 结构的 6 字节头部。
     this.sourceOffset = methodInfoOffset + 6;
     this.sourceLength = methodInfoLength - 6;
   }
 
   /**
-   * Returns the size of the method_info JVMS structure generated by this MethodWriter. Also add the
-   * names of the attributes of this method in the constant pool.
+   * 返回此 MethodWriter 生成的 method_info JVMS 结构的大小。
+   * 同时将此方法的属性名称加入常量池。
    *
-   * @return the size in bytes of the method_info JVMS structure.
+   * @return method_info JVMS 结构的字节大小。
    */
   int computeMethodInfoSize() {
-    // If this method_info must be copied from an existing one, the size computation is trivial.
+    // 如果 method_info 必须从已有的复制，大小计算就非常简单。
     if (sourceOffset != 0) {
-      // sourceLength excludes the first 6 bytes for access_flags, name_index and descriptor_index.
+      // sourceLength 不包含前面 6 个字节，即 access_flags、name_index 和 descriptor_index。
       return 6 + sourceLength;
     }
-    // 2 bytes each for access_flags, name_index, descriptor_index and attributes_count.
+  // access_flags、name_index、descriptor_index 和 attributes_count 各占 2 字节。
     int size = 8;
-    // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
+    // 为便于参考，这里使用与 JVMS 第 4.7 节中相同的属性顺序。
     if (code.length > 0) {
       if (code.length > 65535) {
         throw new MethodTooLargeException(
             symbolTable.getClassName(), name, descriptor, code.length);
       }
       symbolTable.addConstantUtf8(Constants.CODE);
-      // The Code attribute has 6 header bytes, plus 2, 2, 4 and 2 bytes respectively for max_stack,
-      // max_locals, code_length and attributes_count, plus the bytecode and the exception table.
+    // Code 属性包含 6 个头部字节，另外分别为 max_stack、max_locals、code_length 和 attributes_count 各 2、2、4 和 2 字节，
+    // 以及字节码和异常表。
       size += 16 + code.length + Handler.getExceptionTableSize(firstHandler);
       if (stackMapTableEntries != null) {
         boolean useStackMapTable = symbolTable.getMajorVersion() >= Opcodes.V1_6;
         symbolTable.addConstantUtf8(useStackMapTable ? Constants.STACK_MAP_TABLE : "StackMap");
-        // 6 header bytes and 2 bytes for number_of_entries.
+        // 6 字节的头部信息和 2 字节的 number_of_entries。
         size += 8 + stackMapTableEntries.length;
       }
       if (lineNumberTable != null) {
         symbolTable.addConstantUtf8(Constants.LINE_NUMBER_TABLE);
-        // 6 header bytes and 2 bytes for line_number_table_length.
+        // 6 字节的头部信息和 2 字节的 line_number_table_length。
         size += 8 + lineNumberTable.length;
       }
       if (localVariableTable != null) {
         symbolTable.addConstantUtf8(Constants.LOCAL_VARIABLE_TABLE);
-        // 6 header bytes and 2 bytes for local_variable_table_length.
+        // 6 字节的头部信息和 2 字节的 local_variable_table_length。
         size += 8 + localVariableTable.length;
       }
       if (localVariableTypeTable != null) {
         symbolTable.addConstantUtf8(Constants.LOCAL_VARIABLE_TYPE_TABLE);
-        // 6 header bytes and 2 bytes for local_variable_type_table_length.
+         // 6 字节的头部信息和 2 字节的 local_variable_type_table_length。
         size += 8 + localVariableTypeTable.length;
       }
       if (lastCodeRuntimeVisibleTypeAnnotation != null) {
@@ -2163,7 +2115,7 @@ final class MethodWriter extends MethodVisitor {
     }
     if (parameters != null) {
       symbolTable.addConstantUtf8(Constants.METHOD_PARAMETERS);
-      // 6 header bytes and 1 byte for parameters_count.
+      // 6 个头部字节和 1 个字节的 parameters_count。
       size += 7 + parameters.length;
     }
     if (firstAttribute != null) {
@@ -2173,21 +2125,20 @@ final class MethodWriter extends MethodVisitor {
   }
 
   /**
-   * Puts the content of the method_info JVMS structure generated by this MethodWriter into the
-   * given ByteVector.
+   * 将此 MethodWriter 生成的 method_info JVMS 结构的内容写入给定的 ByteVector。
    *
-   * @param output where the method_info structure must be put.
+   * @param output 要写入 method_info 结构的目标 ByteVector。
    */
   void putMethodInfo(final ByteVector output) {
     boolean useSyntheticAttribute = symbolTable.getMajorVersion() < Opcodes.V1_5;
     int mask = useSyntheticAttribute ? Opcodes.ACC_SYNTHETIC : 0;
     output.putShort(accessFlags & ~mask).putShort(nameIndex).putShort(descriptorIndex);
-    // If this method_info must be copied from an existing one, copy it now and return early.
+    // 如果此 method_info 必须从现有的复制，则立即复制并提前返回。
     if (sourceOffset != 0) {
       output.putByteArray(symbolTable.getSource().classFileBuffer, sourceOffset, sourceLength);
       return;
     }
-    // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
+    // 为便于参考，这里使用与 JVMS 第 4.7 节中相同的属性顺序。
     int attributeCount = 0;
     if (code.length > 0) {
       ++attributeCount;
@@ -2231,30 +2182,29 @@ final class MethodWriter extends MethodVisitor {
     if (firstAttribute != null) {
       attributeCount += firstAttribute.getAttributeCount();
     }
-    // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
+    // 为便于参考，这里使用与 JVMS 第 4.7 节中相同的属性顺序。
     output.putShort(attributeCount);
     if (code.length > 0) {
-      // 2, 2, 4 and 2 bytes respectively for max_stack, max_locals, code_length and
-      // attributes_count, plus the bytecode and the exception table.
+    // 分别为 max_stack、max_locals、code_length 和 attributes_count 占用 2、2、4 和 2 字节，外加字节码和异常表。
       int size = 10 + code.length + Handler.getExceptionTableSize(firstHandler);
       int codeAttributeCount = 0;
       if (stackMapTableEntries != null) {
-        // 6 header bytes and 2 bytes for number_of_entries.
+        // 6 字节的头部信息和 2 字节的 number_of_entries。
         size += 8 + stackMapTableEntries.length;
         ++codeAttributeCount;
       }
       if (lineNumberTable != null) {
-        // 6 header bytes and 2 bytes for line_number_table_length.
+        // 6 字节的头部信息和 2 字节的 line_number_table_length。
         size += 8 + lineNumberTable.length;
         ++codeAttributeCount;
       }
       if (localVariableTable != null) {
-        // 6 header bytes and 2 bytes for local_variable_table_length.
+        // 6 字节的头部信息和 2 字节的 local_variable_table_length。
         size += 8 + localVariableTable.length;
         ++codeAttributeCount;
       }
       if (localVariableTypeTable != null) {
-        // 6 header bytes and 2 bytes for local_variable_type_table_length.
+         // 6 字节的头部信息和 2 字节的 local_variable_type_table_length。
         size += 8 + localVariableTypeTable.length;
         ++codeAttributeCount;
       }
@@ -2383,9 +2333,9 @@ final class MethodWriter extends MethodVisitor {
   }
 
   /**
-   * Collects the attributes of this method into the given set of attribute prototypes.
+   * 将该方法的属性收集到给定的属性原型集合中。
    *
-   * @param attributePrototypes a set of attribute prototypes.
+   * @param attributePrototypes 属性原型集合。
    */
   final void collectAttributePrototypes(final Attribute.Set attributePrototypes) {
     attributePrototypes.addAttributes(firstAttribute);

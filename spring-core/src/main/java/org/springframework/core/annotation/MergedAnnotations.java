@@ -16,6 +16,9 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
 import java.lang.reflect.AnnotatedElement;
@@ -24,25 +27,19 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * Provides access to a collection of merged annotations, usually obtained
- * from a source such as a {@link Class} or {@link Method}.
+ * 提供对合并注解集合的访问，通常从 {@link Class} 或 {@link Method} 等源获取。
  *
- * <p>Each merged annotation represents a view where the attribute values may be
- * "merged" from different source values, typically:
+ * <p>每个合并注解表示一个视图，其中属性值可能已从不同的源值“合并”而来，通常包括：
  *
  * <ul>
- * <li>Explicit and Implicit {@link AliasFor @AliasFor} declarations on one or
- * more attributes within the annotation</li>
- * <li>Explicit {@link AliasFor @AliasFor} declarations for a meta-annotation</li>
- * <li>Convention based attribute aliases for a meta-annotation</li>
- * <li>From a meta-annotation declaration</li>
+ * <li>注解中一个或多个属性上的显式和隐式 {@link AliasFor @AliasFor} 声明</li>
+ * <li>元注解的显式 {@link AliasFor @AliasFor} 声明</li>
+ * <li>元注解的基于约定的属性别名</li>
+ * <li>来自元注解声明</li>
  * </ul>
  *
- * <p>For example, a {@code @PostMapping} annotation might be defined as follows:
+ * <p>例如，{@code @PostMapping} 注解可能定义如下：
  *
  * <pre class="code">
  * &#064;Retention(RetentionPolicy.RUNTIME)
@@ -57,75 +54,68 @@ import org.springframework.util.Assert;
  * }
  * </pre>
  *
- * <p>If a method is annotated with {@code @PostMapping("/home")} it will contain
- * merged annotations for both {@code @PostMapping} and the meta-annotation
- * {@code @RequestMapping}. The merged view of the {@code @RequestMapping}
- * annotation will contain the following attributes:
+ * <p>如果一个方法用 {@code @PostMapping("/home")} 注解，它将包含 {@code @PostMapping}
+ * 和元注解 {@code @RequestMapping} 的合并注解。
+ * {@code @RequestMapping} 注解的合并视图将包含以下属性：
  *
  * <p><table border="1">
  * <tr>
- * <th>Name</th>
- * <th>Value</th>
- * <th>Source</th>
+ * <th>名称</th>
+ * <th>值</th>
+ * <th>来源</th>
  * </tr>
  * <tr>
  * <td>value</td>
  * <td>"/home"</td>
- * <td>Declared in {@code @PostMapping}</td>
+ * <td>在 {@code @PostMapping} 中声明</td>
  * </tr>
  * <tr>
  * <td>path</td>
  * <td>"/home"</td>
- * <td>Explicit {@code @AliasFor}</td>
+ * <td>显式 {@code @AliasFor}</td>
  * </tr>
  * <tr>
  * <td>method</td>
  * <td>RequestMethod.POST</td>
- * <td>Declared in meta-annotation</td>
+ * <td>在元注解中声明</td>
  * </tr>
  * </table>
  *
- * <p>{@code MergedAnnotations} can be obtained {@linkplain #from(AnnotatedElement)
- * from} any Java {@link AnnotatedElement}. They may also be used for sources that
- * don't use reflection (such as those that directly parse bytecode).
+ * <p>{@code MergedAnnotations} 可以从任何 Java {@link AnnotatedElement}
+ * {@linkplain #from(AnnotatedElement) 获取}。它们也可以用于不使用反射的源
+ * （例如直接解析字节码的源）。
  *
- * <p>Different {@linkplain SearchStrategy search strategies} can be used to locate
- * related source elements that contain the annotations to be aggregated. For
- * example, {@link SearchStrategy#TYPE_HIERARCHY} will search both superclasses and
- * implemented interfaces.
+ * <p>可以使用不同的 {@linkplain SearchStrategy 搜索策略} 来查找包含要聚合的注解的相关源元素。
+ * 例如，{@link SearchStrategy#TYPE_HIERARCHY} 将搜索超类和已实现的接口。
  *
- * <p>From a {@code MergedAnnotations} instance you can either
- * {@linkplain #get(String) get} a single annotation, or {@linkplain #stream()
- * stream all annotations} or just those that match {@linkplain #stream(String)
- * a specific type}. You can also quickly tell if an annotation
- * {@linkplain #isPresent(String) is present}.
+ * <p>从 {@code MergedAnnotations} 实例中，您可以
+ * {@linkplain #get(String) 获取} 单个注解，或者
+ * {@linkplain #stream() 流式传输所有注解}，或者只传输匹配
+ * {@linkplain #stream(String) 特定类型} 的注解。您还可以快速判断注解
+ * {@linkplain #isPresent(String) 是否存在}。
  *
- * <p>Here are some typical examples:
+ * <p>以下是一些典型示例：
  *
  * <pre class="code">
- * // is an annotation present or meta-present?
+ * // 注解是否存在或元存在？
  * mergedAnnotations.isPresent(ExampleAnnotation.class);
  *
- * // get the merged "value" attribute of ExampleAnnotation (either directly or
- * // meta-present)
+ * // 获取 ExampleAnnotation 的合并“value”属性（直接或元存在）
  * mergedAnnotations.get(ExampleAnnotation.class).getString("value");
  *
- * // get all meta-annotations but no directly present annotations
+ * // 获取所有元注解，但不包括直接存在的注解
  * mergedAnnotations.stream().filter(MergedAnnotation::isMetaPresent);
  *
- * // get all ExampleAnnotation declarations (including any meta-annotations) and
- * // print the merged "value" attributes
+ * // 获取所有 ExampleAnnotation 声明（包括任何元注解）并打印合并的“value”属性
  * mergedAnnotations.stream(ExampleAnnotation.class)
  *     .map(mergedAnnotation -&gt; mergedAnnotation.getString("value"))
  *     .forEach(System.out::println);
  * </pre>
  *
- * <p><b>NOTE: The {@code MergedAnnotations} API and its underlying model have
- * been designed for composable annotations in Spring's common component model,
- * with a focus on attribute aliasing and meta-annotation relationships.</b>
- * There is no support for retrieving plain Java annotations with this API;
- * please use standard Java reflection or Spring's {@link AnnotationUtils}
- * for simple annotation retrieval purposes.
+ * <p><b>注意：{@code MergedAnnotations} API 及其底层模型是为 Spring
+ * 常见组件模型中的可组合注解而设计的，重点关注属性别名和元注解关系。</b>
+ * 此 API 不支持检索纯 Java 注解；请使用标准 Java 反射或 Spring 的
+ * {@link AnnotationUtils} 进行简单的注解检索。
  *
  * @author Phillip Webb
  * @author Sam Brannen
@@ -138,73 +128,63 @@ import org.springframework.util.Assert;
 public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>> {
 
 	/**
-	 * Determine if the specified annotation type is either directly present or
-	 * meta-present.
-	 * <p>Equivalent to calling {@code get(annotationType).isPresent()}.
-	 * @param annotationType the annotation type to check
-	 * @return {@code true} if the annotation is present
+	 * 确定指定的注解类型是直接存在还是元存在。
+	 * <p>等同于调用 {@code get(annotationType).isPresent()}。
+	 * @param annotationType 要检查的注解类型
+	 * @return 如果注解存在，则为 {@code true}
 	 */
 	<A extends Annotation> boolean isPresent(Class<A> annotationType);
 
 	/**
-	 * Determine if the specified annotation type is either directly present or
-	 * meta-present.
-	 * <p>Equivalent to calling {@code get(annotationType).isPresent()}.
-	 * @param annotationType the fully qualified class name of the annotation type
-	 * to check
-	 * @return {@code true} if the annotation is present
+	 * 确定指定的注解类型是直接存在还是元存在。
+	 * <p>等同于调用 {@code get(annotationType).isPresent()}。
+	 * @param annotationType 要检查的注解类型的完全限定类名
+	 * @return 如果注解存在，则为 {@code true}
 	 */
 	boolean isPresent(String annotationType);
 
 	/**
-	 * Determine if the specified annotation type is directly present.
-	 * <p>Equivalent to calling {@code get(annotationType).isDirectlyPresent()}.
-	 * @param annotationType the annotation type to check
-	 * @return {@code true} if the annotation is directly present
+	 * 确定指定的注解类型是否直接存在。
+	 * <p>等同于调用 {@code get(annotationType).isDirectlyPresent()}。
+	 * @param annotationType 要检查的注解类型
+	 * @return 如果注解直接存在，则为 {@code true}
 	 */
 	<A extends Annotation> boolean isDirectlyPresent(Class<A> annotationType);
 
 	/**
-	 * Determine if the specified annotation type is directly present.
-	 * <p>Equivalent to calling {@code get(annotationType).isDirectlyPresent()}.
-	 * @param annotationType the fully qualified class name of the annotation type
-	 * to check
-	 * @return {@code true} if the annotation is directly present
+	 * 确定指定的注解类型是否直接存在。
+	 * <p>等同于调用 {@code get(annotationType).isDirectlyPresent()}。
+	 * @param annotationType 要检查的注解类型的完全限定类名
+	 * @return 如果注解直接存在，则为 {@code true}
 	 */
 	boolean isDirectlyPresent(String annotationType);
 
 	/**
-	 * Get the {@linkplain MergedAnnotationSelectors#nearest() nearest} matching
-	 * annotation or meta-annotation of the specified type, or
-	 * {@link MergedAnnotation#missing()} if none is present.
-	 * @param annotationType the annotation type to get
-	 * @return a {@link MergedAnnotation} instance
+	 * 获取指定类型的 {@linkplain MergedAnnotationSelectors#nearest() 最近} 匹配注解或元注解，
+	 * 如果不存在则为 {@link MergedAnnotation#missing()}。
+	 * @param annotationType 要获取的注解类型
+	 * @return {@link MergedAnnotation} 实例
 	 */
 	<A extends Annotation> MergedAnnotation<A> get(Class<A> annotationType);
 
 	/**
-	 * Get the {@linkplain MergedAnnotationSelectors#nearest() nearest} matching
-	 * annotation or meta-annotation of the specified type, or
-	 * {@link MergedAnnotation#missing()} if none is present.
-	 * @param annotationType the annotation type to get
-	 * @param predicate a predicate that must match, or {@code null} if only
-	 * type matching is required
-	 * @return a {@link MergedAnnotation} instance
+	 * 获取指定类型的 {@linkplain MergedAnnotationSelectors#nearest() 最近} 匹配注解或元注解，
+	 * 如果不存在则为 {@link MergedAnnotation#missing()}。
+	 * @param annotationType 要获取的注解类型
+	 * @param predicate 必须匹配的谓词，如果只需要类型匹配则为 {@code null}
+	 * @return {@link MergedAnnotation} 实例
 	 * @see MergedAnnotationPredicates
 	 */
 	<A extends Annotation> MergedAnnotation<A> get(Class<A> annotationType,
 			@Nullable Predicate<? super MergedAnnotation<A>> predicate);
 
 	/**
-	 * Get a matching annotation or meta-annotation of the specified type, or
-	 * {@link MergedAnnotation#missing()} if none is present.
-	 * @param annotationType the annotation type to get
-	 * @param predicate a predicate that must match, or {@code null} if only
-	 * type matching is required
-	 * @param selector a selector used to choose the most appropriate annotation
-	 * within an aggregate, or {@code null} to select the
-	 * {@linkplain MergedAnnotationSelectors#nearest() nearest}
-	 * @return a {@link MergedAnnotation} instance
+	 * 获取指定类型的匹配注解或元注解，如果不存在则为 {@link MergedAnnotation#missing()}。
+	 * @param annotationType 要获取的注解类型
+	 * @param predicate 必须匹配的谓词，如果只需要类型匹配则为 {@code null}
+	 * @param selector 用于在聚合中选择最合适注解的选择器，如果选择
+	 * {@linkplain MergedAnnotationSelectors#nearest() 最近} 则为 {@code null}
+	 * @return {@link MergedAnnotation} 实例
 	 * @see MergedAnnotationPredicates
 	 * @see MergedAnnotationSelectors
 	 */
@@ -213,40 +193,31 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 			@Nullable MergedAnnotationSelector<A> selector);
 
 	/**
-	 * Get the {@linkplain MergedAnnotationSelectors#nearest() nearest} matching
-	 * annotation or meta-annotation of the specified type, or
-	 * {@link MergedAnnotation#missing()} if none is present.
-	 * @param annotationType the fully qualified class name of the annotation type
-	 * to get
-	 * @return a {@link MergedAnnotation} instance
+	 * 获取指定类型的 {@linkplain MergedAnnotationSelectors#nearest() 最近} 匹配注解或元注解，
+	 * 如果不存在则为 {@link MergedAnnotation#missing()}。
+	 * @param annotationType 要获取的注解类型的完全限定类名
+	 * @return {@link MergedAnnotation} 实例
 	 */
 	<A extends Annotation> MergedAnnotation<A> get(String annotationType);
 
 	/**
-	 * Get the {@linkplain MergedAnnotationSelectors#nearest() nearest} matching
-	 * annotation or meta-annotation of the specified type, or
-	 * {@link MergedAnnotation#missing()} if none is present.
-	 * @param annotationType the fully qualified class name of the annotation type
-	 * to get
-	 * @param predicate a predicate that must match, or {@code null} if only
-	 * type matching is required
-	 * @return a {@link MergedAnnotation} instance
+	 * 获取指定类型的 {@linkplain MergedAnnotationSelectors#nearest() 最近} 匹配注解或元注解，
+	 * 如果不存在则为 {@link MergedAnnotation#missing()}。
+	 * @param annotationType 要获取的注解类型的完全限定类名
+	 * @param predicate 必须匹配的谓词，如果只需要类型匹配则为 {@code null}
+	 * @return {@link MergedAnnotation} 实例
 	 * @see MergedAnnotationPredicates
 	 */
 	<A extends Annotation> MergedAnnotation<A> get(String annotationType,
 			@Nullable Predicate<? super MergedAnnotation<A>> predicate);
 
 	/**
-	 * Get a matching annotation or meta-annotation of the specified type, or
-	 * {@link MergedAnnotation#missing()} if none is present.
-	 * @param annotationType the fully qualified class name of the annotation type
-	 * to get
-	 * @param predicate a predicate that must match, or {@code null} if only
-	 * type matching is required
-	 * @param selector a selector used to choose the most appropriate annotation
-	 * within an aggregate, or {@code null} to select the
-	 * {@linkplain MergedAnnotationSelectors#nearest() nearest}
-	 * @return a {@link MergedAnnotation} instance
+	 * 获取指定类型的匹配注解或元注解，如果不存在则为 {@link MergedAnnotation#missing()}。
+	 * @param annotationType 要获取的注解类型的完全限定类名
+	 * @param predicate 必须匹配的谓词，如果只需要类型匹配则为 {@code null}
+	 * @param selector 用于在聚合中选择最合适注解的选择器，如果选择
+	 * {@linkplain MergedAnnotationSelectors#nearest() 最近} 则为 {@code null}
+	 * @return {@link MergedAnnotation} 实例
 	 * @see MergedAnnotationPredicates
 	 * @see MergedAnnotationSelectors
 	 */
@@ -255,74 +226,61 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 			@Nullable MergedAnnotationSelector<A> selector);
 
 	/**
-	 * Stream all annotations and meta-annotations that match the specified
-	 * type.
-	 * <p>The resulting stream follows the same ordering rules as {@link #stream()}.
-	 * @param annotationType the annotation type to match
-	 * @return a stream of matching annotations
+	 * 流式传输所有匹配指定类型的注解和元注解。
+	 * <p>结果流遵循与 {@link #stream()} 相同的排序规则。
+	 * @param annotationType 要匹配的注解类型
+	 * @return 匹配注解的流
 	 */
 	<A extends Annotation> Stream<MergedAnnotation<A>> stream(Class<A> annotationType);
 
 	/**
-	 * Stream all annotations and meta-annotations that match the specified
-	 * type.
-	 * <p>The resulting stream follows the same ordering rules as {@link #stream()}.
-	 * @param annotationType the fully qualified class name of the annotation type
-	 * to match
-	 * @return a stream of matching annotations
+	 * 流式传输所有匹配指定类型的注解和元注解。
+	 * <p>结果流遵循与 {@link #stream()} 相同的排序规则。
+	 * @param annotationType 要匹配的注解类型的完全限定类名
+	 * @return 匹配注解的流
 	 */
 	<A extends Annotation> Stream<MergedAnnotation<A>> stream(String annotationType);
 
 	/**
-	 * Stream all annotations and meta-annotations contained in this collection.
-	 * <p>The resulting stream is ordered first by the
-	 * {@linkplain MergedAnnotation#getAggregateIndex() aggregate index} and then
-	 * by the annotation distance (with the closest annotations first). This ordering
-	 * means that, for most use-cases, the most suitable annotations appear
-	 * earliest in the stream.
-	 * @return a stream of annotations
+	 * 流式传输此集合中包含的所有注解和元注解。
+	 * <p>结果流首先按 {@linkplain MergedAnnotation#getAggregateIndex() 聚合索引} 排序，
+	 * 然后按注解距离排序（最近的注解优先）。此排序意味着，对于大多数用例，
+	 * 最合适的注解会最先出现在流中。
+	 * @return 注解流
 	 */
 	Stream<MergedAnnotation<Annotation>> stream();
 
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance containing all
-	 * annotations and meta-annotations from the specified element.
-	 * <p>The resulting instance will not include any inherited annotations. If
-	 * you want to include those as well you should use
-	 * {@link #from(AnnotatedElement, SearchStrategy)} with an appropriate
-	 * {@link SearchStrategy}.
-	 * @param element the source element
-	 * @return a {@code MergedAnnotations} instance containing the element's
-	 * annotations
+	 * 创建一个新的 {@link MergedAnnotations} 实例，包含来自指定元素的所有注解和元注解。
+	 * <p>结果实例将不包括任何继承的注解。
+	 * 如果您也想包含这些，应使用带适当 {@link SearchStrategy} 的
+	 * {@link #from(AnnotatedElement, SearchStrategy)}。
+	 * @param element 源元素
+	 * @return 包含元素注解的 {@code MergedAnnotations} 实例
 	 */
 	static MergedAnnotations from(AnnotatedElement element) {
 		return from(element, SearchStrategy.DIRECT);
 	}
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance containing all
-	 * annotations and meta-annotations from the specified element and,
-	 * depending on the {@link SearchStrategy}, related inherited elements.
-	 * @param element the source element
-	 * @param searchStrategy the search strategy to use
-	 * @return a {@code MergedAnnotations} instance containing the merged
-	 * element annotations
+	 * 创建一个新的 {@link MergedAnnotations} 实例，包含来自指定元素的所有注解和元注解，
+	 * 并根据 {@link SearchStrategy} 包含相关的继承元素。
+	 * @param element 源元素
+	 * @param searchStrategy 要使用的搜索策略
+	 * @return 包含合并元素注解的 {@code MergedAnnotations} 实例
 	 */
 	static MergedAnnotations from(AnnotatedElement element, SearchStrategy searchStrategy) {
 		return from(element, searchStrategy, RepeatableContainers.standardRepeatables());
 	}
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance containing all
-	 * annotations and meta-annotations from the specified element and,
-	 * depending on the {@link SearchStrategy}, related inherited elements.
-	 * @param element the source element
-	 * @param searchStrategy the search strategy to use
-	 * @param repeatableContainers the repeatable containers that may be used by
-	 * the element annotations or the meta-annotations
-	 * @return a {@code MergedAnnotations} instance containing the merged
-	 * element annotations
+	 * 创建一个新的 {@link MergedAnnotations} 实例，包含来自指定元素的所有注解和元注解，
+	 * 并根据 {@link SearchStrategy} 包含相关的继承元素。
+	 * @param element 源元素
+	 * @param searchStrategy 要使用的搜索策略
+	 * @param repeatableContainers 元素注解或元注解可能使用的可重复容器
+	 * @return 包含合并元素注解的 {@code MergedAnnotations} 实例
 	 */
 	static MergedAnnotations from(AnnotatedElement element, SearchStrategy searchStrategy,
 			RepeatableContainers repeatableContainers) {
@@ -331,17 +289,13 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	}
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance containing all
-	 * annotations and meta-annotations from the specified element and,
-	 * depending on the {@link SearchStrategy}, related inherited elements.
-	 * @param element the source element
-	 * @param searchStrategy the search strategy to use
-	 * @param repeatableContainers the repeatable containers that may be used by
-	 * the element annotations or the meta-annotations
-	 * @param annotationFilter an annotation filter used to restrict the
-	 * annotations considered
-	 * @return a {@code MergedAnnotations} instance containing the merged
-	 * annotations for the supplied element
+	 * 创建一个新的 {@link MergedAnnotations} 实例，包含来自指定元素的所有注解和元注解，
+	 * 并根据 {@link SearchStrategy} 包含相关的继承元素。
+	 * @param element 源元素
+	 * @param searchStrategy 要使用的搜索策略
+	 * @param repeatableContainers 元素注解或元注解可能使用的可重复容器
+	 * @param annotationFilter 用于限制考虑的注解的注解过滤器
+	 * @return 包含所提供元素的合并注解的 {@code MergedAnnotations} 实例
 	 */
 	static MergedAnnotations from(AnnotatedElement element, SearchStrategy searchStrategy,
 			RepeatableContainers repeatableContainers, AnnotationFilter annotationFilter) {
@@ -352,10 +306,9 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	}
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance from the specified
-	 * annotations.
-	 * @param annotations the annotations to include
-	 * @return a {@code MergedAnnotations} instance containing the annotations
+	 * 从指定的注解创建新的 {@link MergedAnnotations} 实例。
+	 * @param annotations 要包含的注解
+	 * @return 包含注解的 {@code MergedAnnotations} 实例
 	 * @see #from(Object, Annotation...)
 	 */
 	static MergedAnnotations from(Annotation... annotations) {
@@ -363,13 +316,11 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	}
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance from the specified
-	 * annotations.
-	 * @param source the source for the annotations. This source is used only
-	 * for information and logging. It does not need to <em>actually</em>
-	 * contain the specified annotations, and it will not be searched.
-	 * @param annotations the annotations to include
-	 * @return a {@code MergedAnnotations} instance containing the annotations
+	 * 从指定的注解创建新的 {@link MergedAnnotations} 实例。
+	 * @param source 注解的源。此源仅用于信息和日志记录。它不需要
+	 * <em>实际</em>包含指定的注解，也不会被搜索。
+	 * @param annotations 要包含的注解
+	 * @return 包含注解的 {@code MergedAnnotations} 实例
 	 * @see #from(Annotation...)
 	 * @see #from(AnnotatedElement)
 	 */
@@ -378,32 +329,25 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	}
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance from the specified
-	 * annotations.
-	 * @param source the source for the annotations. This source is used only
-	 * for information and logging. It does not need to <em>actually</em>
-	 * contain the specified annotations, and it will not be searched.
-	 * @param annotations the annotations to include
-	 * @param repeatableContainers the repeatable containers that may be used by
-	 * meta-annotations
-	 * @return a {@code MergedAnnotations} instance containing the annotations
+	 * 从指定的注解创建新的 {@link MergedAnnotations} 实例。
+	 * @param source 注解的源。此源仅用于信息和日志记录。它不需要
+	 * <em>实际</em>包含指定的注解，也不会被搜索。
+	 * @param annotations 要包含的注解
+	 * @param repeatableContainers 元注解可能使用的可重复容器
+	 * @return 包含注解的 {@code MergedAnnotations} 实例
 	 */
 	static MergedAnnotations from(Object source, Annotation[] annotations, RepeatableContainers repeatableContainers) {
 		return from(source, annotations, repeatableContainers, AnnotationFilter.PLAIN);
 	}
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance from the specified
-	 * annotations.
-	 * @param source the source for the annotations. This source is used only
-	 * for information and logging. It does not need to <em>actually</em>
-	 * contain the specified annotations, and it will not be searched.
-	 * @param annotations the annotations to include
-	 * @param repeatableContainers the repeatable containers that may be used by
-	 * meta-annotations
-	 * @param annotationFilter an annotation filter used to restrict the
-	 * annotations considered
-	 * @return a {@code MergedAnnotations} instance containing the annotations
+	 * 从指定的注解创建新的 {@link MergedAnnotations} 实例。
+	 * @param source 注解的源。此源仅用于信息和日志记录。它不需要
+	 * <em>实际</em>包含指定的注解，也不会被搜索。
+	 * @param annotations 要包含的注解
+	 * @param repeatableContainers 元注解可能使用的可重复容器
+	 * @param annotationFilter 用于限制考虑的注解的注解过滤器
+	 * @return 包含注解的 {@code MergedAnnotations} 实例
 	 */
 	static MergedAnnotations from(Object source, Annotation[] annotations,
 			RepeatableContainers repeatableContainers, AnnotationFilter annotationFilter) {
@@ -414,18 +358,13 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	}
 
 	/**
-	 * Create a new {@link MergedAnnotations} instance from the specified
-	 * collection of directly present annotations. This method allows a
-	 * {@code MergedAnnotations} instance to be created from annotations that
-	 * are not necessarily loaded using reflection. The provided annotations
-	 * must all be {@link MergedAnnotation#isDirectlyPresent() directly present}
-	 * and must have an {@link MergedAnnotation#getAggregateIndex() aggregate
-	 * index} of {@code 0}.
-	 * <p>The resulting {@code MergedAnnotations} instance will contain both the
-	 * specified annotations and any meta-annotations that can be read using
-	 * reflection.
-	 * @param annotations the annotations to include
-	 * @return a {@code MergedAnnotations} instance containing the annotations
+	 * 从直接存在的注解的指定集合创建新的 {@link MergedAnnotations} 实例。
+	 * 此方法允许从不一定使用反射加载的注解创建 {@code MergedAnnotations} 实例。
+	 * 所提供的注解必须全部 {@link MergedAnnotation#isDirectlyPresent() 直接存在}，
+	 * 并且必须具有 {@link MergedAnnotation#getAggregateIndex() 聚合索引} 为 {@code 0}。
+	 * <p>结果 {@code MergedAnnotations} 实例将包含指定的注解以及可以使用反射读取的任何元注解。
+	 * @param annotations 要包含的注解
+	 * @return 包含注解的 {@code MergedAnnotations} 实例
 	 * @see MergedAnnotation#of(ClassLoader, Object, Class, java.util.Map)
 	 */
 	static MergedAnnotations of(Collection<MergedAnnotation<?>> annotations) {
@@ -434,64 +373,51 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 
 
 	/**
-	 * Search strategies supported by
-	 * {@link MergedAnnotations#from(AnnotatedElement, SearchStrategy)} and
-	 * variants of that method.
+	 * {@link MergedAnnotations#from(AnnotatedElement, SearchStrategy)}
+	 * 和该方法的变体支持的搜索策略。
 	 *
-	 * <p>Each strategy creates a different set of aggregates that will be
-	 * combined to create the final {@link MergedAnnotations}.
+	 * <p>每种策略都会创建一组不同的聚合，这些聚合将组合起来创建最终的 {@link MergedAnnotations}。
 	 */
 	enum SearchStrategy {
 
 		/**
-		 * Find only directly declared annotations, without considering
-		 * {@link Inherited @Inherited} annotations and without searching
-		 * superclasses or implemented interfaces.
+		 * 仅查找直接声明的注解，不考虑 {@link Inherited @Inherited} 注解，
+		 * 也不搜索超类或已实现的接口。
 		 */
 		DIRECT,
 
 		/**
-		 * Find all directly declared annotations as well as any
-		 * {@link Inherited @Inherited} superclass annotations.
-		 * <p>This strategy is only really useful when used with {@link Class}
-		 * types since the {@link Inherited @Inherited} annotation is ignored for
-		 * all other {@linkplain AnnotatedElement annotated elements}.
-		 * <p>This strategy does not search implemented interfaces.
+		 * 查找所有直接声明的注解以及任何 {@link Inherited @Inherited} 超类注解。
+		 * <p>此策略仅在与 {@link Class} 类型一起使用时才真正有用，因为
+		 * {@link Inherited @Inherited} 注解对所有其他
+		 * {@linkplain AnnotatedElement 带注解的元素} 都被忽略。
+		 * <p>此策略不搜索已实现的接口。
 		 */
 		INHERITED_ANNOTATIONS,
 
 		/**
-		 * Find all directly declared and superclass annotations.
-		 * <p>This strategy is similar to {@link #INHERITED_ANNOTATIONS} except
-		 * the annotations do not need to be meta-annotated with
-		 * {@link Inherited @Inherited}.
-		 * <p>This strategy does not search implemented interfaces.
+		 * 查找所有直接声明和超类注解。
+		 * <p>此策略类似于 {@link #INHERITED_ANNOTATIONS}，
+		 * 区别在于注解不需要用 {@link Inherited @Inherited} 进行元注解。
+		 * <p>此策略不搜索已实现的接口。
 		 */
 		SUPERCLASS,
 
 		/**
-		 * Perform a full search of the entire type hierarchy, including
-		 * superclasses and implemented interfaces.
-		 * <p>Superclass annotations do not need to be meta-annotated with
-		 * {@link Inherited @Inherited}.
+		 * 对整个类型层次结构执行完整搜索，包括超类和已实现的接口。
+		 * <p>超类注解不需要用 {@link Inherited @Inherited} 进行元注解。
 		 */
 		TYPE_HIERARCHY,
 
 		/**
-		 * Perform a full search of the entire type hierarchy on the source
-		 * <em>and</em> any enclosing classes.
-		 * <p>This strategy is similar to {@link #TYPE_HIERARCHY} except that
-		 * {@linkplain Class#getEnclosingClass() enclosing classes} are also
-		 * searched.
-		 * <p>Superclass and enclosing class annotations do not need to be
-		 * meta-annotated with {@link Inherited @Inherited}.
-		 * <p>When searching a {@link Method} source, this strategy is identical
-		 * to {@link #TYPE_HIERARCHY}.
-		 * <p><strong>WARNING:</strong> This strategy searches recursively for
-		 * annotations on the enclosing class for any source type, regardless
-		 * whether the source type is an <em>inner class</em>, a {@code static}
-		 * nested class, or a nested interface. Thus, it may find more annotations
-		 * than you would expect.
+		 * 对源<em>和</em>任何封闭类上的整个类型层次结构执行完整搜索。
+		 * <p>此策略类似于 {@link #TYPE_HIERARCHY}，
+		 * 区别在于还会搜索 {@linkplain Class#getEnclosingClass() 封闭类}。
+		 * <p>超类和封闭类注解不需要用 {@link Inherited @Inherited} 进行元注解。
+		 * <p>当搜索 {@link Method} 源时，此策略与 {@link #TYPE_HIERARCHY} 相同。
+		 * <p><strong>警告：</strong>此策略会递归搜索任何源类型（无论源类型是
+		 * <em>内部类</em>、{@code static} 嵌套类还是嵌套接口）的封闭类上的注解。
+		 * 因此，它可能会找到比您预期更多的注解。
 		 */
 		TYPE_HIERARCHY_AND_ENCLOSING_CLASSES
 

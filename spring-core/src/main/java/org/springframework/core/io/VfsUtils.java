@@ -16,6 +16,9 @@
 
 package org.springframework.core.io;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.ReflectionUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,18 +28,14 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.ReflectionUtils;
-
 /**
- * Utility for detecting and accessing JBoss VFS in the classpath.
+ * 用于检测和访问类路径中 JBoss VFS 的工具类。
  *
- * <p>As of Spring 4.0, this class supports VFS 3.x on JBoss AS 6+
- * (package {@code org.jboss.vfs}) and is in particular compatible with
- * JBoss AS 7 and WildFly 8+.
+ * <p>自 Spring 4.0 起，本类支持 JBoss AS 6 及以上版本的 VFS 3.x
+ * （包名为 {@code org.jboss.vfs}），特别兼容 JBoss AS 7 和 WildFly 8 及以上版本。
  *
- * <p>Thanks go to Marius Bogoevici for the initial patch.
- * <b>Note:</b> This is an internal class and should not be used outside the framework.
+ * <p>感谢 Marius Bogoevici 提供的初始补丁。
+ * <b>注意：</b>这是一个内部类，不应在框架外部使用。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -177,7 +176,7 @@ public abstract class VfsUtils {
 		return invokeVfsMethod(VFS_METHOD_GET_ROOT_URI, null, url);
 	}
 
-	// protected methods used by the support sub-package
+	// support 子包使用的受保护方法
 
 	protected static Object getRoot(URL url) throws IOException {
 		return invokeVfsMethod(VFS_METHOD_GET_ROOT_URL, null, url);

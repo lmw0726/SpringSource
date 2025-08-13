@@ -52,7 +52,7 @@ public abstract class AbstractResource implements Resource {
 	 */
 	@Override
 	public boolean exists() {
-		// Try file existence: can we find the file in the file system?
+		// 尝试检查文件是否存在：我们能在文件系统中找到该文件吗？
 		if (isFile()) {
 			try {
 				//基于File进行判断
@@ -64,7 +64,7 @@ public abstract class AbstractResource implements Resource {
 				}
 			}
 		}
-		// Fall back to stream existence: can we open the stream?
+		// 回退到检查流是否存在：我们能打开这个流吗？
 		try {
 			//基于InputStream进行判断，并关闭流
 			getInputStream().close();

@@ -28,16 +28,15 @@
 package org.springframework.asm;
 
 /**
- * Defines additional JVM opcodes, access flags and constants which are not part of the ASM public
- * API.
+ * 定义额外的 JVM 操作码、访问标志及常量，这些不属于 ASM 公共 API 范围。  
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-6.html">JVMS 6</a>
  * @author Eric Bruneton
  */
 final class Constants {
 
-  // The ClassFile attribute names, in the order they are defined in
-  // https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-4.html#jvms-4.7-300.
+  // ClassFile 属性名，按照其在  
+  // https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-4.html#jvms-4.7-300 中定义的顺序。
 
   static final String CONSTANT_VALUE = "ConstantValue";
   static final String CODE = "Code";
@@ -70,27 +69,26 @@ final class Constants {
   static final String PERMITTED_SUBCLASSES = "PermittedSubclasses";
   static final String RECORD = "Record";
 
-  // ASM specific access flags.
-  // WARNING: the 16 least significant bits must NOT be used, to avoid conflicts with standard
-  // access flags, and also to make sure that these flags are automatically filtered out when
-  // written in class files (because access flags are stored using 16 bits only).
+  // ASM 特定的访问标志。
+  // 警告：最低的16位不能使用，以避免与标准访问标志冲突，
+  // 并确保这些标志在写入 class 文件时会被自动过滤（因为访问标志仅用16位存储）。
 
-  static final int ACC_CONSTRUCTOR = 0x40000; // method access flag.
+  static final int ACC_CONSTRUCTOR = 0x40000; // 方法访问标志。  
 
-  // ASM specific stack map frame types, used in {@link ClassVisitor#visitFrame}.
+  // ASM 特定的栈映射帧类型，用于 {@link ClassVisitor#visitFrame}。
 
   /**
-   * A frame inserted between already existing frames. This internal stack map frame type (in
-   * addition to the ones declared in {@link Opcodes}) can only be used if the frame content can be
-   * computed from the previous existing frame and from the instructions between this existing frame
-   * and the inserted one, without any knowledge of the type hierarchy. This kind of frame is only
-   * used when an unconditional jump is inserted in a method while expanding an ASM specific
-   * instruction. Keep in sync with Opcodes.java.
+   * 插入在已有帧之间的帧。  
+   * 这种内部栈映射帧类型（除 {@link Opcodes} 中声明的类型外）  
+   * 仅在可以根据前一个已有帧及该帧与插入帧之间的指令计算出帧内容，  
+   * 且无需类型层次结构信息时使用。  
+   * 这种帧只在扩展 ASM 特定指令时，在方法中插入无条件跳转时使用。  
+   * 请与 Opcodes.java 保持同步。  
    */
   static final int F_INSERT = 256;
 
-  // The JVM opcode values which are not part of the ASM public API.
-  // See https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html.
+  // 不属于 ASM 公共 API 的 JVM 操作码值。
+  // 详见 https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html。
 
   static final int LDC_W = 19;
   static final int LDC2_W = 20;
@@ -138,21 +136,21 @@ final class Constants {
   static final int GOTO_W = 200;
   static final int JSR_W = 201;
 
-  // Constants to convert between normal and wide jump instructions.
+  // 用于在普通跳转指令和宽跳转指令之间转换的常量。
 
-  // The delta between the GOTO_W and JSR_W opcodes and GOTO and JUMP.
+  // GOTO_W 和 JSR_W 指令与 GOTO 和 JUMP 指令的操作码差值。
   static final int WIDE_JUMP_OPCODE_DELTA = GOTO_W - Opcodes.GOTO;
 
-  // Constants to convert JVM opcodes to the equivalent ASM specific opcodes, and vice versa.
+  // 用于将 JVM 操作码转换为对应的 ASM 特定操作码，反之亦然的常量。
 
-  // The delta between the ASM_IFEQ, ..., ASM_IF_ACMPNE, ASM_GOTO and ASM_JSR opcodes
-  // and IFEQ, ..., IF_ACMPNE, GOTO and JSR.
+  // ASM_IFEQ、...、ASM_IF_ACMPNE、ASM_GOTO 和 ASM_JSR 操作码与
+  // IFEQ、...、IF_ACMPNE、GOTO 和 JSR 的操作码差值。
   static final int ASM_OPCODE_DELTA = 49;
 
-  // The delta between the ASM_IFNULL and ASM_IFNONNULL opcodes and IFNULL and IFNONNULL.
+  // ASM_IFNULL 和 ASM_IFNONNULL 操作码与 IFNULL 和 IFNONNULL 的操作码差值。
   static final int ASM_IFNULL_OPCODE_DELTA = 20;
 
-  // ASM specific opcodes, used for long forward jump instructions.
+  // ASM 特定的操作码，用于表示长距离向前跳转指令。
 
   static final int ASM_IFEQ = Opcodes.IFEQ + ASM_OPCODE_DELTA;
   static final int ASM_IFNE = Opcodes.IFNE + ASM_OPCODE_DELTA;

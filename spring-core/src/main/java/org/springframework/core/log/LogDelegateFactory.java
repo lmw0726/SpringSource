@@ -16,19 +16,18 @@
 
 package org.springframework.core.log;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
- * Factory for common {@link Log} delegates with Spring's logging conventions.
+ * 基于 Spring 日志规范的通用 {@link Log} 委托工厂。
  *
- * <p>Mainly for internal use within the framework with Apache Commons Logging,
- * typically in the form of the {@code spring-jcl} bridge but also compatible
- * with other Commons Logging bridges.
+ * <p>主要供框架内部与 Apache Commons Logging 配合使用，
+ * 通常通过 {@code spring-jcl} 桥接实现，但也兼容其他 Commons Logging 桥接实现。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -42,17 +41,14 @@ public final class LogDelegateFactory {
 
 
 	/**
-	 * Create a composite logger that delegates to a primary or falls back on a
-	 * secondary logger if logging for the primary logger is not enabled.
-	 * <p>This may be used for fallback logging from lower-level packages that
-	 * logically should log together with some higher-level package but the two
-	 * don't happen to share a suitable parent package (e.g. logging for the web
-	 * and lower-level http and codec packages). For such cases the primary
-	 * (class-based) logger can be wrapped with a shared fallback logger.
-	 * @param primaryLogger primary logger to try first
-	 * @param secondaryLogger secondary logger
-	 * @param tertiaryLoggers optional vararg of further fallback loggers
-	 * @return the resulting composite logger for the related categories
+	 * 创建一个复合日志器，根据优先级依次委托到主日志器、次日志器及更多的备用日志器。
+	 * <p>此方法可用于底层包向上层包的日志回退，这些包在包结构上不共享合适的父包，
+	 * 但逻辑上应该合并日志（例如 web 包与底层 http、codec 包）。通过此复合日志器，
+	 * 主日志器先尝试输出，若未启用则回退至备用日志器。
+	 * @param primaryLogger 首选日志器
+	 * @param secondaryLogger 次选日志器
+	 * @param tertiaryLoggers 其他备用日志器（可选）
+	 * @return 复合日志器，负责相关类别的日志输出
 	 */
 	public static Log getCompositeLog(Log primaryLogger, Log secondaryLogger, Log... tertiaryLoggers) {
 		List<Log> loggers = new ArrayList<>(2 + tertiaryLoggers.length);
@@ -63,24 +59,22 @@ public final class LogDelegateFactory {
 	}
 
 	/**
-	 * Create a "hidden" logger with a category name prefixed with "_", thus
-	 * precluding it from being enabled together with other log categories from
-	 * the same package. This is useful for specialized output that is either
-	 * too verbose or otherwise optional or unnecessary to see all the time.
-	 * @param clazz the class for which to create a logger
-	 * @return a Log with the category {@code "_" + fully-qualified class name}
+	 * 创建一个“隐藏”日志器，其类别名前缀为 "_"，
+	 * 使其不会与同包的其他日志类别同时启用。
+	 * 适合用于过于详细或可选、不必一直显示的专用输出。
+	 * @param clazz 需要创建日志器的类
+	 * @return 类别名为 "_" + 类的全限定名的日志器
 	 */
 	public static Log getHiddenLog(Class<?> clazz) {
 		return getHiddenLog(clazz.getName());
 	}
 
 	/**
-	 * Create a "hidden" logger with a category name prefixed with "_", thus
-	 * precluding it from being enabled together with other log categories from
-	 * the same package. This is useful for specialized output that is either
-	 * too verbose or otherwise optional or unnecessary to see all the time.
-	 * @param category the log category to use
-	 * @return a Log with the category {@code "_" + category}
+	 * 创建一个“隐藏”日志器，其类别名前缀为 "_"，
+	 * 使其不会与同包的其他日志类别同时启用。
+	 * 适合用于过于详细或可选、不必一直显示的专用输出。
+	 * @param category 日志类别名
+	 * @return 类别名为 "_" + category 的日志器
 	 * @since 5.3.5
 	 */
 	public static Log getHiddenLog(String category) {

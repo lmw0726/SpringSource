@@ -16,22 +16,18 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
-
-import org.springframework.lang.Nullable;
 
 import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
 
 /**
- * Utility methods for working with the file system.
+ * 用于操作文件系统的工具方法。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -43,16 +39,12 @@ import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
 public abstract class FileSystemUtils {
 
 	/**
-	 * Delete the supplied {@link File} - for directories,
-	 * recursively delete any nested directories or files as well.
-	 * <p>Note: Like {@link File#delete()}, this method does not throw any
-	 * exception but rather silently returns {@code false} in case of I/O
-	 * errors. Consider using {@link #deleteRecursively(Path)} for NIO-style
-	 * handling of I/O errors, clearly differentiating between non-existence
-	 * and failure to delete an existing file.
-	 * @param root the root {@code File} to delete
-	 * @return {@code true} if the {@code File} was successfully deleted,
-	 * otherwise {@code false}
+	 * 删除指定的 {@link File} —— 对于目录，也会递归删除其中嵌套的目录或文件。
+	 * <p>注意：类似于 {@link File#delete()}，此方法不会抛出异常，
+	 * 而是在发生 I/O 错误时静默返回 {@code false}。如果需要使用 NIO 风格处理 I/O 错误，
+	 * 并清晰区分文件不存在和删除失败，建议使用 {@link #deleteRecursively(Path)}。
+	 * @param root 要删除的根 {@code File}
+	 * @return 如果文件成功删除，返回 {@code true}；否则返回 {@code false}
 	 */
 	public static boolean deleteRecursively(@Nullable File root) {
 		if (root == null) {
@@ -68,12 +60,10 @@ public abstract class FileSystemUtils {
 	}
 
 	/**
-	 * Delete the supplied {@link File} &mdash; for directories,
-	 * recursively delete any nested directories or files as well.
-	 * @param root the root {@code File} to delete
-	 * @return {@code true} if the {@code File} existed and was deleted,
-	 * or {@code false} if it did not exist
-	 * @throws IOException in the case of I/O errors
+	 * 删除指定的 {@link File} —— 对于目录，也会递归删除其中嵌套的目录或文件。
+	 * @param root 要删除的根 {@code File}
+	 * @return 如果文件存在且被删除，返回 {@code true}；如果文件不存在，返回 {@code false}
+	 * @throws IOException 如果发生 I/O 错误
 	 * @since 5.0
 	 */
 	public static boolean deleteRecursively(@Nullable Path root) throws IOException {
@@ -100,11 +90,10 @@ public abstract class FileSystemUtils {
 	}
 
 	/**
-	 * Recursively copy the contents of the {@code src} file/directory
-	 * to the {@code dest} file/directory.
-	 * @param src the source directory
-	 * @param dest the destination directory
-	 * @throws IOException in the case of I/O errors
+	 * 递归复制 {@code src} 文件/目录的内容到 {@code dest} 文件/目录。
+	 * @param src 源目录
+	 * @param dest 目标目录
+	 * @throws IOException 如果发生 I/O 错误
 	 */
 	public static void copyRecursively(File src, File dest) throws IOException {
 		Assert.notNull(src, "Source File must not be null");
@@ -113,11 +102,10 @@ public abstract class FileSystemUtils {
 	}
 
 	/**
-	 * Recursively copy the contents of the {@code src} file/directory
-	 * to the {@code dest} file/directory.
-	 * @param src the source directory
-	 * @param dest the destination directory
-	 * @throws IOException in the case of I/O errors
+	 * 递归复制 {@code src} 文件/目录的内容到 {@code dest} 文件/目录。
+	 * @param src 源目录
+	 * @param dest 目标目录
+	 * @throws IOException 如果发生 I/O 错误
 	 * @since 5.0
 	 */
 	public static void copyRecursively(Path src, Path dest) throws IOException {

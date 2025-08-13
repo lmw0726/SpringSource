@@ -19,19 +19,18 @@ package org.springframework.util.comparator;
 import java.util.Comparator;
 
 /**
- * Comparator that adapts Comparables to the Comparator interface.
- * Mainly for internal use in other Comparators, when supposed
- * to work on Comparables.
+ * 将Comparable适配到Comparator接口的比较器。
+ * 主要用于其他比较器内部，当需要处理Comparable对象时。
  *
  * @author Keith Donald
  * @since 1.2.2
- * @param <T> the type of comparable objects that may be compared by this comparator
+ * @param <T> 此比较器可以比较的可比较对象类型
  * @see Comparable
  */
 public class ComparableComparator<T extends Comparable<T>> implements Comparator<T> {
 
 	/**
-	 * A shared instance of this default comparator.
+	 * 此默认比较器的共享实例。
 	 * @see Comparators#comparable()
 	 */
 	@SuppressWarnings("rawtypes")

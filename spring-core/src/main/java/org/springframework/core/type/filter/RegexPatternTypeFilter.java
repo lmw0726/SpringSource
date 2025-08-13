@@ -16,13 +16,13 @@
 
 package org.springframework.core.type.filter;
 
-import java.util.regex.Pattern;
-
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.util.Assert;
 
+import java.util.regex.Pattern;
+
 /**
- * A simple filter for matching a fully-qualified class name with a regex {@link Pattern}.
+ * 用于使用正则表达式 {@link Pattern} 匹配全限定类名的简单过滤器。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
