@@ -35,10 +35,10 @@ import org.w3c.dom.NodeList;
 import java.util.*;
 
 /**
- * Stateful delegate class used to parse XML bean definitions.
- * Intended for use by both the main parser and any extension
- * {@link BeanDefinitionParser BeanDefinitionParsers} or
- * {@link BeanDefinitionDecorator BeanDefinitionDecorators}.
+ * 用于解析 XML Bean 定义的有状态委托类。
+ * 旨在供主解析器以及任何扩展的
+ * {@link BeanDefinitionParser BeanDefinitionParsers} 或
+ * {@link BeanDefinitionDecorator BeanDefinitionDecorators} 使用。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -233,7 +233,7 @@ public class BeanDefinitionParserDelegate {
 
 
 	/**
-	 * Get the {@link XmlReaderContext} associated with this helper instance.
+	 * 获取与此辅助实例关联的 {@link XmlReaderContext}。
 	 */
 	public final XmlReaderContext getReaderContext() {
 		return this.readerContext;
@@ -248,21 +248,21 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Report an error with the given message for the given source element.
+	 * 为指定的源元素报告错误信息。
 	 */
 	protected void error(String message, Node source) {
 		this.readerContext.error(message, source, this.parseState.snapshot());
 	}
 
 	/**
-	 * Report an error with the given message for the given source element.
+	 * 为指定的源元素报告错误信息。
 	 */
 	protected void error(String message, Element source) {
 		this.readerContext.error(message, source, this.parseState.snapshot());
 	}
 
 	/**
-	 * Report an error with the given message for the given source element.
+	 * 为指定的源元素报告错误信息，并附带异常原因。
 	 */
 	protected void error(String message, Element source, Throwable cause) {
 		this.readerContext.error(message, source, this.parseState.snapshot(), cause);
@@ -270,7 +270,7 @@ public class BeanDefinitionParserDelegate {
 
 
 	/**
-	 * Initialize the default settings assuming a {@code null} parent delegate.
+	 * 初始化默认设置，假设父委托为 {@code null}。
 	 */
 	public void initDefaults(Element root) {
 		initDefaults(root, null);
@@ -358,8 +358,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Return the default settings for bean definitions as indicated within
-	 * the attributes of the top-level {@code <beans/>} element.
+	 * 返回顶层 {@code <beans/>} 元素属性中指定的 Bean 定义默认设置。
 	 */
 	public BeanDefinitionDefaults getBeanDefinitionDefaults() {
 		BeanDefinitionDefaults bdd = new BeanDefinitionDefaults();
@@ -371,8 +370,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Return any patterns provided in the 'default-autowire-candidates'
-	 * attribute of the top-level {@code <beans/>} element.
+	 * 返回顶层 {@code <beans/>} 元素的 'default-autowire-candidates' 属性中提供的任意模式。
 	 */
 	@Nullable
 	public String[] getAutowireCandidatePatterns() {
@@ -1636,7 +1634,7 @@ public class BeanDefinitionParserDelegate {
 			} else if (namespaceUri.startsWith("http://www.springframework.org/schema/")) {
 				error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", node);
 			} else {
-				// A custom namespace, not to be handled by Spring - maybe "xml:...".
+				// 一个自定义命名空间，而不是由Spring处理-也许是 “xml:...”。
 				if (logger.isDebugEnabled()) {
 					logger.debug("No Spring NamespaceHandler found for XML schema namespace [" + namespaceUri + "]");
 				}

@@ -16,16 +16,16 @@
 
 package org.springframework.beans;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.ObjectUtils;
+
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.ObjectUtils;
-
 /**
- * Common delegate methods for Spring's internal {@link PropertyDescriptor} implementations.
+ * Spring内部 {@link PropertyDescriptor} 实现的通用委托方法。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -33,7 +33,7 @@ import org.springframework.util.ObjectUtils;
 abstract class PropertyDescriptorUtils {
 
 	/**
-	 * See {@link java.beans.FeatureDescriptor}.
+	 * 详见 {@link java.beans.FeatureDescriptor}。
 	 */
 	public static void copyNonMethodProperties(PropertyDescriptor source, PropertyDescriptor target) {
 		target.setExpert(source.isExpert());
@@ -43,21 +43,21 @@ abstract class PropertyDescriptorUtils {
 		target.setShortDescription(source.getShortDescription());
 		target.setDisplayName(source.getDisplayName());
 
-		// Copy all attributes (emulating behavior of private FeatureDescriptor#addTable)
+		// 复制所有属性（模拟私有 FeatureDescriptor#addTable 的行为）
 		Enumeration<String> keys = source.attributeNames();
 		while (keys.hasMoreElements()) {
 			String key = keys.nextElement();
 			target.setValue(key, source.getValue(key));
 		}
 
-		// See java.beans.PropertyDescriptor#PropertyDescriptor(PropertyDescriptor)
+		// 详见 java.beans.PropertyDescriptor#PropertyDescriptor(PropertyDescriptor)
 		target.setPropertyEditorClass(source.getPropertyEditorClass());
 		target.setBound(source.isBound());
 		target.setConstrained(source.isConstrained());
 	}
 
 	/**
-	 * See {@link java.beans.PropertyDescriptor#findPropertyType}.
+	 * 详见 {@link java.beans.PropertyDescriptor#findPropertyType}.
 	 */
 	@Nullable
 	public static Class<?> findPropertyType(@Nullable Method readMethod, @Nullable Method writeMethod)
@@ -82,11 +82,11 @@ abstract class PropertyDescriptorUtils {
 			}
 			if (propertyType != null) {
 				if (propertyType.isAssignableFrom(params[0])) {
-					// Write method's property type potentially more specific
+					// 写方法的属性类型可能更具体
 					propertyType = params[0];
 				}
 				else if (params[0].isAssignableFrom(propertyType)) {
-					// Proceed with read method's property type
+					// 使用读方法的属性类型继续处理
 				}
 				else {
 					throw new IntrospectionException(
@@ -102,7 +102,7 @@ abstract class PropertyDescriptorUtils {
 	}
 
 	/**
-	 * See {@link java.beans.IndexedPropertyDescriptor#findIndexedPropertyType}.
+	 * 详见 {@link java.beans.IndexedPropertyDescriptor#findIndexedPropertyType}.
 	 */
 	@Nullable
 	public static Class<?> findIndexedPropertyType(String name, @Nullable Class<?> propertyType,
@@ -134,11 +134,11 @@ abstract class PropertyDescriptorUtils {
 			}
 			if (indexedPropertyType != null) {
 				if (indexedPropertyType.isAssignableFrom(params[1])) {
-					// Write method's property type potentially more specific
+					// 写方法的属性类型可能更具体
 					indexedPropertyType = params[1];
 				}
 				else if (params[1].isAssignableFrom(indexedPropertyType)) {
-					// Proceed with read method's property type
+					// 使用读方法的属性类型继续处理
 				}
 				else {
 					throw new IntrospectionException("Type mismatch between indexed read and write methods: " +
@@ -160,9 +160,8 @@ abstract class PropertyDescriptorUtils {
 	}
 
 	/**
-	 * Compare the given {@code PropertyDescriptors} and return {@code true} if
-	 * they are equivalent, i.e. their read method, write method, property type,
-	 * property editor and flags are equivalent.
+	 * 比较给定的 {@code PropertyDescriptors} 并在它们等价时返回 {@code true}，
+	 * 即它们的读方法、写方法、属性类型、属性编辑器和标志都等价。
 	 * @see java.beans.PropertyDescriptor#equals(Object)
 	 */
 	public static boolean equals(PropertyDescriptor pd, PropertyDescriptor otherPd) {

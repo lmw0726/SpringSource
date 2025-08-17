@@ -16,17 +16,17 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.TypeConverter;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
- * Simple factory for shared Set instances. Allows for central setup
- * of Sets via the "set" element in XML bean definitions.
+ * 用于共享 Set 实例的简单工厂。
+ * 允许通过 XML Bean 定义中的 "set" 元素集中配置 Set。
  *
  * @author Juergen Hoeller
  * @since 09.12.2003
@@ -44,16 +44,16 @@ public class SetFactoryBean extends AbstractFactoryBean<Set<Object>> {
 
 
 	/**
-	 * Set the source Set, typically populated via XML "set" elements.
+	 * 设置源 Set，通常通过 XML 中的 "set" 元素填充。
 	 */
 	public void setSourceSet(Set<?> sourceSet) {
 		this.sourceSet = sourceSet;
 	}
 
 	/**
-	 * Set the class to use for the target Set. Can be populated with a fully
-	 * qualified class name when defined in a Spring application context.
-	 * <p>Default is a linked HashSet, keeping the registration order.
+	 * 设置目标 Set 的实现类。
+	 * 在 Spring 应用上下文中定义时，可以使用全限定类名。
+	 * <p>默认使用 LinkedHashSet，保持注册顺序。
 	 * @see java.util.LinkedHashSet
 	 */
 	@SuppressWarnings("rawtypes")

@@ -19,12 +19,11 @@ package org.springframework.beans.factory;
 import org.springframework.beans.FatalBeanException;
 
 /**
- * Exception that a bean implementation is suggested to throw if its own
- * factory-aware initialization code fails. BeansExceptions thrown by
- * bean factory methods themselves should simply be propagated as-is.
+ * 建议bean实现在其自身的工厂感知初始化代码失败时抛出的异常。
+ * 由bean工厂方法本身抛出的BeansException应该简单地按原样传播。
  *
- * <p>Note that {@code afterPropertiesSet()} or a custom "init-method"
- * can throw any exception.
+ * <p>注意{@code afterPropertiesSet()}或自定义的"init-method"
+ * 可以抛出任何异常。
  *
  * @author Juergen Hoeller
  * @since 13.11.2003
@@ -35,18 +34,17 @@ import org.springframework.beans.FatalBeanException;
 public class BeanInitializationException extends FatalBeanException {
 
 	/**
-	 * Create a new BeanInitializationException with the specified message.
-	 * @param msg the detail message
+	 * 使用指定消息创建一个新的BeanInitializationException。
+	 * @param msg 详细消息
 	 */
 	public BeanInitializationException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Create a new BeanInitializationException with the specified message
-	 * and root cause.
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 * 使用指定消息和根本原因创建一个新的BeanInitializationException。
+	 * @param msg 详细消息
+	 * @param cause 根本原因
 	 */
 	public BeanInitializationException(String msg, Throwable cause) {
 		super(msg, cause);

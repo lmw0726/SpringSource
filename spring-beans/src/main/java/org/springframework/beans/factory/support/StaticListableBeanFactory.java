@@ -91,7 +91,7 @@ public class StaticListableBeanFactory implements ListableBeanFactory {
 
 
 	//---------------------------------------------------------------------
-	// Implementation of BeanFactory interface
+	// BeanFactory接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -275,7 +275,7 @@ public class StaticListableBeanFactory implements ListableBeanFactory {
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ListableBeanFactory interface
+	// ListableBeanFactory接口的实现
 	//---------------------------------------------------------------------
 
 	@Override

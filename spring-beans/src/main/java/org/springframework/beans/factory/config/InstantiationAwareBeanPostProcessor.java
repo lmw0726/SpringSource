@@ -23,18 +23,15 @@ import org.springframework.lang.Nullable;
 import java.beans.PropertyDescriptor;
 
 /**
- * Subinterface of {@link BeanPostProcessor} that adds a before-instantiation callback,
- * and a callback after instantiation but before explicit properties are set or
- * autowiring occurs.
+ * {@link BeanPostProcessor} 的子接口，增加了实例化之前的回调，
+ * 以及实例化之后但在显式属性设置或自动装配发生之前的回调。
  *
- * <p>Typically used to suppress default instantiation for specific target beans,
- * for example to create proxies with special TargetSources (pooling targets,
- * lazily initializing targets, etc), or to implement additional injection strategies
- * such as field injection.
+ * <p>通常用于抑制特定目标 bean 的默认实例化，例如：
+ * 为其创建带有特殊 TargetSource 的代理（对象池目标、延迟初始化目标等），
+ * 或者实现额外的注入策略（如字段注入）。
  *
- * <p><b>NOTE:</b> This interface is a special purpose interface, mainly for
- * internal use within the framework. It is recommended to implement the plain
- * {@link BeanPostProcessor} interface as far as possible.
+ * <p><b>注意：</b>此接口是一个特殊用途接口，主要用于框架内部。
+ * 在可能的情况下，建议尽量实现普通的 {@link BeanPostProcessor} 接口。
  *
  * @author Juergen Hoeller
  * @author Rod Johnson

@@ -24,14 +24,13 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * The default implementation of the {@link PropertyValues} interface.
- * Allows simple manipulation of properties, and provides constructors
- * to support deep copy and construction from a Map.
+ * {@link PropertyValues} 接口的默认实现。
+ * 允许对属性进行简单操作，并提供构造函数以支持深拷贝和从 Map 构造。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
- * @since 13 May 2001
+ * @since 2001年5月13日
  */
 @SuppressWarnings("serial")
 public class MutablePropertyValues implements PropertyValues, Serializable {

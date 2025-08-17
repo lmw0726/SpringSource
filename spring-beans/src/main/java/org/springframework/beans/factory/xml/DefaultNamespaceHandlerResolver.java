@@ -32,13 +32,11 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Default implementation of the {@link NamespaceHandlerResolver} interface.
- * Resolves namespace URIs to implementation classes based on the mappings
- * contained in mapping file.
+ * {@link NamespaceHandlerResolver} 接口的默认实现。
+ * 根据映射文件中的映射关系，将命名空间 URI 解析为实现类。
  *
- * <p>By default, this implementation looks for the mapping file at
- * {@code META-INF/spring.handlers}, but this can be changed using the
- * {@link #DefaultNamespaceHandlerResolver(ClassLoader, String)} constructor.
+ * <p>默认情况下，此实现会在 {@code META-INF/spring.handlers} 查找映射文件，
+ * 但可以使用 {@link #DefaultNamespaceHandlerResolver(ClassLoader, String)} 构造函数更改。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -49,13 +47,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver {
 
 	/**
-	 * The location to look for the mapping files. Can be present in multiple JAR files.
+	 * 用于查找映射文件的位置。可以存在于多个 JAR 文件中。
 	 */
 	public static final String DEFAULT_HANDLER_MAPPINGS_LOCATION = "META-INF/spring.handlers";
 
 
 	/**
-	 * Logger available to subclasses.
+	 * 可供子类使用的日志记录器。
 	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -82,10 +80,8 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 
 
 	/**
-	 * Create a new {@code DefaultNamespaceHandlerResolver} using the
-	 * default mapping file location.
-	 * <p>This constructor will result in the thread context ClassLoader being used
-	 * to load resources.
+	 * 使用默认映射文件位置创建一个新的 {@code DefaultNamespaceHandlerResolver}。
+	 * <p>此构造函数将使用线程上下文 ClassLoader 来加载资源。
 	 *
 	 * @see #DEFAULT_HANDLER_MAPPINGS_LOCATION
 	 */

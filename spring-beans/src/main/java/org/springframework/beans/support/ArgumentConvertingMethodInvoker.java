@@ -16,9 +16,6 @@
 
 package org.springframework.beans.support;
 
-import java.beans.PropertyEditor;
-import java.lang.reflect.Method;
-
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.beans.TypeConverter;
@@ -28,12 +25,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.MethodInvoker;
 import org.springframework.util.ReflectionUtils;
 
+import java.beans.PropertyEditor;
+import java.lang.reflect.Method;
+
 /**
- * Subclass of {@link MethodInvoker} that tries to convert the given
- * arguments for the actual target method via a {@link TypeConverter}.
+ * {@link MethodInvoker} 的子类，尝试通过 {@link TypeConverter} 将给定参数转换为实际目标方法所需类型。
  *
- * <p>Supports flexible argument conversions, in particular for
- * invoking a specific overloaded method.
+ * <p>支持灵活的参数转换，特别是在调用特定重载方法时。
  *
  * @author Juergen Hoeller
  * @since 1.1
@@ -48,10 +46,9 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 
 
 	/**
-	 * Set a TypeConverter to use for argument type conversion.
-	 * <p>Default is a {@link org.springframework.beans.SimpleTypeConverter}.
-	 * Can be overridden with any TypeConverter implementation, typically
-	 * a pre-configured SimpleTypeConverter or a BeanWrapperImpl instance.
+	 * 设置用于参数类型转换的 TypeConverter。
+	 * <p>默认是 {@link org.springframework.beans.SimpleTypeConverter}。
+	 * 可以使用任何 TypeConverter 实现覆盖，通常是预配置的 SimpleTypeConverter 或 BeanWrapperImpl 实例。
 	 * @see org.springframework.beans.SimpleTypeConverter
 	 * @see org.springframework.beans.BeanWrapperImpl
 	 */
@@ -61,11 +58,9 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 	}
 
 	/**
-	 * Return the TypeConverter used for argument type conversion.
-	 * <p>Can be cast to {@link org.springframework.beans.PropertyEditorRegistry}
-	 * if direct access to the underlying PropertyEditors is desired
-	 * (provided that the present TypeConverter actually implements the
-	 * PropertyEditorRegistry interface).
+	 * 返回用于参数类型转换的 TypeConverter。
+	 * <p>如果希望直接访问底层 PropertyEditors，可将其强制转换为 {@link org.springframework.beans.PropertyEditorRegistry}，
+	 * 前提是当前 TypeConverter 实现了 PropertyEditorRegistry 接口。
 	 */
 	@Nullable
 	public TypeConverter getTypeConverter() {
@@ -76,23 +71,21 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 	}
 
 	/**
-	 * Obtain the default TypeConverter for this method invoker.
-	 * <p>Called if no explicit TypeConverter has been specified.
-	 * The default implementation builds a
-	 * {@link org.springframework.beans.SimpleTypeConverter}.
-	 * Can be overridden in subclasses.
+	 * 获取该方法调用器的默认 TypeConverter。
+	 * <p>如果未指定显式 TypeConverter，将调用此方法。
+	 * 默认实现创建 {@link org.springframework.beans.SimpleTypeConverter}。
+	 * 可在子类中覆盖。
 	 */
 	protected TypeConverter getDefaultTypeConverter() {
 		return new SimpleTypeConverter();
 	}
 
 	/**
-	 * Register the given custom property editor for all properties of the given type.
-	 * <p>Typically used in conjunction with the default
-	 * {@link org.springframework.beans.SimpleTypeConverter}; will work with any
-	 * TypeConverter that implements the PropertyEditorRegistry interface as well.
-	 * @param requiredType type of the property
-	 * @param propertyEditor editor to register
+	 * 为给定类型的所有属性注册自定义属性编辑器。
+	 * <p>通常与默认 {@link org.springframework.beans.SimpleTypeConverter} 一起使用；
+	 * 也可用于实现了 PropertyEditorRegistry 接口的任何 TypeConverter。
+	 * @param requiredType 属性类型
+	 * @param propertyEditor 要注册的编辑器
 	 * @see #setTypeConverter
 	 * @see org.springframework.beans.PropertyEditorRegistry#registerCustomEditor
 	 */
@@ -107,29 +100,28 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 
 
 	/**
-	 * This implementation looks for a method with matching parameter types.
+	 * 该实现查找具有匹配参数类型的方法。
 	 * @see #doFindMatchingMethod
 	 */
 	@Override
 	protected Method findMatchingMethod() {
 		Method matchingMethod = super.findMatchingMethod();
-		// Second pass: look for method where arguments can be converted to parameter types.
+		// 第二轮尝试：查找参数可被转换为方法参数类型的方法
 		if (matchingMethod == null) {
-			// Interpret argument array as individual method arguments.
+			// 将参数数组解释为单独的方法参数
 			matchingMethod = doFindMatchingMethod(getArguments());
 		}
 		if (matchingMethod == null) {
-			// Interpret argument array as single method argument of array type.
+			// 将参数数组解释为单个数组类型参数
 			matchingMethod = doFindMatchingMethod(new Object[] {getArguments()});
 		}
 		return matchingMethod;
 	}
 
 	/**
-	 * Actually find a method with matching parameter type, i.e. where each
-	 * argument value is assignable to the corresponding parameter type.
-	 * @param arguments the argument values to match against method parameters
-	 * @return a matching method, or {@code null} if none
+	 * 实际查找具有匹配参数类型的方法，即每个参数值都可赋值给对应的方法参数类型。
+	 * @param arguments 要匹配的方法参数值
+	 * @return 匹配的方法，若没有匹配则返回 {@code null}
 	 */
 	@Nullable
 	protected Method doFindMatchingMethod(Object[] arguments) {
@@ -145,19 +137,19 @@ public class ArgumentConvertingMethodInvoker extends MethodInvoker {
 			Object[] argumentsToUse = null;
 			for (Method candidate : candidates) {
 				if (candidate.getName().equals(targetMethod)) {
-					// Check if the inspected method has the correct number of parameters.
+					// 检查方法参数数量是否正确
 					int parameterCount = candidate.getParameterCount();
 					if (parameterCount == argCount) {
 						Class<?>[] paramTypes = candidate.getParameterTypes();
 						Object[] convertedArguments = new Object[argCount];
 						boolean match = true;
 						for (int j = 0; j < argCount && match; j++) {
-							// Verify that the supplied argument is assignable to the method parameter.
+							// 验证提供的参数是否可赋值给方法参数类型
 							try {
 								convertedArguments[j] = converter.convertIfNecessary(arguments[j], paramTypes[j]);
 							}
 							catch (TypeMismatchException ex) {
-								// Ignore -> simply doesn't match.
+								// 不匹配则忽略
 								match = false;
 							}
 						}

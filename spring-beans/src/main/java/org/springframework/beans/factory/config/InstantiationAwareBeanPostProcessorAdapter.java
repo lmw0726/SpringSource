@@ -17,21 +17,19 @@
 package org.springframework.beans.factory.config;
 
 /**
- * Adapter that implements all methods on {@link SmartInstantiationAwareBeanPostProcessor}
- * as no-ops, which will not change normal processing of each bean instantiated
- * by the container. Subclasses may override merely those methods that they are
- * actually interested in.
+ * 一个适配器类，实现了 {@link SmartInstantiationAwareBeanPostProcessor} 的所有方法，
+ * 并将其作为空操作（no-op），因此不会改变容器中每个 bean 的正常实例化处理。
+ * 子类只需重写自己真正关心的方法即可。
  *
- * <p>Note that this base class is only recommendable if you actually require
- * {@link InstantiationAwareBeanPostProcessor} functionality. If all you need
- * is plain {@link BeanPostProcessor} functionality, prefer a straight
- * implementation of that (simpler) interface.
+ * <p>注意：只有在确实需要 {@link InstantiationAwareBeanPostProcessor} 功能时，
+ * 才推荐使用此基类。如果只需要最基本的 {@link BeanPostProcessor} 功能，
+ * 建议直接实现该（更简单的）接口。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 2.0
- * @deprecated as of 5.3 in favor of implementing {@link InstantiationAwareBeanPostProcessor}
- * or {@link SmartInstantiationAwareBeanPostProcessor} directly.
+ * @deprecated 自 5.3 起已废弃，推荐直接实现 {@link InstantiationAwareBeanPostProcessor}
+ * 或 {@link SmartInstantiationAwareBeanPostProcessor}。
  */
 @Deprecated
 public abstract class InstantiationAwareBeanPostProcessorAdapter implements SmartInstantiationAwareBeanPostProcessor {

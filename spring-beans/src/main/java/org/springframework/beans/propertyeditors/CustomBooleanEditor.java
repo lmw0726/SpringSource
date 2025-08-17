@@ -16,21 +16,19 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditorSupport;
+
 /**
- * Property editor for Boolean/boolean properties.
+ * Boolean/boolean 属性的属性编辑器。
  *
- * <p>This is not meant to be used as system PropertyEditor but rather as
- * locale-specific Boolean editor within custom controller code, to parse
- * UI-caused boolean strings into boolean properties of beans and check
- * them in the UI form.
+ * <p>此编辑器并非用于系统级 PropertyEditor，而是用于自定义控制器代码中的
+ * 本地化 Boolean 编辑器，将 UI 提交的布尔字符串解析为 Bean 的布尔属性，
+ * 并在 UI 表单中进行检查。
  *
- * <p>In web MVC code, this editor will typically be registered with
- * {@code binder.registerCustomEditor} calls.
+ * <p>在 Web MVC 中，此编辑器通常通过 {@code binder.registerCustomEditor} 注册使用。
  *
  * @author Juergen Hoeller
  * @since 10.06.2003
@@ -39,42 +37,42 @@ import org.springframework.util.StringUtils;
 public class CustomBooleanEditor extends PropertyEditorSupport {
 
 	/**
-	 * Value of {@code "true"}.
+	 * {@code "true"} 的值。
 	 */
 	public static final String VALUE_TRUE = "true";
 
 	/**
-	 * Value of {@code "false"}.
+	 * {@code "false"} 的值。
 	 */
 	public static final String VALUE_FALSE = "false";
 
 	/**
-	 * Value of {@code "on"}.
+	 * {@code "on"} 的值。
 	 */
 	public static final String VALUE_ON = "on";
 
 	/**
-	 * Value of {@code "off"}.
+	 * {@code "off"} 的值。
 	 */
 	public static final String VALUE_OFF = "off";
 
 	/**
-	 * Value of {@code "yes"}.
+	 * {@code "yes"} 的值。
 	 */
 	public static final String VALUE_YES = "yes";
 
 	/**
-	 * Value of {@code "no"}.
+	 * {@code "no"} 的值。
 	 */
 	public static final String VALUE_NO = "no";
 
 	/**
-	 * Value of {@code "1"}.
+	 * {@code "1"} 的值。
 	 */
 	public static final String VALUE_1 = "1";
 
 	/**
-	 * Value of {@code "0"}.
+	 * {@code "0"} 的值。
 	 */
 	public static final String VALUE_0 = "0";
 
@@ -89,30 +87,24 @@ public class CustomBooleanEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Create a new CustomBooleanEditor instance, with "true"/"on"/"yes"
-	 * and "false"/"off"/"no" as recognized String values.
-	 * <p>The "allowEmpty" parameter states if an empty String should
-	 * be allowed for parsing, i.e. get interpreted as null value.
-	 * Else, an IllegalArgumentException gets thrown in that case.
-	 * @param allowEmpty if empty strings should be allowed
+	 * 创建一个新的 CustomBooleanEditor 实例，使用 "true"/"on"/"yes" 和 "false"/"off"/"no" 作为识别的字符串值。
+	 * <p>"allowEmpty" 参数指示是否允许解析空字符串，即将其解释为 null 值。
+	 * 否则，在这种情况下会抛出 IllegalArgumentException。
+	 * @param allowEmpty 是否允许空字符串
 	 */
 	public CustomBooleanEditor(boolean allowEmpty) {
 		this(null, null, allowEmpty);
 	}
 
 	/**
-	 * Create a new CustomBooleanEditor instance,
-	 * with configurable String values for true and false.
-	 * <p>The "allowEmpty" parameter states if an empty String should
-	 * be allowed for parsing, i.e. get interpreted as null value.
-	 * Else, an IllegalArgumentException gets thrown in that case.
-	 * @param trueString the String value that represents true:
-	 * for example, "true" (VALUE_TRUE), "on" (VALUE_ON),
-	 * "yes" (VALUE_YES) or some custom value
-	 * @param falseString the String value that represents false:
-	 * for example, "false" (VALUE_FALSE), "off" (VALUE_OFF),
-	 * "no" (VALUE_NO) or some custom value
-	 * @param allowEmpty if empty strings should be allowed
+	 * 创建一个新的 CustomBooleanEditor 实例，允许自定义 true 和 false 的字符串值。
+	 * <p>"allowEmpty" 参数指示是否允许解析空字符串，即将其解释为 null 值。
+	 * 否则，在这种情况下会抛出 IllegalArgumentException。
+	 * @param trueString 表示 true 的字符串值：
+	 * 例如 "true" (VALUE_TRUE)、"on" (VALUE_ON)、"yes" (VALUE_YES) 或自定义值
+	 * @param falseString 表示 false 的字符串值：
+	 * 例如 "false" (VALUE_FALSE)、"off" (VALUE_OFF)、"no" (VALUE_NO) 或自定义值
+	 * @param allowEmpty 是否允许空字符串
 	 * @see #VALUE_TRUE
 	 * @see #VALUE_FALSE
 	 * @see #VALUE_ON
@@ -131,7 +123,7 @@ public class CustomBooleanEditor extends PropertyEditorSupport {
 	public void setAsText(@Nullable String text) throws IllegalArgumentException {
 		String input = (text != null ? text.trim() : null);
 		if (this.allowEmpty && !StringUtils.hasLength(input)) {
-			// Treat empty String as null value.
+			// 将空字符串视为null值。
 			setValue(null);
 		}
 		else if (this.trueString != null && this.trueString.equalsIgnoreCase(input)) {

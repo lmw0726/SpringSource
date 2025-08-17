@@ -21,9 +21,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Exception thrown when a bean depends on other beans or simple properties
- * that were not specified in the bean factory definition, although
- * dependency checking was enabled.
+ * 当bean依赖于其他bean或简单属性，但这些依赖项未在bean工厂定义中指定时抛出的异常，
+ * 尽管依赖检查已启用。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -37,11 +36,11 @@ public class UnsatisfiedDependencyException extends BeanCreationException {
 
 
 	/**
-	 * Create a new UnsatisfiedDependencyException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param beanName the name of the bean requested
-	 * @param propertyName the name of the bean property that couldn't be satisfied
-	 * @param msg the detail message
+	 * 创建一个新的UnsatisfiedDependencyException。
+	 * @param resourceDescription bean定义来源资源的描述
+	 * @param beanName 请求的bean名称
+	 * @param propertyName 无法满足的bean属性名称
+	 * @param msg 详细消息
 	 */
 	public UnsatisfiedDependencyException(
 			@Nullable String resourceDescription, @Nullable String beanName, String propertyName, String msg) {
@@ -53,11 +52,11 @@ public class UnsatisfiedDependencyException extends BeanCreationException {
 	}
 
 	/**
-	 * Create a new UnsatisfiedDependencyException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param beanName the name of the bean requested
-	 * @param propertyName the name of the bean property that couldn't be satisfied
-	 * @param ex the bean creation exception that indicated the unsatisfied dependency
+	 * 创建一个新的UnsatisfiedDependencyException。
+	 * @param resourceDescription bean定义来源资源的描述
+	 * @param beanName 请求的bean名称
+	 * @param propertyName 无法满足的bean属性名称
+	 * @param ex 表示不满足依赖关系的bean创建异常
 	 */
 	public UnsatisfiedDependencyException(
 			@Nullable String resourceDescription, @Nullable String beanName, String propertyName, BeansException ex) {
@@ -67,11 +66,11 @@ public class UnsatisfiedDependencyException extends BeanCreationException {
 	}
 
 	/**
-	 * Create a new UnsatisfiedDependencyException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param beanName the name of the bean requested
-	 * @param injectionPoint the injection point (field or method/constructor parameter)
-	 * @param msg the detail message
+	 * 创建一个新的UnsatisfiedDependencyException。
+	 * @param resourceDescription bean定义来源资源的描述
+	 * @param beanName 请求的bean名称
+	 * @param injectionPoint 注入点（字段或方法/构造函数参数）
+	 * @param msg 详细消息
 	 * @since 4.3
 	 */
 	public UnsatisfiedDependencyException(
@@ -84,11 +83,11 @@ public class UnsatisfiedDependencyException extends BeanCreationException {
 	}
 
 	/**
-	 * Create a new UnsatisfiedDependencyException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param beanName the name of the bean requested
-	 * @param injectionPoint the injection point (field or method/constructor parameter)
-	 * @param ex the bean creation exception that indicated the unsatisfied dependency
+	 * 创建一个新的UnsatisfiedDependencyException。
+	 * @param resourceDescription bean定义来源资源的描述
+	 * @param beanName 请求的bean名称
+	 * @param injectionPoint 注入点（字段或方法/构造函数参数）
+	 * @param ex 表示不满足依赖关系的bean创建异常
 	 * @since 4.3
 	 */
 	public UnsatisfiedDependencyException(
@@ -100,7 +99,7 @@ public class UnsatisfiedDependencyException extends BeanCreationException {
 
 
 	/**
-	 * Return the injection point (field or method/constructor parameter), if known.
+	 * 返回注入点（字段或方法/构造函数参数），如果已知的话。
 	 * @since 4.3
 	 */
 	@Nullable

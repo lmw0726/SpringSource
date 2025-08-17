@@ -23,11 +23,9 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * Set of method overrides, determining which, if any, methods on a
- * managed object the Spring IoC container will override at runtime.
+ * 方法重写集合，用于确定 Spring IoC 容器在运行时将对受管对象上的哪些方法（如果有的话）进行重写。
  *
- * <p>The currently supported {@link MethodOverride} variants are
- * {@link LookupOverride} and {@link ReplaceOverride}.
+ * <p>当前支持的 {@link MethodOverride} 变体包括 {@link LookupOverride} 和 {@link ReplaceOverride}。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

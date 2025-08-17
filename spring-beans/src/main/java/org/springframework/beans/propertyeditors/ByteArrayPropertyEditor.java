@@ -16,13 +16,12 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.lang.Nullable;
 
+import java.beans.PropertyEditorSupport;
+
 /**
- * Editor for byte arrays. Strings will simply be converted to
- * their corresponding byte representations.
+ * 字节数组编辑器。字符串会被简单地转换为对应的字节表示。
  *
  * @author Juergen Hoeller
  * @since 1.0.1

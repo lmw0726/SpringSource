@@ -16,23 +16,22 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-import java.io.IOException;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceEditor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.beans.PropertyEditorSupport;
+import java.io.IOException;
+
 /**
- * One-way PropertyEditor which can convert from a text String to a
- * {@code java.io.InputStream}, interpreting the given String as a
- * Spring resource location (e.g. a URL String).
+ * 单向 PropertyEditor，可将文本字符串转换为 {@code java.io.InputStream}，
+ * 并将给定字符串解释为 Spring 资源位置（例如 URL 字符串）。
  *
- * <p>Supports Spring-style URL notation: any fully qualified standard URL
- * ("file:", "http:", etc.) and Spring's special "classpath:" pseudo-URL.
+ * <p>支持 Spring 风格的 URL 表示法：任何完全限定的标准 URL
+ * （"file:"、"http:" 等）以及 Spring 的特殊 "classpath:" 伪 URL。
  *
- * <p>Note that such streams usually do not get closed by Spring itself!
+ * <p>注意，此类流通常不会由 Spring 自动关闭！
  *
  * @author Juergen Hoeller
  * @since 1.0.1
@@ -48,15 +47,15 @@ public class InputStreamEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Create a new InputStreamEditor, using the default ResourceEditor underneath.
+	 * 使用默认 ResourceEditor 创建一个新的 InputStreamEditor。
 	 */
 	public InputStreamEditor() {
 		this.resourceEditor = new ResourceEditor();
 	}
 
 	/**
-	 * Create a new InputStreamEditor, using the given ResourceEditor underneath.
-	 * @param resourceEditor the ResourceEditor to use
+	 * 使用指定的 ResourceEditor 创建一个新的 InputStreamEditor。
+	 * @param resourceEditor 要使用的 ResourceEditor
 	 */
 	public InputStreamEditor(ResourceEditor resourceEditor) {
 		Assert.notNull(resourceEditor, "ResourceEditor must not be null");
@@ -77,8 +76,7 @@ public class InputStreamEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * This implementation returns {@code null} to indicate that
-	 * there is no appropriate text representation.
+	 * 返回 {@code null}，表示没有适当的文本表示。
 	 */
 	@Override
 	@Nullable

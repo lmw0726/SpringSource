@@ -16,9 +16,6 @@
 
 package org.springframework.beans.factory.annotation;
 
-import java.lang.annotation.Annotation;
-import java.util.Set;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -28,10 +25,12 @@ import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
+import java.lang.annotation.Annotation;
+import java.util.Set;
+
 /**
- * A {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor}
- * implementation that allows for convenient registration of custom autowire
- * qualifier types.
+ * 一个 {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor} 实现，
+ * 用于方便地注册自定义自动装配限定符（qualifier）类型。
  *
  * <pre class="code">
  * &lt;bean id="customAutowireConfigurer" class="org.springframework.beans.factory.annotation.CustomAutowireConfigurer"&gt;
@@ -49,7 +48,7 @@ import org.springframework.util.ClassUtils;
  */
 public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 
-	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
+	private int order = Ordered.LOWEST_PRECEDENCE;  // 默认：与非 Ordered 相同
 
 	@Nullable
 	private Set<?> customQualifierTypes;
@@ -73,14 +72,11 @@ public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanC
 	}
 
 	/**
-	 * Register custom qualifier annotation types to be considered
-	 * when autowiring beans. Each element of the provided set may
-	 * be either a Class instance or a String representation of the
-	 * fully-qualified class name of the custom annotation.
-	 * <p>Note that any annotation that is itself annotated with Spring's
-	 * {@link org.springframework.beans.factory.annotation.Qualifier}
-	 * does not require explicit registration.
-	 * @param customQualifierTypes the custom types to register
+	 * 注册自定义限定符注解类型，以便在自动装配 Bean 时使用。
+	 * 提供的集合中的每个元素可以是 Class 实例，也可以是自定义注解全限定类名的 String 表示。
+	 * <p>注意，任何本身被 Spring 的 {@link org.springframework.beans.factory.annotation.Qualifier} 注解的注解
+	 * 不需要显式注册。
+	 * @param customQualifierTypes 需要注册的自定义类型
 	 */
 	public void setCustomQualifierTypes(Set<?> customQualifierTypes) {
 		this.customQualifierTypes = customQualifierTypes;

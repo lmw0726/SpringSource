@@ -30,20 +30,15 @@ import java.net.URL;
 import java.net.URLDecoder;
 
 /**
- * {@code EntityResolver} implementation that tries to resolve entity references
- * through a {@link org.springframework.core.io.ResourceLoader} (usually,
- * relative to the resource base of an {@code ApplicationContext}), if applicable.
- * Extends {@link DelegatingEntityResolver} to also provide DTD and XSD lookup.
+ * {@code EntityResolver} 实现，尝试通过 {@link org.springframework.core.io.ResourceLoader}（通常相对于
+ * {@code ApplicationContext} 的资源基础路径）解析实体引用（如果适用）。
+ * 扩展 {@link DelegatingEntityResolver} 以提供 DTD 和 XSD 查找。
  *
- * <p>Allows to use standard XML entities to include XML snippets into an
- * application context definition, for example to split a large XML file
- * into various modules. The include paths can be relative to the
- * application context's resource base as usual, instead of relative
- * to the JVM working directory (the XML parser's default).
+ * <p>允许使用标准 XML 实体将 XML 片段包含到应用上下文定义中，例如将大型 XML 文件拆分为多个模块。
+ * 包含路径可以像往常一样相对于应用上下文的资源基础路径，而不是相对于 JVM 工作目录（XML 解析器的默认值）。
  *
- * <p>Note: In addition to relative paths, every URL that specifies a
- * file in the current system root, i.e. the JVM working directory,
- * will be interpreted relative to the application context too.
+ * <p>注意：除了相对路径之外，任何指定当前系统根目录中文件的 URL（即 JVM 工作目录），
+ * 也将相对于应用上下文进行解释。
  *
  * @author Juergen Hoeller
  * @see org.springframework.core.io.ResourceLoader
@@ -60,11 +55,9 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 
 
 	/**
-	 * Create a ResourceEntityResolver for the specified ResourceLoader
-	 * (usually, an ApplicationContext).
+	 * 为指定的 ResourceLoader（通常是 ApplicationContext）创建一个 ResourceEntityResolver。
 	 *
-	 * @param resourceLoader the ResourceLoader (or ApplicationContext)
-	 *                       to load XML entity includes with
+	 * @param resourceLoader 用于加载 XML 实体包含的 ResourceLoader（或 ApplicationContext）
 	 */
 	public ResourceEntityResolver(ResourceLoader resourceLoader) {
 		super(resourceLoader.getClassLoader());

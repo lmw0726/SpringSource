@@ -16,25 +16,23 @@
 
 package org.springframework.beans.factory.config;
 
-import java.io.Serializable;
-
-import javax.inject.Provider;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import javax.inject.Provider;
+import java.io.Serializable;
+
 /**
- * A {@link org.springframework.beans.factory.FactoryBean} implementation that
- * returns a value which is a JSR-330 {@link javax.inject.Provider} that in turn
- * returns a bean sourced from a {@link org.springframework.beans.factory.BeanFactory}.
+ * 一个 {@link org.springframework.beans.factory.FactoryBean} 实现，
+ * 返回一个值，该值是 JSR-330 {@link javax.inject.Provider}，
+ * 而后者又返回来源于 {@link org.springframework.beans.factory.BeanFactory} 的bean。
  *
- * <p>This is basically a JSR-330 compliant variant of Spring's good old
- * {@link ObjectFactoryCreatingFactoryBean}. It can be used for traditional
- * external dependency injection configuration that targets a property or
- * constructor argument of type {@code javax.inject.Provider}, as an
- * alternative to JSR-330's {@code @Inject} annotation-driven approach.
+ * <p>这基本上是 Spring 传统的 {@link ObjectFactoryCreatingFactoryBean} 的
+ * JSR-330 兼容变体。它可以用于传统的外部依赖注入配置，目标是类型为
+ * {@code javax.inject.Provider} 的属性或构造函数参数，
+ * 作为 JSR-330 {@code @Inject} 注解驱动方法的替代方案。
  *
  * @author Juergen Hoeller
  * @since 3.0.2
@@ -48,11 +46,10 @@ public class ProviderCreatingFactoryBean extends AbstractFactoryBean<Provider<Ob
 
 
 	/**
-	 * Set the name of the target bean.
-	 * <p>The target does not <i>have</i> to be a non-singleton bean, but realistically
-	 * always will be (because if the target bean were a singleton, then said singleton
-	 * bean could simply be injected straight into the dependent object, thus obviating
-	 * the need for the extra level of indirection afforded by this factory approach).
+	 * 设置目标bean的名称。
+	 * <p>目标<i>不必</i>是非单例bean，但实际上通常都是
+	 * （因为如果目标bean是单例，那么该单例bean可以直接注入到依赖对象中，
+	 * 从而避免了这种工厂方法提供的额外间接层的需要）。
 	 */
 	public void setTargetBeanName(String targetBeanName) {
 		this.targetBeanName = targetBeanName;
@@ -80,7 +77,7 @@ public class ProviderCreatingFactoryBean extends AbstractFactoryBean<Provider<Ob
 
 
 	/**
-	 * Independent inner class - for serialization purposes.
+	 * 独立的内部类 - 用于序列化目的。
 	 */
 	@SuppressWarnings("serial")
 	private static class TargetBeanProvider implements Provider<Object>, Serializable {

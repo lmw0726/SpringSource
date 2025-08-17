@@ -26,8 +26,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * Holder containing one or more {@link PropertyValue} objects,
- * typically comprising one update for a specific target bean.
+ * 包含一个或多个 {@link PropertyValue} 对象的容器，
+ * 通常包含对特定目标Bean的一次更新。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

@@ -16,9 +16,6 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
@@ -27,17 +24,20 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
- * Simple {@link BeanFactoryPostProcessor} implementation that registers
- * custom {@link Scope Scope(s)} with the containing {@link ConfigurableBeanFactory}.
+ * 简单的 {@link BeanFactoryPostProcessor} 实现，用于在包含的 {@link ConfigurableBeanFactory} 中注册
+ * 自定义的 {@link Scope Scope(s)}。
  *
- * <p>Will register all of the supplied {@link #setScopes(java.util.Map) scopes}
- * with the {@link ConfigurableListableBeanFactory} that is passed to the
- * {@link #postProcessBeanFactory(ConfigurableListableBeanFactory)} method.
+ * <p>将会将所有通过 {@link #setScopes(java.util.Map) setScopes} 提供的作用域
+ * 注册到传递给 {@link #postProcessBeanFactory(ConfigurableListableBeanFactory)} 方法的
+ * {@link ConfigurableListableBeanFactory} 中。
  *
- * <p>This class allows for <i>declarative</i> registration of custom scopes.
- * Alternatively, consider implementing a custom {@link BeanFactoryPostProcessor}
- * that calls {@link ConfigurableBeanFactory#registerScope} programmatically.
+ * <p>此类允许对自定义作用域进行 <i>声明式</i> 注册。
+ * 或者，可以考虑实现一个自定义的 {@link BeanFactoryPostProcessor}，
+ * 并通过编程方式调用 {@link ConfigurableBeanFactory#registerScope}。
  *
  * @author Juergen Hoeller
  * @author Rick Evans
@@ -56,19 +56,18 @@ public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClas
 
 
 	/**
-	 * Specify the custom scopes that are to be registered.
-	 * <p>The keys indicate the scope names (of type String); each value
-	 * is expected to be the corresponding custom {@link Scope} instance
-	 * or class name.
+	 * 指定要注册的自定义作用域。
+	 * <p>Map 的 key 表示作用域名称（类型为 String）；每个 value
+	 * 期望为对应的自定义 {@link Scope} 实例或类名。
 	 */
 	public void setScopes(Map<String, Object> scopes) {
 		this.scopes = scopes;
 	}
 
 	/**
-	 * Add the given scope to this configurer's map of scopes.
-	 * @param scopeName the name of the scope
-	 * @param scope the scope implementation
+	 * 将给定的作用域添加到此配置器的作用域映射中。
+	 * @param scopeName 作用域名称
+	 * @param scope 作用域实现
 	 * @since 4.1.1
 	 */
 	public void addScope(String scopeName, Scope scope) {

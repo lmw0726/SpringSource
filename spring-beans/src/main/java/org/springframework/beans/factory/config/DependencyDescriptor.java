@@ -16,19 +16,8 @@
 
 package org.springframework.beans.factory.config;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Optional;
-
 import kotlin.reflect.KProperty;
 import kotlin.reflect.jvm.ReflectJvmMapping;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.InjectionPoint;
@@ -41,10 +30,20 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Optional;
+
 /**
- * Descriptor for a specific dependency that is about to be injected.
- * Wraps a constructor parameter, a method parameter or a field,
- * allowing unified access to their metadata.
+ * 即将被注入的特定依赖项的描述符。
+ * 包装构造函数参数、方法参数或字段，
+ * 允许统一访问它们的元数据。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -82,21 +81,20 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 
 
 	/**
-	 * Create a new descriptor for a method or constructor parameter.
-	 * Considers the dependency as 'eager'.
-	 * @param methodParameter the MethodParameter to wrap
-	 * @param required whether the dependency is required
+	 * 为方法或构造函数参数创建一个新的描述符。
+	 * 将依赖项视为“急切”依赖。
+	 * @param methodParameter 要包装的 MethodParameter
+	 * @param required 该依赖项是否为必需
 	 */
 	public DependencyDescriptor(MethodParameter methodParameter, boolean required) {
 		this(methodParameter, required, true);
 	}
 
 	/**
-	 * Create a new descriptor for a method or constructor parameter.
-	 * @param methodParameter the MethodParameter to wrap
-	 * @param required whether the dependency is required
-	 * @param eager whether this dependency is 'eager' in the sense of
-	 * eagerly resolving potential target beans for type matching
+	 * 为方法或构造函数参数创建一个新的描述符。
+	 * @param methodParameter 要包装的 MethodParameter
+	 * @param required 该依赖项是否为必需
+	 * @param eager 是否为“急切”依赖，即尽早解析可能的目标 Bean 以进行类型匹配
 	 */
 	public DependencyDescriptor(MethodParameter methodParameter, boolean required, boolean eager) {
 		super(methodParameter);
@@ -113,21 +111,20 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Create a new descriptor for a field.
-	 * Considers the dependency as 'eager'.
-	 * @param field the field to wrap
-	 * @param required whether the dependency is required
+	 * 为字段创建一个新的描述符。
+	 * 将依赖项视为“急切”依赖。
+	 * @param field 要包装的字段
+	 * @param required 该依赖项是否为必需
 	 */
 	public DependencyDescriptor(Field field, boolean required) {
 		this(field, required, true);
 	}
 
 	/**
-	 * Create a new descriptor for a field.
-	 * @param field the field to wrap
-	 * @param required whether the dependency is required
-	 * @param eager whether this dependency is 'eager' in the sense of
-	 * eagerly resolving potential target beans for type matching
+	 * 为字段创建一个新的描述符。
+	 * @param field 要包装的字段
+	 * @param required 该依赖项是否为必需
+	 * @param eager 是否为“急切”依赖，即尽早解析可能的目标 Bean 以进行类型匹配
 	 */
 	public DependencyDescriptor(Field field, boolean required, boolean eager) {
 		super(field);
@@ -139,8 +136,8 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Copy constructor.
-	 * @param original the original descriptor to create a copy from
+	 * 拷贝构造函数。
+	 * @param original 要复制的原始描述符
 	 */
 	public DependencyDescriptor(DependencyDescriptor original) {
 		super(original);
@@ -158,11 +155,10 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 
 
 	/**
-	 * Return whether this dependency is required.
-	 * <p>Optional semantics are derived from Java 8's {@link java.util.Optional},
-	 * any variant of a parameter-level {@code Nullable} annotation (such as from
-	 * JSR-305 or the FindBugs set of annotations), or a language-level nullable
-	 * type declaration in Kotlin.
+	 * 返回该依赖项是否为必需。
+	 * <p>可选语义来源于 Java 8 的 {@link java.util.Optional}，
+	 * 参数级别的 {@code Nullable} 注解（例如来自 JSR-305 或 FindBugs 注解集），
+	 * 或 Kotlin 的语言级可空类型声明。
 	 */
 	public boolean isRequired() {
 		if (!this.required) {
@@ -181,9 +177,9 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Check whether the underlying field is annotated with any variant of a
-	 * {@code Nullable} annotation, e.g. {@code javax.annotation.Nullable} or
-	 * {@code edu.umd.cs.findbugs.annotations.Nullable}.
+	 * 检查底层字段是否被任何变体的 {@code Nullable} 注解标注，
+	 * 例如 {@code javax.annotation.Nullable} 或
+	 * {@code edu.umd.cs.findbugs.annotations.Nullable}。
 	 */
 	private boolean hasNullableAnnotation() {
 		for (Annotation ann : getAnnotations()) {
@@ -195,24 +191,21 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Return whether this dependency is 'eager' in the sense of
-	 * eagerly resolving potential target beans for type matching.
+	 * 返回该依赖项是否为“急切”依赖，
+	 * 即尽早解析可能的目标 Bean 以进行类型匹配。
 	 */
 	public boolean isEager() {
 		return this.eager;
 	}
 
 	/**
-	 * Resolve the specified not-unique scenario: by default,
-	 * throwing a {@link NoUniqueBeanDefinitionException}.
-	 * <p>Subclasses may override this to select one of the instances or
-	 * to opt out with no result at all through returning {@code null}.
-	 * @param type the requested bean type
-	 * @param matchingBeans a map of bean names and corresponding bean
-	 * instances which have been pre-selected for the given type
-	 * (qualifiers etc already applied)
-	 * @return a bean instance to proceed with, or {@code null} for none
-	 * @throws BeansException in case of the not-unique scenario being fatal
+	 * 处理指定的非唯一场景：默认情况下抛出 {@link NoUniqueBeanDefinitionException}。
+	 * <p>子类可以重写此方法，从实例中选择一个，或者通过返回 {@code null} 完全放弃。
+	 * @param type 请求的 Bean 类型
+	 * @param matchingBeans 已预选的指定类型的 Bean 名称与实例映射
+	 * （包括限定符等已应用）
+	 * @return 选定的 Bean 实例，或 {@code null} 表示无
+	 * @throws BeansException 当非唯一场景导致错误时
 	 * @since 5.1
 	 */
 	@Nullable
@@ -221,18 +214,15 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Resolve the specified not-unique scenario: by default,
-	 * throwing a {@link NoUniqueBeanDefinitionException}.
-	 * <p>Subclasses may override this to select one of the instances or
-	 * to opt out with no result at all through returning {@code null}.
-	 * @param type the requested bean type
-	 * @param matchingBeans a map of bean names and corresponding bean
-	 * instances which have been pre-selected for the given type
-	 * (qualifiers etc already applied)
-	 * @return a bean instance to proceed with, or {@code null} for none
-	 * @throws BeansException in case of the not-unique scenario being fatal
+	 * 处理指定的非唯一场景：默认情况下抛出 {@link NoUniqueBeanDefinitionException}。
+	 * <p>子类可以重写此方法，从实例中选择一个，或者通过返回 {@code null} 完全放弃。
+	 * @param type 请求的 Bean 类型
+	 * @param matchingBeans 已预选的指定类型的 Bean 名称与实例映射
+	 * （包括限定符等已应用）
+	 * @return 选定的 Bean 实例，或 {@code null} 表示无
+	 * @throws BeansException 当非唯一场景导致错误时
 	 * @since 4.3
-	 * @deprecated as of 5.1, in favor of {@link #resolveNotUnique(ResolvableType, Map)}
+	 * @deprecated 自 5.1 起，推荐使用 {@link #resolveNotUnique(ResolvableType, Map)}
 	 */
 	@Deprecated
 	@Nullable
@@ -241,15 +231,12 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Resolve a shortcut for this dependency against the given factory, for example
-	 * taking some pre-resolved information into account.
-	 * <p>The resolution algorithm will first attempt to resolve a shortcut through this
-	 * method before going into the regular type matching algorithm across all beans.
-	 * Subclasses may override this method to improve resolution performance based on
-	 * pre-cached information while still receiving {@link InjectionPoint} exposure etc.
-	 * @param beanFactory the associated factory
-	 * @return the shortcut result if any, or {@code null} if none
-	 * @throws BeansException if the shortcut could not be obtained
+	 * 针对给定工厂解析该依赖项的快捷方式，例如考虑一些预解析的信息。
+	 * <p>解析算法会先尝试通过此方法解析快捷方式，然后再进入所有 Bean 的常规类型匹配算法。
+	 * 子类可以重写此方法，基于预缓存信息提升解析性能，同时仍能获取 {@link InjectionPoint} 暴露等功能。
+	 * @param beanFactory 关联的工厂
+	 * @return 快捷方式解析结果，如无则返回 {@code null}
+	 * @throws BeansException 如果无法获取快捷方式
 	 * @since 4.3.1
 	 */
 	@Nullable
@@ -258,15 +245,14 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Resolve the specified bean name, as a candidate result of the matching
-	 * algorithm for this dependency, to a bean instance from the given factory.
-	 * <p>The default implementation calls {@link BeanFactory#getBean(String)}.
-	 * Subclasses may provide additional arguments or other customizations.
-	 * @param beanName the bean name, as a candidate result for this dependency
-	 * @param requiredType the expected type of the bean (as an assertion)
-	 * @param beanFactory the associated factory
-	 * @return the bean instance (never {@code null})
-	 * @throws BeansException if the bean could not be obtained
+	 * 将指定的 Bean 名称解析为 Bean 实例，作为该依赖项匹配算法的候选结果。
+	 * <p>默认实现调用 {@link BeanFactory#getBean(String)}。
+	 * 子类可以提供额外参数或其他自定义实现。
+	 * @param beanName 作为候选结果的 Bean 名称
+	 * @param requiredType 期望的 Bean 类型（用于断言）
+	 * @param beanFactory 关联的工厂
+	 * @return Bean 实例（永不为 {@code null}）
+	 * @throws BeansException 如果无法获取 Bean
 	 * @since 4.3.2
 	 * @see BeanFactory#getBean(String)
 	 */
@@ -278,7 +264,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 
 
 	/**
-	 * Increase this descriptor's nesting level.
+	 * 增加该描述符的嵌套层级。
 	 */
 	public void increaseNestingLevel() {
 		this.nestingLevel++;
@@ -289,9 +275,9 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Optionally set the concrete class that contains this dependency.
-	 * This may differ from the class that declares the parameter/field in that
-	 * it may be a subclass thereof, potentially substituting type variables.
+	 * 可选地设置包含此依赖项的具体类。
+	 * 这可能与声明参数/字段的类不同，
+	 * 因为它可能是其子类，并可能替换类型变量。
 	 * @since 4.0
 	 */
 	public void setContainingClass(Class<?> containingClass) {
@@ -303,7 +289,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Build a {@link ResolvableType} object for the wrapped parameter/field.
+	 * 为封装的参数/字段构建一个 {@link ResolvableType} 对象。
 	 * @since 4.0
 	 */
 	public ResolvableType getResolvableType() {
@@ -318,7 +304,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Build a {@link TypeDescriptor} object for the wrapped parameter/field.
+	 * 为封装的参数/字段构建一个 {@link TypeDescriptor} 对象。
 	 * @since 5.1.4
 	 */
 	public TypeDescriptor getTypeDescriptor() {
@@ -333,10 +319,10 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Return whether a fallback match is allowed.
-	 * <p>This is {@code false} by default but may be overridden to return {@code true} in order
-	 * to suggest to an {@link org.springframework.beans.factory.support.AutowireCandidateResolver}
-	 * that a fallback match is acceptable as well.
+	 * 返回是否允许回退匹配。
+	 * <p>默认情况下为 {@code false}，但可以重写为 {@code true}，
+	 * 以向 {@link org.springframework.beans.factory.support.AutowireCandidateResolver}
+	 * 表示也可以接受回退匹配。
 	 * @since 4.0
 	 */
 	public boolean fallbackMatchAllowed() {
@@ -344,7 +330,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Return a variant of this descriptor that is intended for a fallback match.
+	 * 返回该描述符的一个变体，用于回退匹配。
 	 * @since 4.0
 	 * @see #fallbackMatchAllowed()
 	 */
@@ -358,10 +344,9 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Initialize parameter name discovery for the underlying method parameter, if any.
-	 * <p>This method does not actually try to retrieve the parameter name at
-	 * this point; it just allows discovery to happen when the application calls
-	 * {@link #getDependencyName()} (if ever).
+	 * 为底层方法参数（如果有）初始化参数名发现。
+	 * <p>此方法在此时不会实际尝试获取参数名；
+	 * 它只是允许在应用调用 {@link #getDependencyName()} 时进行发现（如果调用的话）。
 	 */
 	public void initParameterNameDiscovery(@Nullable ParameterNameDiscoverer parameterNameDiscoverer) {
 		if (this.methodParameter != null) {
@@ -370,8 +355,8 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Determine the name of the wrapped parameter/field.
-	 * @return the declared name (may be {@code null} if unresolvable)
+	 * 获取封装参数/字段的名称。
+	 * @return 声明的名称（如果无法解析可能为 {@code null}）
 	 */
 	@Nullable
 	public String getDependencyName() {
@@ -379,8 +364,8 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Determine the declared (non-generic) type of the wrapped parameter/field.
-	 * @return the declared type (never {@code null})
+	 * 获取封装参数/字段的声明类型（非泛型）。
+	 * @return 声明类型（永不为 {@code null}）
 	 */
 	public Class<?> getDependencyType() {
 		if (this.field != null) {
@@ -433,14 +418,14 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 
 
 	//---------------------------------------------------------------------
-	// Serialization support
+	// 序列化支持
 	//---------------------------------------------------------------------
 
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-		// Rely on default serialization; just initialize state after deserialization.
+		// 依赖默认序列化；在反序列化后初始化状态。
 		ois.defaultReadObject();
 
-		// Restore reflective handles (which are unfortunately not serializable)
+		// 恢复反射句柄（遗憾的是这些不可序列化）
 		try {
 			if (this.fieldName != null) {
 				this.field = this.declaringClass.getDeclaredField(this.fieldName);
@@ -466,12 +451,12 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 
 
 	/**
-	 * Inner class to avoid a hard dependency on Kotlin at runtime.
+	 * 内部类，用于避免在运行时对 Kotlin 的硬依赖。
 	 */
 	private static class KotlinDelegate {
 
 		/**
-		 * Check whether the specified {@link Field} represents a nullable Kotlin type or not.
+		 * 检查指定的 {@link Field} 是否表示可为空的 Kotlin 类型。
 		 */
 		public static boolean isNullable(Field field) {
 			KProperty<?> property = ReflectJvmMapping.getKotlinProperty(field);

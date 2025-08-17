@@ -25,10 +25,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Tag collection class used to hold managed List elements, which may
- * include runtime bean references (to be resolved into bean objects).
+ * 用于持有受管 List 元素的标签集合类，其中可能包含运行时 Bean 引用（将在运行时解析为 Bean 对象）。
  *
- * @param <E> the element type
+ * @param <E> 元素类型
  * @author Rod Johnson
  * @author Rob Harrop
  * @author Juergen Hoeller

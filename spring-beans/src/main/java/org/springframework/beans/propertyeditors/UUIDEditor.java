@@ -16,14 +16,13 @@
 
 package org.springframework.beans.propertyeditors;
 
+import org.springframework.util.StringUtils;
+
 import java.beans.PropertyEditorSupport;
 import java.util.UUID;
 
-import org.springframework.util.StringUtils;
-
 /**
- * Editor for {@code java.util.UUID}, translating UUID
- * String representations into UUID objects and back.
+ * {@code java.util.UUID} 的编辑器，将 UUID 字符串表示转换为 UUID 对象，反之亦然。
  *
  * @author Juergen Hoeller
  * @since 3.0.1

@@ -19,8 +19,8 @@ package org.springframework.beans;
 import org.springframework.lang.Nullable;
 
 /**
- * Exception thrown on an attempt to set the value of a property that
- * is not writable (typically because there is no setter method).
+ * 当尝试设置一个不可写属性的值时抛出的异常
+ * （通常是因为没有对应的 setter 方法）。
  *
  * @author Rod Johnson
  * @author Alef Arendsen
@@ -34,9 +34,9 @@ public class NotWritablePropertyException extends InvalidPropertyException {
 
 
 	/**
-	 * Create a new NotWritablePropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property name
+	 * 创建一个新的 NotWritablePropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
 	 */
 	public NotWritablePropertyException(Class<?> beanClass, String propertyName) {
 		super(beanClass, propertyName,
@@ -46,10 +46,10 @@ public class NotWritablePropertyException extends InvalidPropertyException {
 	}
 
 	/**
-	 * Create a new NotWritablePropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property name
-	 * @param msg the detail message
+	 * 创建一个新的 NotWritablePropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
+	 * @param msg 详细消息
 	 */
 	public NotWritablePropertyException(Class<?> beanClass, String propertyName, String msg) {
 		super(beanClass, propertyName, msg);
@@ -57,11 +57,11 @@ public class NotWritablePropertyException extends InvalidPropertyException {
 	}
 
 	/**
-	 * Create a new NotWritablePropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property name
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 * 创建一个新的 NotWritablePropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
+	 * @param msg 详细消息
+	 * @param cause 根本原因
 	 */
 	public NotWritablePropertyException(Class<?> beanClass, String propertyName, String msg, Throwable cause) {
 		super(beanClass, propertyName, msg, cause);
@@ -69,22 +69,19 @@ public class NotWritablePropertyException extends InvalidPropertyException {
 	}
 
 	/**
-	 * Create a new NotWritablePropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property name
-	 * @param msg the detail message
-	 * @param possibleMatches suggestions for actual bean property names
-	 * that closely match the invalid property name
+	 * 创建一个新的 NotWritablePropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
+	 * @param msg 详细消息
+	 * @param possibleMatches 与无效属性名相近的实际 bean 属性名建议
 	 */
 	public NotWritablePropertyException(Class<?> beanClass, String propertyName, String msg, String[] possibleMatches) {
 		super(beanClass, propertyName, msg);
 		this.possibleMatches = possibleMatches;
 	}
 
-
 	/**
-	 * Return suggestions for actual bean property names that closely match
-	 * the invalid property name, if any.
+	 * 返回与无效属性名相近的实际 bean 属性名建议（如果有）。
 	 */
 	@Nullable
 	public String[] getPossibleMatches() {

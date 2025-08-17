@@ -22,9 +22,9 @@ import org.springframework.core.type.MethodMetadata;
 import org.springframework.lang.Nullable;
 
 /**
- * Extended {@link org.springframework.beans.factory.config.BeanDefinition}
- * interface that exposes {@link org.springframework.core.type.AnnotationMetadata}
- * about its bean class - without requiring the class to be loaded yet.
+ * 扩展的 {@link org.springframework.beans.factory.config.BeanDefinition} 接口，
+ * 暴露其 Bean 类的 {@link org.springframework.core.type.AnnotationMetadata} 信息——
+ * 无需提前加载类。
  *
  * @author Juergen Hoeller
  * @see AnnotatedGenericBeanDefinition

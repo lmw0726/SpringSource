@@ -16,21 +16,20 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-import java.io.IOException;
-
-import org.xml.sax.InputSource;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceEditor;
 import org.springframework.util.Assert;
+import org.xml.sax.InputSource;
+
+import java.beans.PropertyEditorSupport;
+import java.io.IOException;
 
 /**
- * Editor for {@code org.xml.sax.InputSource}, converting from a
- * Spring resource location String to a SAX InputSource object.
+ * {@code org.xml.sax.InputSource} 的 PropertyEditor，
+ * 可将 Spring 资源位置字符串转换为 SAX InputSource 对象。
  *
- * <p>Supports Spring-style URL notation: any fully qualified standard URL
- * ("file:", "http:", etc) and Spring's special "classpath:" pseudo-URL.
+ * <p>支持 Spring 风格的 URL 表示法：任何完全限定的标准 URL
+ * （"file:"、"http:" 等）以及 Spring 的特殊 "classpath:" 伪 URL。
  *
  * @author Juergen Hoeller
  * @since 3.0.3
@@ -46,17 +45,15 @@ public class InputSourceEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Create a new InputSourceEditor,
-	 * using the default ResourceEditor underneath.
+	 * 使用默认 ResourceEditor 创建一个新的 InputSourceEditor。
 	 */
 	public InputSourceEditor() {
 		this.resourceEditor = new ResourceEditor();
 	}
 
 	/**
-	 * Create a new InputSourceEditor,
-	 * using the given ResourceEditor underneath.
-	 * @param resourceEditor the ResourceEditor to use
+	 * 使用指定的 ResourceEditor 创建一个新的 InputSourceEditor。
+	 * @param resourceEditor 要使用的 ResourceEditor
 	 */
 	public InputSourceEditor(ResourceEditor resourceEditor) {
 		Assert.notNull(resourceEditor, "ResourceEditor must not be null");

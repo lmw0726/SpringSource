@@ -16,38 +16,13 @@
 
 package org.springframework.beans.factory.annotation;
 
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.TypeConverter;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.InjectionPoint;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
@@ -68,55 +43,54 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor BeanPostProcessor}
- * implementation that autowires annotated fields, setter methods, and arbitrary
- * config methods. Such members to be injected are detected through annotations:
- * by default, Spring's {@link Autowired @Autowired} and {@link Value @Value}
- * annotations.
+ * 实现类，用于自动注入带注解的字段、setter 方法以及任意配置方法。
+ * 这些需要注入的成员通过注解检测：默认情况下使用 Spring 的 {@link Autowired @Autowired} 和 {@link Value @Value} 注解。
  *
- * <p>Also supports JSR-330's {@link javax.inject.Inject @Inject} annotation,
- * if available, as a direct alternative to Spring's own {@code @Autowired}.
+ * <p>如果可用，也支持 JSR-330 的 {@link javax.inject.Inject @Inject} 注解，
+ * 作为 Spring 自身 {@code @Autowired} 的直接替代方案。
  *
- * <h3>Autowired Constructors</h3>
- * <p>Only one constructor of any given bean class may declare this annotation with
- * the 'required' attribute set to {@code true}, indicating <i>the</i> constructor
- * to autowire when used as a Spring bean. Furthermore, if the 'required' attribute
- * is set to {@code true}, only a single constructor may be annotated with
- * {@code @Autowired}. If multiple <i>non-required</i> constructors declare the
- * annotation, they will be considered as candidates for autowiring. The constructor
- * with the greatest number of dependencies that can be satisfied by matching beans
- * in the Spring container will be chosen. If none of the candidates can be satisfied,
- * then a primary/default constructor (if present) will be used. If a class only
- * declares a single constructor to begin with, it will always be used, even if not
- * annotated. An annotated constructor does not have to be public.
+ * <h3>Autowired 构造函数</h3>
+ * <p>任意给定 bean 类中，只有一个构造函数可以声明此注解并将 'required' 属性设置为 {@code true}，
+ * 表示在作为 Spring bean 使用时应自动注入的构造函数。
+ * 如果 'required' 属性设置为 {@code true}，则只能有一个构造函数标注 {@code @Autowired}。
+ * 如果多个 <i>非必需</i> 构造函数声明了该注解，它们将被视为自动注入的候选者。
+ * 将选择可以由 Spring 容器中的匹配 bean 满足最多依赖关系的构造函数。
+ * 如果没有候选构造函数可以满足，则使用主/默认构造函数（如果存在）。
+ * 如果类一开始只声明了单个构造函数，则始终使用它，即使未标注注解。
+ * 标注注解的构造函数不必为 public。
  *
- * <h3>Autowired Fields</h3>
- * <p>Fields are injected right after construction of a bean, before any
- * config methods are invoked. Such a config field does not have to be public.
+ * <h3>Autowired 字段</h3>
+ * <p>字段会在 bean 构造完成后立即注入，在任何配置方法被调用之前。
+ * 此类配置字段不必为 public。
  *
- * <h3>Autowired Methods</h3>
- * <p>Config methods may have an arbitrary name and any number of arguments; each of
- * those arguments will be autowired with a matching bean in the Spring container.
- * Bean property setter methods are effectively just a special case of such a
- * general config method. Config methods do not have to be public.
+ * <h3>Autowired 方法</h3>
+ * <p>配置方法可以具有任意名称和任意数量的参数；这些参数中的每一个
+ * 都将使用 Spring 容器中的匹配 bean 自动注入。
+ * Bean 属性 setter 方法实际上只是这种通用配置方法的特例。
+ * 配置方法不必为 public。
  *
- * <h3>Annotation Config vs. XML Config</h3>
- * <p>A default {@code AutowiredAnnotationBeanPostProcessor} will be registered
- * by the "context:annotation-config" and "context:component-scan" XML tags.
- * Remove or turn off the default annotation configuration there if you intend
- * to specify a custom {@code AutowiredAnnotationBeanPostProcessor} bean definition.
+ * <h3>注解配置 vs XML 配置</h3>
+ * <p>默认 {@code AutowiredAnnotationBeanPostProcessor} 将由 "context:annotation-config"
+ * 和 "context:component-scan" XML 标签注册。
+ * 如果打算指定自定义的 {@code AutowiredAnnotationBeanPostProcessor} bean 定义，
+ * 请移除或关闭默认注解配置。
  *
- * <p><b>NOTE:</b> Annotation injection will be performed <i>before</i> XML injection;
- * thus the latter configuration will override the former for properties wired through
- * both approaches.
+ * <p><b>注意：</b>注解注入会在 <i>XML 注入之前</i> 执行；
+ * 因此，通过两种方式都注入的属性，XML 配置将覆盖注解配置。
  *
- * <h3>{@literal @}Lookup Methods</h3>
- * <p>In addition to regular injection points as discussed above, this post-processor
- * also handles Spring's {@link Lookup @Lookup} annotation which identifies lookup
- * methods to be replaced by the container at runtime. This is essentially a type-safe
- * version of {@code getBean(Class, args)} and {@code getBean(String, args)}.
- * See {@link Lookup @Lookup's javadoc} for details.
+ * <h3>{@literal @}Lookup 方法</h3>
+ * <p>除了上述常规注入点外，该后处理器还处理 Spring 的 {@link Lookup @Lookup} 注解，
+ * 用于标识在运行时由容器替换的查找方法。
+ * 这本质上是 {@code getBean(Class, args)} 和 {@code getBean(String, args)} 的类型安全版本。
+ * 详细信息请参阅 {@link Lookup @Lookup 的 javadoc}。
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -152,10 +126,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 
 	/**
-	 * Create a new {@code AutowiredAnnotationBeanPostProcessor} for Spring's
-	 * standard {@link Autowired @Autowired} and {@link Value @Value} annotations.
-	 * <p>Also supports JSR-330's {@link javax.inject.Inject @Inject} annotation,
-	 * if available.
+	 * 为 Spring 标准的 {@link Autowired @Autowired} 和 {@link Value @Value} 注解
+	 * 创建一个新的 {@code AutowiredAnnotationBeanPostProcessor}。
+	 * <p>如果可用，也支持 JSR-330 的 {@link javax.inject.Inject @Inject} 注解。
 	 */
 	@SuppressWarnings("unchecked")
 	public AutowiredAnnotationBeanPostProcessor() {
@@ -166,20 +139,19 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader()));
 			logger.trace("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
 		} catch (ClassNotFoundException ex) {
-			// JSR-330 API not available - simply skip.
+			// JSR-330 API不可用-简单地跳过。
 		}
 	}
 
 
 	/**
-	 * Set the 'autowired' annotation type, to be used on constructors, fields,
-	 * setter methods, and arbitrary config methods.
-	 * <p>The default autowired annotation types are the Spring-provided
-	 * {@link Autowired @Autowired} and {@link Value @Value} annotations as well
-	 * as JSR-330's {@link javax.inject.Inject @Inject} annotation, if available.
-	 * <p>This setter property exists so that developers can provide their own
-	 * (non-Spring-specific) annotation type to indicate that a member is supposed
-	 * to be autowired.
+	 * 设置“自动装配”的注解类型，用于构造函数、字段、
+	 * setter 方法以及任意配置方法。
+	 * <p>默认的自动装配注解类型是 Spring 提供的
+	 * {@link Autowired @Autowired} 和 {@link Value @Value} 注解，
+	 * 如果可用，还包括 JSR-330 的 {@link javax.inject.Inject @Inject} 注解。
+	 * <p>提供此 setter 属性是为了让开发者可以指定自己的
+	 * （非 Spring 特定）注解类型，以表明某个成员应被自动装配。
 	 */
 	public void setAutowiredAnnotationType(Class<? extends Annotation> autowiredAnnotationType) {
 		Assert.notNull(autowiredAnnotationType, "'autowiredAnnotationType' must not be null");
@@ -188,14 +160,13 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * Set the 'autowired' annotation types, to be used on constructors, fields,
-	 * setter methods, and arbitrary config methods.
-	 * <p>The default autowired annotation types are the Spring-provided
-	 * {@link Autowired @Autowired} and {@link Value @Value} annotations as well
-	 * as JSR-330's {@link javax.inject.Inject @Inject} annotation, if available.
-	 * <p>This setter property exists so that developers can provide their own
-	 * (non-Spring-specific) annotation types to indicate that a member is supposed
-	 * to be autowired.
+	 * 设置“自动装配”的注解类型集合，用于构造函数、字段、
+	 * setter 方法以及任意配置方法。
+	 * <p>默认的自动装配注解类型是 Spring 提供的
+	 * {@link Autowired @Autowired} 和 {@link Value @Value} 注解，
+	 * 如果可用，还包括 JSR-330 的 {@link javax.inject.Inject @Inject} 注解。
+	 * <p>提供此 setter 属性是为了让开发者可以指定自己的
+	 * （非 Spring 特定）注解类型集合，以表明某个成员应被自动装配。
 	 */
 	public void setAutowiredAnnotationTypes(Set<Class<? extends Annotation>> autowiredAnnotationTypes) {
 		Assert.notEmpty(autowiredAnnotationTypes, "'autowiredAnnotationTypes' must not be empty");
@@ -204,7 +175,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * Set the name of an attribute of the annotation that specifies whether it is required.
+	 * 设置注解中用于标识依赖是否必须的属性名。
 	 *
 	 * @see #setRequiredParameterValue(boolean)
 	 */
@@ -213,9 +184,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * Set the boolean value that marks a dependency as required.
-	 * <p>For example if using 'required=true' (the default), this value should be
-	 * {@code true}; but if using 'optional=false', this value should be {@code false}.
+	 * 设置标记依赖为必需的布尔值。
+	 * <p>例如，如果使用 'required=true'（默认值），此值应为 {@code true}；
+	 * 如果使用 'optional=false'，此值应为 {@code false}。
 	 *
 	 * @see #setRequiredParameterName(String)
 	 */
@@ -261,7 +232,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, final String beanName)
 			throws BeanCreationException {
 
-		// Let's check for lookup methods here...
+		// 这里检查 lookup 方法…
 		if (!this.lookupMethodsChecked.contains(beanName)) {
 			if (AnnotationUtils.isCandidateClass(beanClass, Lookup.class)) {
 				try {
@@ -293,10 +264,10 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 			this.lookupMethodsChecked.add(beanName);
 		}
 
-		// Quick check on the concurrent map first, with minimal locking.
+		// 先在并发映射上快速检查，锁定开销最小。
 		Constructor<?>[] candidateConstructors = this.candidateConstructorsCache.get(beanClass);
 		if (candidateConstructors == null) {
-			// Fully synchronized resolution now...
+			// 现在进行完全同步的解析…
 			synchronized (this.candidateConstructorsCache) {
 				candidateConstructors = this.candidateConstructorsCache.get(beanClass);
 				if (candidateConstructors == null) {
@@ -328,7 +299,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 											userClass.getDeclaredConstructor(candidate.getParameterTypes());
 									ann = findAutowiredAnnotation(superCtor);
 								} catch (NoSuchMethodException ex) {
-									// Simply proceed, no equivalent superclass constructor found...
+									// 直接继续，未找到等效的父类构造函数…
 								}
 							}
 						}
@@ -355,7 +326,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						}
 					}
 					if (!candidates.isEmpty()) {
-						// Add default constructor to list of optional constructors, as fallback.
+						// 将默认构造函数添加到可选构造函数列表中，作为备用方案。
 						if (requiredConstructor == null) {
 							if (defaultConstructor != null) {
 								candidates.add(defaultConstructor);
@@ -406,12 +377,11 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * 'Native' processing method for direct calls with an arbitrary target instance,
-	 * resolving all of its fields and methods which are annotated with one of the
-	 * configured 'autowired' annotation types.
+	 * “原生”处理方法，用于直接调用任意目标实例，
+	 * 会解析该实例中所有带有已配置的“自动装配”注解类型的字段和方法。
 	 *
-	 * @param bean the target instance to process
-	 * @throws BeanCreationException if autowiring failed
+	 * @param bean 要处理的目标实例
+	 * @throws BeanCreationException 如果自动装配失败
 	 * @see #setAutowiredAnnotationTypes(Set)
 	 */
 	public void processInjection(Object bean) throws BeanCreationException {
@@ -429,9 +399,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 
 	private InjectionMetadata findAutowiringMetadata(String beanName, Class<?> clazz, @Nullable PropertyValues pvs) {
-		// Fall back to class name as cache key, for backwards compatibility with custom callers.
+		// 回退使用类名作为缓存键，以与自定义调用者保持向后兼容。
 		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
-		// Quick check on the concurrent map first, with minimal locking.
+		// 先在并发映射上快速检查，锁定开销最小。
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
 		if (InjectionMetadata.needsRefresh(metadata, clazz)) {
 			synchronized (this.injectionMetadataCache) {
@@ -519,13 +489,12 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * Determine if the annotated field or method requires its dependency.
-	 * <p>A 'required' dependency means that autowiring should fail when no beans
-	 * are found. Otherwise, the autowiring process will simply bypass the field
-	 * or method when no beans are found.
+	 * 判断带注解的字段或方法是否需要其依赖。
+	 * <p>“必需”的依赖意味着当未找到任何 Bean 时，自动装配应失败。
+	 * 否则，当未找到 Bean 时，自动装配过程将简单地跳过该字段或方法。
 	 *
-	 * @param ann the Autowired annotation
-	 * @return whether the annotation indicates that a dependency is required
+	 * @param ann Autowired 注解
+	 * @return 注解是否表示依赖是必需的
 	 */
 	@SuppressWarnings("deprecation")
 	protected boolean determineRequiredStatus(MergedAnnotation<?> ann) {
@@ -534,14 +503,13 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * Determine if the annotated field or method requires its dependency.
-	 * <p>A 'required' dependency means that autowiring should fail when no beans
-	 * are found. Otherwise, the autowiring process will simply bypass the field
-	 * or method when no beans are found.
+	 * 判断带注解的字段或方法是否需要其依赖。
+	 * <p>“必需”的依赖意味着当未找到任何 Bean 时，自动装配应失败。
+	 * 否则，当未找到 Bean 时，自动装配过程将简单地跳过该字段或方法。
 	 *
-	 * @param ann the Autowired annotation
-	 * @return whether the annotation indicates that a dependency is required
-	 * @deprecated since 5.2, in favor of {@link #determineRequiredStatus(MergedAnnotation)}
+	 * @param ann Autowired 注解
+	 * @return 注解是否表示依赖是必需的
+	 * @deprecated 自 5.2 起，推荐使用 {@link #determineRequiredStatus(MergedAnnotation)}
 	 */
 	@Deprecated
 	protected boolean determineRequiredStatus(AnnotationAttributes ann) {
@@ -550,11 +518,11 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * Obtain all beans of the given type as autowire candidates.
+	 * 获取给定类型的所有 Bean 作为自动装配候选。
 	 *
-	 * @param type the type of the bean
-	 * @return the target beans, or an empty Collection if no bean of this type is found
-	 * @throws BeansException if bean retrieval failed
+	 * @param type Bean 的类型
+	 * @return 目标 Bean，如果未找到该类型的 Bean，则返回空集合
+	 * @throws BeansException 如果获取 Bean 失败
 	 */
 	protected <T> Map<String, T> findAutowireCandidates(Class<T> type) throws BeansException {
 		if (this.beanFactory == null) {
@@ -565,7 +533,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * Register the specified bean as dependent on the autowired beans.
+	 * 将指定的 Bean 注册为依赖于自动装配的 Bean。
 	 */
 	private void registerDependentBeans(@Nullable String beanName, Set<String> autowiredBeanNames) {
 		if (beanName != null) {
@@ -582,7 +550,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	/**
-	 * Resolve the specified cached method argument or field value.
+	 * 解析指定的已缓存方法参数或字段值。
 	 */
 	@Nullable
 	private Object resolvedCachedArgument(@Nullable String beanName, @Nullable Object cachedArgument) {
@@ -597,7 +565,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 
 	/**
-	 * Class representing injection information about an annotated field.
+	 * 表示关于带注解字段的注入信息的类。
 	 */
 	private class AutowiredFieldElement extends InjectionMetadata.InjectedElement {
 
@@ -621,7 +589,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				try {
 					value = resolvedCachedArgument(beanName, this.cachedFieldValue);
 				} catch (NoSuchBeanDefinitionException ex) {
-					// Unexpected removal of target bean for cached argument -> re-resolve
+					// 意外删除缓存参数的目标bean-> 重新解析
 					value = resolveFieldValue(field, bean, beanName);
 				}
 			} else {
@@ -671,7 +639,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 
 	/**
-	 * Class representing injection information about an annotated method.
+	 * 表示关于带注解方法的注入信息的类。
 	 */
 	private class AutowiredMethodElement extends InjectionMetadata.InjectedElement {
 
@@ -698,7 +666,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				try {
 					arguments = resolveCachedArguments(beanName);
 				} catch (NoSuchBeanDefinitionException ex) {
-					// Unexpected removal of target bean for cached argument -> re-resolve
+					// 意外删除缓存参数的目标bean-> 重新解析
 					arguments = resolveMethodArguments(method, bean, beanName);
 				}
 			} else {
@@ -781,7 +749,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 
 	/**
-	 * DependencyDescriptor variant with a pre-resolved target bean name.
+	 * 带有预解析目标 Bean 名称的 DependencyDescriptor 变体。
 	 */
 	@SuppressWarnings("serial")
 	private static class ShortcutDependencyDescriptor extends DependencyDescriptor {

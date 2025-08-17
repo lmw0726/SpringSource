@@ -16,26 +16,25 @@
 
 package org.springframework.beans.factory.xml;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
- * {@link EntityResolver} implementation for the Spring beans DTD,
- * to load the DTD from the Spring class path (or JAR file).
+ * Spring beans DTD 的 {@link EntityResolver} 实现，
+ * 用于从 Spring 类路径（或 JAR 文件）加载 DTD。
  *
- * <p>Fetches "spring-beans.dtd" from the class path resource
- * "/org/springframework/beans/factory/xml/spring-beans.dtd",
- * no matter whether specified as some local URL that includes "spring-beans"
- * in the DTD name or as "https://www.springframework.org/dtd/spring-beans-2.0.dtd".
+ * <p>从类路径资源
+ * "/org/springframework/beans/factory/xml/spring-beans.dtd"
+ * 获取 "spring-beans.dtd"，无论是作为包含 "spring-beans" 的本地 URL
+ * 还是作为 "https://www.springframework.org/dtd/spring-beans-2.0.dtd"。
  *
  * @author Juergen Hoeller
  * @author Colin Sampaleanu

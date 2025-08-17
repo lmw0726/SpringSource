@@ -16,16 +16,16 @@
 
 package org.springframework.beans.factory;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 /**
- * Exception thrown when a {@code BeanFactory} is asked for a bean instance for which
- * multiple matching candidates have been found when only one matching bean was expected.
+ * 当{@code BeanFactory}被要求获取一个bean实例，但找到了多个匹配的候选者，
+ * 而只期望一个匹配的bean时抛出的异常。
  *
  * @author Juergen Hoeller
  * @since 3.2.1
@@ -41,10 +41,10 @@ public class NoUniqueBeanDefinitionException extends NoSuchBeanDefinitionExcepti
 
 
 	/**
-	 * Create a new {@code NoUniqueBeanDefinitionException}.
-	 * @param type required type of the non-unique bean
-	 * @param numberOfBeansFound the number of matching beans
-	 * @param message detailed message describing the problem
+	 * 创建一个新的{@code NoUniqueBeanDefinitionException}。
+	 * @param type 非唯一bean的所需类型
+	 * @param numberOfBeansFound 匹配的bean数量
+	 * @param message 描述问题的详细消息
 	 */
 	public NoUniqueBeanDefinitionException(Class<?> type, int numberOfBeansFound, String message) {
 		super(type, message);
@@ -53,9 +53,9 @@ public class NoUniqueBeanDefinitionException extends NoSuchBeanDefinitionExcepti
 	}
 
 	/**
-	 * Create a new {@code NoUniqueBeanDefinitionException}.
-	 * @param type required type of the non-unique bean
-	 * @param beanNamesFound the names of all matching beans (as a Collection)
+	 * 创建一个新的{@code NoUniqueBeanDefinitionException}。
+	 * @param type 非唯一bean的所需类型
+	 * @param beanNamesFound 所有匹配的bean名称（作为Collection）
 	 */
 	public NoUniqueBeanDefinitionException(Class<?> type, Collection<String> beanNamesFound) {
 		super(type, "expected single matching bean but found " + beanNamesFound.size() + ": " +
@@ -65,18 +65,18 @@ public class NoUniqueBeanDefinitionException extends NoSuchBeanDefinitionExcepti
 	}
 
 	/**
-	 * Create a new {@code NoUniqueBeanDefinitionException}.
-	 * @param type required type of the non-unique bean
-	 * @param beanNamesFound the names of all matching beans (as an array)
+	 * 创建一个新的{@code NoUniqueBeanDefinitionException}。
+	 * @param type 非唯一bean的所需类型
+	 * @param beanNamesFound 所有匹配的bean名称（作为数组）
 	 */
 	public NoUniqueBeanDefinitionException(Class<?> type, String... beanNamesFound) {
 		this(type, Arrays.asList(beanNamesFound));
 	}
 
 	/**
-	 * Create a new {@code NoUniqueBeanDefinitionException}.
-	 * @param type required type of the non-unique bean
-	 * @param beanNamesFound the names of all matching beans (as a Collection)
+	 * 创建一个新的{@code NoUniqueBeanDefinitionException}。
+	 * @param type 非唯一bean的所需类型
+	 * @param beanNamesFound 所有匹配的bean名称（作为Collection）
 	 * @since 5.1
 	 */
 	public NoUniqueBeanDefinitionException(ResolvableType type, Collection<String> beanNamesFound) {
@@ -87,9 +87,9 @@ public class NoUniqueBeanDefinitionException extends NoSuchBeanDefinitionExcepti
 	}
 
 	/**
-	 * Create a new {@code NoUniqueBeanDefinitionException}.
-	 * @param type required type of the non-unique bean
-	 * @param beanNamesFound the names of all matching beans (as an array)
+	 * 创建一个新的{@code NoUniqueBeanDefinitionException}。
+	 * @param type 非唯一bean的所需类型
+	 * @param beanNamesFound 所有匹配的bean名称（作为数组）
 	 * @since 5.1
 	 */
 	public NoUniqueBeanDefinitionException(ResolvableType type, String... beanNamesFound) {
@@ -98,8 +98,8 @@ public class NoUniqueBeanDefinitionException extends NoSuchBeanDefinitionExcepti
 
 
 	/**
-	 * Return the number of beans found when only one matching bean was expected.
-	 * For a NoUniqueBeanDefinitionException, this will usually be higher than 1.
+	 * 返回当只期望一个匹配bean时找到的bean数量。
+	 * 对于NoUniqueBeanDefinitionException，这通常会大于1。
 	 * @see #getBeanType()
 	 */
 	@Override
@@ -108,8 +108,8 @@ public class NoUniqueBeanDefinitionException extends NoSuchBeanDefinitionExcepti
 	}
 
 	/**
-	 * Return the names of all beans found when only one matching bean was expected.
-	 * Note that this may be {@code null} if not specified at construction time.
+	 * 返回当只期望一个匹配bean时找到的所有bean名称。
+	 * 注意，如果在构造时未指定，这可能是{@code null}。
 	 * @since 4.3
 	 * @see #getBeanType()
 	 */

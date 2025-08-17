@@ -19,13 +19,11 @@ package org.springframework.beans.factory.config;
 import org.springframework.beans.BeanMetadataElement;
 
 /**
- * Interface that exposes a reference to a bean name in an abstract fashion.
- * This interface does not necessarily imply a reference to an actual bean
- * instance; it just expresses a logical reference to the name of a bean.
+ * 以抽象方式暴露对 bean 名称的引用的接口。
+ * 该接口不一定意味着对实际 bean 实例的引用；它只是表示对 bean 名称的逻辑引用。
  *
- * <p>Serves as common interface implemented by any kind of bean reference
- * holder, such as {@link RuntimeBeanReference RuntimeBeanReference} and
- * {@link RuntimeBeanNameReference RuntimeBeanNameReference}.
+ * <p>作为所有类型 bean 引用持有者的公共接口，例如 {@link RuntimeBeanReference RuntimeBeanReference} 和
+ * {@link RuntimeBeanNameReference RuntimeBeanNameReference}。
  *
  * @author Juergen Hoeller
  * @since 2.0

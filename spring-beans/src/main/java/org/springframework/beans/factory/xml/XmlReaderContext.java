@@ -33,9 +33,10 @@ import org.xml.sax.InputSource;
 import java.io.StringReader;
 
 /**
- * Extension of {@link org.springframework.beans.factory.parsing.ReaderContext},
- * specific to use with an {@link XmlBeanDefinitionReader}. Provides access to the
- * {@link NamespaceHandlerResolver} configured in the {@link XmlBeanDefinitionReader}.
+ * {@link org.springframework.beans.factory.parsing.ReaderContext} 的扩展类，
+ * 专用于 {@link XmlBeanDefinitionReader}。
+ * 提供对 {@link XmlBeanDefinitionReader} 中配置的
+ * {@link NamespaceHandlerResolver} 的访问。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -88,9 +89,9 @@ public class XmlReaderContext extends ReaderContext {
 	}
 
 	/**
-	 * Return the resource loader to use, if any.
-	 * <p>This will be non-null in regular scenarios,
-	 * also allowing access to the resource class loader.
+	 * 返回要使用的资源加载器（如果有）。
+	 * <p>在常规场景下，这通常不会为 null，
+	 * 并允许访问资源类加载器。
 	 *
 	 * @see XmlBeanDefinitionReader#setResourceLoader
 	 * @see ResourceLoader#getClassLoader()
@@ -101,9 +102,9 @@ public class XmlReaderContext extends ReaderContext {
 	}
 
 	/**
-	 * Return the bean class loader to use, if any.
-	 * <p>Note that this will be null in regular scenarios,
-	 * as an indication to lazily resolve bean classes.
+	 * 返回要使用的 Bean 类加载器（如果有）。
+	 * <p>注意，在常规场景下，这通常为 null，
+	 * 用于指示延迟解析 Bean 类。
 	 *
 	 * @see XmlBeanDefinitionReader#setBeanClassLoader
 	 */
@@ -144,8 +145,8 @@ public class XmlReaderContext extends ReaderContext {
 	}
 
 	/**
-	 * Call the bean name generator for the given bean definition
-	 * and register the bean definition under the generated name.
+	 * 调用给定 Bean 定义的 Bean 名称生成器，
+	 * 并使用生成的名称注册该 Bean 定义。
 	 *
 	 * @see XmlBeanDefinitionReader#getBeanNameGenerator()
 	 * @see org.springframework.beans.factory.support.BeanNameGenerator#generateBeanName
@@ -158,7 +159,7 @@ public class XmlReaderContext extends ReaderContext {
 	}
 
 	/**
-	 * Read an XML document from the given String.
+	 * 从给定的字符串读取 XML 文档。
 	 *
 	 * @see #getReader()
 	 */

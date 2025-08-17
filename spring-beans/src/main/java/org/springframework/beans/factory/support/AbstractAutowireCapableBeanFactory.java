@@ -290,7 +290,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//-------------------------------------------------------------------------
-	// Typical methods for creating and populating external bean instances
+	// 创建和填充外部 bean 实例的常用方法
 	//-------------------------------------------------------------------------
 
 	@Override
@@ -355,7 +355,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//-------------------------------------------------------------------------
-	// Specialized methods for fine-grained control over the bean lifecycle
+	// 用于对bean生命周期进行细粒度控制的专用方法
 	//-------------------------------------------------------------------------
 
 	@Override
@@ -497,7 +497,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//-------------------------------------------------------------------------
-	// Delegate methods for resolving injection points
+	// 解析注入点的委托方法
 	//-------------------------------------------------------------------------
 
 	@Override
@@ -521,7 +521,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//---------------------------------------------------------------------
-	// Implementation of relevant AbstractBeanFactory template methods
+	// 相关AbstractBeanFactory模板方法的实现
 	//---------------------------------------------------------------------
 
 	/**
@@ -1087,7 +1087,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//---------------------------------------------------------------------
-	// Implementation methods
+	// 实现方法
 	//---------------------------------------------------------------------
 
 	/**

@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link ComponentDefinition} implementation that holds one or more nested
- * {@link ComponentDefinition} instances, aggregating them into a named group
- * of components.
+ * {@link ComponentDefinition}实现，持有一个或多个嵌套的
+ * {@link ComponentDefinition}实例，将它们聚合为一个命名的
+ * 组件组。
  *
  * @author Juergen Hoeller
  * @see #getNestedComponents()

@@ -20,11 +20,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
- * Simple implementation of {@link SourceExtractor} that returns {@code null}
- * as the source metadata.
+ * {@link SourceExtractor}的简单实现，返回{@code null}
+ * 作为源元数据。
  *
- * <p>This is the default implementation and prevents too much metadata from being
- * held in memory during normal (non-tooled) runtime usage.
+ * <p>这是默认实现，防止在正常（非工具）运行时使用期间
+ * 在内存中保留过多元数据。
  *
  * @author Rob Harrop
  * @since 2.0

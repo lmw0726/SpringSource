@@ -16,28 +16,27 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.Properties;
-
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.CollectionFactory;
 import org.springframework.lang.Nullable;
 
+import java.util.Properties;
+
 /**
- * Factory for {@link java.util.Properties} that reads from a YAML source,
- * exposing a flat structure of String property values.
+ * 用于从 YAML 源读取的 {@link java.util.Properties} 工厂，
+ * 以扁平化的字符串属性值结构暴露数据。
  *
- * <p>YAML is a nice human-readable format for configuration, and it has some
- * useful hierarchical properties. It's more or less a superset of JSON, so it
- * has a lot of similar features.
+ * <p>YAML 是一种易于人类阅读的配置格式，具有层级结构的属性特性。
+ * 它或多或少是 JSON 的超集，因此具备许多类似功能。
  *
- * <p><b>Note: All exposed values are of type {@code String}</b> for access through
- * the common {@link Properties#getProperty} method (e.g. in configuration property
- * resolution through {@link PropertyResourceConfigurer#setProperties(Properties)}).
- * If this is not desirable, use {@link YamlMapFactoryBean} instead.
+ * <p><b>注意：所有暴露的值均为 {@code String} 类型，方便通过
+ * 通用的 {@link Properties#getProperty} 方法访问
+ * （例如通过 {@link PropertyResourceConfigurer#setProperties(Properties)} 进行配置属性解析）。
+ * 如果不需要此行为，请改用 {@link YamlMapFactoryBean}。</b>
  *
- * <p>The Properties created by this factory have nested paths for hierarchical
- * objects, so for instance this YAML
+ * <p>该工厂创建的 Properties 会对层级对象使用嵌套路径，
+ * 例如如下 YAML：
  *
  * <pre class="code">
  * environments:
@@ -49,7 +48,7 @@ import org.springframework.lang.Nullable;
  *     name: My Cool App
  * </pre>
  *
- * is transformed into these properties:
+ * 会被转换成如下 Properties：
  *
  * <pre class="code">
  * environments.dev.url=https://dev.bar.com
@@ -58,8 +57,7 @@ import org.springframework.lang.Nullable;
  * environments.prod.name=My Cool App
  * </pre>
  *
- * Lists are split as property keys with <code>[]</code> dereferencers, for
- * example this YAML:
+ * 列表会被拆分成带有 <code>[]</code> 访问符的属性键，例如：
  *
  * <pre class="code">
  * servers:
@@ -67,14 +65,14 @@ import org.springframework.lang.Nullable;
  * - foo.bar.com
  * </pre>
  *
- * becomes properties like this:
+ * 会变成如下 Properties：
  *
  * <pre class="code">
  * servers[0]=dev.bar.com
  * servers[1]=foo.bar.com
  * </pre>
  *
- * <p>Requires SnakeYAML 1.18 or higher, as of Spring Framework 5.0.6.
+ * <p>从 Spring Framework 5.0.6 起，需要 SnakeYAML 1.18 或更高版本。
  *
  * @author Dave Syer
  * @author Stephane Nicoll
@@ -90,8 +88,8 @@ public class YamlPropertiesFactoryBean extends YamlProcessor implements FactoryB
 
 
 	/**
-	 * Set if a singleton should be created, or a new object on each request
-	 * otherwise. Default is {@code true} (a singleton).
+	 * 设置是否创建单例对象，否则每次请求创建一个新对象。
+	 * 默认值为 {@code true}（单例）。
 	 */
 	public void setSingleton(boolean singleton) {
 		this.singleton = singleton;
@@ -122,12 +120,11 @@ public class YamlPropertiesFactoryBean extends YamlProcessor implements FactoryB
 
 
 	/**
-	 * Template method that subclasses may override to construct the object
-	 * returned by this factory. The default implementation returns a
-	 * properties with the content of all resources.
-	 * <p>Invoked lazily the first time {@link #getObject()} is invoked in
-	 * case of a shared singleton; else, on each {@link #getObject()} call.
-	 * @return the object returned by this factory
+	 * 模板方法，子类可重写以构造此工厂返回的对象。
+	 * 默认实现返回包含所有资源内容的 Properties。
+	 * <p>如果是共享单例，则首次调用 {@link #getObject()} 时延迟调用；
+	 * 否则，每次调用 {@link #getObject()} 时都会调用。
+	 * @return 此工厂返回的对象
 	 * @see #process(MatchCallback)
 	 */
 	protected Properties createProperties() {

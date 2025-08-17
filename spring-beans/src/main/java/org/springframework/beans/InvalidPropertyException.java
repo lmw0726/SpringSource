@@ -19,8 +19,8 @@ package org.springframework.beans;
 import org.springframework.lang.Nullable;
 
 /**
- * Exception thrown when referring to an invalid bean property.
- * Carries the offending bean class and property name.
+ * 当引用无效的 bean 属性时抛出的异常。
+ * 携带出错的 bean 类和属性名信息。
  *
  * @author Juergen Hoeller
  * @since 1.0.2
@@ -34,21 +34,21 @@ public class InvalidPropertyException extends FatalBeanException {
 
 
 	/**
-	 * Create a new InvalidPropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property
-	 * @param msg the detail message
+	 * 创建一个新的 InvalidPropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
+	 * @param msg 详细消息
 	 */
 	public InvalidPropertyException(Class<?> beanClass, String propertyName, String msg) {
 		this(beanClass, propertyName, msg, null);
 	}
 
 	/**
-	 * Create a new InvalidPropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 * 创建一个新的 InvalidPropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
+	 * @param msg 详细消息
+	 * @param cause 根本原因
 	 */
 	public InvalidPropertyException(Class<?> beanClass, String propertyName, String msg, @Nullable Throwable cause) {
 		super("Invalid property '" + propertyName + "' of bean class [" + beanClass.getName() + "]: " + msg, cause);
@@ -57,14 +57,14 @@ public class InvalidPropertyException extends FatalBeanException {
 	}
 
 	/**
-	 * Return the offending bean class.
+	 * 返回出错的 bean 类。
 	 */
 	public Class<?> getBeanClass() {
 		return this.beanClass;
 	}
 
 	/**
-	 * Return the name of the offending property.
+	 * 返回出错的属性名。
 	 */
 	public String getPropertyName() {
 		return this.propertyName;

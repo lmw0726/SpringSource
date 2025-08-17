@@ -21,34 +21,27 @@ import org.w3c.dom.Node;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 
 /**
- * Interface used by the {@link DefaultBeanDefinitionDocumentReader}
- * to handle custom, nested (directly under a {@code <bean>}) tags.
+ * {@link DefaultBeanDefinitionDocumentReader} 用于处理自定义的、嵌套的（直接在 {@code <bean>} 下）标签的接口。
  *
- * <p>Decoration may also occur based on custom attributes applied to the
- * {@code <bean>} tag. Implementations are free to turn the metadata in the
- * custom tag into as many
- * {@link org.springframework.beans.factory.config.BeanDefinition BeanDefinitions} as
- * required and to transform the
- * {@link org.springframework.beans.factory.config.BeanDefinition} of the enclosing
- * {@code <bean>} tag, potentially even returning a completely different
- * {@link org.springframework.beans.factory.config.BeanDefinition} to replace the
- * original.
+ * <p>也可以根据应用于 {@code <bean>} 标签的自定义属性进行装饰。
+ * 实现类可以自由地将自定义标签中的元数据转换为任意数量的
+ * {@link org.springframework.beans.factory.config.BeanDefinition BeanDefinitions}，
+ * 并可以转换包含该自定义标签的 {@code <bean>} 标签的
+ * {@link org.springframework.beans.factory.config.BeanDefinition}，
+ * 甚至可能返回一个完全不同的 {@link org.springframework.beans.factory.config.BeanDefinition} 来替换原有定义。
  *
- * <p>{@link BeanDefinitionDecorator BeanDefinitionDecorators} should be aware that
- * they may be part of a chain. In particular, a {@link BeanDefinitionDecorator} should
- * be aware that a previous {@link BeanDefinitionDecorator} may have replaced the
- * original {@link org.springframework.beans.factory.config.BeanDefinition} with a
- * {@link org.springframework.aop.framework.ProxyFactoryBean} definition allowing for
- * custom {@link org.aopalliance.intercept.MethodInterceptor interceptors} to be added.
+ * <p>{@link BeanDefinitionDecorator BeanDefinitionDecorators} 应注意，它们可能是链的一部分。
+ * 特别是，一个 {@link BeanDefinitionDecorator} 应意识到先前的 {@link BeanDefinitionDecorator}
+ * 可能已用 {@link org.springframework.aop.framework.ProxyFactoryBean} 定义替换了原始的
+ * {@link org.springframework.beans.factory.config.BeanDefinition}，从而允许添加自定义
+ * {@link org.aopalliance.intercept.MethodInterceptor 拦截器}。
  *
- * <p>{@link BeanDefinitionDecorator BeanDefinitionDecorators} that wish to add an
- * interceptor to the enclosing bean should extend
- * {@link org.springframework.aop.config.AbstractInterceptorDrivenBeanDefinitionDecorator}
- * which handles the chaining ensuring that only one proxy is created and that it
- * contains all interceptors from the chain.
+ * <p>希望为封闭 Bean 添加拦截器的 {@link BeanDefinitionDecorator BeanDefinitionDecorators}
+ * 应扩展 {@link org.springframework.aop.config.AbstractInterceptorDrivenBeanDefinitionDecorator}，
+ * 它处理链的管理，确保只创建一个代理，并包含链中的所有拦截器。
  *
- * <p>The parser locates a {@link BeanDefinitionDecorator} from the
- * {@link NamespaceHandler} for the namespace in which the custom tag resides.
+ * <p>解析器会从自定义标签所在命名空间的 {@link NamespaceHandler} 中定位相应的
+ * {@link BeanDefinitionDecorator}。
  *
  * @author Rob Harrop
  * @since 2.0
@@ -58,14 +51,14 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 public interface BeanDefinitionDecorator {
 
 	/**
-	 * Parse the specified {@link Node} (either an element or an attribute) and decorate
-	 * the supplied {@link org.springframework.beans.factory.config.BeanDefinition},
-	 * returning the decorated definition.
-	 * <p>Implementations may choose to return a completely new definition, which will
-	 * replace the original definition in the resulting
-	 * {@link org.springframework.beans.factory.BeanFactory}.
-	 * <p>The supplied {@link ParserContext} can be used to register any additional
-	 * beans needed to support the main definition.
+	 * 解析指定的 {@link Node}（元素或属性），并装饰提供的
+	 * {@link org.springframework.beans.factory.config.BeanDefinition}，
+	 * 返回装饰后的定义。
+	 *
+	 * <p>实现类可以选择返回一个全新的定义，这将替换结果
+	 * {@link org.springframework.beans.factory.BeanFactory} 中的原始定义。
+	 *
+	 * <p>提供的 {@link ParserContext} 可用于注册支持主定义所需的其他 Bean。
 	 */
 	BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definition, ParserContext parserContext);
 

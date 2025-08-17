@@ -20,13 +20,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for resolving a value by evaluating it as an expression,
- * if applicable.
+ * 通过将值作为表达式进行求值来解析值的策略接口（如适用）。
  *
- * <p>A raw {@link org.springframework.beans.factory.BeanFactory} does not
- * contain a default implementation of this strategy. However,
- * {@link org.springframework.context.ApplicationContext} implementations
- * will provide expression support out of the box.
+ * <p>普通的 {@link org.springframework.beans.factory.BeanFactory} 并不包含该策略的默认实现。
+ * 但是，{@link org.springframework.context.ApplicationContext} 实现会开箱即用地提供表达式支持。
  *
  * @author Juergen Hoeller
  * @since 3.0

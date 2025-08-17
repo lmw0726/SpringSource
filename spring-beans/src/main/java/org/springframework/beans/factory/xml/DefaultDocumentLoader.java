@@ -30,13 +30,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * Spring's default {@link DocumentLoader} implementation.
+ * Spring 默认的 {@link DocumentLoader} 实现。
  *
- * <p>Simply loads {@link Document documents} using the standard JAXP-configured
- * XML parser. If you want to change the {@link DocumentBuilder} that is used to
- * load documents, then one strategy is to define a corresponding Java system property
- * when starting your JVM. For example, to use the Oracle {@link DocumentBuilder},
- * you might start your application like as follows:
+ * <p>使用标准的 JAXP 配置的 XML 解析器加载 {@link Document 文档}。
+ * 如果想更改用于加载文档的 {@link DocumentBuilder}，一种策略是在启动 JVM 时
+ * 定义相应的 Java 系统属性。例如，要使用 Oracle 的 {@link DocumentBuilder}，
+ * 可以像如下方式启动应用程序：
  *
  * <pre class="code">java -Djavax.xml.parsers.DocumentBuilderFactory=oracle.xml.jaxp.JXDocumentBuilderFactory MyMainClass</pre>
  *
@@ -117,16 +116,14 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	}
 
 	/**
-	 * Create a JAXP DocumentBuilder that this bean definition reader
-	 * will use for parsing XML documents. Can be overridden in subclasses,
-	 * adding further initialization of the builder.
+	 * 创建一个 JAXP DocumentBuilder，供此 BeanDefinitionReader 用于解析 XML 文档。
+	 * 子类可以重写此方法，对 DocumentBuilder 进行进一步初始化。
 	 *
-	 * @param factory        the JAXP DocumentBuilderFactory that the DocumentBuilder
-	 *                       should be created with
-	 * @param entityResolver the SAX EntityResolver to use
-	 * @param errorHandler   the SAX ErrorHandler to use
-	 * @return the JAXP DocumentBuilder
-	 * @throws ParserConfigurationException if thrown by JAXP methods
+	 * @param factory        用于创建 DocumentBuilder 的 JAXP DocumentBuilderFactory
+	 * @param entityResolver 要使用的 SAX EntityResolver
+	 * @param errorHandler   要使用的 SAX ErrorHandler
+	 * @return 创建的 JAXP DocumentBuilder
+	 * @throws ParserConfigurationException 如果 JAXP 方法抛出异常
 	 */
 	protected DocumentBuilder createDocumentBuilder(DocumentBuilderFactory factory,
 													@Nullable EntityResolver entityResolver, @Nullable ErrorHandler errorHandler)

@@ -35,13 +35,12 @@ import java.util.*;
 import java.util.function.Supplier;
 
 /**
- * Base class for concrete, full-fledged {@link BeanDefinition} classes,
- * factoring out common properties of {@link GenericBeanDefinition},
- * {@link RootBeanDefinition}, and {@link ChildBeanDefinition}.
+ * 具体的、功能完整的 {@link BeanDefinition} 类的基类，
+ * 提取了 {@link GenericBeanDefinition}、{@link RootBeanDefinition} 和 {@link ChildBeanDefinition}
+ * 的公共属性。
  *
- * <p>The autowire constants match the ones defined in the
- * {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
- * interface.
+ * <p>自动装配常量与 {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
+ * 接口中定义的常量一致。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

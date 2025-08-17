@@ -20,8 +20,8 @@ import java.beans.PropertyEditorSupport;
 import java.util.Currency;
 
 /**
- * Editor for {@code java.util.Currency}, translating currency codes into Currency
- * objects. Exposes the currency code as text representation of a Currency object.
+ * {@code java.util.Currency} 的编辑器，将货币代码转换为 Currency 对象。
+ * 并将货币代码作为 Currency 对象的文本表示。
  *
  * @author Juergen Hoeller
  * @since 3.0

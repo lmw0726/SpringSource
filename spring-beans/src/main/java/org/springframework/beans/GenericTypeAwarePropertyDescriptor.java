@@ -16,14 +16,7 @@
 
 package org.springframework.beans;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.MethodParameter;
@@ -33,10 +26,16 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Extension of the standard JavaBeans {@link PropertyDescriptor} class,
- * overriding {@code getPropertyType()} such that a generically declared
- * type variable will be resolved against the containing bean class.
+ * 标准 JavaBeans {@link PropertyDescriptor} 类的扩展，
+ * 重写了 {@code getPropertyType()} 方法，使得泛型声明的类型变量
+ * 会根据所属的 bean 类进行解析。
  *
  * @author Juergen Hoeller
  * @since 2.5.2
@@ -74,9 +73,9 @@ final class GenericTypeAwarePropertyDescriptor extends PropertyDescriptor {
 		Method readMethodToUse = (readMethod != null ? BridgeMethodResolver.findBridgedMethod(readMethod) : null);
 		Method writeMethodToUse = (writeMethod != null ? BridgeMethodResolver.findBridgedMethod(writeMethod) : null);
 		if (writeMethodToUse == null && readMethodToUse != null) {
-			// Fallback: Original JavaBeans introspection might not have found matching setter
-			// method due to lack of bridge method resolution, in case of the getter using a
-			// covariant return type whereas the setter is defined for the concrete property type.
+			// 回退逻辑：原生 JavaBeans 内省可能未找到匹配的 setter 方法，
+			// 这是因为 getter 方法使用了协变返回类型（covariant return type），
+			// 而 setter 方法是为具体的属性类型定义的，缺少桥接方法解析导致未匹配到。
 			Method candidate = ClassUtils.getMethodIfAvailable(
 					this.beanClass, "set" + StringUtils.capitalize(getName()), (Class<?>[]) null);
 			if (candidate != null && candidate.getParameterCount() == 1) {
@@ -88,9 +87,8 @@ final class GenericTypeAwarePropertyDescriptor extends PropertyDescriptor {
 
 		if (this.writeMethod != null) {
 			if (this.readMethod == null) {
-				// Write method not matched against read method: potentially ambiguous through
-				// several overloaded variants, in which case an arbitrary winner has been chosen
-				// by the JDK's JavaBeans Introspector...
+				// 写方法未与读方法匹配：可能因为存在多个重载方法而产生歧义，
+				// 在这种情况下，JDK 的 JavaBeans Introspector 会随意选择一个方法作为匹配。
 				Set<Method> ambiguousCandidates = new HashSet<>();
 				for (Method method : beanClass.getMethods()) {
 					if (method.getName().equals(writeMethodToUse.getName()) &&

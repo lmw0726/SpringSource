@@ -16,6 +16,11 @@
 
 package org.springframework.beans.propertyeditors;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceEditor;
+import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
+
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.net.URI;
@@ -24,22 +29,15 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceEditor;
-import org.springframework.util.Assert;
-import org.springframework.util.ResourceUtils;
-
 /**
- * Editor for {@code java.nio.file.Path}, to directly populate a Path
- * property instead of using a String property as bridge.
+ * {@link java.nio.file.Path} 的属性编辑器，用于直接填充 Path 属性，
+ * 而不通过 String 属性作为桥梁。
  *
- * <p>Based on {@link Paths#get(URI)}'s resolution algorithm, checking
- * registered NIO file system providers, including the default file system
- * for "file:..." paths. Also supports Spring-style URL notation: any fully
- * qualified standard URL and Spring's special "classpath:" pseudo-URL, as
- * well as Spring's context-specific relative file paths. As a fallback, a
- * path will be resolved in the file system via {@code Paths#get(String)}
- * if no existing context-relative resource could be found.
+ * <p>基于 {@link Paths#get(URI)} 的解析算法，检查已注册的 NIO 文件系统提供器，
+ * 包括 "file:..." 路径的默认文件系统。也支持 Spring 风格的 URL 表示法：
+ * 任意完全限定的标准 URL 以及 Spring 特殊的 "classpath:" 伪 URL，
+ * 还支持 Spring 上下文特定的相对文件路径。作为回退，如果未找到现有的
+ * 上下文相关资源，将通过 {@code Paths#get(String)} 在文件系统中解析路径。
  *
  * @author Juergen Hoeller
  * @since 4.3.2
@@ -56,15 +54,15 @@ public class PathEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Create a new PathEditor, using the default ResourceEditor underneath.
+	 * 创建一个使用默认 ResourceEditor 的 PathEditor。
 	 */
 	public PathEditor() {
 		this.resourceEditor = new ResourceEditor();
 	}
 
 	/**
-	 * Create a new PathEditor, using the given ResourceEditor underneath.
-	 * @param resourceEditor the ResourceEditor to use
+	 * 创建一个使用指定 ResourceEditor 的 PathEditor。
+	 * @param resourceEditor 要使用的 ResourceEditor
 	 */
 	public PathEditor(ResourceEditor resourceEditor) {
 		Assert.notNull(resourceEditor, "ResourceEditor must not be null");
@@ -80,19 +78,19 @@ public class PathEditor extends PropertyEditorSupport {
 				URI uri = new URI(text);
 				if (uri.getScheme() != null) {
 					nioPathCandidate = false;
-					// Let's try NIO file system providers via Paths.get(URI)
+					// 尝试通过 Paths.get(URI) 使用 NIO 文件系统提供器
 					setValue(Paths.get(uri).normalize());
 					return;
 				}
 			}
 			catch (URISyntaxException ex) {
-				// Not a valid URI; potentially a Windows-style path after
-				// a file prefix (let's try as Spring resource location)
+				// 不是有效的 URI；可能是 Windows 风格的路径，带有 file 前缀
+				// 将尝试作为 Spring 资源位置处理
 				nioPathCandidate = !text.startsWith(ResourceUtils.FILE_URL_PREFIX);
 			}
 			catch (FileSystemNotFoundException ex) {
-				// URI scheme not registered for NIO (let's try URL
-				// protocol handlers via Spring's resource mechanism).
+				// URI 的 scheme 未在 NIO 中注册
+				// 将尝试通过 Spring 的资源机制使用 URL 协议处理器
 			}
 		}
 

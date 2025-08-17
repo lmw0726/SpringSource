@@ -21,14 +21,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Class that models an arbitrary location in a {@link Resource resource}.
+ * 对{@link Resource 资源}中任意位置进行建模的类。
  *
- * <p>Typically used to track the location of problematic or erroneous
- * metadata in XML configuration files. For example, a
- * {@link #getSource() source} location might be 'The bean defined on
- * line 76 of beans.properties has an invalid Class'; another source might
- * be the actual DOM Element from a parsed XML {@link org.w3c.dom.Document};
- * or the source object might simply be {@code null}.
+ * <p>通常用于跟踪XML配置文件中有问题或错误的
+ * 元数据的位置。例如，一个{@link #getSource() 源}位置可能是
+ * 'beans.properties第76行定义的bean具有无效的Class'；另一个源可能
+ * 是解析的XML {@link org.w3c.dom.Document}中的实际DOM元素；
+ * 或者源对象可能简单地为{@code null}。
  *
  * @author Rob Harrop
  * @since 2.0
@@ -42,18 +41,18 @@ public class Location {
 
 
 	/**
-	 * Create a new instance of the {@link Location} class.
-	 * @param resource the resource with which this location is associated
+	 * 创建{@link Location}类的新实例。
+	 * @param resource 与此位置关联的资源
 	 */
 	public Location(Resource resource) {
 		this(resource, null);
 	}
 
 	/**
-	 * Create a new instance of the {@link Location} class.
-	 * @param resource the resource with which this location is associated
-	 * @param source the actual location within the associated resource
-	 * (may be {@code null})
+	 * 创建{@link Location}类的新实例。
+	 * @param resource 与此位置关联的资源
+	 * @param source 关联资源内的实际位置
+	 * （可能为{@code null}）
 	 */
 	public Location(Resource resource, @Nullable Object source) {
 		Assert.notNull(resource, "Resource must not be null");
@@ -63,17 +62,16 @@ public class Location {
 
 
 	/**
-	 * Get the resource with which this location is associated.
+	 * 获取与此位置关联的资源。
 	 */
 	public Resource getResource() {
 		return this.resource;
 	}
 
 	/**
-	 * Get the actual location within the associated {@link #getResource() resource}
-	 * (may be {@code null}).
-	 * <p>See the {@link Location class level javadoc for this class} for examples
-	 * of what the actual type of the returned object may be.
+	 * 获取关联{@link #getResource() 资源}内的实际位置
+	 * （可能为{@code null}）。
+	 * <p>有关返回对象的实际类型的示例，请参见{@link Location 此类的类级javadoc}。
 	 */
 	@Nullable
 	public Object getSource() {

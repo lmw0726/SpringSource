@@ -16,15 +16,6 @@
 
 package org.springframework.beans.factory.support;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyAccessor;
@@ -40,33 +31,38 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.PropertiesPersister;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
+
 /**
- * Bean definition reader for a simple properties format.
+ * 用于简单属性格式的 Bean 定义读取器。
  *
- * <p>Provides bean definition registration methods for Map/Properties and
- * ResourceBundle. Typically applied to a DefaultListableBeanFactory.
+ * <p>为 Map/Properties 和 ResourceBundle 提供 Bean 定义注册方法。
+ * 通常应用于 DefaultListableBeanFactory。
  *
- * <p><b>Example:</b>
+ * <p><b>示例：</b>
  *
  * <pre class="code">
- * employee.(class)=MyClass       // bean is of class MyClass
- * employee.(abstract)=true       // this bean can't be instantiated directly
- * employee.group=Insurance       // real property
- * employee.usesDialUp=false      // real property (potentially overridden)
+ * employee.(class)=MyClass       // bean 的类为 MyClass
+ * employee.(abstract)=true       // 此 bean 无法直接实例化
+ * employee.group=Insurance       // 真正的属性
+ * employee.usesDialUp=false      // 真正的属性（可能被覆盖）
  *
- * salesrep.(parent)=employee     // derives from "employee" bean definition
- * salesrep.(lazy-init)=true      // lazily initialize this singleton bean
- * salesrep.manager(ref)=tony     // reference to another bean
- * salesrep.department=Sales      // real property
+ * salesrep.(parent)=employee     // 派生自 "employee" bean 定义
+ * salesrep.(lazy-init)=true      // 延迟初始化此单例 bean
+ * salesrep.manager(ref)=tony     // 引用另一个 bean
+ * salesrep.department=Sales      // 真正的属性
  *
- * techie.(parent)=employee       // derives from "employee" bean definition
- * techie.(scope)=prototype       // bean is a prototype (not a shared instance)
- * techie.manager(ref)=jeff       // reference to another bean
- * techie.department=Engineering  // real property
- * techie.usesDialUp=true         // real property (overriding parent value)
+ * techie.(parent)=employee       // 派生自 "employee" bean 定义
+ * techie.(scope)=prototype       // bean 为原型（非共享实例）
+ * techie.manager(ref)=jeff       // 引用另一个 bean
+ * techie.department=Engineering  // 真正的属性
+ * techie.usesDialUp=true         // 真正的属性（覆盖父值）
  *
- * ceo.$0(ref)=secretary          // inject 'secretary' bean as 0th constructor arg
- * ceo.$1=1000000                 // inject value '1000000' at 1st constructor arg
+ * ceo.$0(ref)=secretary          // 将 'secretary' bean 注入第 0 个构造参数
+ * ceo.$1=1000000                 // 将值 '1000000' 注入第 1 个构造参数
  * </pre>
  *
  * @author Rod Johnson
@@ -74,21 +70,21 @@ import org.springframework.util.StringUtils;
  * @author Rob Harrop
  * @see DefaultListableBeanFactory
  * @since 26.11.2003
- * @deprecated as of 5.3, in favor of Spring's common bean definition formats
- * and/or custom reader implementations
+ * @deprecated 自 5.3 起，建议使用 Spring 通用 Bean 定义格式
+ * 和/或自定义读取器实现
  */
 @Deprecated
 public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	/**
-	 * Value of a T/F attribute that represents true.
-	 * Anything else represents false. Case seNsItive.
+	 * 表示 true 的 T/F 属性值。
+	 * 其他值表示 false。大小写敏感。
 	 */
 	public static final String TRUE_VALUE = "true";
 
 	/**
-	 * Separator between bean name and property name.
-	 * We follow normal Java conventions.
+	 * bean 名称与属性名称之间的分隔符。
+	 * 我们遵循常规 Java 命名约定。
 	 */
 	public static final String SEPARATOR = ".";
 
@@ -150,10 +146,10 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 
 
 	/**
-	 * Create new PropertiesBeanDefinitionReader for the given bean factory.
+	 * 为给定的 bean 工厂创建新的 PropertiesBeanDefinitionReader。
 	 *
-	 * @param registry the BeanFactory to load bean definitions into,
-	 *                 in the form of a BeanDefinitionRegistry
+	 * @param registry 要加载 bean 定义的 BeanFactory，
+	 *                 以 BeanDefinitionRegistry 的形式提供
 	 */
 	public PropertiesBeanDefinitionReader(BeanDefinitionRegistry registry) {
 		super(registry);
@@ -161,23 +157,19 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 
 
 	/**
-	 * Set the default parent bean for this bean factory.
-	 * If a child bean definition handled by this factory provides neither
-	 * a parent nor a class attribute, this default value gets used.
-	 * <p>Can be used e.g. for view definition files, to define a parent
-	 * with a default view class and common attributes for all views.
-	 * View definitions that define their own parent or carry their own
-	 * class can still override this.
-	 * <p>Strictly speaking, the rule that a default parent setting does
-	 * not apply to a bean definition that carries a class is there for
-	 * backwards compatibility reasons. It still matches the typical use case.
+	 * 为此 bean 工厂设置默认父 bean。
+	 * 如果由此工厂处理的子 bean 定义既没有提供 parent，也没有 class 属性，则使用此默认值。
+	 * <p>例如可用于视图定义文件，为所有视图定义具有默认视图类和通用属性的父级。
+	 * 自定义父级或自带 class 的视图定义仍可覆盖此设置。
+	 * <p>严格来说，默认父设置不适用于带有 class 的 bean 定义，这一规则是出于向后兼容性考虑。
+	 * 但它仍然符合典型使用场景。
 	 */
 	public void setDefaultParentBean(@Nullable String defaultParentBean) {
 		this.defaultParentBean = defaultParentBean;
 	}
 
 	/**
-	 * Return the default parent bean for this bean factory.
+	 * 返回此 bean 工厂的默认父 bean。
 	 */
 	@Nullable
 	public String getDefaultParentBean() {
@@ -185,8 +177,8 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	}
 
 	/**
-	 * Set the PropertiesPersister to use for parsing properties files.
-	 * The default is ResourcePropertiesPersister.
+	 * 设置用于解析 properties 文件的 PropertiesPersister。
+	 * 默认使用 ResourcePropertiesPersister。
 	 *
 	 * @see ResourcePropertiesPersister#INSTANCE
 	 */
@@ -196,7 +188,7 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	}
 
 	/**
-	 * Return the PropertiesPersister to use for parsing properties files.
+	 * 返回用于解析 properties 文件的 PropertiesPersister。
 	 */
 	public PropertiesPersister getPropertiesPersister() {
 		return this.propertiesPersister;
@@ -217,25 +209,23 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	}
 
 	/**
-	 * Load bean definitions from the specified properties file.
+	 * 从指定的属性文件中加载 Bean 定义。
 	 *
-	 * @param resource the resource descriptor for the properties file
-	 * @param prefix   a filter within the keys in the map: e.g. 'beans.'
-	 *                 (can be empty or {@code null})
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * @param resource  属性文件的资源描述符
+	 * @param prefix    键名的过滤前缀，例如 'beans.'（可以为空或 {@code null}）
+	 * @return          找到的 Bean 定义的数量
+	 * @throws BeanDefinitionStoreException 如果发生加载或解析错误
 	 */
 	public int loadBeanDefinitions(Resource resource, @Nullable String prefix) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(new EncodedResource(resource), prefix);
 	}
 
 	/**
-	 * Load bean definitions from the specified properties file.
+	 * 从指定的属性文件中加载 Bean 定义。
 	 *
-	 * @param encodedResource the resource descriptor for the properties file,
-	 *                        allowing to specify an encoding to use for parsing the file
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * @param encodedResource 属性文件的资源描述符，允许指定用于解析文件的编码格式
+	 * @return                找到的 Bean 定义的数量
+	 * @throws BeanDefinitionStoreException 如果发生加载或解析错误
 	 */
 	public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(encodedResource, null);
@@ -280,12 +270,12 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	}
 
 	/**
-	 * Register bean definitions contained in a resource bundle,
-	 * using all property keys (i.e. not filtering by prefix).
+	 * 注册资源包（ResourceBundle）中包含的 Bean 定义，
+	 * 使用所有属性键（即不通过前缀进行过滤）。
 	 *
-	 * @param rb the ResourceBundle to load from
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * @param rb 要从中加载的 ResourceBundle
+	 * @return 找到的 Bean 定义的数量
+	 * @throws BeanDefinitionStoreException 如果发生加载或解析错误
 	 * @see #registerBeanDefinitions(java.util.ResourceBundle, String)
 	 */
 	public int registerBeanDefinitions(ResourceBundle rb) throws BeanDefinitionStoreException {
@@ -293,18 +283,16 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	}
 
 	/**
-	 * Register bean definitions contained in a ResourceBundle.
-	 * <p>Similar syntax as for a Map. This method is useful to enable
-	 * standard Java internationalization support.
+	 * 注册 ResourceBundle 中包含的 Bean 定义。
+	 * <p>语法与 Map 类似。该方法有助于启用标准的 Java 国际化支持。
 	 *
-	 * @param rb     the ResourceBundle to load from
-	 * @param prefix a filter within the keys in the map: e.g. 'beans.'
-	 *               (can be empty or {@code null})
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * @param rb     要从中加载的 ResourceBundle
+	 * @param prefix 键名的过滤前缀，例如 'beans.'（可以为空或 {@code null}）
+	 * @return 找到的 Bean 定义的数量
+	 * @throws BeanDefinitionStoreException 如果发生加载或解析错误
 	 */
 	public int registerBeanDefinitions(ResourceBundle rb, @Nullable String prefix) throws BeanDefinitionStoreException {
-		// Simply create a map and call overloaded method.
+		// 简单创建一个 Map 并调用重载方法
 		Map<String, Object> map = new HashMap<>();
 		Enumeration<String> keys = rb.getKeys();
 		while (keys.hasMoreElements()) {
@@ -316,14 +304,13 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 
 
 	/**
-	 * Register bean definitions contained in a Map, using all property keys (i.e. not
-	 * filtering by prefix).
+	 * 注册 Map 中包含的 Bean 定义，使用所有属性键（即不通过前缀进行过滤）。
 	 *
-	 * @param map a map of {@code name} to {@code property} (String or Object). Property
-	 *            values will be strings if coming from a Properties file etc. Property names
-	 *            (keys) <b>must</b> be Strings. Class keys must be Strings.
-	 * @return the number of bean definitions found
-	 * @throws BeansException in case of loading or parsing errors
+	 * @param map 一个从 {@code 名称} 到 {@code 属性}（String 或 Object）的映射。
+	 *            如果属性值来自 Properties 文件等，则值为字符串形式。
+	 *            属性名称（键）<b>必须</b>是字符串，类对应的键也必须是字符串。
+	 * @return 找到的 Bean 定义的数量
+	 * @throws BeansException 如果发生加载或解析错误
 	 * @see #registerBeanDefinitions(java.util.Map, String, String)
 	 */
 	public int registerBeanDefinitions(Map<?, ?> map) throws BeansException {
@@ -331,16 +318,15 @@ public class PropertiesBeanDefinitionReader extends AbstractBeanDefinitionReader
 	}
 
 	/**
-	 * Register bean definitions contained in a Map.
-	 * Ignore ineligible properties.
+	 * 注册 Map 中包含的 Bean 定义。
+	 * 忽略不符合条件的属性。
 	 *
-	 * @param map    a map of {@code name} to {@code property} (String or Object). Property
-	 *               values will be strings if coming from a Properties file etc. Property names
-	 *               (keys) <b>must</b> be Strings. Class keys must be Strings.
-	 * @param prefix a filter within the keys in the map: e.g. 'beans.'
-	 *               (can be empty or {@code null})
-	 * @return the number of bean definitions found
-	 * @throws BeansException in case of loading or parsing errors
+	 * @param map    一个从 {@code 名称} 到 {@code 属性}（String 或 Object）的映射。
+	 *               如果属性值来自 Properties 文件等，则值为字符串形式。
+	 *               属性名称（键）<b>必须</b>是字符串，类对应的键也必须是字符串。
+	 * @param prefix 键名的过滤前缀，例如 'beans.'（可以为空或 {@code null}）
+	 * @return 找到的 Bean 定义的数量
+	 * @throws BeansException 如果发生加载或解析错误
 	 */
 	public int registerBeanDefinitions(Map<?, ?> map, @Nullable String prefix) throws BeansException {
 		return registerBeanDefinitions(map, prefix, "Map " + map);

@@ -25,11 +25,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Tag collection class used to hold managed Map values, which may
- * include runtime bean references (to be resolved into bean objects).
+ * 用于持有受管 Map 值的标签集合类，其中可能包含运行时 Bean 引用（将在运行时解析为 Bean 对象）。
  *
- * @param <K> the key type
- * @param <V> the value type
+ * @param <K> 键的类型
+ * @param <V> 值的类型
  * @author Juergen Hoeller
  * @author Rob Harrop
  * @since 27.05.2003

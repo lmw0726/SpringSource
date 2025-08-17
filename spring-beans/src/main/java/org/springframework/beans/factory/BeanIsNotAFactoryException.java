@@ -17,9 +17,8 @@
 package org.springframework.beans.factory;
 
 /**
- * Exception thrown when a bean is not a factory, but a user tries to get
- * at the factory for the given bean name. Whether a bean is a factory is
- * determined by whether it implements the FactoryBean interface.
+ * 当bean不是工厂，但用户试图获取给定bean名称的工厂时抛出的异常。
+ * bean是否为工厂由其是否实现FactoryBean接口决定。
  *
  * @author Rod Johnson
  * @since 10.03.2003
@@ -29,10 +28,9 @@ package org.springframework.beans.factory;
 public class BeanIsNotAFactoryException extends BeanNotOfRequiredTypeException {
 
 	/**
-	 * Create a new BeanIsNotAFactoryException.
-	 * @param name the name of the bean requested
-	 * @param actualType the actual type returned, which did not match
-	 * the expected type
+	 * 创建一个新的BeanIsNotAFactoryException。
+	 * @param name 请求的bean名称
+	 * @param actualType 返回的实际类型，与期望类型不匹配
 	 */
 	public BeanIsNotAFactoryException(String name, Class<?> actualType) {
 		super(name, FactoryBean.class, actualType);

@@ -32,13 +32,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link FactoryBean} that evaluates a property path on a given target object.
+ * {@link FactoryBean} 在给定的目标对象上计算属性路径。
  *
- * <p>The target object can be specified directly or via a bean name.
+ * <p>目标对象可以直接指定或通过bean名称指定。
  *
- * <p>Usage examples:
+ * <p>使用示例：
  *
- * <pre class="code">&lt;!-- target bean to be referenced by name --&gt;
+ * <pre class="code">&lt;!-- 通过名称引用的目标bean --&gt;
  * &lt;bean id="tb" class="org.springframework.beans.TestBean" singleton="false"&gt;
  *   &lt;property name="age" value="10"/&gt;
  *   &lt;property name="spouse"&gt;
@@ -48,7 +48,7 @@ import org.springframework.util.StringUtils;
  *   &lt;/property&gt;
  * &lt;/bean&gt;
  *
- * &lt;!-- will result in 12, which is the value of property 'age' of the inner bean --&gt;
+ * &lt;!-- 将返回12，这是内部bean的属性'age'的值 --&gt;
  * &lt;bean id="propertyPath1" class="org.springframework.beans.factory.config.PropertyPathFactoryBean"&gt;
  *   &lt;property name="targetObject"&gt;
  *     &lt;bean class="org.springframework.beans.TestBean"&gt;
@@ -58,24 +58,23 @@ import org.springframework.util.StringUtils;
  *   &lt;property name="propertyPath" value="age"/&gt;
  * &lt;/bean&gt;
  *
- * &lt;!-- will result in 11, which is the value of property 'spouse.age' of bean 'tb' --&gt;
+ * &lt;!-- 将返回11，这是bean 'tb'的属性'spouse.age'的值 --&gt;
  * &lt;bean id="propertyPath2" class="org.springframework.beans.factory.config.PropertyPathFactoryBean"&gt;
  *   &lt;property name="targetBeanName" value="tb"/&gt;
  *   &lt;property name="propertyPath" value="spouse.age"/&gt;
  * &lt;/bean&gt;
  *
- * &lt;!-- will result in 10, which is the value of property 'age' of bean 'tb' --&gt;
+ * &lt;!-- 将返回10，这是bean 'tb'的属性'age'的值 --&gt;
  * &lt;bean id="tb.age" class="org.springframework.beans.factory.config.PropertyPathFactoryBean"/&gt;</pre>
  *
- * <p>If you are using Spring 2.0 and XML Schema support in your configuration file(s),
- * you can also use the following style of configuration for property path access.
- * (See also the appendix entitled 'XML Schema-based configuration' in the Spring
- * reference manual for more examples.)
+ * <p>如果您在配置文件中使用Spring 2.0和XML Schema支持，
+ * 您还可以使用以下配置风格来访问属性路径。
+ * （更多示例请参阅Spring参考手册中标题为"基于XML Schema的配置"的附录。）
  *
- * <pre class="code"> &lt;!-- will result in 10, which is the value of property 'age' of bean 'tb' --&gt;
+ * <pre class="code"> &lt;!-- 将返回10，这是bean 'tb'的属性'age'的值 --&gt;
  * &lt;util:property-path id="name" path="testBean.age"/&gt;</pre>
  *
- * Thanks to Matthias Ernst for the suggestion and initial prototype!
+ * 感谢Matthias Ernst的建议和初始原型！
  *
  * @author Juergen Hoeller
  * @since 1.1.2
@@ -107,10 +106,10 @@ public class PropertyPathFactoryBean implements FactoryBean<Object>, BeanNameAwa
 
 
 	/**
-	 * Specify a target object to apply the property path to.
-	 * Alternatively, specify a target bean name.
-	 * @param targetObject a target object, for example a bean reference
-	 * or an inner bean
+	 * 指定要应用属性路径的目标对象。
+	 * 或者，指定目标bean名称。
+	 * @param targetObject 目标对象，例如bean引用
+	 * 或内部bean
 	 * @see #setTargetBeanName
 	 */
 	public void setTargetObject(Object targetObject) {
@@ -118,10 +117,10 @@ public class PropertyPathFactoryBean implements FactoryBean<Object>, BeanNameAwa
 	}
 
 	/**
-	 * Specify the name of a target bean to apply the property path to.
-	 * Alternatively, specify a target object directly.
-	 * @param targetBeanName the bean name to be looked up in the
-	 * containing bean factory (e.g. "testBean")
+	 * 指定要应用属性路径的目标bean名称。
+	 * 或者，直接指定目标对象。
+	 * @param targetBeanName 要在包含的bean工厂中查找的bean名称
+	 * （例如 "testBean"）
 	 * @see #setTargetObject
 	 */
 	public void setTargetBeanName(String targetBeanName) {
@@ -129,31 +128,30 @@ public class PropertyPathFactoryBean implements FactoryBean<Object>, BeanNameAwa
 	}
 
 	/**
-	 * Specify the property path to apply to the target.
-	 * @param propertyPath the property path, potentially nested
-	 * (e.g. "age" or "spouse.age")
+	 * 指定要应用到目标的属性路径。
+	 * @param propertyPath 属性路径，可能是嵌套的
+	 * （例如 "age" 或 "spouse.age"）
 	 */
 	public void setPropertyPath(String propertyPath) {
 		this.propertyPath = StringUtils.trimAllWhitespace(propertyPath);
 	}
 
 	/**
-	 * Specify the type of the result from evaluating the property path.
-	 * <p>Note: This is not necessary for directly specified target objects
-	 * or singleton target beans, where the type can be determined through
-	 * introspection. Just specify this in case of a prototype target,
-	 * provided that you need matching by type (for example, for autowiring).
-	 * @param resultType the result type, for example "java.lang.Integer"
+	 * 指定计算属性路径的结果类型。
+	 * <p>注意：对于直接指定的目标对象或单例目标bean，这不是必需的，
+	 * 因为类型可以通过内省确定。只有在原型目标的情况下才指定此项，
+	 * 前提是您需要按类型匹配（例如，用于自动装配）。
+	 * @param resultType 结果类型，例如 "java.lang.Integer"
 	 */
 	public void setResultType(Class<?> resultType) {
 		this.resultType = resultType;
 	}
 
 	/**
-	 * The bean name of this PropertyPathFactoryBean will be interpreted
-	 * as "beanName.property" pattern, if neither "targetObject" nor
-	 * "targetBeanName" nor "propertyPath" have been specified.
-	 * This allows for concise bean definitions with just an id/name.
+	 * 如果既没有指定 "targetObject" 也没有指定 "targetBeanName"
+	 * 或 "propertyPath"，则此 PropertyPathFactoryBean 的bean名称
+	 * 将被解释为 "beanName.property" 模式。
+	 * 这允许使用仅带有id/name的简洁bean定义。
 	 */
 	@Override
 	public void setBeanName(String beanName) {
@@ -175,7 +173,7 @@ public class PropertyPathFactoryBean implements FactoryBean<Object>, BeanNameAwa
 						"Specify 'targetObject' or 'targetBeanName' in combination with 'propertyPath'");
 			}
 
-			// No other properties specified: check bean name.
+			// 未指定其他属性: 检查bean名称。
 			int dotIndex = (this.beanName != null ? this.beanName.indexOf('.') : -1);
 			if (dotIndex == -1) {
 				throw new IllegalArgumentException(
@@ -187,12 +185,12 @@ public class PropertyPathFactoryBean implements FactoryBean<Object>, BeanNameAwa
 		}
 
 		else if (this.propertyPath == null) {
-			// either targetObject or targetBeanName specified
+			// 指定targetObject或targetBeanName
 			throw new IllegalArgumentException("'propertyPath' is required");
 		}
 
 		if (this.targetBeanWrapper == null && this.beanFactory.isSingleton(this.targetBeanName)) {
-			// Eagerly fetch singleton target bean, and determine result type.
+			// 急切地获取单例目标bean，并确定结果类型。
 			Object bean = this.beanFactory.getBean(this.targetBeanName);
 			this.targetBeanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(bean);
 			this.resultType = this.targetBeanWrapper.getPropertyType(this.propertyPath);
@@ -213,7 +211,7 @@ public class PropertyPathFactoryBean implements FactoryBean<Object>, BeanNameAwa
 			}
 		}
 		else {
-			// Fetch prototype target bean...
+			// 获取原型目标bean...
 			Assert.state(this.beanFactory != null, "No BeanFactory available");
 			Assert.state(this.targetBeanName != null, "No target bean name specified");
 			Object bean = this.beanFactory.getBean(this.targetBeanName);
@@ -229,10 +227,10 @@ public class PropertyPathFactoryBean implements FactoryBean<Object>, BeanNameAwa
 	}
 
 	/**
-	 * While this FactoryBean will often be used for singleton targets,
-	 * the invoked getters for the property path might return a new object
-	 * for each call, so we have to assume that we're not returning the
-	 * same object for each {@link #getObject()} call.
+	 * 虽然此 FactoryBean 通常用于单例目标，
+	 * 但属性路径的调用getter可能会为每次调用返回新对象，
+	 * 所以我们必须假设每次 {@link #getObject()} 调用
+	 * 都不会返回相同的对象。
 	 */
 	@Override
 	public boolean isSingleton() {

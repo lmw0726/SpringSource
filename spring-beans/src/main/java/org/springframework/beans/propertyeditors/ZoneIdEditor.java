@@ -20,8 +20,8 @@ import java.beans.PropertyEditorSupport;
 import java.time.ZoneId;
 
 /**
- * Editor for {@code java.time.ZoneId}, translating zone ID Strings into {@code ZoneId}
- * objects. Exposes the {@code TimeZone} ID as a text representation.
+ * {@code java.time.ZoneId} 的编辑器，将时区 ID 字符串转换为 {@code ZoneId} 对象。
+ * 同时将 {@code TimeZone} 的 ID 作为文本表示暴露。
  *
  * @author Nicholas Williams
  * @since 4.0

@@ -24,11 +24,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 /**
- * Represents an override of a method that looks up an object in the same IoC context,
- * either by bean name or by bean type (based on the declared method return type).
+ * 表示对一个方法的重写，该方法用于在同一个 IoC 容器中根据 Bean 名称或 Bean 类型查找对象
+ *（基于方法声明的返回类型）。
  *
- * <p>Methods eligible for lookup override may declare arguments in which case the
- * given arguments are passed to the bean retrieval operation.
+ * <p>适用于查找重写的方法可以声明参数，此时这些参数将被传递给 Bean 检索操作。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

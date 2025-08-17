@@ -20,11 +20,11 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 
 /**
- * Base implementation of {@link ComponentDefinition} that provides a basic implementation of
- * {@link #getDescription} which delegates to {@link #getName}. Also provides a base implementation
- * of {@link #toString} which delegates to {@link #getDescription} in keeping with the recommended
- * implementation strategy. Also provides default implementations of {@link #getInnerBeanDefinitions}
- * and {@link #getBeanReferences} that return an empty array.
+ * {@link ComponentDefinition}的基础实现，提供了{@link #getDescription}的基本实现，
+ * 该实现委托给{@link #getName}。还提供了{@link #toString}的基础实现，
+ * 该实现按照推荐的实现策略委托给{@link #getDescription}。还提供了
+ * {@link #getInnerBeanDefinitions}和{@link #getBeanReferences}的默认实现，
+ * 返回空数组。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

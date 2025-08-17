@@ -20,8 +20,7 @@ import org.springframework.beans.FatalBeanException;
 import org.springframework.lang.Nullable;
 
 /**
- * Exception thrown when the BeanFactory cannot load the specified class
- * of a given bean.
+ * 当BeanFactory无法加载给定bean的指定类时抛出的异常。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -39,12 +38,11 @@ public class CannotLoadBeanClassException extends FatalBeanException {
 
 
 	/**
-	 * Create a new CannotLoadBeanClassException.
-	 * @param resourceDescription description of the resource
-	 * that the bean definition came from
-	 * @param beanName the name of the bean requested
-	 * @param beanClassName the name of the bean class
-	 * @param cause the root cause
+	 * 创建一个新的CannotLoadBeanClassException。
+	 * @param resourceDescription bean定义来源资源的描述
+	 * @param beanName 请求的bean名称
+	 * @param beanClassName bean类的名称
+	 * @param cause 根本原因
 	 */
 	public CannotLoadBeanClassException(@Nullable String resourceDescription, String beanName,
 			@Nullable String beanClassName, ClassNotFoundException cause) {
@@ -57,12 +55,11 @@ public class CannotLoadBeanClassException extends FatalBeanException {
 	}
 
 	/**
-	 * Create a new CannotLoadBeanClassException.
-	 * @param resourceDescription description of the resource
-	 * that the bean definition came from
-	 * @param beanName the name of the bean requested
-	 * @param beanClassName the name of the bean class
-	 * @param cause the root cause
+	 * 创建一个新的CannotLoadBeanClassException。
+	 * @param resourceDescription bean定义来源资源的描述
+	 * @param beanName 请求的bean名称
+	 * @param beanClassName bean类的名称
+	 * @param cause 根本原因
 	 */
 	public CannotLoadBeanClassException(@Nullable String resourceDescription, String beanName,
 			@Nullable String beanClassName, LinkageError cause) {
@@ -77,8 +74,7 @@ public class CannotLoadBeanClassException extends FatalBeanException {
 
 
 	/**
-	 * Return the description of the resource that the bean
-	 * definition came from.
+	 * 返回bean定义来源资源的描述。
 	 */
 	@Nullable
 	public String getResourceDescription() {
@@ -86,14 +82,14 @@ public class CannotLoadBeanClassException extends FatalBeanException {
 	}
 
 	/**
-	 * Return the name of the bean requested.
+	 * 返回请求的bean名称。
 	 */
 	public String getBeanName() {
 		return this.beanName;
 	}
 
 	/**
-	 * Return the name of the class we were trying to load.
+	 * 返回我们试图加载的类的名称。
 	 */
 	@Nullable
 	public String getBeanClassName() {

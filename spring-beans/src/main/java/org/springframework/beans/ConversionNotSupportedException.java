@@ -16,12 +16,12 @@
 
 package org.springframework.beans;
 
-import java.beans.PropertyChangeEvent;
-
 import org.springframework.lang.Nullable;
 
+import java.beans.PropertyChangeEvent;
+
 /**
- * Exception thrown when no suitable editor or converter can be found for a bean property.
+ * 当无法为 bean 属性找到合适的编辑器或转换器时抛出的异常。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -31,10 +31,10 @@ import org.springframework.lang.Nullable;
 public class ConversionNotSupportedException extends TypeMismatchException {
 
 	/**
-	 * Create a new ConversionNotSupportedException.
-	 * @param propertyChangeEvent the PropertyChangeEvent that resulted in the problem
-	 * @param requiredType the required target type (or {@code null} if not known)
-	 * @param cause the root cause (may be {@code null})
+	 * 创建一个新的 ConversionNotSupportedException。
+	 * @param propertyChangeEvent 导致问题的 PropertyChangeEvent
+	 * @param requiredType 所需的目标类型（如果未知，则为 {@code null}）
+	 * @param cause 根本原因（可能为 {@code null}）
 	 */
 	public ConversionNotSupportedException(PropertyChangeEvent propertyChangeEvent,
 			@Nullable Class<?> requiredType, @Nullable Throwable cause) {
@@ -42,10 +42,10 @@ public class ConversionNotSupportedException extends TypeMismatchException {
 	}
 
 	/**
-	 * Create a new ConversionNotSupportedException.
-	 * @param value the offending value that couldn't be converted (may be {@code null})
-	 * @param requiredType the required target type (or {@code null} if not known)
-	 * @param cause the root cause (may be {@code null})
+	 * 创建一个新的 ConversionNotSupportedException。
+	 * @param value 无法转换的值（可能为 {@code null}）
+	 * @param requiredType 所需的目标类型（如果未知，则为 {@code null}）
+	 * @param cause 根本原因（可能为 {@code null}）
 	 */
 	public ConversionNotSupportedException(@Nullable Object value, @Nullable Class<?> requiredType, @Nullable Throwable cause) {
 		super(value, requiredType, cause);

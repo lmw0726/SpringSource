@@ -16,14 +16,14 @@
 
 package org.springframework.beans.support;
 
-import java.io.Serializable;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
+
 /**
- * Mutable implementation of the {@link SortDefinition} interface.
- * Supports toggling the ascending value on setting the same property again.
+ * {@link SortDefinition} 接口的可变实现。
+ * 支持在再次设置相同属性时切换升序标志。
  *
  * @author Juergen Hoeller
  * @author Jean-Pierre Pawlak
@@ -43,8 +43,8 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 
 
 	/**
-	 * Create an empty MutableSortDefinition,
-	 * to be populated via its bean properties.
+	 * 创建一个空的 MutableSortDefinition，
+	 * 通过其 bean 属性进行填充。
 	 * @see #setProperty
 	 * @see #setIgnoreCase
 	 * @see #setAscending
@@ -53,9 +53,9 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 	}
 
 	/**
-	 * Copy constructor: create a new MutableSortDefinition
-	 * that mirrors the given sort definition.
-	 * @param source the original sort definition
+	 * 拷贝构造函数：创建一个新的 MutableSortDefinition，
+	 * 镜像给定的排序定义。
+	 * @param source 原始的排序定义
 	 */
 	public MutableSortDefinition(SortDefinition source) {
 		this.property = source.getProperty();
@@ -64,10 +64,10 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 	}
 
 	/**
-	 * Create a MutableSortDefinition for the given settings.
-	 * @param property the property to compare
-	 * @param ignoreCase whether upper and lower case in String values should be ignored
-	 * @param ascending whether to sort ascending (true) or descending (false)
+	 * 根据给定设置创建 MutableSortDefinition。
+	 * @param property 要比较的属性
+	 * @param ignoreCase 是否在 String 值比较时忽略大小写
+	 * @param ascending 是否升序排序（true 表示升序，false 表示降序）
 	 */
 	public MutableSortDefinition(String property, boolean ignoreCase, boolean ascending) {
 		this.property = property;
@@ -76,10 +76,9 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 	}
 
 	/**
-	 * Create a new MutableSortDefinition.
-	 * @param toggleAscendingOnSameProperty whether to toggle the ascending flag
-	 * if the same property gets set again (that is, {@code setProperty} gets
-	 * called with already set property name again).
+	 * 创建一个新的 MutableSortDefinition。
+	 * @param toggleAscendingOnSameProperty 当再次设置同一属性时是否切换升序标志
+	 * （即 {@code setProperty} 被调用且属性名与当前已设置的相同时）
 	 */
 	public MutableSortDefinition(boolean toggleAscendingOnSameProperty) {
 		this.toggleAscendingOnProperty = toggleAscendingOnSameProperty;
@@ -87,9 +86,9 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 
 
 	/**
-	 * Set the property to compare.
-	 * <p>If the property was the same as the current, the sort is reversed if
-	 * "toggleAscendingOnProperty" is activated, else simply ignored.
+	 * 设置要比较的属性。
+	 * <p>如果属性与当前属性相同，并且 "toggleAscendingOnProperty" 被激活，则排序顺序会被反转，
+	 * 否则仅忽略该设置。
 	 * @see #setToggleAscendingOnProperty
 	 */
 	public void setProperty(String property) {
@@ -97,7 +96,7 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 			this.property = "";
 		}
 		else {
-			// Implicit toggling of ascending?
+			// 是否隐式切换升序标志？
 			if (isToggleAscendingOnProperty()) {
 				this.ascending = (!property.equals(this.property) || !this.ascending);
 			}
@@ -111,7 +110,7 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 	}
 
 	/**
-	 * Set whether upper and lower case in String values should be ignored.
+	 * 设置在 String 值比较时是否忽略大小写。
 	 */
 	public void setIgnoreCase(boolean ignoreCase) {
 		this.ignoreCase = ignoreCase;
@@ -123,7 +122,7 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 	}
 
 	/**
-	 * Set whether to sort ascending (true) or descending (false).
+	 * 设置排序顺序：升序为 true，降序为 false。
 	 */
 	public void setAscending(boolean ascending) {
 		this.ascending = ascending;
@@ -135,19 +134,18 @@ public class MutableSortDefinition implements SortDefinition, Serializable {
 	}
 
 	/**
-	 * Set whether to toggle the ascending flag if the same property gets set again
-	 * (that is, {@link #setProperty} gets called with already set property name again).
-	 * <p>This is particularly useful for parameter binding through a web request,
-	 * where clicking on the field header again might be supposed to trigger a
-	 * resort for the same field but opposite order.
+	 * 设置当再次设置同一属性时是否切换升序标志
+	 * （即 {@link #setProperty} 被调用，且属性名与当前已设置的相同时）。
+	 * <p>这对于通过 Web 请求进行参数绑定特别有用，例如再次点击字段标题时
+	 * 可能希望对同一字段以相反顺序重新排序。
 	 */
 	public void setToggleAscendingOnProperty(boolean toggleAscendingOnProperty) {
 		this.toggleAscendingOnProperty = toggleAscendingOnProperty;
 	}
 
 	/**
-	 * Return whether to toggle the ascending flag if the same property gets set again
-	 * (that is, {@code setProperty} gets called with already set property name again).
+	 * 返回当再次设置同一属性时是否切换升序标志
+	 * （即 {@code setProperty} 被调用，且属性名与当前已设置的相同时）。
 	 */
 	public boolean isToggleAscendingOnProperty() {
 		return this.toggleAscendingOnProperty;

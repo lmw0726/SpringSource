@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Descriptive {@link org.springframework.core.io.Resource} wrapper for
- * a {@link org.springframework.beans.factory.config.BeanDefinition}.
+ * 为 {@link org.springframework.beans.factory.config.BeanDefinition} 提供描述性信息的
+ * {@link org.springframework.core.io.Resource} 包装类。
  *
  * @author Juergen Hoeller
  * @see org.springframework.core.io.DescriptiveResource

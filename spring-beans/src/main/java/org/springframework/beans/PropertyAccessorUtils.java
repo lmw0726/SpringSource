@@ -19,8 +19,7 @@ package org.springframework.beans;
 import org.springframework.lang.Nullable;
 
 /**
- * Utility methods for classes that perform bean property access
- * according to the {@link PropertyAccessor} interface.
+ * 根据 {@link PropertyAccessor} 接口执行Bean属性访问的类的实用方法。
  *
  * @author Juergen Hoeller
  * @since 1.2.6
@@ -28,11 +27,11 @@ import org.springframework.lang.Nullable;
 public abstract class PropertyAccessorUtils {
 
 	/**
-	 * Return the actual property name for the given property path.
+	 * 返回给定属性路径的实际属性名称。
 	 *
-	 * @param propertyPath the property path to determine the property name
-	 *                     for (can include property keys, for example for specifying a map entry)
-	 * @return the actual property name, without any key elements
+	 * @param propertyPath 要确定属性名称的属性路径
+	 *                     （可以包含属性键，例如用于指定映射条目）
+	 * @return 实际的属性名称，不包含任何键元素
 	 */
 	public static String getPropertyName(String propertyPath) {
 		int separatorIndex = (propertyPath.endsWith(PropertyAccessor.PROPERTY_KEY_SUFFIX) ?
@@ -41,10 +40,10 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Check whether the given property path indicates an indexed or nested property.
+	 * 检查给定的属性路径是否表示索引属性或嵌套属性。
 	 *
-	 * @param propertyPath the property path to check
-	 * @return whether the path indicates an indexed or nested property
+	 * @param propertyPath 要检查的属性路径
+	 * @return 路径是否表示索引属性或嵌套属性
 	 */
 	public static boolean isNestedOrIndexedProperty(@Nullable String propertyPath) {
 		if (propertyPath == null) {
@@ -121,12 +120,12 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Determine whether the given registered path matches the given property path,
-	 * either indicating the property itself or an indexed element of the property.
+	 * 确定给定的已注册路径是否匹配给定的属性路径，
+	 * 指示属性本身或属性的索引元素。
 	 *
-	 * @param propertyPath   the property path (typically without index)
-	 * @param registeredPath the registered path (potentially with index)
-	 * @return whether the paths match
+	 * @param propertyPath   属性路径（通常不带索引）
+	 * @param registeredPath 已注册路径（可能带有索引）
+	 * @return 路径是否匹配
 	 */
 	public static boolean matchesProperty(String registeredPath, String propertyPath) {
 		if (!registeredPath.startsWith(propertyPath)) {
@@ -143,13 +142,13 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Determine the canonical name for the given property path.
-	 * Removes surrounding quotes from map keys:<br>
+	 * 确定给定属性路径的规范名称。
+	 * 移除映射键周围的引号：<br>
 	 * {@code map['key']} &rarr; {@code map[key]}<br>
 	 * {@code map["key"]} &rarr; {@code map[key]}
 	 *
-	 * @param propertyName the bean property path
-	 * @return the canonical representation of the property path
+	 * @param propertyName Bean属性路径
+	 * @return 属性路径的规范表示
 	 */
 	public static String canonicalPropertyName(@Nullable String propertyName) {
 		if (propertyName == null) {
@@ -179,11 +178,11 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Determine the canonical names for the given property paths.
+	 * 确定给定属性路径的规范名称。
 	 *
-	 * @param propertyNames the bean property paths (as array)
-	 * @return the canonical representation of the property paths
-	 * (as array of the same size)
+	 * @param propertyNames Bean属性路径（数组形式）
+	 * @return 属性路径的规范表示
+	 * （相同大小的数组）
 	 * @see #canonicalPropertyName(String)
 	 */
 	@Nullable

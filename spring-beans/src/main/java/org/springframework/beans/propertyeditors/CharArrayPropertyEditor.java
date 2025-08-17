@@ -16,13 +16,12 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.lang.Nullable;
 
+import java.beans.PropertyEditorSupport;
+
 /**
- * Editor for char arrays. Strings will simply be converted to
- * their corresponding char representations.
+ * char 数组的编辑器。字符串将直接转换为对应的 char 表示。
  *
  * @author Juergen Hoeller
  * @since 1.2.8

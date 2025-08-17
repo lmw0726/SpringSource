@@ -25,11 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension of {@link MethodOverride} that represents an arbitrary
- * override of a method by the IoC container.
+ * {@link MethodOverride} 的扩展，表示 IoC 容器对方法的任意重写。
  *
- * <p>Any non-final method can be overridden, irrespective of its
- * parameters and return types.
+ * <p>任何非 final 方法都可以被重写，无论其参数和返回类型如何。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

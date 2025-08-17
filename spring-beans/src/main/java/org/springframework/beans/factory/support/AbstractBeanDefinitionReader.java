@@ -34,11 +34,9 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Abstract base class for bean definition readers which implement
- * the {@link BeanDefinitionReader} interface.
+ * 实现 {@link BeanDefinitionReader} 接口的 bean 定义读取器的抽象基类。
  *
- * <p>Provides common properties like the bean factory to work on
- * and the class loader to use for loading bean classes.
+ * <p>提供一些公共属性，例如要操作的 bean 工厂，以及用于加载 bean 类的类加载器。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -48,7 +46,7 @@ import java.util.Set;
 public abstract class AbstractBeanDefinitionReader implements BeanDefinitionReader, EnvironmentCapable {
 
 	/**
-	 * Logger available to subclasses.
+	 * 子类可用的日志记录器。
 	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -99,12 +97,10 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 
 	/**
-	 * Return the bean factory to register the bean definitions with.
-	 * <p>The factory is exposed through the BeanDefinitionRegistry interface,
-	 * encapsulating the methods that are relevant for bean definition handling.
+	 * 返回用于注册 bean 定义的 bean 工厂。
+	 * <p>该工厂通过 BeanDefinitionRegistry 接口暴露，封装了与 bean 定义处理相关的方法。
 	 *
-	 * @deprecated as of Spring Framework 5.3.15 in favor of {@link #getRegistry()},
-	 * to be removed in Spring Framework 6.0
+	 * @deprecated 自 Spring Framework 5.3.15 起弃用，建议使用 {@link #getRegistry()}，将在 Spring Framework 6.0 中移除
 	 */
 	@Deprecated
 	public final BeanDefinitionRegistry getBeanFactory() {
@@ -117,13 +113,10 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	/**
-	 * Set the ResourceLoader to use for resource locations.
-	 * If specifying a ResourcePatternResolver, the bean definition reader
-	 * will be capable of resolving resource patterns to Resource arrays.
-	 * <p>Default is PathMatchingResourcePatternResolver, also capable of
-	 * resource pattern resolving through the ResourcePatternResolver interface.
-	 * <p>Setting this to {@code null} suggests that absolute resource loading
-	 * is not available for this bean definition reader.
+	 * 设置用于资源路径的 ResourceLoader。
+	 * 如果指定的是 ResourcePatternResolver，则 bean 定义读取器将能够把资源路径模式解析为 Resource 数组。
+	 * <p>默认值为 PathMatchingResourcePatternResolver，它也通过 ResourcePatternResolver 接口支持资源模式解析。
+	 * <p>将其设置为 {@code null} 表示该 bean 定义读取器不支持绝对路径资源加载。
 	 *
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
@@ -139,10 +132,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	/**
-	 * Set the ClassLoader to use for bean classes.
-	 * <p>Default is {@code null}, which suggests to not load bean classes
-	 * eagerly but rather to just register bean definitions with class names,
-	 * with the corresponding Classes to be resolved later (or never).
+	 * 设置用于加载 bean 类的 ClassLoader。
+	 * <p>默认值为 {@code null}，表示不应急于加载 bean 类，而应仅使用类名注册 bean 定义，
+	 * 对应的类将在后续解析（或永不解析）。
 	 *
 	 * @see Thread#getContextClassLoader()
 	 */
@@ -157,9 +149,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	/**
-	 * Set the Environment to use when reading bean definitions. Most often used
-	 * for evaluating profile information to determine which bean definitions
-	 * should be read and which should be omitted.
+	 * 设置读取 bean 定义时要使用的 Environment。通常用于解析 profile 信息，
+	 * 以确定哪些 bean 定义应被读取，哪些应被忽略。
 	 */
 	public void setEnvironment(Environment environment) {
 		Assert.notNull(environment, "Environment must not be null");
@@ -172,9 +163,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	/**
-	 * Set the BeanNameGenerator to use for anonymous beans
-	 * (without explicit bean name specified).
-	 * <p>Default is a {@link DefaultBeanNameGenerator}.
+	 * 设置用于匿名 bean（未显式指定 bean 名称）的 BeanNameGenerator。
+	 * <p>默认值为 {@link DefaultBeanNameGenerator}。
 	 */
 	public void setBeanNameGenerator(@Nullable BeanNameGenerator beanNameGenerator) {
 		this.beanNameGenerator = (beanNameGenerator != null ? beanNameGenerator : DefaultBeanNameGenerator.INSTANCE);

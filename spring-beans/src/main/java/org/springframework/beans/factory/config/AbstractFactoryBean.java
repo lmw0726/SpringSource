@@ -33,20 +33,16 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * Simple template superclass for {@link FactoryBean} implementations that
- * creates a singleton or a prototype object, depending on a flag.
+ * {@link FactoryBean} 实现的简单模板超类，根据标志创建单例或原型对象。
  *
- * <p>If the "singleton" flag is {@code true} (the default),
- * this class will create the object that it creates exactly once
- * on initialization and subsequently return said singleton instance
- * on all calls to the {@link #getObject()} method.
+ * <p>如果 "singleton" 标志为 {@code true}（默认值），
+ * 本类将在初始化时仅创建一次对象，并在随后的 {@link #getObject()} 调用中
+ * 始终返回该单例实例。
  *
- * <p>Else, this class will create a new instance every time the
- * {@link #getObject()} method is invoked. Subclasses are responsible
- * for implementing the abstract {@link #createInstance()} template
- * method to actually create the object(s) to expose.
+ * <p>否则，每次调用 {@link #getObject()} 方法时，本类将创建一个新实例。
+ * 子类负责实现抽象的 {@link #createInstance()} 模板方法，以实际创建要暴露的对象。
  *
- * @param <T> the bean type
+ * @param <T> Bean 类型
  * @author Juergen Hoeller
  * @author Keith Donald
  * @see #setSingleton

@@ -25,7 +25,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Bean factory post processor that logs a warning for {@link Deprecated @Deprecated} beans.
+ * Bean 工厂后置处理器，用于记录被 {@link Deprecated @Deprecated} 注解标记的 Bean 的警告信息。
  *
  * @author Arjen Poutsma
  * @since 3.0.3
@@ -33,16 +33,15 @@ import org.springframework.util.StringUtils;
 public class DeprecatedBeanWarner implements BeanFactoryPostProcessor {
 
 	/**
-	 * Logger available to subclasses.
+	 * 可供子类使用的日志对象。
 	 */
 	protected transient Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * Set the name of the logger to use.
-	 * The name will be passed to the underlying logger implementation through Commons Logging,
-	 * getting interpreted as log category according to the logger's configuration.
-	 * <p>This can be specified to not log into the category of this warner class but rather
-	 * into a specific named category.
+	 * 设置要使用的日志器名称。
+	 * 该名称将通过 Commons Logging 传递给底层日志实现，
+	 * 并根据日志器的配置被解释为日志类别。
+	 * <p>可通过此方式指定，将日志写入特定命名的类别，而不是此警告类的默认类别。
 	 * @see org.apache.commons.logging.LogFactory#getLog(String)
 	 * @see java.util.logging.Logger#getLogger(String)
 	 */
@@ -73,10 +72,10 @@ public class DeprecatedBeanWarner implements BeanFactoryPostProcessor {
 	}
 
 	/**
-	 * Logs a warning for a bean annotated with {@link Deprecated @Deprecated}.
-	 * @param beanName the name of the deprecated bean
-	 * @param beanType the user-specified type of the deprecated bean
-	 * @param beanDefinition the definition of the deprecated bean
+	 * 为被 {@link Deprecated @Deprecated} 注解标记的 Bean 记录警告日志。
+	 * @param beanName 被废弃 Bean 的名称
+	 * @param beanType 被废弃 Bean 的用户指定类型
+	 * @param beanDefinition 被废弃 Bean 的定义
 	 */
 	protected void logDeprecatedBean(String beanName, Class<?> beanType, BeanDefinition beanDefinition) {
 		StringBuilder builder = new StringBuilder();
@@ -94,18 +93,18 @@ public class DeprecatedBeanWarner implements BeanFactoryPostProcessor {
 	}
 
 	/**
-	 * Actually write to the underlying log.
-	 * <p>The default implementations logs the message at "warn" level.
-	 * @param message the message to write
+	 * 将日志实际写入底层日志系统。
+	 * <p>默认实现将消息记录在 "warn" 级别。
+	 * @param message 要写入的消息
 	 */
 	protected void writeToLog(String message) {
 		logger.warn(message);
 	}
 
 	/**
-	 * Determine whether the {@link #logger} field is enabled.
-	 * <p>Default is {@code true} when the "warn" level is enabled.
-	 * Subclasses can override this to change the level under which logging occurs.
+	 * 判断 {@link #logger} 是否启用。
+	 * <p>默认情况下，当 "warn" 级别启用时返回 {@code true}。
+	 * 子类可以重写此方法以改变日志输出的级别。
 	 */
 	protected boolean isLogEnabled() {
 		return logger.isWarnEnabled();

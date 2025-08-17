@@ -19,8 +19,7 @@ package org.springframework.beans;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface representing an object whose value set can be merged with
- * that of a parent object.
+ * 表示其值集合可以与父对象的值集合合并的对象接口。
  *
  * @author Rob Harrop
  * @see org.springframework.beans.factory.support.ManagedSet

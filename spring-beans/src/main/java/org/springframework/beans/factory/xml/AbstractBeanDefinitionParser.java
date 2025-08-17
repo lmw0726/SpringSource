@@ -28,18 +28,17 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
- * Abstract {@link BeanDefinitionParser} implementation providing
- * a number of convenience methods and a
- * {@link AbstractBeanDefinitionParser#parseInternal template method}
- * that subclasses must override to provide the actual parsing logic.
+ * 抽象的 {@link BeanDefinitionParser} 实现，提供了一些便捷方法，
+ * 以及一个 {@link AbstractBeanDefinitionParser#parseInternal 模板方法}，
+ * 子类必须重写该方法以提供实际的解析逻辑。
  *
- * <p>Use this {@link BeanDefinitionParser} implementation when you want
- * to parse some arbitrarily complex XML into one or more
- * {@link BeanDefinition BeanDefinitions}. If you just want to parse some
- * XML into a single {@code BeanDefinition}, you may wish to consider
- * the simpler convenience extensions of this class, namely
- * {@link AbstractSingleBeanDefinitionParser} and
- * {@link AbstractSimpleBeanDefinitionParser}.
+ * <p>当希望将任意复杂的 XML 解析为一个或多个
+ * {@link BeanDefinition BeanDefinitions} 时，可使用此
+ * {@link BeanDefinitionParser} 实现。
+ * 如果只需要将 XML 解析为单个 {@code BeanDefinition}，
+ * 可以考虑此类的更简单便捷的扩展类，
+ * 即 {@link AbstractSingleBeanDefinitionParser} 和
+ * {@link AbstractSimpleBeanDefinitionParser}。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

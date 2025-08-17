@@ -16,22 +16,20 @@
 
 package org.springframework.beans;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.StringJoiner;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.StringJoiner;
+
 /**
- * Combined exception, composed of individual PropertyAccessException instances.
- * An object of this class is created at the beginning of the binding
- * process, and errors added to it as necessary.
+ * 组合异常，由单个PropertyAccessException实例组成。
+ * 此类的对象在绑定过程开始时创建，并根据需要添加错误。
  *
- * <p>The binding process continues when it encounters application-level
- * PropertyAccessExceptions, applying those changes that can be applied
- * and storing rejected changes in an object of this class.
+ * <p>当遇到应用程序级别的PropertyAccessExceptions时，绑定过程会继续进行，
+ * 应用那些可以应用的更改，并将被拒绝的更改存储在此类的对象中。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -40,13 +38,13 @@ import org.springframework.util.ObjectUtils;
 @SuppressWarnings("serial")
 public class PropertyBatchUpdateException extends BeansException {
 
-	/** List of PropertyAccessException objects. */
+	/** PropertyAccessException对象列表。 */
 	private final PropertyAccessException[] propertyAccessExceptions;
 
 
 	/**
-	 * Create a new PropertyBatchUpdateException.
-	 * @param propertyAccessExceptions the List of PropertyAccessExceptions
+	 * 创建新的PropertyBatchUpdateException。
+	 * @param propertyAccessExceptions PropertyAccessExceptions列表
 	 */
 	public PropertyBatchUpdateException(PropertyAccessException[] propertyAccessExceptions) {
 		super(null, null);
@@ -56,22 +54,22 @@ public class PropertyBatchUpdateException extends BeansException {
 
 
 	/**
-	 * If this returns 0, no errors were encountered during binding.
+	 * 如果返回0，则在绑定过程中没有遇到错误。
 	 */
 	public final int getExceptionCount() {
 		return this.propertyAccessExceptions.length;
 	}
 
 	/**
-	 * Return an array of the propertyAccessExceptions stored in this object.
-	 * <p>Will return the empty array (not {@code null}) if there were no errors.
+	 * 返回存储在此对象中的propertyAccessExceptions数组。
+	 * <p>如果没有错误，将返回空数组（不是 {@code null}）。
 	 */
 	public final PropertyAccessException[] getPropertyAccessExceptions() {
 		return this.propertyAccessExceptions;
 	}
 
 	/**
-	 * Return the exception for this field, or {@code null} if there isn't any.
+	 * 返回此字段的异常，如果没有则返回 {@code null}。
 	 */
 	@Nullable
 	public PropertyAccessException getPropertyAccessException(String propertyName) {

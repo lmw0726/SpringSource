@@ -19,8 +19,8 @@ package org.springframework.beans;
 import java.beans.PropertyChangeEvent;
 
 /**
- * Thrown when a bean property getter or setter method throws an exception,
- * analogous to an InvocationTargetException.
+ * 当 bean 属性的 getter 或 setter 方法抛出异常时抛出，
+ * 类似于 InvocationTargetException。
  *
  * @author Rod Johnson
  */
@@ -28,15 +28,15 @@ import java.beans.PropertyChangeEvent;
 public class MethodInvocationException extends PropertyAccessException {
 
 	/**
-	 * Error code that a method invocation error will be registered with.
+	 * 用于注册方法调用错误的错误码。
 	 */
 	public static final String ERROR_CODE = "methodInvocation";
 
 
 	/**
-	 * Create a new MethodInvocationException.
-	 * @param propertyChangeEvent the PropertyChangeEvent that resulted in an exception
-	 * @param cause the Throwable raised by the invoked method
+	 * 创建一个新的 MethodInvocationException。
+	 * @param propertyChangeEvent 导致异常的 PropertyChangeEvent
+	 * @param cause 被调用方法抛出的 Throwable
 	 */
 	public MethodInvocationException(PropertyChangeEvent propertyChangeEvent, Throwable cause) {
 		super(propertyChangeEvent, "Property '" + propertyChangeEvent.getPropertyName() + "' threw exception", cause);

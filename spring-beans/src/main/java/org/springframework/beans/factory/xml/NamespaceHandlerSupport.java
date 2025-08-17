@@ -27,13 +27,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Support class for implementing custom {@link NamespaceHandler NamespaceHandlers}.
- * Parsing and decorating of individual {@link Node Nodes} is done via {@link BeanDefinitionParser}
- * and {@link BeanDefinitionDecorator} strategy interfaces, respectively.
+ * 用于实现自定义 {@link NamespaceHandler 命名空间处理器} 的支持类。
+ * 对单个 {@link Node 节点} 的解析和装饰分别通过 {@link BeanDefinitionParser}
+ * 和 {@link BeanDefinitionDecorator} 策略接口完成。
  *
- * <p>Provides the {@link #registerBeanDefinitionParser} and {@link #registerBeanDefinitionDecorator}
- * methods for registering a {@link BeanDefinitionParser} or {@link BeanDefinitionDecorator}
- * to handle a specific element.
+ * <p>提供了 {@link #registerBeanDefinitionParser} 和 {@link #registerBeanDefinitionDecorator}
+ * 方法，用于注册 {@link BeanDefinitionParser} 或 {@link BeanDefinitionDecorator}，
+ * 以处理特定的 XML 元素。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

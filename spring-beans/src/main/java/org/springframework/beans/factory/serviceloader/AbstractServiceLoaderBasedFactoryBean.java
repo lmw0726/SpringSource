@@ -25,8 +25,7 @@ import org.springframework.util.ClassUtils;
 import java.util.ServiceLoader;
 
 /**
- * Abstract base class for FactoryBeans operating on the
- * JDK 1.6 {@link java.util.ServiceLoader} facility.
+ * 基于 JDK 1.6 {@link java.util.ServiceLoader} 机制的 FactoryBean 的抽象基类。
  *
  * @author Juergen Hoeller
  * @since 2.5

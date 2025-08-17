@@ -20,8 +20,8 @@ import org.springframework.beans.FatalBeanException;
 import org.springframework.lang.Nullable;
 
 /**
- * Exception thrown when a BeanFactory encounters an invalid bean definition:
- * e.g. in case of incomplete or contradictory bean metadata.
+ * 当 BeanFactory 遇到无效的 Bean 定义时抛出的异常：
+ * 例如不完整或相互矛盾的 Bean 元数据。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -38,8 +38,8 @@ public class BeanDefinitionStoreException extends FatalBeanException {
 
 
 	/**
-	 * Create a new BeanDefinitionStoreException.
-	 * @param msg the detail message (used as exception message as-is)
+	 * 创建一个新的 BeanDefinitionStoreException。
+	 * @param msg 详细信息（直接作为异常消息使用）
 	 */
 	public BeanDefinitionStoreException(String msg) {
 		super(msg);
@@ -48,9 +48,9 @@ public class BeanDefinitionStoreException extends FatalBeanException {
 	}
 
 	/**
-	 * Create a new BeanDefinitionStoreException.
-	 * @param msg the detail message (used as exception message as-is)
-	 * @param cause the root cause (may be {@code null})
+	 * 创建一个新的 BeanDefinitionStoreException。
+	 * @param msg 详细信息（直接作为异常消息使用）
+	 * @param cause 根本原因（可能为 {@code null}）
 	 */
 	public BeanDefinitionStoreException(String msg, @Nullable Throwable cause) {
 		super(msg, cause);
@@ -59,9 +59,9 @@ public class BeanDefinitionStoreException extends FatalBeanException {
 	}
 
 	/**
-	 * Create a new BeanDefinitionStoreException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param msg the detail message (used as exception message as-is)
+	 * 创建一个新的 BeanDefinitionStoreException。
+	 * @param resourceDescription Bean 定义来源资源的描述
+	 * @param msg 详细信息（直接作为异常消息使用）
 	 */
 	public BeanDefinitionStoreException(@Nullable String resourceDescription, String msg) {
 		super(msg);
@@ -70,10 +70,10 @@ public class BeanDefinitionStoreException extends FatalBeanException {
 	}
 
 	/**
-	 * Create a new BeanDefinitionStoreException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param msg the detail message (used as exception message as-is)
-	 * @param cause the root cause (may be {@code null})
+	 * 创建一个新的 BeanDefinitionStoreException。
+	 * @param resourceDescription Bean 定义来源资源的描述
+	 * @param msg 详细信息（直接作为异常消息使用）
+	 * @param cause 根本原因（可能为 {@code null}）
 	 */
 	public BeanDefinitionStoreException(@Nullable String resourceDescription, String msg, @Nullable Throwable cause) {
 		super(msg, cause);
@@ -82,23 +82,21 @@ public class BeanDefinitionStoreException extends FatalBeanException {
 	}
 
 	/**
-	 * Create a new BeanDefinitionStoreException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param beanName the name of the bean
-	 * @param msg the detail message (appended to an introductory message that indicates
-	 * the resource and the name of the bean)
+	 * 创建一个新的 BeanDefinitionStoreException。
+	 * @param resourceDescription Bean 定义来源资源的描述
+	 * @param beanName Bean 的名称
+	 * @param msg 详细信息（会附加在提示资源和 Bean 名称的介绍性消息之后）
 	 */
 	public BeanDefinitionStoreException(@Nullable String resourceDescription, String beanName, String msg) {
 		this(resourceDescription, beanName, msg, null);
 	}
 
 	/**
-	 * Create a new BeanDefinitionStoreException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param beanName the name of the bean
-	 * @param msg the detail message (appended to an introductory message that indicates
-	 * the resource and the name of the bean)
-	 * @param cause the root cause (may be {@code null})
+	 * 创建一个新的 BeanDefinitionStoreException。
+	 * @param resourceDescription Bean 定义来源资源的描述
+	 * @param beanName Bean 的名称
+	 * @param msg 详细信息（会附加在提示资源和 Bean 名称的介绍性消息之后）
+	 * @param cause 根本原因（可能为 {@code null}）
 	 */
 	public BeanDefinitionStoreException(
 			@Nullable String resourceDescription, String beanName, String msg, @Nullable Throwable cause) {
@@ -111,7 +109,7 @@ public class BeanDefinitionStoreException extends FatalBeanException {
 
 
 	/**
-	 * Return the description of the resource that the bean definition came from, if available.
+	 * 返回 Bean 定义来源资源的描述（如果可用）。
 	 */
 	@Nullable
 	public String getResourceDescription() {
@@ -119,7 +117,7 @@ public class BeanDefinitionStoreException extends FatalBeanException {
 	}
 
 	/**
-	 * Return the name of the bean, if available.
+	 * 返回 Bean 的名称（如果可用）。
 	 */
 	@Nullable
 	public String getBeanName() {

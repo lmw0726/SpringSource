@@ -17,42 +17,36 @@
 package org.springframework.beans.factory;
 
 /**
- * Extension of the {@link FactoryBean} interface. Implementations may
- * indicate whether they always return independent instances, for the
- * case where their {@link #isSingleton()} implementation returning
- * {@code false} does not clearly indicate independent instances.
+ * {@link FactoryBean}接口的扩展。实现类可以指示它们是否总是返回独立实例，
+ * 用于处理其{@link #isSingleton()}实现返回{@code false}但不能清楚表明
+ * 是否为独立实例的情况。
  *
- * <p>Plain {@link FactoryBean} implementations which do not implement
- * this extended interface are simply assumed to always return independent
- * instances if their {@link #isSingleton()} implementation returns
- * {@code false}; the exposed object is only accessed on demand.
+ * <p>未实现此扩展接口的普通{@link FactoryBean}实现，如果其{@link #isSingleton()}
+ * 实现返回{@code false}，则简单地假定总是返回独立实例；暴露的对象只在需要时访问。
  *
- * <p><b>NOTE:</b> This interface is a special purpose interface, mainly for
- * internal use within the framework and within collaborating frameworks.
- * In general, application-provided FactoryBeans should simply implement
- * the plain {@link FactoryBean} interface. New methods might be added
- * to this extended interface even in point releases.
+ * <p><b>注意：</b>此接口是一个特殊用途的接口，主要用于框架内部使用以及
+ * 协作框架内使用。通常情况下，应用程序提供的FactoryBean应该简单地实现
+ * 普通的{@link FactoryBean}接口。即使在修订版本中，也可能会向此扩展接口
+ * 添加新方法。
  *
  * @author Juergen Hoeller
  * @since 2.0.3
- * @param <T> the bean type
+ * @param <T> bean类型
  * @see #isPrototype()
  * @see #isSingleton()
  */
 public interface SmartFactoryBean<T> extends FactoryBean<T> {
 
 	/**
-	 * Is the object managed by this factory a prototype? That is,
-	 * will {@link #getObject()} always return an independent instance?
-	 * <p>The prototype status of the FactoryBean itself will generally
-	 * be provided by the owning {@link BeanFactory}; usually, it has to be
-	 * defined as singleton there.
-	 * <p>This method is supposed to strictly check for independent instances;
-	 * it should not return {@code true} for scoped objects or other
-	 * kinds of non-singleton, non-independent objects. For this reason,
-	 * this is not simply the inverted form of {@link #isSingleton()}.
-	 * <p>The default implementation returns {@code false}.
-	 * @return whether the exposed object is a prototype
+	 * 此工厂管理的对象是否为原型？也就是说，{@link #getObject()}是否总是
+	 * 返回一个独立的实例？
+	 * <p>FactoryBean本身的原型状态通常由拥有它的{@link BeanFactory}提供；
+	 * 通常，它必须在那里定义为单例。
+	 * <p>此方法应该严格检查独立实例；对于作用域对象或其他类型的非单例、
+	 * 非独立对象，它不应该返回{@code true}。出于这个原因，这不是
+	 * {@link #isSingleton()}的简单反向形式。
+	 * <p>默认实现返回{@code false}。
+	 * @return 暴露的对象是否为原型
 	 * @see #getObject()
 	 * @see #isSingleton()
 	 */
@@ -61,18 +55,15 @@ public interface SmartFactoryBean<T> extends FactoryBean<T> {
 	}
 
 	/**
-	 * Does this FactoryBean expect eager initialization, that is,
-	 * eagerly initialize itself as well as expect eager initialization
-	 * of its singleton object (if any)?
-	 * <p>A standard FactoryBean is not expected to initialize eagerly:
-	 * Its {@link #getObject()} will only be called for actual access, even
-	 * in case of a singleton object. Returning {@code true} from this
-	 * method suggests that {@link #getObject()} should be called eagerly,
-	 * also applying post-processors eagerly. This may make sense in case
-	 * of a {@link #isSingleton() singleton} object, in particular if
-	 * post-processors expect to be applied on startup.
-	 * <p>The default implementation returns {@code false}.
-	 * @return whether eager initialization applies
+	 * 此FactoryBean是否期望预先初始化，也就是说，预先初始化自身以及
+	 * 期望预先初始化其单例对象（如果有的话）？
+	 * <p>标准的FactoryBean不期望预先初始化：其{@link #getObject()}只会在
+	 * 实际访问时被调用，即使是单例对象的情况下也是如此。从此方法返回{@code true}
+	 * 表示应该预先调用{@link #getObject()}，同时也预先应用后处理器。
+	 * 在{@link #isSingleton() 单例}对象的情况下这可能是有意义的，特别是
+	 * 如果后处理器期望在启动时被应用。
+	 * <p>默认实现返回{@code false}。
+	 * @return 是否应用预先初始化
 	 * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory#preInstantiateSingletons()
 	 */
 	default boolean isEagerInit() {

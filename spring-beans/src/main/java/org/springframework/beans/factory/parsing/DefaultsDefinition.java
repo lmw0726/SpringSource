@@ -19,11 +19,11 @@ package org.springframework.beans.factory.parsing;
 import org.springframework.beans.BeanMetadataElement;
 
 /**
- * Marker interface for a defaults definition,
- * extending BeanMetadataElement to inherit source exposure.
+ * 默认值定义的标记接口，
+ * 扩展BeanMetadataElement以继承源暴露。
  *
- * <p>Concrete implementations are typically based on 'document defaults',
- * for example specified at the root tag level within an XML document.
+ * <p>具体实现通常基于'文档默认值'，
+ * 例如在XML文档的根标签级别指定的默认值。
  *
  * @author Juergen Hoeller
  * @since 2.0.2

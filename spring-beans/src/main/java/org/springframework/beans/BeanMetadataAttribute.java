@@ -21,8 +21,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Holder for a key-value style attribute that is part of a bean definition.
- * Keeps track of the definition source in addition to the key-value pair.
+ * 用于保存 bean 定义中键值对样式属性的持有者。
+ * 除了保存键值对外，还跟踪定义的来源。
  *
  * @author Juergen Hoeller
  * @since 2.5

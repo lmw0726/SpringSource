@@ -16,40 +16,34 @@
 
 package org.springframework.beans.factory.xml;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link EntityResolver} implementation that attempts to resolve schema URLs into
- * local {@link ClassPathResource classpath resources} using a set of mappings files.
+ * {@link EntityResolver} 的实现，尝试使用一组映射文件将 schema URL 解析为本地的 {@link ClassPathResource classpath 资源}。
  *
- * <p>By default, this class will look for mapping files in the classpath using the
- * pattern: {@code META-INF/spring.schemas} allowing for multiple files to exist on
- * the classpath at any one time.
+ * <p>默认情况下，该类会在类路径中查找映射文件，使用的模式为：
+ * {@code META-INF/spring.schemas}，允许类路径中同时存在多个此类文件。
  *
- * <p>The format of {@code META-INF/spring.schemas} is a properties file where each line
- * should be of the form {@code systemId=schema-location} where {@code schema-location}
- * should also be a schema file in the classpath. Since {@code systemId} is commonly a
- * URL, one must be careful to escape any ':' characters which are treated as delimiters
- * in properties files.
+ * <p>{@code META-INF/spring.schemas} 的格式为属性文件，每一行应为：
+ * {@code systemId=schema-location}，其中 {@code schema-location} 也应为类路径中的 schema 文件。
+ * 由于 {@code systemId} 通常是 URL，因此必须注意转义 ':' 字符，因为在属性文件中它们被视为分隔符。
  *
- * <p>The pattern for the mapping files can be overridden using the
- * {@link #PluggableSchemaResolver(ClassLoader, String)} constructor.
+ * <p>映射文件的模式可以通过 {@link #PluggableSchemaResolver(ClassLoader, String)} 构造方法覆盖。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -81,11 +75,9 @@ public class PluggableSchemaResolver implements EntityResolver {
 
 
 	/**
-	 * Loads the schema URL &rarr; schema file location mappings using the default
-	 * mapping file pattern "META-INF/spring.schemas".
+	 * 使用默认映射文件模式 "META-INF/spring.schemas" 加载 schema URL → schema 文件位置映射。
 	 *
-	 * @param classLoader the ClassLoader to use for loading
-	 *                    (can be {@code null}) to use the default ClassLoader)
+	 * @param classLoader 用于加载的 ClassLoader（可以为 {@code null}，表示使用默认 ClassLoader）
 	 * @see PropertiesLoaderUtils#loadAllProperties(String, ClassLoader)
 	 */
 	public PluggableSchemaResolver(@Nullable ClassLoader classLoader) {
@@ -94,13 +86,10 @@ public class PluggableSchemaResolver implements EntityResolver {
 	}
 
 	/**
-	 * Loads the schema URL &rarr; schema file location mappings using the given
-	 * mapping file pattern.
+	 * 使用给定的映射文件模式加载 schema URL → schema 文件位置映射。
 	 *
-	 * @param classLoader            the ClassLoader to use for loading
-	 *                               (can be {@code null}) to use the default ClassLoader)
-	 * @param schemaMappingsLocation the location of the file that defines schema mappings
-	 *                               (must not be empty)
+	 * @param classLoader            用于加载的 ClassLoader（可以为 {@code null}，表示使用默认 ClassLoader）
+	 * @param schemaMappingsLocation 定义 schema 映射的文件位置（不能为空）
 	 * @see PropertiesLoaderUtils#loadAllProperties(String, ClassLoader)
 	 */
 	public PluggableSchemaResolver(@Nullable ClassLoader classLoader, String schemaMappingsLocation) {

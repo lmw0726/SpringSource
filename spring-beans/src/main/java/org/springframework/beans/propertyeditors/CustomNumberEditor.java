@@ -16,26 +16,21 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-import java.text.NumberFormat;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditorSupport;
+import java.text.NumberFormat;
+
 /**
- * Property editor for any Number subclass such as Short, Integer, Long,
- * BigInteger, Float, Double, BigDecimal. Can use a given NumberFormat for
- * (locale-specific) parsing and rendering, or alternatively the default
- * {@code decode} / {@code valueOf} / {@code toString} methods.
+ * 针对任意 Number 子类（如 Short、Integer、Long、BigInteger、Float、Double、BigDecimal）的属性编辑器。
+ * 可以使用指定的 NumberFormat 进行（基于地区的）解析和格式化，也可以使用默认的 {@code decode} / {@code valueOf} / {@code toString} 方法。
  *
- * <p>This is not meant to be used as system PropertyEditor but rather
- * as locale-specific number editor within custom controller code,
- * parsing user-entered number strings into Number properties of beans
- * and rendering them in the UI form.
+ * <p>此编辑器并非系统级 PropertyEditor，而是用于自定义控制器代码中解析用户输入的数字字符串，
+ * 并将其赋值给 Bean 的 Number 属性，同时在 UI 表单中进行渲染。
  *
- * <p>In web MVC code, this editor will typically be registered with
- * {@code binder.registerCustomEditor} calls.
+ * <p>在 Web MVC 代码中，通常通过 {@code binder.registerCustomEditor} 注册此编辑器。
  *
  * @author Juergen Hoeller
  * @since 06.06.2003
@@ -54,15 +49,10 @@ public class CustomNumberEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Create a new CustomNumberEditor instance, using the default
-	 * {@code valueOf} methods for parsing and {@code toString}
-	 * methods for rendering.
-	 * <p>The "allowEmpty" parameter states if an empty String should
-	 * be allowed for parsing, i.e. get interpreted as {@code null} value.
-	 * Else, an IllegalArgumentException gets thrown in that case.
-	 * @param numberClass the Number subclass to generate
-	 * @param allowEmpty if empty strings should be allowed
-	 * @throws IllegalArgumentException if an invalid numberClass has been specified
+	 * 使用默认的 {@code valueOf} 方法解析文本，{@code toString} 方法格式化值。
+	 * @param numberClass 要处理的 Number 子类
+	 * @param allowEmpty 是否允许空字符串解析为 {@code null}
+	 * @throws IllegalArgumentException 如果指定的 numberClass 无效
 	 * @see org.springframework.util.NumberUtils#parseNumber(String, Class)
 	 * @see Integer#valueOf
 	 * @see Integer#toString
@@ -72,15 +62,11 @@ public class CustomNumberEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * Create a new CustomNumberEditor instance, using the given NumberFormat
-	 * for parsing and rendering.
-	 * <p>The allowEmpty parameter states if an empty String should
-	 * be allowed for parsing, i.e. get interpreted as {@code null} value.
-	 * Else, an IllegalArgumentException gets thrown in that case.
-	 * @param numberClass the Number subclass to generate
-	 * @param numberFormat the NumberFormat to use for parsing and rendering
-	 * @param allowEmpty if empty strings should be allowed
-	 * @throws IllegalArgumentException if an invalid numberClass has been specified
+	 * 使用指定的 NumberFormat 解析和格式化数字。
+	 * @param numberClass 要处理的 Number 子类
+	 * @param numberFormat 用于解析和格式化的 NumberFormat
+	 * @param allowEmpty 是否允许空字符串解析为 {@code null}
+	 * @throws IllegalArgumentException 如果指定的 numberClass 无效
 	 * @see org.springframework.util.NumberUtils#parseNumber(String, Class, java.text.NumberFormat)
 	 * @see java.text.NumberFormat#parse
 	 * @see java.text.NumberFormat#format
@@ -98,26 +84,26 @@ public class CustomNumberEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Parse the Number from the given text, using the specified NumberFormat.
+	 * 使用指定的 NumberFormat 或默认解析方法将文本解析为 Number。
 	 */
 	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		if (this.allowEmpty && !StringUtils.hasText(text)) {
-			// Treat empty String as null value.
+			// 空字符串视为 null
 			setValue(null);
 		}
 		else if (this.numberFormat != null) {
-			// Use given NumberFormat for parsing text.
+			// 使用指定 NumberFormat 解析
 			setValue(NumberUtils.parseNumber(text, this.numberClass, this.numberFormat));
 		}
 		else {
-			// Use default valueOf methods for parsing text.
+			// 使用默认解析方法解析
 			setValue(NumberUtils.parseNumber(text, this.numberClass));
 		}
 	}
 
 	/**
-	 * Coerce a Number value into the required target class, if necessary.
+	 * 将 Number 值强制转换为目标类型（如果需要）。
 	 */
 	@Override
 	public void setValue(@Nullable Object value) {
@@ -130,7 +116,7 @@ public class CustomNumberEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * Format the Number as String, using the specified NumberFormat.
+	 * 使用指定的 NumberFormat 或 toString 方法将 Number 格式化为字符串。
 	 */
 	@Override
 	public String getAsText() {
@@ -139,11 +125,11 @@ public class CustomNumberEditor extends PropertyEditorSupport {
 			return "";
 		}
 		if (this.numberFormat != null) {
-			// Use NumberFormat for rendering value.
+			// 使用 NumberFormat 格式化
 			return this.numberFormat.format(value);
 		}
 		else {
-			// Use toString method for rendering value.
+			// 使用 toString 方法格式化
 			return value.toString();
 		}
 	}

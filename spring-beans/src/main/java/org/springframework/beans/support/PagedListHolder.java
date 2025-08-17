@@ -16,37 +16,35 @@
 
 package org.springframework.beans.support;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * PagedListHolder is a simple state holder for handling lists of objects,
- * separating them into pages. Page numbering starts with 0.
+ * PagedListHolder 是一个用于处理对象列表的简单状态持有器，
+ * 将列表分成多个页面。页码从 0 开始。
  *
- * <p>This is mainly targeted at usage in web UIs. Typically, an instance will be
- * instantiated with a list of beans, put into the session, and exported as model.
- * The properties can all be set/get programmatically, but the most common way will
- * be data binding, i.e. populating the bean from request parameters. The getters
- * will mainly be used by the view.
+ * <p>主要用于 Web 界面（UI）。通常，实例会使用一个 bean 列表创建，
+ * 放入 session 中，并作为模型导出。属性可以通过编程方式设置/获取，
+ * 但最常见的方式是数据绑定，即从请求参数填充 bean。
+ * getter 方法主要供视图使用。
  *
- * <p>Supports sorting the underlying list via a {@link SortDefinition} implementation,
- * available as property "sort". By default, a {@link MutableSortDefinition} instance
- * will be used, toggling the ascending value on setting the same property again.
+ * <p>支持通过 {@link SortDefinition} 实现对底层列表进行排序，
+ * 对应属性为 "sort"。默认使用 {@link MutableSortDefinition} 实例，
+ * 在再次设置同一属性时会切换升序标志。
  *
- * <p>The data binding names have to be called "pageSize" and "sort.ascending",
- * as expected by BeanWrapper. Note that the names and the nesting syntax match
- * the respective JSTL EL expressions, like "myModelAttr.pageSize" and
- * "myModelAttr.sort.ascending".
+ * <p>数据绑定的名称必须为 "pageSize" 和 "sort.ascending"，与 BeanWrapper 一致。
+ * 注意名称和嵌套语法与相应的 JSTL EL 表达式匹配，例如 "myModelAttr.pageSize"
+ * 和 "myModelAttr.sort.ascending"。
  *
  * @author Juergen Hoeller
  * @since 19.05.2003
- * @param <E> the element type
+ * @param <E> 元素类型
  * @see #getPageList()
  * @see org.springframework.beans.support.MutableSortDefinition
  */
@@ -54,12 +52,12 @@ import org.springframework.util.Assert;
 public class PagedListHolder<E> implements Serializable {
 
 	/**
-	 * The default page size.
+	 * 默认页大小。
 	 */
 	public static final int DEFAULT_PAGE_SIZE = 10;
 
 	/**
-	 * The default maximum number of page links.
+	 * 默认的最大页链接数。
 	 */
 	public static final int DEFAULT_MAX_LINKED_PAGES = 10;
 
@@ -85,8 +83,8 @@ public class PagedListHolder<E> implements Serializable {
 
 
 	/**
-	 * Create a new holder instance.
-	 * You'll need to set a source list to be able to use the holder.
+	 * 创建一个新的 holder 实例。
+	 * 需要设置源列表才能使用该 holder。
 	 * @see #setSource
 	 */
 	public PagedListHolder() {
@@ -94,9 +92,9 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Create a new holder instance with the given source list, starting with
-	 * a default sort definition (with "toggleAscendingOnProperty" activated).
-	 * @param source the source List
+	 * 使用给定的源列表创建一个新的 holder 实例，默认使用一个排序定义
+	 * （并启用 "toggleAscendingOnProperty"）。
+	 * @param source 源列表
 	 * @see MutableSortDefinition#setToggleAscendingOnProperty
 	 */
 	public PagedListHolder(List<E> source) {
@@ -104,9 +102,9 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Create a new holder instance with the given source list.
-	 * @param source the source List
-	 * @param sort the SortDefinition to start with
+	 * 使用给定的源列表创建一个新的 holder 实例。
+	 * @param source 源列表
+	 * @param sort 初始排序定义
 	 */
 	public PagedListHolder(List<E> source, SortDefinition sort) {
 		setSource(source);
@@ -115,7 +113,7 @@ public class PagedListHolder<E> implements Serializable {
 
 
 	/**
-	 * Set the source list for this holder.
+	 * 设置该 holder 的源列表。
 	 */
 	public void setSource(List<E> source) {
 		Assert.notNull(source, "Source List must not be null");
@@ -125,14 +123,14 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Return the source list for this holder.
+	 * 返回该 holder 的源列表。
 	 */
 	public List<E> getSource() {
 		return this.source;
 	}
 
 	/**
-	 * Return the last time the list has been fetched from the source provider.
+	 * 返回列表上次从源提供者获取的时间。
 	 */
 	@Nullable
 	public Date getRefreshDate() {
@@ -140,8 +138,8 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Set the sort definition for this holder.
-	 * Typically an instance of MutableSortDefinition.
+	 * 设置该 holder 的排序定义。
+	 * 通常为 MutableSortDefinition 的实例。
 	 * @see org.springframework.beans.support.MutableSortDefinition
 	 */
 	public void setSort(@Nullable SortDefinition sort) {
@@ -149,7 +147,7 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Return the sort definition for this holder.
+	 * 返回该 holder 的排序定义。
 	 */
 	@Nullable
 	public SortDefinition getSort() {
@@ -157,9 +155,9 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Set the current page size.
-	 * Resets the current page number if changed.
-	 * <p>Default value is 10.
+	 * 设置当前页大小。
+	 * 如果改变，会重置当前页码。
+	 * <p>默认值为 10。
 	 */
 	public void setPageSize(int pageSize) {
 		if (pageSize != this.pageSize) {
@@ -171,15 +169,15 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Return the current page size.
+	 * 返回当前页大小。
 	 */
 	public int getPageSize() {
 		return this.pageSize;
 	}
 
 	/**
-	 * Set the current page number.
-	 * Page numbering starts with 0.
+	 * 设置当前页码。
+	 * 页码从 0 开始。
 	 */
 	public void setPage(int page) {
 		this.page = page;
@@ -187,8 +185,8 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Return the current page number.
-	 * Page numbering starts with 0.
+	 * 返回当前页码。
+	 * 页码从 0 开始。
 	 */
 	public int getPage() {
 		this.newPageSet = false;
@@ -199,14 +197,14 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Set the maximum number of page links to a few pages around the current one.
+	 * 设置当前页周围的最大页链接数。
 	 */
 	public void setMaxLinkedPages(int maxLinkedPages) {
 		this.maxLinkedPages = maxLinkedPages;
 	}
 
 	/**
-	 * Return the maximum number of page links to a few pages around the current one.
+	 * 返回当前页周围的最大页链接数。
 	 */
 	public int getMaxLinkedPages() {
 		return this.maxLinkedPages;
@@ -214,7 +212,7 @@ public class PagedListHolder<E> implements Serializable {
 
 
 	/**
-	 * Return the number of pages for the current source list.
+	 * 返回当前源列表的总页数。
 	 */
 	public int getPageCount() {
 		float nrOfPages = (float) getNrOfElements() / getPageSize();
@@ -222,22 +220,22 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Return if the current page is the first one.
+	 * 判断当前页是否为第一页。
 	 */
 	public boolean isFirstPage() {
 		return getPage() == 0;
 	}
 
 	/**
-	 * Return if the current page is the last one.
+	 * 判断当前页是否为最后一页。
 	 */
 	public boolean isLastPage() {
-		return getPage() == getPageCount() -1;
+		return getPage() == getPageCount() - 1;
 	}
 
 	/**
-	 * Switch to previous page.
-	 * Will stay on first page if already on first page.
+	 * 切换到上一页。
+	 * 如果已经是第一页，则保持不变。
 	 */
 	public void previousPage() {
 		if (!isFirstPage()) {
@@ -246,8 +244,8 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Switch to next page.
-	 * Will stay on last page if already on last page.
+	 * 切换到下一页。
+	 * 如果已经是最后一页，则保持不变。
 	 */
 	public void nextPage() {
 		if (!isLastPage()) {
@@ -256,23 +254,23 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Return the total number of elements in the source list.
+	 * 返回源列表中的元素总数。
 	 */
 	public int getNrOfElements() {
 		return getSource().size();
 	}
 
 	/**
-	 * Return the element index of the first element on the current page.
-	 * Element numbering starts with 0.
+	 * 返回当前页第一个元素的索引。
+	 * 元素编号从 0 开始。
 	 */
 	public int getFirstElementOnPage() {
 		return (getPageSize() * getPage());
 	}
 
 	/**
-	 * Return the element index of the last element on the current page.
-	 * Element numbering starts with 0.
+	 * 返回当前页最后一个元素的索引。
+	 * 元素编号从 0 开始。
 	 */
 	public int getLastElementOnPage() {
 		int endIndex = getPageSize() * (getPage() + 1);
@@ -281,21 +279,21 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Return a sub-list representing the current page.
+	 * 返回表示当前页的子列表。
 	 */
 	public List<E> getPageList() {
 		return getSource().subList(getFirstElementOnPage(), getLastElementOnPage() + 1);
 	}
 
 	/**
-	 * Return the first page to which create a link around the current page.
+	 * 返回用于在当前页周围创建链接的第一页。
 	 */
 	public int getFirstLinkedPage() {
 		return Math.max(0, getPage() - (getMaxLinkedPages() / 2));
 	}
 
 	/**
-	 * Return the last page to which create a link around the current page.
+	 * 返回用于在当前页周围创建链接的最后一页。
 	 */
 	public int getLastLinkedPage() {
 		return Math.min(getFirstLinkedPage() + getMaxLinkedPages() - 1, getPageCount() - 1);
@@ -303,9 +301,9 @@ public class PagedListHolder<E> implements Serializable {
 
 
 	/**
-	 * Resort the list if necessary, i.e. if the current {@code sort} instance
-	 * isn't equal to the backed-up {@code sortUsed} instance.
-	 * <p>Calls {@code doSort} to trigger actual sorting.
+	 * 如有必要，对列表重新排序，即当前的 {@code sort} 实例
+	 * 与备份的 {@code sortUsed} 实例不相等时。
+	 * <p>调用 {@code doSort} 执行实际排序。
 	 * @see #doSort
 	 */
 	public void resort() {
@@ -318,15 +316,13 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Create a deep copy of the given sort definition,
-	 * for use as state holder to compare a modified sort definition against.
-	 * <p>Default implementation creates a MutableSortDefinition instance.
-	 * Can be overridden in subclasses, in particular in case of custom
-	 * extensions to the SortDefinition interface. Is allowed to return
-	 * null, which means that no sort state will be held, triggering
-	 * actual sorting for each {@code resort} call.
-	 * @param sort the current SortDefinition object
-	 * @return a deep copy of the SortDefinition object
+	 * 创建给定排序定义的深拷贝，
+	 * 用作状态持有者，以便将修改后的排序定义与之比较。
+	 * <p>默认实现创建一个 MutableSortDefinition 实例。
+	 * 可以在子类中重写，尤其是在自定义扩展 SortDefinition 接口时。
+	 * 可以返回 null，这意味着不保存排序状态，从而在每次 {@code resort} 调用时执行实际排序。
+	 * @param sort 当前的 SortDefinition 对象
+	 * @return SortDefinition 对象的深拷贝
 	 * @see MutableSortDefinition#MutableSortDefinition(SortDefinition)
 	 */
 	protected SortDefinition copySortDefinition(SortDefinition sort) {
@@ -334,10 +330,9 @@ public class PagedListHolder<E> implements Serializable {
 	}
 
 	/**
-	 * Actually perform sorting of the given source list, according to
-	 * the given sort definition.
-	 * <p>The default implementation uses Spring's PropertyComparator.
-	 * Can be overridden in subclasses.
+	 * 根据给定的排序定义，对源列表执行实际排序。
+	 * <p>默认实现使用 Spring 的 PropertyComparator。
+	 * 可以在子类中重写。
 	 * @see PropertyComparator#sort(java.util.List, SortDefinition)
 	 */
 	protected void doSort(List<E> source, SortDefinition sort) {

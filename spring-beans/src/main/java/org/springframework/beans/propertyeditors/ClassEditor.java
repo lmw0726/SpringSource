@@ -16,19 +16,18 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditorSupport;
+
 /**
- * Property editor for {@link Class java.lang.Class}, to enable the direct
- * population of a {@code Class} property without recourse to having to use a
- * String class name property as bridge.
+ * {@link Class java.lang.Class} 的属性编辑器，用于直接设置 Class 属性，
+ * 无需通过 String 类型的类名作为桥梁。
  *
- * <p>Also supports "java.lang.String[]"-style array class names, in contrast to the
- * standard {@link Class#forName(String)} method.
+ * <p>同时支持类似 "java.lang.String[]"-风格的数组类名，这在标准
+ * {@link Class#forName(String)} 方法中是无法直接支持的。
  *
  * @author Juergen Hoeller
  * @author Rick Evans
@@ -43,16 +42,16 @@ public class ClassEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Create a default ClassEditor, using the thread context ClassLoader.
+	 * 创建默认的 ClassEditor，使用线程上下文 ClassLoader。
 	 */
 	public ClassEditor() {
 		this(null);
 	}
 
 	/**
-	 * Create a default ClassEditor, using the given ClassLoader.
-	 * @param classLoader the ClassLoader to use
-	 * (or {@code null} for the thread context ClassLoader)
+	 * 创建指定 ClassLoader 的 ClassEditor。
+	 * @param classLoader 要使用的 ClassLoader
+	 * (如果为 {@code null}，则使用线程上下文 ClassLoader)
 	 */
 	public ClassEditor(@Nullable ClassLoader classLoader) {
 		this.classLoader = (classLoader != null ? classLoader : ClassUtils.getDefaultClassLoader());

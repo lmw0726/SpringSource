@@ -37,9 +37,9 @@ import java.security.PrivilegedAction;
 import java.util.*;
 
 /**
- * Delegate for resolving constructors and factory methods.
+ * 用于解析构造函数和工厂方法的委托类。
  *
- * <p>Performs constructor resolution through argument matching.
+ * <p>通过参数匹配来执行构造函数的解析。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -57,8 +57,8 @@ class ConstructorResolver {
 	private static final Object[] EMPTY_ARGS = new Object[0];
 
 	/**
-	 * Marker for autowired arguments in a cached argument array, to be replaced
-	 * by a {@linkplain #resolveAutowiredArgument resolved autowired argument}.
+	 * 在缓存的参数数组中标记自动注入的参数，
+	 * 稍后将被 {@linkplain #resolveAutowiredArgument 解析出的自动注入参数} 替换。
 	 */
 	private static final Object autowiredArgumentMarker = new Object();
 
@@ -72,9 +72,9 @@ class ConstructorResolver {
 
 
 	/**
-	 * Create a new ConstructorResolver for the given factory and instantiation strategy.
+	 * 为给定的工厂和实例化策略创建一个新的 ConstructorResolver。
 	 *
-	 * @param beanFactory the BeanFactory to work with
+	 * @param beanFactory 要操作的 BeanFactory
 	 */
 	public ConstructorResolver(AbstractAutowireCapableBeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
@@ -322,10 +322,10 @@ class ConstructorResolver {
 	}
 
 	/**
-	 * Resolve the factory method in the specified bean definition, if possible.
-	 * {@link RootBeanDefinition#getResolvedFactoryMethod()} can be checked for the result.
+	 * 解析指定 bean 定义中的工厂方法（如果可能的话）。
+	 * 可通过 {@link RootBeanDefinition#getResolvedFactoryMethod()} 检查解析结果。
 	 *
-	 * @param mbd the bean definition to check
+	 * @param mbd 要检查的 bean 定义
 	 */
 	public void resolveFactoryMethodIfPossible(RootBeanDefinition mbd) {
 		Class<?> factoryClass;
@@ -717,9 +717,9 @@ class ConstructorResolver {
 	}
 
 	/**
-	 * Resolve the constructor arguments for this bean into the resolvedValues object.
-	 * This may involve looking up other beans.
-	 * <p>This method is also used for handling invocations of static factory methods.
+	 * 将此 bean 的构造函数参数解析到 resolvedValues 对象中。
+	 * 此过程可能涉及查找其他 bean。
+	 * <p>该方法也用于处理静态工厂方法的调用。
 	 */
 	private int resolveConstructorArguments(String beanName, RootBeanDefinition mbd, BeanWrapper bw,
 											ConstructorArgumentValues cargs, ConstructorArgumentValues resolvedValues) {
@@ -770,8 +770,7 @@ class ConstructorResolver {
 	}
 
 	/**
-	 * Create an array of arguments to invoke a constructor or factory method,
-	 * given the resolved constructor argument values.
+	 * 根据已解析的构造函数参数值，创建用于调用构造函数或工厂方法的参数数组。
 	 */
 	private ArgumentsHolder createArgumentArray(
 			String beanName, RootBeanDefinition mbd, @Nullable ConstructorArgumentValues resolvedValues,
@@ -788,20 +787,19 @@ class ConstructorResolver {
 		for (int paramIndex = 0; paramIndex < paramTypes.length; paramIndex++) {
 			Class<?> paramType = paramTypes[paramIndex];
 			String paramName = (paramNames != null ? paramNames[paramIndex] : "");
-			// Try to find matching constructor argument value, either indexed or generic.
+			// 尝试查找匹配的构造函数参数值，无论是按索引还是通用类型。
 			ConstructorArgumentValues.ValueHolder valueHolder = null;
 			if (resolvedValues != null) {
 				valueHolder = resolvedValues.getArgumentValue(paramIndex, paramType, paramName, usedValueHolders);
-				// If we couldn't find a direct match and are not supposed to autowire,
-				// let's try the next generic, untyped argument value as fallback:
-				// it could match after type conversion (for example, String -> int).
+				// 如果未找到直接匹配项且不允许自动注入，
+				// 则尝试下一个通用的、无类型的参数值作为备选：它可能在类型转换后匹配（例如，String -> int）。
 				if (valueHolder == null && (!autowiring || paramTypes.length == resolvedValues.getArgumentCount())) {
 					valueHolder = resolvedValues.getGenericArgumentValue(null, null, usedValueHolders);
 				}
 			}
 			if (valueHolder != null) {
-				// We found a potential match - let's give it a try.
-				// Do not consider the same value definition multiple times!
+				// 找到了潜在匹配项——尝试使用它。
+				// 不要多次考虑同一个值定义！
 				usedValueHolders.add(valueHolder);
 				Object originalValue = valueHolder.getValue();
 				Object convertedValue;
@@ -830,8 +828,7 @@ class ConstructorResolver {
 				args.rawArguments[paramIndex] = originalValue;
 			} else {
 				MethodParameter methodParam = MethodParameter.forExecutable(executable, paramIndex);
-				// No explicit match found: we're either supposed to autowire or
-				// have to fail creating an argument array for the given constructor.
+				// 未找到明确匹配：要么需要自动注入，要么必须因给定构造函数无法创建参数数组而失败。
 				if (!autowiring) {
 					throw new UnsatisfiedDependencyException(
 							mbd.getResourceDescription(), beanName, new InjectionPoint(methodParam),
@@ -931,15 +928,15 @@ class ConstructorResolver {
 			try {
 				return userClass.getDeclaredConstructor(constructor.getParameterTypes());
 			} catch (NoSuchMethodException ex) {
-				// No equivalent constructor on user class (superclass)...
-				// Let's proceed with the given constructor as we usually would.
+				// 用户类（父类）中没有对应的构造函数...
+				// 继续使用给定的构造函数，按通常的方式处理。
 			}
 		}
 		return constructor;
 	}
 
 	/**
-	 * Template method for resolving the specified argument which is supposed to be autowired.
+	 * 用于解析指定的、应当被自动注入的参数的模板方法。
 	 */
 	@Nullable
 	protected Object resolveAutowiredArgument(MethodParameter param, String beanName,
@@ -960,8 +957,7 @@ class ConstructorResolver {
 			throw ex;
 		} catch (NoSuchBeanDefinitionException ex) {
 			if (fallback) {
-				// Single constructor or factory method -> let's return an empty array/collection
-				// for e.g. a vararg or a non-null List/Set/Map parameter.
+				// 单个构造函数或工厂方法 -> 对于可变参数或非空的 List/Set/Map 参数，返回空数组/集合
 				if (paramType.isArray()) {
 					return Array.newInstance(paramType.getComponentType(), 0);
 				} else if (CollectionFactory.isApproximableCollectionType(paramType)) {
@@ -986,7 +982,7 @@ class ConstructorResolver {
 
 
 	/**
-	 * Private inner class for holding argument combinations.
+	 * 用于保存参数组合的私有内部类。
 	 */
 	private static class ArgumentsHolder {
 
@@ -1062,7 +1058,7 @@ class ConstructorResolver {
 
 
 	/**
-	 * Delegate for checking Java's {@link ConstructorProperties} annotation.
+	 * 用于检查 Java 的 {@link ConstructorProperties} 注解的委托类。
 	 */
 	private static class ConstructorPropertiesChecker {
 

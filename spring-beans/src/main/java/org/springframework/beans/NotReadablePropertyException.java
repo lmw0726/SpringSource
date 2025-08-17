@@ -17,8 +17,8 @@
 package org.springframework.beans;
 
 /**
- * Exception thrown on an attempt to get the value of a property
- * that isn't readable, because there's no getter method.
+ * 当尝试获取一个不可读属性的值时抛出的异常，
+ * 这是由于该属性没有对应的 getter 方法。
  *
  * @author Juergen Hoeller
  * @since 1.0.2
@@ -27,9 +27,9 @@ package org.springframework.beans;
 public class NotReadablePropertyException extends InvalidPropertyException {
 
 	/**
-	 * Create a new NotReadablePropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property
+	 * 创建一个新的 NotReadablePropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
 	 */
 	public NotReadablePropertyException(Class<?> beanClass, String propertyName) {
 		super(beanClass, propertyName,
@@ -38,21 +38,21 @@ public class NotReadablePropertyException extends InvalidPropertyException {
 	}
 
 	/**
-	 * Create a new NotReadablePropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property
-	 * @param msg the detail message
+	 * 创建一个新的 NotReadablePropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
+	 * @param msg 详细消息
 	 */
 	public NotReadablePropertyException(Class<?> beanClass, String propertyName, String msg) {
 		super(beanClass, propertyName, msg);
 	}
 
 	/**
-	 * Create a new NotReadablePropertyException.
-	 * @param beanClass the offending bean class
-	 * @param propertyName the offending property
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 * 创建一个新的 NotReadablePropertyException。
+	 * @param beanClass 出错的 bean 类
+	 * @param propertyName 出错的属性名
+	 * @param msg 详细消息
+	 * @param cause 根本原因
 	 * @since 4.0.9
 	 */
 	public NotReadablePropertyException(Class<?> beanClass, String propertyName, String msg, Throwable cause) {

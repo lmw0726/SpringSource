@@ -16,12 +16,6 @@
 
 package org.springframework.beans.factory.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Parameter;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.DependencyDescriptor;
@@ -32,9 +26,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Parameter;
+
 /**
- * Public delegate for resolving autowirable parameters on externally managed
- * constructors and methods.
+ * 用于解析外部管理的构造函数和方法上可自动装配参数的公共代理。
  *
  * @author Sam Brannen
  * @author Juergen Hoeller
@@ -66,17 +65,11 @@ public final class ParameterResolutionDelegate {
 
 
 	/**
-	 * Determine if the supplied {@link Parameter} can <em>potentially</em> be
-	 * autowired from an {@link AutowireCapableBeanFactory}.
-	 * <p>Returns {@code true} if the supplied parameter is annotated or
-	 * meta-annotated with {@link Autowired @Autowired},
-	 * {@link Qualifier @Qualifier}, or {@link Value @Value}.
-	 * <p>Note that {@link #resolveDependency} may still be able to resolve the
-	 * dependency for the supplied parameter even if this method returns {@code false}.
-	 * @param parameter the parameter whose dependency should be autowired
-	 * (must not be {@code null})
-	 * @param parameterIndex the index of the parameter in the constructor or method
-	 * that declares the parameter
+	 * 判断所提供的 {@link Parameter} 是否 <em>可能</em> 可以从 {@link AutowireCapableBeanFactory} 自动装配。
+	 * <p>如果所提供的参数使用了 {@link Autowired @Autowired}、{@link Qualifier @Qualifier} 或 {@link Value @Value} 注解或元注解，则返回 {@code true}。
+	 * <p>注意，即使此方法返回 {@code false}，{@link #resolveDependency} 仍然可能能够解析所提供参数的依赖。
+	 * @param parameter 需要自动装配依赖的参数（不能为空）
+	 * @param parameterIndex 参数在声明该参数的构造函数或方法中的索引
 	 * @see #resolveDependency
 	 */
 	public static boolean isAutowirable(Parameter parameter, int parameterIndex) {
@@ -88,29 +81,19 @@ public final class ParameterResolutionDelegate {
 	}
 
 	/**
-	 * Resolve the dependency for the supplied {@link Parameter} from the
-	 * supplied {@link AutowireCapableBeanFactory}.
-	 * <p>Provides comprehensive autowiring support for individual method parameters
-	 * on par with Spring's dependency injection facilities for autowired fields and
-	 * methods, including support for {@link Autowired @Autowired},
-	 * {@link Qualifier @Qualifier}, and {@link Value @Value} with support for property
-	 * placeholders and SpEL expressions in {@code @Value} declarations.
-	 * <p>The dependency is required unless the parameter is annotated or meta-annotated
-	 * with {@link Autowired @Autowired} with the {@link Autowired#required required}
-	 * flag set to {@code false}.
-	 * <p>If an explicit <em>qualifier</em> is not declared, the name of the parameter
-	 * will be used as the qualifier for resolving ambiguities.
-	 * @param parameter the parameter whose dependency should be resolved (must not be
-	 * {@code null})
-	 * @param parameterIndex the index of the parameter in the constructor or method
-	 * that declares the parameter
-	 * @param containingClass the concrete class that contains the parameter; this may
-	 * differ from the class that declares the parameter in that it may be a subclass
-	 * thereof, potentially substituting type variables (must not be {@code null})
-	 * @param beanFactory the {@code AutowireCapableBeanFactory} from which to resolve
-	 * the dependency (must not be {@code null})
-	 * @return the resolved object, or {@code null} if none found
-	 * @throws BeansException if dependency resolution failed
+	 * 从提供的 {@link AutowireCapableBeanFactory} 中解析所提供 {@link Parameter} 的依赖。
+	 * <p>为单个方法参数提供全面的自动装配支持，其功能与 Spring 对自动装配字段和方法的依赖注入相当，
+	 * 包括对 {@link Autowired @Autowired}、{@link Qualifier @Qualifier} 和 {@link Value @Value} 的支持，
+	 * 并支持 {@code @Value} 声明中的属性占位符和 SpEL 表达式。
+	 * <p>除非参数使用 {@link Autowired @Autowired} 注解或元注解且其 {@link Autowired#required required} 标志设置为 {@code false}，
+	 * 否则依赖项是必需的。
+	 * <p>如果没有显式声明 <em>限定符</em>，将使用参数名称作为解决歧义的限定符。
+	 * @param parameter 需要解析依赖的参数（不能为空）
+	 * @param parameterIndex 参数在声明该参数的构造函数或方法中的索引
+	 * @param containingClass 包含该参数的具体类；可能与声明参数的类不同，可能是其子类，并可能替换类型变量（不能为空）
+	 * @param beanFactory 用于解析依赖的 {@code AutowireCapableBeanFactory}（不能为空）
+	 * @return 解析得到的对象，如果未找到则返回 {@code null}
+	 * @throws BeansException 如果依赖解析失败
 	 * @see #isAutowirable
 	 * @see Autowired#required
 	 * @see SynthesizingMethodParameter#forExecutable(Executable, int)
@@ -137,32 +120,24 @@ public final class ParameterResolutionDelegate {
 	}
 
 	/**
-	 * Due to a bug in {@code javac} on JDK versions prior to JDK 9, looking up
-	 * annotations directly on a {@link Parameter} will fail for inner class
-	 * constructors.
-	 * <h4>Bug in javac in JDK &lt; 9</h4>
-	 * <p>The parameter annotations array in the compiled byte code excludes an entry
-	 * for the implicit <em>enclosing instance</em> parameter for an inner class
-	 * constructor.
-	 * <h4>Workaround</h4>
-	 * <p>This method provides a workaround for this off-by-one error by allowing the
-	 * caller to access annotations on the preceding {@link Parameter} object (i.e.,
-	 * {@code index - 1}). If the supplied {@code index} is zero, this method returns
-	 * an empty {@code AnnotatedElement}.
-	 * <h4>WARNING</h4>
-	 * <p>The {@code AnnotatedElement} returned by this method should never be cast and
-	 * treated as a {@code Parameter} since the metadata (e.g., {@link Parameter#getName()},
-	 * {@link Parameter#getType()}, etc.) will not match those for the declared parameter
-	 * at the given index in an inner class constructor.
-	 * @return the supplied {@code parameter} or the <em>effective</em> {@code Parameter}
-	 * if the aforementioned bug is in effect
+	 * 由于 JDK 9 之前的 {@code javac} 存在的一个 bug，直接在 {@link Parameter} 上查找注解
+	 * 会导致内部类构造函数失败。
+	 * <h4>JDK &lt; 9 的 javac Bug</h4>
+	 * <p>在编译字节码中，参数注解数组会排除内部类构造函数的隐式 <em>外部实例</em> 参数。
+	 * <h4>解决方法</h4>
+	 * <p>此方法通过允许调用者访问前一个 {@link Parameter} 对象（即 {@code index - 1}）的注解来解决这个偏移一的错误。
+	 * 如果提供的 {@code index} 为零，则此方法返回一个空的 {@code AnnotatedElement}。
+	 * <h4>警告</h4>
+	 * <p>此方法返回的 {@code AnnotatedElement} 不应被强制转换为 {@code Parameter} 使用，
+	 * 因为其元数据（如 {@link Parameter#getName()}、{@link Parameter#getType()} 等）可能与内部类构造函数中给定索引的声明参数不匹配。
+	 * @return 提供的 {@code parameter} 或者在上述 bug 生效时的 <em>有效</em> {@code Parameter}
 	 */
 	private static AnnotatedElement getEffectiveAnnotatedParameter(Parameter parameter, int index) {
 		Executable executable = parameter.getDeclaringExecutable();
 		if (executable instanceof Constructor && ClassUtils.isInnerClass(executable.getDeclaringClass()) &&
 				executable.getParameterAnnotations().length == executable.getParameterCount() - 1) {
-			// Bug in javac in JDK <9: annotation array excludes enclosing instance parameter
-			// for inner classes, so access it with the actual parameter index lowered by 1
+			// JDK <9 的 javac 中存在 Bug：注解数组会排除内部类的外部实例参数
+			// 因此需要将实际参数索引减 1 来访问正确的参数
 			return (index == 0 ? EMPTY_ANNOTATED_ELEMENT : executable.getParameters()[index - 1]);
 		}
 		return parameter;

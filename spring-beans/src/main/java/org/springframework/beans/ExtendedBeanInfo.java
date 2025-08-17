@@ -29,9 +29,8 @@ import java.util.List;
 import java.util.*;
 
 /**
- * Decorator for a standard {@link BeanInfo} object, e.g. as created by
- * {@link Introspector#getBeanInfo(Class)}, designed to discover and register
- * static and/or non-void returning setter methods. For example:
+ * 对标准 {@link BeanInfo} 对象的装饰，例如通过 {@link Introspector#getBeanInfo(Class)} 创建的 BeanInfo，
+ * 用于发现和注册静态或返回非 void 的 setter 方法。例如：
  *
  * <pre class="code">
  * public class Bean {
@@ -48,16 +47,14 @@ import java.util.*;
  *     }
  * }</pre>
  * <p>
- * The standard JavaBeans {@code Introspector} will discover the {@code getFoo} read
- * method, but will bypass the {@code #setFoo(Foo)} write method, because its non-void
- * returning signature does not comply with the JavaBeans specification.
- * {@code ExtendedBeanInfo}, on the other hand, will recognize and include it. This is
- * designed to allow APIs with "builder" or method-chaining style setter signatures to be
- * used within Spring {@code <beans>} XML. {@link #getPropertyDescriptors()} returns all
- * existing property descriptors from the wrapped {@code BeanInfo} as well any added for
- * non-void returning setters. Both standard ("non-indexed") and
+ * 标准的 JavaBeans {@code Introspector} 会发现 {@code getFoo} 读方法，
+ * 但会忽略 {@code #setFoo(Foo)} 写方法，因为其返回类型非 void，不符合 JavaBeans 规范。
+ * {@code ExtendedBeanInfo} 则会识别并包含该方法。
+ * 这使得带有“builder”或方法链式 setter 签名的 API 可以在 Spring {@code <beans>} XML 中使用。
+ * {@link #getPropertyDescriptors()} 会返回封装的 {@code BeanInfo} 中所有现有的属性描述符，
+ * 以及为返回非 void 的 setter 添加的属性描述符。标准（“非索引”）属性和
  * <a href="https://docs.oracle.com/javase/tutorial/javabeans/writing/properties.html">
- * indexed properties</a> are fully supported.
+ * 索引属性</a> 都得到完全支持。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -76,14 +73,13 @@ class ExtendedBeanInfo implements BeanInfo {
 
 
 	/**
-	 * Wrap the given {@link BeanInfo} instance; copy all its existing property descriptors
-	 * locally, wrapping each in a custom {@link SimpleIndexedPropertyDescriptor indexed}
-	 * or {@link SimplePropertyDescriptor non-indexed} {@code PropertyDescriptor}
-	 * variant that bypasses default JDK weak/soft reference management; then search
-	 * through its method descriptors to find any non-void returning write methods and
-	 * update or create the corresponding {@link PropertyDescriptor} for each one found.
+	 * 包装给定的 {@link BeanInfo} 实例；将其所有现有的属性描述符本地复制一份，
+	 * 并将每个描述符包装为自定义的 {@link SimpleIndexedPropertyDescriptor 索引型}
+	 * 或 {@link SimplePropertyDescriptor 非索引型} {@code PropertyDescriptor} 变体，
+	 * 以绕过 JDK 默认的弱/软引用管理；然后遍历其方法描述符，查找所有返回非 void 的写方法，
+	 * 并更新或创建每个找到的 {@link PropertyDescriptor}。
 	 *
-	 * @param delegate the wrapped {@code BeanInfo}, which is never modified
+	 * @param delegate 被包装的 {@code BeanInfo}，不会被修改
 	 * @see #getPropertyDescriptors()
 	 */
 	public ExtendedBeanInfo(BeanInfo delegate) {
@@ -94,7 +90,7 @@ class ExtendedBeanInfo implements BeanInfo {
 						new SimpleIndexedPropertyDescriptor((IndexedPropertyDescriptor) pd) :
 						new SimplePropertyDescriptor(pd));
 			} catch (IntrospectionException ex) {
-				// Probably simply a method that wasn't meant to follow the JavaBeans pattern...
+				// 可能只是一个不符合 JavaBeans 规范的方法……
 				if (logger.isDebugEnabled()) {
 					logger.debug("Ignoring invalid bean property '" + pd.getName() + "': " + ex.getMessage());
 				}
@@ -106,7 +102,7 @@ class ExtendedBeanInfo implements BeanInfo {
 				try {
 					handleCandidateWriteMethod(method);
 				} catch (IntrospectionException ex) {
-					// We're only trying to find candidates, can easily ignore extra ones here...
+					// 我们这里只是尝试寻找候选方法，可以轻松忽略多余的方法……
 					if (logger.isDebugEnabled()) {
 						logger.debug("Ignoring candidate write method [" + method + "]: " + ex.getMessage());
 					}
@@ -124,9 +120,9 @@ class ExtendedBeanInfo implements BeanInfo {
 				matches.add(method);
 			}
 		}
-		// Sort non-void returning write methods to guard against the ill effects of
-		// non-deterministic sorting of methods returned from Class#getDeclaredMethods
-		// under JDK 7. See https://bugs.java.com/view_bug.do?bug_id=7023180
+		// 对返回非 void 的写方法进行排序，以防止
+		// JDK 7 中 Class#getDeclaredMethods 返回方法顺序不确定导致的问题。
+		// 参见：https://bugs.java.com/view_bug.do?bug_id=7023180
 		matches.sort((m1, m2) -> m2.toString().compareTo(m1.toString()));
 		return matches;
 	}
@@ -208,9 +204,8 @@ class ExtendedBeanInfo implements BeanInfo {
 
 
 	/**
-	 * Return the set of {@link PropertyDescriptor PropertyDescriptors} from the wrapped
-	 * {@link BeanInfo} object as well as {@code PropertyDescriptors} for each non-void
-	 * returning setter method found during construction.
+	 * 返回封装的 {@link BeanInfo} 对象中的 {@link PropertyDescriptor PropertyDescriptors} 集合，
+	 * 以及在构造过程中找到的每个非 void 返回类型的 setter 方法对应的 {@code PropertyDescriptors}。
 	 *
 	 * @see #ExtendedBeanInfo(BeanInfo)
 	 */
@@ -256,7 +251,7 @@ class ExtendedBeanInfo implements BeanInfo {
 
 
 	/**
-	 * A simple {@link PropertyDescriptor}.
+	 * 一个简单的 {@link PropertyDescriptor}.
 	 */
 	static class SimplePropertyDescriptor extends PropertyDescriptor {
 
@@ -315,7 +310,7 @@ class ExtendedBeanInfo implements BeanInfo {
 				try {
 					this.propertyType = PropertyDescriptorUtils.findPropertyType(this.readMethod, this.writeMethod);
 				} catch (IntrospectionException ex) {
-					// Ignore, as does PropertyDescriptor#getPropertyType
+					// 忽略异常，行为与 PropertyDescriptor#getPropertyType 一致
 				}
 			}
 			return this.propertyType;
@@ -352,7 +347,7 @@ class ExtendedBeanInfo implements BeanInfo {
 
 
 	/**
-	 * A simple {@link IndexedPropertyDescriptor}.
+	 * 一个简单的 {@link IndexedPropertyDescriptor}.
 	 */
 	static class SimpleIndexedPropertyDescriptor extends IndexedPropertyDescriptor {
 
@@ -426,7 +421,7 @@ class ExtendedBeanInfo implements BeanInfo {
 				try {
 					this.propertyType = PropertyDescriptorUtils.findPropertyType(this.readMethod, this.writeMethod);
 				} catch (IntrospectionException ex) {
-					// Ignore, as does IndexedPropertyDescriptor#getPropertyType
+					// 忽略异常，行为与 IndexedPropertyDescriptor#getPropertyType 一致
 				}
 			}
 			return this.propertyType;
@@ -462,7 +457,7 @@ class ExtendedBeanInfo implements BeanInfo {
 					this.indexedPropertyType = PropertyDescriptorUtils.findIndexedPropertyType(
 							getName(), getPropertyType(), this.indexedReadMethod, this.indexedWriteMethod);
 				} catch (IntrospectionException ex) {
-					// Ignore, as does IndexedPropertyDescriptor#getIndexedPropertyType
+					// 忽略异常，行为与 IndexedPropertyDescriptor#getIndexedPropertyType 一致
 				}
 			}
 			return this.indexedPropertyType;
@@ -480,7 +475,7 @@ class ExtendedBeanInfo implements BeanInfo {
 		}
 
 		/*
-		 * See java.beans.IndexedPropertyDescriptor#equals
+		 * 参考 java.beans.IndexedPropertyDescriptor#equals 方法
 		 */
 		@Override
 		public boolean equals(@Nullable Object other) {
@@ -517,8 +512,8 @@ class ExtendedBeanInfo implements BeanInfo {
 
 
 	/**
-	 * Sorts PropertyDescriptor instances alpha-numerically to emulate the behavior of
-	 * {@link java.beans.BeanInfo#getPropertyDescriptors()}.
+	 * 对 PropertyDescriptor 实例按字母数字顺序进行排序，
+	 * 以模拟 {@link java.beans.BeanInfo#getPropertyDescriptors()} 的行为。
 	 *
 	 * @see ExtendedBeanInfo#propertyDescriptors
 	 */

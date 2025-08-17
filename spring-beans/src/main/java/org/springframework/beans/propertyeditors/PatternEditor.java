@@ -16,14 +16,14 @@
 
 package org.springframework.beans.propertyeditors;
 
+import org.springframework.lang.Nullable;
+
 import java.beans.PropertyEditorSupport;
 import java.util.regex.Pattern;
 
-import org.springframework.lang.Nullable;
-
 /**
- * Editor for {@code java.util.regex.Pattern}, to directly populate a Pattern property.
- * Expects the same syntax as Pattern's {@code compile} method.
+ * {@code java.util.regex.Pattern} 的编辑器，用于直接设置 Pattern 属性。
+ * 期望与 Pattern 的 {@code compile} 方法相同的语法。
  *
  * @author Juergen Hoeller
  * @since 2.0.1
@@ -36,15 +36,15 @@ public class PatternEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Create a new PatternEditor with default settings.
+	 * 创建一个使用默认设置的 PatternEditor。
 	 */
 	public PatternEditor() {
 		this.flags = 0;
 	}
 
 	/**
-	 * Create a new PatternEditor with the given settings.
-	 * @param flags the {@code java.util.regex.Pattern} flags to apply
+	 * 创建一个使用指定设置的 PatternEditor。
+	 * @param flags 要应用的 {@code java.util.regex.Pattern} 标志
 	 * @see java.util.regex.Pattern#compile(String, int)
 	 * @see java.util.regex.Pattern#CASE_INSENSITIVE
 	 * @see java.util.regex.Pattern#MULTILINE

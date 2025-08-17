@@ -22,17 +22,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a method (typically a JavaBean setter method) as being 'required': that is,
- * the setter method must be configured to be dependency-injected with a value.
+ * 标记一个方法（通常是 JavaBean 的 setter 方法）为“必需”的：
+ * 即该 setter 方法必须被配置为通过依赖注入获得一个值。
  *
- * <p>Please do consult the javadoc for the {@link RequiredAnnotationBeanPostProcessor}
- * class (which, by default, checks for the presence of this annotation).
+ * <p>请参考 {@link RequiredAnnotationBeanPostProcessor} 类的 javadoc
+ *（默认情况下，该类会检查此注解的存在）。
  *
  * @author Rob Harrop
  * @since 2.0
  * @see RequiredAnnotationBeanPostProcessor
- * @deprecated as of 5.1, in favor of using constructor injection for required settings
- * (or a custom {@link org.springframework.beans.factory.InitializingBean} implementation)
+ * @deprecated 自 5.1 起，推荐使用构造器注入来设置必需属性
+ * （或使用自定义 {@link org.springframework.beans.factory.InitializingBean} 实现）
  */
 @Deprecated
 @Retention(RetentionPolicy.RUNTIME)

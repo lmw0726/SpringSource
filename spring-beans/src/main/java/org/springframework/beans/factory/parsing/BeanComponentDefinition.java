@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ComponentDefinition based on a standard BeanDefinition, exposing the given bean
- * definition as well as inner bean definitions and bean references for the given bean.
+ * 基于标准BeanDefinition的ComponentDefinition，暴露给定的bean
+ * 定义以及给定bean的内部bean定义和bean引用。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

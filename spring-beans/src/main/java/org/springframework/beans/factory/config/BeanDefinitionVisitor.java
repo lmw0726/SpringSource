@@ -26,12 +26,11 @@ import org.springframework.util.StringValueResolver;
 import java.util.*;
 
 /**
- * Visitor class for traversing {@link BeanDefinition} objects, in particular
- * the property values and constructor argument values contained in them,
- * resolving bean metadata values.
+ * 用于遍历 {@link BeanDefinition} 对象的访问者类，特别是其中包含的属性值和构造函数参数值，
+ * 并解析 Bean 的元数据值。
  *
- * <p>Used by {@link PlaceholderConfigurerSupport} to parse all String values
- * contained in a BeanDefinition, resolving any placeholders found.
+ * <p>被 {@link PlaceholderConfigurerSupport} 用于解析 BeanDefinition 中的所有字符串值，
+ * 并解析其中的占位符。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -48,10 +47,9 @@ public class BeanDefinitionVisitor {
 
 
 	/**
-	 * Create a new BeanDefinitionVisitor, applying the specified
-	 * value resolver to all bean metadata values.
+	 * 创建一个新的 BeanDefinitionVisitor，将指定的值解析器应用于所有 Bean 元数据值。
 	 *
-	 * @param valueResolver the StringValueResolver to apply
+	 * @param valueResolver 要应用的 StringValueResolver
 	 */
 	public BeanDefinitionVisitor(StringValueResolver valueResolver) {
 		Assert.notNull(valueResolver, "StringValueResolver must not be null");
@@ -59,8 +57,8 @@ public class BeanDefinitionVisitor {
 	}
 
 	/**
-	 * Create a new BeanDefinitionVisitor for subclassing.
-	 * Subclasses need to override the {@link #resolveStringValue} method.
+	 * 为子类创建一个新的 BeanDefinitionVisitor。
+	 * 子类需要重写 {@link #resolveStringValue} 方法。
 	 */
 	protected BeanDefinitionVisitor() {
 	}

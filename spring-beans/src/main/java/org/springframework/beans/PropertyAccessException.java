@@ -16,13 +16,13 @@
 
 package org.springframework.beans;
 
-import java.beans.PropertyChangeEvent;
-
 import org.springframework.lang.Nullable;
 
+import java.beans.PropertyChangeEvent;
+
 /**
- * Superclass for exceptions related to a property access,
- * such as type mismatch or invocation target exception.
+ * 与属性访问相关的异常的超类，
+ * 例如类型不匹配或调用目标异常。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -35,10 +35,10 @@ public abstract class PropertyAccessException extends BeansException {
 
 
 	/**
-	 * Create a new PropertyAccessException.
-	 * @param propertyChangeEvent the PropertyChangeEvent that resulted in the problem
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 * 创建新的PropertyAccessException。
+	 * @param propertyChangeEvent 导致问题的PropertyChangeEvent
+	 * @param msg 详细消息
+	 * @param cause 根本原因
 	 */
 	public PropertyAccessException(PropertyChangeEvent propertyChangeEvent, String msg, @Nullable Throwable cause) {
 		super(msg, cause);
@@ -46,9 +46,9 @@ public abstract class PropertyAccessException extends BeansException {
 	}
 
 	/**
-	 * Create a new PropertyAccessException without PropertyChangeEvent.
-	 * @param msg the detail message
-	 * @param cause the root cause
+	 * 创建不带PropertyChangeEvent的新PropertyAccessException。
+	 * @param msg 详细消息
+	 * @param cause 根本原因
 	 */
 	public PropertyAccessException(String msg, @Nullable Throwable cause) {
 		super(msg, cause);
@@ -57,9 +57,8 @@ public abstract class PropertyAccessException extends BeansException {
 
 
 	/**
-	 * Return the PropertyChangeEvent that resulted in the problem.
-	 * <p>May be {@code null}; only available if an actual bean property
-	 * was affected.
+	 * 返回导致问题的PropertyChangeEvent。
+	 * <p>可能为 {@code null}；仅当实际的Bean属性受到影响时才可用。
 	 */
 	@Nullable
 	public PropertyChangeEvent getPropertyChangeEvent() {
@@ -67,7 +66,7 @@ public abstract class PropertyAccessException extends BeansException {
 	}
 
 	/**
-	 * Return the name of the affected property, if available.
+	 * 返回受影响属性的名称（如果可用）。
 	 */
 	@Nullable
 	public String getPropertyName() {
@@ -75,7 +74,7 @@ public abstract class PropertyAccessException extends BeansException {
 	}
 
 	/**
-	 * Return the affected value that was about to be set, if any.
+	 * 返回即将被设置的受影响值（如果有）。
 	 */
 	@Nullable
 	public Object getValue() {
@@ -83,7 +82,7 @@ public abstract class PropertyAccessException extends BeansException {
 	}
 
 	/**
-	 * Return a corresponding error code for this type of exception.
+	 * 返回此类型异常对应的错误代码。
 	 */
 	public abstract String getErrorCode();
 

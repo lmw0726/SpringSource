@@ -24,11 +24,10 @@ import org.springframework.util.ObjectUtils;
 import java.lang.reflect.Method;
 
 /**
- * Object representing the override of a method on a managed object by the IoC
- * container.
+ * 表示由 IoC 容器对受管对象上的某个方法进行重写的对象。
  *
- * <p>Note that the override mechanism is <em>not</em> intended as a generic
- * means of inserting crosscutting code: use AOP for that.
+ * <p>请注意，该重写机制 <em>并非</em>用于插入横切逻辑的通用手段：
+ * 如需此类功能，请使用 AOP。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

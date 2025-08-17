@@ -26,8 +26,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Utility methods that are useful for bean definition reader implementations.
- * Mainly intended for internal use.
+ * 对 bean 定义读取器实现有用的工具方法。
+ * 主要用于内部使用。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -173,14 +173,12 @@ public abstract class BeanDefinitionReaderUtils {
 	}
 
 	/**
-	 * Register the given bean definition with a generated name,
-	 * unique within the given bean factory.
+	 * 使用生成的、在给定 bean 工厂中唯一的名称来注册指定的 bean 定义。
 	 *
-	 * @param definition the bean definition to generate a bean name for
-	 * @param registry   the bean factory to register with
-	 * @return the generated bean name
-	 * @throws BeanDefinitionStoreException if no unique name can be generated
-	 *                                      for the given bean definition or the definition cannot be registered
+	 * @param definition 要为其生成名称的 bean 定义
+	 * @param registry   要注册到的 bean 工厂
+	 * @return 生成的 bean 名称
+	 * @throws BeanDefinitionStoreException 如果无法为给定 bean 定义生成唯一名称，或无法注册该定义
 	 */
 	public static String registerWithGeneratedName(
 			AbstractBeanDefinition definition, BeanDefinitionRegistry registry)

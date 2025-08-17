@@ -17,9 +17,11 @@
 package org.springframework.beans.factory.support;
 
 /**
- * Internal exception to be propagated from {@link ConstructorResolver},
- * passed through to the initiating {@link DefaultSingletonBeanRegistry}
- * (without wrapping in a {@code BeanCreationException}).
+ * 从 {@link ConstructorResolver} 内部抛出的异常，直接传递给发起的 {@link DefaultSingletonBeanRegistry}，
+ * 无需包装成 {@code BeanCreationException}。
+ *
+ * <p>该异常用于标识在工厂 Bean 创建过程中，其目标单例 Bean 实例意外提前出现的情况，
+ * 通常发生在循环依赖解析期间，当目标单例已隐式创建但尚未完成注册时。
  *
  * @author Juergen Hoeller
  * @since 5.0

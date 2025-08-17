@@ -39,15 +39,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Default implementation of the {@link BeanDefinitionDocumentReader} interface that
- * reads bean definitions according to the "spring-beans" DTD and XSD format
- * (Spring's default XML bean definition format).
+ * {@link BeanDefinitionDocumentReader} 接口的默认实现，
+ * 根据 "spring-beans" DTD 和 XSD 格式读取 bean 定义
+ * （Spring 的默认 XML Bean 定义格式）。
  *
- * <p>The structure, elements, and attribute names of the required XML document
- * are hard-coded in this class. (Of course a transform could be run if necessary
- * to produce this format). {@code <beans>} does not need to be the root
- * element of the XML document: this class will parse all bean definition elements
- * in the XML file, regardless of the actual root element.
+ * <p>所需 XML 文档的结构、元素和属性名称在本类中是硬编码的。
+ * （当然，如果需要，可以先进行转换以生成该格式）。
+ * {@code <beans>} 不必是 XML 文档的根元素：
+ * 本类会解析 XML 文件中的所有 bean 定义元素，而不管实际的根元素是什么。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

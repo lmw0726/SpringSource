@@ -21,12 +21,10 @@ import org.springframework.lang.Nullable;
 import java.io.Serializable;
 
 /**
- * Simple marker class for an individually autowired property value, to be added
- * to {@link BeanDefinition#getPropertyValues()} for a specific bean property.
+ * 用于单个自动注入属性值的简单标记类，将添加到特定 Bean 属性的 {@link BeanDefinition#getPropertyValues()} 中。
  *
- * <p>At runtime, this will be replaced with a {@link DependencyDescriptor}
- * for the corresponding bean property's write method, eventually to be resolved
- * through a {@link AutowireCapableBeanFactory#resolveDependency} step.
+ * <p>在运行时，这将被替换为对应 Bean 属性写方法的 {@link DependencyDescriptor}，
+ * 最终通过 {@link AutowireCapableBeanFactory#resolveDependency} 步骤进行解析。
  *
  * @author Juergen Hoeller
  * @see AutowireCapableBeanFactory#resolveDependency

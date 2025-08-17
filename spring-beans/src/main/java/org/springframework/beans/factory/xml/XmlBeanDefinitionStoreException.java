@@ -22,9 +22,9 @@ import org.xml.sax.SAXParseException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 
 /**
- * XML-specific BeanDefinitionStoreException subclass that wraps a
- * {@link org.xml.sax.SAXException}, typically a {@link org.xml.sax.SAXParseException}
- * which contains information about the error location.
+ * XML 特定的 BeanDefinitionStoreException 子类，用于包装
+ * {@link org.xml.sax.SAXException}，通常是包含错误位置信息的
+ * {@link org.xml.sax.SAXParseException}。
  *
  * @author Juergen Hoeller
  * @since 2.0.2
@@ -35,10 +35,10 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 public class XmlBeanDefinitionStoreException extends BeanDefinitionStoreException {
 
 	/**
-	 * Create a new XmlBeanDefinitionStoreException.
-	 * @param resourceDescription description of the resource that the bean definition came from
-	 * @param msg the detail message (used as exception message as-is)
-	 * @param cause the SAXException (typically a SAXParseException) root cause
+	 * 创建一个新的 XmlBeanDefinitionStoreException。
+	 * @param resourceDescription Bean 定义来源资源的描述
+	 * @param msg 详细信息（直接作为异常消息使用）
+	 * @param cause SAXException（通常为 SAXParseException）根本原因
 	 * @see org.xml.sax.SAXParseException
 	 */
 	public XmlBeanDefinitionStoreException(String resourceDescription, String msg, SAXException cause) {
@@ -46,8 +46,8 @@ public class XmlBeanDefinitionStoreException extends BeanDefinitionStoreExceptio
 	}
 
 	/**
-	 * Return the line number in the XML resource that failed.
-	 * @return the line number if available (in case of a SAXParseException); -1 else
+	 * 返回 XML 资源中出错的行号。
+	 * @return 如果可用（SAXParseException 情况下）返回行号，否则返回 -1
 	 * @see org.xml.sax.SAXParseException#getLineNumber()
 	 */
 	public int getLineNumber() {

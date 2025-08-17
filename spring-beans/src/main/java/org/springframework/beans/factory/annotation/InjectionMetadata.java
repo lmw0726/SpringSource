@@ -16,6 +16,12 @@
 
 package org.springframework.beans.factory.annotation;
 
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.lang.Nullable;
+import org.springframework.util.ReflectionUtils;
+
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -26,19 +32,13 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValues;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.lang.Nullable;
-import org.springframework.util.ReflectionUtils;
-
 /**
- * Internal class for managing injection metadata.
- * Not intended for direct use in applications.
+ * 管理注入元数据的内部类。
+ * 不建议在应用程序中直接使用。
  *
- * <p>Used by {@link AutowiredAnnotationBeanPostProcessor},
- * {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor} and
- * {@link org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor}.
+ * <p>由 {@link AutowiredAnnotationBeanPostProcessor}、
+ * {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor} 和
+ * {@link org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor} 使用。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -46,7 +46,7 @@ import org.springframework.util.ReflectionUtils;
 public class InjectionMetadata {
 
 	/**
-	 * An empty {@code InjectionMetadata} instance with no-op callbacks.
+	 * 一个空的 {@code InjectionMetadata} 实例，回调为空操作。
 	 * @since 5.2
 	 */
 	public static final InjectionMetadata EMPTY = new InjectionMetadata(Object.class, Collections.emptyList()) {
@@ -75,11 +75,10 @@ public class InjectionMetadata {
 
 
 	/**
-	 * Create a new {@code InjectionMetadata instance}.
-	 * <p>Preferably use {@link #forElements} for reusing the {@link #EMPTY}
-	 * instance in case of no elements.
-	 * @param targetClass the target class
-	 * @param elements the associated elements to inject
+	 * 创建一个新的 {@code InjectionMetadata} 实例。
+	 * <p>在没有元素的情况下，最好使用 {@link #forElements} 来重用 {@link #EMPTY} 实例。
+	 * @param targetClass 目标类
+	 * @param elements 关联的需要注入的元素集合
 	 * @see #forElements
 	 */
 	public InjectionMetadata(Class<?> targetClass, Collection<InjectedElement> elements) {
@@ -89,9 +88,9 @@ public class InjectionMetadata {
 
 
 	/**
-	 * Determine whether this metadata instance needs to be refreshed.
-	 * @param clazz the current target class
-	 * @return {@code true} indicating a refresh, {@code false} otherwise
+	 * 判断该元数据实例是否需要刷新。
+	 * @param clazz 当前目标类
+	 * @return 如果需要刷新返回 {@code true}，否则返回 {@code false}
 	 * @since 5.2.4
 	 */
 	protected boolean needsRefresh(Class<?> clazz) {
@@ -122,7 +121,7 @@ public class InjectionMetadata {
 	}
 
 	/**
-	 * Clear property skipping for the contained elements.
+	 * 清除所包含元素的属性跳过设置。
 	 * @since 3.2.13
 	 */
 	public void clear(@Nullable PropertyValues pvs) {
@@ -138,10 +137,10 @@ public class InjectionMetadata {
 
 
 	/**
-	 * Return an {@code InjectionMetadata} instance, possibly for empty elements.
-	 * @param elements the elements to inject (possibly empty)
-	 * @param clazz the target class
-	 * @return a new {@link #InjectionMetadata(Class, Collection)} instance
+	 * 返回一个 {@code InjectionMetadata} 实例，可能包含空元素。
+	 * @param elements 需要注入的元素（可能为空）
+	 * @param clazz 目标类
+	 * @return 一个新的 {@link #InjectionMetadata(Class, Collection)} 实例
 	 * @since 5.2
 	 */
 	public static InjectionMetadata forElements(Collection<InjectedElement> elements, Class<?> clazz) {
@@ -150,10 +149,10 @@ public class InjectionMetadata {
 	}
 
 	/**
-	 * Check whether the given injection metadata needs to be refreshed.
-	 * @param metadata the existing metadata instance
-	 * @param clazz the current target class
-	 * @return {@code true} indicating a refresh, {@code false} otherwise
+	 * 检查给定的注入元数据是否需要刷新。
+	 * @param metadata 现有的元数据实例
+	 * @param clazz 当前目标类
+	 * @return 如果需要刷新则返回 {@code true}，否则返回 {@code false}
 	 * @see #needsRefresh(Class)
 	 */
 	public static boolean needsRefresh(@Nullable InjectionMetadata metadata, Class<?> clazz) {
@@ -162,7 +161,7 @@ public class InjectionMetadata {
 
 
 	/**
-	 * A single injected element.
+	 * 单个注入的元素。
 	 */
 	public abstract static class InjectedElement {
 
@@ -217,7 +216,7 @@ public class InjectionMetadata {
 		}
 
 		/**
-		 * Either this or {@link #getResourceToInject} needs to be overridden.
+		 * 必须重写此方法或 {@link #getResourceToInject} 方法中的一个。
 		 */
 		protected void inject(Object target, @Nullable String requestingBeanName, @Nullable PropertyValues pvs)
 				throws Throwable {
@@ -243,9 +242,8 @@ public class InjectionMetadata {
 		}
 
 		/**
-		 * Check whether this injector's property needs to be skipped due to
-		 * an explicit property value having been specified. Also marks the
-		 * affected property as processed for other processors to ignore it.
+		 * 检查由于已明确指定属性值，该注入器的属性是否需要被跳过。
+		 * 同时将受影响的属性标记为已处理，以便其他处理器忽略它。
 		 */
 		protected boolean checkPropertySkipping(@Nullable PropertyValues pvs) {
 			Boolean skip = this.skip;
@@ -263,7 +261,7 @@ public class InjectionMetadata {
 				}
 				if (this.pd != null) {
 					if (pvs.contains(this.pd.getName())) {
-						// Explicit value provided as part of the bean definition.
+						// 作为bean定义的一部分提供的显式值。
 						this.skip = true;
 						return true;
 					}
@@ -277,7 +275,7 @@ public class InjectionMetadata {
 		}
 
 		/**
-		 * Clear property skipping for this element.
+		 * 清除该元素的属性跳过设置。
 		 * @since 3.2.13
 		 */
 		protected void clearPropertySkipping(@Nullable PropertyValues pvs) {
@@ -292,7 +290,7 @@ public class InjectionMetadata {
 		}
 
 		/**
-		 * Either this or {@link #inject} needs to be overridden.
+		 * 必须重写此方法或 {@link #inject} 方法中的一个。
 		 */
 		@Nullable
 		protected Object getResourceToInject(Object target, @Nullable String requestingBeanName) {

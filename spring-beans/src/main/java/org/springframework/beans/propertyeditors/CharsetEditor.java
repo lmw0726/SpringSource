@@ -16,17 +16,17 @@
 
 package org.springframework.beans.propertyeditors;
 
+import org.springframework.util.StringUtils;
+
 import java.beans.PropertyEditorSupport;
 import java.nio.charset.Charset;
 
-import org.springframework.util.StringUtils;
-
 /**
- * Editor for {@code java.nio.charset.Charset}, translating charset
- * String representations into Charset objects and back.
+ * {@code java.nio.charset.Charset} 的编辑器，将字符集的字符串表示
+ * 转换为 {@link Charset} 对象，反之亦然。
  *
- * <p>Expects the same syntax as Charset's {@link java.nio.charset.Charset#name()},
- * e.g. {@code UTF-8}, {@code ISO-8859-16}, etc.
+ * <p>期望使用与 Charset 的 {@link java.nio.charset.Charset#name()}
+ * 相同的语法，例如 {@code UTF-8}、{@code ISO-8859-16} 等。
  *
  * @author Arjen Poutsma
  * @since 2.5.4

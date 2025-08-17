@@ -21,14 +21,14 @@ import org.springframework.lang.Nullable;
 import org.w3c.dom.Element;
 
 /**
- * Interface used by the {@link DefaultBeanDefinitionDocumentReader} to handle custom,
- * top-level (directly under {@code <beans/>}) tags.
+ * 接口，用于 {@link DefaultBeanDefinitionDocumentReader} 处理自定义的
+ * 顶级标签（直接位于 {@code <beans/>} 下）。
  *
- * <p>Implementations are free to turn the metadata in the custom tag into as many
- * {@link BeanDefinition BeanDefinitions} as required.
+ * <p>实现类可以自由地将自定义标签中的元数据转换为所需数量的
+ * {@link BeanDefinition BeanDefinitions}。
  *
- * <p>The parser locates a {@link BeanDefinitionParser} from the associated
- * {@link NamespaceHandler} for the namespace in which the custom tag resides.
+ * <p>解析器会从关联的 {@link NamespaceHandler} 中找到适用于该自定义标签所在命名空间的
+ * {@link BeanDefinitionParser}。
  *
  * @author Rob Harrop
  * @see NamespaceHandler

@@ -39,14 +39,14 @@ import java.time.temporal.Temporal;
 import java.util.*;
 
 /**
- * Static convenience methods for JavaBeans: for instantiating beans,
- * checking bean property types, copying bean properties, etc.
+ * 提供 JavaBeans 的静态便捷方法：用于实例化 bean、
+ * 检查 bean 属性类型、复制 bean 属性等操作。
  *
- * <p>Mainly for internal use within the framework, but to some degree also
- * useful for application classes. Consider
- * <a href="https://commons.apache.org/proper/commons-beanutils/">Apache Commons BeanUtils</a>,
- * <a href="https://hotelsdotcom.github.io/bull/">BULL - Bean Utils Light Library</a>,
- * or similar third-party frameworks for more comprehensive bean utilities.
+ * <p>主要供框架内部使用，但在一定程度上也对应用程序类有用。
+ * 对于更全面的 bean 工具，可以考虑使用
+ * <a href="https://commons.apache.org/proper/commons-beanutils/">Apache Commons BeanUtils</a>、
+ * <a href="https://hotelsdotcom.github.io/bull/">BULL - Bean Utils Light Library</a>
+ * 或类似的第三方框架。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

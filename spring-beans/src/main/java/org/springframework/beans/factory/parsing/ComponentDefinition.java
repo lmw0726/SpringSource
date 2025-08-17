@@ -21,50 +21,47 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 
 /**
- * Interface that describes the logical view of a set of {@link BeanDefinition BeanDefinitions}
- * and {@link BeanReference BeanReferences} as presented in some configuration context.
+ * 描述一组{@link BeanDefinition BeanDefinitions}
+ * 和{@link BeanReference BeanReferences}逻辑视图的接口，
+ * 如在某些配置上下文中呈现的那样。
  *
- * <p>With the introduction of {@link org.springframework.beans.factory.xml.NamespaceHandler pluggable custom XML tags},
- * it is now possible for a single logical configuration entity, in this case an XML tag, to
- * create multiple {@link BeanDefinition BeanDefinitions} and {@link BeanReference RuntimeBeanReferences}
- * in order to provide more succinct configuration and greater convenience to end users. As such, it can
- * no longer be assumed that each configuration entity (e.g. XML tag) maps to one {@link BeanDefinition}.
- * For tool vendors and other users who wish to present visualization or support for configuring Spring
- * applications it is important that there is some mechanism in place to tie the {@link BeanDefinition BeanDefinitions}
- * in the {@link org.springframework.beans.factory.BeanFactory} back to the configuration data in a way
- * that has concrete meaning to the end user. As such, {@link org.springframework.beans.factory.xml.NamespaceHandler}
- * implementations are able to publish events in the form of a {@code ComponentDefinition} for each
- * logical entity being configured. Third parties can then {@link ReaderEventListener subscribe to these events},
- * allowing for a user-centric view of the bean metadata.
+ * <p>随着{@link org.springframework.beans.factory.xml.NamespaceHandler 可插拔自定义XML标签}的引入，
+ * 现在单个逻辑配置实体（在这种情况下是XML标签）可能
+ * 创建多个{@link BeanDefinition BeanDefinitions}和{@link BeanReference RuntimeBeanReferences}
+ * 以提供更简洁的配置和更大的最终用户便利性。因此，不能
+ * 再假设每个配置实体（例如XML标签）映射到一个{@link BeanDefinition}。
+ * 对于希望为配置Spring应用程序提供可视化或支持的工具供应商和其他用户来说，
+ * 重要的是有某种机制将{@link org.springframework.beans.factory.BeanFactory}中的{@link BeanDefinition BeanDefinitions}
+ * 以对最终用户有具体意义的方式链接回配置数据。因此，{@link org.springframework.beans.factory.xml.NamespaceHandler}
+ * 实现能够为每个正在配置的逻辑实体以{@code ComponentDefinition}的形式发布事件。
+ * 第三方然后可以{@link ReaderEventListener 订阅这些事件}，
+ * 从而提供以用户为中心的bean元数据视图。
  *
- * <p>Each {@code ComponentDefinition} has a {@link #getSource source object} which is configuration-specific.
- * In the case of XML-based configuration this is typically the {@link org.w3c.dom.Node} which contains the user
- * supplied configuration information. In addition to this, each {@link BeanDefinition} enclosed in a
- * {@code ComponentDefinition} has its own {@link BeanDefinition#getSource() source object} which may point
- * to a different, more specific, set of configuration data. Beyond this, individual pieces of bean metadata such
- * as the {@link org.springframework.beans.PropertyValue PropertyValues} may also have a source object giving an
- * even greater level of detail. Source object extraction is handled through the
- * {@link SourceExtractor} which can be customized as required.
+ * <p>每个{@code ComponentDefinition}都有一个特定于配置的{@link #getSource 源对象}。
+ * 在基于XML的配置情况下，这通常是包含用户提供的配置信息的{@link org.w3c.dom.Node}。
+ * 除此之外，包含在{@code ComponentDefinition}中的每个{@link BeanDefinition}
+ * 都有自己的{@link BeanDefinition#getSource() 源对象}，该对象可能指向
+ * 不同的、更具体的配置数据集合。除此之外，bean元数据的各个部分，如
+ * {@link org.springframework.beans.PropertyValue PropertyValues}也可能有源对象，提供
+ * 更高级别的详细信息。源对象提取通过{@link SourceExtractor}处理，
+ * 可以根据需要进行自定义。
  *
- * <p>Whilst direct access to important {@link BeanReference BeanReferences} is provided through
- * {@link #getBeanReferences}, tools may wish to inspect all {@link BeanDefinition BeanDefinitions} to gather
- * the full set of {@link BeanReference BeanReferences}. Implementations are required to provide
- * all {@link BeanReference BeanReferences} that are required to validate the configuration of the
- * overall logical entity as well as those required to provide full user visualisation of the configuration.
- * It is expected that certain {@link BeanReference BeanReferences} will not be important to
- * validation or to the user view of the configuration and as such these may be omitted. A tool may wish to
- * display any additional {@link BeanReference BeanReferences} sourced through the supplied
- * {@link BeanDefinition BeanDefinitions} but this is not considered to be a typical case.
+ * <p>虽然通过{@link #getBeanReferences}提供了对重要{@link BeanReference BeanReferences}的直接访问，
+ * 但工具可能希望检查所有{@link BeanDefinition BeanDefinitions}以收集
+ * 完整的{@link BeanReference BeanReferences}集合。实现需要提供
+ * 验证整体逻辑实体配置所需的所有{@link BeanReference BeanReferences}，
+ * 以及提供配置完整用户可视化所需的那些。预期某些{@link BeanReference BeanReferences}
+ * 对验证或用户配置视图并不重要，因此可能被省略。工具可能希望
+ * 显示通过提供的{@link BeanDefinition BeanDefinitions}获取的任何其他{@link BeanReference BeanReferences}，
+ * 但这不被认为是典型情况。
  *
- * <p>Tools can determine the important of contained {@link BeanDefinition BeanDefinitions} by checking the
- * {@link BeanDefinition#getRole role identifier}. The role is essentially a hint to the tool as to how
- * important the configuration provider believes a {@link BeanDefinition} is to the end user. It is expected
- * that tools will <strong>not</strong> display all {@link BeanDefinition BeanDefinitions} for a given
- * {@code ComponentDefinition} choosing instead to filter based on the role. Tools may choose to make
- * this filtering user configurable. Particular notice should be given to the
- * {@link BeanDefinition#ROLE_INFRASTRUCTURE INFRASTRUCTURE role identifier}. {@link BeanDefinition BeanDefinitions}
- * classified with this role are completely unimportant to the end user and are required only for
- * internal implementation reasons.
+ * <p>工具可以通过检查{@link BeanDefinition#getRole 角色标识符}来确定包含的{@link BeanDefinition BeanDefinitions}的重要性。
+ * 角色本质上是配置提供者认为{@link BeanDefinition}对最终用户有多重要的提示。
+ * 预期工具将<strong>不会</strong>显示给定{@code ComponentDefinition}的所有{@link BeanDefinition BeanDefinitions}，
+ * 而是选择基于角色进行过滤。工具可能选择使这种过滤用户可配置。
+ * 应特别注意{@link BeanDefinition#ROLE_INFRASTRUCTURE INFRASTRUCTURE角色标识符}。
+ * 具有此角色分类的{@link BeanDefinition BeanDefinitions}对最终用户完全不重要，
+ * 仅出于内部实现原因而需要。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

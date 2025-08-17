@@ -16,15 +16,14 @@
 
 package org.springframework.beans.propertyeditors;
 
+import org.springframework.util.StringUtils;
+
 import java.beans.PropertyEditorSupport;
 import java.util.TimeZone;
 
-import org.springframework.util.StringUtils;
-
 /**
- * Editor for {@code java.util.TimeZone}, translating timezone IDs into
- * {@code TimeZone} objects. Exposes the {@code TimeZone} ID as a text
- * representation.
+ * {@code java.util.TimeZone} 的编辑器，将时区 ID 转换为 {@code TimeZone} 对象。
+ * 以文本形式暴露 {@code TimeZone} 的 ID。
  *
  * @author Juergen Hoeller
  * @author Nicholas Williams

@@ -20,8 +20,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Immutable placeholder class used for a property value object when it's a
- * reference to another bean name in the factory, to be resolved at runtime.
+ * 不可变占位符类，当属性值对象是对工厂中另一个bean名称的引用时使用，
+ * 在运行时进行解析。
  *
  * @author Juergen Hoeller
  * @see RuntimeBeanReference

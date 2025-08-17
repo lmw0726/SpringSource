@@ -16,20 +16,17 @@
 
 package org.springframework.beans;
 
+import org.springframework.beans.propertyeditors.PropertiesEditor;
+
 import java.beans.PropertyEditorSupport;
 import java.util.Properties;
 
-import org.springframework.beans.propertyeditors.PropertiesEditor;
-
 /**
- * {@link java.beans.PropertyEditor Editor} for a {@link PropertyValues} object.
+ * 用于 {@link PropertyValues} 对象的 {@link java.beans.PropertyEditor Editor}。
  *
- * <p>The required format is defined in the {@link java.util.Properties}
- * documentation. Each property must be on a new line.
+ * <p>所需的格式在 {@link java.util.Properties} 文档中定义。每个属性必须在新行上。
  *
- * <p>The present implementation relies on a
- * {@link org.springframework.beans.propertyeditors.PropertiesEditor}
- * underneath.
+ * <p>当前实现底层依赖于 {@link org.springframework.beans.propertyeditors.PropertiesEditor}。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

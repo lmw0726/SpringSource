@@ -24,21 +24,17 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.lang.Nullable;
 
 /**
- * Base interface used by the {@link DefaultBeanDefinitionDocumentReader}
- * for handling custom namespaces in a Spring XML configuration file.
+ * 基础接口，由 {@link DefaultBeanDefinitionDocumentReader} 使用，
+ * 用于处理 Spring XML 配置文件中的自定义命名空间。
  *
- * <p>Implementations are expected to return implementations of the
- * {@link BeanDefinitionParser} interface for custom top-level tags and
- * implementations of the {@link BeanDefinitionDecorator} interface for
- * custom nested tags.
+ * <p>实现类应返回 {@link BeanDefinitionParser} 接口的实现，用于自定义顶层标签，
+ * 以及 {@link BeanDefinitionDecorator} 接口的实现，用于自定义嵌套标签。
  *
- * <p>The parser will call {@link #parse} when it encounters a custom tag
- * directly under the {@code <beans>} tags and {@link #decorate} when
- * it encounters a custom tag directly under a {@code <bean>} tag.
+ * <p>解析器在遇到直接位于 {@code <beans>} 标签下的自定义标签时会调用 {@link #parse}，
+ * 在遇到直接位于 {@code <bean>} 标签下的自定义标签时会调用 {@link #decorate}。
  *
- * <p>Developers writing their own custom element extensions typically will
- * not implement this interface directly, but rather make use of the provided
- * {@link NamespaceHandlerSupport} class.
+ * <p>编写自定义元素扩展的开发者通常不会直接实现此接口，
+ * 而是使用提供的 {@link NamespaceHandlerSupport} 类。
  *
  * @author Rob Harrop
  * @author Erik Wiersma

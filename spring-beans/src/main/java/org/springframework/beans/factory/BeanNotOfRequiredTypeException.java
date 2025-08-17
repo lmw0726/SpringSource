@@ -20,7 +20,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.util.ClassUtils;
 
 /**
- * Thrown when a bean doesn't match the expected type.
+ * 当bean不匹配期望类型时抛出的异常。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -28,22 +28,21 @@ import org.springframework.util.ClassUtils;
 @SuppressWarnings("serial")
 public class BeanNotOfRequiredTypeException extends BeansException {
 
-	/** The name of the instance that was of the wrong type. */
+	/** 类型错误的实例名称。 */
 	private final String beanName;
 
-	/** The required type. */
+	/** 所需类型。 */
 	private final Class<?> requiredType;
 
-	/** The offending type. */
+	/** 有问题的类型。 */
 	private final Class<?> actualType;
 
 
 	/**
-	 * Create a new BeanNotOfRequiredTypeException.
-	 * @param beanName the name of the bean requested
-	 * @param requiredType the required type
-	 * @param actualType the actual type returned, which did not match
-	 * the expected type
+	 * 创建一个新的BeanNotOfRequiredTypeException。
+	 * @param beanName 请求的bean名称
+	 * @param requiredType 所需类型
+	 * @param actualType 返回的实际类型，与期望类型不匹配
 	 */
 	public BeanNotOfRequiredTypeException(String beanName, Class<?> requiredType, Class<?> actualType) {
 		super("Bean named '" + beanName + "' is expected to be of type '" + ClassUtils.getQualifiedName(requiredType) +
@@ -55,21 +54,21 @@ public class BeanNotOfRequiredTypeException extends BeansException {
 
 
 	/**
-	 * Return the name of the instance that was of the wrong type.
+	 * 返回类型错误的实例名称。
 	 */
 	public String getBeanName() {
 		return this.beanName;
 	}
 
 	/**
-	 * Return the expected type for the bean.
+	 * 返回bean的期望类型。
 	 */
 	public Class<?> getRequiredType() {
 		return this.requiredType;
 	}
 
 	/**
-	 * Return the actual type of the instance found.
+	 * 返回找到的实例的实际类型。
 	 */
 	public Class<?> getActualType() {
 		return this.actualType;

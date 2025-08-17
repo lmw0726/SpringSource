@@ -16,16 +16,16 @@
 
 package org.springframework.beans.factory.serviceloader;
 
+import org.springframework.beans.factory.BeanClassLoaderAware;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import org.springframework.beans.factory.BeanClassLoaderAware;
-
 /**
- * {@link org.springframework.beans.factory.FactoryBean} that exposes <i>all</i>
- * services for the configured service class, represented as a List of service objects,
- * obtained through the JDK 1.6 {@link java.util.ServiceLoader} facility.
+ * 一个 {@link org.springframework.beans.factory.FactoryBean}，通过 JDK 1.6 的
+ * {@link java.util.ServiceLoader} 机制获取并暴露所配置服务类的<i>所有</i>服务实例，
+ * 以服务对象的 List 形式表示。
  *
  * @author Juergen Hoeller
  * @since 2.5

@@ -31,8 +31,7 @@ import java.util.Comparator;
 import java.util.Set;
 
 /**
- * Utility class that contains various methods useful for the implementation of
- * autowire-capable bean factories.
+ * 包含多种对实现支持自动注入功能的 bean 工厂有用的方法的工具类。
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -49,24 +48,20 @@ abstract class AutowireUtils {
 
 
 	/**
-	 * Sort the given constructors, preferring public constructors and "greedy" ones with
-	 * a maximum number of arguments. The result will contain public constructors first,
-	 * with decreasing number of arguments, then non-public constructors, again with
-	 * decreasing number of arguments.
+	 * 对给定的构造函数进行排序，优先选择 public 构造函数以及参数数量最多的“贪婪”构造函数。
+	 * 排序结果中，public 构造函数在前，按参数数量递减排列；然后是非 public 构造函数，同样按参数数量递减排列。
 	 *
-	 * @param constructors the constructor array to sort
+	 * @param constructors 要排序的构造函数数组
 	 */
 	public static void sortConstructors(Constructor<?>[] constructors) {
 		Arrays.sort(constructors, EXECUTABLE_COMPARATOR);
 	}
 
 	/**
-	 * Sort the given factory methods, preferring public methods and "greedy" ones
-	 * with a maximum of arguments. The result will contain public methods first,
-	 * with decreasing number of arguments, then non-public methods, again with
-	 * decreasing number of arguments.
+	 * 对给定的工厂方法进行排序，优先选择 public 方法以及参数数量最多的“贪婪”方法。
+	 * 排序结果中，public 方法在前，按参数数量递减排列；然后是非 public 方法，同样按参数数量递减排列。
 	 *
-	 * @param factoryMethods the factory method array to sort
+	 * @param factoryMethods 要排序的工厂方法数组
 	 */
 	public static void sortFactoryMethods(Method[] factoryMethods) {
 		Arrays.sort(factoryMethods, EXECUTABLE_COMPARATOR);
@@ -118,12 +113,12 @@ abstract class AutowireUtils {
 	}
 
 	/**
-	 * Resolve the given autowiring value against the given required type,
-	 * e.g. an {@link ObjectFactory} value to its actual object result.
+	 * 将给定的自动注入值根据所需的类型进行解析，
+	 * 例如，将 {@link ObjectFactory} 值解析为其实际的对象结果。
 	 *
-	 * @param autowiringValue the value to resolve
-	 * @param requiredType    the type to assign the result to
-	 * @return the resolved value
+	 * @param autowiringValue 要解析的值
+	 * @param requiredType    用于赋值结果的目标类型
+	 * @return 解析后的值
 	 */
 	public static Object resolveAutowiringValue(Object autowiringValue, Class<?> requiredType) {
 		if (autowiringValue instanceof ObjectFactory && !requiredType.isInstance(autowiringValue)) {
@@ -260,7 +255,7 @@ abstract class AutowireUtils {
 
 
 	/**
-	 * Reflective {@link InvocationHandler} for lazy access to the current target object.
+	 * 用于延迟访问当前目标对象的反射式 {@link InvocationHandler}。
 	 */
 	@SuppressWarnings("serial")
 	private static class ObjectFactoryDelegatingInvocationHandler implements InvocationHandler, Serializable {
@@ -275,10 +270,10 @@ abstract class AutowireUtils {
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			switch (method.getName()) {
 				case "equals":
-					// Only consider equal when proxies are identical.
+					// 仅当代理相同时才考虑相等。
 					return (proxy == args[0]);
 				case "hashCode":
-					// Use hashCode of proxy.
+					// 使用代理的hashCode。
 					return System.identityHashCode(proxy);
 				case "toString":
 					return this.objectFactory.toString();

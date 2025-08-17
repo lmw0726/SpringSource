@@ -20,8 +20,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
- * Context that gets passed along a bean definition reading process,
- * encapsulating all relevant configuration as well as state.
+ * 在bean定义读取过程中传递的上下文，
+ * 封装所有相关配置以及状态。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -64,31 +64,31 @@ public class ReaderContext {
 	}
 
 
-	// Errors and warnings
+	// 错误和警告
 
 	/**
-	 * Raise a fatal error.
+	 * 抛出致命错误。
 	 */
 	public void fatal(String message, @Nullable Object source) {
 		fatal(message, source, null, null);
 	}
 
 	/**
-	 * Raise a fatal error.
+	 * 抛出致命错误。
 	 */
 	public void fatal(String message, @Nullable Object source, @Nullable Throwable cause) {
 		fatal(message, source, null, cause);
 	}
 
 	/**
-	 * Raise a fatal error.
+	 * 抛出致命错误。
 	 */
 	public void fatal(String message, @Nullable Object source, @Nullable ParseState parseState) {
 		fatal(message, source, parseState, null);
 	}
 
 	/**
-	 * Raise a fatal error.
+	 * 抛出致命错误。
 	 */
 	public void fatal(String message, @Nullable Object source, @Nullable ParseState parseState, @Nullable Throwable cause) {
 		Location location = new Location(getResource(), source);
@@ -96,21 +96,21 @@ public class ReaderContext {
 	}
 
 	/**
-	 * 标注常规错误
+	 * 抛出常规错误。
 	 */
 	public void error(String message, @Nullable Object source) {
 		error(message, source, null, null);
 	}
 
 	/**
-	 * Raise a regular error.
+	 * 抛出常规错误。
 	 */
 	public void error(String message, @Nullable Object source, @Nullable Throwable cause) {
 		error(message, source, null, cause);
 	}
 
 	/**
-	 * Raise a regular error.
+	 * 抛出常规错误。
 	 */
 	public void error(String message, @Nullable Object source, @Nullable ParseState parseState) {
 		error(message, source, parseState, null);
@@ -127,28 +127,28 @@ public class ReaderContext {
 	}
 
 	/**
-	 * Raise a non-critical warning.
+	 * 抛出非关键性警告。
 	 */
 	public void warning(String message, @Nullable Object source) {
 		warning(message, source, null, null);
 	}
 
 	/**
-	 * Raise a non-critical warning.
+	 * 抛出非关键性警告。
 	 */
 	public void warning(String message, @Nullable Object source, @Nullable Throwable cause) {
 		warning(message, source, null, cause);
 	}
 
 	/**
-	 * Raise a non-critical warning.
+	 * 抛出非关键性警告。
 	 */
 	public void warning(String message, @Nullable Object source, @Nullable ParseState parseState) {
 		warning(message, source, parseState, null);
 	}
 
 	/**
-	 * Raise a non-critical warning.
+	 * 抛出非关键性警告。
 	 */
 	public void warning(String message, @Nullable Object source, @Nullable ParseState parseState, @Nullable Throwable cause) {
 		Location location = new Location(getResource(), source);
@@ -156,7 +156,7 @@ public class ReaderContext {
 	}
 
 
-	// Explicit parse events
+	// 明确的解析事件
 
 	/**
 	 * 触发默认注册的事件。
@@ -180,7 +180,7 @@ public class ReaderContext {
 	}
 
 	/**
-	 * Fire an import-processed event.
+	 * 触发导入处理的事件。
 	 */
 	public void fireImportProcessed(String importedResource, @Nullable Object source) {
 		this.eventListener.importProcessed(new ImportDefinition(importedResource, source));
@@ -194,10 +194,10 @@ public class ReaderContext {
 	}
 
 
-	// Source extraction
+	// 源提取
 
 	/**
-	 * Return the source extractor in use.
+	 * 返回使用中的源提取器。
 	 */
 	public SourceExtractor getSourceExtractor() {
 		return this.sourceExtractor;

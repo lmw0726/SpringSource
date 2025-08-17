@@ -16,22 +16,18 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditorSupport;
+
 /**
- * Editor for a {@link Character}, to populate a property
- * of type {@code Character} or {@code char} from a String value.
+ * {@link Character} 的编辑器，用于将 String 值转换为 Character 或 char 类型的属性。
  *
- * <p>Note that the JDK does not contain a default
- * {@link java.beans.PropertyEditor property editor} for {@code char}!
- * {@link org.springframework.beans.BeanWrapperImpl} will register this
- * editor by default.
+ * <p>注意 JDK 默认并不包含 {@link java.beans.PropertyEditor} 来处理 char 类型！
+ * {@link org.springframework.beans.BeanWrapperImpl} 会默认注册此编辑器。
  *
- * <p>Also supports conversion from a Unicode character sequence; e.g.
- * {@code u0041} ('A').
+ * <p>也支持从 Unicode 字符序列转换，例如 {@code u0041} ('A')。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -43,26 +39,26 @@ import org.springframework.util.StringUtils;
 public class CharacterEditor extends PropertyEditorSupport {
 
 	/**
-	 * The prefix that identifies a string as being a Unicode character sequence.
+	 * 标识字符串为 Unicode 字符序列的前缀。
 	 */
 	private static final String UNICODE_PREFIX = "\\u";
 
 	/**
-	 * The length of a Unicode character sequence.
+	 * Unicode 字符序列的长度。
 	 */
 	private static final int UNICODE_LENGTH = 6;
 
-
+	/**
+	 * 是否允许空字符串。
+	 */
 	private final boolean allowEmpty;
 
 
 	/**
-	 * Create a new CharacterEditor instance.
-	 * <p>The "allowEmpty" parameter controls whether an empty String is to be
-	 * allowed in parsing, i.e. be interpreted as the {@code null} value when
-	 * {@link #setAsText(String) text is being converted}. If {@code false},
-	 * an {@link IllegalArgumentException} will be thrown at that time.
-	 * @param allowEmpty if empty strings are to be allowed
+	 * 创建一个新的 CharacterEditor 实例。
+	 * <p>"allowEmpty" 参数控制在解析时是否允许空字符串，即当调用 {@link #setAsText(String)} 转换文本时是否解释为 {@code null}。
+	 * 如果为 {@code false}，遇到空字符串时会抛出 {@link IllegalArgumentException}。
+	 * @param allowEmpty 是否允许空字符串
 	 */
 	public CharacterEditor(boolean allowEmpty) {
 		this.allowEmpty = allowEmpty;
@@ -72,7 +68,7 @@ public class CharacterEditor extends PropertyEditorSupport {
 	@Override
 	public void setAsText(@Nullable String text) throws IllegalArgumentException {
 		if (this.allowEmpty && !StringUtils.hasLength(text)) {
-			// Treat empty String as null value.
+			// 将空字符串视为null值。
 			setValue(null);
 		}
 		else if (text == null) {

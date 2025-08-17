@@ -16,40 +16,38 @@
 
 package org.springframework.beans.propertyeditors;
 
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
 import java.beans.PropertyEditorSupport;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
 /**
- * {@link java.beans.PropertyEditor} implementation for standard JDK
- * {@link java.util.ResourceBundle ResourceBundles}.
+ * 针对标准 JDK {@link java.util.ResourceBundle ResourceBundles} 的 {@link java.beans.PropertyEditor} 实现。
  *
- * <p>Only supports conversion <i>from</i> a String, but not <i>to</i> a String.
+ * <p>仅支持从字符串转换 <i>到</i> ResourceBundle，不支持从 ResourceBundle 转换 <i>到</i> 字符串。
  *
- * Find below some examples of using this class in a (properly configured)
- * Spring container using XML-based metadata:
+ * 以下示例展示了在使用 XML 配置的 Spring 容器中如何使用此类：
  *
  * <pre class="code"> &lt;bean id="errorDialog" class="..."&gt;
  *    &lt;!--
- *        the 'messages' property is of type java.util.ResourceBundle.
- *        the 'DialogMessages.properties' file exists at the root of the CLASSPATH
+ *        'messages' 属性类型为 java.util.ResourceBundle。
+ *        'DialogMessages.properties' 文件位于 CLASSPATH 根目录
  *    --&gt;
  *    &lt;property name="messages" value="DialogMessages"/&gt;
  * &lt;/bean&gt;</pre>
  *
  * <pre class="code"> &lt;bean id="errorDialog" class="..."&gt;
  *    &lt;!--
- *        the 'DialogMessages.properties' file exists in the 'com/messages' package
+ *        'DialogMessages.properties' 文件位于 'com/messages' 包中
  *    --&gt;
  *    &lt;property name="messages" value="com/messages/DialogMessages"/&gt;
  * &lt;/bean&gt;</pre>
  *
- * <p>A 'properly configured' Spring {@link org.springframework.context.ApplicationContext container}
- * might contain a {@link org.springframework.beans.factory.config.CustomEditorConfigurer}
- * definition such that the conversion can be effected transparently:
+ * <p>一个“配置正确”的 Spring {@link org.springframework.context.ApplicationContext 容器}
+ * 可能包含 {@link org.springframework.beans.factory.config.CustomEditorConfigurer} 定义，
+ * 以便透明地进行转换：
  *
  * <pre class="code"> &lt;bean class="org.springframework.beans.factory.config.CustomEditorConfigurer"&gt;
  *    &lt;property name="customEditors"&gt;
@@ -61,10 +59,9 @@ import org.springframework.util.StringUtils;
  *    &lt;/property&gt;
  * &lt;/bean&gt;</pre>
  *
- * <p>Please note that this {@link java.beans.PropertyEditor} is <b>not</b>
- * registered by default with any of the Spring infrastructure.
+ * <p>请注意，此 {@link java.beans.PropertyEditor} 默认不会被 Spring 基础设施注册。
  *
- * <p>Thanks to David Leal Valmana for the suggestion and initial prototype.
+ * <p>感谢 David Leal Valmana 提出的建议及初始原型。
  *
  * @author Rick Evans
  * @author Juergen Hoeller
@@ -73,8 +70,7 @@ import org.springframework.util.StringUtils;
 public class ResourceBundleEditor extends PropertyEditorSupport {
 
 	/**
-	 * The separator used to distinguish between the base name and the locale
-	 * (if any) when {@link #setAsText(String) converting from a String}.
+	 * 当从字符串 {@link #setAsText(String) 转换} 时，用于区分基名和区域设置（如果有）的分隔符。
 	 */
 	public static final String BASE_NAME_SEPARATOR = "_";
 
@@ -89,7 +85,7 @@ public class ResourceBundleEditor extends PropertyEditorSupport {
 			setValue(ResourceBundle.getBundle(name));
 		}
 		else {
-			// The name potentially contains locale information
+			// 名称可能包含区域设置信息
 			String baseName = name.substring(0, separator);
 			if (!StringUtils.hasText(baseName)) {
 				throw new IllegalArgumentException("Invalid ResourceBundle name: '" + text + "'");

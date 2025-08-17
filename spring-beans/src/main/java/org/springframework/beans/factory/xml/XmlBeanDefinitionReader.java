@@ -41,18 +41,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Bean definition reader for XML bean definitions.
- * Delegates the actual XML document reading to an implementation
- * of the {@link BeanDefinitionDocumentReader} interface.
+ * 用于读取 XML Bean 定义的 Bean 定义读取器。
+ * 实际的 XML 文档读取操作由 {@link BeanDefinitionDocumentReader} 接口的实现类完成。
  *
- * <p>Typically applied to a
+ * <p>通常应用于
  * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
- * or a {@link org.springframework.context.support.GenericApplicationContext}.
+ * 或 {@link org.springframework.context.support.GenericApplicationContext}。
  *
- * <p>This class loads a DOM document and applies the BeanDefinitionDocumentReader to it.
- * The document reader will register each bean definition with the given bean factory,
- * talking to the latter's implementation of the
- * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry} interface.
+ * <p>该类会加载 DOM 文档并将其交给 BeanDefinitionDocumentReader 处理。
+ * 文档读取器会将每个 Bean 定义注册到指定的 BeanFactory，
+ * 并通过该 BeanFactory 对 {@link org.springframework.beans.factory.support.BeanDefinitionRegistry} 接口的实现进行操作。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -140,10 +138,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * Create new XmlBeanDefinitionReader for the given bean factory.
+	 * 为给定的 BeanFactory 创建新的 XmlBeanDefinitionReader。
 	 *
-	 * @param registry the BeanFactory to load bean definitions into,
-	 *                 in the form of a BeanDefinitionRegistry
+	 * @param registry 要加载 Bean 定义的 BeanFactory，
+	 *                 以 BeanDefinitionRegistry 形式提供
 	 */
 	public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
 		super(registry);
@@ -151,9 +149,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * Set whether to use XML validation. Default is {@code true}.
-	 * <p>This method switches namespace awareness on if validation is turned off,
-	 * in order to still process schema namespaces properly in such a scenario.
+	 * 设置是否使用 XML 验证。默认值为 {@code true}。
+	 * <p>如果关闭验证，该方法会开启命名空间感知，
+	 * 以便在此情况下仍能正确处理模式命名空间。
 	 *
 	 * @see #setValidationMode
 	 * @see #setNamespaceAware
@@ -164,7 +162,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Set the validation mode to use by name. Defaults to {@link #VALIDATION_AUTO}.
+	 * 按名称设置要使用的验证模式。默认值为 {@link #VALIDATION_AUTO}。
 	 *
 	 * @see #setValidationMode
 	 */
@@ -189,11 +187,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Set whether or not the XML parser should be XML namespace aware.
-	 * Default is "false".
-	 * <p>This is typically not needed when schema validation is active.
-	 * However, without validation, this has to be switched to "true"
-	 * in order to properly process schema namespaces.
+	 * 设置 XML 解析器是否应支持 XML 命名空间。
+	 * 默认值为 "false"。
+	 * <p>当启用模式验证时，通常不需要设置此项。
+	 * 但是在未启用验证的情况下，需要将其设置为 "true"，
+	 * 以正确处理模式命名空间。
 	 */
 	public void setNamespaceAware(boolean namespaceAware) {
 		this.namespaceAware = namespaceAware;
@@ -207,57 +205,53 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Specify which {@link org.springframework.beans.factory.parsing.ProblemReporter} to use.
-	 * <p>The default implementation is {@link org.springframework.beans.factory.parsing.FailFastProblemReporter}
-	 * which exhibits fail fast behaviour. External tools can provide an alternative implementation
-	 * that collates errors and warnings for display in the tool UI.
+	 * 指定要使用的 {@link org.springframework.beans.factory.parsing.ProblemReporter}。
+	 * <p>默认实现为 {@link org.springframework.beans.factory.parsing.FailFastProblemReporter}，
+	 * 采用快速失败的行为。外部工具可以提供替代实现，
+	 * 将错误和警告收集以在工具 UI 中显示。
 	 */
 	public void setProblemReporter(@Nullable ProblemReporter problemReporter) {
 		this.problemReporter = (problemReporter != null ? problemReporter : new FailFastProblemReporter());
 	}
 
 	/**
-	 * Specify which {@link ReaderEventListener} to use.
-	 * <p>The default implementation is EmptyReaderEventListener which discards every event notification.
-	 * External tools can provide an alternative implementation to monitor the components being
-	 * registered in the BeanFactory.
+	 * 指定要使用的 {@link ReaderEventListener}。
+	 * <p>默认实现为 EmptyReaderEventListener，会丢弃所有事件通知。
+	 * 外部工具可以提供替代实现，用于监控注册到 BeanFactory 的组件。
 	 */
 	public void setEventListener(@Nullable ReaderEventListener eventListener) {
 		this.eventListener = (eventListener != null ? eventListener : new EmptyReaderEventListener());
 	}
 
 	/**
-	 * Specify the {@link SourceExtractor} to use.
-	 * <p>The default implementation is {@link NullSourceExtractor} which simply returns {@code null}
-	 * as the source object. This means that - during normal runtime execution -
-	 * no additional source metadata is attached to the bean configuration metadata.
+	 * 指定要使用的 {@link SourceExtractor}。
+	 * <p>默认实现为 {@link NullSourceExtractor}，仅返回 {@code null} 作为源对象。
+	 * 这意味着在正常运行时，不会向 Bean 配置元数据附加额外的源信息。
 	 */
 	public void setSourceExtractor(@Nullable SourceExtractor sourceExtractor) {
 		this.sourceExtractor = (sourceExtractor != null ? sourceExtractor : new NullSourceExtractor());
 	}
 
 	/**
-	 * Specify the {@link NamespaceHandlerResolver} to use.
-	 * <p>If none is specified, a default instance will be created through
-	 * {@link #createDefaultNamespaceHandlerResolver()}.
+	 * 指定要使用的 {@link NamespaceHandlerResolver}。
+	 * <p>如果未指定，将通过 {@link #createDefaultNamespaceHandlerResolver()} 创建默认实例。
 	 */
 	public void setNamespaceHandlerResolver(@Nullable NamespaceHandlerResolver namespaceHandlerResolver) {
 		this.namespaceHandlerResolver = namespaceHandlerResolver;
 	}
 
 	/**
-	 * Specify the {@link DocumentLoader} to use.
-	 * <p>The default implementation is {@link DefaultDocumentLoader}
-	 * which loads {@link Document} instances using JAXP.
+	 * 指定要使用的 {@link DocumentLoader}。
+	 * <p>默认实现为 {@link DefaultDocumentLoader}，使用 JAXP 加载 {@link Document} 实例。
 	 */
 	public void setDocumentLoader(@Nullable DocumentLoader documentLoader) {
 		this.documentLoader = (documentLoader != null ? documentLoader : new DefaultDocumentLoader());
 	}
 
 	/**
-	 * Set a SAX entity resolver to be used for parsing.
-	 * <p>By default, {@link ResourceEntityResolver} will be used. Can be overridden
-	 * for custom entity resolution, for example relative to some specific base path.
+	 * 设置用于解析的 SAX 实体解析器。
+	 * <p>默认使用 {@link ResourceEntityResolver}，可以覆盖以实现自定义实体解析，
+	 * 例如相对于某个特定的基础路径。
 	 */
 	public void setEntityResolver(@Nullable EntityResolver entityResolver) {
 		this.entityResolver = entityResolver;
@@ -280,11 +274,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Set an implementation of the {@code org.xml.sax.ErrorHandler}
-	 * interface for custom handling of XML parsing errors and warnings.
-	 * <p>If not set, a default SimpleSaxErrorHandler is used that simply
-	 * logs warnings using the logger instance of the view class,
-	 * and rethrows errors to discontinue the XML transformation.
+	 * 设置 {@code org.xml.sax.ErrorHandler} 接口的实现，
+	 * 用于自定义处理 XML 解析中的错误和警告。
+	 * <p>如果未设置，将使用默认的 SimpleSaxErrorHandler，
+	 * 仅使用视图类的日志记录器记录警告，并重新抛出错误以中断 XML 转换。
 	 *
 	 * @see SimpleSaxErrorHandler
 	 */
@@ -293,11 +286,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Specify the {@link BeanDefinitionDocumentReader} implementation to use,
-	 * responsible for the actual reading of the XML bean definition document.
-	 * <p>The default is {@link DefaultBeanDefinitionDocumentReader}.
+	 * 指定要使用的 {@link BeanDefinitionDocumentReader} 实现类，
+	 * 负责实际读取 XML Bean 定义文档。
+	 * <p>默认使用 {@link DefaultBeanDefinitionDocumentReader}。
 	 *
-	 * @param documentReaderClass the desired BeanDefinitionDocumentReader implementation class
+	 * @param documentReaderClass 所需的 BeanDefinitionDocumentReader 实现类
 	 */
 	public void setDocumentReaderClass(Class<? extends BeanDefinitionDocumentReader> documentReaderClass) {
 		this.documentReaderClass = documentReaderClass;
@@ -356,24 +349,23 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Load bean definitions from the specified XML file.
+	 * 从指定的 XML 文件加载 Bean 定义。
 	 *
-	 * @param inputSource the SAX InputSource to read from
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * @param inputSource 要读取的 SAX InputSource
+	 * @return 找到的 Bean 定义数量
+	 * @throws BeanDefinitionStoreException 加载或解析错误时抛出
 	 */
 	public int loadBeanDefinitions(InputSource inputSource) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(inputSource, "resource loaded through SAX InputSource");
 	}
 
 	/**
-	 * Load bean definitions from the specified XML file.
+	 * 从指定的 XML 文件加载 Bean 定义。
 	 *
-	 * @param inputSource         the SAX InputSource to read from
-	 * @param resourceDescription a description of the resource
-	 *                            (can be {@code null} or empty)
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * @param inputSource         要读取的 SAX InputSource
+	 * @param resourceDescription 资源描述（可以为 {@code null} 或空）
+	 * @return 找到的 Bean 定义数量
+	 * @throws BeanDefinitionStoreException 加载或解析错误时抛出
 	 */
 	public int loadBeanDefinitions(InputSource inputSource, @Nullable String resourceDescription)
 			throws BeanDefinitionStoreException {

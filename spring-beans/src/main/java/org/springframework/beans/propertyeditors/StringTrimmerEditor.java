@@ -16,16 +16,16 @@
 
 package org.springframework.beans.propertyeditors;
 
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyEditorSupport;
+
 /**
- * Property editor that trims Strings.
+ * 字符串修剪的属性编辑器。
  *
- * <p>Optionally allows transforming an empty string into a {@code null} value.
- * Needs to be explicitly registered, e.g. for command binding.
+ * <p>可选地将空字符串转换为 {@code null} 值。
+ * 需要显式注册，例如用于命令绑定。
  *
  * @author Juergen Hoeller
  * @see org.springframework.validation.DataBinder#registerCustomEditor
@@ -39,9 +39,8 @@ public class StringTrimmerEditor extends PropertyEditorSupport {
 
 
 	/**
-	 * Create a new StringTrimmerEditor.
-	 * @param emptyAsNull {@code true} if an empty String is to be
-	 * transformed into {@code null}
+	 * 创建一个新的 StringTrimmerEditor。
+	 * @param emptyAsNull 如果为 {@code true}，空字符串将被转换为 {@code null}
 	 */
 	public StringTrimmerEditor(boolean emptyAsNull) {
 		this.charsToDelete = null;
@@ -49,12 +48,10 @@ public class StringTrimmerEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * Create a new StringTrimmerEditor.
-	 * @param charsToDelete a set of characters to delete, in addition to
-	 * trimming an input String. Useful for deleting unwanted line breaks:
-	 * e.g. "\r\n\f" will delete all new lines and line feeds in a String.
-	 * @param emptyAsNull {@code true} if an empty String is to be
-	 * transformed into {@code null}
+	 * 创建一个新的 StringTrimmerEditor。
+	 * @param charsToDelete 需要删除的一组字符，除了对输入字符串进行修剪之外。
+	 *                      用于删除不需要的换行符，例如 "\r\n\f" 会删除字符串中的所有换行和回车符。
+	 * @param emptyAsNull 如果为 {@code true}，空字符串将被转换为 {@code null}
 	 */
 	public StringTrimmerEditor(String charsToDelete, boolean emptyAsNull) {
 		this.charsToDelete = charsToDelete;

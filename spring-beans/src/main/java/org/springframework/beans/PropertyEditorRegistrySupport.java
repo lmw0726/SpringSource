@@ -124,7 +124,7 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 
 
 	//---------------------------------------------------------------------
-	// Management of default editors
+	// 默认编辑器的管理
 	//---------------------------------------------------------------------
 
 	/**
@@ -279,7 +279,7 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 
 
 	//---------------------------------------------------------------------
-	// Management of custom editors
+	// 自定义编辑器的管理
 	//---------------------------------------------------------------------
 
 	@Override

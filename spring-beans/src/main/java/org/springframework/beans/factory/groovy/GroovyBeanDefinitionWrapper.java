@@ -16,12 +16,7 @@
 
 package org.springframework.beans.factory.groovy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import groovy.lang.GroovyObjectSupport;
-
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -32,9 +27,13 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
- * Internal wrapper for a Spring BeanDefinition, allowing for Groovy-style
- * property access within a {@link GroovyBeanDefinitionReader} closure.
+ * Spring BeanDefinition的内部包装器，允许在{@link GroovyBeanDefinitionReader}闭包中
+ * 进行Groovy风格的属性访问。
  *
  * @author Jeff Brown
  * @author Juergen Hoeller
@@ -193,7 +192,7 @@ class GroovyBeanDefinitionWrapper extends GroovyObjectSupport {
 					bd.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
 				}
 			}
-			// constructorArgs
+			// 构造器参数
 			else if (CONSTRUCTOR_ARGS.equals(property) && newValue instanceof List) {
 				ConstructorArgumentValues cav = new ConstructorArgumentValues();
 				List<?> args = (List<?>) newValue;
@@ -202,31 +201,31 @@ class GroovyBeanDefinitionWrapper extends GroovyObjectSupport {
 				}
 				bd.setConstructorArgumentValues(cav);
 			}
-			// factoryBean
+			// 工厂bean
 			else if (FACTORY_BEAN.equals(property)) {
 				if (newValue != null) {
 					bd.setFactoryBeanName(newValue.toString());
 				}
 			}
-			// factoryMethod
+			// 工厂方法
 			else if (FACTORY_METHOD.equals(property)) {
 				if (newValue != null) {
 					bd.setFactoryMethodName(newValue.toString());
 				}
 			}
-			// initMethod
+			// 初始化方法
 			else if (INIT_METHOD.equals(property)) {
 				if (newValue != null) {
 					bd.setInitMethodName(newValue.toString());
 				}
 			}
-			// destroyMethod
+			// 销毁方法
 			else if (DESTROY_METHOD.equals(property)) {
 				if (newValue != null) {
 					bd.setDestroyMethodName(newValue.toString());
 				}
 			}
-			// singleton property
+			// 单例属性
 			else if (SINGLETON.equals(property)) {
 				bd.setScope(Boolean.TRUE.equals(newValue) ?
 						BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);

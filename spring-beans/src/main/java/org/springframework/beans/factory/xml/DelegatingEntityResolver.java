@@ -16,18 +16,17 @@
 
 package org.springframework.beans.factory.xml;
 
-import java.io.IOException;
-
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
+import java.io.IOException;
 
 /**
- * {@link EntityResolver} implementation that delegates to a {@link BeansDtdResolver}
- * and a {@link PluggableSchemaResolver} for DTDs and XML schemas, respectively.
+ * {@link EntityResolver} 实现，分别委托给 {@link BeansDtdResolver} 和 {@link PluggableSchemaResolver}
+ * 来处理 DTD 和 XML Schema。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -59,13 +58,12 @@ public class DelegatingEntityResolver implements EntityResolver {
 
 
 	/**
-	 * Create a new DelegatingEntityResolver that delegates to
-	 * a default {@link BeansDtdResolver} and a default {@link PluggableSchemaResolver}.
-	 * <p>Configures the {@link PluggableSchemaResolver} with the supplied
-	 * {@link ClassLoader}.
+	 * 创建一个新的 DelegatingEntityResolver，委托给默认的 {@link BeansDtdResolver} 和
+	 * 默认的 {@link PluggableSchemaResolver}。
+	 * <p>使用提供的 {@link ClassLoader} 配置 {@link PluggableSchemaResolver}。
 	 *
-	 * @param classLoader the ClassLoader to use for loading
-	 *                    (can be {@code null}) to use the default ClassLoader)
+	 * @param classLoader 用于加载的 ClassLoader
+	 *                    （可以为 {@code null}，使用默认 ClassLoader）
 	 */
 	public DelegatingEntityResolver(@Nullable ClassLoader classLoader) {
 		this.dtdResolver = new BeansDtdResolver();
@@ -73,11 +71,10 @@ public class DelegatingEntityResolver implements EntityResolver {
 	}
 
 	/**
-	 * Create a new DelegatingEntityResolver that delegates to
-	 * the given {@link EntityResolver EntityResolvers}.
+	 * 创建一个新的 DelegatingEntityResolver，委托给给定的 {@link EntityResolver}。
 	 *
-	 * @param dtdResolver    the EntityResolver to resolve DTDs with
-	 * @param schemaResolver the EntityResolver to resolve XML schemas with
+	 * @param dtdResolver    用于解析 DTD 的 EntityResolver
+	 * @param schemaResolver 用于解析 XML Schema 的 EntityResolver
 	 */
 	public DelegatingEntityResolver(EntityResolver dtdResolver, EntityResolver schemaResolver) {
 		Assert.notNull(dtdResolver, "'dtdResolver' is required");
