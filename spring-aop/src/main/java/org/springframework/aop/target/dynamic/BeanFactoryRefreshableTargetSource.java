@@ -20,11 +20,10 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.util.Assert;
 
 /**
- * Refreshable TargetSource that fetches fresh target beans from a BeanFactory.
+ * 可刷新的 TargetSource，从 BeanFactory 中获取全新的目标 Bean。
  *
- * <p>Can be subclassed to override {@code requiresRefresh()} to suppress
- * unnecessary refreshes. By default, a refresh will be performed every time
- * the "refreshCheckDelay" has elapsed.
+ * <p>可以被子类化以重写 {@code requiresRefresh()} 方法来抑制不必要的刷新。
+ * 默认情况下，每次 "refreshCheckDelay" 过后都会执行刷新。
  *
  * @author Rob Harrop
  * @author Rod Johnson
@@ -43,12 +42,10 @@ public class BeanFactoryRefreshableTargetSource extends AbstractRefreshableTarge
 
 
 	/**
-	 * Create a new BeanFactoryRefreshableTargetSource for the given
-	 * bean factory and bean name.
-	 * <p>Note that the passed-in BeanFactory should have an appropriate
-	 * bean definition set up for the given bean name.
-	 * @param beanFactory the BeanFactory to fetch beans from
-	 * @param beanName the name of the target bean
+	 * 为给定的 BeanFactory 和 Bean 名称创建一个新的 BeanFactoryRefreshableTargetSource。
+	 * <p>注意，传入的 BeanFactory 应该已为给定的 Bean 名称设置好适当的 Bean 定义。
+	 * @param beanFactory 用于获取 Bean 的 BeanFactory
+	 * @param beanName 目标 Bean 的名称
 	 */
 	public BeanFactoryRefreshableTargetSource(BeanFactory beanFactory, String beanName) {
 		Assert.notNull(beanFactory, "BeanFactory is required");
@@ -59,7 +56,7 @@ public class BeanFactoryRefreshableTargetSource extends AbstractRefreshableTarge
 
 
 	/**
-	 * Retrieve a fresh target object.
+	 * 获取一个全新的目标对象。
 	 */
 	@Override
 	protected final Object freshTarget() {
@@ -67,10 +64,8 @@ public class BeanFactoryRefreshableTargetSource extends AbstractRefreshableTarge
 	}
 
 	/**
-	 * A template method that subclasses may override to provide a
-	 * fresh target object for the given bean factory and bean name.
-	 * <p>This default implementation fetches a new target bean
-	 * instance from the bean factory.
+	 * 模板方法，子类可以重写以提供给定 BeanFactory 和 Bean 名称的全新目标对象。
+	 * <p>此默认实现从 BeanFactory 中获取一个新的目标 Bean 实例。
 	 * @see org.springframework.beans.factory.BeanFactory#getBean
 	 */
 	protected Object obtainFreshBean(BeanFactory beanFactory, String beanName) {

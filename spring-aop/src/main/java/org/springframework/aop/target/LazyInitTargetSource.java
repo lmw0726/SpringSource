@@ -20,17 +20,15 @@ import org.springframework.beans.BeansException;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link org.springframework.aop.TargetSource} that lazily accesses a
- * singleton bean from a {@link org.springframework.beans.factory.BeanFactory}.
+ * {@link org.springframework.aop.TargetSource} 的实现，
+ * 延迟从 {@link org.springframework.beans.factory.BeanFactory} 中获取单例 Bean。
  *
- * <p>Useful when a proxy reference is needed on initialization but
- * the actual target object should not be initialized until first use.
- * When the target bean is defined in an
- * {@link org.springframework.context.ApplicationContext} (or a
- * {@code BeanFactory} that is eagerly pre-instantiating singleton beans)
- * it must be marked as "lazy-init" too, else it will be instantiated by said
- * {@code ApplicationContext} (or {@code BeanFactory}) on startup.
- * <p>For example:
+ * <p>适用于在初始化时需要代理引用，但实际目标对象应在首次使用时才初始化的场景。
+ * 当目标 Bean 定义在 {@link org.springframework.context.ApplicationContext}
+ * （或一个会提前预实例化单例 Bean 的 {@code BeanFactory}）中时，
+ * 它也必须标记为 "lazy-init"，否则会在 {@code ApplicationContext}
+ * （或 {@code BeanFactory}）启动时被实例化。
+ * <p>例如：
  *
  * <pre class="code">
  * &lt;bean id="serviceTarget" class="example.MyService" lazy-init="true"&gt;
@@ -45,11 +43,10 @@ import org.springframework.lang.Nullable;
  *   &lt;/property&gt;
  * &lt;/bean&gt;</pre>
  *
- * The "serviceTarget" bean will not get initialized until a method on the
- * "service" proxy gets invoked.
+ * 直到 "service" 代理上的方法被调用之前，"serviceTarget" Bean 都不会被初始化。
  *
- * <p>Subclasses can extend this class and override the {@link #postProcessTargetObject(Object)} to
- * perform some additional processing with the target object when it is first loaded.
+ * <p>子类可以扩展此类并重写 {@link #postProcessTargetObject(Object)} 方法，
+ * 以便在目标对象首次加载时对其执行一些额外的处理。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -75,9 +72,8 @@ public class LazyInitTargetSource extends AbstractBeanFactoryBasedTargetSource {
 	}
 
 	/**
-	 * Subclasses may override this method to perform additional processing on
-	 * the target object when it is first loaded.
-	 * @param targetObject the target object that has just been instantiated (and configured)
+	 * 子类可以重写此方法，以便在目标对象首次加载时对其执行额外的处理。
+	 * @param targetObject 刚刚被实例化（和配置）的目标对象
 	 */
 	protected void postProcessTargetObject(Object targetObject) {
 	}

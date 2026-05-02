@@ -20,12 +20,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * BeanPostProcessor that registers {@link AdvisorAdapter} beans in the BeanFactory with
- * an {@link AdvisorAdapterRegistry} (by default the {@link GlobalAdvisorAdapterRegistry}).
+ * BeanPostProcessor，将 BeanFactory 中的 {@link AdvisorAdapter} bean
+ * 注册到 {@link AdvisorAdapterRegistry} 中（默认为 {@link GlobalAdvisorAdapterRegistry}）。
  *
- * <p>The only requirement for it to work is that it needs to be defined
- * in application context along with "non-native" Spring AdvisorAdapters
- * that need to be "recognized" by Spring's AOP framework.
+ * <p>它工作的唯一要求是需要在应用程序上下文中定义它，
+ * 以及需要被 Spring AOP 框架"识别"的"非原生" Spring AdvisorAdapters。
  *
  * @author Dmitriy Kopylenko
  * @author Juergen Hoeller
@@ -39,8 +38,8 @@ public class AdvisorAdapterRegistrationManager implements BeanPostProcessor {
 
 
 	/**
-	 * Specify the AdvisorAdapterRegistry to register AdvisorAdapter beans with.
-	 * Default is the global AdvisorAdapterRegistry.
+	 * 指定要向其注册 AdvisorAdapter bean 的 AdvisorAdapterRegistry。
+	 * 默认为全局 AdvisorAdapterRegistry。
 	 * @see GlobalAdvisorAdapterRegistry
 	 */
 	public void setAdvisorAdapterRegistry(AdvisorAdapterRegistry advisorAdapterRegistry) {

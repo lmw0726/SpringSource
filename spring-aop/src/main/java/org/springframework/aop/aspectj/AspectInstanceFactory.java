@@ -20,11 +20,11 @@ import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface implemented to provide an instance of an AspectJ aspect.
- * Decouples from Spring's bean factory.
+ * 用于提供 AspectJ 切面实例的接口。
+ * 与 Spring 的 bean 工厂解耦。
  *
- * <p>Extends the {@link org.springframework.core.Ordered} interface
- * to express an order value for the underlying aspect in a chain.
+ * <p>扩展 {@link org.springframework.core.Ordered} 接口，
+ * 以表达链中底层切面的顺序值。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -34,14 +34,14 @@ import org.springframework.lang.Nullable;
 public interface AspectInstanceFactory extends Ordered {
 
 	/**
-	 * Create an instance of this factory's aspect.
-	 * @return the aspect instance (never {@code null})
+	 * 创建此工厂的切面实例。
+	 * @return 切面实例（绝不为 {@code null}）
 	 */
 	Object getAspectInstance();
 
 	/**
-	 * Expose the aspect class loader that this factory uses.
-	 * @return the aspect class loader (or {@code null} for the bootstrap loader)
+	 * 暴露此工厂使用的切面类加载器。
+	 * @return 切面类加载器（引导类加载器则返回 {@code null}）
 	 * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
 	 */
 	@Nullable

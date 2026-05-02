@@ -17,13 +17,11 @@
 package org.springframework.aop;
 
 /**
- * Superinterface for advisors that perform one or more AOP <b>introductions</b>.
+ * 执行一个或多个 AOP <b>引介</b>的 advisor 的上级接口。
  *
- * <p>This interface cannot be implemented directly; subinterfaces must
- * provide the advice type implementing the introduction.
+ * <p>此接口不能直接实现；子接口必须提供实现引介的通知类型。
  *
- * <p>Introduction is the implementation of additional interfaces
- * (not implemented by a target) via AOP advice.
+ * <p>引介是通过 AOP 通知实现附加接口（目标对象未实现的接口）。
  *
  * @author Rod Johnson
  * @since 04.04.2003
@@ -32,19 +30,16 @@ package org.springframework.aop;
 public interface IntroductionAdvisor extends Advisor, IntroductionInfo {
 
 	/**
-	 * Return the filter determining which target classes this introduction
-	 * should apply to.
-	 * <p>This represents the class part of a pointcut. Note that method
-	 * matching doesn't make sense to introductions.
-	 * @return the class filter
+	 * 返回用于确定此引介应应用于哪些目标类的过滤器。
+	 * <p>这表示切点的类部分。注意，方法匹配对引介没有意义。
+	 * @return 类过滤器
 	 */
 	ClassFilter getClassFilter();
 
 	/**
-	 * Can the advised interfaces be implemented by the introduction advice?
-	 * Invoked before adding an IntroductionAdvisor.
-	 * @throws IllegalArgumentException if the advised interfaces can't be
-	 * implemented by the introduction advice
+	 * 被通知的接口能否由引介通知实现？
+	 * 在添加 IntroductionAdvisor 之前调用。
+	 * @throws IllegalArgumentException 如果被通知的接口不能由引介通知实现
 	 */
 	void validateInterfaces() throws IllegalArgumentException;
 

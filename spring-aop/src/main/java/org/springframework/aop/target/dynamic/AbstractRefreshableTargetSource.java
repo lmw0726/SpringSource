@@ -23,12 +23,11 @@ import org.springframework.aop.TargetSource;
 import org.springframework.lang.Nullable;
 
 /**
- * Abstract {@link org.springframework.aop.TargetSource} implementation that
- * wraps a refreshable target object. Subclasses can determine whether a
- * refresh is required, and need to provide fresh target objects.
+ * 抽象的 {@link org.springframework.aop.TargetSource} 实现，
+ * 包装一个可刷新的目标对象。子类可以确定是否需要刷新，
+ * 并需要提供新的目标对象。
  *
- * <p>Implements the {@link Refreshable} interface in order to allow for
- * explicit control over the refresh status.
+ * <p>实现了 {@link Refreshable} 接口，以便允许对刷新状态进行显式控制。
  *
  * @author Rod Johnson
  * @author Rob Harrop
@@ -39,7 +38,7 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractRefreshableTargetSource implements TargetSource, Refreshable {
 
-	/** Logger available to subclasses. */
+	/** 子类可用的日志记录器。 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	@Nullable
@@ -55,10 +54,10 @@ public abstract class AbstractRefreshableTargetSource implements TargetSource, R
 
 
 	/**
-	 * Set the delay between refresh checks, in milliseconds.
-	 * Default is -1, indicating no refresh checks at all.
-	 * <p>Note that an actual refresh will only happen when
-	 * {@link #requiresRefresh()} returns {@code true}.
+	 * 设置刷新检查之间的延迟时间（毫秒）。
+	 * 默认值为 -1，表示完全不进行刷新检查。
+	 * <p>注意，只有当 {@link #requiresRefresh()} 返回 {@code true} 时，
+	 * 才会实际执行刷新。
 	 */
 	public void setRefreshCheckDelay(long refreshCheckDelay) {
 		this.refreshCheckDelay = refreshCheckDelay;
@@ -74,7 +73,7 @@ public abstract class AbstractRefreshableTargetSource implements TargetSource, R
 	}
 
 	/**
-	 * Not static.
+	 * 非静态。
 	 */
 	@Override
 	public boolean isStatic() {
@@ -91,7 +90,7 @@ public abstract class AbstractRefreshableTargetSource implements TargetSource, R
 	}
 
 	/**
-	 * No need to release target.
+	 * 无需释放目标对象。
 	 */
 	@Override
 	public void releaseTarget(Object object) {
@@ -128,7 +127,7 @@ public abstract class AbstractRefreshableTargetSource implements TargetSource, R
 		long currentTimeMillis = System.currentTimeMillis();
 
 		if (this.lastRefreshCheck < 0 || currentTimeMillis - this.lastRefreshCheck > this.refreshCheckDelay) {
-			// Going to perform a refresh check - update the timestamp.
+			// 即将执行刷新检查 - 更新时间戳。
 			this.lastRefreshCheck = currentTimeMillis;
 			logger.debug("Refresh check delay elapsed - checking whether refresh is required");
 			return true;
@@ -139,22 +138,20 @@ public abstract class AbstractRefreshableTargetSource implements TargetSource, R
 
 
 	/**
-	 * Determine whether a refresh is required.
-	 * Invoked for each refresh check, after the refresh check delay has elapsed.
-	 * <p>The default implementation always returns {@code true}, triggering
-	 * a refresh every time the delay has elapsed. To be overridden by subclasses
-	 * with an appropriate check of the underlying target resource.
-	 * @return whether a refresh is required
+	 * 确定是否需要刷新。
+	 * 在每次刷新检查时调用，前提是刷新检查延迟已经过去。
+	 * <p>默认实现始终返回 {@code true}，意味着每次延迟过后都会触发刷新。
+	 * 子类应重写此方法，以便对底层目标资源进行适当的检查。
+	 * @return 是否需要刷新
 	 */
 	protected boolean requiresRefresh() {
 		return true;
 	}
 
 	/**
-	 * Obtain a fresh target object.
-	 * <p>Only invoked if a refresh check has found that a refresh is required
-	 * (that is, {@link #requiresRefresh()} has returned {@code true}).
-	 * @return the fresh target object
+	 * 获取一个全新的目标对象。
+	 * <p>仅在刷新检查发现需要刷新时调用（即 {@link #requiresRefresh()} 返回 {@code true}）。
+	 * @return 全新的目标对象
 	 */
 	protected abstract Object freshTarget();
 

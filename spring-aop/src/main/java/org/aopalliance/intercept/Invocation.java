@@ -19,20 +19,18 @@ package org.aopalliance.intercept;
 import javax.annotation.Nonnull;
 
 /**
- * This interface represents an invocation in the program.
+ * 此接口表示程序中的一次调用。
  *
- * <p>An invocation is a joinpoint and can be intercepted by an
- * interceptor.
+ * <p>一次调用是一个连接点，并且可以被拦截器拦截。
  *
  * @author Rod Johnson
  */
 public interface Invocation extends Joinpoint {
 
 	/**
-	 * Get the arguments as an array object.
-	 * It is possible to change element values within this
-	 * array to change the arguments.
-	 * @return the argument of the invocation
+	 * 以数组对象的形式获取参数。
+	 * 可以修改此数组中的元素值来改变参数。
+	 * @return 此次调用的参数
 	 */
 	@Nonnull
 	Object[] getArguments();

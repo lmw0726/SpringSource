@@ -21,17 +21,17 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * Regular expression pointcut based on the {@code java.util.regex} package.
- * Supports the following JavaBean properties:
+ * 基于 {@code java.util.regex} 包的正则表达式切点。
+ * 支持以下 JavaBean 属性：
  * <ul>
- * <li>pattern: regular expression for the fully-qualified method names to match
- * <li>patterns: alternative property taking a String array of patterns. The result will
- * be the union of these patterns.
+ * <li>pattern：用于匹配完全限定方法名的正则表达式
+ * <li>patterns：可选属性，接受 String 数组形式的模式。结果将
+ * 是这些模式的并集。
  * </ul>
  *
- * <p>Note: the regular expressions must be a match. For example,
- * {@code .*get.*} will match com.mycom.Foo.getBar().
- * {@code get.*} will not.
+ * <p>注意：正则表达式必须是匹配整个目标的匹配。例如，
+ * {@code .*get.*} 将匹配 com.mycom.Foo.getBar()。
+ * {@code get.*} 则不会。
  *
  * @author Dmitriy Kopylenko
  * @author Rob Harrop
@@ -41,18 +41,18 @@ import java.util.regex.PatternSyntaxException;
 public class JdkRegexpMethodPointcut extends AbstractRegexpMethodPointcut {
 
 	/**
-	 * Compiled form of the patterns.
+	 * 模式的已编译形式。
 	 */
 	private Pattern[] compiledPatterns = new Pattern[0];
 
 	/**
-	 * Compiled form of the exclusion patterns.
+	 * 排除模式的已编译形式。
 	 */
 	private Pattern[] compiledExclusionPatterns = new Pattern[0];
 
 
 	/**
-	 * Initialize {@link Pattern Patterns} from the supplied {@code String[]}.
+	 * 从提供的 {@code String[]} 初始化 {@link Pattern Patterns}。
 	 */
 	@Override
 	protected void initPatternRepresentation(String[] patterns) throws PatternSyntaxException {
@@ -60,7 +60,7 @@ public class JdkRegexpMethodPointcut extends AbstractRegexpMethodPointcut {
 	}
 
 	/**
-	 * Initialize exclusion {@link Pattern Patterns} from the supplied {@code String[]}.
+	 * 从提供的 {@code String[]} 初始化排除用的 {@link Pattern Patterns}。
 	 */
 	@Override
 	protected void initExcludedPatternRepresentation(String[] excludedPatterns) throws PatternSyntaxException {
@@ -68,8 +68,8 @@ public class JdkRegexpMethodPointcut extends AbstractRegexpMethodPointcut {
 	}
 
 	/**
-	 * Returns {@code true} if the {@link Pattern} at index {@code patternIndex}
-	 * matches the supplied candidate {@code String}.
+	 * 如果索引 {@code patternIndex} 处的 {@link Pattern}
+	 * 匹配提供的候选 {@code String}，则返回 {@code true}。
 	 */
 	@Override
 	protected boolean matches(String pattern, int patternIndex) {
@@ -78,8 +78,8 @@ public class JdkRegexpMethodPointcut extends AbstractRegexpMethodPointcut {
 	}
 
 	/**
-	 * Returns {@code true} if the exclusion {@link Pattern} at index {@code patternIndex}
-	 * matches the supplied candidate {@code String}.
+	 * 如果索引 {@code patternIndex} 处的排除 {@link Pattern}
+	 * 匹配提供的候选 {@code String}，则返回 {@code true}。
 	 */
 	@Override
 	protected boolean matchesExclusion(String candidate, int patternIndex) {
@@ -89,8 +89,7 @@ public class JdkRegexpMethodPointcut extends AbstractRegexpMethodPointcut {
 
 
 	/**
-	 * Compiles the supplied {@code String[]} into an array of
-	 * {@link Pattern} objects and returns that array.
+	 * 将提供的 {@code String[]} 编译为 {@link Pattern} 对象数组并返回该数组。
 	 */
 	private Pattern[] compilePatterns(String[] source) throws PatternSyntaxException {
 		Pattern[] destination = new Pattern[source.length];

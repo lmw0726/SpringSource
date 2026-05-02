@@ -19,12 +19,12 @@ package org.springframework.aop;
 import org.aopalliance.intercept.MethodInterceptor;
 
 /**
- * Subinterface of AOP Alliance MethodInterceptor that allows additional interfaces
- * to be implemented by the interceptor, and available via a proxy using that
- * interceptor. This is a fundamental AOP concept called <b>introduction</b>.
+ * AOP Alliance MethodInterceptor 的子接口，允许拦截器实现附加接口，
+ * 并通过使用该拦截器的代理暴露这些接口。这是一个称为
+ * <b>引介</b>（introduction）的基础 AOP 概念。
  *
- * <p>Introductions are often <b>mixins</b>, enabling the building of composite
- * objects that can achieve many of the goals of multiple inheritance in Java.
+ * <p>引介通常是 <b>mixin</b>，支持构建复合对象，
+ * 这些对象可以实现 Java 中多重继承的许多目标。
  *
  * @author Rod Johnson
  * @see DynamicIntroductionAdvice

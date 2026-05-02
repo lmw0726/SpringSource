@@ -25,8 +25,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Implementation of {@link AspectInstanceFactory} that creates a new instance
- * of the specified aspect class for every {@link #getAspectInstance()} call.
+ * {@link AspectInstanceFactory} 的实现，为每次
+ * {@link #getAspectInstance()} 调用创建指定切面类的新实例。
  *
  * @author Juergen Hoeller
  * @since 2.0.4
@@ -37,8 +37,8 @@ public class SimpleAspectInstanceFactory implements AspectInstanceFactory {
 
 
 	/**
-	 * Create a new SimpleAspectInstanceFactory for the given aspect class.
-	 * @param aspectClass the aspect class
+	 * 为给定的切面类创建新的 SimpleAspectInstanceFactory。
+	 * @param aspectClass 切面类
 	 */
 	public SimpleAspectInstanceFactory(Class<?> aspectClass) {
 		Assert.notNull(aspectClass, "Aspect class must not be null");
@@ -47,7 +47,7 @@ public class SimpleAspectInstanceFactory implements AspectInstanceFactory {
 
 
 	/**
-	 * Return the specified aspect class (never {@code null}).
+	 * 返回指定的切面类（绝不为 {@code null}）。
 	 */
 	public final Class<?> getAspectClass() {
 		return this.aspectClass;
@@ -83,10 +83,10 @@ public class SimpleAspectInstanceFactory implements AspectInstanceFactory {
 	}
 
 	/**
-	 * Determine the order for this factory's aspect instance,
-	 * either an instance-specific order expressed through implementing
-	 * the {@link org.springframework.core.Ordered} interface,
-	 * or a fallback order.
+	 * 确定此工厂的切面实例的顺序，
+	 * 可以是通过实现 {@link org.springframework.core.Ordered} 接口
+	 * 表达的实例特定顺序，
+	 * 或者是回退顺序。
 	 * @see org.springframework.core.Ordered
 	 * @see #getOrderForAspectClass
 	 */
@@ -96,11 +96,10 @@ public class SimpleAspectInstanceFactory implements AspectInstanceFactory {
 	}
 
 	/**
-	 * Determine a fallback order for the case that the aspect instance
-	 * does not express an instance-specific order through implementing
-	 * the {@link org.springframework.core.Ordered} interface.
-	 * <p>The default implementation simply returns {@code Ordered.LOWEST_PRECEDENCE}.
-	 * @param aspectClass the aspect class
+	 * 确定切面实例不通过实现 {@link org.springframework.core.Ordered} 接口
+	 * 表达实例特定顺序的情况下的回退顺序。
+	 * <p>默认实现简单地返回 {@code Ordered.LOWEST_PRECEDENCE}。
+	 * @param aspectClass 切面类
 	 */
 	protected int getOrderForAspectClass(Class<?> aspectClass) {
 		return Ordered.LOWEST_PRECEDENCE;

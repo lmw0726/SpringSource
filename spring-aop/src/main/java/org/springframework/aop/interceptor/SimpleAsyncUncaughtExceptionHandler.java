@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A default {@link AsyncUncaughtExceptionHandler} that simply logs the exception.
+ * 一个默认的 {@link AsyncUncaughtExceptionHandler}，它只是记录异常。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller

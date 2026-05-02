@@ -16,9 +16,6 @@
 
 package org.springframework.aop.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator;
 import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
 import org.springframework.aop.framework.autoproxy.InfrastructureAdvisorAutoProxyCreator;
@@ -29,13 +26,16 @@ import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Utility class for handling registration of AOP auto-proxy creators.
+ * 用于处理 AOP 自动代理创建器注册的实用工具类。
  *
- * <p>Only a single auto-proxy creator should be registered yet multiple concrete
- * implementations are available. This class provides a simple escalation protocol,
- * allowing a caller to request a particular auto-proxy creator and know that creator,
- * <i>or a more capable variant thereof</i>, will be registered as a post-processor.
+ * <p>应该只注册一个自动代理创建器，但存在多个具体实现。
+ * 该类提供了一个简单的升级协议，
+ * 允许调用者请求特定的自动代理创建器，并确保该创建器，
+ * <i>或其更强大的变体</i>，将被注册为后置处理器。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -46,18 +46,18 @@ import org.springframework.util.Assert;
 public abstract class AopConfigUtils {
 
 	/**
-	 * The bean name of the internally managed auto-proxy creator.
+	 * 内部管理的自动代理创建器的 bean 名称。
 	 */
 	public static final String AUTO_PROXY_CREATOR_BEAN_NAME =
 			"org.springframework.aop.config.internalAutoProxyCreator";
 
 	/**
-	 * Stores the auto proxy creator classes in escalation order.
+	 * 按升级顺序存储自动代理创建器类。
 	 */
 	private static final List<Class<?>> APC_PRIORITY_LIST = new ArrayList<>(3);
 
 	static {
-		// Set up the escalation list...
+		// 设置升级列表...
 		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);
 		APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
 		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);

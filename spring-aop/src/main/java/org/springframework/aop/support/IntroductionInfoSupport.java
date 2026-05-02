@@ -31,11 +31,10 @@ import org.springframework.aop.IntroductionInfo;
 import org.springframework.util.ClassUtils;
 
 /**
- * Support for implementations of {@link org.springframework.aop.IntroductionInfo}.
+ * 对 {@link org.springframework.aop.IntroductionInfo} 实现的支持。
  *
- * <p>Allows subclasses to conveniently add all interfaces from a given object,
- * and to suppress interfaces that should not be added. Also allows for querying
- * all introduced interfaces.
+ * <p>允许子类方便地添加给定对象的所有接口，
+ * 并抑制不应添加的接口。还允许查询所有被引介的接口。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -49,11 +48,10 @@ public class IntroductionInfoSupport implements IntroductionInfo, Serializable {
 
 
 	/**
-	 * Suppress the specified interface, which may have been autodetected
-	 * due to the delegate implementing it. Call this method to exclude
-	 * internal interfaces from being visible at the proxy level.
-	 * <p>Does nothing if the interface is not implemented by the delegate.
-	 * @param ifc the interface to suppress
+	 * 抑制指定接口，该接口可能由于委托实现它而被自动检测到。
+	 * 调用此方法可排除内部接口，使其在代理级别不可见。
+	 * <p>如果委托未实现该接口，则不执行任何操作。
+	 * @param ifc 要抑制的接口
 	 */
 	public void suppressInterface(Class<?> ifc) {
 		this.publishedInterfaces.remove(ifc);
@@ -65,9 +63,9 @@ public class IntroductionInfoSupport implements IntroductionInfo, Serializable {
 	}
 
 	/**
-	 * Check whether the specified interfaces is a published introduction interface.
-	 * @param ifc the interface to check
-	 * @return whether the interface is part of this introduction
+	 * 检查指定接口是否为已发布的引介接口。
+	 * @param ifc 要检查的接口
+	 * @return 该接口是否属于此引介的一部分
 	 */
 	public boolean implementsInterface(Class<?> ifc) {
 		for (Class<?> pubIfc : this.publishedInterfaces) {
@@ -79,17 +77,17 @@ public class IntroductionInfoSupport implements IntroductionInfo, Serializable {
 	}
 
 	/**
-	 * Publish all interfaces that the given delegate implements at the proxy level.
-	 * @param delegate the delegate object
+	 * 在代理级别发布给定委托实现的所有接口。
+	 * @param delegate 委托对象
 	 */
 	protected void implementInterfacesOnObject(Object delegate) {
 		this.publishedInterfaces.addAll(ClassUtils.getAllInterfacesAsSet(delegate));
 	}
 
 	/**
-	 * Is this method on an introduced interface?
-	 * @param mi the method invocation
-	 * @return whether the invoked method is on an introduced interface
+	 * 此方法是否位于被引介的接口上？
+	 * @param mi 方法调用
+	 * @return 被调用的方法是否位于被引介的接口上
 	 */
 	protected final boolean isMethodOnIntroducedInterface(MethodInvocation mi) {
 		Boolean rememberedResult = this.rememberedMethods.get(mi.getMethod());
@@ -97,7 +95,7 @@ public class IntroductionInfoSupport implements IntroductionInfo, Serializable {
 			return rememberedResult;
 		}
 		else {
-			// Work it out and cache it.
+			// 计算结果并缓存。
 			boolean result = implementsInterface(mi.getMethod().getDeclaringClass());
 			this.rememberedMethods.put(mi.getMethod(), result);
 			return result;
@@ -106,18 +104,18 @@ public class IntroductionInfoSupport implements IntroductionInfo, Serializable {
 
 
 	//---------------------------------------------------------------------
-	// Serialization support
+	// 序列化支持
 	//---------------------------------------------------------------------
 
 	/**
-	 * This method is implemented only to restore the logger.
-	 * We don't make the logger static as that would mean that subclasses
-	 * would use this class's log category.
+	 * 实现此方法只是为了恢复 logger。
+	 * 我们不将 logger 设为 static，因为那样会导致子类
+	 * 使用此类的日志类别。
 	 */
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-		// Rely on default serialization; just initialize state after deserialization.
+		// 依赖默认序列化；仅在反序列化后初始化状态。
 		ois.defaultReadObject();
-		// Initialize transient fields.
+		// 初始化 transient 字段。
 		this.rememberedMethods = new ConcurrentHashMap<>(32);
 	}
 

@@ -35,28 +35,25 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * AOP Alliance {@code MethodInterceptor} that processes method invocations
- * asynchronously, using a given {@link org.springframework.core.task.AsyncTaskExecutor}.
- * Typically used with the {@link org.springframework.scheduling.annotation.Async} annotation.
+ * 异步处理方法调用的 AOP Alliance {@code MethodInterceptor}，
+ * 使用给定的 {@link org.springframework.core.task.AsyncTaskExecutor}。
+ * 通常与 {@link org.springframework.scheduling.annotation.Async} 注解一起使用。
  *
- * <p>In terms of target method signatures, any parameter types are supported.
- * However, the return type is constrained to either {@code void} or
- * {@code java.util.concurrent.Future}. In the latter case, the Future handle
- * returned from the proxy will be an actual asynchronous Future that can be used
- * to track the result of the asynchronous method execution. However, since the
- * target method needs to implement the same signature, it will have to return
- * a temporary Future handle that just passes the return value through
- * (like Spring's {@link org.springframework.scheduling.annotation.AsyncResult}
- * or EJB 3.1's {@code javax.ejb.AsyncResult}).
+ * <p>就目标方法签名而言，支持任何参数类型。
+ * 但是，返回类型被限制为 {@code void} 或 {@code java.util.concurrent.Future}。
+ * 在后一种情况下，从代理返回的 Future 句柄将是实际的异步 Future，
+ * 可用于跟踪异步方法执行的结果。然而，由于目标方法需要实现相同签名，
+ * 它必须返回一个临时 Future 句柄，该句柄只是传递返回值
+ * （例如 Spring 的 {@link org.springframework.scheduling.annotation.AsyncResult}
+ * 或 EJB 3.1 的 {@code javax.ejb.AsyncResult}）。
  *
- * <p>When the return type is {@code java.util.concurrent.Future}, any exception thrown
- * during the execution can be accessed and managed by the caller. With {@code void}
- * return type however, such exceptions cannot be transmitted back. In that case an
- * {@link AsyncUncaughtExceptionHandler} can be registered to process such exceptions.
+ * <p>当返回类型为 {@code java.util.concurrent.Future} 时，执行期间抛出的任何异常
+ * 都可以由调用者访问和管理。但对于 {@code void} 返回类型，
+ * 此类异常无法传回。在这种情况下，可以注册
+ * {@link AsyncUncaughtExceptionHandler} 来处理此类异常。
  *
- * <p>As of Spring 3.1.2 the {@code AnnotationAsyncExecutionInterceptor} subclass is
- * preferred for use due to its support for executor qualification in conjunction with
- * Spring's {@code @Async} annotation.
+ * <p>自 Spring 3.1.2 起，首选使用 {@code AnnotationAsyncExecutionInterceptor} 子类，
+ * 因为它支持结合 Spring 的 {@code @Async} 注解进行执行器限定。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -69,21 +66,21 @@ import org.springframework.util.ClassUtils;
 public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport implements MethodInterceptor, Ordered {
 
 	/**
-	 * Create a new instance with a default {@link AsyncUncaughtExceptionHandler}.
-	 * @param defaultExecutor the {@link Executor} (typically a Spring {@link AsyncTaskExecutor}
-	 * or {@link java.util.concurrent.ExecutorService}) to delegate to;
-	 * as of 4.2.6, a local executor for this interceptor will be built otherwise
+	 * 使用默认 {@link AsyncUncaughtExceptionHandler} 创建一个新实例。
+	 * @param defaultExecutor 要委托给的 {@link Executor}
+	 * （通常是 Spring {@link AsyncTaskExecutor} 或 {@link java.util.concurrent.ExecutorService}）；
+	 * 自 4.2.6 起，如果未提供，则会为此拦截器构建本地执行器
 	 */
 	public AsyncExecutionInterceptor(@Nullable Executor defaultExecutor) {
 		super(defaultExecutor);
 	}
 
 	/**
-	 * Create a new {@code AsyncExecutionInterceptor}.
-	 * @param defaultExecutor the {@link Executor} (typically a Spring {@link AsyncTaskExecutor}
-	 * or {@link java.util.concurrent.ExecutorService}) to delegate to;
-	 * as of 4.2.6, a local executor for this interceptor will be built otherwise
-	 * @param exceptionHandler the {@link AsyncUncaughtExceptionHandler} to use
+	 * 创建新的 {@code AsyncExecutionInterceptor}。
+	 * @param defaultExecutor 要委托给的 {@link Executor}
+	 * （通常是 Spring {@link AsyncTaskExecutor} 或 {@link java.util.concurrent.ExecutorService}）；
+	 * 自 4.2.6 起，如果未提供，则会为此拦截器构建本地执行器
+	 * @param exceptionHandler 要使用的 {@link AsyncUncaughtExceptionHandler}
 	 */
 	public AsyncExecutionInterceptor(@Nullable Executor defaultExecutor, AsyncUncaughtExceptionHandler exceptionHandler) {
 		super(defaultExecutor, exceptionHandler);
@@ -91,11 +88,11 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 
 
 	/**
-	 * Intercept the given method invocation, submit the actual calling of the method to
-	 * the correct task executor and return immediately to the caller.
-	 * @param invocation the method to intercept and make asynchronous
-	 * @return {@link Future} if the original method returns {@code Future}; {@code null}
-	 * otherwise.
+	 * 拦截给定方法调用，将该方法的实际调用提交给正确的任务执行器，
+	 * 并立即返回给调用者。
+	 * @param invocation 要拦截并异步化的方法
+	 * @return 如果原始方法返回 {@code Future}，则返回 {@link Future}；
+	 * 否则返回 {@code null}。
 	 */
 	@Override
 	@Nullable
@@ -130,10 +127,10 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 	}
 
 	/**
-	 * This implementation is a no-op for compatibility in Spring 3.1.2.
-	 * Subclasses may override to provide support for extracting qualifier information,
-	 * e.g. via an annotation on the given method.
-	 * @return always {@code null}
+	 * 为了兼容 Spring 3.1.2，此实现是 no-op。
+	 * 子类可以重写以支持提取限定符信息，
+	 * 例如通过给定方法上的注解。
+	 * @return 始终为 {@code null}
 	 * @since 3.1.2
 	 * @see #determineAsyncExecutor(Method)
 	 */
@@ -144,11 +141,11 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 	}
 
 	/**
-	 * This implementation searches for a unique {@link org.springframework.core.task.TaskExecutor}
-	 * bean in the context, or for an {@link Executor} bean named "taskExecutor" otherwise.
-	 * If neither of the two is resolvable (e.g. if no {@code BeanFactory} was configured at all),
-	 * this implementation falls back to a newly created {@link SimpleAsyncTaskExecutor} instance
-	 * for local use if no default could be found.
+	 * 此实现会在上下文中查找唯一的 {@link org.springframework.core.task.TaskExecutor} bean，
+	 * 否则查找名为 "taskExecutor" 的 {@link Executor} bean。
+	 * 如果两者都无法解析（例如完全没有配置 {@code BeanFactory}），
+	 * 并且未找到默认值，则此实现会回退到新创建的 {@link SimpleAsyncTaskExecutor} 实例
+	 * 以供本地使用。
 	 * @see #DEFAULT_TASK_EXECUTOR_BEAN_NAME
 	 */
 	@Override

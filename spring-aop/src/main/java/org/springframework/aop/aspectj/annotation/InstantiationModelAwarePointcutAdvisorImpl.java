@@ -34,8 +34,8 @@ import org.springframework.aop.support.Pointcuts;
 import org.springframework.lang.Nullable;
 
 /**
- * Internal implementation of AspectJPointcutAdvisor.
- * Note that there will be one instance of this advisor for each target method.
+ * AspectJPointcutAdvisor 的内部实现。
+ * 注意，对于每个目标方法都会有此 advisor 的一个实例。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -95,19 +95,19 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 		this.aspectName = aspectName;
 
 		if (aspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
-			// Static part of the pointcut is a lazy type.
+			// 切点的静态部分是延迟类型。
 			Pointcut preInstantiationPointcut = Pointcuts.union(
 					aspectInstanceFactory.getAspectMetadata().getPerClausePointcut(), this.declaredPointcut);
 
-			// Make it dynamic: must mutate from pre-instantiation to post-instantiation state.
-			// If it's not a dynamic pointcut, it may be optimized out
-			// by the Spring AOP infrastructure after the first evaluation.
+			// 使其成为动态切点：必须从实例化前状态变更为实例化后状态。
+			// 如果它不是动态切点，Spring AOP 基础设施可能会在第一次求值后
+			// 将其优化掉。
 			this.pointcut = new PerTargetInstantiationModelPointcut(
 					this.declaredPointcut, preInstantiationPointcut, aspectInstanceFactory);
 			this.lazy = true;
 		}
 		else {
-			// A singleton aspect.
+			// 单例切面。
 			this.pointcut = this.declaredPointcut;
 			this.lazy = false;
 			this.instantiatedAdvice = instantiateAdvice(this.declaredPointcut);
@@ -116,8 +116,8 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 
 
 	/**
-	 * The pointcut for Spring AOP to use.
-	 * Actual behaviour of the pointcut will change depending on the state of the advice.
+	 * 供 Spring AOP 使用的切点。
+	 * 切点的实际行为会根据通知的状态而变化。
 	 */
 	@Override
 	public Pointcut getPointcut() {
@@ -135,7 +135,7 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 	/**
-	 * Lazily instantiate advice if necessary.
+	 * 如有必要，延迟实例化通知。
 	 */
 	@Override
 	public synchronized Advice getAdvice() {
@@ -152,9 +152,8 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 	/**
-	 * This is only of interest for Spring AOP: AspectJ instantiation semantics
-	 * are much richer. In AspectJ terminology, all a return of {@code true}
-	 * means here is that the aspect is not a SINGLETON.
+	 * 这只对 Spring AOP 有意义：AspectJ 的实例化语义要丰富得多。
+	 * 按 AspectJ 术语来说，此处返回 {@code true} 仅表示该切面不是 SINGLETON。
 	 */
 	@Override
 	public boolean isPerInstance() {
@@ -162,7 +161,7 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 	/**
-	 * Return the AspectJ AspectMetadata for this advisor.
+	 * 返回此 advisor 的 AspectJ AspectMetadata。
 	 */
 	public AspectMetadata getAspectMetadata() {
 		return this.aspectInstanceFactory.getAspectMetadata();
@@ -208,8 +207,7 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 	/**
-	 * Duplicates some logic from getAdvice, but importantly does not force
-	 * creation of the advice.
+	 * 复制了 getAdvice 中的一些逻辑，但重要的是不会强制创建通知。
 	 */
 	private void determineAdviceType() {
 		AspectJAnnotation<?> aspectJAnnotation =
@@ -259,9 +257,9 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 
 
 	/**
-	 * Pointcut implementation that changes its behaviour when the advice is instantiated.
-	 * Note that this is a <i>dynamic</i> pointcut; otherwise it might be optimized out
-	 * if it does not at first match statically.
+	 * 当通知被实例化时会改变其行为的切点实现。
+	 * 注意，这是一个<i>动态</i>切点；否则，如果它最初没有静态匹配，
+	 * 可能会被优化掉。
 	 */
 	private static final class PerTargetInstantiationModelPointcut extends DynamicMethodMatcherPointcut {
 
@@ -284,15 +282,15 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 
 		@Override
 		public boolean matches(Method method, Class<?> targetClass) {
-			// We're either instantiated and matching on declared pointcut,
-			// or uninstantiated matching on either pointcut...
+			// 我们要么已经实例化并在声明的切点上匹配，
+			// 要么尚未实例化并在任一切点上匹配...
 			return (isAspectMaterialized() && this.declaredPointcut.matches(method, targetClass)) ||
 					this.preInstantiationPointcut.getMethodMatcher().matches(method, targetClass);
 		}
 
 		@Override
 		public boolean matches(Method method, Class<?> targetClass, Object... args) {
-			// This can match only on declared pointcut.
+			// 这里仅能在声明的切点上匹配。
 			return (isAspectMaterialized() && this.declaredPointcut.matches(method, targetClass));
 		}
 

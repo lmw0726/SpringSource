@@ -36,17 +36,15 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.lang.Nullable;
 
 /**
- * Convenient superclass for
  * {@link org.springframework.aop.framework.autoproxy.TargetSourceCreator}
- * implementations that require creating multiple instances of a prototype bean.
+ * 实现的便捷超类，这些实现需要创建原型bean的多个实例。
  *
- * <p>Uses an internal BeanFactory to manage the target instances,
- * copying the original bean definition to this internal factory.
- * This is necessary because the original BeanFactory will just
- * contain the proxy instance created through auto-proxying.
+ * <p>使用内部 BeanFactory 来管理目标实例，
+ * 将原始 bean 定义复制到此内部工厂。
+ * 这是必要的，因为原始 BeanFactory 将只包含
+ * 通过自动代理创建的代理实例。
  *
- * <p>Requires running in an
- * {@link org.springframework.beans.factory.support.AbstractBeanFactory}.
+ * <p>需要在 {@link org.springframework.beans.factory.support.AbstractBeanFactory} 中运行。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -60,7 +58,7 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 
 	private ConfigurableBeanFactory beanFactory;
 
-	/** Internally used DefaultListableBeanFactory instances, keyed by bean name. */
+	/** 内部使用的 DefaultListableBeanFactory 实例，以 bean 名称为键。 */
 	private final Map<String, DefaultListableBeanFactory> internalBeanFactories =
 			new HashMap<>();
 
@@ -75,7 +73,7 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 	}
 
 	/**
-	 * Return the BeanFactory that this TargetSourceCreators runs in.
+	 * 返回此 TargetSourceCreator 运行所在的 BeanFactory。
 	 */
 	protected final BeanFactory getBeanFactory() {
 		return this.beanFactory;
@@ -83,7 +81,7 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 
 
 	//---------------------------------------------------------------------
-	// Implementation of the TargetSourceCreator interface
+	// TargetSourceCreator 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -101,9 +99,9 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 
 		DefaultListableBeanFactory internalBeanFactory = getInternalBeanFactoryForBean(beanName);
 
-		// We need to override just this bean definition, as it may reference other beans
-		// and we're happy to take the parent's definition for those.
-		// Always use prototype scope if demanded.
+		// 我们只需要覆盖此 bean 定义，因为它可能引用其他 bean，
+		// 而我们很乐意采用这些 bean 的父级定义。
+		// 如果有要求，始终使用原型范围。
 		BeanDefinition bd = this.beanFactory.getMergedBeanDefinition(beanName);
 		GenericBeanDefinition bdCopy = new GenericBeanDefinition(bd);
 		if (isPrototypeBased()) {
@@ -111,7 +109,7 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 		}
 		internalBeanFactory.registerBeanDefinition(beanName, bdCopy);
 
-		// Complete configuring the PrototypeTargetSource.
+		// 完成 PrototypeTargetSource 的配置。
 		targetSource.setTargetBeanName(beanName);
 		targetSource.setBeanFactory(internalBeanFactory);
 
@@ -119,9 +117,9 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 	}
 
 	/**
-	 * Return the internal BeanFactory to be used for the specified bean.
-	 * @param beanName the name of the target bean
-	 * @return the internal BeanFactory to be used
+	 * 返回要用于指定 bean 的内部 BeanFactory。
+	 * @param beanName 目标 bean 的名称
+	 * @return 要使用的内部 BeanFactory
 	 */
 	protected DefaultListableBeanFactory getInternalBeanFactoryForBean(String beanName) {
 		synchronized (this.internalBeanFactories) {
@@ -131,19 +129,19 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 	}
 
 	/**
-	 * Build an internal BeanFactory for resolving target beans.
-	 * @param containingFactory the containing BeanFactory that originally defines the beans
-	 * @return an independent internal BeanFactory to hold copies of some target beans
+	 * 构建一个内部 BeanFactory 用于解析目标 bean。
+	 * @param containingFactory 最初定义 bean 的包含 BeanFactory
+	 * @return 一个独立的内部 BeanFactory，用于保存某些目标 bean 的副本
 	 */
 	protected DefaultListableBeanFactory buildInternalBeanFactory(ConfigurableBeanFactory containingFactory) {
-		// Set parent so that references (up container hierarchies) are correctly resolved.
+		// 设置父级，以便（向上容器层次结构）的引用被正确解析。
 		DefaultListableBeanFactory internalBeanFactory = new DefaultListableBeanFactory(containingFactory);
 
-		// Required so that all BeanPostProcessors, Scopes, etc become available.
+		// 必要的，以便所有 BeanPostProcessors、Scopes 等都变得可用。
 		internalBeanFactory.copyConfigurationFrom(containingFactory);
 
-		// Filter out BeanPostProcessors that are part of the AOP infrastructure,
-		// since those are only meant to apply to beans defined in the original factory.
+		// 过滤掉作为 AOP 基础设施一部分的 BeanPostProcessors，
+		// 因为那些只适用于在原始工厂中定义的 bean。
 		internalBeanFactory.getBeanPostProcessors().removeIf(beanPostProcessor ->
 				beanPostProcessor instanceof AopInfrastructureBean);
 
@@ -151,7 +149,7 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 	}
 
 	/**
-	 * Destroys the internal BeanFactory on shutdown of the TargetSourceCreator.
+	 * 在 TargetSourceCreator 关闭时销毁内部 BeanFactory。
 	 * @see #getInternalBeanFactoryForBean
 	 */
 	@Override
@@ -165,13 +163,13 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 
 
 	//---------------------------------------------------------------------
-	// Template methods to be implemented by subclasses
+	// 需要由子类实现的模板方法
 	//---------------------------------------------------------------------
 
 	/**
-	 * Return whether this TargetSourceCreator is prototype-based.
-	 * The scope of the target bean definition will be set accordingly.
-	 * <p>Default is "true".
+	 * 返回此 TargetSourceCreator 是否基于原型。
+	 * 目标 bean 定义的范围将相应地设置。
+	 * <p>默认为 "true"。
 	 * @see org.springframework.beans.factory.config.BeanDefinition#isSingleton()
 	 */
 	protected boolean isPrototypeBased() {
@@ -179,15 +177,15 @@ public abstract class AbstractBeanFactoryBasedTargetSourceCreator
 	}
 
 	/**
-	 * Subclasses must implement this method to return a new AbstractPrototypeBasedTargetSource
-	 * if they wish to create a custom TargetSource for this bean, or {@code null} if they are
-	 * not interested it in, in which case no special target source will be created.
-	 * Subclasses should not call {@code setTargetBeanName} or {@code setBeanFactory}
-	 * on the AbstractPrototypeBasedTargetSource: This class' implementation of
-	 * {@code getTargetSource()} will do that.
-	 * @param beanClass the class of the bean to create a TargetSource for
-	 * @param beanName the name of the bean
-	 * @return the AbstractPrototypeBasedTargetSource, or {@code null} if we don't match this
+	 * 子类必须实现此方法以返回新的 AbstractPrototypeBasedTargetSource，
+	 * 如果它们希望为此 bean 创建自定义 TargetSource，或者如果它们对它不感兴趣
+	 * 则返回 {@code null}，在这种情况下将不会创建特殊的目标源。
+	 * 子类不应在 AbstractPrototypeBasedTargetSource 上调用
+	 * {@code setTargetBeanName} 或 {@code setBeanFactory}：
+	 * 此类的 {@code getTargetSource()} 实现将执行此操作。
+	 * @param beanClass 要为其创建 TargetSource 的 bean 的类
+	 * @param beanName bean 的名称
+	 * @return AbstractPrototypeBasedTargetSource，如果不匹配则返回 {@code null}
 	 */
 	@Nullable
 	protected abstract AbstractBeanFactoryBasedTargetSource createBeanFactoryBasedTargetSource(

@@ -25,9 +25,8 @@ import org.springframework.util.Assert;
 
 /**
  * {@link org.springframework.beans.factory.parsing.ComponentDefinition}
- * that bridges the gap between the advisor bean definition configured
- * by the {@code <aop:advisor>} tag and the component definition
- * infrastructure.
+ * 它架起了由 {@code <aop:advisor>} 标签配置的通知者 bean 定义
+ * 和组件定义基础设施之间的桥梁。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

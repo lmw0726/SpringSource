@@ -23,8 +23,8 @@ import org.springframework.aop.target.ThreadLocalTargetSource;
 import org.springframework.lang.Nullable;
 
 /**
- * Convenient TargetSourceCreator using bean name prefixes to create one of three
- * well-known TargetSource types:
+ * 便捷的 TargetSourceCreator，使用 bean 名称前缀创建三种
+ * 众所周知的 TargetSource 类型之一：
  * <ul>
  * <li>: CommonsPool2TargetSource</li>
  * <li>% ThreadLocalTargetSource</li>
@@ -40,17 +40,17 @@ import org.springframework.lang.Nullable;
 public class QuickTargetSourceCreator extends AbstractBeanFactoryBasedTargetSourceCreator {
 
 	/**
-	 * The CommonsPool2TargetSource prefix.
+	 * CommonsPool2TargetSource 前缀。
 	 */
 	public static final String PREFIX_COMMONS_POOL = ":";
 
 	/**
-	 * The ThreadLocalTargetSource prefix.
+	 * ThreadLocalTargetSource 前缀。
 	 */
 	public static final String PREFIX_THREAD_LOCAL = "%";
 
 	/**
-	 * The PrototypeTargetSource prefix.
+	 * PrototypeTargetSource 前缀。
 	 */
 	public static final String PREFIX_PROTOTYPE = "!";
 
@@ -71,7 +71,7 @@ public class QuickTargetSourceCreator extends AbstractBeanFactoryBasedTargetSour
 			return new PrototypeTargetSource();
 		}
 		else {
-			// No match. Don't create a custom target source.
+			// 没有匹配。不要创建自定义目标源。
 			return null;
 		}
 	}

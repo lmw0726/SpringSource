@@ -1,7 +1,7 @@
 /**
- * Classes enabling AspectJ 5 @Annotated classes to be used in Spring AOP.
+ * 使 AspectJ 5 @Annotated 类能够在 Spring AOP 中使用的类。
  *
- * <p>Normally to be used through an AspectJAutoProxyCreator rather than directly.
+ * <p>通常通过 AspectJAutoProxyCreator 使用，而不是直接使用。
  */
 @NonNullApi
 @NonNullFields

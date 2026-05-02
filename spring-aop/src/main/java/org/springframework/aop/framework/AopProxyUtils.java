@@ -36,11 +36,11 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Utility methods for AOP proxy factories.
- * Mainly for internal use within the AOP framework.
+ * AOP 代理工厂的实用工具方法。
+ * 主要供 AOP 框架内部使用。
  *
- * <p>See {@link org.springframework.aop.support.AopUtils} for a collection of
- * generic AOP utility methods which do not depend on AOP framework internals.
+ * <p>请参阅 {@link org.springframework.aop.support.AopUtils}，其中包含不依赖 AOP 框架内部实现的
+ * 通用 AOP 实用工具方法集合。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -49,16 +49,16 @@ import org.springframework.util.ReflectionUtils;
  */
 public abstract class AopProxyUtils {
 
-	// JDK 17 Class.isSealed() method available?
+	// JDK 17 Class.isSealed() 方法是否可用？
 	@Nullable
 	private static final Method isSealedMethod = ClassUtils.getMethodIfAvailable(Class.class, "isSealed");
 
 
 	/**
-	 * Obtain the singleton target object behind the given proxy, if any.
-	 * @param candidate the (potential) proxy to check
-	 * @return the singleton target object managed in a {@link SingletonTargetSource},
-	 * or {@code null} in any other case (not a proxy, not an existing singleton target)
+	 * 获取给定代理后面的单例目标对象（如果存在）。
+	 * @param candidate 要检查的（潜在）代理
+	 * @return 由 {@link SingletonTargetSource} 管理的单例目标对象，
+	 * 或者在其他情况下返回 {@code null}（不是代理或不存在单例目标）
 	 * @since 4.3.8
 	 * @see Advised#getTargetSource()
 	 * @see SingletonTargetSource#getTarget()
@@ -75,12 +75,10 @@ public abstract class AopProxyUtils {
 	}
 
 	/**
-	 * Determine the ultimate target class of the given bean instance, traversing
-	 * not only a top-level proxy but any number of nested proxies as well &mdash;
-	 * as long as possible without side effects, that is, just for singleton targets.
-	 * @param candidate the instance to check (might be an AOP proxy)
-	 * @return the ultimate target class (or the plain class of the given
-	 * object as fallback; never {@code null})
+	 * 确定给定 bean 实例的最终目标类，不仅遍历顶层代理，还会遍历任意数量的嵌套代理 &mdash;
+	 * 只要不会产生副作用，即仅适用于单例目标。
+	 * @param candidate 要检查的实例（可能是 AOP 代理）
+	 * @return 最终的目标类（或者作为回退的给定对象的原始类；永远不会是 {@code null}）
 	 * @see org.springframework.aop.TargetClassAware#getTargetClass()
 	 * @see Advised#getTargetSource()
 	 */
@@ -99,12 +97,12 @@ public abstract class AopProxyUtils {
 	}
 
 	/**
-	 * Determine the complete set of interfaces to proxy for the given AOP configuration.
-	 * <p>This will always add the {@link Advised} interface unless the AdvisedSupport's
-	 * {@link AdvisedSupport#setOpaque "opaque"} flag is on. Always adds the
-	 * {@link org.springframework.aop.SpringProxy} marker interface.
-	 * @param advised the proxy config
-	 * @return the complete set of interfaces to proxy
+	 * 确定为给定 AOP 配置代理的完整接口集。
+	 * <p>这将始终添加 {@link Advised} 接口，除非 AdvisedSupport 的
+	 * {@link AdvisedSupport#setOpaque "opaque"} 标志已开启。始终添加
+	 * {@link org.springframework.aop.SpringProxy} 标记接口。
+	 * @param advised 代理配置
+	 * @return 要代理的完整接口集
 	 * @see SpringProxy
 	 * @see Advised
 	 */
@@ -113,13 +111,13 @@ public abstract class AopProxyUtils {
 	}
 
 	/**
-	 * Determine the complete set of interfaces to proxy for the given AOP configuration.
-	 * <p>This will always add the {@link Advised} interface unless the AdvisedSupport's
-	 * {@link AdvisedSupport#setOpaque "opaque"} flag is on. Always adds the
-	 * {@link org.springframework.aop.SpringProxy} marker interface.
-	 * @param advised the proxy config
-	 * @param decoratingProxy whether to expose the {@link DecoratingProxy} interface
-	 * @return the complete set of interfaces to proxy
+	 * 确定为给定 AOP 配置代理的完整接口集。
+	 * <p>这将始终添加 {@link Advised} 接口，除非 AdvisedSupport 的
+	 * {@link AdvisedSupport#setOpaque "opaque"} 标志已开启。始终添加
+	 * {@link org.springframework.aop.SpringProxy} 标记接口。
+	 * @param advised 代理配置
+	 * @param decoratingProxy 是否暴露 {@link DecoratingProxy} 接口
+	 * @return 要代理的完整接口集
 	 * @since 4.3
 	 * @see SpringProxy
 	 * @see Advised
@@ -128,7 +126,7 @@ public abstract class AopProxyUtils {
 	static Class<?>[] completeProxiedInterfaces(AdvisedSupport advised, boolean decoratingProxy) {
 		Class<?>[] specifiedInterfaces = advised.getProxiedInterfaces();
 		if (specifiedInterfaces.length == 0) {
-			// No user-specified interfaces: check whether target class is an interface.
+			// 未指定用户接口：检查目标类是否为接口。
 			Class<?> targetClass = advised.getTargetClass();
 			if (targetClass != null) {
 				if (targetClass.isInterface()) {
@@ -142,7 +140,7 @@ public abstract class AopProxyUtils {
 		}
 		List<Class<?>> proxiedInterfaces = new ArrayList<>(specifiedInterfaces.length + 3);
 		for (Class<?> ifc : specifiedInterfaces) {
-			// Only non-sealed interfaces are actually eligible for JDK proxying (on JDK 17)
+			// 只有非密封接口才实际适用于 JDK 代理（在 JDK 17 上）
 			if (isSealedMethod == null || Boolean.FALSE.equals(ReflectionUtils.invokeMethod(isSealedMethod, ifc))) {
 				proxiedInterfaces.add(ifc);
 			}
@@ -160,11 +158,11 @@ public abstract class AopProxyUtils {
 	}
 
 	/**
-	 * Extract the user-specified interfaces that the given proxy implements,
-	 * i.e. all non-Advised interfaces that the proxy implements.
-	 * @param proxy the proxy to analyze (usually a JDK dynamic proxy)
-	 * @return all user-specified interfaces that the proxy implements,
-	 * in the original order (never {@code null} or empty)
+	 * 提取给定代理实现的用户指定接口，
+	 * 即代理实现的所有非 Advised 接口。
+	 * @param proxy 要分析的代理（通常是 JDK 动态代理）
+	 * @return 代理实现的所有用户指定接口，
+	 * 按原始顺序排列（永远不会是 {@code null} 或空）
 	 * @see Advised
 	 */
 	public static Class<?>[] proxiedUserInterfaces(Object proxy) {
@@ -185,9 +183,9 @@ public abstract class AopProxyUtils {
 	}
 
 	/**
-	 * Check equality of the proxies behind the given AdvisedSupport objects.
-	 * Not the same as equality of the AdvisedSupport objects:
-	 * rather, equality of interfaces, advisors and target sources.
+	 * 检查给定 AdvisedSupport 对象后面的代理是否相等。
+	 * 与 AdvisedSupport 对象的相等性不同：
+	 * 而是检查接口、通知器和目标源的相等性。
 	 */
 	public static boolean equalsInProxy(AdvisedSupport a, AdvisedSupport b) {
 		return (a == b ||
@@ -195,14 +193,14 @@ public abstract class AopProxyUtils {
 	}
 
 	/**
-	 * Check equality of the proxied interfaces behind the given AdvisedSupport objects.
+	 * 检查给定 AdvisedSupport 对象后面的代理接口是否相等。
 	 */
 	public static boolean equalsProxiedInterfaces(AdvisedSupport a, AdvisedSupport b) {
 		return Arrays.equals(a.getProxiedInterfaces(), b.getProxiedInterfaces());
 	}
 
 	/**
-	 * Check equality of the advisors behind the given AdvisedSupport objects.
+	 * 检查给定 AdvisedSupport 对象后面的通知器是否相等。
 	 */
 	public static boolean equalsAdvisors(AdvisedSupport a, AdvisedSupport b) {
 		return a.getAdvisorCount() == b.getAdvisorCount() && Arrays.equals(a.getAdvisors(), b.getAdvisors());
@@ -210,12 +208,11 @@ public abstract class AopProxyUtils {
 
 
 	/**
-	 * Adapt the given arguments to the target signature in the given method,
-	 * if necessary: in particular, if a given vararg argument array does not
-	 * match the array type of the declared vararg parameter in the method.
-	 * @param method the target method
-	 * @param arguments the given arguments
-	 * @return a cloned argument array, or the original if no adaptation is needed
+	 * 如果需要，将给定参数适配到给定方法中的目标签名：
+	 * 特别是当给定的可变参数数组与方法中声明的可变参数的数组类型不匹配时。
+	 * @param method 目标方法
+	 * @param arguments 给定的参数
+	 * @return 克隆的参数数组，如果不需要适配则返回原始数组
 	 * @since 4.2.3
 	 */
 	static Object[] adaptArgumentsIfNecessary(Method method, @Nullable Object[] arguments) {

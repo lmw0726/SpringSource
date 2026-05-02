@@ -26,8 +26,8 @@ import org.springframework.aop.support.DelegatePerTargetObjectIntroductionInterc
 import org.springframework.aop.support.DelegatingIntroductionInterceptor;
 
 /**
- * Introduction advisor delegating to the given object.
- * Implements AspectJ annotation-style behavior for the DeclareParents annotation.
+ * 委托给给定对象的引介 advisor。
+ * 实现 DeclareParents 注解的 AspectJ 注解风格行为。
  *
  * @author Rod Johnson
  * @author Ramnivas Laddad
@@ -43,10 +43,10 @@ public class DeclareParentsAdvisor implements IntroductionAdvisor {
 
 
 	/**
-	 * Create a new advisor for this DeclareParents field.
-	 * @param interfaceType static field defining the introduction
-	 * @param typePattern type pattern the introduction is restricted to
-	 * @param defaultImpl the default implementation class
+	 * 为此 DeclareParents 字段创建新的 advisor。
+	 * @param interfaceType 定义引介的静态字段
+	 * @param typePattern 引介受限于的类型模式
+	 * @param defaultImpl 默认实现类
 	 */
 	public DeclareParentsAdvisor(Class<?> interfaceType, String typePattern, Class<?> defaultImpl) {
 		this(interfaceType, typePattern,
@@ -54,27 +54,27 @@ public class DeclareParentsAdvisor implements IntroductionAdvisor {
 	}
 
 	/**
-	 * Create a new advisor for this DeclareParents field.
-	 * @param interfaceType static field defining the introduction
-	 * @param typePattern type pattern the introduction is restricted to
-	 * @param delegateRef the delegate implementation object
+	 * 为此 DeclareParents 字段创建新的 advisor。
+	 * @param interfaceType 定义引介的静态字段
+	 * @param typePattern 引介受限于的类型模式
+	 * @param delegateRef 委托实现对象
 	 */
 	public DeclareParentsAdvisor(Class<?> interfaceType, String typePattern, Object delegateRef) {
 		this(interfaceType, typePattern, new DelegatingIntroductionInterceptor(delegateRef));
 	}
 
 	/**
-	 * Private constructor to share common code between impl-based delegate and reference-based delegate
-	 * (cannot use method such as init() to share common code, due the use of final fields).
-	 * @param interfaceType static field defining the introduction
-	 * @param typePattern type pattern the introduction is restricted to
-	 * @param interceptor the delegation advice as {@link IntroductionInterceptor}
+	 * 私有构造函数，用于在基于实现的委托和基于引用的委托之间共享公共代码
+	 * （由于使用了 final 字段，不能使用 init() 之类的方法共享公共代码）。
+	 * @param interfaceType 定义引介的静态字段
+	 * @param typePattern 引介受限于的类型模式
+	 * @param interceptor 作为 {@link IntroductionInterceptor} 的委托通知
 	 */
 	private DeclareParentsAdvisor(Class<?> interfaceType, String typePattern, IntroductionInterceptor interceptor) {
 		this.advice = interceptor;
 		this.introducedInterface = interfaceType;
 
-		// Excludes methods implemented.
+		// 排除已实现的方法。
 		ClassFilter typePatternFilter = new TypePatternClassFilter(typePattern);
 		ClassFilter exclusion = (clazz -> !this.introducedInterface.isAssignableFrom(clazz));
 		this.typePatternClassFilter = ClassFilters.intersection(typePatternFilter, exclusion);
@@ -88,7 +88,7 @@ public class DeclareParentsAdvisor implements IntroductionAdvisor {
 
 	@Override
 	public void validateInterfaces() throws IllegalArgumentException {
-		// Do nothing
+		// 不执行任何操作
 	}
 
 	@Override

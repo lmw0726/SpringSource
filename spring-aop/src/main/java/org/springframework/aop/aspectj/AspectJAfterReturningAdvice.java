@@ -27,7 +27,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.TypeUtils;
 
 /**
- * Spring AOP advice wrapping an AspectJ after-returning advice method.
+ * 包装 AspectJ after-returning 通知方法的 Spring AOP 通知。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -69,31 +69,31 @@ public class AspectJAfterReturningAdvice extends AbstractAspectJAdvice
 
 
 	/**
-	 * Following AspectJ semantics, if a returning clause was specified, then the
-	 * advice is only invoked if the returned value is an instance of the given
-	 * returning type and generic type parameters, if any, match the assignment
-	 * rules. If the returning type is Object, the advice is *always* invoked.
-	 * @param returnValue the return value of the target method
-	 * @return whether to invoke the advice method for the given return value
+	 * 按照 AspectJ 语义，如果指定了 returning 子句，
+	 * 则只有在返回值是给定 returning 类型的实例，
+	 * 并且泛型类型参数（如果有）符合赋值规则时，才调用该通知。
+	 * 如果 returning 类型是 Object，则该通知会始终被调用。
+	 * @param returnValue 目标方法的返回值
+	 * @return 是否针对给定返回值调用通知方法
 	 */
 	private boolean shouldInvokeOnReturnValueOf(Method method, @Nullable Object returnValue) {
 		Class<?> type = getDiscoveredReturningType();
 		Type genericType = getDiscoveredReturningGenericType();
-		// If we aren't dealing with a raw type, check if generic parameters are assignable.
+		// 如果处理的不是原始类型，则检查泛型参数是否可赋值。
 		return (matchesReturnValue(type, method, returnValue) &&
 				(genericType == null || genericType == type ||
 						TypeUtils.isAssignable(genericType, method.getGenericReturnType())));
 	}
 
 	/**
-	 * Following AspectJ semantics, if a return value is null (or return type is void),
-	 * then the return type of target method should be used to determine whether advice
-	 * is invoked or not. Also, even if the return type is void, if the type of argument
-	 * declared in the advice method is Object, then the advice must still get invoked.
-	 * @param type the type of argument declared in advice method
-	 * @param method the advice method
-	 * @param returnValue the return value of the target method
-	 * @return whether to invoke the advice method for the given return value and type
+	 * 按照 AspectJ 语义，如果返回值为 null（或返回类型为 void），
+	 * 则应使用目标方法的返回类型来确定是否调用通知。
+	 * 另外，即使返回类型为 void，如果通知方法中声明的参数类型为 Object，
+	 * 该通知仍必须被调用。
+	 * @param type 通知方法中声明的参数类型
+	 * @param method 通知方法
+	 * @param returnValue 目标方法的返回值
+	 * @return 是否针对给定返回值和类型调用通知方法
 	 */
 	private boolean matchesReturnValue(Class<?> type, Method method, @Nullable Object returnValue) {
 		if (returnValue != null) {

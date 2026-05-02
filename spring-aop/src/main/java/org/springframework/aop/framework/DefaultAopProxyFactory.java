@@ -24,19 +24,18 @@ import org.springframework.core.NativeDetector;
 import org.springframework.util.ClassUtils;
 
 /**
- * Default {@link AopProxyFactory} implementation, creating either a CGLIB proxy
- * or a JDK dynamic proxy.
+ * 默认 {@link AopProxyFactory} 实现，创建 CGLIB 代理或 JDK 动态代理。
  *
- * <p>Creates a CGLIB proxy if one the following is true for a given
- * {@link AdvisedSupport} instance:
+ * <p>对于给定的 {@link AdvisedSupport} 实例，如果满足以下任一条件，
+ * 则创建 CGLIB 代理：
  * <ul>
- * <li>the {@code optimize} flag is set
- * <li>the {@code proxyTargetClass} flag is set
- * <li>no proxy interfaces have been specified
+ * <li>设置了 {@code optimize} 标志
+ * <li>设置了 {@code proxyTargetClass} 标志
+ * <li>未指定代理接口
  * </ul>
  *
- * <p>In general, specify {@code proxyTargetClass} to enforce a CGLIB proxy,
- * or specify one or more interfaces to use a JDK dynamic proxy.
+ * <p>通常，指定 {@code proxyTargetClass} 以强制使用 CGLIB 代理，
+ * 或指定一个或多个接口以使用 JDK 动态代理。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -72,9 +71,9 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 	}
 
 	/**
-	 * Determine whether the supplied {@link AdvisedSupport} has only the
-	 * {@link org.springframework.aop.SpringProxy} interface specified
-	 * (or no proxy interfaces specified at all).
+	 * 确定提供的 {@link AdvisedSupport} 是否只指定了
+	 * {@link org.springframework.aop.SpringProxy} 接口
+	 * （或完全未指定代理接口）。
 	 */
 	private boolean hasNoUserSuppliedProxyInterfaces(AdvisedSupport config) {
 		Class<?>[] ifcs = config.getProxiedInterfaces();

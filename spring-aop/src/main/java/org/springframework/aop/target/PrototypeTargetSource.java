@@ -19,12 +19,11 @@ package org.springframework.aop.target;
 import org.springframework.beans.BeansException;
 
 /**
- * {@link org.springframework.aop.TargetSource} implementation that
- * creates a new instance of the target bean for each request,
- * destroying each instance on release (after each request).
+ * {@link org.springframework.aop.TargetSource} 的实现，
+ * 为每个请求创建目标 Bean 的新实例，
+ * 并在释放（每次请求后）时销毁每个实例。
  *
- * <p>Obtains bean instances from its containing
- * {@link org.springframework.beans.factory.BeanFactory}.
+ * <p>从其包含的 {@link org.springframework.beans.factory.BeanFactory} 中获取 Bean 实例。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -35,7 +34,7 @@ import org.springframework.beans.BeansException;
 public class PrototypeTargetSource extends AbstractPrototypeBasedTargetSource {
 
 	/**
-	 * Obtain a new prototype instance for every call.
+	 * 为每次调用获取一个新的原型实例。
 	 * @see #newPrototypeInstance()
 	 */
 	@Override
@@ -44,7 +43,7 @@ public class PrototypeTargetSource extends AbstractPrototypeBasedTargetSource {
 	}
 
 	/**
-	 * Destroy the given independent instance.
+	 * 销毁给定的独立实例。
 	 * @see #destroyPrototypeInstance
 	 */
 	@Override

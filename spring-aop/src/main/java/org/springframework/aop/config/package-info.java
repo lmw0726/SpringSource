@@ -1,6 +1,6 @@
 /**
- * Support package for declarative AOP configuration,
- * with XML schema being the primary configuration format.
+ * 声明式 AOP 配置的支持包，
+ * XML schema 是主要的配置格式。
  */
 @NonNullApi
 @NonNullFields

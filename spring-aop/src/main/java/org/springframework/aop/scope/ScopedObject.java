@@ -19,11 +19,11 @@ package org.springframework.aop.scope;
 import org.springframework.aop.RawTargetAccess;
 
 /**
- * An AOP introduction interface for scoped objects.
+ * 作用域对象的 AOP 引介接口。
  *
- * <p>Objects created from the {@link ScopedProxyFactoryBean} can be cast
- * to this interface, enabling access to the raw target object
- * and programmatic removal of the target object.
+ * <p>从 {@link ScopedProxyFactoryBean} 创建的对象
+ * 可以强制转换为此接口，从而能够访问原始目标对象
+ * 并以编程方式移除目标对象。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -33,20 +33,20 @@ import org.springframework.aop.RawTargetAccess;
 public interface ScopedObject extends RawTargetAccess {
 
 	/**
-	 * Return the current target object behind this scoped object proxy,
-	 * in its raw form (as stored in the target scope).
-	 * <p>The raw target object can for example be passed to persistence
-	 * providers which would not be able to handle the scoped proxy object.
-	 * @return the current target object behind this scoped object proxy
+	 * 返回此作用域对象代理背后的当前目标对象，
+	 * 以其原始形式（如存储在目标作用域中）。
+	 * <p>原始目标对象可以例如传递给无法处理
+	 * 作用域代理对象的持久化提供程序。
+	 * @return 此作用域对象代理背后的当前目标对象
 	 */
 	Object getTargetObject();
 
 	/**
-	 * Remove this object from its target scope, for example from
-	 * the backing session.
-	 * <p>Note that no further calls may be made to the scoped object
-	 * afterwards (at least within the current thread, that is, with
-	 * the exact same target object in the target scope).
+	 * 从此对象的目标作用域中移除该对象，例如从
+	 * 支持会话中。
+	 * <p>请注意，之后可能无法再对作用域对象
+	 * 进行调用（至少在当前线程中，即使用
+	 * 目标作用域中完全相同的目标对象）。
 	 */
 	void removeFromScope();
 

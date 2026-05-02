@@ -26,7 +26,7 @@ import org.springframework.aop.AfterAdvice;
 import org.springframework.lang.Nullable;
 
 /**
- * Spring AOP advice wrapping an AspectJ after-throwing advice method.
+ * 包装 AspectJ after-throwing 通知方法的 Spring AOP 通知。
  *
  * @author Rod Johnson
  * @since 2.0
@@ -72,8 +72,8 @@ public class AspectJAfterThrowingAdvice extends AbstractAspectJAdvice
 	}
 
 	/**
-	 * In AspectJ semantics, after throwing advice that specifies a throwing clause
-	 * is only invoked if the thrown exception is a subtype of the given throwing type.
+	 * 在 AspectJ 语义中，指定 throwing 子句的 after throwing 通知
+	 * 只有在抛出的异常是给定 throwing 类型的子类型时才会被调用。
 	 */
 	private boolean shouldInvokeOnThrowing(Throwable ex) {
 		return getDiscoveredThrowingType().isAssignableFrom(ex.getClass());

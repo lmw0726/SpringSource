@@ -27,13 +27,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link org.springframework.aop.aspectj.AspectInstanceFactory} implementation
- * backed by a Spring {@link org.springframework.beans.factory.BeanFactory}.
+ * 由 Spring {@link org.springframework.beans.factory.BeanFactory} 支持的
+ * {@link org.springframework.aop.aspectj.AspectInstanceFactory} 实现。
  *
- * <p>Note that this may instantiate multiple times if using a prototype,
- * which probably won't give the semantics you expect.
- * Use a {@link LazySingletonAspectInstanceFactoryDecorator}
- * to wrap this to ensure only one new aspect comes back.
+ * <p>请注意，如果使用原型，这可能会实例化多次，这可能不会给你期望的语义。
+ * 使用 {@link LazySingletonAspectInstanceFactoryDecorator}
+ * 包装此工厂以确保只返回一个新的切面实例。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -52,24 +51,22 @@ public class BeanFactoryAspectInstanceFactory implements MetadataAwareAspectInst
 
 
 	/**
-	 * Create a BeanFactoryAspectInstanceFactory. AspectJ will be called to
-	 * introspect to create AJType metadata using the type returned for the
-	 * given bean name from the BeanFactory.
-	 * @param beanFactory the BeanFactory to obtain instance(s) from
-	 * @param name the name of the bean
+	 * 创建 BeanFactoryAspectInstanceFactory。将调用 AspectJ 来内省，
+	 * 使用从 BeanFactory 为给定 bean 名称返回的类型创建 AJType 元数据。
+	 * @param beanFactory 从中获取实例的 BeanFactory
+	 * @param name bean 的名称
 	 */
 	public BeanFactoryAspectInstanceFactory(BeanFactory beanFactory, String name) {
 		this(beanFactory, name, null);
 	}
 
 	/**
-	 * Create a BeanFactoryAspectInstanceFactory, providing a type that AspectJ should
-	 * introspect to create AJType metadata. Use if the BeanFactory may consider the type
-	 * to be a subclass (as when using CGLIB), and the information should relate to a superclass.
-	 * @param beanFactory the BeanFactory to obtain instance(s) from
-	 * @param name the name of the bean
-	 * @param type the type that should be introspected by AspectJ
-	 * ({@code null} indicates resolution through {@link BeanFactory#getType} via the bean name)
+	 * 创建 BeanFactoryAspectInstanceFactory，提供 AspectJ 应该内省以创建 AJType 元数据的类型。
+	 * 如果 BeanFactory 可能将该类型视为子类（例如使用 CGLIB 时），并且信息应该与超类相关，则使用此方法。
+	 * @param beanFactory 从中获取实例的 BeanFactory
+	 * @param name bean 的名称
+	 * @param type 应该由 AspectJ 内省的类型
+	 * ({@code null} 表示通过 bean 名称经由 {@link BeanFactory#getType} 解析)
 	 */
 	public BeanFactoryAspectInstanceFactory(BeanFactory beanFactory, String name, @Nullable Class<?> type) {
 		Assert.notNull(beanFactory, "BeanFactory must not be null");
@@ -107,13 +104,13 @@ public class BeanFactoryAspectInstanceFactory implements MetadataAwareAspectInst
 	@Nullable
 	public Object getAspectCreationMutex() {
 		if (this.beanFactory.isSingleton(this.name)) {
-			// Rely on singleton semantics provided by the factory -> no local lock.
+			// 依赖工厂提供的单例语义 -> 不需要本地锁。
 			return null;
 		}
 		else if (this.beanFactory instanceof ConfigurableBeanFactory) {
-			// No singleton guarantees from the factory -> let's lock locally but
-			// reuse the factory's singleton lock, just in case a lazy dependency
-			// of our advice bean happens to trigger the singleton lock implicitly...
+			// 工厂不提供单例保证 -> 让我们本地加锁但
+			// 重用工厂的单例锁，以防我们通知 bean 的
+			// 延迟依赖隐式触发单例锁...
 			return ((ConfigurableBeanFactory) this.beanFactory).getSingletonMutex();
 		}
 		else {
@@ -122,12 +119,11 @@ public class BeanFactoryAspectInstanceFactory implements MetadataAwareAspectInst
 	}
 
 	/**
-	 * Determine the order for this factory's target aspect, either
-	 * an instance-specific order expressed through implementing the
-	 * {@link org.springframework.core.Ordered} interface (only
-	 * checked for singleton beans), or an order expressed through the
-	 * {@link org.springframework.core.annotation.Order} annotation
-	 * at the class level.
+	 * 确定此工厂目标切面的顺序，可以是通过实现
+	 * {@link org.springframework.core.Ordered} 接口表示的实例特定顺序
+	 *（仅检查单例 bean），
+	 * 也可以是通过类级别的 {@link org.springframework.core.annotation.Order}
+	 * 注解表示的顺序。
 	 * @see org.springframework.core.Ordered
 	 * @see org.springframework.core.annotation.Order
 	 */

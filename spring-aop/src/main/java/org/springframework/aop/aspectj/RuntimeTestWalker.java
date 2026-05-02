@@ -42,16 +42,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * This class encapsulates some AspectJ internal knowledge that should be
- * pushed back into the AspectJ project in a future release.
+ * 此类封装了一些 AspectJ 内部知识，这些知识应在未来版本中
+ * 推回到 AspectJ 项目中。
  *
- * <p>It relies on implementation specific knowledge in AspectJ to break
- * encapsulation and do something AspectJ was not designed to do: query
- * the types of runtime tests that will be performed. The code here should
- * migrate to {@code ShadowMatch.getVariablesInvolvedInRuntimeTest()}
- * or some similar operation.
+ * <p>它依赖于 AspectJ 中特定于实现的知识来破坏封装，
+ * 并执行 AspectJ 未设计要做的事情：查询将要执行的运行时测试的类型。
+ * 这里的代码应该迁移到 {@code ShadowMatch.getVariablesInvolvedInRuntimeTest()}
+ * 或一些类似的操作。
  *
- * <p>See <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=151593">Bug 151593</a>
+ * <p>参见 <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=151593">Bug 151593</a>
  *
  * @author Adrian Colyer
  * @author Ramnivas Laddad
@@ -95,8 +94,8 @@ class RuntimeTestWalker {
 
 
 	/**
-	 * If the test uses any of the this, target, at_this, at_target, and at_annotation vars,
-	 * then it tests subtype sensitive vars.
+	 * 如果测试使用了 this、target、at_this、at_target 和 at_annotation 变量中的任何一个，
+	 * 则它测试子类型敏感变量。
 	 */
 	public boolean testsSubtypeSensitiveVars() {
 		return (this.runtimeTest != null &&
@@ -229,7 +228,7 @@ class RuntimeTestWalker {
 
 
 	/**
-	 * Check if residue of target(TYPE) kind. See SPR-3783 for more details.
+	 * 检查是否为 target(TYPE) 类型的残留。有关更多详细信息，请参阅 SPR-3783。
 	 */
 	private static class TargetInstanceOfResidueTestVisitor extends InstanceOfResidueTestVisitor {
 
@@ -244,7 +243,7 @@ class RuntimeTestWalker {
 
 
 	/**
-	 * Check if residue of this(TYPE) kind. See SPR-2979 for more details.
+	 * 检查是否为 this(TYPE) 类型的残留。有关更多详细信息，请参阅 SPR-2979。
 	 */
 	private static class ThisInstanceOfResidueTestVisitor extends InstanceOfResidueTestVisitor {
 
@@ -252,7 +251,7 @@ class RuntimeTestWalker {
 			super(thisClass, true, THIS_VAR);
 		}
 
-		// TODO: Optimization: Process only if this() specifies a type and not an identifier.
+		// TODO：优化：仅当 this() 指定类型而不是标识符时才处理。
 		public boolean thisInstanceOfMatches(Test test) {
 			return instanceOfMatches(test);
 		}
@@ -285,7 +284,7 @@ class RuntimeTestWalker {
 
 		@Override
 		public void visit(HasAnnotation hasAnn) {
-			// If you thought things were bad before, now we sink to new levels of horror...
+			// 如果你认为以前的情况很糟糕，现在我们会陷入新的恐怖级别...
 			ReflectionVar v = (ReflectionVar) hasAnn.getVar();
 			int varType = getVarType(v);
 			if (varType == AT_THIS_VAR || varType == AT_TARGET_VAR || varType == AT_ANNOTATION_VAR) {

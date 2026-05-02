@@ -25,16 +25,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Convenient class for regexp method pointcuts that hold an Advice,
- * making them an {@link org.springframework.aop.Advisor}.
+ * 持有 Advice 的正则表达式方法切点便捷类，
+ * 从而使其成为 {@link org.springframework.aop.Advisor}。
  *
- * <p>Configure this class using the "pattern" and "patterns"
- * pass-through properties. These are analogous to the pattern
- * and patterns properties of {@link AbstractRegexpMethodPointcut}.
+ * <p>使用 "pattern" 和 "patterns" 透传属性配置此类。
+ * 它们类似于 {@link AbstractRegexpMethodPointcut} 的 pattern
+ * 和 patterns 属性。
  *
- * <p>Can delegate to any {@link AbstractRegexpMethodPointcut} subclass.
- * By default, {@link JdkRegexpMethodPointcut} will be used. To choose
- * a specific one, override the {@link #createPointcut} method.
+ * <p>可以委托给任何 {@link AbstractRegexpMethodPointcut} 子类。
+ * 默认情况下将使用 {@link JdkRegexpMethodPointcut}。
+ * 若要选择特定实现，请重写 {@link #createPointcut} 方法。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -55,7 +55,7 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 
 
 	/**
-	 * Create an empty RegexpMethodPointcutAdvisor.
+	 * 创建空的 RegexpMethodPointcutAdvisor。
 	 * @see #setPattern
 	 * @see #setPatterns
 	 * @see #setAdvice
@@ -64,9 +64,9 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 	}
 
 	/**
-	 * Create a RegexpMethodPointcutAdvisor for the given advice.
-	 * The pattern still needs to be specified afterwards.
-	 * @param advice the advice to use
+	 * 为给定 advice 创建 RegexpMethodPointcutAdvisor。
+	 * 之后仍需指定模式。
+	 * @param advice 要使用的 advice
 	 * @see #setPattern
 	 * @see #setPatterns
 	 */
@@ -75,9 +75,9 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 	}
 
 	/**
-	 * Create a RegexpMethodPointcutAdvisor for the given advice.
-	 * @param pattern the pattern to use
-	 * @param advice the advice to use
+	 * 为给定 advice 创建 RegexpMethodPointcutAdvisor。
+	 * @param pattern 要使用的模式
+	 * @param advice 要使用的 advice
 	 */
 	public RegexpMethodPointcutAdvisor(String pattern, Advice advice) {
 		setPattern(pattern);
@@ -85,9 +85,9 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 	}
 
 	/**
-	 * Create a RegexpMethodPointcutAdvisor for the given advice.
-	 * @param patterns the patterns to use
-	 * @param advice the advice to use
+	 * 为给定 advice 创建 RegexpMethodPointcutAdvisor。
+	 * @param patterns 要使用的模式
+	 * @param advice 要使用的 advice
 	 */
 	public RegexpMethodPointcutAdvisor(String[] patterns, Advice advice) {
 		setPatterns(patterns);
@@ -96,8 +96,8 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 
 
 	/**
-	 * Set the regular expression defining methods to match.
-	 * <p>Use either this method or {@link #setPatterns}, not both.
+	 * 设置定义要匹配方法的正则表达式。
+	 * <p>使用此方法或 {@link #setPatterns}，不要同时使用两者。
 	 * @see #setPatterns
 	 */
 	public void setPattern(String pattern) {
@@ -105,10 +105,10 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 	}
 
 	/**
-	 * Set the regular expressions defining methods to match.
-	 * To be passed through to the pointcut implementation.
-	 * <p>Matching will be the union of all these; if any of the
-	 * patterns matches, the pointcut matches.
+	 * 设置定义要匹配方法的正则表达式。
+	 * 将透传给切点实现。
+	 * <p>匹配结果将是所有这些表达式的并集；如果任一模式匹配，
+	 * 则切点匹配。
 	 * @see AbstractRegexpMethodPointcut#setPatterns
 	 */
 	public void setPatterns(String... patterns) {
@@ -117,7 +117,7 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 
 
 	/**
-	 * Initialize the singleton Pointcut held within this Advisor.
+	 * 初始化此 Advisor 内部持有的单例 Pointcut。
 	 */
 	@Override
 	public Pointcut getPointcut() {
@@ -133,9 +133,8 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 	}
 
 	/**
-	 * Create the actual pointcut: By default, a {@link JdkRegexpMethodPointcut}
-	 * will be used.
-	 * @return the Pointcut instance (never {@code null})
+	 * 创建实际切点：默认情况下将使用 {@link JdkRegexpMethodPointcut}。
+	 * @return Pointcut 实例（永远不会为 {@code null}）
 	 */
 	protected AbstractRegexpMethodPointcut createPointcut() {
 		return new JdkRegexpMethodPointcut();
@@ -149,7 +148,7 @@ public class RegexpMethodPointcutAdvisor extends AbstractGenericPointcutAdvisor 
 
 
 	/**
-	 * Empty class used for a serializable monitor object.
+	 * 用作可序列化监视器对象的空类。
 	 */
 	private static class SerializableMonitor implements Serializable {
 	}

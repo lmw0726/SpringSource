@@ -28,13 +28,12 @@ import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Auto proxy creator that identifies beans to proxy via a list of names.
- * Checks for direct, "xxx*", and "*xxx" matches.
+ * 通过名称列表识别要代理 bean 的自动代理创建器。
+ * 检查直接匹配、"xxx*" 和 "*xxx" 匹配。
  *
- * <p>For configuration details, see the javadoc of the parent class
- * AbstractAutoProxyCreator. Typically, you will specify a list of
- * interceptor names to apply to all identified beans, via the
- * "interceptorNames" property.
+ * <p>有关配置细节，请参阅父类 AbstractAutoProxyCreator 的 javadoc。
+ * 通常，你会通过 "interceptorNames" 属性指定要应用于所有已识别 bean 的
+ * 拦截器名称列表。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -54,14 +53,13 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 
 
 	/**
-	 * Set the names of the beans that should automatically get wrapped with proxies.
-	 * A name can specify a prefix to match by ending with "*", e.g. "myBean,tx*"
-	 * will match the bean named "myBean" and all beans whose name start with "tx".
-	 * <p><b>NOTE:</b> In case of a FactoryBean, only the objects created by the
-	 * FactoryBean will get proxied. This default behavior applies as of Spring 2.0.
-	 * If you intend to proxy a FactoryBean instance itself (a rare use case, but
-	 * Spring 1.2's default behavior), specify the bean name of the FactoryBean
-	 * including the factory-bean prefix "&amp;": e.g. "&amp;myFactoryBean".
+	 * 设置应自动使用代理包装的 bean 名称。
+	 * 名称可以通过以 "*" 结尾指定要匹配的前缀，例如 "myBean,tx*"
+	 * 将匹配名为 "myBean" 的 bean，以及所有名称以 "tx" 开头的 bean。
+	 * <p><b>注意：</b>对于 FactoryBean，只会代理 FactoryBean 创建的对象。
+	 * 自 Spring 2.0 起应用此默认行为。如果打算代理 FactoryBean 实例本身
+	 * （这是少见用例，但属于 Spring 1.2 的默认行为），请指定包含 factory-bean
+	 * 前缀 "&amp;" 的 FactoryBean bean 名称：例如 "&amp;myFactoryBean"。
 	 * @see org.springframework.beans.factory.FactoryBean
 	 * @see org.springframework.beans.factory.BeanFactory#FACTORY_BEAN_PREFIX
 	 */
@@ -75,9 +73,9 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 
 
 	/**
-	 * Delegate to {@link AbstractAutoProxyCreator#getCustomTargetSource(Class, String)}
-	 * if the bean name matches one of the names in the configured list of supported
-	 * names, returning {@code null} otherwise.
+	 * 如果 bean 名称匹配已配置受支持名称列表中的某个名称，
+	 * 则委托给 {@link AbstractAutoProxyCreator#getCustomTargetSource(Class, String)}，
+	 * 否则返回 {@code null}。
 	 * @since 5.3
 	 * @see #setBeanNames(String...)
 	 */
@@ -88,8 +86,8 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 	}
 
 	/**
-	 * Identify as a bean to proxy if the bean name matches one of the names in
-	 * the configured list of supported names.
+	 * 如果 bean 名称匹配已配置受支持名称列表中的某个名称，
+	 * 则将其识别为要代理的 bean。
 	 * @see #setBeanNames(String...)
 	 */
 	@Override
@@ -102,11 +100,11 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 	}
 
 	/**
-	 * Determine if the bean name for the given bean class matches one of the names
-	 * in the configured list of supported names.
-	 * @param beanClass the class of the bean to advise
-	 * @param beanName the name of the bean
-	 * @return {@code true} if the given bean name is supported
+	 * 确定给定 bean 类的 bean 名称是否匹配
+	 * 已配置受支持名称列表中的某个名称。
+	 * @param beanClass 要进行 advising 的 bean 类
+	 * @param beanName bean 的名称
+	 * @return 如果支持给定 bean 名称，则为 {@code true}
 	 * @see #setBeanNames(String...)
 	 */
 	private boolean isSupportedBeanName(Class<?> beanClass, String beanName) {
@@ -138,12 +136,12 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 	}
 
 	/**
-	 * Determine if the given bean name matches the mapped name.
-	 * <p>The default implementation checks for "xxx*", "*xxx" and "*xxx*" matches,
-	 * as well as direct equality. Can be overridden in subclasses.
-	 * @param beanName the bean name to check
-	 * @param mappedName the name in the configured list of names
-	 * @return if the names match
+	 * 确定给定 bean 名称是否匹配映射名称。
+	 * <p>默认实现检查 "xxx*"、"*xxx" 和 "*xxx*" 匹配，
+	 * 以及直接相等。可以在子类中重写。
+	 * @param beanName 要检查的 bean 名称
+	 * @param mappedName 已配置名称列表中的名称
+	 * @return 名称是否匹配
 	 * @see org.springframework.util.PatternMatchUtils#simpleMatch(String, String)
 	 */
 	protected boolean isMatch(String beanName, String mappedName) {

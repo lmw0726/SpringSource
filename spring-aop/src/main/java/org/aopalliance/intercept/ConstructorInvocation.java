@@ -21,11 +21,10 @@ import java.lang.reflect.Constructor;
 import javax.annotation.Nonnull;
 
 /**
- * Description of an invocation to a constructor, given to an
- * interceptor upon constructor-call.
+ * 对构造方法调用的描述，在构造方法调用时
+ * 提供给拦截器。
  *
- * <p>A constructor invocation is a joinpoint and can be intercepted
- * by a constructor interceptor.
+ * <p>构造方法调用是一个连接点，可以被构造方法拦截器拦截。
  *
  * @author Rod Johnson
  * @see ConstructorInterceptor
@@ -33,10 +32,10 @@ import javax.annotation.Nonnull;
 public interface ConstructorInvocation extends Invocation {
 
 	/**
-	 * Get the constructor being called.
-	 * <p>This method is a friendly implementation of the
-	 * {@link Joinpoint#getStaticPart()} method (same result).
-	 * @return the constructor being called
+	 * 获取正在调用的构造方法。
+	 * <p>此方法是 {@link Joinpoint#getStaticPart()} 方法
+	 * 的友好实现（结果相同）。
+	 * @return 正在调用的构造方法
 	 */
 	@Nonnull
 	Constructor<?> getConstructor();

@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Static utility methods for composing {@link ClassFilter ClassFilters}.
+ * 用于组合 {@link ClassFilter ClassFilters} 的静态工具方法。
  *
  * @author Rod Johnson
  * @author Rob Harrop
@@ -38,11 +38,10 @@ import org.springframework.util.ObjectUtils;
 public abstract class ClassFilters {
 
 	/**
-	 * Match all classes that <i>either</i> (or both) of the given ClassFilters matches.
-	 * @param cf1 the first ClassFilter
-	 * @param cf2 the second ClassFilter
-	 * @return a distinct ClassFilter that matches all classes that either
-	 * of the given ClassFilter matches
+	 * 匹配给定 ClassFilter 中<i>任一</i>（或两个）匹配的所有类。
+	 * @param cf1 第一个 ClassFilter
+	 * @param cf2 第二个 ClassFilter
+	 * @return 一个独立的 ClassFilter，匹配给定任一 ClassFilter 匹配的所有类
 	 */
 	public static ClassFilter union(ClassFilter cf1, ClassFilter cf2) {
 		Assert.notNull(cf1, "First ClassFilter must not be null");
@@ -51,10 +50,9 @@ public abstract class ClassFilters {
 	}
 
 	/**
-	 * Match all classes that <i>either</i> (or all) of the given ClassFilters matches.
-	 * @param classFilters the ClassFilters to match
-	 * @return a distinct ClassFilter that matches all classes that either
-	 * of the given ClassFilter matches
+	 * 匹配给定 ClassFilter 中<i>任一</i>（或全部）匹配的所有类。
+	 * @param classFilters 要匹配的 ClassFilter
+	 * @return 一个独立的 ClassFilter，匹配给定任一 ClassFilter 匹配的所有类
 	 */
 	public static ClassFilter union(ClassFilter[] classFilters) {
 		Assert.notEmpty(classFilters, "ClassFilter array must not be empty");
@@ -62,11 +60,10 @@ public abstract class ClassFilters {
 	}
 
 	/**
-	 * Match all classes that <i>both</i> of the given ClassFilters match.
-	 * @param cf1 the first ClassFilter
-	 * @param cf2 the second ClassFilter
-	 * @return a distinct ClassFilter that matches all classes that both
-	 * of the given ClassFilter match
+	 * 匹配给定两个 ClassFilter<i>都</i>匹配的所有类。
+	 * @param cf1 第一个 ClassFilter
+	 * @param cf2 第二个 ClassFilter
+	 * @return 一个独立的 ClassFilter，匹配给定两个 ClassFilter 都匹配的所有类
 	 */
 	public static ClassFilter intersection(ClassFilter cf1, ClassFilter cf2) {
 		Assert.notNull(cf1, "First ClassFilter must not be null");
@@ -75,10 +72,9 @@ public abstract class ClassFilters {
 	}
 
 	/**
-	 * Match all classes that <i>all</i> of the given ClassFilters match.
-	 * @param classFilters the ClassFilters to match
-	 * @return a distinct ClassFilter that matches all classes that both
-	 * of the given ClassFilter match
+	 * 匹配给定 ClassFilter<i>全部</i>匹配的所有类。
+	 * @param classFilters 要匹配的 ClassFilter
+	 * @return 一个独立的 ClassFilter，匹配给定 ClassFilter 都匹配的所有类
 	 */
 	public static ClassFilter intersection(ClassFilter[] classFilters) {
 		Assert.notEmpty(classFilters, "ClassFilter array must not be empty");
@@ -87,7 +83,7 @@ public abstract class ClassFilters {
 
 
 	/**
-	 * ClassFilter implementation for a union of the given ClassFilters.
+	 * 给定 ClassFilter 的并集 ClassFilter 实现。
 	 */
 	@SuppressWarnings("serial")
 	private static class UnionClassFilter implements ClassFilter, Serializable {
@@ -128,7 +124,7 @@ public abstract class ClassFilters {
 
 
 	/**
-	 * ClassFilter implementation for an intersection of the given ClassFilters.
+	 * 给定 ClassFilter 的交集 ClassFilter 实现。
 	 */
 	@SuppressWarnings("serial")
 	private static class IntersectionClassFilter implements ClassFilter, Serializable {

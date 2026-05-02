@@ -25,14 +25,12 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.lang.Nullable;
 
 /**
- * Utility class for handling registration of auto-proxy creators used internally
- * by the '{@code aop}' namespace tags.
+ * 用于处理 '{@code aop}' 命名空间标签内部使用的自动代理创建器注册的实用工具类。
  *
- * <p>Only a single auto-proxy creator should be registered and multiple configuration
- * elements may wish to register different concrete implementations. As such this class
- * delegates to {@link AopConfigUtils} which provides a simple escalation protocol.
- * Callers may request a particular auto-proxy creator and know that creator,
- * <i>or a more capable variant thereof</i>, will be registered as a post-processor.
+ * <p>应该只注册一个自动代理创建器，但多个配置元素可能希望注册不同的具体实现。
+ * 因此，该类委托给 {@link AopConfigUtils}，它提供了一个简单的升级协议。
+ * 调用者可以请求特定的自动代理创建器，并确保该创建器，
+ * <i>或其更强大的变体</i>，将被注册为后置处理器。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -43,12 +41,12 @@ import org.springframework.lang.Nullable;
 public abstract class AopNamespaceUtils {
 
 	/**
-	 * The {@code proxy-target-class} attribute as found on AOP-related XML tags.
+	 * 在 AOP 相关的 XML 标签上找到的 {@code proxy-target-class} 属性。
 	 */
 	public static final String PROXY_TARGET_CLASS_ATTRIBUTE = "proxy-target-class";
 
 	/**
-	 * The {@code expose-proxy} attribute as found on AOP-related XML tags.
+	 * 在 AOP 相关的 XML 标签上找到的 {@code expose-proxy} 属性。
 	 */
 	private static final String EXPOSE_PROXY_ATTRIBUTE = "expose-proxy";
 

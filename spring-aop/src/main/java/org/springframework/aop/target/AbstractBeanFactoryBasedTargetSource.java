@@ -27,16 +27,16 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Base class for {@link org.springframework.aop.TargetSource} implementations
- * that are based on a Spring {@link org.springframework.beans.factory.BeanFactory},
- * delegating to Spring-managed bean instances.
+ * 基于 Spring {@link org.springframework.beans.factory.BeanFactory} 的
+ * {@link org.springframework.aop.TargetSource} 实现的基类，
+ * 委托给 Spring 管理的 Bean 实例。
  *
- * <p>Subclasses can create prototype instances or lazily access a
- * singleton target, for example. See {@link LazyInitTargetSource} and
- * {@link AbstractPrototypeBasedTargetSource}'s subclasses for concrete strategies.
+ * <p>子类可以创建原型实例或延迟访问单例目标对象。
+ * 参见 {@link LazyInitTargetSource} 和 {@link AbstractPrototypeBasedTargetSource}
+ * 的子类以了解具体的策略。
  *
- * <p>BeanFactory-based TargetSources are serializable. This involves
- * disconnecting the current target and turning into a {@link SingletonTargetSource}.
+ * <p>基于 BeanFactory 的 TargetSource 是可序列化的。
+ * 这涉及断开当前目标对象的连接并转换为 {@link SingletonTargetSource}。
  *
  * @author Juergen Hoeller
  * @author Rod Johnson
@@ -49,33 +49,31 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class AbstractBeanFactoryBasedTargetSource implements TargetSource, BeanFactoryAware, Serializable {
 
-	/** use serialVersionUID from Spring 1.2.7 for interoperability. */
+	/** 使用 Spring 1.2.7 的 serialVersionUID 以保证互操作性。 */
 	private static final long serialVersionUID = -4721607536018568393L;
 
 
-	/** Logger available to subclasses. */
+	/** 子类可用的日志记录器。 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	/** Name of the target bean we will create on each invocation. */
+	/** 每次调用时将要创建的目标 Bean 的名称。 */
 	private String targetBeanName;
 
-	/** Class of the target. */
+	/** 目标对象的类。 */
 	private volatile Class<?> targetClass;
 
 	/**
-	 * BeanFactory that owns this TargetSource. We need to hold onto this
-	 * reference so that we can create new prototype instances as necessary.
+	 * 拥有此 TargetSource 的 BeanFactory。我们需要持有此引用，
+	 * 以便在必要时创建新的原型实例。
 	 */
 	private BeanFactory beanFactory;
 
 
 	/**
-	 * Set the name of the target bean in the factory.
-	 * <p>The target bean should not be a singleton, else the same instance will
-	 * always be obtained from the factory, resulting in the same behavior as
-	 * provided by {@link SingletonTargetSource}.
-	 * @param targetBeanName name of the target bean in the BeanFactory
-	 * that owns this interceptor
+	 * 设置工厂中目标 Bean 的名称。
+	 * <p>目标 Bean 不应该是单例的，否则每次都会从工厂中获取相同的实例，
+	 * 导致与 {@link SingletonTargetSource} 提供的行为相同。
+	 * @param targetBeanName 拥有此拦截器的 BeanFactory 中目标 Bean 的名称
 	 * @see SingletonTargetSource
 	 */
 	public void setTargetBeanName(String targetBeanName) {
@@ -83,25 +81,25 @@ public abstract class AbstractBeanFactoryBasedTargetSource implements TargetSour
 	}
 
 	/**
-	 * Return the name of the target bean in the factory.
+	 * 返回工厂中目标 Bean 的名称。
 	 */
 	public String getTargetBeanName() {
 		return this.targetBeanName;
 	}
 
 	/**
-	 * Specify the target class explicitly, to avoid any kind of access to the
-	 * target bean (for example, to avoid initialization of a FactoryBean instance).
-	 * <p>Default is to detect the type automatically, through a {@code getType}
-	 * call on the BeanFactory (or even a full {@code getBean} call as fallback).
+	 * 显式指定目标类，以避免对目标 Bean 的任何形式的访问
+	 * （例如，避免初始化 FactoryBean 实例）。
+	 * <p>默认是通过 BeanFactory 上的 {@code getType} 调用自动检测类型
+	 * （甚至以完整的 {@code getBean} 调用作为回退）。
 	 */
 	public void setTargetClass(Class<?> targetClass) {
 		this.targetClass = targetClass;
 	}
 
 	/**
-	 * Set the owning BeanFactory. We need to save a reference so that we can
-	 * use the {@code getBean} method on every invocation.
+	 * 设置拥有的 BeanFactory。我们需要保存引用，
+	 * 以便在每次调用时使用 {@code getBean} 方法。
 	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
@@ -112,7 +110,7 @@ public abstract class AbstractBeanFactoryBasedTargetSource implements TargetSour
 	}
 
 	/**
-	 * Return the owning BeanFactory.
+	 * 返回拥有的 BeanFactory。
 	 */
 	public BeanFactory getBeanFactory() {
 		return this.beanFactory;
@@ -126,10 +124,10 @@ public abstract class AbstractBeanFactoryBasedTargetSource implements TargetSour
 			return targetClass;
 		}
 		synchronized (this) {
-			// Full check within synchronization, entering the BeanFactory interaction algorithm only once...
+			// 在同步块内进行完整检查，仅进入一次 BeanFactory 交互算法...
 			targetClass = this.targetClass;
 			if (targetClass == null && this.beanFactory != null) {
-				// Determine type of the target bean.
+				// 确定目标 Bean 的类型。
 				targetClass = this.beanFactory.getType(this.targetBeanName);
 				if (targetClass == null) {
 					if (logger.isTraceEnabled()) {
@@ -151,14 +149,14 @@ public abstract class AbstractBeanFactoryBasedTargetSource implements TargetSour
 
 	@Override
 	public void releaseTarget(Object target) throws Exception {
-		// Nothing to do here.
+		// 此处无需任何操作。
 	}
 
 
 	/**
-	 * Copy configuration from the other AbstractBeanFactoryBasedTargetSource object.
-	 * Subclasses should override this if they wish to expose it.
-	 * @param other object to copy configuration from
+	 * 从另一个 AbstractBeanFactoryBasedTargetSource 对象复制配置。
+	 * 如果子类希望暴露此功能，应重写此方法。
+	 * @param other 要从中复制配置的对象
 	 */
 	protected void copyFrom(AbstractBeanFactoryBasedTargetSource other) {
 		this.targetBeanName = other.targetBeanName;

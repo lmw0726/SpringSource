@@ -35,22 +35,20 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Base implementation for
+ * 希望向结果 bean 添加
+ * {@link org.aopalliance.intercept.MethodInterceptor 拦截器} 的
  * {@link org.springframework.beans.factory.xml.BeanDefinitionDecorator BeanDefinitionDecorators}
- * wishing to add an {@link org.aopalliance.intercept.MethodInterceptor interceptor}
- * to the resulting bean.
+ * 的基础实现。
  *
- * <p>This base class controls the creation of the {@link ProxyFactoryBean} bean definition
- * and wraps the original as an inner-bean definition for the {@code target} property
- * of {@link ProxyFactoryBean}.
+ * <p>此基类控制 {@link ProxyFactoryBean} bean 定义的创建，
+ * 并将原始定义包装为 {@link ProxyFactoryBean} 的 {@code target} 属性的内部 bean 定义。
  *
- * <p>Chaining is correctly handled, ensuring that only one {@link ProxyFactoryBean} definition
- * is created. If a previous {@link org.springframework.beans.factory.xml.BeanDefinitionDecorator}
- * already created the {@link org.springframework.aop.framework.ProxyFactoryBean} then the
- * interceptor is simply added to the existing definition.
+ * <p>链式调用被正确处理，确保只创建一个 {@link ProxyFactoryBean} 定义。
+ * 如果之前的 {@link org.springframework.beans.factory.xml.BeanDefinitionDecorator}
+ * 已经创建了 {@link org.springframework.aop.framework.ProxyFactoryBean}，
+ * 则拦截器只是简单地添加到现有定义中。
  *
- * <p>Subclasses have only to create the {@code BeanDefinition} to the interceptor that
- * they wish to add.
+ * <p>子类只需创建他们希望添加的拦截器的 {@code BeanDefinition}。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

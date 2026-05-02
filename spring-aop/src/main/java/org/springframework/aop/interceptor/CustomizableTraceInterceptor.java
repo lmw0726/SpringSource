@@ -31,34 +31,26 @@ import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
 /**
- * {@code MethodInterceptor} implementation that allows for highly customizable
- * method-level tracing, using placeholders.
+ * {@code MethodInterceptor} 实现，使用占位符提供高度可定制的
+ * 方法级跟踪。
  *
- * <p>Trace messages are written on method entry, and if the method invocation succeeds
- * on method exit. If an invocation results in an exception, then an exception message
- * is written. The contents of these trace messages is fully customizable and special
- * placeholders are available to allow you to include runtime information in your log
- * messages. The placeholders available are:
+ * <p>跟踪消息在方法进入时写入，如果方法调用成功则在方法退出时写入。
+ * 如果调用导致异常，则写入异常消息。这些跟踪消息的内容是完全可定制的，
+ * 特殊的占位符可用于在日志消息中包含运行时信息。可用的占位符有：
  *
  * <p><ul>
- * <li>{@code $[methodName]} - replaced with the name of the method being invoked</li>
- * <li>{@code $[targetClassName]} - replaced with the name of the class that is
- * the target of the invocation</li>
- * <li>{@code $[targetClassShortName]} - replaced with the short name of the class
- * that is the target of the invocation</li>
- * <li>{@code $[returnValue]} - replaced with the value returned by the invocation</li>
- * <li>{@code $[argumentTypes]} - replaced with a comma-separated list of the
- * short class names of the method arguments</li>
- * <li>{@code $[arguments]} - replaced with a comma-separated list of the
- * {@code String} representation of the method arguments</li>
- * <li>{@code $[exception]} - replaced with the {@code String} representation
- * of any {@code Throwable} raised during the invocation</li>
- * <li>{@code $[invocationTime]} - replaced with the time, in milliseconds,
- * taken by the method invocation</li>
+ * <li>{@code $[methodName]} - 替换为被调用方法的名称</li>
+ * <li>{@code $[targetClassName]} - 替换为调用目标类的名称</li>
+ * <li>{@code $[targetClassShortName]} - 替换为调用目标类的短名称</li>
+ * <li>{@code $[returnValue]} - 替换为调用返回的值</li>
+ * <li>{@code $[argumentTypes]} - 替换为方法参数的短类名逗号分隔列表</li>
+ * <li>{@code $[arguments]} - 替换为方法参数的 {@code String} 表示逗号分隔列表</li>
+ * <li>{@code $[exception]} - 替换为调用期间引发的任何 {@code Throwable} 的 {@code String} 表示</li>
+ * <li>{@code $[invocationTime]} - 替换为方法调用所用的时间（毫秒）</li>
  * </ul>
  *
- * <p>There are restrictions on which placeholders can be used in which messages:
- * see the individual message properties for details on the valid placeholders.
+ * <p>对于哪些占位符可以在哪些消息中使用有限制：
+ * 有关有效占位符的详细信息，请参阅各个消息属性。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -72,109 +64,104 @@ import org.springframework.util.StringUtils;
 public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 
 	/**
-	 * The {@code $[methodName]} placeholder.
-	 * Replaced with the name of the method being invoked.
+	 * {@code $[methodName]} 占位符。
+	 * 替换为被调用方法的名称。
 	 */
 	public static final String PLACEHOLDER_METHOD_NAME = "$[methodName]";
 
 	/**
-	 * The {@code $[targetClassName]} placeholder.
-	 * Replaced with the fully-qualified name of the {@code Class}
-	 * of the method invocation target.
+	 * {@code $[targetClassName]} 占位符。
+	 * 替换为方法调用目标的 {@code Class} 的完全限定名称。
 	 */
 	public static final String PLACEHOLDER_TARGET_CLASS_NAME = "$[targetClassName]";
 
 	/**
-	 * The {@code $[targetClassShortName]} placeholder.
-	 * Replaced with the short name of the {@code Class} of the
-	 * method invocation target.
+	 * {@code $[targetClassShortName]} 占位符。
+	 * 替换为方法调用目标的 {@code Class} 的短名称。
 	 */
 	public static final String PLACEHOLDER_TARGET_CLASS_SHORT_NAME = "$[targetClassShortName]";
 
 	/**
-	 * The {@code $[returnValue]} placeholder.
-	 * Replaced with the {@code String} representation of the value
-	 * returned by the method invocation.
+	 * {@code $[returnValue]} 占位符。
+	 * 替换为方法调用返回的值的 {@code String} 表示。
 	 */
 	public static final String PLACEHOLDER_RETURN_VALUE = "$[returnValue]";
 
 	/**
-	 * The {@code $[argumentTypes]} placeholder.
-	 * Replaced with a comma-separated list of the argument types for the
-	 * method invocation. Argument types are written as short class names.
+	 * {@code $[argumentTypes]} 占位符。
+	 * 替换为方法调用的参数类型的逗号分隔列表。
+	 * 参数类型写为短类名。
 	 */
 	public static final String PLACEHOLDER_ARGUMENT_TYPES = "$[argumentTypes]";
 
 	/**
-	 * The {@code $[arguments]} placeholder.
-	 * Replaced with a comma separated list of the argument values for the
-	 * method invocation. Relies on the {@code toString()} method of
-	 * each argument type.
+	 * {@code $[arguments]} 占位符。
+	 * 替换为方法调用的参数值的逗号分隔列表。
+	 * 依赖每个参数类型的 {@code toString()} 方法。
 	 */
 	public static final String PLACEHOLDER_ARGUMENTS = "$[arguments]";
 
 	/**
-	 * The {@code $[exception]} placeholder.
-	 * Replaced with the {@code String} representation of any
-	 * {@code Throwable} raised during method invocation.
+	 * {@code $[exception]} 占位符。
+	 * 替换为方法调用期间引发的任何 {@code Throwable} 的 {@code String} 表示。
 	 */
 	public static final String PLACEHOLDER_EXCEPTION = "$[exception]";
 
 	/**
-	 * The {@code $[invocationTime]} placeholder.
-	 * Replaced with the time taken by the invocation (in milliseconds).
+	 * {@code $[invocationTime]} 占位符。
+	 * 替换为调用所用的时间（毫秒）。
 	 */
 	public static final String PLACEHOLDER_INVOCATION_TIME = "$[invocationTime]";
 
 	/**
-	 * The default message used for writing method entry messages.
+	 * 用于写入方法进入消息的默认消息。
 	 */
 	private static final String DEFAULT_ENTER_MESSAGE = "Entering method '" +
 			PLACEHOLDER_METHOD_NAME + "' of class [" + PLACEHOLDER_TARGET_CLASS_NAME + "]";
 
 	/**
-	 * The default message used for writing method exit messages.
+	 * 用于写入方法退出消息的默认消息。
 	 */
 	private static final String DEFAULT_EXIT_MESSAGE = "Exiting method '" +
 			PLACEHOLDER_METHOD_NAME + "' of class [" + PLACEHOLDER_TARGET_CLASS_NAME + "]";
 
 	/**
-	 * The default message used for writing exception messages.
+	 * 用于写入异常消息的默认消息。
 	 */
 	private static final String DEFAULT_EXCEPTION_MESSAGE = "Exception thrown in method '" +
 			PLACEHOLDER_METHOD_NAME + "' of class [" + PLACEHOLDER_TARGET_CLASS_NAME + "]";
 
 	/**
-	 * The {@code Pattern} used to match placeholders.
+	 * 用于匹配占位符的 {@code Pattern}。
 	 */
 	private static final Pattern PATTERN = Pattern.compile("\\$\\[\\p{Alpha}+]");
 
 	/**
-	 * The {@code Set} of allowed placeholders.
+	 * 允许的占位符的 {@code Set}。
 	 */
 	private static final Set<Object> ALLOWED_PLACEHOLDERS =
 			new Constants(CustomizableTraceInterceptor.class).getValues("PLACEHOLDER_");
 
 
 	/**
-	 * The message for method entry.
+	 * 方法进入的消息。
 	 */
 	private String enterMessage = DEFAULT_ENTER_MESSAGE;
 
 	/**
-	 * The message for method exit.
+	 * 方法退出的消息。
 	 */
 	private String exitMessage = DEFAULT_EXIT_MESSAGE;
 
 	/**
-	 * The message for exceptions during method execution.
+	 * 方法执行期间异常的消息。
 	 */
 	private String exceptionMessage = DEFAULT_EXCEPTION_MESSAGE;
 
 
 	/**
-	 * Set the template used for method entry log messages.
-	 * This template can contain any of the following placeholders:
+	 * 设置用于方法进入日志消息的模板。
+	 * 此模板可以包含以下任何占位符：
 	 * <ul>
 	 * <li>{@code $[targetClassName]}</li>
 	 * <li>{@code $[targetClassShortName]}</li>
@@ -195,8 +182,8 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 	}
 
 	/**
-	 * Set the template used for method exit log messages.
-	 * This template can contain any of the following placeholders:
+	 * 设置用于方法退出日志消息的模板。
+	 * 此模板可以包含以下任何占位符：
 	 * <ul>
 	 * <li>{@code $[targetClassName]}</li>
 	 * <li>{@code $[targetClassShortName]}</li>
@@ -215,8 +202,8 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 	}
 
 	/**
-	 * Set the template used for method exception log messages.
-	 * This template can contain any of the following placeholders:
+	 * 设置用于方法异常日志消息的模板。
+	 * 此模板可以包含以下任何占位符：
 	 * <ul>
 	 * <li>{@code $[targetClassName]}</li>
 	 * <li>{@code $[targetClassShortName]}</li>
@@ -235,10 +222,9 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 
 
 	/**
-	 * Writes a log message before the invocation based on the value of {@code enterMessage}.
-	 * If the invocation succeeds, then a log message is written on exit based on the value
-	 * {@code exitMessage}. If an exception occurs during invocation, then a message is
-	 * written based on the value of {@code exceptionMessage}.
+	 * 在调用之前根据 {@code enterMessage} 的值写入日志消息。
+	 * 如果调用成功，则在退出时根据 {@code exitMessage} 的值写入日志消息。
+	 * 如果在调用期间发生异常，则根据 {@code exceptionMessage} 的值写入消息。
 	 * @see #setEnterMessage
 	 * @see #setExitMessage
 	 * @see #setExceptionMessage
@@ -277,20 +263,17 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 	}
 
 	/**
-	 * Replace the placeholders in the given message with the supplied values,
-	 * or values derived from those supplied.
-	 * @param message the message template containing the placeholders to be replaced
-	 * @param methodInvocation the {@code MethodInvocation} being logged.
-	 * Used to derive values for all placeholders except {@code $[exception]}
-	 * and {@code $[returnValue]}.
-	 * @param returnValue any value returned by the invocation.
-	 * Used to replace the {@code $[returnValue]} placeholder. May be {@code null}.
-	 * @param throwable any {@code Throwable} raised during the invocation.
-	 * The value of {@code Throwable.toString()} is replaced for the
-	 * {@code $[exception]} placeholder. May be {@code null}.
-	 * @param invocationTime the value to write in place of the
-	 * {@code $[invocationTime]} placeholder
-	 * @return the formatted output to write to the log
+	 * 用提供的值或从提供的值派生的值替换给定消息中的占位符。
+	 * @param message 包含要替换的占位符的消息模板
+	 * @param methodInvocation 正在记录的 {@code MethodInvocation}。
+	 * 用于派生除 {@code $[exception]} 和 {@code $[returnValue]} 之外的所有占位符的值。
+	 * @param returnValue 调用返回的任何值。
+	 * 用于替换 {@code $[returnValue]} 占位符。可能为 {@code null}。
+	 * @param throwable 调用期间引发的任何 {@code Throwable}。
+	 * {@code Throwable.toString()} 的值被替换为 {@code $[exception]} 占位符。
+	 * 可能为 {@code null}。
+	 * @param invocationTime 要代替 {@code $[invocationTime]} 占位符写入的值
+	 * @return 要写入日志的格式化输出
 	 */
 	protected String replacePlaceholders(String message, MethodInvocation methodInvocation,
 			@Nullable Object returnValue, @Nullable Throwable throwable, long invocationTime) {
@@ -340,13 +323,12 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 	}
 
 	/**
-	 * Adds the {@code String} representation of the method return value
-	 * to the supplied {@code StringBuffer}. Correctly handles
-	 * {@code null} and {@code void} results.
-	 * @param methodInvocation the {@code MethodInvocation} that returned the value
-	 * @param matcher the {@code Matcher} containing the matched placeholder
-	 * @param output the {@code StringBuffer} to write output to
-	 * @param returnValue the value returned by the method invocation.
+	 * 将方法返回值的 {@code String} 表示添加到提供的 {@code StringBuffer}。
+	 * 正确处理 {@code null} 和 {@code void} 结果。
+	 * @param methodInvocation 返回值的 {@code MethodInvocation}
+	 * @param matcher 包含匹配占位符的 {@code Matcher}
+	 * @param output 要写入输出的 {@code StringBuffer}
+	 * @param returnValue 方法调用返回的值。
 	 */
 	private void appendReturnValue(
 			MethodInvocation methodInvocation, Matcher matcher, StringBuffer output, @Nullable Object returnValue) {
@@ -363,14 +345,13 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 	}
 
 	/**
-	 * Adds a comma-separated list of the short {@code Class} names of the
-	 * method argument types to the output. For example, if a method has signature
-	 * {@code put(java.lang.String, java.lang.Object)} then the value returned
-	 * will be {@code String, Object}.
-	 * @param methodInvocation the {@code MethodInvocation} being logged.
-	 * Arguments will be retrieved from the corresponding {@code Method}.
-	 * @param matcher the {@code Matcher} containing the state of the output
-	 * @param output the {@code StringBuffer} containing the output
+	 * 将方法参数类型的短 {@code Class} 名称的逗号分隔列表添加到输出中。
+	 * 例如，如果方法的签名是 {@code put(java.lang.String, java.lang.Object)}，
+	 * 则返回的值将是 {@code String, Object}。
+	 * @param methodInvocation 正在记录的 {@code MethodInvocation}。
+	 * 参数将从相应的 {@code Method} 中检索。
+	 * @param matcher 包含输出状态的 {@code Matcher}
+	 * @param output 包含输出的 {@code StringBuffer}
 	 */
 	private void appendArgumentTypes(MethodInvocation methodInvocation, Matcher matcher, StringBuffer output) {
 		Class<?>[] argumentTypes = methodInvocation.getMethod().getParameterTypes();
@@ -383,9 +364,8 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 	}
 
 	/**
-	 * Checks to see if the supplied {@code String} has any placeholders
-	 * that are not specified as constants on this class and throws an
-	 * {@code IllegalArgumentException} if so.
+	 * 检查提供的 {@code String} 是否有任何未在此类中指定为常量的占位符，
+	 * 如果有则抛出 {@code IllegalArgumentException}。
 	 */
 	private void checkForInvalidPlaceholders(String message) throws IllegalArgumentException {
 		Matcher matcher = PATTERN.matcher(message);

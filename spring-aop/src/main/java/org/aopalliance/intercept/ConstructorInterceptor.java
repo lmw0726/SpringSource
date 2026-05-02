@@ -19,13 +19,11 @@ package org.aopalliance.intercept;
 import javax.annotation.Nonnull;
 
 /**
- * Intercepts the construction of a new object.
+ * 拦截新对象的构造。
  *
- * <p>The user should implement the {@link
- * #construct(ConstructorInvocation)} method to modify the original
- * behavior. E.g. the following class implements a singleton
- * interceptor (allows only one unique instance for the intercepted
- * class):
+ * <p>用户应实现 {@link #construct(ConstructorInvocation)} 方法来修改原始行为。
+ * 例如，以下类实现了一个单例拦截器
+ * （只允许被拦截类有一个唯一实例）：
  *
  * <pre class=code>
  * class DebuggingInterceptor implements ConstructorInterceptor {
@@ -46,15 +44,12 @@ import javax.annotation.Nonnull;
 public interface ConstructorInterceptor extends Interceptor  {
 
 	/**
-	 * Implement this method to perform extra treatments before and
-	 * after the construction of a new object. Polite implementations
-	 * would certainly like to invoke {@link Joinpoint#proceed()}.
-	 * @param invocation the construction joinpoint
-	 * @return the newly created object, which is also the result of
-	 * the call to {@link Joinpoint#proceed()}; might be replaced by
-	 * the interceptor
-	 * @throws Throwable if the interceptors or the target object
-	 * throws an exception
+	 * 实现此方法，以便在新对象构造之前和之后执行额外处理。
+	 * 规范的实现当然通常会调用 {@link Joinpoint#proceed()}。
+	 * @param invocation 构造连接点
+	 * @return 新创建的对象，它也是调用 {@link Joinpoint#proceed()} 的结果；
+	 * 可能会被拦截器替换
+	 * @throws Throwable 如果拦截器或目标对象抛出异常
 	 */
 	@Nonnull
 	Object construct(ConstructorInvocation invocation) throws Throwable;

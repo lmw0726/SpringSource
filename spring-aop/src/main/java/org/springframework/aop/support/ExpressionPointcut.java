@@ -20,7 +20,7 @@ import org.springframework.aop.Pointcut;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface to be implemented by pointcuts that use String expressions.
+ * 使用 String 表达式的切点需要实现的接口。
  *
  * @author Rob Harrop
  * @since 2.0
@@ -28,7 +28,7 @@ import org.springframework.lang.Nullable;
 public interface ExpressionPointcut extends Pointcut {
 
 	/**
-	 * Return the String expression for this pointcut.
+	 * 返回此切点的 String 表达式。
 	 */
 	@Nullable
 	String getExpression();

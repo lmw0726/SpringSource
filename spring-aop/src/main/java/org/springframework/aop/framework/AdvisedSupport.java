@@ -43,16 +43,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Base class for AOP proxy configuration managers.
- * These are not themselves AOP proxies, but subclasses of this class are
- * normally factories from which AOP proxy instances are obtained directly.
+ * AOP 代理配置管理器的基类。
+ * 它们本身不是 AOP 代理，但此类的子类通常是工厂，
+ * 可从中直接获取 AOP 代理实例。
  *
- * <p>This class frees subclasses of the housekeeping of Advices
- * and Advisors, but doesn't actually implement proxy creation
- * methods, which are provided by subclasses.
+ * <p>此类使子类无需处理 Advices 和 Advisors 的日常管理，
+ * 但实际上不实现代理创建方法；这些方法由子类提供。
  *
- * <p>This class is serializable; subclasses need not be.
- * This class is used to hold snapshots of proxies.
+ * <p>此类可序列化；子类不需要可序列化。
+ * 此类用于保存代理的快照。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -60,52 +59,51 @@ import org.springframework.util.CollectionUtils;
  */
 public class AdvisedSupport extends ProxyConfig implements Advised {
 
-	/** use serialVersionUID from Spring 2.0 for interoperability. */
+	/** 使用 Spring 2.0 中的 serialVersionUID 以实现互操作性。 */
 	private static final long serialVersionUID = 2651364800145442165L;
 
 
 	/**
-	 * Canonical TargetSource when there's no target, and behavior is
-	 * supplied by the advisors.
+	 * 没有目标且行为由 advisors 提供时的规范 TargetSource。
 	 */
 	public static final TargetSource EMPTY_TARGET_SOURCE = EmptyTargetSource.INSTANCE;
 
 
-	/** Package-protected to allow direct access for efficiency. */
+	/** 包保护以允许为提高效率而直接访问。 */
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;
 
-	/** Whether the Advisors are already filtered for the specific target class. */
+	/** Advisors 是否已经针对特定目标类过滤。 */
 	private boolean preFiltered = false;
 
-	/** The AdvisorChainFactory to use. */
+	/** 要使用的 AdvisorChainFactory。 */
 	AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
 
-	/** Cache with Method as key and advisor chain List as value. */
+	/** 以 Method 为键、advisor 链 List 为值的缓存。 */
 	private transient Map<MethodCacheKey, List<Object>> methodCache;
 
 	/**
-	 * Interfaces to be implemented by the proxy. Held in List to keep the order
-	 * of registration, to create JDK proxy with specified order of interfaces.
+	 * 代理要实现的接口。保存在 List 中以保持注册顺序，
+	 * 从而按指定的接口顺序创建 JDK 代理。
 	 */
 	private List<Class<?>> interfaces = new ArrayList<>();
 
 	/**
-	 * List of Advisors. If an Advice is added, it will be wrapped
-	 * in an Advisor before being added to this List.
+	 * Advisors 列表。如果添加的是 Advice，
+	 * 它会先包装在 Advisor 中，再添加到此 List。
 	 */
 	private List<Advisor> advisors = new ArrayList<>();
 
 
 	/**
-	 * No-arg constructor for use as a JavaBean.
+	 * 供 JavaBean 使用的无参构造函数。
 	 */
 	public AdvisedSupport() {
 		this.methodCache = new ConcurrentHashMap<>(32);
 	}
 
 	/**
-	 * Create a AdvisedSupport instance with the given parameters.
-	 * @param interfaces the proxied interfaces
+	 * 使用给定参数创建 AdvisedSupport 实例。
+	 * @param interfaces 被代理的接口
 	 */
 	public AdvisedSupport(Class<?>... interfaces) {
 		this();
@@ -114,8 +112,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 
 	/**
-	 * Set the given object as target.
-	 * Will create a SingletonTargetSource for the object.
+	 * 将给定对象设置为目标。
+	 * 会为该对象创建 SingletonTargetSource。
 	 * @see #setTargetSource
 	 * @see org.springframework.aop.target.SingletonTargetSource
 	 */
@@ -134,15 +132,12 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Set a target class to be proxied, indicating that the proxy
-	 * should be castable to the given class.
-	 * <p>Internally, an {@link org.springframework.aop.target.EmptyTargetSource}
-	 * for the given target class will be used. The kind of proxy needed
-	 * will be determined on actual creation of the proxy.
-	 * <p>This is a replacement for setting a "targetSource" or "target",
-	 * for the case where we want a proxy based on a target class
-	 * (which can be an interface or a concrete class) without having
-	 * a fully capable TargetSource available.
+	 * 设置要被代理的目标类，表示该代理应可强制转换为给定类。
+	 * <p>内部会为给定目标类使用 {@link org.springframework.aop.target.EmptyTargetSource}。
+	 * 所需的代理类型将在实际创建代理时确定。
+	 * <p>这是设置 "targetSource" 或 "target" 的替代方案，
+	 * 用于我们希望基于目标类（可以是接口或具体类）创建代理，
+	 * 但没有完全可用的 TargetSource 的情况。
 	 * @see #setTargetSource
 	 * @see #setTarget
 	 */
@@ -167,8 +162,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Set the advisor chain factory to use.
-	 * <p>Default is a {@link DefaultAdvisorChainFactory}.
+	 * 设置要使用的 advisor 链工厂。
+	 * <p>默认为 {@link DefaultAdvisorChainFactory}。
 	 */
 	public void setAdvisorChainFactory(AdvisorChainFactory advisorChainFactory) {
 		Assert.notNull(advisorChainFactory, "AdvisorChainFactory must not be null");
@@ -176,7 +171,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Return the advisor chain factory to use (never {@code null}).
+	 * 返回要使用的 advisor 链工厂（绝不为 {@code null}）。
 	 */
 	public AdvisorChainFactory getAdvisorChainFactory() {
 		return this.advisorChainFactory;
@@ -184,7 +179,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 
 	/**
-	 * Set the interfaces to be proxied.
+	 * 设置要代理的接口。
 	 */
 	public void setInterfaces(Class<?>... interfaces) {
 		Assert.notNull(interfaces, "Interfaces must not be null");
@@ -195,8 +190,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Add a new proxied interface.
-	 * @param intf the additional interface to proxy
+	 * 添加新的被代理接口。
+	 * @param intf 要代理的附加接口
 	 */
 	public void addInterface(Class<?> intf) {
 		Assert.notNull(intf, "Interface must not be null");
@@ -210,11 +205,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Remove a proxied interface.
-	 * <p>Does nothing if the given interface isn't proxied.
-	 * @param intf the interface to remove from the proxy
-	 * @return {@code true} if the interface was removed; {@code false}
-	 * if the interface was not found and hence could not be removed
+	 * 移除被代理接口。
+	 * <p>如果给定接口未被代理，则不执行任何操作。
+	 * @param intf 要从代理中移除的接口
+	 * @return 如果接口已移除，则为 {@code true}；如果未找到该接口，
+	 * 因而无法移除，则为 {@code false}
 	 */
 	public boolean removeInterface(Class<?> intf) {
 		return this.interfaces.remove(intf);
@@ -285,7 +280,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		Advisor advisor = this.advisors.remove(index);
 		if (advisor instanceof IntroductionAdvisor) {
 			IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
-			// We need to remove introduction interfaces.
+			// 需要移除引介接口。
 			for (Class<?> ifc : ia.getInterfaces()) {
 				removeInterface(ifc);
 			}
@@ -314,16 +309,16 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Add all of the given advisors to this proxy configuration.
-	 * @param advisors the advisors to register
+	 * 将所有给定 advisor 添加到此代理配置中。
+	 * @param advisors 要注册的 advisors
 	 */
 	public void addAdvisors(Advisor... advisors) {
 		addAdvisors(Arrays.asList(advisors));
 	}
 
 	/**
-	 * Add all of the given advisors to this proxy configuration.
-	 * @param advisors the advisors to register
+	 * 将所有给定 advisor 添加到此代理配置中。
+	 * @param advisors 要注册的 advisors
 	 */
 	public void addAdvisors(Collection<Advisor> advisors) {
 		if (isFrozen()) {
@@ -343,7 +338,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 	private void validateIntroductionAdvisor(IntroductionAdvisor advisor) {
 		advisor.validateInterfaces();
-		// If the advisor passed validation, we can make the change.
+		// 如果 advisor 通过了验证，则可以进行更改。
 		Class<?>[] ifcs = advisor.getInterfaces();
 		for (Class<?> ifc : ifcs) {
 			addInterface(ifc);
@@ -364,9 +359,9 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Allows uncontrolled access to the {@link List} of {@link Advisor Advisors}.
-	 * <p>Use with care, and remember to {@link #adviceChanged() fire advice changed events}
-	 * when making any modifications.
+	 * 允许不受控制地访问 {@link Advisor Advisors} 的 {@link List}。
+	 * <p>请谨慎使用，并记得在进行任何修改时
+	 * {@link #adviceChanged() 触发通知变更事件}。
 	 */
 	protected final List<Advisor> getAdvisorsInternal() {
 		return this.advisors;
@@ -379,18 +374,18 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Cannot add introductions this way unless the advice implements IntroductionInfo.
+	 * 除非该 advice 实现 IntroductionInfo，否则不能以这种方式添加引介。
 	 */
 	@Override
 	public void addAdvice(int pos, Advice advice) throws AopConfigException {
 		Assert.notNull(advice, "Advice must not be null");
 		if (advice instanceof IntroductionInfo) {
-			// We don't need an IntroductionAdvisor for this kind of introduction:
-			// It's fully self-describing.
+			// 对于这种引介，不需要 IntroductionAdvisor：
+			// 它是完全自描述的。
 			addAdvisor(pos, new DefaultIntroductionAdvisor(advice, (IntroductionInfo) advice));
 		}
 		else if (advice instanceof DynamicIntroductionAdvice) {
-			// We need an IntroductionAdvisor for this kind of introduction.
+			// 对于这种引介，需要 IntroductionAdvisor。
 			throw new AopConfigException("DynamicIntroductionAdvice may only be added as part of IntroductionAdvisor");
 		}
 		else {
@@ -423,9 +418,9 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Is the given advice included in any advisor within this proxy configuration?
-	 * @param advice the advice to check inclusion of
-	 * @return whether this advice instance is included
+	 * 给定 advice 是否包含在此代理配置内的任何 advisor 中？
+	 * @param advice 要检查是否包含的 advice
+	 * @return 是否包含此 advice 实例
 	 */
 	public boolean adviceIncluded(@Nullable Advice advice) {
 		if (advice != null) {
@@ -439,9 +434,9 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Count advices of the given class.
-	 * @param adviceClass the advice class to check
-	 * @return the count of the interceptors of this class or subclasses
+	 * 统计给定类的 advices。
+	 * @param adviceClass 要检查的 advice 类
+	 * @return 此类或其子类的拦截器数量
 	 */
 	public int countAdvicesOfType(@Nullable Class<?> adviceClass) {
 		int count = 0;
@@ -457,11 +452,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 
 	/**
-	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
-	 * for the given method, based on this configuration.
-	 * @param method the proxied method
-	 * @param targetClass the target class
-	 * @return a List of MethodInterceptors (may also include InterceptorAndDynamicMethodMatchers)
+	 * 基于此配置，为给定方法确定 {@link org.aopalliance.intercept.MethodInterceptor}
+	 * 对象列表。
+	 * @param method 被代理的方法
+	 * @param targetClass 目标类
+	 * @return MethodInterceptors 的 List（也可能包含 InterceptorAndDynamicMethodMatchers）
 	 */
 	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Method method, @Nullable Class<?> targetClass) {
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
@@ -475,27 +470,27 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Invoked when advice has changed.
+	 * 当 advice 已更改时调用。
 	 */
 	protected void adviceChanged() {
 		this.methodCache.clear();
 	}
 
 	/**
-	 * Call this method on a new instance created by the no-arg constructor
-	 * to create an independent copy of the configuration from the given object.
-	 * @param other the AdvisedSupport object to copy configuration from
+	 * 在由无参构造函数创建的新实例上调用此方法，
+	 * 以从给定对象创建配置的独立副本。
+	 * @param other 要从中复制配置的 AdvisedSupport 对象
 	 */
 	protected void copyConfigurationFrom(AdvisedSupport other) {
 		copyConfigurationFrom(other, other.targetSource, new ArrayList<>(other.advisors));
 	}
 
 	/**
-	 * Copy the AOP configuration from the given AdvisedSupport object,
-	 * but allow substitution of a fresh TargetSource and a given interceptor chain.
-	 * @param other the AdvisedSupport object to take proxy configuration from
-	 * @param targetSource the new TargetSource
-	 * @param advisors the Advisors for the chain
+	 * 从给定 AdvisedSupport 对象复制 AOP 配置，
+	 * 但允许替换为新的 TargetSource 和给定的拦截器链。
+	 * @param other 要从中获取代理配置的 AdvisedSupport 对象
+	 * @param targetSource 新的 TargetSource
+	 * @param advisors 链中的 Advisors
 	 */
 	protected void copyConfigurationFrom(AdvisedSupport other, TargetSource targetSource, List<Advisor> advisors) {
 		copyFrom(other);
@@ -513,8 +508,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Build a configuration-only copy of this AdvisedSupport,
-	 * replacing the TargetSource.
+	 * 构建此 AdvisedSupport 的仅配置副本，
+	 * 并替换 TargetSource。
 	 */
 	AdvisedSupport getConfigurationOnlyCopy() {
 		AdvisedSupport copy = new AdvisedSupport();
@@ -528,14 +523,14 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 
 	//---------------------------------------------------------------------
-	// Serialization support
+	// 序列化支持
 	//---------------------------------------------------------------------
 
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-		// Rely on default serialization; just initialize state after deserialization.
+		// 依赖默认序列化；仅在反序列化后初始化状态。
 		ois.defaultReadObject();
 
-		// Initialize transient fields.
+		// 初始化 transient 字段。
 		this.methodCache = new ConcurrentHashMap<>(32);
 	}
 
@@ -545,7 +540,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * For debugging/diagnostic use.
+	 * 用于调试/诊断。
 	 */
 	@Override
 	public String toString() {
@@ -561,8 +556,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 
 	/**
-	 * Simple wrapper class around a Method. Used as the key when
-	 * caching methods, for efficient equals and hashCode comparisons.
+	 * Method 周围的简单包装类。用作缓存方法时的键，
+	 * 以便高效进行 equals 和 hashCode 比较。
 	 */
 	private static final class MethodCacheKey implements Comparable<MethodCacheKey> {
 

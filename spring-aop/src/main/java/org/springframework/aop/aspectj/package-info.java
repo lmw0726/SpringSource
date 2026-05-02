@@ -1,12 +1,11 @@
 /**
- * AspectJ integration package. Includes Spring AOP advice implementations for AspectJ 5
- * annotation-style methods, and an AspectJExpressionPointcut: a Spring AOP Pointcut
- * implementation that allows use of the AspectJ pointcut expression language with the Spring AOP
- * runtime framework.
+ * AspectJ 集成包。包括用于 AspectJ 5 注解样式方法的 Spring AOP Advice 实现，
+ * 以及 AspectJExpressionPointcut：一个 Spring AOP Pointcut 实现，
+ * 允许在 Spring AOP 运行时框架中使用 AspectJ 切点表达式语言。
  *
- * <p>Note that use of this package does <i>not</i> require the use of the {@code ajc} compiler
- * or AspectJ load-time weaver. It is intended to enable the use of a valuable subset of AspectJ
- * functionality, with consistent semantics, with the proxy-based Spring AOP framework.
+ * <p>请注意，使用此包<i>不</i>需要使用 {@code ajc} 编译器
+ * 或 AspectJ 加载时织入器。它旨在启用 AspectJ 功能的有价值子集，
+ * 并具有一致的语义，与基于代理的 Spring AOP 框架一起使用。
  */
 @NonNullApi
 @NonNullFields

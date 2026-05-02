@@ -35,8 +35,8 @@ import org.springframework.util.ClassUtils;
 
 /**
  * {@link org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator}
- * subclass that exposes AspectJ's invocation context and understands AspectJ's rules
- * for advice precedence when multiple pieces of advice come from the same aspect.
+ * 子类，暴露 AspectJ 的调用上下文，并理解当多条 advice 来自同一切面时
+ * AspectJ 的 advice 优先级规则。
  *
  * @author Adrian Colyer
  * @author Juergen Hoeller
@@ -50,20 +50,17 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 
 
 	/**
-	 * Sort the supplied {@link Advisor} instances according to AspectJ precedence.
-	 * <p>If two pieces of advice come from the same aspect, they will have the same
-	 * order. Advice from the same aspect is then further ordered according to the
-	 * following rules:
+	 * 根据 AspectJ 优先级对提供的 {@link Advisor} 实例排序。
+	 * <p>如果两条 advice 来自同一切面，它们将具有相同顺序。
+	 * 来自同一切面的 advice 随后会根据以下规则进一步排序：
 	 * <ul>
-	 * <li>If either of the pair is <em>after</em> advice, then the advice declared
-	 * last gets highest precedence (i.e., runs last).</li>
-	 * <li>Otherwise the advice declared first gets highest precedence (i.e., runs
-	 * first).</li>
+	 * <li>如果其中任一方是 <em>after</em> advice，则最后声明的 advice
+	 * 具有最高优先级（即最后运行）。</li>
+	 * <li>否则，最先声明的 advice 具有最高优先级（即最先运行）。</li>
 	 * </ul>
-	 * <p><b>Important:</b> Advisors are sorted in precedence order, from highest
-	 * precedence to lowest. "On the way in" to a join point, the highest precedence
-	 * advisor should run first. "On the way out" of a join point, the highest
-	 * precedence advisor should run last.
+	 * <p><b>重要：</b>Advisor 按优先级顺序排序，从最高优先级到最低优先级。
+	 * 在“进入”连接点时，最高优先级的 advisor 应首先运行。
+	 * 在“离开”连接点时，最高优先级的 advisor 应最后运行。
 	 */
 	@Override
 	protected List<Advisor> sortAdvisors(List<Advisor> advisors) {
@@ -86,9 +83,8 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 	}
 
 	/**
-	 * Add an {@link ExposeInvocationInterceptor} to the beginning of the advice chain.
-	 * <p>This additional advice is needed when using AspectJ pointcut expressions
-	 * and when using AspectJ-style advice.
+	 * 将 {@link ExposeInvocationInterceptor} 添加到 advice 链开头。
+	 * <p>使用 AspectJ pointcut 表达式以及 AspectJ 风格 advice 时需要此附加 advice。
 	 */
 	@Override
 	protected void extendAdvisors(List<Advisor> candidateAdvisors) {
@@ -97,7 +93,7 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 
 	@Override
 	protected boolean shouldSkip(Class<?> beanClass, String beanName) {
-		// TODO: Consider optimization by caching the list of the aspect names
+		// TODO: 考虑通过缓存切面名称列表进行优化
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		for (Advisor advisor : candidateAdvisors) {
 			if (advisor instanceof AspectJPointcutAdvisor &&
@@ -110,7 +106,7 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 
 
 	/**
-	 * Implements AspectJ's {@link PartialComparable} interface for defining partial orderings.
+	 * 实现 AspectJ 的 {@link PartialComparable} 接口，用于定义偏序关系。
 	 */
 	private static class PartiallyComparableAdvisorHolder implements PartialComparable {
 

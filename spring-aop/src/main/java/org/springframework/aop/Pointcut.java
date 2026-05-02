@@ -17,11 +17,11 @@
 package org.springframework.aop;
 
 /**
- * Core Spring pointcut abstraction.
+ * Spring 的核心切点抽象。
  *
- * <p>A pointcut is composed of a {@link ClassFilter} and a {@link MethodMatcher}.
- * Both these basic terms and a Pointcut itself can be combined to build up combinations
- * (e.g. through {@link org.springframework.aop.support.ComposablePointcut}).
+ * <p>切点由一个 {@link ClassFilter} 和一个 {@link MethodMatcher} 组成。
+ * 这些基本术语以及 Pointcut 本身都可以组合起来构建复合匹配条件
+ * （例如通过 {@link org.springframework.aop.support.ComposablePointcut}）。
  *
  * @author Rod Johnson
  * @see ClassFilter
@@ -33,20 +33,20 @@ package org.springframework.aop;
 public interface Pointcut {
 
 	/**
-	 * Return the ClassFilter for this pointcut.
-	 * @return the ClassFilter (never {@code null})
+	 * 返回此切点的 ClassFilter。
+	 * @return ClassFilter（永远不会为 {@code null}）
 	 */
 	ClassFilter getClassFilter();
 
 	/**
-	 * Return the MethodMatcher for this pointcut.
-	 * @return the MethodMatcher (never {@code null})
+	 * 返回此切点的 MethodMatcher。
+	 * @return MethodMatcher（永远不会为 {@code null}）
 	 */
 	MethodMatcher getMethodMatcher();
 
 
 	/**
-	 * Canonical Pointcut instance that always matches.
+	 * 始终匹配的规范 Pointcut 实例。
 	 */
 	Pointcut TRUE = TruePointcut.INSTANCE;
 

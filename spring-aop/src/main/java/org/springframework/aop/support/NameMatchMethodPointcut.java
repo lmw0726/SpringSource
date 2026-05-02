@@ -26,9 +26,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.PatternMatchUtils;
 
 /**
- * Pointcut bean for simple method name matches, as an alternative to regexp patterns.
+ * 用于简单方法名匹配的切点 Bean，可作为正则表达式模式的替代方案。
  *
- * <p>Does not handle overloaded methods: all methods with a given name will be eligible.
+ * <p>不处理重载方法：具有给定名称的所有方法都将符合条件。
  *
  * @author Juergen Hoeller
  * @author Rod Johnson
@@ -43,8 +43,8 @@ public class NameMatchMethodPointcut extends StaticMethodMatcherPointcut impleme
 
 
 	/**
-	 * Convenience method when we have only a single method name to match.
-	 * Use either this method or {@code setMappedNames}, not both.
+	 * 当只有一个方法名需要匹配时使用的便捷方法。
+	 * 使用此方法或 {@code setMappedNames}，不要同时使用两者。
 	 * @see #setMappedNames
 	 */
 	public void setMappedName(String mappedName) {
@@ -52,22 +52,22 @@ public class NameMatchMethodPointcut extends StaticMethodMatcherPointcut impleme
 	}
 
 	/**
-	 * Set the method names defining methods to match.
-	 * Matching will be the union of all these; if any match,
-	 * the pointcut matches.
+	 * 设置定义要匹配方法的方法名。
+	 * 匹配结果将是所有这些名称的并集；如果任一名称匹配，
+	 * 则切点匹配。
 	 */
 	public void setMappedNames(String... mappedNames) {
 		this.mappedNames = new ArrayList<>(Arrays.asList(mappedNames));
 	}
 
 	/**
-	 * Add another eligible method name, in addition to those already named.
-	 * Like the set methods, this method is for use when configuring proxies,
-	 * before a proxy is used.
-	 * <p><b>NB:</b> This method does not work after the proxy is in
-	 * use, as advice chains will be cached.
-	 * @param name the name of the additional method that will match
-	 * @return this pointcut to allow for multiple additions in one line
+	 * 在已命名的方法之外，再添加一个符合条件的方法名。
+	 * 与 set 方法一样，此方法用于配置代理时，
+	 * 即在代理被使用之前调用。
+	 * <p><b>注意：</b>代理投入使用后，此方法不起作用，
+	 * 因为通知链将被缓存。
+	 * @param name 将要匹配的附加方法名称
+	 * @return 此切点，以便在一行中多次添加
 	 */
 	public NameMatchMethodPointcut addMethodName(String name) {
 		this.mappedNames.add(name);
@@ -86,12 +86,12 @@ public class NameMatchMethodPointcut extends StaticMethodMatcherPointcut impleme
 	}
 
 	/**
-	 * Return if the given method name matches the mapped name.
-	 * <p>The default implementation checks for "xxx*", "*xxx" and "*xxx*" matches,
-	 * as well as direct equality. Can be overridden in subclasses.
-	 * @param methodName the method name of the class
-	 * @param mappedName the name in the descriptor
-	 * @return if the names match
+	 * 返回给定方法名是否匹配映射名称。
+	 * <p>默认实现检查 "xxx*"、"*xxx" 和 "*xxx*" 匹配，
+	 * 以及直接相等。可在子类中重写。
+	 * @param methodName 类中的方法名
+	 * @param mappedName 描述符中的名称
+	 * @return 名称是否匹配
 	 * @see org.springframework.util.PatternMatchUtils#simpleMatch(String, String)
 	 */
 	protected boolean isMatch(String methodName, String mappedName) {

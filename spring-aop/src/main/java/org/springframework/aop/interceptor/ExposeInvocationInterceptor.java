@@ -28,15 +28,14 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.lang.Nullable;
 
 /**
- * Interceptor that exposes the current {@link org.aopalliance.intercept.MethodInvocation}
- * as a thread-local object. We occasionally need to do this; for example, when a pointcut
- * (e.g. an AspectJ expression pointcut) needs to know the full invocation context.
+ * 将当前 {@link org.aopalliance.intercept.MethodInvocation}
+ * 暴露为线程本地对象的拦截器。我们偶尔需要这样做；例如，
+ * 当切点（例如 AspectJ 表达式切点）需要知道完整调用上下文时。
  *
- * <p>Don't use this interceptor unless this is really necessary. Target objects should
- * not normally know about Spring AOP, as this creates a dependency on Spring API.
- * Target objects should be plain POJOs as far as possible.
+ * <p>除非确实必要，否则不要使用此拦截器。目标对象通常不应了解 Spring AOP，
+ * 因为这会产生对 Spring API 的依赖。目标对象应尽可能是普通 POJO。
  *
- * <p>If used, this interceptor will normally be the first in the interceptor chain.
+ * <p>如果使用，此拦截器通常会是拦截器链中的第一个。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -44,12 +43,12 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public final class ExposeInvocationInterceptor implements MethodInterceptor, PriorityOrdered, Serializable {
 
-	/** Singleton instance of this class. */
+	/** 此类的单例实例。 */
 	public static final ExposeInvocationInterceptor INSTANCE = new ExposeInvocationInterceptor();
 
 	/**
-	 * Singleton advisor for this class. Use in preference to INSTANCE when using
-	 * Spring AOP, as it prevents the need to create a new Advisor to wrap the instance.
+	 * 此类的单例 advisor。在使用 Spring AOP 时，优先使用它而不是 INSTANCE，
+	 * 因为它避免了创建新的 Advisor 来包装该实例的需要。
 	 */
 	public static final Advisor ADVISOR = new DefaultPointcutAdvisor(INSTANCE) {
 		@Override
@@ -63,10 +62,10 @@ public final class ExposeInvocationInterceptor implements MethodInterceptor, Pri
 
 
 	/**
-	 * Return the AOP Alliance MethodInvocation object associated with the current invocation.
-	 * @return the invocation object associated with the current invocation
-	 * @throws IllegalStateException if there is no AOP invocation in progress,
-	 * or if the ExposeInvocationInterceptor was not added to this interceptor chain
+	 * 返回与当前调用关联的 AOP Alliance MethodInvocation 对象。
+	 * @return 与当前调用关联的调用对象
+	 * @throws IllegalStateException 如果当前没有正在进行的 AOP 调用，
+	 * 或 ExposeInvocationInterceptor 未添加到此拦截器链中
 	 */
 	public static MethodInvocation currentInvocation() throws IllegalStateException {
 		MethodInvocation mi = invocation.get();
@@ -83,7 +82,7 @@ public final class ExposeInvocationInterceptor implements MethodInterceptor, Pri
 
 
 	/**
-	 * Ensures that only the canonical instance can be created.
+	 * 确保只能创建规范实例。
 	 */
 	private ExposeInvocationInterceptor() {
 	}
@@ -107,9 +106,9 @@ public final class ExposeInvocationInterceptor implements MethodInterceptor, Pri
 	}
 
 	/**
-	 * Required to support serialization. Replaces with canonical instance
-	 * on deserialization, protecting Singleton pattern.
-	 * <p>Alternative to overriding the {@code equals} method.
+	 * 支持序列化所需。在反序列化时替换为规范实例，
+	 * 保护单例模式。
+	 * <p>这是重写 {@code equals} 方法的替代方式。
 	 */
 	private Object readResolve() {
 		return INSTANCE;

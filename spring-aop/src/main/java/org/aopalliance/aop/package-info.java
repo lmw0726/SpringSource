@@ -1,4 +1,4 @@
 /**
- * The core AOP Alliance advice marker.
+ * 核心AOP联盟建言标记。
  */
 package org.aopalliance.aop;

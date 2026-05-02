@@ -27,10 +27,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Simple {@link org.springframework.aop.MethodMatcher MethodMatcher} that looks
- * for a specific annotation being present on a method (checking both the method
- * on the invoked interface, if any, and the corresponding method on the target
- * class).
+ * 简单的 {@link org.springframework.aop.MethodMatcher MethodMatcher}，
+ * 用于查找指定注解是否存在于方法上（检查被调用接口上的方法，
+ * 如果有的话，也检查目标类上的对应方法）。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -45,20 +44,19 @@ public class AnnotationMethodMatcher extends StaticMethodMatcher {
 
 
 	/**
-	 * Create a new AnnotationClassFilter for the given annotation type.
-	 * @param annotationType the annotation type to look for
+	 * 为给定注解类型创建新的 AnnotationMethodMatcher。
+	 * @param annotationType 要查找的注解类型
 	 */
 	public AnnotationMethodMatcher(Class<? extends Annotation> annotationType) {
 		this(annotationType, false);
 	}
 
 	/**
-	 * Create a new AnnotationClassFilter for the given annotation type.
-	 * @param annotationType the annotation type to look for
-	 * @param checkInherited whether to also check the superclasses and
-	 * interfaces as well as meta-annotations for the annotation type
-	 * (i.e. whether to use {@link AnnotatedElementUtils#hasAnnotation}
-	 * semantics instead of standard Java {@link Method#isAnnotationPresent})
+	 * 为给定注解类型创建新的 AnnotationMethodMatcher。
+	 * @param annotationType 要查找的注解类型
+	 * @param checkInherited 是否还检查超类和接口，以及该注解类型的元注解
+	 * （即是否使用 {@link AnnotatedElementUtils#hasAnnotation} 语义，
+	 * 而不是标准 Java {@link Method#isAnnotationPresent}）
 	 * @since 5.0
 	 */
 	public AnnotationMethodMatcher(Class<? extends Annotation> annotationType, boolean checkInherited) {
@@ -74,11 +72,11 @@ public class AnnotationMethodMatcher extends StaticMethodMatcher {
 		if (matchesMethod(method)) {
 			return true;
 		}
-		// Proxy classes never have annotations on their redeclared methods.
+		// 代理类在其重新声明的方法上永远没有注解。
 		if (Proxy.isProxyClass(targetClass)) {
 			return false;
 		}
-		// The method may be on an interface, so let's check on the target class as well.
+		// 该方法可能在接口上，因此也要检查目标类上的方法。
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 		return (specificMethod != method && matchesMethod(specificMethod));
 	}

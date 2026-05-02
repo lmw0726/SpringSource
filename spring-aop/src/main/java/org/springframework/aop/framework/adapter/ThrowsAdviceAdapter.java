@@ -25,8 +25,8 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.ThrowsAdvice;
 
 /**
- * Adapter to enable {@link org.springframework.aop.ThrowsAdvice} to be used
- * in the Spring AOP framework.
+ * 适配器，使 {@link org.springframework.aop.ThrowsAdvice} 能够
+ * 在 Spring AOP 框架中使用。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

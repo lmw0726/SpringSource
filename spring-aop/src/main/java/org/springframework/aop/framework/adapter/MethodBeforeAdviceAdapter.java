@@ -25,8 +25,8 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.MethodBeforeAdvice;
 
 /**
- * Adapter to enable {@link org.springframework.aop.MethodBeforeAdvice}
- * to be used in the Spring AOP framework.
+ * 适配器，使 {@link org.springframework.aop.MethodBeforeAdvice}
+ * 能够在 Spring AOP 框架中使用。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

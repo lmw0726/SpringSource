@@ -1,16 +1,16 @@
 /**
- * Package containing Spring's basic AOP infrastructure, compliant with the
- * <a href="http://aopalliance.sourceforge.net">AOP Alliance</a> interfaces.
+ * 包含 Spring 基本 AOP 基础设施的包，符合
+ * <a href="http://aopalliance.sourceforge.net">AOP Alliance</a> 接口。
  *
- * <p>Spring AOP supports proxying interfaces or classes, introductions, and offers
- * static and dynamic pointcuts.
+ * <p>Spring AOP 支持代理接口或类、引介，并提供
+ * 静态和动态切点。
  *
- * <p>Any Spring AOP proxy can be cast to the ProxyConfig AOP configuration interface
- * in this package to add or remove interceptors.
+ * <p>任何 Spring AOP 代理都可以强制转换为此包中的 ProxyConfig AOP 配置接口，
+ * 以添加或删除拦截器。
  *
- * <p>The ProxyFactoryBean is a convenient way to create AOP proxies in a BeanFactory
- * or ApplicationContext. However, proxies can be created programmatically using the
- * ProxyFactory class.
+ * <p>ProxyFactoryBean 是在 BeanFactory 或 ApplicationContext 中
+ * 创建 AOP 代理的便捷方式。但是，也可以使用 ProxyFactory 类
+ * 以编程方式创建代理。
  */
 @NonNullApi
 @NonNullFields

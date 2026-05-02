@@ -22,8 +22,8 @@ import org.springframework.aop.ClassFilter;
 import org.springframework.aop.Pointcut;
 
 /**
- * Convenient class for name-match method pointcuts that hold an Advice,
- * making them an Advisor.
+ * 持有 Advice 的方法名匹配方法切点便捷类，
+ * 从而使其成为 Advisor。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -44,8 +44,8 @@ public class NameMatchMethodPointcutAdvisor extends AbstractGenericPointcutAdvis
 
 
 	/**
-	 * Set the {@link ClassFilter} to use for this pointcut.
-	 * Default is {@link ClassFilter#TRUE}.
+	 * 设置此切点要使用的 {@link ClassFilter}。
+	 * 默认值为 {@link ClassFilter#TRUE}。
 	 * @see NameMatchMethodPointcut#setClassFilter
 	 */
 	public void setClassFilter(ClassFilter classFilter) {
@@ -53,8 +53,8 @@ public class NameMatchMethodPointcutAdvisor extends AbstractGenericPointcutAdvis
 	}
 
 	/**
-	 * Convenience method when we have only a single method name to match.
-	 * Use either this method or {@code setMappedNames}, not both.
+	 * 当只有一个方法名需要匹配时使用的便捷方法。
+	 * 使用此方法或 {@code setMappedNames}，不要同时使用两者。
 	 * @see #setMappedNames
 	 * @see NameMatchMethodPointcut#setMappedName
 	 */
@@ -63,9 +63,9 @@ public class NameMatchMethodPointcutAdvisor extends AbstractGenericPointcutAdvis
 	}
 
 	/**
-	 * Set the method names defining methods to match.
-	 * Matching will be the union of all these; if any match,
-	 * the pointcut matches.
+	 * 设置定义要匹配方法的方法名。
+	 * 匹配结果将是所有这些名称的并集；如果任一名称匹配，
+	 * 则切点匹配。
 	 * @see NameMatchMethodPointcut#setMappedNames
 	 */
 	public void setMappedNames(String... mappedNames) {
@@ -73,11 +73,11 @@ public class NameMatchMethodPointcutAdvisor extends AbstractGenericPointcutAdvis
 	}
 
 	/**
-	 * Add another eligible method name, in addition to those already named.
-	 * Like the set methods, this method is for use when configuring proxies,
-	 * before a proxy is used.
-	 * @param name the name of the additional method that will match
-	 * @return this pointcut to allow for multiple additions in one line
+	 * 在已命名的方法之外，再添加一个符合条件的方法名。
+	 * 与 set 方法一样，此方法用于配置代理时，
+	 * 即在代理被使用之前调用。
+	 * @param name 将要匹配的附加方法名称
+	 * @return 此切点，以便在一行中多次添加
 	 * @see NameMatchMethodPointcut#addMethodName
 	 */
 	public NameMatchMethodPointcut addMethodName(String name) {

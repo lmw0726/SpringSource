@@ -23,9 +23,9 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.OrderUtils;
 
 /**
- * Implementation of {@link MetadataAwareAspectInstanceFactory} that is backed
- * by a specified singleton object, returning the same instance for every
- * {@link #getAspectInstance()} call.
+ * 由指定单例对象支持的 {@link MetadataAwareAspectInstanceFactory} 实现，
+ * 为每个 {@link #getAspectInstance()} 调用
+ * 返回相同的实例。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -40,9 +40,9 @@ public class SingletonMetadataAwareAspectInstanceFactory extends SingletonAspect
 
 
 	/**
-	 * Create a new SingletonMetadataAwareAspectInstanceFactory for the given aspect.
-	 * @param aspectInstance the singleton aspect instance
-	 * @param aspectName the name of the aspect
+	 * 为给定的切面创建新的 SingletonMetadataAwareAspectInstanceFactory。
+	 * @param aspectInstance 单例切面实例
+	 * @param aspectName 切面的名称
 	 */
 	public SingletonMetadataAwareAspectInstanceFactory(Object aspectInstance, String aspectName) {
 		super(aspectInstance);

@@ -28,12 +28,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Abstract BeanFactory-based PointcutAdvisor that allows for any Advice
- * to be configured as reference to an Advice bean in a BeanFactory.
+ * 基于 BeanFactory 的抽象 PointcutAdvisor，允许将任何 Advice
+ * 配置为 BeanFactory 中 Advice bean 的引用。
  *
- * <p>Specifying the name of an advice bean instead of the advice object itself
- * (if running within a BeanFactory) increases loose coupling at initialization time,
- * in order to not initialize the advice object until the pointcut actually matches.
+ * <p>（在 BeanFactory 中运行时）指定 advice bean 的名称而不是 advice 对象本身，
+ * 可以在初始化时增强松耦合，以便直到切点实际匹配时才初始化 advice 对象。
  *
  * @author Juergen Hoeller
  * @since 2.0.2
@@ -56,11 +55,10 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 
 
 	/**
-	 * Specify the name of the advice bean that this advisor should refer to.
-	 * <p>An instance of the specified bean will be obtained on first access
-	 * of this advisor's advice. This advisor will only ever obtain at most one
-	 * single instance of the advice bean, caching the instance for the lifetime
-	 * of the advisor.
+	 * 指定此 advisor 应引用的 advice bean 的名称。
+	 * <p>首次访问此 advisor 的 advice 时，将获取指定 bean 的一个实例。
+	 * 此 advisor 最多只会获取该 advice bean 的一个实例，
+	 * 并在 advisor 的生命周期内缓存该实例。
 	 * @see #getAdvice()
 	 */
 	public void setAdviceBeanName(@Nullable String adviceBeanName) {
@@ -68,7 +66,7 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 	}
 
 	/**
-	 * Return the name of the advice bean that this advisor refers to, if any.
+	 * 返回此 advisor 所引用的 advice bean 的名称（如果有）。
 	 */
 	@Nullable
 	public String getAdviceBeanName() {
@@ -91,8 +89,8 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 	}
 
 	/**
-	 * Specify a particular instance of the target advice directly,
-	 * avoiding lazy resolution in {@link #getAdvice()}.
+	 * 直接指定目标 advice 的特定实例，
+	 * 避免在 {@link #getAdvice()} 中延迟解析。
 	 * @since 3.1
 	 */
 	public void setAdvice(Advice advice) {
@@ -112,15 +110,15 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 		Assert.state(this.beanFactory != null, "BeanFactory must be set to resolve 'adviceBeanName'");
 
 		if (this.beanFactory.isSingleton(this.adviceBeanName)) {
-			// Rely on singleton semantics provided by the factory.
+			// 依赖工厂提供的单例语义。
 			advice = this.beanFactory.getBean(this.adviceBeanName, Advice.class);
 			this.advice = advice;
 			return advice;
 		}
 		else {
-			// No singleton guarantees from the factory -> let's lock locally but
-			// reuse the factory's singleton lock, just in case a lazy dependency
-			// of our advice bean happens to trigger the singleton lock implicitly...
+			// 工厂没有单例保证 -> 在本地加锁，
+			// 但复用工厂的单例锁，以防我们的 advice bean 的某个延迟依赖
+			// 恰好隐式触发单例锁...
 			synchronized (this.adviceMonitor) {
 				advice = this.advice;
 				if (advice == null) {
@@ -147,14 +145,14 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 
 
 	//---------------------------------------------------------------------
-	// Serialization support
+	// 序列化支持
 	//---------------------------------------------------------------------
 
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-		// Rely on default serialization, just initialize state after deserialization.
+		// 依赖默认序列化，只在反序列化后初始化状态。
 		ois.defaultReadObject();
 
-		// Initialize transient fields.
+		// 初始化 transient 字段。
 		resetAdviceMonitor();
 	}
 

@@ -21,11 +21,10 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.lang.Nullable;
 
 /**
- * Extension of the AOP Alliance {@link org.aopalliance.intercept.MethodInvocation}
- * interface, allowing access to the proxy that the method invocation was made through.
+ * AOP Alliance {@link org.aopalliance.intercept.MethodInvocation} 接口的扩展，
+ * 允许访问本次方法调用所经过的代理。
  *
- * <p>Useful to be able to substitute return values with the proxy,
- * if necessary, for example if the invocation target returned itself.
+ * <p>在必要时可用于将返回值替换为代理，例如调用目标返回自身时。
  *
  * @author Juergen Hoeller
  * @author Adrian Colyer
@@ -36,51 +35,50 @@ import org.springframework.lang.Nullable;
 public interface ProxyMethodInvocation extends MethodInvocation {
 
 	/**
-	 * Return the proxy that this method invocation was made through.
-	 * @return the original proxy object
+	 * 返回本次方法调用所经过的代理。
+	 * @return 原始代理对象
 	 */
 	Object getProxy();
 
 	/**
-	 * Create a clone of this object. If cloning is done before {@code proceed()}
-	 * is invoked on this object, {@code proceed()} can be invoked once per clone
-	 * to invoke the joinpoint (and the rest of the advice chain) more than once.
-	 * @return an invocable clone of this invocation.
-	 * {@code proceed()} can be called once per clone.
+	 * 创建此对象的克隆。如果在此对象上调用 {@code proceed()} 之前完成克隆，
+	 * 则可以在每个克隆上调用一次 {@code proceed()}，
+	 * 从而多次调用连接点（以及通知链的其余部分）。
+	 * @return 此调用的可调用克隆。
+	 * 每个克隆可以调用一次 {@code proceed()}。
 	 */
 	MethodInvocation invocableClone();
 
 	/**
-	 * Create a clone of this object. If cloning is done before {@code proceed()}
-	 * is invoked on this object, {@code proceed()} can be invoked once per clone
-	 * to invoke the joinpoint (and the rest of the advice chain) more than once.
-	 * @param arguments the arguments that the cloned invocation is supposed to use,
-	 * overriding the original arguments
-	 * @return an invocable clone of this invocation.
-	 * {@code proceed()} can be called once per clone.
+	 * 创建此对象的克隆。如果在此对象上调用 {@code proceed()} 之前完成克隆，
+	 * 则可以在每个克隆上调用一次 {@code proceed()}，
+	 * 从而多次调用连接点（以及通知链的其余部分）。
+	 * @param arguments 克隆后的调用应使用的参数，
+	 * 覆盖原始参数
+	 * @return 此调用的可调用克隆。
+	 * 每个克隆可以调用一次 {@code proceed()}。
 	 */
 	MethodInvocation invocableClone(Object... arguments);
 
 	/**
-	 * Set the arguments to be used on subsequent invocations in the any advice
-	 * in this chain.
-	 * @param arguments the argument array
+	 * 设置此链中任意通知在后续调用中要使用的参数。
+	 * @param arguments 参数数组
 	 */
 	void setArguments(Object... arguments);
 
 	/**
-	 * Add the specified user attribute with the given value to this invocation.
-	 * <p>Such attributes are not used within the AOP framework itself. They are
-	 * just kept as part of the invocation object, for use in special interceptors.
-	 * @param key the name of the attribute
-	 * @param value the value of the attribute, or {@code null} to reset it
+	 * 将指定用户属性及其给定值添加到此调用中。
+	 * <p>这些属性不会在 AOP 框架自身内部使用。它们只是作为调用对象的一部分保留，
+	 * 供特殊拦截器使用。
+	 * @param key 属性名称
+	 * @param value 属性值，或 {@code null} 表示重置该属性
 	 */
 	void setUserAttribute(String key, @Nullable Object value);
 
 	/**
-	 * Return the value of the specified user attribute.
-	 * @param key the name of the attribute
-	 * @return the value of the attribute, or {@code null} if not set
+	 * 返回指定用户属性的值。
+	 * @param key 属性名称
+	 * @return 属性值；如果未设置，则返回 {@code null}
 	 * @see #setUserAttribute
 	 */
 	@Nullable

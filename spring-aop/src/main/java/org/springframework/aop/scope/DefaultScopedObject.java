@@ -22,12 +22,12 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.util.Assert;
 
 /**
- * Default implementation of the {@link ScopedObject} interface.
+ * {@link ScopedObject} 接口的默认实现。
  *
- * <p>Simply delegates the calls to the underlying
+ * <p>简单地将调用委托给底层的
  * {@link ConfigurableBeanFactory bean factory}
  * ({@link ConfigurableBeanFactory#getBean(String)}/
- * {@link ConfigurableBeanFactory#destroyScopedBean(String)}).
+ * {@link ConfigurableBeanFactory#destroyScopedBean(String)})。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -43,9 +43,9 @@ public class DefaultScopedObject implements ScopedObject, Serializable {
 
 
 	/**
-	 * Creates a new instance of the {@link DefaultScopedObject} class.
-	 * @param beanFactory the {@link ConfigurableBeanFactory} that holds the scoped target object
-	 * @param targetBeanName the name of the target bean
+	 * 创建 {@link DefaultScopedObject} 类的新实例。
+	 * @param beanFactory 持有作用域目标对象的 {@link ConfigurableBeanFactory}
+	 * @param targetBeanName 目标 bean 的名称
 	 */
 	public DefaultScopedObject(ConfigurableBeanFactory beanFactory, String targetBeanName) {
 		Assert.notNull(beanFactory, "BeanFactory must not be null");

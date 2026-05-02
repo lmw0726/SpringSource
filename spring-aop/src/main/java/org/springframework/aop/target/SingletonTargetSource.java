@@ -23,13 +23,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Implementation of the {@link org.springframework.aop.TargetSource} interface
- * that holds a given object. This is the default implementation of the TargetSource
- * interface, as used by the Spring AOP framework. There is usually no need to
- * create objects of this class in application code.
+ * {@link org.springframework.aop.TargetSource} 接口的实现，
+ * 持有给定的对象。这是 TargetSource 接口的默认实现，
+ * 由 Spring AOP 框架使用。通常不需要在应用程序代码中
+ * 创建此类的对象。
  *
- * <p>This class is serializable. However, the actual serializability of a
- * SingletonTargetSource will depend on whether the target is serializable.
+ * <p>此类是可序列化的。然而，SingletonTargetSource 的实际可序列化性
+ * 取决于其目标对象是否可序列化。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -37,17 +37,17 @@ import org.springframework.util.ObjectUtils;
  */
 public class SingletonTargetSource implements TargetSource, Serializable {
 
-	/** use serialVersionUID from Spring 1.2 for interoperability. */
+	/** 使用 Spring 1.2 的 serialVersionUID 以保证互操作性。 */
 	private static final long serialVersionUID = 9031246629662423738L;
 
 
-	/** Target cached and invoked using reflection. */
+	/** 被缓存并通过反射调用的目标对象。 */
 	private final Object target;
 
 
 	/**
-	 * Create a new SingletonTargetSource for the given target.
-	 * @param target the target object
+	 * 为给定的目标对象创建一个新的 SingletonTargetSource。
+	 * @param target 目标对象
 	 */
 	public SingletonTargetSource(Object target) {
 		Assert.notNull(target, "Target object must not be null");
@@ -77,8 +77,7 @@ public class SingletonTargetSource implements TargetSource, Serializable {
 
 
 	/**
-	 * Two invoker interceptors are equal if they have the same target or if the
-	 * targets or the targets are equal.
+	 * 如果两个调用拦截器具有相同的目标对象，或者目标对象本身相等，则它们相等。
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -93,7 +92,7 @@ public class SingletonTargetSource implements TargetSource, Serializable {
 	}
 
 	/**
-	 * SingletonTargetSource uses the hash code of the target object.
+	 * SingletonTargetSource 使用目标对象的哈希码。
 	 */
 	@Override
 	public int hashCode() {

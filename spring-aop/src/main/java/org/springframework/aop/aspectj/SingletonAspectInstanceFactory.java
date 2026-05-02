@@ -23,9 +23,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Implementation of {@link AspectInstanceFactory} that is backed by a
- * specified singleton object, returning the same instance for every
- * {@link #getAspectInstance()} call.
+ * {@link AspectInstanceFactory} 的实现，由指定的单例对象支持，
+ * 为每次 {@link #getAspectInstance()} 调用返回相同的实例。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -39,8 +38,8 @@ public class SingletonAspectInstanceFactory implements AspectInstanceFactory, Se
 
 
 	/**
-	 * Create a new SingletonAspectInstanceFactory for the given aspect instance.
-	 * @param aspectInstance the singleton aspect instance
+	 * 为给定的切面实例创建新的 SingletonAspectInstanceFactory。
+	 * @param aspectInstance 单例切面实例
 	 */
 	public SingletonAspectInstanceFactory(Object aspectInstance) {
 		Assert.notNull(aspectInstance, "Aspect instance must not be null");
@@ -60,10 +59,10 @@ public class SingletonAspectInstanceFactory implements AspectInstanceFactory, Se
 	}
 
 	/**
-	 * Determine the order for this factory's aspect instance,
-	 * either an instance-specific order expressed through implementing
-	 * the {@link org.springframework.core.Ordered} interface,
-	 * or a fallback order.
+	 * 确定此工厂的切面实例的顺序，
+	 * 可以是通过实现 {@link org.springframework.core.Ordered} 接口
+	 * 表达的实例特定顺序，
+	 * 或者是回退顺序。
 	 * @see org.springframework.core.Ordered
 	 * @see #getOrderForAspectClass
 	 */
@@ -76,11 +75,10 @@ public class SingletonAspectInstanceFactory implements AspectInstanceFactory, Se
 	}
 
 	/**
-	 * Determine a fallback order for the case that the aspect instance
-	 * does not express an instance-specific order through implementing
-	 * the {@link org.springframework.core.Ordered} interface.
-	 * <p>The default implementation simply returns {@code Ordered.LOWEST_PRECEDENCE}.
-	 * @param aspectClass the aspect class
+	 * 确定切面实例不通过实现 {@link org.springframework.core.Ordered} 接口
+	 * 表达实例特定顺序的情况下的回退顺序。
+	 * <p>默认实现简单地返回 {@code Ordered.LOWEST_PRECEDENCE}。
+	 * @param aspectClass 切面类
 	 */
 	protected int getOrderForAspectClass(Class<?> aspectClass) {
 		return Ordered.LOWEST_PRECEDENCE;

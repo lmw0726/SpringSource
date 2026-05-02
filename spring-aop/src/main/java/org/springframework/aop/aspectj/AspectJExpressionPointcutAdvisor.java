@@ -23,7 +23,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.lang.Nullable;
 
 /**
- * Spring AOP Advisor that can be used for any AspectJ pointcut expression.
+ * 可用于任何 AspectJ 切点表达式的 Spring AOP Advisor。
  *
  * @author Rob Harrop
  * @since 2.0

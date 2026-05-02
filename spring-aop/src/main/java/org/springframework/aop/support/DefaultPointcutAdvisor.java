@@ -24,11 +24,11 @@ import org.springframework.aop.Pointcut;
 import org.springframework.lang.Nullable;
 
 /**
- * Convenient Pointcut-driven Advisor implementation.
+ * 便捷的、由 Pointcut 驱动的 Advisor 实现。
  *
- * <p>This is the most commonly used Advisor implementation. It can be used
- * with any pointcut and advice type, except for introductions. There is
- * normally no need to subclass this class, or to implement custom Advisors.
+ * <p>这是最常用的 Advisor 实现。它可与任何切点和通知类型一起使用，
+ * 但引介除外。通常不需要对此类进行子类化，
+ * 也不需要实现自定义 Advisor。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -42,26 +42,26 @@ public class DefaultPointcutAdvisor extends AbstractGenericPointcutAdvisor imple
 
 
 	/**
-	 * Create an empty DefaultPointcutAdvisor.
-	 * <p>Advice must be set before use using setter methods.
-	 * Pointcut will normally be set also, but defaults to {@code Pointcut.TRUE}.
+	 * 创建空的 DefaultPointcutAdvisor。
+	 * <p>使用前必须通过 setter 方法设置 Advice。
+	 * 通常也会设置 Pointcut，但默认值为 {@code Pointcut.TRUE}。
 	 */
 	public DefaultPointcutAdvisor() {
 	}
 
 	/**
-	 * Create a DefaultPointcutAdvisor that matches all methods.
-	 * <p>{@code Pointcut.TRUE} will be used as Pointcut.
-	 * @param advice the Advice to use
+	 * 创建匹配所有方法的 DefaultPointcutAdvisor。
+	 * <p>{@code Pointcut.TRUE} 将用作 Pointcut。
+	 * @param advice 要使用的 Advice
 	 */
 	public DefaultPointcutAdvisor(Advice advice) {
 		this(Pointcut.TRUE, advice);
 	}
 
 	/**
-	 * Create a DefaultPointcutAdvisor, specifying Pointcut and Advice.
-	 * @param pointcut the Pointcut targeting the Advice
-	 * @param advice the Advice to run when Pointcut matches
+	 * 创建 DefaultPointcutAdvisor，指定 Pointcut 和 Advice。
+	 * @param pointcut 作用于 Advice 的 Pointcut
+	 * @param advice Pointcut 匹配时要运行的 Advice
 	 */
 	public DefaultPointcutAdvisor(Pointcut pointcut, Advice advice) {
 		this.pointcut = pointcut;
@@ -70,8 +70,8 @@ public class DefaultPointcutAdvisor extends AbstractGenericPointcutAdvisor imple
 
 
 	/**
-	 * Specify the pointcut targeting the advice.
-	 * <p>Default is {@code Pointcut.TRUE}.
+	 * 指定 advice 要作用的切点。
+	 * <p>默认值为 {@code Pointcut.TRUE}。
 	 * @see #setAdvice
 	 */
 	public void setPointcut(@Nullable Pointcut pointcut) {

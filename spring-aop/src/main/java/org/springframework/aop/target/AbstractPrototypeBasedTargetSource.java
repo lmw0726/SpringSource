@@ -28,13 +28,12 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 
 /**
- * Base class for dynamic {@link org.springframework.aop.TargetSource} implementations
- * that create new prototype bean instances to support a pooling or
- * new-instance-per-invocation strategy.
+ * 动态 {@link org.springframework.aop.TargetSource} 实现的基类，
+ * 创建新的原型 Bean 实例以支持池化或每次调用创建新实例的策略。
  *
- * <p>Such TargetSources must run in a {@link BeanFactory}, as it needs to
- * call the {@code getBean} method to create a new prototype instance.
- * Therefore, this base class extends {@link AbstractBeanFactoryBasedTargetSource}.
+ * <p>此类 TargetSource 必须在 {@link BeanFactory} 中运行，
+ * 因为它需要调用 {@code getBean} 方法来创建新的原型实例。
+ * 因此，此基类继承了 {@link AbstractBeanFactoryBasedTargetSource}。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -50,7 +49,7 @@ public abstract class AbstractPrototypeBasedTargetSource extends AbstractBeanFac
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		super.setBeanFactory(beanFactory);
 
-		// Check whether the target bean is defined as prototype.
+		// 检查目标 Bean 是否被定义为原型。
 		if (!beanFactory.isPrototype(getTargetBeanName())) {
 			throw new BeanDefinitionStoreException(
 					"Cannot use prototype-based TargetSource against non-prototype bean with name '" +
@@ -59,8 +58,8 @@ public abstract class AbstractPrototypeBasedTargetSource extends AbstractBeanFac
 	}
 
 	/**
-	 * Subclasses should call this method to create a new prototype instance.
-	 * @throws BeansException if bean creation failed
+	 * 子类应调用此方法来创建新的原型实例。
+	 * @throws BeansException 如果 Bean 创建失败
 	 */
 	protected Object newPrototypeInstance() throws BeansException {
 		if (logger.isDebugEnabled()) {
@@ -70,8 +69,8 @@ public abstract class AbstractPrototypeBasedTargetSource extends AbstractBeanFac
 	}
 
 	/**
-	 * Subclasses should call this method to destroy an obsolete prototype instance.
-	 * @param target the bean instance to destroy
+	 * 子类应调用此方法来销毁过时的原型实例。
+	 * @param target 要销毁的 Bean 实例
 	 */
 	protected void destroyPrototypeInstance(Object target) {
 		if (logger.isDebugEnabled()) {
@@ -92,7 +91,7 @@ public abstract class AbstractPrototypeBasedTargetSource extends AbstractBeanFac
 
 
 	//---------------------------------------------------------------------
-	// Serialization support
+	// 序列化支持
 	//---------------------------------------------------------------------
 
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
@@ -101,19 +100,17 @@ public abstract class AbstractPrototypeBasedTargetSource extends AbstractBeanFac
 	}
 
 	/**
-	 * Replaces this object with a SingletonTargetSource on serialization.
-	 * Protected as otherwise it won't be invoked for subclasses.
-	 * (The {@code writeReplace()} method must be visible to the class
-	 * being serialized.)
-	 * <p>With this implementation of this method, there is no need to mark
-	 * non-serializable fields in this class or subclasses as transient.
+	 * 在序列化时用 SingletonTargetSource 替换此对象。
+	 * 设置为 protected，否则不会为子类调用。
+	 * （{@code writeReplace()} 方法必须对正在序列化的类可见。）
+	 * <p>通过此方法的实现，无需将此类或子类中的非序列化字段标记为 transient。
 	 */
 	protected Object writeReplace() throws ObjectStreamException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Disconnecting TargetSource [" + this + "]");
 		}
 		try {
-			// Create disconnected SingletonTargetSource/EmptyTargetSource.
+			// 创建已断开连接的 SingletonTargetSource/EmptyTargetSource。
 			Object target = getTarget();
 			return (target != null ? new SingletonTargetSource(target) :
 					EmptyTargetSource.forClass(getTargetClass()));

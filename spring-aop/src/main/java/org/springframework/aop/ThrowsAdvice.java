@@ -17,31 +17,29 @@
 package org.springframework.aop;
 
 /**
- * Tag interface for throws advice.
+ * 异常通知的标记接口。
  *
- * <p>There are not any methods on this interface, as methods are invoked by
- * reflection. Implementing classes must implement methods of the form:
+ * <p>此接口上没有任何方法，因为方法通过反射调用。
+ * 实现类必须实现如下形式的方法：
  *
  * <pre class="code">void afterThrowing([Method, args, target], ThrowableSubclass);</pre>
  *
- * <p>Some examples of valid methods would be:
+ * <p>以下是一些有效方法的示例：
  *
  * <pre class="code">public void afterThrowing(Exception ex)</pre>
  * <pre class="code">public void afterThrowing(RemoteException)</pre>
  * <pre class="code">public void afterThrowing(Method method, Object[] args, Object target, Exception ex)</pre>
  * <pre class="code">public void afterThrowing(Method method, Object[] args, Object target, ServletException ex)</pre>
  *
- * The first three arguments are optional, and only useful if we want further
- * information about the joinpoint, as in AspectJ <b>after-throwing</b> advice.
+ * 前三个参数是可选的，只有在我们希望获取有关连接点的更多信息时才有用，
+ * 例如 AspectJ 的 <b>after-throwing</b> 通知。
  *
- * <p><b>Note:</b> If a throws-advice method throws an exception itself, it will
- * override the original exception (i.e. change the exception thrown to the user).
- * The overriding exception will typically be a RuntimeException; this is compatible
- * with any method signature. However, if a throws-advice method throws a checked
- * exception, it will have to match the declared exceptions of the target method
- * and is hence to some degree coupled to specific target method signatures.
- * <b>Do not throw an undeclared checked exception that is incompatible with
- * the target method's signature!</b>
+ * <p><b>注意：</b>如果异常通知方法本身抛出异常，
+ * 它将覆盖原始异常（即改变抛给用户的异常）。
+ * 覆盖异常通常是 RuntimeException；这与任何方法签名都兼容。
+ * 然而，如果异常通知方法抛出 checked 异常，
+ * 它必须与目标方法声明的异常匹配，因此在某种程度上会耦合到特定的目标方法签名。
+ * <b>不要抛出与目标方法签名不兼容的未声明 checked 异常！</b>
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

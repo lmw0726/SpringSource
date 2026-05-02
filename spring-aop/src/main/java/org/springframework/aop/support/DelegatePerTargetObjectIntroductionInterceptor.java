@@ -28,23 +28,20 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Convenient implementation of the
- * {@link org.springframework.aop.IntroductionInterceptor} interface.
+ * {@link org.springframework.aop.IntroductionInterceptor} 接口的便捷实现。
  *
- * <p>This differs from {@link DelegatingIntroductionInterceptor} in that a single
- * instance of this class can be used to advise multiple target objects, and each target
- * object will have its <i>own</i> delegate (whereas DelegatingIntroductionInterceptor
- * shares the same delegate, and hence the same state across all targets).
+ * <p>此类与 {@link DelegatingIntroductionInterceptor} 的不同之处在于，
+ * 此类的单个实例可用于通知多个目标对象，并且每个目标对象都会拥有其<i>自己的</i>委托
+ * （而 DelegatingIntroductionInterceptor 在所有目标之间共享同一个委托，
+ * 因而也共享同一状态）。
  *
- * <p>The {@code suppressInterface} method can be used to suppress interfaces
- * implemented by the delegate class but which should not be introduced to the
- * owning AOP proxy.
+ * <p>{@code suppressInterface} 方法可用于抑制委托类实现但不应引介到所属
+ * AOP 代理的接口。
  *
- * <p>An instance of this class is serializable if the delegates are.
+ * <p>如果委托可序列化，则此类的实例也可序列化。
  *
- * <p><i>Note: There are some implementation similarities between this class and
- * {@link DelegatingIntroductionInterceptor} that suggest a possible refactoring
- * to extract a common ancestor class in the future.</i>
+ * <p><i>注意：此类与 {@link DelegatingIntroductionInterceptor} 之间存在一些实现相似性，
+ * 这表明将来可能会重构以提取公共祖先类。</i>
  *
  * @author Adrian Colyer
  * @author Juergen Hoeller
@@ -57,7 +54,7 @@ public class DelegatePerTargetObjectIntroductionInterceptor extends Introduction
 		implements IntroductionInterceptor {
 
 	/**
-	 * Hold weak references to keys as we don't want to interfere with garbage collection..
+	 * 持有键的弱引用，因为我们不希望干扰垃圾回收。
 	 */
 	private final Map<Object, Object> delegateMap = new WeakHashMap<>();
 
@@ -69,10 +66,10 @@ public class DelegatePerTargetObjectIntroductionInterceptor extends Introduction
 	public DelegatePerTargetObjectIntroductionInterceptor(Class<?> defaultImplType, Class<?> interfaceType) {
 		this.defaultImplType = defaultImplType;
 		this.interfaceType = interfaceType;
-		// Create a new delegate now (but don't store it in the map).
-		// We do this for two reasons:
-		// 1) to fail early if there is a problem instantiating delegates
-		// 2) to populate the interface map once and once only
+		// 现在创建一个新委托（但不将其存储在映射中）。
+		// 我们这样做有两个原因：
+		// 1) 如果实例化委托存在问题，则尽早失败
+		// 2) 只填充一次接口映射
 		Object delegate = createNewDelegate();
 		implementInterfacesOnObject(delegate);
 		suppressInterface(IntroductionInterceptor.class);
@@ -81,9 +78,9 @@ public class DelegatePerTargetObjectIntroductionInterceptor extends Introduction
 
 
 	/**
-	 * Subclasses may need to override this if they want to perform custom
-	 * behaviour in around advice. However, subclasses should invoke this
-	 * method, which handles introduced interfaces and forwarding to the target.
+	 * 如果子类希望在环绕通知中执行自定义行为，可能需要重写此方法。
+	 * 但是，子类应调用此方法，
+	 * 该方法会处理被引介的接口并转发到目标。
 	 */
 	@Override
 	@Nullable
@@ -91,13 +88,13 @@ public class DelegatePerTargetObjectIntroductionInterceptor extends Introduction
 		if (isMethodOnIntroducedInterface(mi)) {
 			Object delegate = getIntroductionDelegateFor(mi.getThis());
 
-			// Using the following method rather than direct reflection,
-			// we get correct handling of InvocationTargetException
-			// if the introduced method throws an exception.
+			// 使用以下方法而不是直接反射，
+			// 可以在被引介方法抛出异常时，
+			// 正确处理 InvocationTargetException。
 			Object retVal = AopUtils.invokeJoinpointUsingReflection(delegate, mi.getMethod(), mi.getArguments());
 
-			// Massage return value if possible: if the delegate returned itself,
-			// we really want to return the proxy.
+			// 如果可能，调整返回值：如果委托返回了自身，
+			// 我们真正想返回的是代理。
 			if (retVal == delegate && mi instanceof ProxyMethodInvocation) {
 				retVal = ((ProxyMethodInvocation) mi).getProxy();
 			}
@@ -108,15 +105,15 @@ public class DelegatePerTargetObjectIntroductionInterceptor extends Introduction
 	}
 
 	/**
-	 * Proceed with the supplied {@link org.aopalliance.intercept.MethodInterceptor}.
-	 * Subclasses can override this method to intercept method invocations on the
-	 * target object which is useful when an introduction needs to monitor the object
-	 * that it is introduced into. This method is <strong>never</strong> called for
-	 * {@link MethodInvocation MethodInvocations} on the introduced interfaces.
+	 * 使用提供的 {@link org.aopalliance.intercept.MethodInterceptor} 继续执行。
+	 * 子类可以重写此方法，以拦截目标对象上的方法调用；
+	 * 当引介需要监控被引介到的对象时，这很有用。
+	 * 对于被引介接口上的 {@link MethodInvocation MethodInvocations}，
+	 * 此方法<strong>永远不会</strong>被调用。
 	 */
 	@Nullable
 	protected Object doProceed(MethodInvocation mi) throws Throwable {
-		// If we get here, just pass the invocation on.
+		// 如果执行到这里，只需继续传递该调用。
 		return mi.proceed();
 	}
 

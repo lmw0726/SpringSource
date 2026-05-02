@@ -27,9 +27,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Interceptor to wrap a {@link MethodBeforeAdvice}.
- * <p>Used internally by the AOP framework; application developers should not
- * need to use this class directly.
+ * 用于包装 {@link MethodBeforeAdvice} 的拦截器。
+ * <p>由 AOP 框架内部使用；应用开发者不应需要直接使用此类。
  *
  * @author Rod Johnson
  * @see AfterReturningAdviceInterceptor
@@ -42,8 +41,8 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 
 
 	/**
-	 * Create a new MethodBeforeAdviceInterceptor for the given advice.
-	 * @param advice the MethodBeforeAdvice to wrap
+	 * 为给定通知创建新的 MethodBeforeAdviceInterceptor。
+	 * @param advice 要包装的 MethodBeforeAdvice
 	 */
 	public MethodBeforeAdviceInterceptor(MethodBeforeAdvice advice) {
 		Assert.notNull(advice, "Advice must not be null");

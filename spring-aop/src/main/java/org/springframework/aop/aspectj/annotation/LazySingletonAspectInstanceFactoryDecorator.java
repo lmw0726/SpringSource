@@ -22,7 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Decorator to cause a {@link MetadataAwareAspectInstanceFactory} to instantiate only once.
+ * 装饰器，使 {@link MetadataAwareAspectInstanceFactory} 只实例化一次。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -38,8 +38,8 @@ public class LazySingletonAspectInstanceFactoryDecorator implements MetadataAwar
 
 
 	/**
-	 * Create a new lazily initializing decorator for the given AspectInstanceFactory.
-	 * @param maaif the MetadataAwareAspectInstanceFactory to decorate
+	 * 为给定的 AspectInstanceFactory 创建新的延迟初始化装饰器。
+	 * @param maaif 要装饰的 MetadataAwareAspectInstanceFactory
 	 */
 	public LazySingletonAspectInstanceFactoryDecorator(MetadataAwareAspectInstanceFactory maaif) {
 		Assert.notNull(maaif, "AspectInstanceFactory must not be null");

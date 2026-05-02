@@ -22,8 +22,8 @@ import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link org.springframework.beans.factory.parsing.ComponentDefinition}
- * that holds an aspect definition, including its nested pointcuts.
+ * 保存切面定义的 {@link org.springframework.beans.factory.parsing.ComponentDefinition}，
+ * 包括其嵌套的切入点。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

@@ -24,16 +24,15 @@ import org.aspectj.bridge.IMessage.Kind;
 import org.aspectj.bridge.IMessageHandler;
 
 /**
- * Implementation of AspectJ's {@link IMessageHandler} interface that
- * routes AspectJ weaving messages through the same logging system as the
- * regular Spring messages.
+ * AspectJ 的 {@link IMessageHandler} 接口实现，
+ * 将 AspectJ 织入消息通过与常规 Spring 消息相同的日志系统路由。
  *
- * <p>Pass the option...
+ * <p>将选项...
  *
  * <p><code class="code">-XmessageHandlerClass:org.springframework.aop.aspectj.AspectJWeaverMessageHandler</code>
  *
- * <p>to the weaver; for example, specifying the following in a
- * "{@code META-INF/aop.xml} file:
+ * <p>传递给织入器；例如，在
+ * "{@code META-INF/aop.xml} 文件中指定以下内容：
  *
  * <p><code class="code">&lt;weaver options="..."/&gt;</code>
  *

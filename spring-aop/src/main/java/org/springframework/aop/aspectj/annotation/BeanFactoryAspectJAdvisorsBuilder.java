@@ -16,23 +16,22 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.aspectj.lang.reflect.PerClauseKind;
-
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * Helper for retrieving @AspectJ beans from a BeanFactory and building
- * Spring Advisors based on them, for use with auto-proxying.
+ * 用于从 BeanFactory 中检索 @AspectJ bean 并基于它们构建 Spring Advisor 的辅助类，
+ * 供自动代理使用。
  *
  * @author Juergen Hoeller
  * @since 2.0.2
@@ -53,17 +52,17 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 
 
 	/**
-	 * Create a new BeanFactoryAspectJAdvisorsBuilder for the given BeanFactory.
-	 * @param beanFactory the ListableBeanFactory to scan
+	 * 为给定的 BeanFactory 创建一个新的 BeanFactoryAspectJAdvisorsBuilder。
+	 * @param beanFactory 要扫描的 ListableBeanFactory
 	 */
 	public BeanFactoryAspectJAdvisorsBuilder(ListableBeanFactory beanFactory) {
 		this(beanFactory, new ReflectiveAspectJAdvisorFactory(beanFactory));
 	}
 
 	/**
-	 * Create a new BeanFactoryAspectJAdvisorsBuilder for the given BeanFactory.
-	 * @param beanFactory the ListableBeanFactory to scan
-	 * @param advisorFactory the AspectJAdvisorFactory to build each Advisor with
+	 * 为给定的 BeanFactory 创建一个新的 BeanFactoryAspectJAdvisorsBuilder。
+	 * @param beanFactory 要扫描的 ListableBeanFactory
+	 * @param advisorFactory 用于构建每个 Advisor 的 AspectJAdvisorFactory
 	 */
 	public BeanFactoryAspectJAdvisorsBuilder(ListableBeanFactory beanFactory, AspectJAdvisorFactory advisorFactory) {
 		Assert.notNull(beanFactory, "ListableBeanFactory must not be null");
@@ -74,10 +73,10 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 
 
 	/**
-	 * Look for AspectJ-annotated aspect beans in the current bean factory,
-	 * and return to a list of Spring AOP Advisors representing them.
-	 * <p>Creates a Spring Advisor for each AspectJ advice method.
-	 * @return the list of {@link org.springframework.aop.Advisor} beans
+	 * 在当前 bean factory 中查找带有 AspectJ 注解的切面 bean，
+	 * 并返回表示它们的 Spring AOP Advisor 列表。
+	 * <p>为每个 AspectJ 通知方法创建一个 Spring Advisor。
+	 * @return {@link org.springframework.aop.Advisor} bean 列表
 	 * @see #isEligibleBean
 	 */
 	public List<Advisor> buildAspectJAdvisors() {
@@ -95,8 +94,8 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						if (!isEligibleBean(beanName)) {
 							continue;
 						}
-						// We must be careful not to instantiate beans eagerly as in this case they
-						// would be cached by the Spring container but would not have been weaved.
+						// 我们必须小心不要急切实例化 bean，因为在这种情况下它们
+						// 会被 Spring 容器缓存，但不会被织入。
 						Class<?> beanType = this.beanFactory.getType(beanName, false);
 						if (beanType == null) {
 							continue;
@@ -117,7 +116,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 								advisors.addAll(classAdvisors);
 							}
 							else {
-								// Per target or per this.
+								// 每个目标或每个这个。
 								if (this.beanFactory.isSingleton(beanName)) {
 									throw new IllegalArgumentException("Bean with name '" + beanName +
 											"' is a singleton, but aspect instantiation model is not singleton");
@@ -153,9 +152,9 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 	}
 
 	/**
-	 * Return whether the aspect bean with the given name is eligible.
-	 * @param beanName the name of the aspect bean
-	 * @return whether the bean is eligible
+	 * 返回具有给定名称的切面 bean 是否符合条件。
+	 * @param beanName 切面 bean 的名称
+	 * @return 该 bean 是否符合条件
 	 */
 	protected boolean isEligibleBean(String beanName) {
 		return true;

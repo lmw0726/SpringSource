@@ -21,8 +21,8 @@ import java.lang.reflect.Method;
 import org.springframework.lang.Nullable;
 
 /**
- * Advice invoked before a method is invoked. Such advices cannot
- * prevent the method call proceeding, unless they throw a Throwable.
+ * 在方法被调用之前调用的通知。除非抛出 Throwable，
+ * 否则此类通知不能阻止方法调用继续执行。
  *
  * @author Rod Johnson
  * @see AfterReturningAdvice
@@ -31,14 +31,13 @@ import org.springframework.lang.Nullable;
 public interface MethodBeforeAdvice extends BeforeAdvice {
 
 	/**
-	 * Callback before a given method is invoked.
-	 * @param method the method being invoked
-	 * @param args the arguments to the method
-	 * @param target the target of the method invocation. May be {@code null}.
-	 * @throws Throwable if this object wishes to abort the call.
-	 * Any exception thrown will be returned to the caller if it's
-	 * allowed by the method signature. Otherwise the exception
-	 * will be wrapped as a runtime exception.
+	 * 给定方法被调用之前的回调。
+	 * @param method 正在调用的方法
+	 * @param args 方法的参数
+	 * @param target 方法调用的目标对象。可能为 {@code null}。
+	 * @throws Throwable 如果此对象希望中止调用。
+	 * 抛出的任何异常都会在方法签名允许时返回给调用者。
+	 * 否则，该异常会被包装为运行时异常。
 	 */
 	void before(Method method, Object[] args, @Nullable Object target) throws Throwable;
 

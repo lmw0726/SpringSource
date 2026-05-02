@@ -26,9 +26,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Utility class for creating a scoped proxy.
+ * 用于创建作用域代理的实用类。
  *
- * <p>Used by ScopedProxyBeanDefinitionDecorator and ClassPathBeanDefinitionScanner.
+ * <p>由 ScopedProxyBeanDefinitionDecorator 和 ClassPathBeanDefinitionScanner 使用。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -117,13 +117,13 @@ public abstract class ScopedProxyUtils {
 	}
 
 	/**
-	 * Get the original bean name for the provided {@linkplain #getTargetBeanName
-	 * target bean name}.
+	 * 获取提供的 {@linkplain #getTargetBeanName
+	 * 目标 bean 名称} 的原始 bean 名称。
 	 *
-	 * @param targetBeanName the target bean name for the scoped proxy
-	 * @return the original bean name
-	 * @throws IllegalArgumentException if the supplied bean name does not refer
-	 *                                  to the target of a scoped proxy
+	 * @param targetBeanName 作用域代理的目标 bean 名称
+	 * @return 原始 bean 名称
+	 * @throws IllegalArgumentException 如果提供的 bean 名称
+	 *                                  不引用作用域代理的目标
 	 * @see #getTargetBeanName(String)
 	 * @see #isScopedTarget(String)
 	 * @since 5.1.10
@@ -135,8 +135,8 @@ public abstract class ScopedProxyUtils {
 	}
 
 	/**
-	 * Determine if the {@code beanName} is the name of a bean that references
-	 * the target bean within a scoped proxy.
+	 * 确定 {@code beanName} 是否为引用
+	 * 作用域代理内目标 bean 的 bean 名称。
 	 *
 	 * @since 4.1.4
 	 */

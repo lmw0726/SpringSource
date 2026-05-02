@@ -50,8 +50,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Base class for AOP Alliance {@link org.aopalliance.aop.Advice} classes
- * wrapping an AspectJ aspect or an AspectJ-annotated advice method.
+ * AOP Alliance {@link org.aopalliance.aop.Advice} 类的基类，
+ * 用于包装 AspectJ 切面或带 AspectJ 注解的通知方法。
  *
  * @author Rod Johnson
  * @author Adrian Colyer
@@ -63,18 +63,17 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedenceInformation, Serializable {
 
 	/**
-	 * Key used in ReflectiveMethodInvocation userAttributes map for the current joinpoint.
+	 * ReflectiveMethodInvocation userAttributes 映射中用于当前连接点的键。
 	 */
 	protected static final String JOIN_POINT_KEY = JoinPoint.class.getName();
 
 
 	/**
-	 * Lazily instantiate joinpoint for the current invocation.
-	 * Requires MethodInvocation to be bound with ExposeInvocationInterceptor.
-	 * <p>Do not use if access is available to the current ReflectiveMethodInvocation
-	 * (in an around advice).
-	 * @return current AspectJ joinpoint, or through an exception if we're not in a
-	 * Spring AOP invocation.
+	 * 为当前调用延迟实例化连接点。
+	 * 要求 MethodInvocation 通过 ExposeInvocationInterceptor 绑定。
+	 * <p>如果可以访问当前 ReflectiveMethodInvocation（在环绕通知中），
+	 * 则不要使用此方法。
+	 * @return 当前 AspectJ 连接点；如果我们不在 Spring AOP 调用中，则抛出异常
 	 */
 	public static JoinPoint currentJoinPoint() {
 		MethodInvocation mi = ExposeInvocationInterceptor.currentInvocation();
@@ -104,29 +103,29 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	private final AspectInstanceFactory aspectInstanceFactory;
 
 	/**
-	 * The name of the aspect (ref bean) in which this advice was defined
-	 * (used when determining advice precedence so that we can determine
-	 * whether two pieces of advice come from the same aspect).
+	 * 定义此通知的切面（ref bean）的名称
+	 * （在确定通知优先级时使用，以便我们能够判断
+	 * 两个通知是否来自同一个切面）。
 	 */
 	private String aspectName = "";
 
 	/**
-	 * The order of declaration of this advice within the aspect.
+	 * 此通知在切面中的声明顺序。
 	 */
 	private int declarationOrder;
 
 	/**
-	 * This will be non-null if the creator of this advice object knows the argument names
-	 * and sets them explicitly.
+	 * 如果此通知对象的创建者知道参数名称并显式设置了它们，
+	 * 则此字段非 null。
 	 */
 	@Nullable
 	private String[] argumentNames;
 
-	/** Non-null if after throwing advice binds the thrown value. */
+	/** 如果 after throwing 通知绑定了抛出的值，则非 null。 */
 	@Nullable
 	private String throwingName;
 
-	/** Non-null if after returning advice binds the return value. */
+	/** 如果 after returning 通知绑定了返回值，则非 null。 */
 	@Nullable
 	private String returningName;
 
@@ -135,14 +134,14 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	private Class<?> discoveredThrowingType = Object.class;
 
 	/**
-	 * Index for thisJoinPoint argument (currently only
-	 * supported at index 0 if present at all).
+	 * thisJoinPoint 参数的索引（目前如果存在，
+	 * 仅支持位于索引 0）。
 	 */
 	private int joinPointArgumentIndex = -1;
 
 	/**
-	 * Index for thisJoinPointStaticPart argument (currently only
-	 * supported at index 0 if present at all).
+	 * thisJoinPointStaticPart 参数的索引（目前如果存在，
+	 * 仅支持位于索引 0）。
 	 */
 	private int joinPointStaticPartArgumentIndex = -1;
 
@@ -153,15 +152,15 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 	@Nullable
 	private Type discoveredReturningGenericType;
-	// Note: Unlike return type, no such generic information is needed for the throwing type,
-	// since Java doesn't allow exception types to be parameterized.
+	// 注意：与返回类型不同，抛出类型不需要此类泛型信息，
+	// 因为 Java 不允许异常类型参数化。
 
 
 	/**
-	 * Create a new AbstractAspectJAdvice for the given advice method.
-	 * @param aspectJAdviceMethod the AspectJ-style advice method
-	 * @param pointcut the AspectJ expression pointcut
-	 * @param aspectInstanceFactory the factory for aspect instances
+	 * 为给定通知方法创建新的 AbstractAspectJAdvice。
+	 * @param aspectJAdviceMethod AspectJ 风格的通知方法
+	 * @param pointcut AspectJ 表达式切点
+	 * @param aspectInstanceFactory 切面实例的工厂
 	 */
 	public AbstractAspectJAdvice(
 			Method aspectJAdviceMethod, AspectJExpressionPointcut pointcut, AspectInstanceFactory aspectInstanceFactory) {
@@ -177,14 +176,14 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 
 	/**
-	 * Return the AspectJ-style advice method.
+	 * 返回 AspectJ 风格的通知方法。
 	 */
 	public final Method getAspectJAdviceMethod() {
 		return this.aspectJAdviceMethod;
 	}
 
 	/**
-	 * Return the AspectJ expression pointcut.
+	 * 返回 AspectJ 表达式切点。
 	 */
 	public final AspectJExpressionPointcut getPointcut() {
 		calculateArgumentBindings();
@@ -192,8 +191,8 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * Build a 'safe' pointcut that excludes the AspectJ advice method itself.
-	 * @return a composable pointcut that builds on the original AspectJ expression pointcut
+	 * 构建一个“安全”的切点，排除 AspectJ 通知方法自身。
+	 * @return 一个基于原始 AspectJ 表达式切点构建的可组合切点
 	 * @see #getPointcut()
 	 */
 	public final Pointcut buildSafePointcut() {
@@ -204,14 +203,14 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * Return the factory for aspect instances.
+	 * 返回切面实例的工厂。
 	 */
 	public final AspectInstanceFactory getAspectInstanceFactory() {
 		return this.aspectInstanceFactory;
 	}
 
 	/**
-	 * Return the ClassLoader for aspect instances.
+	 * 返回切面实例的 ClassLoader。
 	 */
 	@Nullable
 	public final ClassLoader getAspectClassLoader() {
@@ -225,7 +224,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 
 	/**
-	 * Set the name of the aspect (bean) in which the advice was declared.
+	 * 设置声明该通知的切面（bean）的名称。
 	 */
 	public void setAspectName(String name) {
 		this.aspectName = name;
@@ -237,7 +236,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * Set the declaration order of this advice within the aspect.
+	 * 设置此通知在切面中的声明顺序。
 	 */
 	public void setDeclarationOrder(int order) {
 		this.declarationOrder = order;
@@ -249,10 +248,10 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * Set by creator of this advice object if the argument names are known.
-	 * <p>This could be for example because they have been explicitly specified in XML,
-	 * or in an advice annotation.
-	 * @param argNames comma delimited list of arg names
+	 * 如果参数名称已知，则由此通知对象的创建者设置。
+	 * <p>例如，可能是因为它们已在 XML 中显式指定，
+	 * 或在通知注解中指定。
+	 * @param argNames 以逗号分隔的参数名称列表
 	 */
 	public void setArgumentNames(String argNames) {
 		String[] tokens = StringUtils.commaDelimitedListToStringArray(argNames);
@@ -271,7 +270,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		}
 		if (this.argumentNames != null) {
 			if (this.aspectJAdviceMethod.getParameterCount() == this.argumentNames.length + 1) {
-				// May need to add implicit join point arg name...
+				// 可能需要添加隐式连接点参数名称...
 				Class<?> firstArgType = this.aspectJAdviceMethod.getParameterTypes()[0];
 				if (firstArgType == JoinPoint.class ||
 						firstArgType == ProceedingJoinPoint.class ||
@@ -290,16 +289,16 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * We need to hold the returning name at this level for argument binding calculations,
-	 * this method allows the afterReturning advice subclass to set the name.
+	 * 我们需要在此级别持有 returning 名称以进行参数绑定计算，
+	 * 此方法允许 afterReturning 通知子类设置该名称。
 	 */
 	protected void setReturningNameNoCheck(String name) {
-		// name could be a variable or a type...
+		// name 可能是变量或类型...
 		if (isVariableName(name)) {
 			this.returningName = name;
 		}
 		else {
-			// assume a type
+			// 假定为类型
 			try {
 				this.discoveredReturningType = ClassUtils.forName(name, getAspectClassLoader());
 			}
@@ -325,16 +324,16 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * We need to hold the throwing name at this level for argument binding calculations,
-	 * this method allows the afterThrowing advice subclass to set the name.
+	 * 我们需要在此级别持有 throwing 名称以进行参数绑定计算，
+	 * 此方法允许 afterThrowing 通知子类设置该名称。
 	 */
 	protected void setThrowingNameNoCheck(String name) {
-		// name could be a variable or a type...
+		// name 可能是变量或类型...
 		if (isVariableName(name)) {
 			this.throwingName = name;
 		}
 		else {
-			// assume a type
+			// 假定为类型
 			try {
 				this.discoveredThrowingType = ClassUtils.forName(name, getAspectClassLoader());
 			}
@@ -356,20 +355,19 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 
 	/**
-	 * Do as much work as we can as part of the set-up so that argument binding
-	 * on subsequent advice invocations can be as fast as possible.
-	 * <p>If the first argument is of type JoinPoint or ProceedingJoinPoint then we
-	 * pass a JoinPoint in that position (ProceedingJoinPoint for around advice).
-	 * <p>If the first argument is of type {@code JoinPoint.StaticPart}
-	 * then we pass a {@code JoinPoint.StaticPart} in that position.
-	 * <p>Remaining arguments have to be bound by pointcut evaluation at
-	 * a given join point. We will get back a map from argument name to
-	 * value. We need to calculate which advice parameter needs to be bound
-	 * to which argument name. There are multiple strategies for determining
-	 * this binding, which are arranged in a ChainOfResponsibility.
+	 * 在设置阶段尽可能完成更多工作，
+	 * 使后续通知调用中的参数绑定尽可能快。
+	 * <p>如果第一个参数的类型为 JoinPoint 或 ProceedingJoinPoint，
+	 * 则在该位置传入 JoinPoint（环绕通知传入 ProceedingJoinPoint）。
+	 * <p>如果第一个参数的类型为 {@code JoinPoint.StaticPart}，
+	 * 则在该位置传入 {@code JoinPoint.StaticPart}。
+	 * <p>其余参数必须通过给定连接点处的切点求值进行绑定。
+	 * 我们会得到一个从参数名到值的映射。需要计算哪个通知参数
+	 * 需要绑定到哪个参数名。用于确定此绑定的策略有多个，
+	 * 它们按责任链（ChainOfResponsibility）排列。
 	 */
 	public final synchronized void calculateArgumentBindings() {
-		// The simple case... nothing to bind.
+		// 简单情况... 无需绑定任何内容。
 		if (this.argumentsIntrospected || this.parameterTypes.length == 0) {
 			return;
 		}
@@ -382,7 +380,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		}
 
 		if (numUnboundArgs > 0) {
-			// need to bind arguments by name as returned from the pointcut match
+			// 需要按切点匹配返回的名称绑定参数
 			bindArgumentsByName(numUnboundArgs);
 		}
 
@@ -442,19 +440,19 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * Create a ParameterNameDiscoverer to be used for argument binding.
-	 * <p>The default implementation creates a {@link DefaultParameterNameDiscoverer}
-	 * and adds a specifically configured {@link AspectJAdviceParameterNameDiscoverer}.
+	 * 创建用于参数绑定的 ParameterNameDiscoverer。
+	 * <p>默认实现创建一个 {@link DefaultParameterNameDiscoverer}，
+	 * 并添加一个经过专门配置的 {@link AspectJAdviceParameterNameDiscoverer}。
 	 */
 	protected ParameterNameDiscoverer createParameterNameDiscoverer() {
-		// We need to discover them, or if that fails, guess,
-		// and if we can't guess with 100% accuracy, fail.
+		// 需要发现这些名称；如果失败则进行猜测，
+		// 如果不能以 100% 准确率猜出，则失败。
 		DefaultParameterNameDiscoverer discoverer = new DefaultParameterNameDiscoverer();
 		AspectJAdviceParameterNameDiscoverer adviceParameterNameDiscoverer =
 				new AspectJAdviceParameterNameDiscoverer(this.pointcut.getExpression());
 		adviceParameterNameDiscoverer.setReturningName(this.returningName);
 		adviceParameterNameDiscoverer.setThrowingName(this.throwingName);
-		// Last in chain, so if we're called and we fail, that's bad...
+		// 链中的最后一个，因此如果调用到我们并且失败，就很糟糕...
 		adviceParameterNameDiscoverer.setRaiseExceptions(true);
 		discoverer.addDiscoverer(adviceParameterNameDiscoverer);
 		return discoverer;
@@ -471,14 +469,14 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 					this.argumentNames.length + " arguments.");
 		}
 
-		// So we match in number...
+		// 因此我们按数量匹配...
 		int argumentIndexOffset = this.parameterTypes.length - numArgumentsLeftToBind;
 		for (int i = argumentIndexOffset; i < this.argumentNames.length; i++) {
 			this.argumentBindings.put(this.argumentNames[i], i);
 		}
 
-		// Check that returning and throwing were in the argument names list if
-		// specified, and find the discovered argument types.
+		// 检查 returning 和 throwing 是否在参数名称列表中（如果已指定），
+		// 并查找发现的参数类型。
 		if (this.returningName != null) {
 			if (!this.argumentBindings.containsKey(this.returningName)) {
 				throw new IllegalStateException("Returning argument name '" + this.returningName +
@@ -501,14 +499,14 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 			}
 		}
 
-		// configure the pointcut expression accordingly.
+		// 相应地配置切点表达式。
 		configurePointcutParameters(this.argumentNames, argumentIndexOffset);
 	}
 
 	/**
-	 * All parameters from argumentIndexOffset onwards are candidates for
-	 * pointcut parameters - but returning and throwing vars are handled differently
-	 * and must be removed from the list if present.
+	 * 从 argumentIndexOffset 开始的所有参数都是切点参数候选项 ——
+	 * 但 returning 和 throwing 变量需要以不同方式处理，
+	 * 如果存在，必须从列表中移除。
 	 */
 	private void configurePointcutParameters(String[] argumentNames, int argumentIndexOffset) {
 		int numParametersToRemove = argumentIndexOffset;
@@ -541,20 +539,19 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * Take the arguments at the method execution join point and output a set of arguments
-	 * to the advice method.
-	 * @param jp the current JoinPoint
-	 * @param jpMatch the join point match that matched this execution join point
-	 * @param returnValue the return value from the method execution (may be null)
-	 * @param ex the exception thrown by the method execution (may be null)
-	 * @return the empty array if there are no arguments
+	 * 获取方法执行连接点处的参数，并输出一组传给通知方法的参数。
+	 * @param jp 当前 JoinPoint
+	 * @param jpMatch 与此执行连接点匹配的连接点匹配结果
+	 * @param returnValue 方法执行的返回值（可能为 null）
+	 * @param ex 方法执行抛出的异常（可能为 null）
+	 * @return 如果没有参数，则返回空数组
 	 */
 	protected Object[] argBinding(JoinPoint jp, @Nullable JoinPointMatch jpMatch,
 			@Nullable Object returnValue, @Nullable Throwable ex) {
 
 		calculateArgumentBindings();
 
-		// AMC start
+		// AMC 开始
 		Object[] adviceInvocationArgs = new Object[this.parameterTypes.length];
 		int numBound = 0;
 
@@ -568,7 +565,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		}
 
 		if (!CollectionUtils.isEmpty(this.argumentBindings)) {
-			// binding from pointcut match
+			// 来自切点匹配的绑定
 			if (jpMatch != null) {
 				PointcutParameter[] parameterBindings = jpMatch.getParameterBindings();
 				for (PointcutParameter parameter : parameterBindings) {
@@ -578,13 +575,13 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 					numBound++;
 				}
 			}
-			// binding from returning clause
+			// 来自 returning 子句的绑定
 			if (this.returningName != null) {
 				Integer index = this.argumentBindings.get(this.returningName);
 				adviceInvocationArgs[index] = returnValue;
 				numBound++;
 			}
-			// binding from thrown exception
+			// 来自抛出异常的绑定
 			if (this.throwingName != null) {
 				Integer index = this.argumentBindings.get(this.throwingName);
 				adviceInvocationArgs[index] = ex;
@@ -603,12 +600,12 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 
 	/**
-	 * Invoke the advice method.
-	 * @param jpMatch the JoinPointMatch that matched this execution join point
-	 * @param returnValue the return value from the method execution (may be null)
-	 * @param ex the exception thrown by the method execution (may be null)
-	 * @return the invocation result
-	 * @throws Throwable in case of invocation failure
+	 * 调用通知方法。
+	 * @param jpMatch 与此执行连接点匹配的 JoinPointMatch
+	 * @param returnValue 方法执行的返回值（可能为 null）
+	 * @param ex 方法执行抛出的异常（可能为 null）
+	 * @return 调用结果
+	 * @throws Throwable 调用失败时抛出
 	 */
 	protected Object invokeAdviceMethod(
 			@Nullable JoinPointMatch jpMatch, @Nullable Object returnValue, @Nullable Throwable ex)
@@ -617,7 +614,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		return invokeAdviceMethodWithGivenArgs(argBinding(getJoinPoint(), jpMatch, returnValue, ex));
 	}
 
-	// As above, but in this case we are given the join point.
+	// 与上面相同，但在这种情况下会给定连接点。
 	protected Object invokeAdviceMethod(JoinPoint jp, @Nullable JoinPointMatch jpMatch,
 			@Nullable Object returnValue, @Nullable Throwable t) throws Throwable {
 
@@ -644,14 +641,14 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
-	 * Overridden in around advice to return proceeding join point.
+	 * 在环绕通知中重写，以返回 proceeding join point。
 	 */
 	protected JoinPoint getJoinPoint() {
 		return currentJoinPoint();
 	}
 
 	/**
-	 * Get the current join point match at the join point we are being dispatched on.
+	 * 获取当前正在分派的连接点处的连接点匹配结果。
 	 */
 	@Nullable
 	protected JoinPointMatch getJoinPointMatch() {
@@ -662,12 +659,12 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		return getJoinPointMatch((ProxyMethodInvocation) mi);
 	}
 
-	// Note: We can't use JoinPointMatch.getClass().getName() as the key, since
-	// Spring AOP does all the matching at a join point, and then all the invocations.
-	// Under this scenario, if we just use JoinPointMatch as the key, then
-	// 'last man wins' which is not what we want at all.
-	// Using the expression is guaranteed to be safe, since 2 identical expressions
-	// are guaranteed to bind in exactly the same way.
+	// 注意：不能使用 JoinPointMatch.getClass().getName() 作为键，因为
+	// Spring AOP 会在一个连接点处完成所有匹配，然后执行所有调用。
+	// 在这种场景下，如果只使用 JoinPointMatch 作为键，
+	// 就会出现“最后一个胜出”的情况，而这完全不是我们想要的。
+	// 使用表达式可以保证安全，因为两个完全相同的表达式
+	// 保证会以完全相同的方式绑定。
 	@Nullable
 	protected JoinPointMatch getJoinPointMatch(ProxyMethodInvocation pmi) {
 		String expression = this.pointcut.getExpression();
@@ -693,7 +690,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 
 	/**
-	 * MethodMatcher that excludes the specified advice method.
+	 * 排除指定通知方法的 MethodMatcher。
 	 * @see AbstractAspectJAdvice#buildSafePointcut()
 	 */
 	private static class AdviceExcludingMethodMatcher extends StaticMethodMatcher {

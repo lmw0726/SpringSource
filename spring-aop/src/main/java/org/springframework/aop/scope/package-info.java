@@ -1,5 +1,5 @@
 /**
- * Support for AOP-based scoping of target objects, with configurable backend.
+ * 支持基于 AOP 的目标对象作用域，具有可配置的后端。
  */
 @NonNullApi
 @NonNullFields

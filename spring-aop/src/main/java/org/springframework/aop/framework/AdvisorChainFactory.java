@@ -22,7 +22,7 @@ import java.util.List;
 import org.springframework.lang.Nullable;
 
 /**
- * Factory interface for advisor chains.
+ * advisor 链的工厂接口。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -30,13 +30,13 @@ import org.springframework.lang.Nullable;
 public interface AdvisorChainFactory {
 
 	/**
-	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
-	 * for the given advisor chain configuration.
-	 * @param config the AOP configuration in the form of an Advised object
-	 * @param method the proxied method
-	 * @param targetClass the target class (may be {@code null} to indicate a proxy without
-	 * target object, in which case the method's declaring class is the next best option)
-	 * @return a List of MethodInterceptors (may also include InterceptorAndDynamicMethodMatchers)
+	 * 根据给定的 advisor 链配置，确定
+	 * {@link org.aopalliance.intercept.MethodInterceptor} 对象列表。
+	 * @param config Advised 对象形式的 AOP 配置
+	 * @param method 被代理的方法
+	 * @param targetClass 目标类（可以为 {@code null}，表示没有目标对象的代理，
+	 * 此时方法的声明类是次优选择）
+	 * @return MethodInterceptor 的 List（也可能包含 InterceptorAndDynamicMethodMatcher）
 	 */
 	List<Object> getInterceptorsAndDynamicInterceptionAdvice(Advised config, Method method, @Nullable Class<?> targetClass);
 
