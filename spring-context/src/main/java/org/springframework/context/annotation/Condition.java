@@ -20,17 +20,14 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
- * A single {@code condition} that must be {@linkplain #matches matched} in order
- * for a component to be registered.
+ * 单个{@code 条件}，必须{@linkplain #matches 匹配}才能注册组件。
  *
- * <p>Conditions are checked immediately before the bean-definition is due to be
- * registered and are free to veto registration based on any criteria that can
- * be determined at that point.
+ * <p>条件会在bean定义即将注册之前立即检查，并且可以基于在该时刻能够确定的任何标准
+ * 自由否决注册。
  *
- * <p>Conditions must follow the same restrictions as {@link BeanFactoryPostProcessor}
- * and take care to never interact with bean instances. For more fine-grained control
- * of conditions that interact with {@code @Configuration} beans consider implementing
- * the {@link ConfigurationCondition} interface.
+ * <p>条件必须遵循与{@link BeanFactoryPostProcessor}相同的限制，
+ * 并且注意永远不要与bean实例交互。对于与{@code @Configuration} bean交互的更细粒度的条件控制，
+ * 请考虑实现{@link ConfigurationCondition}接口。
  *
  * @author Phillip Webb
  * @since 4.0
@@ -42,12 +39,12 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 public interface Condition {
 
 	/**
-	 * Determine if the condition matches.
-	 * @param context the condition context
-	 * @param metadata the metadata of the {@link org.springframework.core.type.AnnotationMetadata class}
-	 * or {@link org.springframework.core.type.MethodMetadata method} being checked
-	 * @return {@code true} if the condition matches and the component can be registered,
-	 * or {@code false} to veto the annotated component's registration
+	 * 确定条件是否匹配。
+	 * @param context 条件上下文
+	 * @param metadata 正在检查的{@link org.springframework.core.type.AnnotationMetadata 类}
+	 * 或{@link org.springframework.core.type.MethodMetadata 方法}的元数据
+	 * @return 如果条件匹配且组件可以注册则返回{@code true}，
+	 * 如果要否决被注解组件的注册则返回{@code false}
 	 */
 	boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata);
 

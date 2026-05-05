@@ -16,22 +16,20 @@
 
 package org.springframework.jdbc.datasource.embedded;
 
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.UUID;
-import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Factory for creating an {@link EmbeddedDatabase} instance.
@@ -150,8 +148,8 @@ public class EmbeddedDatabaseFactory {
 	}
 
 	/**
-	 * Factory method that returns the {@linkplain EmbeddedDatabase embedded database}
-	 * instance, which is also a {@link DataSource}.
+	 * 返回{@linkplain EmbeddedDatabase 嵌入式数据库}实例的工厂方法，
+	 * 该实例也是一个{@link DataSource}。
 	 */
 	public EmbeddedDatabase getDatabase() {
 		if (this.dataSource == null) {
@@ -162,46 +160,49 @@ public class EmbeddedDatabaseFactory {
 
 
 	/**
-	 * Hook to initialize the embedded database.
-	 * <p>If the {@code generateUniqueDatabaseName} flag has been set to {@code true},
-	 * the current value of the {@linkplain #setDatabaseName database name} will
-	 * be overridden with an auto-generated name.
-	 * <p>Subclasses may call this method to force initialization; however,
-	 * this method should only be invoked once.
-	 * <p>After calling this method, {@link #getDataSource()} returns the
-	 * {@link DataSource} providing connectivity to the database.
+	 * 初始化嵌入式数据库的钩子方法。
+	 * <p>如果{@code generateUniqueDatabaseName}标志已设置为{@code true}，
+	 * 当前的{@linkplain #setDatabaseName 数据库名称}值将被自动生成的名称覆盖。
+	 * <p>子类可以调用此方法来强制初始化；但是，此方法应该只被调用一次。
+	 * <p>调用此方法后，{@link #getDataSource()}返回提供数据库连接的{@link DataSource}。
 	 */
 	protected void initDatabase() {
 		if (this.generateUniqueDatabaseName) {
+			// 🔑 如果需要生成唯一的数据库名，则使用 UUID 生成
 			setDatabaseName(UUID.randomUUID().toString());
 		}
 
-		// Create the embedded database first
+		// 🏗️ 创建嵌入式数据库（默认使用 HSQL）
 		if (this.databaseConfigurer == null) {
 			this.databaseConfigurer = EmbeddedDatabaseConfigurerFactory.getConfigurer(EmbeddedDatabaseType.HSQL);
 		}
+		// ⚙️ 配置数据库连接属性
 		this.databaseConfigurer.configureConnectionProperties(
 				this.dataSourceFactory.getConnectionProperties(), this.databaseName);
+		// 🛢️ 初始化数据源
 		this.dataSource = this.dataSourceFactory.getDataSource();
 
+		// 📝 打印数据库启动日志（INFO级别）
 		if (logger.isInfoEnabled()) {
 			if (this.dataSource instanceof SimpleDriverDataSource) {
 				SimpleDriverDataSource simpleDriverDataSource = (SimpleDriverDataSource) this.dataSource;
+				// 📡 记录嵌入式数据库的 URL 和用户名
 				logger.info(String.format("Starting embedded database: url='%s', username='%s'",
 						simpleDriverDataSource.getUrl(), simpleDriverDataSource.getUsername()));
 			}
 			else {
+				// 📛 记录数据库名称
 				logger.info(String.format("Starting embedded database '%s'", this.databaseName));
 			}
 		}
 
-		// Now populate the database
+		// 📥 填充数据库（执行初始化脚本）
 		if (this.databasePopulator != null) {
 			try {
 				DatabasePopulatorUtils.execute(this.databasePopulator, this.dataSource);
 			}
 			catch (RuntimeException ex) {
-				// failed to populate, so leave it as not initialized
+				// ❌ 数据库填充失败，关闭数据库并抛出异常
 				shutdownDatabase();
 				throw ex;
 			}

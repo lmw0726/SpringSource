@@ -23,8 +23,8 @@ import org.springframework.scripting.ScriptSource;
 import org.springframework.util.Assert;
 
 /**
- * Subclass of {@link BeanFactoryRefreshableTargetSource} that determines whether
- * a refresh is required through the given {@link ScriptFactory}.
+ * {@link BeanFactoryRefreshableTargetSource} 的子类，
+ * 通过给定的 {@link ScriptFactory} 来确定是否需要刷新。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -41,13 +41,12 @@ public class RefreshableScriptTargetSource extends BeanFactoryRefreshableTargetS
 
 
 	/**
-	 * Create a new RefreshableScriptTargetSource.
-	 * @param beanFactory the BeanFactory to fetch the scripted bean from
-	 * @param beanName the name of the target bean
-	 * @param scriptFactory the ScriptFactory to delegate to for determining
-	 * whether a refresh is required
-	 * @param scriptSource the ScriptSource for the script definition
-	 * @param isFactoryBean whether the target script defines a FactoryBean
+	 * 创建一个新的 RefreshableScriptTargetSource。
+	 * @param beanFactory 用于获取脚本化 Bean 的 BeanFactory
+	 * @param beanName 目标 Bean 的名称
+	 * @param scriptFactory 委托以确定是否需要刷新的 ScriptFactory
+	 * @param scriptSource 脚本定义的 ScriptSource
+	 * @param isFactoryBean 目标脚本是否定义了一个 FactoryBean
 	 */
 	public RefreshableScriptTargetSource(BeanFactory beanFactory, String beanName,
 			ScriptFactory scriptFactory, ScriptSource scriptSource, boolean isFactoryBean) {
@@ -62,8 +61,8 @@ public class RefreshableScriptTargetSource extends BeanFactoryRefreshableTargetS
 
 
 	/**
-	 * Determine whether a refresh is required through calling
-	 * ScriptFactory's {@code requiresScriptedObjectRefresh} method.
+	 * 通过调用 ScriptFactory 的 {@code requiresScriptedObjectRefresh} 方法
+	 * 来确定是否需要刷新。
 	 * @see ScriptFactory#requiresScriptedObjectRefresh(ScriptSource)
 	 */
 	@Override
@@ -72,7 +71,7 @@ public class RefreshableScriptTargetSource extends BeanFactoryRefreshableTargetS
 	}
 
 	/**
-	 * Obtain a fresh target object, retrieving a FactoryBean if necessary.
+	 * 获取一个全新的目标对象，如有必要则获取 FactoryBean。
 	 */
 	@Override
 	protected Object obtainFreshBean(BeanFactory beanFactory, String beanName) {

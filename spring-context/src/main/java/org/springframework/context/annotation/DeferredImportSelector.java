@@ -20,16 +20,15 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.lang.Nullable;
 
 /**
- * A variation of {@link ImportSelector} that runs after all {@code @Configuration} beans
- * have been processed. This type of selector can be particularly useful when the selected
- * imports are {@code @Conditional}.
+ * {@link ImportSelector} 的一种变体，在所有 {@code @Configuration} Bean 被处理完之后运行。
+ * 当所选导入类带有 {@code @Conditional} 条件注解时，这种选择器特别有用。
  *
- * <p>Implementations can also extend the {@link org.springframework.core.Ordered}
- * interface or use the {@link org.springframework.core.annotation.Order} annotation to
- * indicate a precedence against other {@link DeferredImportSelector DeferredImportSelectors}.
+ * <p>实现类也可以扩展 {@link org.springframework.core.Ordered} 接口，或使用
+ * {@link org.springframework.core.annotation.Order} 注解，以指定相对于其他
+ * {@link DeferredImportSelector 延迟导入选择器} 的优先级。
  *
- * <p>Implementations may also provide an {@link #getImportGroup() import group} which
- * can provide additional sorting and filtering logic across different selectors.
+ * <p>实现类还可以提供一个 {@link #getImportGroup() 导入分组}，用于在不同选择器之间进行
+ * 额外的排序和过滤逻辑。
  *
  * @author Phillip Webb
  * @author Stephane Nicoll
@@ -38,9 +37,9 @@ import org.springframework.lang.Nullable;
 public interface DeferredImportSelector extends ImportSelector {
 
 	/**
-	 * Return a specific import group.
-	 * <p>The default implementations return {@code null} for no grouping required.
-	 * @return the import group class, or {@code null} if none
+	 * 返回一个特定的导入分组类。
+	 * <p>默认实现返回 {@code null}，表示不需要分组。
+	 * @return 导入分组类，如果不需要则返回 {@code null}
 	 * @since 5.0
 	 */
 	@Nullable
@@ -50,27 +49,26 @@ public interface DeferredImportSelector extends ImportSelector {
 
 
 	/**
-	 * Interface used to group results from different import selectors.
+	 * 用于将不同导入选择器的结果进行分组的接口。
 	 * @since 5.0
 	 */
 	interface Group {
 
 		/**
-		 * Process the {@link AnnotationMetadata} of the importing @{@link Configuration}
-		 * class using the specified {@link DeferredImportSelector}.
+		 * 使用指定的 {@link DeferredImportSelector} 处理导入类（带有 @{@link Configuration} 注解）的
+		 * {@link AnnotationMetadata} 元数据。
 		 */
 		void process(AnnotationMetadata metadata, DeferredImportSelector selector);
 
 		/**
-		 * Return the {@link Entry entries} of which class(es) should be imported
-		 * for this group.
+		 * 返回应该为该分组导入的类的 {@link Entry 条目}。
 		 */
 		Iterable<Entry> selectImports();
 
 
 		/**
-		 * An entry that holds the {@link AnnotationMetadata} of the importing
-		 * {@link Configuration} class and the class name to import.
+		 * 一个条目，包含导入的 {@link Configuration} 类的 {@link AnnotationMetadata} 元数据，
+		 * 以及要导入的类名。
 		 */
 		class Entry {
 
@@ -84,15 +82,14 @@ public interface DeferredImportSelector extends ImportSelector {
 			}
 
 			/**
-			 * Return the {@link AnnotationMetadata} of the importing
-			 * {@link Configuration} class.
+			 * 返回导入的 {@link Configuration} 类的 {@link AnnotationMetadata} 元数据。
 			 */
 			public AnnotationMetadata getMetadata() {
 				return this.metadata;
 			}
 
 			/**
-			 * Return the fully qualified name of the class to import.
+			 * 返回要导入类的全限定类名。
 			 */
 			public String getImportClassName() {
 				return this.importClassName;

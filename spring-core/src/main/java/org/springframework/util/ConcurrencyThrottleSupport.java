@@ -100,35 +100,59 @@ public abstract class ConcurrencyThrottleSupport implements Serializable {
 	 * @see #afterAccess()
 	 */
 	protected void beforeAccess() {
+		// 如果并发限制被设置为“完全不允许并发”
 		if (this.concurrencyLimit == NO_CONCURRENCY) {
+			// 直接拒绝调用
 			throw new IllegalStateException(
 					"Currently no invocations allowed - concurrency limit set to NO_CONCURRENCY");
 		}
+
+		// 如果设置了并发限制（>0 表示有限并发）
 		if (this.concurrencyLimit > 0) {
+			// 是否开启 debug 日志
 			boolean debug = logger.isDebugEnabled();
+
+			// 使用 monitor 对象作为锁，保证并发安全
 			synchronized (this.monitor) {
+
+				// 标记当前线程是否被中断过
 				boolean interrupted = false;
+
+				// 当当前并发数已经达到上限时
 				while (this.concurrencyCount >= this.concurrencyLimit) {
+
+					// 如果线程在等待过程中被中断过
 					if (interrupted) {
+						// 抛出异常，不再继续等待
 						throw new IllegalStateException("Thread was interrupted while waiting for invocation access, " +
 								"but concurrency limit still does not allow for entering");
 					}
+
+					// 打印调试日志：当前并发已达到上限，线程将被阻塞
 					if (debug) {
 						logger.debug("Concurrency count " + this.concurrencyCount +
 								" has reached limit " + this.concurrencyLimit + " - blocking");
 					}
 					try {
+						// 当前线程进入等待状态，释放锁，等待被唤醒
 						this.monitor.wait();
 					}
 					catch (InterruptedException ex) {
+						// 如果线程被中断：
 						// 重新中断当前线程，以允许其他线程响应。
 						Thread.currentThread().interrupt();
+
+						// 标记为已中断（但继续走 while 流程）
 						interrupted = true;
 					}
 				}
+
+				// 如果开启 debug，记录进入限流区域
 				if (debug) {
 					logger.debug("Entering throttle at concurrency count " + this.concurrencyCount);
 				}
+
+				// 并发计数 +1（表示当前线程成功进入执行区）
 				this.concurrencyCount++;
 			}
 		}
@@ -139,12 +163,22 @@ public abstract class ConcurrencyThrottleSupport implements Serializable {
 	 * @see #beforeAccess()
 	 */
 	protected void afterAccess() {
+		// 只有在设置了并发限制（>=0）时才需要做释放逻辑
 		if (this.concurrencyLimit >= 0) {
+
+			// 使用同一个 monitor 对象加锁，保证并发安全
 			synchronized (this.monitor) {
+
+				// 当前并发计数 -1（释放一个“执行名额”）
 				this.concurrencyCount--;
+
+				// 如果开启 debug 日志，打印当前并发数
 				if (logger.isDebugEnabled()) {
 					logger.debug("Returning from throttle at concurrency count " + this.concurrencyCount);
 				}
+
+				// 唤醒一个正在 wait() 的线程
+				// 👉 让其有机会重新竞争进入执行区
 				this.monitor.notify();
 			}
 		}

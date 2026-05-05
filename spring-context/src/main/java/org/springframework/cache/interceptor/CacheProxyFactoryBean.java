@@ -25,19 +25,17 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.cache.CacheManager;
 
 /**
- * Proxy factory bean for simplified declarative caching handling.
- * This is a convenient alternative to a standard AOP
- * {@link org.springframework.aop.framework.ProxyFactoryBean}
- * with a separate {@link CacheInterceptor} definition.
+ * 用于简化声明式缓存处理的代理 factory bean。
+ * 这是标准 AOP {@link org.springframework.aop.framework.ProxyFactoryBean}
+ * 加单独 {@link CacheInterceptor} 定义的便捷替代方案。
  *
- * <p>This class is designed to facilitate declarative cache demarcation: namely, wrapping
- * a singleton target object with a caching proxy, proxying all the interfaces that the
- * target implements. Exists primarily for third-party framework integration.
- * <strong>Users should favor the {@code cache:} XML namespace
- * {@link org.springframework.cache.annotation.Cacheable @Cacheable} annotation.</strong>
- * See the
- * <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#cache-annotations">declarative annotation-based caching</a>
- * section of the Spring reference documentation for more information.
+ * <p>此类旨在促进声明式缓存边界划分：即使用缓存代理包装 singleton
+ * 目标对象，代理目标实现的所有接口。主要用于第三方框架集成。
+ * <strong>用户应优先使用 {@code cache:} XML 命名空间和
+ * {@link org.springframework.cache.annotation.Cacheable @Cacheable} 注解。</strong>
+ * 有关更多信息，请参阅 Spring 参考文档中的
+ * <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#cache-annotations">基于声明式注解的缓存</a>
+ * 章节。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -55,7 +53,7 @@ public class CacheProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 
 
 	/**
-	 * Set one or more sources to find cache operations.
+	 * 设置一个或多个用于查找缓存操作的源。
 	 * @see CacheInterceptor#setCacheOperationSources
 	 */
 	public void setCacheOperationSources(CacheOperationSource... cacheOperationSources) {
@@ -63,9 +61,9 @@ public class CacheProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 	}
 
 	/**
-	 * Set the default {@link KeyGenerator} that this cache aspect should delegate to
-	 * if no specific key generator has been set for the operation.
-	 * <p>The default is a {@link SimpleKeyGenerator}.
+	 * 设置此缓存切面在没有为操作设置特定键生成器时应委托的
+	 * 默认 {@link KeyGenerator}。
+	 * <p>默认值为 {@link SimpleKeyGenerator}。
 	 * @since 5.0.3
 	 * @see CacheInterceptor#setKeyGenerator
 	 */
@@ -74,10 +72,9 @@ public class CacheProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 	}
 
 	/**
-	 * Set the default {@link CacheResolver} that this cache aspect should delegate
-	 * to if no specific cache resolver has been set for the operation.
-	 * <p>The default resolver resolves the caches against their names and the
-	 * default cache manager.
+	 * 设置此缓存切面在没有为操作设置特定缓存解析器时应委托的
+	 * 默认 {@link CacheResolver}。
+	 * <p>默认解析器会根据缓存名称和默认缓存管理器解析缓存。
 	 * @since 5.0.3
 	 * @see CacheInterceptor#setCacheResolver
 	 */
@@ -86,8 +83,8 @@ public class CacheProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 	}
 
 	/**
-	 * Set the {@link CacheManager} to use to create a default {@link CacheResolver}.
-	 * Replace the current {@link CacheResolver}, if any.
+	 * 设置用于创建默认 {@link CacheResolver} 的 {@link CacheManager}。
+	 * 替换当前的 {@link CacheResolver}（如果有）。
 	 * @since 5.0.3
 	 * @see CacheInterceptor#setCacheManager
 	 */
@@ -96,9 +93,9 @@ public class CacheProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 	}
 
 	/**
-	 * Set a pointcut, i.e. a bean that triggers conditional invocation of the
-	 * {@link CacheInterceptor} depending on the method and attributes passed.
-	 * <p>Note: Additional interceptors are always invoked.
+	 * 设置 pointcut，即根据传入的方法和属性触发
+	 * {@link CacheInterceptor} 条件调用的 bean。
+	 * <p>注意：附加拦截器始终会被调用。
 	 * @see #setPreInterceptors
 	 * @see #setPostInterceptors
 	 */

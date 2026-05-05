@@ -21,8 +21,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.MultiValueMap;
 
 /**
- * {@link Condition} that matches based on the value of a {@link Profile @Profile}
- * annotation.
+ * 基于{@link Profile @Profile}注解的值进行匹配的{@link Condition}实现。
  *
  * @author Chris Beams
  * @author Phillip Webb

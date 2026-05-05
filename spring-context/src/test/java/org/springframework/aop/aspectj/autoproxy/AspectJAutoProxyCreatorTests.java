@@ -69,8 +69,8 @@ import org.springframework.lang.Nullable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for AspectJ auto-proxying. Includes mixing with Spring AOP Advisors
- * to demonstrate that existing autoproxying contract is honoured.
+ * AspectJ 自动代理的集成测试。包括与 Spring AOP Advisors 混合使用，
+ * 以演示现有的自动代理契约得到了遵守。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -120,18 +120,18 @@ public class AspectJAutoProxyCreatorTests {
 		ClassPathXmlApplicationContext ac = newContext("aspectsPlusAdvisor.xml");
 
 		GenericApplicationContext childAc = new GenericApplicationContext(ac);
-		// Create a child factory with a bean that should be woven
+		// 创建包含需要被织入的 bean 的子工厂
 		RootBeanDefinition bd = new RootBeanDefinition(TestBean.class);
 		bd.getPropertyValues().addPropertyValue(new PropertyValue("name", "Adrian"))
 				.addPropertyValue(new PropertyValue("age", 34));
 		childAc.registerBeanDefinition("adrian2", bd);
-		// Register the advisor auto proxy creator with subclass
+		// 在子类中注册 advisor 自动代理创建器
 		childAc.registerBeanDefinition(AnnotationAwareAspectJAutoProxyCreator.class.getName(), new RootBeanDefinition(
 				AnnotationAwareAspectJAutoProxyCreator.class));
 		childAc.refresh();
 
 		ITestBean beanFromChildContextThatShouldBeWeaved = (ITestBean) childAc.getBean("adrian2");
-		//testAspectsAndAdvisorAreApplied(childAc, (ITestBean) ac.getBean("adrian"));
+		// 测试切面和通知都被应用（从子上下文和父上下文取出的 bean）
 		doTestAspectsAndAdvisorAreApplied(childAc, beanFromChildContextThatShouldBeWeaved);
 	}
 
@@ -179,12 +179,12 @@ public class AspectJAutoProxyCreatorTests {
 		ITestBean adrian1 = (ITestBean) bf.getBean("adrian");
 		assertThat(AopUtils.isAopProxy(adrian1)).isTrue();
 
-		// Does not trigger advice or count
+		// 不会触发通知或计数
 		int explicitlySetAge = 25;
 		adrian1.setAge(explicitlySetAge);
 
 		assertThat(adrian1.getAge()).as("Setter does not initiate advice").isEqualTo(explicitlySetAge);
-		// Fire aspect
+		// 触发切面
 
 		AspectMetadata am = new AspectMetadata(PerTargetAspect.class, "someBean");
 		assertThat(am.getPerClausePointcut().getMethodMatcher().matches(TestBean.class.getMethod("getSpouse"), null)).isTrue();
@@ -195,7 +195,7 @@ public class AspectJAutoProxyCreatorTests {
 		adrian1.setAge(11);
 		assertThat(adrian1.getAge()).as("Any int setter increments").isEqualTo(2);
 		adrian1.setName("Adrian");
-		//assertEquals("Any other setter does not increment", 2, adrian1.getAge());
+		// 任何其他 setter 不会递增计数
 
 		ITestBean adrian2 = (ITestBean) bf.getBean("adrian");
 		assertThat(adrian2).isNotSameAs(adrian1);
@@ -256,8 +256,8 @@ public class AspectJAutoProxyCreatorTests {
 		ITestBean adrian1 = (ITestBean) bf.getBean("adrian");
 		adrian1.getAge();
 		AdviceUsingThisJoinPoint aspectInstance = (AdviceUsingThisJoinPoint) bf.getBean("aspect");
-		//(AdviceUsingThisJoinPoint) Aspects.aspectOf(AdviceUsingThisJoinPoint.class);
-		//assertEquals("method-execution(int TestBean.getAge())",aspectInstance.getLastMethodEntered());
+		// 通过 Aspects.aspectOf 获取切面实例
+		// 断言最后进入的方法
 		assertThat(aspectInstance.getLastMethodEntered().indexOf("TestBean.getAge())") != 0).isTrue();
 	}
 
@@ -337,15 +337,16 @@ public class AspectJAutoProxyCreatorTests {
 	}
 
 	/**
-	 * Returns a new {@link ClassPathXmlApplicationContext} for the file ending in <var>fileSuffix</var>.
+	 * 返回一个新的 {@link ClassPathXmlApplicationContext}，
+	 * 用于加载以 <var>fileSuffix</var> 结尾的文件。
 	 */
 	private ClassPathXmlApplicationContext newContext(String fileSuffix) {
 		return new ClassPathXmlApplicationContext(qName(fileSuffix), getClass());
 	}
 
 	/**
-	 * Returns the relatively qualified name for <var>fileSuffix</var>.
-	 * e.g. for a fileSuffix='foo.xml', this method will return
+	 * 返回 <var>fileSuffix</var> 的相对限定名。
+	 * 例如：对于 fileSuffix='foo.xml'，本方法将返回
 	 * 'AspectJAutoProxyCreatorTests-foo.xml'
 	 */
 	private String qName(String fileSuffix) {
@@ -529,7 +530,7 @@ class RetryAspect {
 	}
 
 	/**
-	 * Retry Advice
+	 * 重试通知
 	 */
 	@Around("execOfPublicMethod()")
 	public Object retry(ProceedingJoinPoint jp) throws Throwable {

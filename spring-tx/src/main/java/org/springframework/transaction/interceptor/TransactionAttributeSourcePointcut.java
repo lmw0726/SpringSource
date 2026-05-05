@@ -27,8 +27,8 @@ import org.springframework.transaction.TransactionManager;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Abstract class that implements a Pointcut that matches if the underlying
- * {@link TransactionAttributeSource} has an attribute for a given method.
+ * 抽象类，实现了一个 Pointcut：当底层
+ * {@link TransactionAttributeSource} 对给定方法具有属性时匹配。
  *
  * @author Juergen Hoeller
  * @since 2.5.5
@@ -71,16 +71,16 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 
 
 	/**
-	 * Obtain the underlying TransactionAttributeSource (may be {@code null}).
-	 * To be implemented by subclasses.
+	 * 获取底层 TransactionAttributeSource（可以为 {@code null}）。
+	 * 由子类实现。
 	 */
 	@Nullable
 	protected abstract TransactionAttributeSource getTransactionAttributeSource();
 
 
 	/**
-	 * {@link ClassFilter} that delegates to {@link TransactionAttributeSource#isCandidateClass}
-	 * for filtering classes whose methods are not worth searching to begin with.
+	 * 委托给 {@link TransactionAttributeSource#isCandidateClass} 的 {@link ClassFilter}，
+	 * 用于过滤那些一开始就不值得搜索其方法的类。
 	 */
 	private class TransactionAttributeSourceClassFilter implements ClassFilter {
 

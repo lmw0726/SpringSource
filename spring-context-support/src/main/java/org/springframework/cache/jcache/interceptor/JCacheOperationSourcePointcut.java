@@ -24,8 +24,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * A Pointcut that matches if the underlying {@link JCacheOperationSource}
- * has an operation for a given method.
+ * 当底层 {@link JCacheOperationSource} 对给定方法具有操作时匹配的 Pointcut。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -40,8 +39,8 @@ public abstract class JCacheOperationSourcePointcut extends StaticMethodMatcherP
 	}
 
 	/**
-	 * Obtain the underlying {@link JCacheOperationSource} (may be {@code null}).
-	 * To be implemented by subclasses.
+	 * 获取底层 {@link JCacheOperationSource}（可以为 {@code null}）。
+	 * 由子类实现。
 	 */
 	@Nullable
 	protected abstract JCacheOperationSource getCacheOperationSource();

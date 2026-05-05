@@ -16,36 +16,6 @@
 
 package org.springframework.context.annotation;
 
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
-import javax.ejb.EJB;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceClient;
-import javax.xml.ws.WebServiceRef;
-
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanUtils;
@@ -56,11 +26,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.beans.factory.config.DependencyDescriptor;
-import org.springframework.beans.factory.config.EmbeddedValueResolver;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import org.springframework.beans.factory.config.*;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.MethodParameter;
@@ -68,71 +34,79 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.jndi.support.SimpleJndiBeanFactory;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.util.StringValueResolver;
+import org.springframework.util.*;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceClient;
+import javax.xml.ws.WebServiceRef;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
- * that supports common Java annotations out of the box, in particular the JSR-250
- * annotations in the {@code javax.annotation} package. These common Java
- * annotations are supported in many Java EE 5 technologies (e.g. JSF 1.2),
- * as well as in Java 6's JAX-WS.
+ * {@link org.springframework.beans.factory.config.BeanPostProcessor} 的实现，
+ * 开箱即用地支持常见的 Java 注解，特别是 {@code javax.annotation} 包中的 JSR-250 注解。
+ * 这些常见的 Java 注解在许多 Java EE 5 技术（例如 JSF 1.2）以及 Java 6 的 JAX-WS 中得到支持。
  *
- * <p>This post-processor includes support for the {@link javax.annotation.PostConstruct}
- * and {@link javax.annotation.PreDestroy} annotations - as init annotation
- * and destroy annotation, respectively - through inheriting from
- * {@link InitDestroyAnnotationBeanPostProcessor} with pre-configured annotation types.
+ * <p>此后处理器通过继承带有预配置注解类型的
+ * {@link InitDestroyAnnotationBeanPostProcessor}，支持
+ * {@link javax.annotation.PostConstruct} 和 {@link javax.annotation.PreDestroy} 注解
+ * —— 分别作为初始化注解和销毁注解。
  *
- * <p>The central element is the {@link javax.annotation.Resource} annotation
- * for annotation-driven injection of named beans, by default from the containing
- * Spring BeanFactory, with only {@code mappedName} references resolved in JNDI.
- * The {@link #setAlwaysUseJndiLookup "alwaysUseJndiLookup" flag} enforces JNDI lookups
- * equivalent to standard Java EE 5 resource injection for {@code name} references
- * and default names as well. The target beans can be simple POJOs, with no special
- * requirements other than the type having to match.
+ * <p>核心元素是 {@link javax.annotation.Resource} 注解，
+ * 用于注解驱动的命名 Bean 注入，默认从包含的 Spring BeanFactory 中进行，
+ * 仅 {@code mappedName} 引用在 JNDI 中解析。
+ * {@link #setAlwaysUseJndiLookup "alwaysUseJndiLookup" 标志}强制对 {@code name}
+ * 引用和默认名称也进行 JNDI 查找，等效于标准 Java EE 5 资源注入。
+ * 目标 Bean 可以是简单的 POJO，除了类型必须匹配外没有特殊要求。
  *
- * <p>The JAX-WS {@link javax.xml.ws.WebServiceRef} annotation is supported too,
- * analogous to {@link javax.annotation.Resource} but with the capability of creating
- * specific JAX-WS service endpoints. This may either point to an explicitly defined
- * resource by name or operate on a locally specified JAX-WS service class. Finally,
- * this post-processor also supports the EJB 3 {@link javax.ejb.EJB} annotation,
- * analogous to {@link javax.annotation.Resource} as well, with the capability to
- * specify both a local bean name and a global JNDI name for fallback retrieval.
- * The target beans can be plain POJOs as well as EJB 3 Session Beans in this case.
+ * <p>JAX-WS {@link javax.xml.ws.WebServiceRef} 注解也得到支持，
+ * 与 {@link javax.annotation.Resource} 类似，但具有创建特定 JAX-WS 服务端点的能力。
+ * 这可以通过名称指向显式定义的资源，也可以作用于本地指定的 JAX-WS 服务类。
+ * 最后，此后处理器还支持 EJB 3 {@link javax.ejb.EJB} 注解，
+ * 也与 {@link javax.annotation.Resource} 类似，具有指定本地 Bean 名称和
+ * 全局 JNDI 名称以进行回退检索的能力。在这种情况下，目标 Bean 可以是
+ * 普通 POJO 以及 EJB 3 Session Bean。
  *
- * <p>The common annotations supported by this post-processor are available in
- * Java 6 (JDK 1.6) as well as in Java EE 5/6 (which provides a standalone jar for
- * its common annotations as well, allowing for use in any based application).
+ * <p>此后处理器支持的常见注解在 Java 6（JDK 1.6）以及 Java EE 5/6
+ * （也为其常见注解提供了独立的 jar 包，允许在任何基于它的应用程序中使用）中可用。
  *
- * <p>For default usage, resolving resource names as Spring bean names,
- * simply define the following in your application context:
+ * <p>对于默认用法，将资源名称解析为 Spring Bean 名称，
+ * 只需在应用程序上下文中定义以下内容：
  *
  * <pre class="code">
  * &lt;bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/&gt;</pre>
  *
- * For direct JNDI access, resolving resource names as JNDI resource references
- * within the Java EE application's "java:comp/env/" namespace, use the following:
+ * 对于直接的 JNDI 访问，将资源名称解析为 Java EE 应用程序
+ * "java:comp/env/" 命名空间内的 JNDI 资源引用，使用以下内容：
  *
  * <pre class="code">
  * &lt;bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"&gt;
  *   &lt;property name="alwaysUseJndiLookup" value="true"/&gt;
  * &lt;/bean&gt;</pre>
  *
- * {@code mappedName} references will always be resolved in JNDI,
- * allowing for global JNDI names (including "java:" prefix) as well. The
- * "alwaysUseJndiLookup" flag just affects {@code name} references and
- * default names (inferred from the field name / property name).
+ * {@code mappedName} 引用将始终在 JNDI 中解析，
+ * 也允许全局 JNDI 名称（包括 "java:" 前缀）。
+ * "alwaysUseJndiLookup" 标志仅影响 {@code name} 引用和
+ * 默认名称（从字段名称/属性名称推断）。
  *
- * <p><b>NOTE:</b> A default CommonAnnotationBeanPostProcessor will be registered
- * by the "context:annotation-config" and "context:component-scan" XML tags.
- * Remove or turn off the default annotation configuration there if you intend
- * to specify a custom CommonAnnotationBeanPostProcessor bean definition!
- * <p><b>NOTE:</b> Annotation injection will be performed <i>before</i> XML injection; thus
- * the latter configuration will override the former for properties wired through
- * both approaches.
+ * <p><b>注意：</b> "context:annotation-config" 和 "context:component-scan" XML 标签
+ * 将注册一个默认的 CommonAnnotationBeanPostProcessor。
+ * 如果您打算指定自定义的 CommonAnnotationBeanPostProcessor Bean 定义，
+ * 请在那里移除或关闭默认的注解配置！
+ * <p><b>注意：</b> 注解注入将在 XML 注入<i>之前</i>执行；因此，
+ * 对于通过两种方式绑定的属性，后者的配置将覆盖前者。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -146,7 +120,7 @@ import org.springframework.util.StringValueResolver;
 public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBeanPostProcessor
 		implements InstantiationAwareBeanPostProcessor, BeanFactoryAware, Serializable {
 
-	// Defensive reference to JNDI API for JDK 9+ (optional java.naming module)
+	// 为 JDK 9+ 对 JNDI API 的防御性引用（可选的 java.naming 模块）
 	private static final boolean jndiPresent = ClassUtils.isPresent(
 			"javax.naming.InitialContext", CommonAnnotationBeanPostProcessor.class.getClassLoader());
 
@@ -195,10 +169,9 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 
 	/**
-	 * Create a new CommonAnnotationBeanPostProcessor,
-	 * with the init and destroy annotation types set to
-	 * {@link javax.annotation.PostConstruct} and {@link javax.annotation.PreDestroy},
-	 * respectively.
+	 * 创建一个新的 CommonAnnotationBeanPostProcessor，
+	 * 将初始化和销毁注解类型分别设置为
+	 * {@link javax.annotation.PostConstruct} 和 {@link javax.annotation.PreDestroy}。
 	 */
 	public CommonAnnotationBeanPostProcessor() {
 		setOrder(Ordered.LOWEST_PRECEDENCE - 3);
@@ -206,7 +179,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		setDestroyAnnotationType(PreDestroy.class);
 		ignoreResourceType("javax.xml.ws.WebServiceContext");
 
-		// java.naming module present on JDK 9+?
+		// JDK 9+ 上存在 java.naming 模块？
 		if (jndiPresent) {
 			this.jndiFactory = new SimpleJndiBeanFactory();
 		}
@@ -214,11 +187,10 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 
 	/**
-	 * Ignore the given resource type when resolving {@code @Resource}
-	 * annotations.
-	 * <p>By default, the {@code javax.xml.ws.WebServiceContext} interface
-	 * will be ignored, since it will be resolved by the JAX-WS runtime.
-	 * @param resourceType the resource type to ignore
+	 * 在解析 {@code @Resource} 注解时忽略给定的资源类型。
+	 * <p>默认情况下，{@code javax.xml.ws.WebServiceContext} 接口将被忽略，
+	 * 因为它将由 JAX-WS 运行时解析。
+	 * @param resourceType 要忽略的资源类型
 	 */
 	public void ignoreResourceType(String resourceType) {
 		Assert.notNull(resourceType, "Ignored resource type must not be null");
@@ -226,13 +198,13 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Set whether to allow a fallback to a type match if no explicit name has been
-	 * specified. The default name (i.e. the field name or bean property name) will
-	 * still be checked first; if a bean of that name exists, it will be taken.
-	 * However, if no bean of that name exists, a by-type resolution of the
-	 * dependency will be attempted if this flag is "true".
-	 * <p>Default is "true". Switch this flag to "false" in order to enforce a
-	 * by-name lookup in all cases, throwing an exception in case of no name match.
+	 * 设置如果未指定显式名称，是否允许回退到类型匹配。
+	 * 默认名称（即字段名称或 Bean 属性名称）仍将首先检查；
+	 * 如果存在该名称的 Bean，则会采用它。
+	 * 然而，如果不存在该名称的 Bean，且此标志为 "true"，
+	 * 则将尝试按类型解析依赖。
+	 * <p>默认值为 "true"。将此标志切换为 "false" 以在所有情况下强制按名称查找，
+	 * 在没有名称匹配时会抛出异常。
 	 * @see org.springframework.beans.factory.config.AutowireCapableBeanFactory#resolveDependency
 	 */
 	public void setFallbackToDefaultTypeMatch(boolean fallbackToDefaultTypeMatch) {
@@ -240,12 +212,12 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Set whether to always use JNDI lookups equivalent to standard Java EE 5 resource
-	 * injection, <b>even for {@code name} attributes and default names</b>.
-	 * <p>Default is "false": Resource names are used for Spring bean lookups in the
-	 * containing BeanFactory; only {@code mappedName} attributes point directly
-	 * into JNDI. Switch this flag to "true" for enforcing Java EE style JNDI lookups
-	 * in any case, even for {@code name} attributes and default names.
+	 * 设置是否始终使用 JNDI 查找，等效于标准 Java EE 5 资源注入，
+	 * <b>即使对于 {@code name} 属性和默认名称也是如此</b>。
+	 * <p>默认值为 "false"：资源名称用于在包含的 BeanFactory 中进行
+	 * Spring Bean 查找；仅 {@code mappedName} 属性直接指向 JNDI。
+	 * 将此标志切换为 "true" 以在任何情况下强制 Java EE 风格的 JNDI 查找，
+	 * 即使对于 {@code name} 属性和默认名称也是如此。
 	 * @see #setJndiFactory
 	 * @see #setResourceFactory
 	 */
@@ -254,13 +226,13 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Specify the factory for objects to be injected into {@code @Resource} /
-	 * {@code @WebServiceRef} / {@code @EJB} annotated fields and setter methods,
-	 * <b>for {@code mappedName} attributes that point directly into JNDI</b>.
-	 * This factory will also be used if "alwaysUseJndiLookup" is set to "true" in order
-	 * to enforce JNDI lookups even for {@code name} attributes and default names.
-	 * <p>The default is a {@link org.springframework.jndi.support.SimpleJndiBeanFactory}
-	 * for JNDI lookup behavior equivalent to standard Java EE 5 resource injection.
+	 * 指定用于注入到 {@code @Resource} / {@code @WebServiceRef} / {@code @EJB}
+	 * 注解的字段和 setter 方法的对象工厂，
+	 * <b>用于直接指向 JNDI 的 {@code mappedName} 属性</b>。
+	 * 如果 "alwaysUseJndiLookup" 设置为 "true"，则也将使用此工厂，
+	 * 以便即使对于 {@code name} 属性和默认名称也强制 JNDI 查找。
+	 * <p>默认是 {@link org.springframework.jndi.support.SimpleJndiBeanFactory}，
+	 * 用于提供等效于标准 Java EE 5 资源注入的 JNDI 查找行为。
 	 * @see #setResourceFactory
 	 * @see #setAlwaysUseJndiLookup
 	 */
@@ -270,16 +242,16 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Specify the factory for objects to be injected into {@code @Resource} /
-	 * {@code @WebServiceRef} / {@code @EJB} annotated fields and setter methods,
-	 * <b>for {@code name} attributes and default names</b>.
-	 * <p>The default is the BeanFactory that this post-processor is defined in,
-	 * if any, looking up resource names as Spring bean names. Specify the resource
-	 * factory explicitly for programmatic usage of this post-processor.
-	 * <p>Specifying Spring's {@link org.springframework.jndi.support.SimpleJndiBeanFactory}
-	 * leads to JNDI lookup behavior equivalent to standard Java EE 5 resource injection,
-	 * even for {@code name} attributes and default names. This is the same behavior
-	 * that the "alwaysUseJndiLookup" flag enables.
+	 * 指定用于注入到 {@code @Resource} / {@code @WebServiceRef} / {@code @EJB}
+	 * 注解的字段和 setter 方法的对象工厂，
+	 * <b>用于 {@code name} 属性和默认名称</b>。
+	 * <p>默认是此后处理器定义的 BeanFactory（如果有的话），
+	 * 将资源名称作为 Spring Bean 名称进行查找。
+	 * 对于此后处理器的编程式使用，请显式指定资源工厂。
+	 * <p>指定 Spring 的 {@link org.springframework.jndi.support.SimpleJndiBeanFactory}
+	 * 将导致等效于标准 Java EE 5 资源注入的 JNDI 查找行为，
+	 * 即使对于 {@code name} 属性和默认名称也是如此。这与
+	 * "alwaysUseJndiLookup" 标志启用的行为相同。
 	 * @see #setAlwaysUseJndiLookup
 	 */
 	public void setResourceFactory(BeanFactory resourceFactory) {
@@ -344,9 +316,9 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 
 	private InjectionMetadata findResourceMetadata(String beanName, Class<?> clazz, @Nullable PropertyValues pvs) {
-		// Fall back to class name as cache key, for backwards compatibility with custom callers.
+		// 回退到类名作为缓存键，以便与自定义调用者保持向后兼容。
 		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
-		// Quick check on the concurrent map first, with minimal locking.
+		// 首先快速检查并发 Map，使用最小锁定。
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
 		if (InjectionMetadata.needsRefresh(metadata, clazz)) {
 			synchronized (this.injectionMetadataCache) {
@@ -448,11 +420,11 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Obtain a lazily resolving resource proxy for the given name and type,
-	 * delegating to {@link #getResource} on demand once a method call comes in.
-	 * @param element the descriptor for the annotated field/method
-	 * @param requestingBeanName the name of the requesting bean
-	 * @return the resource object (never {@code null})
+	 * 获取给定名称和类型的延迟解析资源代理，
+	 * 一旦有方法调用进来，便按需委托给 {@link #getResource}。
+	 * @param element 注解字段/方法的描述符
+	 * @param requestingBeanName 请求 Bean 的名称
+	 * @return 资源对象（永远不为 {@code null}）
 	 * @since 4.2
 	 * @see #getResource
 	 * @see Lazy
@@ -487,16 +459,16 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Obtain the resource object for the given name and type.
-	 * @param element the descriptor for the annotated field/method
-	 * @param requestingBeanName the name of the requesting bean
-	 * @return the resource object (never {@code null})
-	 * @throws NoSuchBeanDefinitionException if no corresponding target resource found
+	 * 获取给定名称和类型的资源对象。
+	 * @param element 注解字段/方法的描述符
+	 * @param requestingBeanName 请求 Bean 的名称
+	 * @return 资源对象（永远不为 {@code null}）
+	 * @throws NoSuchBeanDefinitionException 如果未找到对应的目标资源
 	 */
 	protected Object getResource(LookupElement element, @Nullable String requestingBeanName)
 			throws NoSuchBeanDefinitionException {
 
-		// JNDI lookup to perform?
+		// 要执行 JNDI 查找？
 		String jndiName = null;
 		if (StringUtils.hasLength(element.mappedName)) {
 			jndiName = element.mappedName;
@@ -512,7 +484,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			return this.jndiFactory.getBean(jndiName, element.lookupType);
 		}
 
-		// Regular resource autowiring
+		// 常规资源自动装配
 		if (this.resourceFactory == null) {
 			throw new NoSuchBeanDefinitionException(element.lookupType,
 					"No resource factory configured - specify the 'resourceFactory' property");
@@ -521,13 +493,12 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Obtain a resource object for the given name and type through autowiring
-	 * based on the given factory.
-	 * @param factory the factory to autowire against
-	 * @param element the descriptor for the annotated field/method
-	 * @param requestingBeanName the name of the requesting bean
-	 * @return the resource object (never {@code null})
-	 * @throws NoSuchBeanDefinitionException if no corresponding target resource found
+	 * 基于给定工厂通过自动装配获取给定名称和类型的资源对象。
+	 * @param factory 要基于其进行自动装配的工厂
+	 * @param element 注解字段/方法的描述符
+	 * @param requestingBeanName 请求 Bean 的名称
+	 * @return 资源对象（永远不为 {@code null}）
+	 * @throws NoSuchBeanDefinitionException 如果未找到对应的目标资源
 	 */
 	protected Object autowireResource(BeanFactory factory, LookupElement element, @Nullable String requestingBeanName)
 			throws NoSuchBeanDefinitionException {
@@ -583,8 +554,8 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 
 	/**
-	 * Class representing generic injection information about an annotated field
-	 * or setter method, supporting @Resource and related annotations.
+	 * 表示关于注解字段或 setter 方法的通用注入信息的类，
+	 * 支持 @Resource 和相关注解。
 	 */
 	protected abstract static class LookupElement extends InjectionMetadata.InjectedElement {
 
@@ -602,21 +573,21 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		}
 
 		/**
-		 * Return the resource name for the lookup.
+		 * 返回用于查找的资源名称。
 		 */
 		public final String getName() {
 			return this.name;
 		}
 
 		/**
-		 * Return the desired type for the lookup.
+		 * 返回用于查找的期望类型。
 		 */
 		public final Class<?> getLookupType() {
 			return this.lookupType;
 		}
 
 		/**
-		 * Build a DependencyDescriptor for the underlying field/method.
+		 * 为底层字段/方法构建一个 DependencyDescriptor。
 		 */
 		public final DependencyDescriptor getDependencyDescriptor() {
 			if (this.isField) {
@@ -630,8 +601,8 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 
 	/**
-	 * Class representing injection information about an annotated field
-	 * or setter method, supporting the @Resource annotation.
+	 * 表示关于注解字段或 setter 方法的注入信息的类，
+	 * 支持 @Resource 注解。
 	 */
 	private class ResourceElement extends LookupElement {
 
@@ -656,7 +627,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 				checkResourceType(resourceType);
 			}
 			else {
-				// No resource type specified... check field/method.
+				// 未指定资源类型... 检查字段/方法。
 				resourceType = getResourceType();
 			}
 			this.name = (resourceName != null ? resourceName : "");
@@ -676,8 +647,8 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 
 	/**
-	 * Class representing injection information about an annotated field
-	 * or setter method, supporting the @WebServiceRef annotation.
+	 * 表示关于注解字段或 setter 方法的注入信息的类，
+	 * 支持 @WebServiceRef 注解。
 	 */
 	private class WebServiceRefElement extends LookupElement {
 
@@ -701,7 +672,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 				checkResourceType(resourceType);
 			}
 			else {
-				// No resource type specified... check field/method.
+				// 未指定资源类型... 检查字段/方法。
 				resourceType = getResourceType();
 			}
 			this.name = resourceName;
@@ -723,7 +694,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 				service = (Service) getResource(this, requestingBeanName);
 			}
 			catch (NoSuchBeanDefinitionException notFound) {
-				// Service to be created through generated class.
+				// 要通过生成的类创建的 Service。
 				if (Service.class == this.lookupType) {
 					throw new IllegalStateException("No resource with name '" + this.name + "' found in context, " +
 							"and no specific JAX-WS Service subclass specified. The typical solution is to either specify " +
@@ -761,8 +732,8 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 
 	/**
-	 * Class representing injection information about an annotated field
-	 * or setter method, supporting the @EJB annotation.
+	 * 表示关于注解字段或 setter 方法的注入信息的类，
+	 * 支持 @EJB 注解。
 	 */
 	private class EjbRefElement extends LookupElement {
 
@@ -785,7 +756,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 				checkResourceType(resourceType);
 			}
 			else {
-				// No resource type specified... check field/method.
+				// 未指定资源类型... 检查字段/方法。
 				resourceType = getResourceType();
 			}
 			this.beanName = resourceBeanName;
@@ -798,7 +769,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		protected Object getResourceToInject(Object target, @Nullable String requestingBeanName) {
 			if (StringUtils.hasLength(this.beanName)) {
 				if (beanFactory != null && beanFactory.containsBean(this.beanName)) {
-					// Local match found for explicitly specified local bean name.
+					// 找到显式指定的本地 Bean 名称的本地匹配。
 					Object bean = beanFactory.getBean(this.beanName, this.lookupType);
 					if (requestingBeanName != null && beanFactory instanceof ConfigurableBeanFactory) {
 						((ConfigurableBeanFactory) beanFactory).registerDependentBean(this.beanName, requestingBeanName);
@@ -810,15 +781,15 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 							"Cannot resolve 'beanName' in local BeanFactory. Consider specifying a general 'name' value instead.");
 				}
 			}
-			// JNDI name lookup - may still go to a local BeanFactory.
+			// JNDI 名称查找 - 仍可能转到本地 BeanFactory。
 			return getResource(this, requestingBeanName);
 		}
 	}
 
 
 	/**
-	 * Extension of the DependencyDescriptor class,
-	 * overriding the dependency type with the specified resource type.
+	 * DependencyDescriptor 类的扩展，
+	 * 使用指定的资源类型覆盖依赖类型。
 	 */
 	private static class LookupDependencyDescriptor extends DependencyDescriptor {
 

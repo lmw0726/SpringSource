@@ -16,17 +16,10 @@
 
 package org.springframework.context.annotation;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionDefaults;
-import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.beans.factory.support.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.EnvironmentCapable;
 import org.springframework.core.env.StandardEnvironment;
@@ -34,6 +27,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.PatternMatchUtils;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A bean definition scanner that detects bean candidates on the classpath,
@@ -272,28 +268,52 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 */
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
+
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
+
+		// 🔄 遍历所有基础扫描包
 		for (String basePackage : basePackages) {
+			// 🔍 查找包中的候选组件
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+
+			// 🎯 处理每个候选组件
 			for (BeanDefinition candidate : candidates) {
+				// 🎯 解析作用域元数据并设置作用域
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
+
+				// 🏷️ 生成 Bean 名称
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+
+				// 🔧 如果是抽象 Bean 定义，进行后处理
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+
+				// 📝 如果是注解 Bean 定义，处理通用定义注解
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+
+				// ✅ 检查候选 Bean 是否可以注册
 				if (checkCandidate(beanName, candidate)) {
+					// 🎁 创建 Bean 定义持有者
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
+
+					// 🎯 应用作用域代理模式
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+
+					// ➕ 添加到 Bean 定义集合
 					beanDefinitions.add(definitionHolder);
+
+					// 📋 注册 Bean 定义到注册表
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}
 		}
+
+		// 🎁 返回所有扫描到的 Bean 定义
 		return beanDefinitions;
 	}
 

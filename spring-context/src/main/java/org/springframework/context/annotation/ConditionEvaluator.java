@@ -39,7 +39,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Internal class used to evaluate {@link Conditional} annotations.
+ * 用于评估{@link Conditional}注解的内部类。
  *
  * @author Phillip Webb
  * @author Juergen Hoeller
@@ -51,7 +51,7 @@ class ConditionEvaluator {
 
 
 	/**
-	 * Create a new {@link ConditionEvaluator} instance.
+	 * 创建一个新的{@link ConditionEvaluator}实例。
 	 */
 	public ConditionEvaluator(@Nullable BeanDefinitionRegistry registry,
 							  @Nullable Environment environment, @Nullable ResourceLoader resourceLoader) {
@@ -61,12 +61,12 @@ class ConditionEvaluator {
 
 
 	/**
-	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
-	 * The {@link ConfigurationPhase} will be deduced from the type of item (i.e. a
-	 * {@code @Configuration} class will be {@link ConfigurationPhase#PARSE_CONFIGURATION})
+	 * 根据{@code @Conditional}注解确定是否应该跳过某个项目。
+	 * {@link ConfigurationPhase}将从项目类型中推导出来（即，
+	 * 一个{@code @Configuration}类将是{@link ConfigurationPhase#PARSE_CONFIGURATION}）
 	 *
-	 * @param metadata the meta data
-	 * @return if the item should be skipped
+	 * @param metadata 元数据
+	 * @return 如果该项目应该被跳过则返回true
 	 */
 	public boolean shouldSkip(AnnotatedTypeMetadata metadata) {
 		//根据@Condition决定跳过某个项目
@@ -74,46 +74,56 @@ class ConditionEvaluator {
 	}
 
 	/**
-	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
+	 * 根据{@code @Conditional}注解确定是否应该跳过某个项目。
 	 *
-	 * @param metadata the meta data
-	 * @param phase    the phase of the call
-	 * @return if the item should be skipped
+	 * @param metadata 元数据
+	 * @param phase    调用的阶段
+	 * @return 如果该项目应该被跳过则返回true
 	 */
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
-		//如果没有注解，或者不存在@Conditional注解
+		// 🔍 如果没有注解，或者不存在@Conditional注解
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
 
+		// 🎯 如果阶段为空，根据元数据类型确定阶段
 		if (phase == null) {
+			// 📋 如果是注解元数据且为配置候选，使用解析配置阶段
 			if (metadata instanceof AnnotationMetadata &&
 					ConfigurationClassUtils.isConfigurationCandidate((AnnotationMetadata) metadata)) {
 				return shouldSkip(metadata, ConfigurationPhase.PARSE_CONFIGURATION);
 			}
+			// 🔄 否则使用注册 Bean 阶段递归调用
 			return shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN);
 		}
 
+		// 📝 收集所有条件实例
 		List<Condition> conditions = new ArrayList<>();
 		for (String[] conditionClasses : getConditionClasses(metadata)) {
 			for (String conditionClass : conditionClasses) {
+				// 🏗️ 获取条件实例
 				Condition condition = getCondition(conditionClass, this.context.getClassLoader());
 				conditions.add(condition);
 			}
 		}
 
+		// 🔢 按照优先级对条件进行排序
 		AnnotationAwareOrderComparator.sort(conditions);
 
+		// 🔄 逐个检查条件是否匹配
 		for (Condition condition : conditions) {
 			ConfigurationPhase requiredPhase = null;
+			// 🎯 如果是配置条件，获取所需的配置阶段
 			if (condition instanceof ConfigurationCondition) {
 				requiredPhase = ((ConfigurationCondition) condition).getConfigurationPhase();
 			}
+			// ⚠️ 如果阶段匹配但条件不满足，则跳过
 			if ((requiredPhase == null || requiredPhase == phase) && !condition.matches(this.context, metadata)) {
 				return true;
 			}
 		}
 
+		// ✅ 所有条件都满足，不跳过
 		return false;
 	}
 
@@ -131,7 +141,7 @@ class ConditionEvaluator {
 
 
 	/**
-	 * Implementation of a {@link ConditionContext}.
+	 * {@link ConditionContext}的实现。
 	 */
 	private static class ConditionContextImpl implements ConditionContext {
 

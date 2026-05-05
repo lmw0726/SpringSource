@@ -22,9 +22,9 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
- * Registers an {@link org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
- * AnnotationAwareAspectJAutoProxyCreator} against the current {@link BeanDefinitionRegistry}
- * as appropriate based on a given @{@link EnableAspectJAutoProxy} annotation.
+ * 根据给定的 @{@link EnableAspectJAutoProxy} 注解，向当前的 {@link BeanDefinitionRegistry}
+ * 注册一个适当的 {@link org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
+ * AnnotationAwareAspectJAutoProxyCreator}。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -34,23 +34,24 @@ import org.springframework.core.type.AnnotationMetadata;
 class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 
 	/**
-	 * Register, escalate, and configure the AspectJ auto proxy creator based on the value
-	 * of the @{@link EnableAspectJAutoProxy#proxyTargetClass()} attribute on the importing
-	 * {@code @Configuration} class.
+	 * 根据导入的 {@code @Configuration} 类上 @{@link EnableAspectJAutoProxy#proxyTargetClass()}
+	 * 属性的值，注册、升级并配置 AspectJ 自动代理创建器。
 	 */
 	@Override
 	public void registerBeanDefinitions(
 			AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-
+		// 将 AnnotationAwareAspectJAutoProxyCreator 注册成Bean定义
 		AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(registry);
-
+		// 获取 @EnableAspectJAutoProxy 的属性
 		AnnotationAttributes enableAspectJAutoProxy =
 				AnnotationConfigUtils.attributesFor(importingClassMetadata, EnableAspectJAutoProxy.class);
 		if (enableAspectJAutoProxy != null) {
 			if (enableAspectJAutoProxy.getBoolean("proxyTargetClass")) {
+				// 将 AnnotationAwareAspectJAutoProxyCreator 的 proxyTargetClass 属性值设置为true
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}
 			if (enableAspectJAutoProxy.getBoolean("exposeProxy")) {
+				// 将 AnnotationAwareAspectJAutoProxyCreator 的 exposeProxy 属性值设置为true
 				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);
 			}
 		}
