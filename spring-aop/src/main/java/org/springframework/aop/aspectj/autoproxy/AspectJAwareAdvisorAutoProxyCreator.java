@@ -16,14 +16,9 @@
 
 package org.springframework.aop.aspectj.autoproxy;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import org.aopalliance.aop.Advice;
 import org.aspectj.util.PartialOrder;
 import org.aspectj.util.PartialOrder.PartialComparable;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AbstractAspectJAdvice;
 import org.springframework.aop.aspectj.AspectJPointcutAdvisor;
@@ -32,6 +27,10 @@ import org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreat
 import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 import org.springframework.core.Ordered;
 import org.springframework.util.ClassUtils;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * {@link org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator}
@@ -64,20 +63,33 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 	 */
 	@Override
 	protected List<Advisor> sortAdvisors(List<Advisor> advisors) {
+		// 创建一个新的列表，用于存放“可部分比较”的 Advisor 包装对象
 		List<PartiallyComparableAdvisorHolder> partiallyComparableAdvisors = new ArrayList<>(advisors.size());
+		// 遍历原始 Advisor 列表
 		for (Advisor advisor : advisors) {
+			// 将 Advisor 包装成 PartiallyComparableAdvisorHolder
+			// 该包装类的作用：
+			// 1. 让 Advisor 支持“部分排序”（Partial Order）
+			// 2. 内部使用 DEFAULT_PRECEDENCE_COMPARATOR 作为优先级比较器
 			partiallyComparableAdvisors.add(
 					new PartiallyComparableAdvisorHolder(advisor, DEFAULT_PRECEDENCE_COMPARATOR));
 		}
+		// 使用 AspectJ 的 PartialOrder 算法进行排序
 		List<PartiallyComparableAdvisorHolder> sorted = PartialOrder.sort(partiallyComparableAdvisors);
 		if (sorted != null) {
 			List<Advisor> result = new ArrayList<>(advisors.size());
+			// 遍历排序后的包装对象
 			for (PartiallyComparableAdvisorHolder pcAdvisor : sorted) {
+				// 取出原始 Advisor，加入结果列表
 				result.add(pcAdvisor.getAdvisor());
 			}
+			// 返回排序后的 Advisor 列表
 			return result;
 		}
 		else {
+			// 如果 PartialOrder 排序失败（例如存在循环依赖或无法确定顺序）
+			// 回退到父类排序逻辑（通常是 AnnotationAwareOrderComparator）
+			// 即使用 @Order / Ordered 接口进行排序
 			return super.sortAdvisors(advisors);
 		}
 	}

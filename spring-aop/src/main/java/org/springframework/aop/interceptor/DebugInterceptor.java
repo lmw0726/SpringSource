@@ -60,8 +60,10 @@ public class DebugInterceptor extends SimpleTraceInterceptor {
 	@Nullable
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		synchronized (this) {
+			// 计数器+1
 			this.count++;
 		}
+		// 调用父类的处理方法
 		return super.invoke(invocation);
 	}
 

@@ -16,33 +16,11 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import org.aopalliance.aop.Advice;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.DeclareParents;
-import org.aspectj.lang.annotation.Pointcut;
-
+import org.aspectj.lang.annotation.*;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.MethodBeforeAdvice;
-import org.springframework.aop.aspectj.AbstractAspectJAdvice;
-import org.springframework.aop.aspectj.AspectJAfterAdvice;
-import org.springframework.aop.aspectj.AspectJAfterReturningAdvice;
-import org.springframework.aop.aspectj.AspectJAfterThrowingAdvice;
-import org.springframework.aop.aspectj.AspectJAroundAdvice;
-import org.springframework.aop.aspectj.AspectJExpressionPointcut;
-import org.springframework.aop.aspectj.AspectJMethodBeforeAdvice;
-import org.springframework.aop.aspectj.DeclareParentsAdvisor;
+import org.springframework.aop.aspectj.*;
 import org.springframework.aop.framework.AopConfigException;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
@@ -54,6 +32,14 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 import org.springframework.util.StringUtils;
 import org.springframework.util.comparator.InstanceComparator;
+
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * 工厂：给定遵循 AspectJ 注解语法的 AspectJ 类，
@@ -120,17 +106,25 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	@Override
 	public List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory) {
+		// 获取切面类（@Aspect 标注的类）
 		Class<?> aspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
+		// 获取切面名称（beanName）
 		String aspectName = aspectInstanceFactory.getAspectMetadata().getAspectName();
+		// 校验切面类是否合法（比如是否真的是一个切面）
 		validate(aspectClass);
 
-		// 我们需要用装饰器包装 MetadataAwareAspectInstanceFactory，
-		// 以便它只实例化一次。
+		// ===================== 核心设计 =====================
+		// 用装饰器包装原始工厂，保证切面实例只创建一次（懒加载单例）
+		// 我们需要用装饰器包装 MetadataAwareAspectInstanceFactory，以便它只实例化一次。
 		MetadataAwareAspectInstanceFactory lazySingletonAspectInstanceFactory =
 				new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
+		// 用于存放最终生成的 Advisor 列表
 		List<Advisor> advisors = new ArrayList<>();
+		// 遍历切面类中的所有“通知方法”（@Before / @Around / @After 等）
 		for (Method method : getAdvisorMethods(aspectClass)) {
+			// 将每个方法解析为 Advisor（Spring AOP 核心对象）
+			// 这里 declarationOrder 固定为 0（原因见下方说明）
 			// 在 Spring Framework 5.2.7 之前，advisors.size() 会作为 declarationOrderInAspect
 			// 传递给 getAdvisor(...)，用于表示声明方法列表中的“当前位置”。
 			// 然而，自 Java 7 起，“当前位置”不再有效，因为 JDK 不再
@@ -140,34 +134,49 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 			// 具体来说，值 0 与 AspectJPrecedenceComparator.getAspectDeclarationOrder(Advisor)
 			// 中使用的默认值一致。
 			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, 0, aspectName);
+			// 如果该方法可以生成 Advisor（说明是有效的增强方法）
 			if (advisor != null) {
+				// 加入结果集合
 				advisors.add(advisor);
 			}
 		}
 
+		// ===================== 特殊处理：延迟实例化切面 =====================
+		// 如果存在 Advisor，并且该切面是“懒加载实例化”的（如 perthis / pertarget）
 		// 如果是 per target 切面，则发出虚拟的实例化切面。
 		if (!advisors.isEmpty() && lazySingletonAspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
+			// 创建一个“合成 Advisor”，用于在真正执行前初始化切面实例
 			Advisor instantiationAdvisor = new SyntheticInstantiationAdvisor(lazySingletonAspectInstanceFactory);
 			advisors.add(0, instantiationAdvisor);
 		}
 
-		// 查找引介字段。
+		// ===================== 处理 @DeclareParents =====================
+		// 遍历切面类的所有字段
 		for (Field field : aspectClass.getDeclaredFields()) {
+			// 查找是否有 @DeclareParents（引介增强）
 			Advisor advisor = getDeclareParentsAdvisor(field);
+			// 如果存在，则加入 Advisor 列表
 			if (advisor != null) {
 				advisors.add(advisor);
 			}
 		}
-
+		// 返回最终 Advisor 列表
 		return advisors;
 	}
 
 	private List<Method> getAdvisorMethods(Class<?> aspectClass) {
+		// 创建一个集合，用于存放筛选出来的“通知方法”（@Before / @After / @Around 等）
 		List<Method> methods = new ArrayList<>();
+		// 使用 Spring 的反射工具类，遍历 aspectClass 中的所有方法
+		// methods::add → 符合条件的方法就加入到 methods 集合
+		// adviceMethodFilter → 过滤器，只保留“通知方法”（即带有 AOP 注解的方法）
 		ReflectionUtils.doWithMethods(aspectClass, methods::add, adviceMethodFilter);
+		// 如果方法数量大于 1，则需要排序（保证执行顺序稳定）
 		if (methods.size() > 1) {
+			// 按照 adviceMethodComparator 排序（基于注解类型、优先级等规则）
 			methods.sort(adviceMethodComparator);
 		}
+		// 返回最终筛选并排序后的通知方法列表
 		return methods;
 	}
 
@@ -179,16 +188,21 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	 */
 	@Nullable
 	private Advisor getDeclareParentsAdvisor(Field introductionField) {
+		// 从字段上获取 @DeclareParents 注解（用于引介增强）
 		DeclareParents declareParents = introductionField.getAnnotation(DeclareParents.class);
+		// 如果没有该注解，说明这个字段不是“引介字段”
 		if (declareParents == null) {
-			// 不是引介字段
+			// 不是引介增强，直接返回 null
 			return null;
 		}
 
+		// 如果没有指定 defaultImpl（默认实现类）
 		if (DeclareParents.class == declareParents.defaultImpl()) {
+			// ❌ 抛异常：@DeclareParents 必须指定 defaultImpl
 			throw new IllegalStateException("'defaultImpl' attribute must be set on DeclareParents");
 		}
-
+		// ===================== 构建引介 Advisor =====================
+		// 创建 DeclareParentsAdvisor（引介增强的 Advisor）
 		return new DeclareParentsAdvisor(
 				introductionField.getType(), declareParents.value(), declareParents.defaultImpl());
 	}
@@ -198,15 +212,27 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	@Nullable
 	public Advisor getAdvisor(Method candidateAdviceMethod, MetadataAwareAspectInstanceFactory aspectInstanceFactory,
 			int declarationOrderInAspect, String aspectName) {
-
+		// ===================== 校验切面类是否合法 =====================
+		// 获取切面类，并再次进行校验（是否是合法 @Aspect、是否支持等）
 		validate(aspectInstanceFactory.getAspectMetadata().getAspectClass());
 
+		// ===================== 构建切点（Pointcut） =====================
+		// 根据当前方法（如 @Before / @Around）解析出切点表达式（AspectJ 表达式）
 		AspectJExpressionPointcut expressionPointcut = getPointcut(
 				candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
+		// 如果该方法不是一个合法的增强方法（没有切点表达式等）
 		if (expressionPointcut == null) {
+			// 返回 null，表示该方法不能转为 Advisor
 			return null;
 		}
 
+		// ===================== 构建 Advisor =====================
+		// 创建 Advisor（Spring AOP核心对象）
+		// 内部包含：
+		// - Pointcut（切点）
+		// - Advice（增强逻辑）
+		// - 切面实例工厂
+		// - 排序信息等
 		return new InstantiationModelAwarePointcutAdvisorImpl(expressionPointcut, candidateAdviceMethod,
 				this, aspectInstanceFactory, declarationOrderInAspect, aspectName);
 	}

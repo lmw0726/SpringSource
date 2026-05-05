@@ -16,8 +16,6 @@
 
 package org.springframework.aop.framework.autoproxy;
 
-import java.util.List;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.support.AopUtils;
@@ -26,6 +24,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * 通用自动代理创建器，基于为每个 bean 检测到的 Advisor，
@@ -92,12 +92,18 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
+		// 获取所有候选 Advisor 列表
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		// 从候选 Advisor 中筛选出“可以应用到当前 bean”的 Advisor
+		// 👉 会根据 Pointcut 判断是否匹配该 bean
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+		// 扩展 Advisor
 		extendAdvisors(eligibleAdvisors);
+		// 如果存在可用的 Advisor，则进行排序
 		if (!eligibleAdvisors.isEmpty()) {
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
 		}
+		// 返回最终“适用于当前 bean”的 Advisor 列表
 		return eligibleAdvisors;
 	}
 
@@ -121,12 +127,14 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findAdvisorsThatCanApply(
 			List<Advisor> candidateAdvisors, Class<?> beanClass, String beanName) {
-
+		// 将当前正在被代理的 beanName 设置到 ThreadLocal 中
 		ProxyCreationContext.setCurrentProxiedBeanName(beanName);
 		try {
+		  	// 从候选 Advisor 中筛选出“可以应用到当前 beanClass”的 Advisor
 			return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);
 		}
 		finally {
+			// 清除当前线程中的 beanName
 			ProxyCreationContext.setCurrentProxiedBeanName(null);
 		}
 	}

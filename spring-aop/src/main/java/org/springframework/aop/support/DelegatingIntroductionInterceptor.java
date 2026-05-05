@@ -99,6 +99,7 @@ public class DelegatingIntroductionInterceptor extends IntroductionInfoSupport
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		// 判断当前调用的方法是否属于“引介接口”（Introduction 接口）
 		if (isMethodOnIntroducedInterface(mi)) {
 			// 使用以下方法而不是直接反射，
 			// 可以在被引介方法抛出异常时，
@@ -107,15 +108,20 @@ public class DelegatingIntroductionInterceptor extends IntroductionInfoSupport
 
 			// 如果可能，调整返回值：如果委托返回了自身，
 			// 我们真正想返回的是代理。
+			// 如果返回值正好是 delegate 自身，并且当前调用是代理调用
 			if (retVal == this.delegate && mi instanceof ProxyMethodInvocation) {
+				// 获取当前代理对象
 				Object proxy = ((ProxyMethodInvocation) mi).getProxy();
+				// 如果方法的返回类型可以接收 proxy（类型兼容）
 				if (mi.getMethod().getReturnType().isInstance(proxy)) {
+					// 将返回值从 delegate 替换为 proxy
 					retVal = proxy;
 				}
 			}
+			// 返回最终结果
 			return retVal;
 		}
-
+		// 如果不是引介接口的方法，则走正常的拦截器链执行流程
 		return doProceed(mi);
 	}
 

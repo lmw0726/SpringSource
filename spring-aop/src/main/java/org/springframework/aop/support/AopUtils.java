@@ -16,6 +16,14 @@
 
 package org.springframework.aop.support;
 
+import org.springframework.aop.*;
+import org.springframework.core.BridgeMethodResolver;
+import org.springframework.core.MethodIntrospector;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -24,22 +32,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.springframework.aop.Advisor;
-import org.springframework.aop.AopInvocationException;
-import org.springframework.aop.IntroductionAdvisor;
-import org.springframework.aop.IntroductionAwareMethodMatcher;
-import org.springframework.aop.MethodMatcher;
-import org.springframework.aop.Pointcut;
-import org.springframework.aop.PointcutAdvisor;
-import org.springframework.aop.SpringProxy;
-import org.springframework.aop.TargetClassAware;
-import org.springframework.core.BridgeMethodResolver;
-import org.springframework.core.MethodIntrospector;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ReflectionUtils;
 
 /**
  * AOP 支持代码的工具方法。
@@ -212,39 +204,61 @@ public abstract class AopUtils {
 	 * @return 切点是否可以应用于任何方法
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
+		// 断言：Pointcut 不能为空
 		Assert.notNull(pc, "Pointcut must not be null");
+		// ===================== 第一步：类级别匹配 =====================
+		// 如果 ClassFilter 不匹配当前目标类，直接返回 false
+		// 👉 不需要继续判断方法（性能优化）
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
-
+		// ===================== 第二步：获取方法匹配器 =====================
+		// 获取 MethodMatcher（用于判断方法是否匹配）
 		MethodMatcher methodMatcher = pc.getMethodMatcher();
+
+		// 如果是“全匹配”（匹配所有方法）
 		if (methodMatcher == MethodMatcher.TRUE) {
 			// 如果无论如何都匹配任何方法，则无需迭代方法...
+			// 👉 不需要遍历方法，直接返回 true
 			return true;
 		}
-
+		// ===================== 第三步：是否支持引介增强 =====================
 		IntroductionAwareMethodMatcher introductionAwareMethodMatcher = null;
+		// 如果该 MethodMatcher 支持“引介增强感知”
 		if (methodMatcher instanceof IntroductionAwareMethodMatcher) {
+			// 转换为支持引介的匹配器
 			introductionAwareMethodMatcher = (IntroductionAwareMethodMatcher) methodMatcher;
 		}
-
+		// ===================== 第四步：收集需要检查的类 =====================
+		// 使用 LinkedHashSet 保证顺序 + 去重
 		Set<Class<?>> classes = new LinkedHashSet<>();
+		// 如果目标类不是 JDK 动态代理类
 		if (!Proxy.isProxyClass(targetClass)) {
+			// 获取用户真实类（去掉 CGLIB 代理）
 			classes.add(ClassUtils.getUserClass(targetClass));
 		}
+		// 加入该类实现的所有接口
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
-
+		// ===================== 第五步：方法级匹配（核心） =====================
+		// 遍历所有类（目标类 + 接口）
 		for (Class<?> clazz : classes) {
+			// 获取该类的所有方法（包括私有方法）
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
+			// 遍历方法
 			for (Method method : methods) {
+				// 如果是“支持引介增强”的匹配器
 				if (introductionAwareMethodMatcher != null ?
+						// 使用带 hasIntroductions 参数的匹配方法
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
+						// 否则使用普通匹配
 						methodMatcher.matches(method, targetClass)) {
+					// 只要有一个方法匹配成功 → 返回 true
 					return true;
 				}
 			}
 		}
 
+		// 如果没有任何方法匹配 → 返回 false
 		return false;
 	}
 
@@ -269,14 +283,31 @@ public abstract class AopUtils {
 	 * @return 切点是否可以应用于任何方法
 	 */
 	public static boolean canApply(Advisor advisor, Class<?> targetClass, boolean hasIntroductions) {
+		// ===================== 情况1：引介增强（IntroductionAdvisor） =====================
+		// 如果是引介增强（@DeclareParents）
 		if (advisor instanceof IntroductionAdvisor) {
+
+			// 判断该引介增强的 ClassFilter 是否匹配目标类
+			// 👉 只关心“类级别匹配”，不涉及方法
 			return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
 		}
+
+		// ===================== 情况2：普通切点增强（PointcutAdvisor） =====================
+		// 如果是普通 Advisor（包含 Pointcut + Advice）
 		else if (advisor instanceof PointcutAdvisor) {
+			// 强转为 PointcutAdvisor
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
+			// 调用重载方法，判断该 Pointcut 是否可以应用到目标类
+			// 👉 内部会检查：
+			//   - ClassFilter（类匹配）
+			//   - MethodMatcher（方法匹配）
+			//   - hasIntroductions（是否有引介增强影响）
 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
 		}
+		// ===================== 情况3：无切点的 Advisor =====================
 		else {
+			// 如果既不是 IntroductionAdvisor，也不是 PointcutAdvisor
+			// 👉 说明没有切点限制（例如一些特殊 Advisor）
 			// 它没有切点，因此我们假定它适用。
 			return true;
 		}
@@ -290,49 +321,62 @@ public abstract class AopUtils {
 	 * （可以是传入的原始 List）
 	 */
 	public static List<Advisor> findAdvisorsThatCanApply(List<Advisor> candidateAdvisors, Class<?> clazz) {
+		// 如果候选 Advisor 为空，直接返回
 		if (candidateAdvisors.isEmpty()) {
 			return candidateAdvisors;
 		}
+		// 用于存放最终“可应用”的 Advisor
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
+		// ===================== 第一轮：处理 IntroductionAdvisor =====================
+		// 遍历所有候选 Advisor
 		for (Advisor candidate : candidateAdvisors) {
+			// 如果是“引介增强”（@DeclareParents 对应的 Advisor）
 			if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
+				// 如果该引介增强可以作用在当前类上，加入结果
 				eligibleAdvisors.add(candidate);
 			}
 		}
+		// 判断当前是否存在“引介增强”
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
+		// ===================== 第二轮：处理普通 Advisor =====================
+		// 再次遍历所有候选 Advisor
 		for (Advisor candidate : candidateAdvisors) {
+			// 如果是 IntroductionAdvisor（第一轮已经处理过）
 			if (candidate instanceof IntroductionAdvisor) {
 				// 已处理
 				continue;
 			}
+			// 判断普通 Advisor 是否可以应用到当前类
+			// ⚠️ 注意：这里会传入 hasIntroductions（是否有引介增强）
 			if (canApply(candidate, clazz, hasIntroductions)) {
 				eligibleAdvisors.add(candidate);
 			}
 		}
+		// 返回最终“适用于当前类”的 Advisor 列表
 		return eligibleAdvisors;
 	}
 
 	/**
-	 * Invoke the given target via reflection, as part of an AOP method invocation.
-	 * @param target the target object
-	 * @param method the method to invoke
-	 * @param args the arguments for the method
-	 * @return the invocation result, if any
-	 * @throws Throwable if thrown by the target method
-	 * @throws org.springframework.aop.AopInvocationException in case of a reflection error
+	 * 通过反射调用给定的目标方法，作为 AOP 方法调用的一部分。
+	 * @param target 目标对象
+	 * @param method 要调用的方法
+	 * @param args 方法的参数
+	 * @return 调用结果（如果有）
+	 * @throws Throwable 如果目标方法抛出异常
+	 * @throws org.springframework.aop.AopInvocationException 在反射调用出错时抛出
 	 */
 	@Nullable
 	public static Object invokeJoinpointUsingReflection(@Nullable Object target, Method method, Object[] args)
 			throws Throwable {
 
-		// Use reflection to invoke the method.
+		// 使用反射调用该方法
 		try {
 			ReflectionUtils.makeAccessible(method);
 			return method.invoke(target, args);
 		}
 		catch (InvocationTargetException ex) {
-			// Invoked method threw a checked exception.
-			// We must rethrow it. The client won't see the interceptor.
+			// 被调用的方法抛出了异常（受检异常）
+			// 我们必须重新抛出它，客户端不会看到拦截器
 			throw ex.getTargetException();
 		}
 		catch (IllegalArgumentException ex) {

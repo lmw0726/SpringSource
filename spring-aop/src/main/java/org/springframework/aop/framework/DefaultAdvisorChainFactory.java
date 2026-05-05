@@ -16,23 +16,18 @@
 
 package org.springframework.aop.framework;
 
+import org.aopalliance.intercept.Interceptor;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.springframework.aop.*;
+import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
+import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
+import org.springframework.lang.Nullable;
+
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.aopalliance.intercept.Interceptor;
-import org.aopalliance.intercept.MethodInterceptor;
-
-import org.springframework.aop.Advisor;
-import org.springframework.aop.IntroductionAdvisor;
-import org.springframework.aop.IntroductionAwareMethodMatcher;
-import org.springframework.aop.MethodMatcher;
-import org.springframework.aop.PointcutAdvisor;
-import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
-import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
-import org.springframework.lang.Nullable;
 
 /**
  * 在给定 {@link Advised} 对象的情况下，
@@ -53,56 +48,79 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 
 		// 这有点棘手... 我们必须先处理 introductions，
 		// 但需要在最终列表中保留顺序。
+		// 获取 Advisor 适配器注册器（负责把 Advice → MethodInterceptor）
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
+		// 获取当前代理对象中的所有 Advisor（切面 = Pointcut + Advice）
 		Advisor[] advisors = config.getAdvisors();
+		// 创建拦截器列表，用于存储最终结果
 		List<Object> interceptorList = new ArrayList<>(advisors.length);
+		// 确定实际类（优先 targetClass，否则用方法声明类）
 		Class<?> actualClass = (targetClass != null ? targetClass : method.getDeclaringClass());
+		// 是否存在 Introduction（引入增强）标记（延迟计算）
 		Boolean hasIntroductions = null;
-
+		// 遍历所有 Advisor（核心循环）
 		for (Advisor advisor : advisors) {
+			// ==================== 第一类：PointcutAdvisor ====================
 			if (advisor instanceof PointcutAdvisor) {
 				// 有条件地添加它。
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
+				// 类级别匹配（ClassFilter）
 				if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {
+					// 获取方法匹配器
 					MethodMatcher mm = pointcutAdvisor.getPointcut().getMethodMatcher();
 					boolean match;
+					// ==================== 支持 Introduction 感知 ====================
 					if (mm instanceof IntroductionAwareMethodMatcher) {
+						// 延迟计算是否有 Introduction Advisor
 						if (hasIntroductions == null) {
 							hasIntroductions = hasMatchingIntroductions(advisors, actualClass);
 						}
+						// 方法匹配（带 introduction 信息）
 						match = ((IntroductionAwareMethodMatcher) mm).matches(method, actualClass, hasIntroductions);
 					}
 					else {
+						// 普通方法匹配（静态匹配）
 						match = mm.matches(method, actualClass);
 					}
+					// ==================== 方法匹配成功 ====================
 					if (match) {
+						// 将 Advisor 转换为 MethodInterceptor（关键）
 						MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
+						// ==================== 动态匹配 ====================
 						if (mm.isRuntime()) {
 							// 在 getInterceptors() 方法中创建新的对象实例
 							// 不是问题，因为我们通常会缓存已创建的链。
+							// 需要运行时判断（例如参数判断）
 							for (MethodInterceptor interceptor : interceptors) {
+								// 包装成 动态匹配拦截器
 								interceptorList.add(new InterceptorAndDynamicMethodMatcher(interceptor, mm));
 							}
 						}
 						else {
+							// 静态匹配（直接加入）
 							interceptorList.addAll(Arrays.asList(interceptors));
 						}
 					}
 				}
 			}
+			// ==================== 第二类：IntroductionAdvisor ====================
 			else if (advisor instanceof IntroductionAdvisor) {
 				IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
+				// 类匹配
 				if (config.isPreFiltered() || ia.getClassFilter().matches(actualClass)) {
+					// 转换为拦截器
 					Interceptor[] interceptors = registry.getInterceptors(advisor);
 					interceptorList.addAll(Arrays.asList(interceptors));
 				}
 			}
+			// ==================== 第三类：普通 Advisor ====================
 			else {
+				// 不需要匹配，直接转换
 				Interceptor[] interceptors = registry.getInterceptors(advisor);
 				interceptorList.addAll(Arrays.asList(interceptors));
 			}
 		}
-
+		// 返回最终拦截器链
 		return interceptorList;
 	}
 

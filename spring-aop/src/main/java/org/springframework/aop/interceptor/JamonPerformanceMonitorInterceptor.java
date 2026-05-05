@@ -103,11 +103,13 @@ public class JamonPerformanceMonitorInterceptor extends AbstractMonitoringInterc
 	 */
 	@Override
 	protected Object invokeUnderTrace(MethodInvocation invocation, Log logger) throws Throwable {
+		// 创建调用跟踪名称
 		String name = createInvocationTraceName(invocation);
 		MonKey key = new MonKeyImp(name, name, "ms.");
-
+		// 开启监控
 		Monitor monitor = MonitorFactory.start(key);
 		try {
+			// 处理目标方法，并返回结果值
 			return invocation.proceed();
 		}
 		catch (Throwable ex) {
@@ -115,8 +117,10 @@ public class JamonPerformanceMonitorInterceptor extends AbstractMonitoringInterc
 			throw ex;
 		}
 		finally {
+			// 结束监控
 			monitor.stop();
 			if (!this.trackAllInvocations || isLogEnabled(logger)) {
+				// 如果开启了日志写入功能，写入日志
 				writeToLog(logger, "JAMon performance statistics for method [" + name + "]:\n" + monitor);
 			}
 		}

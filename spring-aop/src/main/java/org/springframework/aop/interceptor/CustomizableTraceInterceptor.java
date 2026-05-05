@@ -16,19 +16,18 @@
 
 package org.springframework.aop.interceptor;
 
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
-
 import org.springframework.core.Constants;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
+
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * {@code MethodInterceptor} 实现，使用占位符提供高度可定制的
@@ -231,14 +230,18 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 	 */
 	@Override
 	protected Object invokeUnderTrace(MethodInvocation invocation, Log logger) throws Throwable {
+		// 获取限定的方法名称
 		String name = ClassUtils.getQualifiedMethodName(invocation.getMethod());
 		StopWatch stopWatch = new StopWatch(name);
 		Object returnValue = null;
 		boolean exitThroughException = false;
 		try {
+			// 开启计时器
 			stopWatch.start(name);
+			// 写入Trace级别的日志
 			writeToLog(logger,
 					replacePlaceholders(this.enterMessage, invocation, null, null, -1));
+			// 处理目标方法，并返回结果
 			returnValue = invocation.proceed();
 			return returnValue;
 		}
@@ -254,8 +257,10 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 		finally {
 			if (!exitThroughException) {
 				if (stopWatch.isRunning()) {
+					// 结束计时器
 					stopWatch.stop();
 				}
+				// 将总耗时写入日志
 				writeToLog(logger, replacePlaceholders(
 						this.exitMessage, invocation, returnValue, null, stopWatch.getTotalTimeMillis()));
 			}

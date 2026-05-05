@@ -16,10 +16,10 @@
 
 package org.springframework.aop.framework;
 
+import org.springframework.util.Assert;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.util.Assert;
 
 /**
  * 代理工厂的基类。
@@ -98,9 +98,13 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	 * 它们<b>不应</b>以 {@code this} 作为参数创建 AOP 代理。
 	 */
 	protected final synchronized AopProxy createAopProxy() {
+		// 如果当前 ProxyFactory 还未激活
 		if (!this.active) {
+			// 执行激活逻辑
 			activate();
 		}
+		// 获取 AopProxyFactory（默认是 DefaultAopProxyFactory）
+		// 并根据当前配置创建具体的 AopProxy 实例
 		return getAopProxyFactory().createAopProxy(this);
 	}
 
@@ -111,6 +115,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	private void activate() {
 		this.active = true;
 		for (AdvisedSupportListener listener : this.listeners) {
+			// 触发建言支持监听器的激活方法
 			listener.activated(this);
 		}
 	}

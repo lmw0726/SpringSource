@@ -16,15 +16,14 @@
 
 package org.springframework.aop.framework.adapter;
 
+import org.aopalliance.aop.Advice;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.aopalliance.aop.Advice;
-import org.aopalliance.intercept.MethodInterceptor;
-
-import org.springframework.aop.Advisor;
-import org.springframework.aop.support.DefaultPointcutAdvisor;
 
 /**
  * {@link AdvisorAdapterRegistry} 接口的默认实现。
@@ -77,19 +76,27 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 
 	@Override
 	public MethodInterceptor[] getInterceptors(Advisor advisor) throws UnknownAdviceTypeException {
+		// 创建拦截器列表，用于存储转换出来的多个拦截器
 		List<MethodInterceptor> interceptors = new ArrayList<>(3);
+		// 获取 Advisor 中的 Advice（增强逻辑）
 		Advice advice = advisor.getAdvice();
+		// 如果 Advice 本身就是 MethodInterceptor，直接使用（无需适配）
 		if (advice instanceof MethodInterceptor) {
 			interceptors.add((MethodInterceptor) advice);
 		}
+		// 遍历所有适配器，将不同类型的 Advice 转换为 MethodInterceptor
 		for (AdvisorAdapter adapter : this.adapters) {
+			// 判断该适配器是否支持当前 Advice 类型
 			if (adapter.supportsAdvice(advice)) {
+				// 使用适配器将 Advisor 转换为 MethodInterceptor
 				interceptors.add(adapter.getInterceptor(advisor));
 			}
 		}
+		// 如果没有任何适配结果，说明该 Advice 类型无法识别
 		if (interceptors.isEmpty()) {
 			throw new UnknownAdviceTypeException(advisor.getAdvice());
 		}
+		// 返回拦截器数组（供 AOP 调用链使用）
 		return interceptors.toArray(new MethodInterceptor[0]);
 	}
 

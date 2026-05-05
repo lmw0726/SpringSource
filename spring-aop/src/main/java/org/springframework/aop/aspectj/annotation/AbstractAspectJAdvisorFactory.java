@@ -16,6 +16,17 @@
 
 package org.springframework.aop.aspectj.annotation;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.AjType;
+import org.aspectj.lang.reflect.AjTypeSystem;
+import org.aspectj.lang.reflect.PerClauseKind;
+import org.springframework.aop.framework.AopConfigException;
+import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -24,24 +35,6 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.AjType;
-import org.aspectj.lang.reflect.AjTypeSystem;
-import org.aspectj.lang.reflect.PerClauseKind;
-
-import org.springframework.aop.framework.AopConfigException;
-import org.springframework.core.ParameterNameDiscoverer;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.lang.Nullable;
 
 /**
  * 可以从遵循 AspectJ 5 注解语法的类中创建 Spring AOP Advisor 的工厂的抽象基类。
@@ -101,23 +94,36 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 
 	@Override
 	public void validate(Class<?> aspectClass) throws AopConfigException {
+		// ===================== 校验1：切面继承关系 =====================
+		// 获取当前切面的父类
 		// 如果父类有该注解且不是抽象的，则是一个错误
 		Class<?> superclass = aspectClass.getSuperclass();
+		// 如果父类也标注了 @Aspect，并且不是抽象类
 		if (superclass.getAnnotation(Aspect.class) != null &&
 				!Modifier.isAbstract(superclass.getModifiers())) {
+			// ❌ 抛异常：不允许继承“具体的切面类”
 			throw new AopConfigException("[" + aspectClass.getName() + "] cannot extend concrete aspect [" +
 					superclass.getName() + "]");
 		}
 
+		// ===================== 校验2：是否真的是 Aspect =====================
+		// 将普通 Class 转换为 AspectJ 的 AjType（用于解析切面元信息）
 		AjType<?> ajType = AjTypeSystem.getAjType(aspectClass);
+		// 如果该类不是一个 Aspect（没有 @Aspect）
 		if (!ajType.isAspect()) {
+			// ❌ 抛异常：不是合法的 @Aspect 切面
 			throw new NotAnAtAspectException(aspectClass);
 		}
+		// ===================== 校验3：不支持的切面模型 =====================
+		// 如果切面使用 percflow（控制流级别实例化）
 		if (ajType.getPerClause().getKind() == PerClauseKind.PERCFLOW) {
+			// ❌ Spring AOP 不支持这种模型
 			throw new AopConfigException(aspectClass.getName() + " uses percflow instantiation model: " +
 					"This is not supported in Spring AOP.");
 		}
+		// 如果切面使用 percflowbelow（控制流以下）
 		if (ajType.getPerClause().getKind() == PerClauseKind.PERCFLOWBELOW) {
+			// ❌ 同样不支持
 			throw new AopConfigException(aspectClass.getName() + " uses percflowbelow instantiation model: " +
 					"This is not supported in Spring AOP.");
 		}

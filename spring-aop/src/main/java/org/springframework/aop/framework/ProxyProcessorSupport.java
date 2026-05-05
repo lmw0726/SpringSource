@@ -16,8 +16,6 @@
 
 package org.springframework.aop.framework;
 
-import java.io.Closeable;
-
 import org.springframework.beans.factory.Aware;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
@@ -26,6 +24,8 @@ import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
+
+import java.io.Closeable;
 
 /**
  * 代理处理器的通用功能基类，特别是 ClassLoader 管理
@@ -101,22 +101,36 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 	 * @param proxyFactory bean 的 ProxyFactory
 	 */
 	protected void evaluateProxyInterfaces(Class<?> beanClass, ProxyFactory proxyFactory) {
+		// 获取 bean类型 实现的所有接口（包括父类继承的接口）
 		Class<?>[] targetInterfaces = ClassUtils.getAllInterfacesForClass(beanClass, getProxyClassLoader());
+		// 是否存在“合理的”代理接口
 		boolean hasReasonableProxyInterface = false;
+		// 遍历所有接口
 		for (Class<?> ifc : targetInterfaces) {
+			// 判断该接口是否：
+			// 1. 不是 Spring 内部的配置回调接口（如 InitializingBean 等）
+			// 2. 不是语言级内部接口（如 Groovy、CGLIB 生成的接口等）
+			// 3. 并且该接口至少声明了一个方法（空接口没有代理意义）
 			if (!isConfigurationCallbackInterface(ifc) && !isInternalLanguageInterface(ifc) &&
 					ifc.getMethods().length > 0) {
+				// 找到一个“合理接口”，可以用于 JDK 动态代理
 				hasReasonableProxyInterface = true;
+				// 一旦找到即可退出循环
 				break;
 			}
 		}
+		// 如果存在合适的接口
 		if (hasReasonableProxyInterface) {
 			// 必须允许引介；不能只将接口设置为目标的接口。
+			// 遍历所有接口
 			for (Class<?> ifc : targetInterfaces) {
+				// 将接口加入 ProxyFactory（用于 JDK 动态代理）
 				proxyFactory.addInterface(ifc);
 			}
 		}
 		else {
+			// 如果没有任何“合理接口”
+			// 则强制使用 CGLIB 代理（基于类，而不是接口）
 			proxyFactory.setProxyTargetClass(true);
 		}
 	}

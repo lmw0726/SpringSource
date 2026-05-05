@@ -16,14 +16,13 @@
 
 package org.springframework.aop.aspectj;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-
 import org.springframework.aop.AfterAdvice;
 import org.springframework.lang.Nullable;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * 包装 AspectJ after 通知方法的 Spring AOP 通知。
@@ -46,9 +45,11 @@ public class AspectJAfterAdvice extends AbstractAspectJAdvice
 	@Nullable
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {
+			// 执行拦截器链
 			return mi.proceed();
 		}
 		finally {
+			// 无论方法是正常返回还是抛出异常，都会执行该通知方法。
 			invokeAdviceMethod(getJoinPointMatch(), null, null);
 		}
 	}

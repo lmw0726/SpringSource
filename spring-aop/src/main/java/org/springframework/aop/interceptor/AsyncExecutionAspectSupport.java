@@ -16,19 +16,8 @@
 
 package org.springframework.aop.interceptor;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
-import java.util.function.Supplier;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -43,6 +32,11 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.function.SingletonSupplier;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 /**
  * 异步方法执行切面的基类，例如
@@ -164,23 +158,34 @@ public abstract class AsyncExecutionAspectSupport implements BeanFactoryAware {
 	 */
 	@Nullable
 	protected AsyncTaskExecutor determineAsyncExecutor(Method method) {
+		// 从缓存中获取该方法对应的执行器
 		AsyncTaskExecutor executor = this.executors.get(method);
+		// 如果缓存中没有
 		if (executor == null) {
 			Executor targetExecutor;
+			// 获取方法上的执行器限定符（例如 @Async("myExecutor")）
 			String qualifier = getExecutorQualifier(method);
+			// 如果指定了 限定符
 			if (StringUtils.hasLength(qualifier)) {
+				// 根据名称从 BeanFactory 中查找对应的 Executor
 				targetExecutor = findQualifiedExecutor(this.beanFactory, qualifier);
 			}
 			else {
+				// 否则使用默认的 Executor
 				targetExecutor = this.defaultExecutor.get();
 			}
+			// 如果没有找到任何 Executor，返回 null
 			if (targetExecutor == null) {
 				return null;
 			}
+			// 如果目标 Executor 已经是 AsyncListenableTaskExecutor 类型，直接使用
+			// 否则使用 TaskExecutorAdapter 进行包装，统一接口
 			executor = (targetExecutor instanceof AsyncListenableTaskExecutor ?
 					(AsyncListenableTaskExecutor) targetExecutor : new TaskExecutorAdapter(targetExecutor));
+			// 放入缓存
 			this.executors.put(method, executor);
 		}
+		// 返回最终确定的异步执行器
 		return executor;
 	}
 

@@ -65,21 +65,32 @@ public class BeanFactoryAdvisorRetrievalHelper {
 	 */
 	public List<Advisor> findAdvisorBeans() {
 		// 确定 Advisor bean 名称列表（如果尚未缓存）。
+		// 获取缓存的 Advisor bean 名称数组
 		String[] advisorNames = this.cachedAdvisorBeanNames;
+		// 如果缓存为空
 		if (advisorNames == null) {
 			// 不要在此处初始化 FactoryBeans：我们需要让所有常规 bean
 			// 保持未初始化状态，以便让自动代理创建器应用于它们！
+			// ⚠️ 注意：这里不会初始化 FactoryBean
+			// 原因：希望普通 bean 仍保持“未实例化”，以便后续能被 AOP 代理
+			// 从 BeanFactory 中获取所有类型为 Advisor 的 bean 名称
 			advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 					this.beanFactory, Advisor.class, true, false);
+			// 缓存 Advisor 名称，避免下次重复扫描
 			this.cachedAdvisorBeanNames = advisorNames;
 		}
+		// 如果没有任何 Advisor，直接返回空列表
 		if (advisorNames.length == 0) {
 			return new ArrayList<>();
 		}
 
+		// 创建结果集合，用于存放最终可用的 Advisor 实例
 		List<Advisor> advisors = new ArrayList<>();
+		// 遍历所有 Advisor bean 名称
 		for (String name : advisorNames) {
+			// 判断该 bean 是否是合格的 bean
 			if (isEligibleBean(name)) {
+				// 如果当前 Advisor 正在创建中
 				if (this.beanFactory.isCurrentlyInCreation(name)) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("Skipping currently created advisor '" + name + "'");
@@ -87,13 +98,18 @@ public class BeanFactoryAdvisorRetrievalHelper {
 				}
 				else {
 					try {
+						// 从容器中获取 Advisor 实例，并加入结果集
 						advisors.add(this.beanFactory.getBean(name, Advisor.class));
 					}
 					catch (BeanCreationException ex) {
+						// 获取最底层异常原因
 						Throwable rootCause = ex.getMostSpecificCause();
+						// 如果是 Bean 当前正在创建异常
 						if (rootCause instanceof BeanCurrentlyInCreationException) {
 							BeanCreationException bce = (BeanCreationException) rootCause;
+							// 获取导致异常的 bean 名称
 							String bceBeanName = bce.getBeanName();
+							// 如果这个 bean 也正处于创建中
 							if (bceBeanName != null && this.beanFactory.isCurrentlyInCreation(bceBeanName)) {
 								if (logger.isTraceEnabled()) {
 									logger.trace("Skipping advisor '" + name +
@@ -101,9 +117,11 @@ public class BeanFactoryAdvisorRetrievalHelper {
 								}
 								// 忽略：表示对我们要通知的 bean 的反向引用。
 								// 我们要查找除当前创建的 bean 本身之外的其他 advisor。
+								// 忽略该 Advisor，说明它依赖当前正在创建的 bean
 								continue;
 							}
 						}
+						// 其他异常直接抛出
 						throw ex;
 					}
 				}

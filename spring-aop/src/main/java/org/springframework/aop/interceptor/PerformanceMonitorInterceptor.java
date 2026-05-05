@@ -54,14 +54,19 @@ public class PerformanceMonitorInterceptor extends AbstractMonitoringInterceptor
 
 	@Override
 	protected Object invokeUnderTrace(MethodInvocation invocation, Log logger) throws Throwable {
+		// 创建调用跟踪名称
 		String name = createInvocationTraceName(invocation);
 		StopWatch stopWatch = new StopWatch(name);
+		// 开启计时器
 		stopWatch.start(name);
 		try {
+			// 处理目标方法并返回值
 			return invocation.proceed();
 		}
 		finally {
+			// 停止计时
 			stopWatch.stop();
+			// 写入总耗时到日志中（Trace级别）
 			writeToLog(logger, stopWatch.shortSummary());
 		}
 	}

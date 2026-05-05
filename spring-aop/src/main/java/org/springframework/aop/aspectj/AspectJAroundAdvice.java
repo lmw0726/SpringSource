@@ -16,16 +16,15 @@
 
 package org.springframework.aop.aspectj;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.weaver.tools.JoinPointMatch;
-
 import org.springframework.aop.ProxyMethodInvocation;
 import org.springframework.lang.Nullable;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * Spring AOP 环绕通知（MethodInterceptor），用于包装
@@ -63,12 +62,17 @@ public class AspectJAroundAdvice extends AbstractAspectJAdvice implements Method
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		// 判断当前 MethodInvocation 是否为 Spring 的 ProxyMethodInvocation
 		if (!(mi instanceof ProxyMethodInvocation)) {
+			// 如果不是，说明当前不在 Spring AOP 代理调用链中，直接抛异常
 			throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
 		}
 		ProxyMethodInvocation pmi = (ProxyMethodInvocation) mi;
+		// 懒加载获取 ProceedingJoinPoint
 		ProceedingJoinPoint pjp = lazyGetProceedingJoinPoint(pmi);
+		// 获取当前连接点匹配信息
 		JoinPointMatch jpm = getJoinPointMatch(pmi);
+		// 调用 Advice 方法（即 @Around 对应的方法）
 		return invokeAdviceMethod(pjp, jpm, null, null);
 	}
 

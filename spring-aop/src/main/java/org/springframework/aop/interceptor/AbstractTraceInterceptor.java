@@ -16,16 +16,15 @@
 
 package org.springframework.aop.interceptor;
 
-import java.io.Serializable;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.support.AopUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
 
 /**
  * 用于跟踪的基础 {@code MethodInterceptor} 实现。
@@ -122,11 +121,15 @@ public abstract class AbstractTraceInterceptor implements MethodInterceptor, Ser
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation invocation) throws Throwable {
+		// 获取日志记录器
 		Log logger = getLoggerForInvocation(invocation);
+		// 如果启用了拦截器
 		if (isInterceptorEnabled(invocation, logger)) {
+			// 调用 invokeUnderTrace 方法
 			return invokeUnderTrace(invocation, logger);
 		}
 		else {
+			// 否则直接执行目标方法（Joinpoint#proceed()）
 			return invocation.proceed();
 		}
 	}

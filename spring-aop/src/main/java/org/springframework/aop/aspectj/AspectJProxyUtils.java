@@ -16,13 +16,13 @@
 
 package org.springframework.aop.aspectj;
 
-import java.util.List;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.PointcutAdvisor;
 import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 /**
  * 处理 AspectJ 代理的实用方法。
@@ -45,12 +45,12 @@ public abstract class AspectJProxyUtils {
 	 * 否则返回 {@code false}
 	 */
 	public static boolean makeAdvisorChainAspectJCapableIfNecessary(List<Advisor> advisors) {
-		// Don't add advisors to an empty list; may indicate that proxying is just not required
+		// 不要在空列表中添加 advisor；这可能意味着根本不需要进行代理
 		if (!advisors.isEmpty()) {
 			boolean foundAspectJAdvice = false;
 			for (Advisor advisor : advisors) {
-				// Be careful not to get the Advice without a guard, as this might eagerly
-				// instantiate a non-singleton AspectJ aspect...
+				// 注意：不要在没有保护的情况下直接获取 Advice，
+				// 因为这可能会提前实例化一个非单例的 AspectJ 切面……
 				if (isAspectJAdvice(advisor)) {
 					foundAspectJAdvice = true;
 					break;

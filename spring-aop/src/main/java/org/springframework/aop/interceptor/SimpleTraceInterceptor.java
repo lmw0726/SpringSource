@@ -53,15 +53,22 @@ public class SimpleTraceInterceptor extends AbstractTraceInterceptor {
 
 	@Override
 	protected Object invokeUnderTrace(MethodInvocation invocation, Log logger) throws Throwable {
+		// 获取当前方法调用的描述信息
 		String invocationDescription = getInvocationDescription(invocation);
+		// 记录日志：方法进入（执行前）
 		writeToLog(logger, "Entering " + invocationDescription);
 		try {
+			// 处理目标方法
 			Object rval = invocation.proceed();
+			// 记录日志：方法正常退出（执行后）
 			writeToLog(logger, "Exiting " + invocationDescription);
+			// 返回方法执行结果
 			return rval;
 		}
 		catch (Throwable ex) {
+			// 记录日志：方法执行过程中抛出了异常
 			writeToLog(logger, "Exception thrown in " + invocationDescription, ex);
+			// 将异常继续抛出
 			throw ex;
 		}
 	}

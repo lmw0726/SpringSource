@@ -16,13 +16,12 @@
 
 package org.springframework.aop.interceptor;
 
-import java.io.Serializable;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.ConcurrencyThrottleSupport;
+
+import java.io.Serializable;
 
 /**
  * 对并发访问进行限流的拦截器，
@@ -50,11 +49,14 @@ public class ConcurrencyThrottleInterceptor extends ConcurrencyThrottleSupport
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+		// 方法执行前的处理
 		beforeAccess();
 		try {
+			// 执行拦截器链
 			return methodInvocation.proceed();
 		}
 		finally {
+			// 方法执行结束后的处理
 			afterAccess();
 		}
 	}

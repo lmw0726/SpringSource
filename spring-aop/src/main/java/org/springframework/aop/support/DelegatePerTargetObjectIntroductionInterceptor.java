@@ -16,16 +16,15 @@
 
 package org.springframework.aop.support;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import org.aopalliance.intercept.MethodInvocation;
-
 import org.springframework.aop.DynamicIntroductionAdvice;
 import org.springframework.aop.IntroductionInterceptor;
 import org.springframework.aop.ProxyMethodInvocation;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
+
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * {@link org.springframework.aop.IntroductionInterceptor} 接口的便捷实现。
@@ -85,7 +84,9 @@ public class DelegatePerTargetObjectIntroductionInterceptor extends Introduction
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		// 判断当前调用的方法是否属于“引介接口”（Introduction 接口）
 		if (isMethodOnIntroducedInterface(mi)) {
+			// 根据当前目标对象，获取对应的引介实现对象
 			Object delegate = getIntroductionDelegateFor(mi.getThis());
 
 			// 使用以下方法而不是直接反射，
@@ -95,12 +96,15 @@ public class DelegatePerTargetObjectIntroductionInterceptor extends Introduction
 
 			// 如果可能，调整返回值：如果委托返回了自身，
 			// 我们真正想返回的是代理。
+			// 如果返回值就是 delegate 本身，并且当前调用是代理调用
 			if (retVal == delegate && mi instanceof ProxyMethodInvocation) {
+				// 获取代理对象，并替换返回值
 				retVal = ((ProxyMethodInvocation) mi).getProxy();
 			}
+			// 返回最终结果
 			return retVal;
 		}
-
+		// 如果不是引介接口方法，则走正常的拦截器链流程
 		return doProceed(mi);
 	}
 

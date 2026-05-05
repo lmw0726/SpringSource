@@ -16,12 +16,12 @@
 
 package org.springframework.aop.framework;
 
-import java.io.Serializable;
-import java.lang.reflect.Proxy;
-
 import org.springframework.aop.SpringProxy;
 import org.springframework.core.NativeDetector;
 import org.springframework.util.ClassUtils;
+
+import java.io.Serializable;
+import java.lang.reflect.Proxy;
 
 /**
  * 默认 {@link AopProxyFactory} 实现，创建 CGLIB 代理或 JDK 动态代理。
@@ -53,19 +53,35 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		// ===================== 第一层判断：是否使用 CGLIB 分支 =====================
+		// 条件成立时，会优先考虑使用 CGLIB
+		// 当前不是 GraalVM 原生镜像环境
+		// 是否开启优化（通常意味着使用 CGLIB）
+		// 是否强制使用 CGLIB（proxyTargetClass=true）
+		// 是否没有用户提供的接口
 		if (!NativeDetector.inNativeImage() &&
 				(config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config))) {
+			// 获取目标类（要被代理的类）
 			Class<?> targetClass = config.getTargetClass();
+
+			// 如果目标类为空，直接抛异常（无法创建代理）
 			if (targetClass == null) {
 				throw new AopConfigException("TargetSource cannot determine target class: " +
 						"Either an interface or a target is required for proxy creation.");
 			}
+			// ===================== 特殊情况：仍然使用 JDK 代理 =====================
+			// 如果目标类是接口 / 已经是代理类 / lambda 表达式
 			if (targetClass.isInterface() || Proxy.isProxyClass(targetClass) || ClassUtils.isLambdaClass(targetClass)) {
+				// 使用 JDK 动态代理
 				return new JdkDynamicAopProxy(config);
 			}
+			// ===================== 默认：使用 CGLIB =====================
+			// 使用 CGLIB 代理（基于继承）
 			return new ObjenesisCglibAopProxy(config);
 		}
+		// ===================== 第二层：默认使用 JDK 代理 =====================
 		else {
+			// 使用 JDK 动态代理
 			return new JdkDynamicAopProxy(config);
 		}
 	}

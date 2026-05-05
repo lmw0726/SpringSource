@@ -111,11 +111,15 @@ public abstract class ExposeBeanNameAdvisors {
 		@Override
 		@Nullable
 		public Object invoke(MethodInvocation mi) throws Throwable {
+			// 判断当前 MethodInvocation 是否为 Spring 的 ProxyMethodInvocation
 			if (!(mi instanceof ProxyMethodInvocation)) {
+				// 如果不是，说明当前不在 Spring AOP 代理调用链中，抛出异常
 				throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
 			}
 			ProxyMethodInvocation pmi = (ProxyMethodInvocation) mi;
+			// 将当前 bean 的名称保存到调用上下文中
 			pmi.setUserAttribute(BEAN_NAME_ATTRIBUTE, this.beanName);
+			// 继续执行拦截器链
 			return mi.proceed();
 		}
 	}
@@ -136,11 +140,20 @@ public abstract class ExposeBeanNameAdvisors {
 		@Override
 		@Nullable
 		public Object invoke(MethodInvocation mi) throws Throwable {
+
+			// 判断当前 MethodInvocation 是否是 Spring 的 ProxyMethodInvocation
 			if (!(mi instanceof ProxyMethodInvocation)) {
+				// 如果不是，说明不在 Spring AOP 代理调用链中，直接抛异常
 				throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
 			}
+
 			ProxyMethodInvocation pmi = (ProxyMethodInvocation) mi;
+
+			// 将当前 Bean 的名称存入调用上下文（userAttribute）
+			// 👉 后续 Advice 可以通过该属性获取当前被代理的 beanName
 			pmi.setUserAttribute(BEAN_NAME_ATTRIBUTE, this.beanName);
+
+			// 调用父类的 invoke 方法，继续执行拦截器链
 			return super.invoke(mi);
 		}
 

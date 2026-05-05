@@ -16,15 +16,8 @@
 
 package org.springframework.aop.interceptor;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.BridgeMethodResolver;
@@ -33,6 +26,12 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
+
+import java.lang.reflect.Method;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 
 /**
  * 异步处理方法调用的 AOP Alliance {@code MethodInterceptor}，
@@ -97,32 +96,43 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 	@Override
 	@Nullable
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
+		// 获取目标类
 		Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
+		// 获取最具体的方法
 		Method specificMethod = ClassUtils.getMostSpecificMethod(invocation.getMethod(), targetClass);
+		// 解析桥接方法
 		final Method userDeclaredMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 
+		// 根据方法选择合适的异步执行器
 		AsyncTaskExecutor executor = determineAsyncExecutor(userDeclaredMethod);
 		if (executor == null) {
+			// 如果没有配置执行器，则抛出异常
 			throw new IllegalStateException(
 					"No executor specified and no default executor set on AsyncExecutionInterceptor either");
 		}
 
 		Callable<Object> task = () -> {
 			try {
+				// 执行原方法
 				Object result = invocation.proceed();
+				// 如果返回值是 Future，则需要获取其真实结果
 				if (result instanceof Future) {
 					return ((Future<?>) result).get();
 				}
 			}
 			catch (ExecutionException ex) {
+				// get()方法抛出了异常，则取出真正的cause
 				handleError(ex.getCause(), userDeclaredMethod, invocation.getArguments());
 			}
 			catch (Throwable ex) {
+				// 处理执行过程中的异常
 				handleError(ex, userDeclaredMethod, invocation.getArguments());
 			}
+			// 如果没有返回值，返回null
 			return null;
 		};
 
+		// 提交任务到线程池执行，并根据方法返回类型包装结果
 		return doSubmit(task, executor, invocation.getMethod().getReturnType());
 	}
 

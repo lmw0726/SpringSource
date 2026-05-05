@@ -16,23 +16,8 @@
 
 package org.springframework.aop.framework;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.aopalliance.aop.Advice;
-
-import org.springframework.aop.Advisor;
-import org.springframework.aop.DynamicIntroductionAdvice;
-import org.springframework.aop.IntroductionAdvisor;
-import org.springframework.aop.IntroductionInfo;
-import org.springframework.aop.TargetSource;
+import org.springframework.aop.*;
 import org.springframework.aop.support.DefaultIntroductionAdvisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.target.EmptyTargetSource;
@@ -41,6 +26,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * AOP 代理配置管理器的基类。
@@ -459,13 +450,20 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	 * @return MethodInterceptors 的 List（也可能包含 InterceptorAndDynamicMethodMatchers）
 	 */
 	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Method method, @Nullable Class<?> targetClass) {
+		// 使用 method 构建缓存 key（方法级别缓存）
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
+		// 从缓存中获取该方法对应的拦截器链
 		List<Object> cached = this.methodCache.get(cacheKey);
+		// 如果缓存中没有（第一次调用这个方法）
 		if (cached == null) {
+			// 通过 advisorChainFactory 构建拦截器链
+			// 本质：Advisor → MethodInterceptor（非常关键）
 			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
 					this, method, targetClass);
+			// 放入缓存
 			this.methodCache.put(cacheKey, cached);
 		}
+		// 返回拦截器链
 		return cached;
 	}
 

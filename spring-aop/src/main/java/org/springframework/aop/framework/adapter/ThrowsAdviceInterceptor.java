@@ -108,11 +108,14 @@ public class ThrowsAdviceInterceptor implements MethodInterceptor, AfterAdvice {
 	@Nullable
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		try {
+			// 处理目标方法，并返回值
 			return mi.proceed();
 		}
 		catch (Throwable ex) {
+			// 获取异常处理器
 			Method handlerMethod = getExceptionHandler(ex);
 			if (handlerMethod != null) {
+				// 异常处理器不为空，调用异常处理方法
 				invokeHandlerMethod(mi, ex, handlerMethod);
 			}
 			throw ex;
@@ -150,6 +153,7 @@ public class ThrowsAdviceInterceptor implements MethodInterceptor, AfterAdvice {
 			handlerArgs = new Object[] {mi.getMethod(), mi.getArguments(), mi.getThis(), ex};
 		}
 		try {
+			// 通过反射调用异常处理方法
 			method.invoke(this.throwsAdvice, handlerArgs);
 		}
 		catch (InvocationTargetException targetEx) {
