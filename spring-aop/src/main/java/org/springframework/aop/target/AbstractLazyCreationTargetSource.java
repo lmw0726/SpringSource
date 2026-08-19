@@ -87,7 +87,7 @@ public abstract class AbstractLazyCreationTargetSource implements TargetSource {
 
 	@Override
 	public void releaseTarget(Object target) throws Exception {
-		// nothing to do
+		// 无需执行任何操作
 	}
 
 

@@ -214,7 +214,7 @@ class RuntimeTestWalker {
 				}
 			}
 			try {
-				// Don't use ResolvedType.isAssignableFrom() as it won't be aware of (Spring) mixins
+				// 不要使用 ResolvedType.isAssignableFrom()，因为它无法感知（Spring 的）mixins
 				if (typeClass == null) {
 					typeClass = ClassUtils.forName(type.getName(), this.matchClass.getClassLoader());
 				}

@@ -113,7 +113,7 @@ public class AspectMetadata implements Serializable {
 				this.perClausePointcut = ajexp;
 				return;
 			case PERTYPEWITHIN:
-				// Works with a type pattern
+				// 适用于类型模式（type pattern）
 				this.perClausePointcut = new ComposablePointcut(new TypePatternClassFilter(findPerClause(aspectClass)));
 				return;
 			default:

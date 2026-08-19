@@ -67,7 +67,7 @@ public class SingletonTargetSource implements TargetSource, Serializable {
 
 	@Override
 	public void releaseTarget(Object target) {
-		// nothing to do
+		// 无需执行任何操作
 	}
 
 	@Override

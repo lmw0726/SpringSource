@@ -431,7 +431,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 			this.argumentNames = createParameterNameDiscoverer().getParameterNames(this.aspectJAdviceMethod);
 		}
 		if (this.argumentNames != null) {
-			// We have been able to determine the arg names.
+			// 我们已经能够确定参数名称。
 			bindExplicitArguments(numArgumentsExpectingToBind);
 		}
 		else {

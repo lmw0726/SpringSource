@@ -58,11 +58,11 @@ public class MethodInvocationProceedingJoinPoint implements ProceedingJoinPoint,
 	@Nullable
 	private Object[] args;
 
-	/** Lazily initialized signature object. */
+	/** 延迟初始化的 Signature（签名）对象。 */
 	@Nullable
 	private Signature signature;
 
-	/** Lazily initialized source location object. */
+	/** 延迟初始化的 SourceLocation（源码位置）对象。 */
 	@Nullable
 	private SourceLocation sourceLocation;
 
@@ -150,7 +150,7 @@ public class MethodInvocationProceedingJoinPoint implements ProceedingJoinPoint,
 
 	@Override
 	public int getId() {
-		// TODO: It's just an adapter but returning 0 might still have side effects...
+		// TODO：它只是一个适配器，但返回 0 可能仍有副作用……
 		return 0;
 	}
 

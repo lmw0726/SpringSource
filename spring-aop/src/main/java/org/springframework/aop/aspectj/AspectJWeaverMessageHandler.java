@@ -89,18 +89,18 @@ public class AspectJWeaverMessageHandler implements IMessageHandler {
 
 	@Override
 	public boolean isIgnoring(Kind messageKind) {
-		// We want to see everything, and allow configuration of log levels dynamically.
+		// 我们希望看到所有消息，并允许动态配置日志级别。
 		return false;
 	}
 
 	@Override
 	public void dontIgnore(Kind messageKind) {
-		// We weren't ignoring anything anyway...
+		// 反正我们本来也没有忽略任何消息……
 	}
 
 	@Override
 	public void ignore(Kind kind) {
-		// We weren't ignoring anything anyway...
+		// 反正我们本来也没有忽略任何消息……
 	}
 
 }

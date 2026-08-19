@@ -318,7 +318,7 @@ public class CustomizableTraceInterceptor extends AbstractTraceInterceptor {
 				matcher.appendReplacement(output, Long.toString(invocationTime));
 			}
 			else {
-				// Should not happen since placeholders are checked earlier.
+				// 不应发生这种情况，因为占位符已在之前检查过。
 				throw new IllegalArgumentException("Unknown placeholder [" + match + "]");
 			}
 		}

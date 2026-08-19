@@ -113,7 +113,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 	private static final String THIS_JOIN_POINT = "thisJoinPoint";
 	private static final String THIS_JOIN_POINT_STATIC_PART = "thisJoinPointStaticPart";
 
-	// Steps in the binding algorithm...
+	// 绑定算法的各个步骤……
 	private static final int STEP_JOIN_POINT_BINDING = 1;
 	private static final int STEP_THROWING_BINDING = 2;
 	private static final int STEP_ANNOTATION_BINDING = 3;
@@ -280,7 +280,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 						this.numberOfRemainingUnboundArguments + " argument(s) could not be bound");
 			}
 			else {
-				// convention for failing is to return null, allowing participation in a chain of responsibility
+				// 约定：失败时返回 null，以便参与责任链
 				return null;
 			}
 		}
@@ -299,8 +299,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 			throw new UnsupportedOperationException("An advice method can never be a constructor");
 		}
 		else {
-			// we return null rather than throw an exception so that we behave well
-			// in a chain-of-responsibility.
+			// 我们返回 null 而不是抛出异常，以便在责任链中表现良好
 			return null;
 		}
 	}
@@ -340,7 +339,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 			return;
 		}
 
-		// So there is binding work to do...
+		// 所以有绑定工作要做……
 		int throwableIndex = -1;
 		for (int i = 0; i < this.argumentTypes.length; i++) {
 			if (isUnbound(i) && isSubtypeOf(Throwable.class, i)) {
@@ -348,7 +347,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 					throwableIndex = i;
 				}
 				else {
-					// Second candidate we've found - ambiguous binding
+					// 找到的第二个候选参数——绑定存在歧义
 					throw new AmbiguousBindingException("Binding of throwing parameter '" +
 							this.throwingName + "' is ambiguous: could be bound to argument " +
 							throwableIndex + " or argument " + i);
@@ -380,7 +379,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 						"' is ambiguous, there are " + this.numberOfRemainingUnboundArguments + " candidates.");
 			}
 
-			// We're all set... find the unbound parameter, and bind it.
+			// 一切就绪……找到未绑定的参数并绑定它。
 			for (int i = 0; i < this.parameterNameBindings.length; i++) {
 				if (this.parameterNameBindings[i] == null) {
 					bindParameterName(i, this.returningName);
@@ -430,7 +429,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 	 */
 	private void bindAnnotationsFromVarNames(List<String> varNames) {
 		if (!varNames.isEmpty()) {
-			// we have work to do...
+			// 我们有工作要做……
 			int numAnnotationSlots = countNumberOfUnboundAnnotationArguments();
 			if (numAnnotationSlots > 1) {
 				throw new AmbiguousBindingException("Found " + varNames.size() +
@@ -439,18 +438,18 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 			}
 			else if (numAnnotationSlots == 1) {
 				if (varNames.size() == 1) {
-					// it's a match
+					// 完全匹配
 					findAndBind(Annotation.class, varNames.get(0));
 				}
 				else {
-					// multiple candidate vars, but only one slot
+					// 有多个候选变量，但只有一个槽位
 					throw new IllegalArgumentException("Found " + varNames.size() +
 							" candidate annotation binding variables" +
 							" but only one potential argument binding slot");
 				}
 			}
 			else {
-				// no slots so presume those candidate vars were actually type names
+				// 没有槽位，因此假定这些候选变量实际上只是类型名称
 			}
 		}
 	}
@@ -513,8 +512,8 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 				i += body.numTokensConsumed;
 				List<String> candidateVarNames = new ArrayList<>();
 				maybeExtractVariableNamesFromArgs(body.text, candidateVarNames);
-				// we may have found some var names that were bound in previous primitive args binding step,
-				// filter them out...
+				// 我们可能已经找到了一些在前面的基本类型参数绑定步骤中已绑定的变量名，
+				// 把它们过滤掉……
 				for (String varName : candidateVarNames) {
 					if (!alreadyBound(varName)) {
 						varNames.add(varName);
@@ -536,7 +535,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 				}
 			}
 		}
-		// else varNames.size must be 0 and we have nothing to bind.
+		// 否则 varNames.size 必然为 0，我们没有任何可绑定的内容。
 	}
 
 	private void maybeBindReferencePointcutParameter() {
@@ -558,25 +557,25 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 			}
 			else {
 				if (tokens.length < i + 2) {
-					// no "(" and nothing following
+					// 没有 "(" 且后面没有内容
 					continue;
 				}
 				else {
 					String nextToken = tokens[i + 1];
 					if (nextToken.charAt(0) != '(') {
-						// next token is not "(" either, can't be a pc...
+						// 下一个标记也不是 "("，不可能是切点……
 						continue;
 					}
 				}
 
 			}
 
-			// eat the body
+			// 消费切点体
 			PointcutBody body = getPointcutBody(tokens, i);
 			i += body.numTokensConsumed;
 
 			if (!nonReferencePointcutTokens.contains(toMatch)) {
-				// then it could be a reference pointcut
+				// 那么它可能是一个引用切点
 				String varName = maybeExtractVariableName(body.text);
 				if (varName != null) {
 					varNames.add(varName);
@@ -596,7 +595,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 				}
 			}
 		}
-		// else varNames.size must be 0 and we have nothing to bind.
+		// 否则 varNames.size 必然为 0，我们没有任何可绑定的内容。
 	}
 
 	/*
@@ -608,7 +607,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 		String currentToken = tokens[startIndex];
 		int bodyStart = currentToken.indexOf('(');
 		if (currentToken.charAt(currentToken.length() - 1) == ')') {
-			// It's an all in one... get the text between the first (and the last)
+			// 这是一个整体……获取第一个 ( 和最后一个 ) 之间的文本
 			return new PointcutBody(0, currentToken.substring(bodyStart + 1, currentToken.length() - 1));
 		}
 		else {
@@ -642,7 +641,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 
 		}
 
-		// We looked and failed...
+		// 我们查找了但失败了……
 		return new PointcutBody(numTokensConsumed, null);
 	}
 
@@ -656,7 +655,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 					"' unbound primitive arguments with no way to distinguish between them.");
 		}
 		if (numUnboundPrimitives == 1) {
-			// Look for arg variable and bind it if we find exactly one...
+			// 查找 args 变量，如果恰好找到一个就绑定它……
 			List<String> varNames = new ArrayList<>();
 			String[] tokens = StringUtils.tokenizeToStringArray(this.pointcutExpression, " ");
 			for (int i = 0; i < tokens.length; i++) {
@@ -671,7 +670,7 @@ public class AspectJAdviceParameterNameDiscoverer implements ParameterNameDiscov
 						" candidate variable names but only one candidate binding slot when matching primitive args");
 			}
 			else if (varNames.size() == 1) {
-				// 1 primitive arg, and one candidate...
+				// 1 个基本类型参数，且只有一个候选……
 				for (int i = 0; i < this.argumentTypes.length; i++) {
 					if (isUnbound(i) && this.argumentTypes[i].isPrimitive()) {
 						bindParameterName(i, varNames.get(0));
