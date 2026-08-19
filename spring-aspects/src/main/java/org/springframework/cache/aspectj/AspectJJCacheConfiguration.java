@@ -25,9 +25,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 
 /**
- * {@code @Configuration} class that registers the Spring infrastructure beans necessary
- * to enable AspectJ-based annotation-driven cache management for standard JSR-107
- * annotations.
+ * {@code @Configuration} 类，用于注册启用基于 AspectJ 的注解驱动缓存管理（cache management）
+ * 所需的 Spring 基础设施 bean，以支持标准的 JSR-107 注解。
  *
  * @author Stephane Nicoll
  * @since 4.1

@@ -23,22 +23,17 @@ import org.aspectj.lang.annotation.RequiredTypes;
 import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
 
 /**
- * Concrete AspectJ transaction aspect using the JTA 1.2
- * {@link javax.transaction.Transactional} annotation.
+ * 使用 JTA 1.2 的 {@link javax.transaction.Transactional} 注解的具体 AspectJ 事务切面（aspect）。
  *
- * <p>When using this aspect, you <i>must</i> annotate the implementation class
- * (and/or methods within that class), <i>not</i> the interface (if any) that
- * the class implements. AspectJ follows Java's rule that annotations on
- * interfaces are <i>not</i> inherited.
+ * <p>使用此切面时，<i>必须</i>在实现类（和/或该类中的方法）上标注注解，
+ * <i>而不要</i>在类所实现的接口（如果有的话）上标注。AspectJ 遵循 Java 的规则：
+ * 接口上的注解<i>不会</i>被继承。
  *
- * <p>An @Transactional annotation on a class specifies the default transaction
- * semantics for the execution of any <b>public</b> operation in the class.
+ * <p>类上的 @Transactional 注解指定该类中任何 <b>public</b> 操作执行的默认事务语义。
  *
- * <p>An @Transactional annotation on a method within the class overrides the
- * default transaction semantics given by the class annotation (if present).
- * Any method may be annotated (regardless of visibility). Annotating
- * non-public methods directly is the only way to get transaction demarcation
- * for the execution of such operations.
+ * <p>类中方法上的 @Transactional 注解会覆盖类注解（如果存在）给定的默认事务语义。
+ * 任何方法都可以标注（无论可见性如何）。直接标注非 public 方法是为此类操作的执行
+ * 获得事务划分的唯一方式。
  *
  * @author Stephane Nicoll
  * @since 4.2
@@ -53,21 +48,21 @@ public aspect JtaAnnotationTransactionAspect extends AbstractTransactionAspect {
 	}
 
 	/**
-	 * Matches the execution of any public method in a type with the Transactional
-	 * annotation, or any subtype of a type with the Transactional annotation.
+	 * 匹配带有 Transactional 注解的类型（或带有 Transactional 注解的类型的任何子类型）中
+	 * 任何 public 方法的执行。
 	 */
 	private pointcut executionOfAnyPublicMethodInAtTransactionalType() :
 		execution(public * ((@Transactional *)+).*(..)) && within(@Transactional *);
 
 	/**
-	 * Matches the execution of any method with the Transactional annotation.
+	 * 匹配带有 Transactional 注解的任何方法的执行。
 	 */
 	private pointcut executionOfTransactionalMethod() :
 		execution(@Transactional * *(..));
 
 	/**
-	 * Definition of pointcut from super aspect - matched join points
-	 * will have Spring transaction management applied.
+	 * 父切面（aspect）中 pointcut（切点）的定义 - 匹配到的连接点
+	 * 将应用 Spring 事务管理。
 	 */
 	protected pointcut transactionalMethodExecution(Object txObject) :
 		(executionOfAnyPublicMethodInAtTransactionalType() || executionOfTransactionalMethod() ) && this(txObject);

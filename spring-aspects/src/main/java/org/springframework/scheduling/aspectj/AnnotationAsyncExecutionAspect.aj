@@ -23,20 +23,19 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.scheduling.annotation.Async;
 
 /**
- * Aspect to route methods based on Spring's {@link Async} annotation.
+ * 基于 Spring 的 {@link Async} 注解对方法进行路由的切面（aspect）。
  *
- * <p>This aspect routes methods marked with the {@link Async} annotation as well as methods
- * in classes marked with the same. Any method expected to be routed asynchronously must
- * return either {@code void}, {@link Future}, or a subtype of {@link Future} (in particular,
- * Spring's {@link org.springframework.util.concurrent.ListenableFuture}). This aspect,
- * therefore, will produce a compile-time error for methods that violate this constraint
- * on the return type. If, however, a class marked with {@code @Async} contains a method
- * that violates this constraint, it produces only a warning.
+ * <p>该切面（aspect）对标记了 {@link Async} 注解的方法进行路由，同时也会路由到标记了
+ * 相同注解的类中的方法。任何期望被异步（async）路由的方法都必须返回 {@code void}、
+ * {@link Future} 或 {@link Future} 的子类型（特别是 Spring 的
+ * {@link org.springframework.util.concurrent.ListenableFuture}）。因此，对于违反此
+ * 返回类型约束的方法，该切面（aspect）将产生编译期错误。但是，如果标记了 {@code @Async}
+ * 的类中包含违反此约束的方法，则只产生警告。
  *
- * <p>This aspect needs to be injected with an implementation of a task-oriented
- * {@link java.util.concurrent.Executor} to activate it for a specific thread pool,
- * or with a {@link org.springframework.beans.factory.BeanFactory} for default
- * executor lookup. Otherwise it will simply delegate all calls synchronously.
+ * <p>该切面（aspect）需要被注入一个面向任务的 {@link java.util.concurrent.Executor}
+ * 实现，以便针对特定的线程池激活它；或者注入一个
+ * {@link org.springframework.beans.factory.BeanFactory} 用于默认的
+ * executor（执行器）查找。否则，它将简单地同步委托所有调用。
  *
  * @author Ramnivas Laddad
  * @author Chris Beams
@@ -55,18 +54,18 @@ public aspect AnnotationAsyncExecutionAspect extends AbstractAsyncExecutionAspec
 
 
 	/**
-	 * This implementation inspects the given method and its declaring class for the
-	 * {@code @Async} annotation, returning the qualifier value expressed by {@link Async#value()}.
-	 * If {@code @Async} is specified at both the method and class level, the method's
-	 * {@code #value} takes precedence (even if empty string, indicating that the default
-	 * executor should be used preferentially).
-	 * @return the qualifier if specified, otherwise empty string indicating that the
-	 * {@linkplain #setExecutor default executor} should be used
+	 * 该实现会检查给定的方法及其声明类上是否有 {@code @Async} 注解，
+	 * 并返回由 {@link Async#value()} 表示的限定符（qualifier）值。
+	 * 如果 {@code @Async} 同时标注在方法级别和类级别，则方法的
+	 * {@code #value} 优先（即使是空字符串，也表明应优先使用默认的
+	 * executor（执行器））。
+	 * @return 如果指定了限定符（qualifier）则返回该限定符，否则返回空字符串，
+	 * 表示应使用 {@linkplain #setExecutor 默认的 executor（执行器）}
 	 * @see #determineAsyncExecutor(Method)
 	 */
 	@Override
 	protected String getExecutorQualifier(Method method) {
-		// Maintainer's note: changes made here should also be made in
+		// 维护者注：此处所做的更改也应同步到
 		// AnnotationAsyncExecutionInterceptor#getExecutorQualifier
 		Async async = AnnotatedElementUtils.findMergedAnnotation(method, Async.class);
 		if (async == null) {

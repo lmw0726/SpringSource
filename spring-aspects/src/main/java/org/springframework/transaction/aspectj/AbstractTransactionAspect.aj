@@ -24,21 +24,17 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 
 /**
- * Abstract superaspect for AspectJ transaction aspects. Concrete
- * subaspects will implement the {@code transactionalMethodExecution()}
- * pointcut using a strategy such as Java 5 annotations.
+ * 供 AspectJ 事务切面（aspect）使用的抽象超切面（superaspect）。具体的
+ * 子切面将使用诸如 Java 5 注解之类的策略来实现 {@code transactionalMethodExecution()}
+ * 切点（pointcut）。
  *
- * <p>Suitable for use inside or outside the Spring IoC container.
- * Set the "transactionManager" property appropriately, allowing
- * use of any transaction implementation supported by Spring.
+ * <p>适用于在 Spring IoC 容器内部或外部使用。请适当设置 "transactionManager"
+ * 属性，从而可以使用 Spring 所支持的任何事务（transaction）实现。
  *
- * <p><b>NB:</b> If a method implements an interface that is itself
- * transactionally annotated, the relevant Spring transaction attribute
- * will <i>not</i> be resolved. This behavior will vary from that of Spring AOP
- * if proxying an interface (but not when proxying a class). We recommend that
- * transaction annotations should be added to classes, rather than business
- * interfaces, as they are an implementation detail rather than a contract
- * specification validation.
+ * <p><b>注意：</b> 如果某个方法实现了一个本身带有事务注解的接口，则相关的
+ * Spring 事务属性将<i>不会</i>被解析。在对接口进行代理（而不是对类进行代理）
+ * 时，此行为将不同于 Spring AOP 的行为。我们建议将事务注解添加到类上，而
+ * 不是添加到业务接口上，因为它们是实现细节，而不是契约规范的校验。
  *
  * @author Rod Johnson
  * @author Ramnivas Laddad
@@ -48,10 +44,10 @@ import org.springframework.transaction.interceptor.TransactionAttributeSource;
 public abstract aspect AbstractTransactionAspect extends TransactionAspectSupport implements DisposableBean {
 
 	/**
-	 * Construct the aspect using the given transaction metadata retrieval strategy.
-	 * @param tas TransactionAttributeSource implementation, retrieving Spring
-	 * transaction metadata for each joinpoint. Implement the subclass to pass in
-	 * {@code null} if it is intended to be configured through Setter Injection.
+	 * 使用给定的事务元数据检索策略来构造该切面。
+	 * @param tas TransactionAttributeSource 实现，用于为每个连接点（joinpoint）
+	 * 检索 Spring 事务元数据。如果打算通过 Setter 注入进行配置，请在子类中传入
+	 * {@code null}。
 	 */
 	protected AbstractTransactionAspect(TransactionAttributeSource tas) {
 		setTransactionAttributeSource(tas);
@@ -59,14 +55,14 @@ public abstract aspect AbstractTransactionAspect extends TransactionAspectSuppor
 
 	@Override
 	public void destroy() {
-		// An aspect is basically a singleton -> cleanup on destruction
+		// 切面本质上是一个单例（singleton）-> 在销毁时进行清理
 		clearTransactionManagerCache();
 	}
 
 	@SuppressAjWarnings("adviceDidNotMatch")
 	Object around(final Object txObject): transactionalMethodExecution(txObject) {
 		MethodSignature methodSignature = (MethodSignature) thisJoinPoint.getSignature();
-		// Adapt to TransactionAspectSupport's invokeWithinTransaction...
+		// 适配 TransactionAspectSupport 的 invokeWithinTransaction...
 		try {
 			return invokeWithinTransaction(methodSignature.getMethod(), txObject.getClass(), new InvocationCallback() {
 				public Object proceedWithInvocation() throws Throwable {
@@ -84,16 +80,16 @@ public abstract aspect AbstractTransactionAspect extends TransactionAspectSuppor
 	}
 
 	/**
-	 * Concrete subaspects must implement this pointcut, to identify
-	 * transactional methods. For each selected joinpoint, TransactionMetadata
-	 * will be retrieved using Spring's TransactionAttributeSource interface.
+	 * 具体的子切面必须实现此切点（pointcut），以识别
+	 * 事务方法。对于每个选中的连接点（joinpoint），将使用
+	 * Spring 的 TransactionAttributeSource 接口检索 TransactionMetadata。
 	 */
 	protected abstract pointcut transactionalMethodExecution(Object txObject);
 
 
 	/**
-	 * Ugly but safe workaround: We need to be able to propagate checked exceptions,
-	 * despite AspectJ around advice supporting specifically declared exceptions only.
+	 * 丑陋但安全的变通方案（workaround）：我们需要能够传播受检异常（checked exception），
+	 * 尽管 AspectJ 的 around 通知（advice）仅支持特别声明的异常。
 	 */
 	private static class Rethrower {
 

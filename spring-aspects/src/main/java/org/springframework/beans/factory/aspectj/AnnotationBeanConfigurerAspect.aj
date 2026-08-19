@@ -29,12 +29,10 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.wiring.BeanConfigurerSupport;
 
 /**
- * Concrete aspect that uses the {@link Configurable} annotation to identify
- * which classes need autowiring.
+ * 使用 {@link Configurable} 注解来识别哪些类需要自动装配（autowiring）的具体切面（aspect）。
  *
- * <p>The bean name to look up will be taken from the {@code @Configurable}
- * annotation if specified; otherwise, the default bean name to look up will be
- * the fully qualified name of the class being configured.
+ * <p>如果指定了 {@code @Configurable} 注解，则将从该注解中获取要查找的 bean 名称；
+ * 否则，默认要查找的 bean 名称为被配置类的全限定名。
  *
  * @author Rod Johnson
  * @author Ramnivas Laddad
@@ -77,7 +75,7 @@ public aspect AnnotationBeanConfigurerAspect extends AbstractInterfaceDrivenDepe
 	public pointcut preConstructionConfiguration() : preConstructionConfigurationSupport(*);
 
 	/*
-	 * An intermediary to match preConstructionConfiguration signature (that doesn't expose the annotation object)
+	 * 用于匹配 preConstructionConfiguration 签名的中间层（该签名不暴露注解对象）
 	 */
 	@CodeGenerationHint(ifNameSuffix="bb0")
 	private pointcut preConstructionConfigurationSupport(Configurable c) : @this(c) && if (c.preConstruction());
@@ -86,8 +84,7 @@ public aspect AnnotationBeanConfigurerAspect extends AbstractInterfaceDrivenDepe
 	declare parents: @Configurable * implements ConfigurableObject;
 
 	/*
-	 * This declaration shouldn't be needed,
-	 * except for an AspectJ bug (https://bugs.eclipse.org/bugs/show_bug.cgi?id=214559)
+	 * 此声明本不应需要，除非遇到 AspectJ 的一个 bug（https://bugs.eclipse.org/bugs/show_bug.cgi?id=214559）
 	 */
 	declare parents: @Configurable Serializable+ implements ConfigurableDeserializationSupport;
 

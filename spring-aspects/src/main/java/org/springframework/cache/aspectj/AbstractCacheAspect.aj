@@ -27,15 +27,14 @@ import org.springframework.cache.interceptor.CacheOperationInvoker;
 import org.springframework.cache.interceptor.CacheOperationSource;
 
 /**
- * Abstract superaspect for AspectJ cache aspects. Concrete subaspects will implement the
- * {@link #cacheMethodExecution} pointcut using a strategy such as Java 5 annotations.
+ * AspectJ 缓存切面（aspect）的抽象超切面。具体子切面将使用诸如 Java 5 注解之类的策略来实现
+ * {@link #cacheMethodExecution} 切点（pointcut）。
  *
- * <p>Suitable for use inside or outside the Spring IoC container. Set the
- * {@link #setCacheManager cacheManager} property appropriately, allowing use of any cache
- * implementation supported by Spring.
+ * <p>既可在 Spring IoC 容器内部使用，也可在容器外部使用。请适当设置
+ * {@link #setCacheManager cacheManager} 属性，以便能够使用 Spring 支持的任何缓存实现。
  *
- * <p><b>NB:</b> If a method implements an interface that is itself cache annotated, the
- * relevant Spring cache definition will <i>not</i> be resolved.
+ * <p><b>注意：</b> 如果某个方法实现了本身带有缓存注解的接口，则相应的
+ * Spring 缓存定义将<i>不会</i>被解析。
  *
  * @author Costin Leau
  * @author Stephane Nicoll
@@ -47,9 +46,8 @@ public abstract aspect AbstractCacheAspect extends CacheAspectSupport implements
 	}
 
 	/**
-	 * Construct object using the given caching metadata retrieval strategy.
-	 * @param cos {@link CacheOperationSource} implementation, retrieving Spring cache
-	 * metadata for each joinpoint.
+	 * 使用给定的缓存元数据检索策略构造对象。
+	 * @param cos {@link CacheOperationSource} 实现，用于为每个连接点（joinpoint）检索 Spring 缓存元数据。
 	 */
 	protected AbstractCacheAspect(CacheOperationSource... cos) {
 		setCacheOperationSources(cos);
@@ -57,7 +55,7 @@ public abstract aspect AbstractCacheAspect extends CacheAspectSupport implements
 
 	@Override
 	public void destroy() {
-		clearMetadataCache(); // An aspect is basically a singleton
+		clearMetadataCache(); // 切面（aspect）本质上是一个单例（singleton）
 	}
 
 	@SuppressAjWarnings("adviceDidNotMatch")
@@ -81,12 +79,12 @@ public abstract aspect AbstractCacheAspect extends CacheAspectSupport implements
 		}
 		catch (CacheOperationInvoker.ThrowableWrapper th) {
 			AnyThrow.throwUnchecked(th.getOriginal());
-			return null; // never reached
+			return null; // 永远不会执行到此处
 		}
 	}
 
 	/**
-	 * Concrete subaspects must implement this pointcut, to identify cached methods.
+	 * 具体子切面必须实现此切点（pointcut），用于识别被缓存的方法。
 	 */
 	protected abstract pointcut cacheMethodExecution(Object cachedObject);
 

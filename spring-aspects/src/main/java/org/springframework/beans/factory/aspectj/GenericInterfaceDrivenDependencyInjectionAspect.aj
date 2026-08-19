@@ -17,13 +17,13 @@
 package org.springframework.beans.factory.aspectj;
 
 /**
- * Generic-based dependency injection aspect.
+ * 基于泛型的依赖注入切面（aspect）。
  *
- * <p>This aspect allows users to implement efficient, type-safe dependency injection
- * without the use of the {@code @Configurable} annotation.
+ * <p>该切面允许用户在不使用 {@code @Configurable} 注解的情况下，
+ * 实现高效、类型安全的依赖注入。
  *
- * <p>The subaspect of this aspect doesn't need to include any AOP constructs. For
- * example, here is a subaspect that configures the {@code PricingStrategyClient} objects.
+ * <p>该切面的子切面无需包含任何 AOP 构造。例如，下面是一个配置
+ * {@code PricingStrategyClient} 对象的子切面示例。
  *
  * <pre class="code">
  * aspect PricingStrategyDependencyInjectionAspect
@@ -53,7 +53,7 @@ public abstract aspect GenericInterfaceDrivenDependencyInjectionAspect<I> extend
 		configure((I) bean);
 	}
 
-	// Unfortunately, erasure used with generics won't allow to use the same named method
+	// 遗憾的是，与泛型一起使用的类型擦除（erasure）机制不允许使用同名的方法
 	protected abstract void configure(I bean);
 
 }

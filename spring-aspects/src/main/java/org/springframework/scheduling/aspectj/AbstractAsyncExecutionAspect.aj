@@ -26,12 +26,11 @@ import org.springframework.aop.interceptor.AsyncExecutionAspectSupport;
 import org.springframework.core.task.AsyncTaskExecutor;
 
 /**
- * Abstract aspect that routes selected methods asynchronously.
+ * 抽象切面（aspect），将选定的方法以异步方式路由执行。
  *
- * <p>This aspect needs to be injected with an implementation of a task-oriented
- * {@link java.util.concurrent.Executor} to activate it for a specific thread pool,
- * or with a {@link org.springframework.beans.factory.BeanFactory} for default
- * executor lookup. Otherwise it will simply delegate all calls synchronously.
+ * <p>该切面需要被注入一个面向任务的 {@link java.util.concurrent.Executor} 实现，
+ * 以便针对特定的线程池激活它；或者注入一个 {@link org.springframework.beans.factory.BeanFactory}
+ * 以进行默认执行器的查找。否则它将简单地以同步方式委托所有调用。
  *
  * @author Ramnivas Laddad
  * @author Juergen Hoeller
@@ -45,9 +44,9 @@ import org.springframework.core.task.AsyncTaskExecutor;
 public abstract aspect AbstractAsyncExecutionAspect extends AsyncExecutionAspectSupport {
 
 	/**
-	 * Create an {@code AnnotationAsyncExecutionAspect} with a {@code null}
-	 * default executor, which should instead be set via {@code #aspectOf} and
-	 * {@link #setExecutor}. The same applies for {@link #setExceptionHandler}.
+	 * 创建一个默认执行器为 {@code null} 的 {@code AnnotationAsyncExecutionAspect}，
+	 * 该执行器应改为通过 {@code #aspectOf} 和 {@link #setExecutor} 设置。
+	 * {@link #setExceptionHandler} 的设置方式与此相同。
 	 */
 	public AbstractAsyncExecutionAspect() {
 		super(null);
@@ -55,11 +54,9 @@ public abstract aspect AbstractAsyncExecutionAspect extends AsyncExecutionAspect
 
 
 	/**
-	 * Apply around advice to methods matching the {@link #asyncMethod()} pointcut,
-	 * submit the actual calling of the method to the correct task executor and return
-	 * immediately to the caller.
-	 * @return {@link Future} if the original method returns {@code Future};
-	 * {@code null} otherwise
+	 * 对匹配 {@link #asyncMethod()} 切点（pointcut）的方法应用环绕通知（around advice），
+	 * 将方法的实际调用提交给正确的任务执行器，并立即返回给调用者。
+	 * @return 如果原方法返回 {@code Future}，则返回 {@link Future}；否则返回 {@code null}
 	 */
 	@SuppressAjWarnings("adviceDidNotMatch")
 	Object around() : asyncMethod() {
@@ -88,7 +85,7 @@ public abstract aspect AbstractAsyncExecutionAspect extends AsyncExecutionAspect
 	}
 
 	/**
-	 * Return the set of joinpoints at which async advice should be applied.
+	 * 返回应应用异步通知（advice）的连接点（joinpoint）集合。
 	 */
 	public abstract pointcut asyncMethod();
 

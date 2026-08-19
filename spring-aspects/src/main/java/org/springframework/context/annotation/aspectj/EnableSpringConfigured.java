@@ -25,15 +25,15 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Import;
 
 /**
- * Signals the current application context to apply dependency injection to
- * non-managed classes that are instantiated outside of the Spring bean factory
- * (typically classes annotated with the
+ * 通知当前应用程序上下文，对在 Spring bean 工厂之外实例化的非受管类
+ * 应用依赖注入（通常是指带有
  * {@link org.springframework.beans.factory.annotation.Configurable @Configurable}
- * annotation).
+ * 注解的类）。
  *
- * <p>Similar to functionality found in Spring's
- * {@code <context:spring-configured>} XML element. Often used in conjunction with
- * {@link org.springframework.context.annotation.EnableLoadTimeWeaving @EnableLoadTimeWeaving}.
+ * <p>与 Spring 的 {@code <context:spring-configured>} XML 元素所提供的功能类似。
+ * 通常与
+ * {@link org.springframework.context.annotation.EnableLoadTimeWeaving @EnableLoadTimeWeaving}
+ * 结合使用。
  *
  * @author Chris Beams
  * @since 3.1

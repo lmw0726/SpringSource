@@ -30,16 +30,14 @@ import org.springframework.cache.interceptor.CacheOperationInvoker;
 import org.springframework.cache.jcache.interceptor.JCacheAspectSupport;
 
 /**
- * Concrete AspectJ cache aspect using JSR-107 standard annotations.
+ * 使用 JSR-107 标准注解的具体 AspectJ 缓存切面（aspect）。
  *
- * <p>When using this aspect, you <i>must</i> annotate the implementation class (and/or
- * methods within that class), <i>not</i> the interface (if any) that the class
- * implements. AspectJ follows Java's rule that annotations on interfaces are <i>not</i>
- * inherited.
+ * <p>使用此切面时，<i>必须</i>在实现类（和/或该类中的方法）上标注注解，<i>而不要</i>
+ * 在类所实现的接口（如果有）上标注。AspectJ 遵循 Java 的规则：接口上的注解<i>不会</i>
+ * 被继承。
  *
- * <p>Any method may be annotated (regardless of visibility). Annotating non-public
- * methods directly is the only way to get caching demarcation for the execution of
- * such operations.
+ * <p>任何方法都可以标注注解（无论可见性如何）。直接为非 public 方法标注注解，
+ * 是为这类操作的执行提供缓存边界（caching demarcation）的唯一方式。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -69,13 +67,13 @@ public aspect JCacheCacheAspect extends JCacheAspectSupport {
 		}
 		catch (CacheOperationInvoker.ThrowableWrapper th) {
 			AnyThrow.throwUnchecked(th.getOriginal());
-			return null; // never reached
+			return null; // 永远不会执行到这里
 		}
 	}
 
 	/**
-	* Definition of pointcut: matched join points will have JSR-107
-	* cache management applied.
+	* 切点（pointcut）定义：匹配的连接点（join point）将应用 JSR-107
+	* 缓存管理。
 	*/
 	protected pointcut cacheMethodExecution(Object cachedObject) :
 			(executionOfCacheResultMethod()
@@ -85,25 +83,25 @@ public aspect JCacheCacheAspect extends JCacheAspectSupport {
 			&& this(cachedObject);
 
 	/**
-	 * Matches the execution of any method with the @{@link CacheResult} annotation.
+	 * 匹配带有 @{@link CacheResult} 注解的任意方法的执行。
 	 */
 	private pointcut executionOfCacheResultMethod() :
 		execution(@CacheResult * *(..));
 
 	/**
-	 * Matches the execution of any method with the @{@link CachePut} annotation.
+	 * 匹配带有 @{@link CachePut} 注解的任意方法的执行。
 	 */
 	private pointcut executionOfCachePutMethod() :
 		execution(@CachePut * *(..));
 
 	/**
-	 * Matches the execution of any method with the @{@link CacheRemove} annotation.
+	 * 匹配带有 @{@link CacheRemove} 注解的任意方法的执行。
 	 */
 	private pointcut executionOfCacheRemoveMethod() :
 		execution(@CacheRemove * *(..));
 
 	/**
-	 * Matches the execution of any method with the @{@link CacheRemoveAll} annotation.
+	 * 匹配带有 @{@link CacheRemoveAll} 注解的任意方法的执行。
 	 */
 	private pointcut executionOfCacheRemoveAllMethod() :
 		execution(@CacheRemoveAll * *(..));

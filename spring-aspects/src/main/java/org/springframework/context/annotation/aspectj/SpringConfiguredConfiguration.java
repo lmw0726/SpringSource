@@ -23,14 +23,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 
 /**
- * {@code @Configuration} class that registers an {@code AnnotationBeanConfigurerAspect}
- * capable of performing dependency injection services for non-Spring managed objects
- * annotated with @{@link org.springframework.beans.factory.annotation.Configurable
- * Configurable}.
+ * {@code @Configuration} 类，用于注册一个 {@code AnnotationBeanConfigurerAspect}（注解 bean 配置器切面），
+ * 该切面能够为标注了 @{@link org.springframework.beans.factory.annotation.Configurable
+ * Configurable} 注解的非 Spring 管理对象执行依赖注入服务。
  *
- * <p>This configuration class is automatically imported when using the
- * {@link EnableSpringConfigured @EnableSpringConfigured} annotation. See
- * {@code @EnableSpringConfigured}'s javadoc for complete usage details.
+ * <p>当使用 {@link EnableSpringConfigured @EnableSpringConfigured} 注解时，此配置类会被自动导入。
+ * 完整的用法详情请参阅 {@code @EnableSpringConfigured} 的 Javadoc。
  *
  * @author Chris Beams
  * @since 3.1
@@ -40,7 +38,7 @@ import org.springframework.context.annotation.Role;
 public class SpringConfiguredConfiguration {
 
 	/**
-	 * The bean name used for the configurer aspect.
+	 * 配置器切面所使用的 bean 名称。
 	 */
 	public static final String BEAN_CONFIGURER_ASPECT_BEAN_NAME =
 			"org.springframework.context.config.internalBeanConfigurerAspect";

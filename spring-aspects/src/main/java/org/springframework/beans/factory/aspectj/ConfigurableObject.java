@@ -17,7 +17,7 @@
 package org.springframework.beans.factory.aspectj;
 
 /**
- * Marker interface for domain objects that need DI through aspects.
+ * 用于需要通过 aspect（切面）进行 DI（依赖注入）的领域对象的标记接口。
  *
  * @author Ramnivas Laddad
  * @since 2.5

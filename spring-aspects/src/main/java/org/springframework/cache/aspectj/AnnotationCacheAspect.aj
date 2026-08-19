@@ -23,20 +23,18 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 
 /**
- * Concrete AspectJ cache aspect using Spring's @{@link Cacheable} annotation.
+ * 使用 Spring 的 @{@link Cacheable} 注解的具体 AspectJ 缓存切面（aspect）。
  *
- * <p>When using this aspect, you <i>must</i> annotate the implementation class (and/or
- * methods within that class), <i>not</i> the interface (if any) that the class
- * implements. AspectJ follows Java's rule that annotations on interfaces are <i>not</i>
- * inherited.
+ * <p>使用此切面时，<i>必须</i>在实现类（以及/或者该类中的方法）上标注注解，
+ * <i>而不要</i>标注在该类所实现的接口（如果有的话）上。AspectJ 遵循 Java 的规则，
+ * 即接口上的注解是<i>不会</i>被继承的。
  *
- * <p>A {@code @Cacheable} annotation on a class specifies the default caching semantics
- * for the execution of any <b>public</b> operation in the class.
+ * <p>类上的 {@code @Cacheable} 注解为类中任何 <b>public</b> 操作的执行指定默认的
+ * 缓存（cache）语义。
  *
- * <p>A {@code @Cacheable} annotation on a method within the class overrides the default
- * caching semantics given by the class annotation (if present). Any method may be
- * annotated (regardless of visibility). Annotating non-public methods directly is the
- * only way to get caching demarcation for the execution of such operations.
+ * <p>类中方法上的 {@code @Cacheable} 注解会覆盖类注解（如果存在）给出的默认缓存
+ * 语义。任何方法都可以标注注解（无论其可见性如何）。直接标注非 public 方法是
+ * 为这类操作的执行划定缓存边界的唯一途径。
  *
  * @author Costin Leau
  * @since 3.1
@@ -48,60 +46,56 @@ public aspect AnnotationCacheAspect extends AbstractCacheAspect {
 	}
 
 	/**
-	 * Matches the execution of any public method in a type with the @{@link Cacheable}
-	 * annotation, or any subtype of a type with the {@code @Cacheable} annotation.
+	 * 匹配带有 @{@link Cacheable} 注解的类型（或其任意子类型）中任何 public 方法的执行。
 	 */
 	private pointcut executionOfAnyPublicMethodInAtCacheableType() :
 		execution(public * ((@Cacheable *)+).*(..)) && within(@Cacheable *);
 
 	/**
-	 * Matches the execution of any public method in a type with the @{@link CacheEvict}
-	 * annotation, or any subtype of a type with the {@code CacheEvict} annotation.
+	 * 匹配带有 @{@link CacheEvict} 注解的类型（或其任意子类型）中任何 public 方法的执行。
 	 */
 	private pointcut executionOfAnyPublicMethodInAtCacheEvictType() :
 		execution(public * ((@CacheEvict *)+).*(..)) && within(@CacheEvict *);
 
 	/**
-	 * Matches the execution of any public method in a type with the @{@link CachePut}
-	 * annotation, or any subtype of a type with the {@code CachePut} annotation.
+	 * 匹配带有 @{@link CachePut} 注解的类型（或其任意子类型）中任何 public 方法的执行。
 	 */
 	private pointcut executionOfAnyPublicMethodInAtCachePutType() :
 		execution(public * ((@CachePut *)+).*(..)) && within(@CachePut *);
 
 	/**
-	 * Matches the execution of any public method in a type with the @{@link Caching}
-	 * annotation, or any subtype of a type with the {@code Caching} annotation.
+	 * 匹配带有 @{@link Caching} 注解的类型（或其任意子类型）中任何 public 方法的执行。
 	 */
 	private pointcut executionOfAnyPublicMethodInAtCachingType() :
 		execution(public * ((@Caching *)+).*(..)) && within(@Caching *);
 
 	/**
-	 * Matches the execution of any method with the @{@link Cacheable} annotation.
+	 * 匹配带有 @{@link Cacheable} 注解的任何方法的执行。
 	 */
 	private pointcut executionOfCacheableMethod() :
 		execution(@Cacheable * *(..));
 
 	/**
-	 * Matches the execution of any method with the @{@link CacheEvict} annotation.
+	 * 匹配带有 @{@link CacheEvict} 注解的任何方法的执行。
 	 */
 	private pointcut executionOfCacheEvictMethod() :
 		execution(@CacheEvict * *(..));
 
 	/**
-	 * Matches the execution of any method with the @{@link CachePut} annotation.
+	 * 匹配带有 @{@link CachePut} 注解的任何方法的执行。
 	 */
 	private pointcut executionOfCachePutMethod() :
 		execution(@CachePut * *(..));
 
 	/**
-	 * Matches the execution of any method with the @{@link Caching} annotation.
+	 * 匹配带有 @{@link Caching} 注解的任何方法的执行。
 	 */
 	private pointcut executionOfCachingMethod() :
 		execution(@Caching * *(..));
 
 	/**
-	 * Definition of pointcut from super aspect - matched join points will have Spring
-	 * cache management applied.
+	 * 来自父切面（super aspect）的 pointcut（切点）定义——匹配到的连接点（join point）
+	 * 将应用 Spring 缓存（cache）管理。
 	 */
 	protected pointcut cacheMethodExecution(Object cachedObject) :
 		(executionOfAnyPublicMethodInAtCacheableType()

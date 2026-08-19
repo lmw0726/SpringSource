@@ -26,9 +26,8 @@ import org.springframework.transaction.annotation.TransactionManagementConfigura
 import org.springframework.transaction.config.TransactionManagementConfigUtils;
 
 /**
- * {@code @Configuration} class that registers the Spring infrastructure beans necessary
- * to enable AspectJ-based annotation-driven transaction management for Spring's own
- * {@link org.springframework.transaction.annotation.Transactional} annotation.
+ * {@code @Configuration} 类，用于注册启用基于 AspectJ（切面编程框架）的、由注解驱动（annotation-driven）的事务（transaction）管理
+ * 所需的 Spring 基础设施 Bean，以便支持 Spring 自身的 {@link org.springframework.transaction.annotation.Transactional} 注解。
  *
  * @author Chris Beams
  * @author Juergen Hoeller

@@ -20,48 +20,35 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 /**
- * An aspect that injects dependency into any object whose type implements the
- * {@link ConfigurableObject} interface.
+ * 一个切面（aspect），用于向任何其类型实现了 {@link ConfigurableObject} 接口的对象注入依赖。
  *
- * <p>This aspect supports injecting into domain objects when they are created
- * for the first time as well as upon deserialization. Subaspects need to simply
- * provide definition for the configureBean() method. This method may be
- * implemented without relying on Spring container if so desired.
+ * <p>该切面支持在领域对象（domain object）首次创建时以及反序列化时对其进行注入。子切面只需
+ * 提供 configureBean() 方法的定义。如有需要，该方法也可以不依赖 Spring 容器来实现。
  *
- * <p>There are two cases that needs to be handled:
+ * <p>这里有两种需要处理的情况：
  * <ol>
- * <li>Normal object creation via the '{@code new}' operator: this is
- * taken care of by advising {@code initialization()} join points.</li>
- * <li>Object creation through deserialization: since no constructor is
- * invoked during deserialization, the aspect needs to advise a method that a
- * deserialization mechanism is going to invoke. Ideally, we should not
- * require user classes to implement any specific method. This implies that
- * we need to <i>introduce</i> the chosen method. We should also handle the cases
- * where the chosen method is already implemented in classes (in which case,
- * the user's implementation for that method should take precedence over the
- * introduced implementation). There are a few choices for the chosen method:
+ * <li>通过 '{@code new}' 操作符进行的普通对象创建：这可以通过对 {@code initialization()}
+ * 连接点（join point）进行通知（advice）来处理。</li>
+ * <li>通过反序列化创建对象：由于反序列化过程中不会调用构造函数，切面需要对反序列化机制将要调用的
+ * 某个方法进行通知。理想情况下，我们不应要求用户类实现任何特定方法。这意味着我们需要
+ * <i>引入</i>（introduce）所选的方法。我们还需要处理所选方法已存在于类中的情况（在这种情况下，
+ * 用户对该方法的实现应优先于引入的实现）。对于所选方法有几种选择：
  * <ul>
- * <li>readObject(ObjectOutputStream): Java requires that the method must be
- * {@code private}</p>. Since aspects cannot introduce a private member,
- * while preserving its name, this option is ruled out.</li>
- * <li>readResolve(): Java doesn't pose any restriction on an access specifier.
- * Problem solved! There is one (minor) limitation of this approach in
- * that if a user class already has this method, that method must be
- * {@code public}. However, this shouldn't be a big burden, since
- * use cases that need classes to implement readResolve() (custom enums,
- * for example) are unlikely to be marked as &#64;Configurable, and
- * in any case asking to make that method {@code public} should not
- * pose any undue burden.</li>
+ * <li>readObject(ObjectOutputStream)：Java 要求该方法必须是
+ * {@code private}</p>。由于切面无法在保留名称的同时引入私有成员，
+ * 因此该选项被排除。</li>
+ * <li>readResolve()：Java 对访问修饰符没有任何限制。问题解决了！这种方法有一个（较小的）局限，
+ * 即如果用户类已经拥有该方法，那么该方法必须是 {@code public}。不过，这不应造成太大负担，
+ * 因为需要类实现 readResolve() 的用例（例如自定义枚举）不太可能被标记为 &#64;Configurable，
+ * 而且无论如何，要求将该方法设为 {@code public} 不应带来任何过重的负担。</li>
  * </ul>
- * The minor collaboration needed by user classes (i.e., that the implementation of
- * {@code readResolve()}, if any, must be {@code public}) can be lifted as well if we
- * were to use an experimental feature in AspectJ - the {@code hasmethod()} PCD.</li>
+ * 如果使用 AspectJ 的一个实验性特性——{@code hasmethod()} PCD，那么用户类所需的少量协作
+ * （即任何 readResolve() 的实现（如果有的话）必须是 {@code public}）也可以被解除。</li>
  * </ol>
  *
- * <p>While having type implement the {@link ConfigurableObject} interface is certainly
- * a valid choice, an alternative is to use a 'declare parents' statement another aspect
- * (a subaspect of this aspect would be a logical choice) that declares the classes that
- * need to be configured by supplying the {@link ConfigurableObject} interface.
+ * <p>虽然让类型实现 {@link ConfigurableObject} 接口当然是一种有效的选择，但另一种替代方案是使用
+ * 另一个切面中的 'declare parents' 语句（此切面的子切面会是合乎逻辑的选择），通过提供
+ * {@link ConfigurableObject} 接口来声明需要被配置的类。
  *
  * @author Ramnivas Laddad
  * @since 2.5.2
@@ -69,13 +56,13 @@ import java.io.Serializable;
 public abstract aspect AbstractInterfaceDrivenDependencyInjectionAspect extends AbstractDependencyInjectionAspect {
 
 	/**
-	 * Select initialization join point as object construction
+	 * 将初始化连接点（join point）选择为对象构造
 	 */
 	public pointcut beanConstruction(Object bean) :
 			initialization(ConfigurableObject+.new(..)) && this(bean);
 
 	/**
-	 * Select deserialization join point made available through ITDs for ConfigurableDeserializationSupport
+	 * 选择通过 ConfigurableDeserializationSupport 的 ITD（跨类型声明，inter-type declaration）提供的反序列化连接点（join point）
 	 */
 	public pointcut beanDeserialization(Object bean) :
 			execution(Object ConfigurableDeserializationSupport+.readResolve()) && this(bean);
@@ -84,14 +71,14 @@ public abstract aspect AbstractInterfaceDrivenDependencyInjectionAspect extends 
 
 
 
-	// Implementation to support re-injecting dependencies once an object is deserialized
+	// 用于在对象被反序列化后重新注入依赖的实现
 
 	/**
-	 * Declare any class implementing Serializable and ConfigurableObject as also implementing
-	 * ConfigurableDeserializationSupport. This allows us to introduce the {@code readResolve()}
-	 * method and select it with the beanDeserialization() pointcut.
-	 * <p>Here is an improved version that uses the hasmethod() pointcut and lifts
-	 * even the minor requirement on user classes:
+	 * 声明任何同时实现 Serializable 和 ConfigurableObject 的类也实现
+	 * ConfigurableDeserializationSupport。这使我们能够引入 {@code readResolve()}
+	 * 方法，并通过 beanDeserialization() 切点（pointcut）选择它。
+	 * <p>下面是一个改进版本，它使用 hasmethod() 切点，甚至解除了对用户类的
+	 * 那一小点要求：
 	 * <pre class="code">
 	 * declare parents: ConfigurableObject+ Serializable+
 	 * && !hasmethod(Object readResolve() throws ObjectStreamException)
@@ -101,18 +88,17 @@ public abstract aspect AbstractInterfaceDrivenDependencyInjectionAspect extends 
 	declare parents: ConfigurableObject+ && Serializable+ implements ConfigurableDeserializationSupport;
 
 	/**
-	 * A marker interface to which the {@code readResolve()} is introduced.
+	 * 一个标记接口（marker interface），{@code readResolve()} 方法被引入到该接口上。
 	 */
 	static interface ConfigurableDeserializationSupport extends Serializable {
 	}
 
 	/**
-	 * Introduce the {@code readResolve()} method so that we can advise its
-	 * execution to configure the object.
-	 * <p>Note if a method with the same signature already exists in a
-	 * {@code Serializable} class of ConfigurableObject type,
-	 * that implementation will take precedence (a good thing, since we are
-	 * merely interested in an opportunity to detect deserialization.)
+	 * 引入 {@code readResolve()} 方法，以便我们可以通知（advise）它的
+	 * 执行来配置对象。
+	 * <p>请注意，如果 ConfigurableObject 类型的 {@code Serializable} 类中已经存在
+	 * 具有相同签名的方法，那么该实现将优先（这是一件好事，因为我们
+	 * 仅仅对检测反序列化的机会感兴趣。）
 	 */
 	public Object ConfigurableDeserializationSupport.readResolve() throws ObjectStreamException {
 		return this;

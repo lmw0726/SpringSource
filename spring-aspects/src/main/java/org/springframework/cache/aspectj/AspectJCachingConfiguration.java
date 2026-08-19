@@ -24,8 +24,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 
 /**
- * {@code @Configuration} class that registers the Spring infrastructure beans
- * necessary to enable AspectJ-based annotation-driven cache management.
+ * 用于注册启用基于 AspectJ 的注解驱动缓存管理（cache management）所需的
+ * Spring 基础设施 bean（infrastructure bean）的 {@code @Configuration} 类。
  *
  * @author Chris Beams
  * @author Stephane Nicoll
