@@ -29,11 +29,10 @@ import org.springframework.core.MethodClassKey;
 import org.springframework.lang.Nullable;
 
 /**
- * Abstract implementation of {@link JCacheOperationSource} that caches attributes
- * for methods and implements a fallback policy: 1. specific target method;
- * 2. declaring method.
+ * {@link JCacheOperationSource} 的抽象实现，缓存方法的属性
+ * 并实现回退策略：1. 特定目标方法；2. 声明方法。
  *
- * <p>This implementation caches attributes by method after they are first used.
+ * <p>此实现在首次使用后按方法缓存属性。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller
@@ -43,8 +42,8 @@ import org.springframework.lang.Nullable;
 public abstract class AbstractFallbackJCacheOperationSource implements JCacheOperationSource {
 
 	/**
-	 * Canonical value held in cache to indicate no caching attribute was
-	 * found for this method and we don't need to look again.
+	 * 缓存中保存的规范值，表示未找到此方法的缓存属性，
+	 * 无需再次查找。
 	 */
 	private static final Object NULL_CACHING_ATTRIBUTE = new Object();
 
@@ -79,22 +78,22 @@ public abstract class AbstractFallbackJCacheOperationSource implements JCacheOpe
 
 	@Nullable
 	private JCacheOperation<?> computeCacheOperation(Method method, @Nullable Class<?> targetClass) {
-		// Don't allow non-public methods, as configured.
+		// 不允许非公开方法，按配置执行。
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
 			return null;
 		}
 
-		// The method may be on an interface, but we need attributes from the target class.
-		// If the target class is null, the method will be unchanged.
+		// 该方法可能在接口上，但我们需要从目标类获取属性。
+		// 如果目标类为null，则方法保持不变。
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
-		// First try is the method in the target class.
+		// 首先尝试目标类中的方法。
 		JCacheOperation<?> operation = findCacheOperation(specificMethod, targetClass);
 		if (operation != null) {
 			return operation;
 		}
 		if (specificMethod != method) {
-			// Fallback is to look at the original method.
+			// 回退到查看原始方法。
 			operation = findCacheOperation(method, targetClass);
 			if (operation != null) {
 				return operation;
@@ -105,19 +104,17 @@ public abstract class AbstractFallbackJCacheOperationSource implements JCacheOpe
 
 
 	/**
-	 * Subclasses need to implement this to return the caching operation
-	 * for the given method, if any.
-	 * @param method the method to retrieve the operation for
-	 * @param targetType the target class
-	 * @return the cache operation associated with this method
-	 * (or {@code null} if none)
+	 * 子类需要实现此方法以返回给定方法的缓存操作（如果有的话）。
+	 * @param method 要检索操作的方法
+	 * @param targetType 目标类
+	 * @return 与此方法关联的缓存操作（如果没有则返回 {@code null}）
 	 */
 	@Nullable
 	protected abstract JCacheOperation<?> findCacheOperation(Method method, @Nullable Class<?> targetType);
 
 	/**
-	 * Should only public methods be allowed to have caching semantics?
-	 * <p>The default implementation returns {@code false}.
+	 * 是否只允许公共方法具有缓存语义？
+	 * <p>默认实现返回 {@code false}。
 	 */
 	protected boolean allowPublicMethodsOnly() {
 		return false;

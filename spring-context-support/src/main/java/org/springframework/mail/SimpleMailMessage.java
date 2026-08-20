@@ -25,12 +25,10 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Models a simple mail message, including data such as the from, to, cc, subject,
- * and text fields.
+ * 对简单邮件消息进行建模，包括发件人、收件人、抄送、主题和正文等数据。
  *
- * <p>Consider {@code JavaMailSender} and JavaMail {@code MimeMessages} for creating
- * more sophisticated messages, for example messages with attachments, special
- * character encodings, or personal names that accompany mail addresses.
+ * <p>如需创建更复杂的邮件消息（例如带有附件、特殊字符编码或附带个人名称的邮件地址），
+ * 请考虑使用 {@code JavaMailSender} 和 JavaMail 的 {@code MimeMessages}。
  *
  * @author Dmitriy Kopylenko
  * @author Juergen Hoeller
@@ -70,14 +68,13 @@ public class SimpleMailMessage implements MailMessage, Serializable {
 
 
 	/**
-	 * Create a new {@code SimpleMailMessage}.
+	 * 创建一个新的 {@code SimpleMailMessage}。
 	 */
 	public SimpleMailMessage() {
 	}
 
 	/**
-	 * Copy constructor for creating a new {@code SimpleMailMessage} from the state
-	 * of an existing {@code SimpleMailMessage} instance.
+	 * 复制构造函数，根据现有 {@code SimpleMailMessage} 实例的状态创建新的 {@code SimpleMailMessage}。
 	 */
 	public SimpleMailMessage(SimpleMailMessage original) {
 		Assert.notNull(original, "'original' message argument must not be null");
@@ -189,8 +186,8 @@ public class SimpleMailMessage implements MailMessage, Serializable {
 
 
 	/**
-	 * Copy the contents of this message to the given target message.
-	 * @param target the {@code MailMessage} to copy to
+	 * 将此消息的内容复制到给定的目标消息。
+	 * @param target 要复制到的 {@code MailMessage}
 	 */
 	public void copyTo(MailMessage target) {
 		Assert.notNull(target, "'target' MailMessage must not be null");

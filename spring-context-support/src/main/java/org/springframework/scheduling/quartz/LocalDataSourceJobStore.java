@@ -36,25 +36,24 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.lang.Nullable;
 
 /**
- * Subclass of Quartz's {@link JobStoreCMT} class that delegates to a Spring-managed
- * {@link DataSource} instead of using a Quartz-managed JDBC connection pool.
- * This JobStore will be used if SchedulerFactoryBean's "dataSource" property is set.
- * You may also configure it explicitly, possibly as a custom subclass of this
- * {@code LocalDataSourceJobStore} or as an equivalent {@code JobStoreCMT} variant.
+ * Quartz 的 {@link JobStoreCMT} 类的子类，委托给 Spring 管理的
+ * {@link DataSource}，而非使用 Quartz 管理的 JDBC 连接池。
+ * 如果设置了 SchedulerFactoryBean 的 "dataSource" 属性，将使用此 JobStore。
+ * 也可以显式配置它，可以作为此 {@code LocalDataSourceJobStore}
+ * 的自定义子类，或者作为等效的 {@code JobStoreCMT} 变体。
  *
- * <p>Supports both transactional and non-transactional DataSource access.
- * With a non-XA DataSource and local Spring transactions, a single DataSource
- * argument is sufficient. In case of an XA DataSource and global JTA transactions,
- * SchedulerFactoryBean's "nonTransactionalDataSource" property should be set,
- * passing in a non-XA DataSource that will not participate in global transactions.
+ * <p>支持事务性和非事务性的 DataSource 访问。
+ * 使用非 XA DataSource 和本地 Spring 事务时，只需提供一个 DataSource
+ * 参数即可。如果使用 XA DataSource 和全局 JTA 事务，
+ * 应设置 SchedulerFactoryBean 的 "nonTransactionalDataSource" 属性，
+ * 传入一个不会参与全局事务的非 XA DataSource。
  *
- * <p>Operations performed by this JobStore will properly participate in any
- * kind of Spring-managed transaction, as it uses Spring's DataSourceUtils
- * connection handling methods that are aware of a current transaction.
+ * <p>此 JobStore 执行的操作将正确参与任何类型的 Spring 管理的事务，
+ * 因为它使用了 Spring 的 DataSourceUtils 连接处理方法，
+ * 这些方法能够感知当前事务。
  *
- * <p>Note that all Quartz Scheduler operations that affect the persistent
- * job store should usually be performed within active transactions,
- * as they assume to get proper locks etc.
+ * <p>请注意，所有影响持久化作业存储的 Quartz Scheduler 操作
+ * 通常应在活动事务中执行，因为它们假定能够获取适当的锁等。
  *
  * @author Juergen Hoeller
  * @since 1.1
@@ -65,20 +64,20 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.jdbc.datasource.DataSourceUtils#doGetConnection
  * @see org.springframework.jdbc.datasource.DataSourceUtils#releaseConnection
  */
-@SuppressWarnings("unchecked")  // due to a warning in Quartz 2.2's JobStoreCMT
+@SuppressWarnings("unchecked")  // 由于 Quartz 2.2 的 JobStoreCMT 中的警告
 public class LocalDataSourceJobStore extends JobStoreCMT {
 
 	/**
-	 * Name used for the transactional ConnectionProvider for Quartz.
-	 * This provider will delegate to the local Spring-managed DataSource.
+	 * Quartz 事务性 ConnectionProvider 使用的名称。
+	 * 此提供者将委托给本地 Spring 管理的 DataSource。
 	 * @see org.quartz.utils.DBConnectionManager#addConnectionProvider
 	 * @see SchedulerFactoryBean#setDataSource
 	 */
 	public static final String TX_DATA_SOURCE_PREFIX = "springTxDataSource.";
 
 	/**
-	 * Name used for the non-transactional ConnectionProvider for Quartz.
-	 * This provider will delegate to the local Spring-managed DataSource.
+	 * Quartz 非事务性 ConnectionProvider 使用的名称。
+	 * 此提供者将委托给本地 Spring 管理的 DataSource。
 	 * @see org.quartz.utils.DBConnectionManager#addConnectionProvider
 	 * @see SchedulerFactoryBean#setDataSource
 	 */
@@ -91,66 +90,66 @@ public class LocalDataSourceJobStore extends JobStoreCMT {
 
 	@Override
 	public void initialize(ClassLoadHelper loadHelper, SchedulerSignaler signaler) throws SchedulerConfigException {
-		// Absolutely needs thread-bound DataSource to initialize.
+		// 绝对需要线程绑定的 DataSource 来初始化。
 		this.dataSource = SchedulerFactoryBean.getConfigTimeDataSource();
 		if (this.dataSource == null) {
 			throw new SchedulerConfigException("No local DataSource found for configuration - " +
 					"'dataSource' property must be set on SchedulerFactoryBean");
 		}
 
-		// Configure transactional connection settings for Quartz.
+		// 为 Quartz 配置事务性连接设置。
 		setDataSource(TX_DATA_SOURCE_PREFIX + getInstanceName());
 		setDontSetAutoCommitFalse(true);
 
-		// Register transactional ConnectionProvider for Quartz.
+		// 为 Quartz 注册事务性 ConnectionProvider。
 		DBConnectionManager.getInstance().addConnectionProvider(
 				TX_DATA_SOURCE_PREFIX + getInstanceName(),
 				new ConnectionProvider() {
 					@Override
 					public Connection getConnection() throws SQLException {
-						// Return a transactional Connection, if any.
+						// 返回一个事务性连接（如果有的话）。
 						return DataSourceUtils.doGetConnection(dataSource);
 					}
 					@Override
 					public void shutdown() {
-						// Do nothing - a Spring-managed DataSource has its own lifecycle.
+						// 不做任何操作 - Spring 管理的 DataSource 有自己的生命周期。
 					}
 					@Override
 					public void initialize() {
-						// Do nothing - a Spring-managed DataSource has its own lifecycle.
+						// 不做任何操作 - Spring 管理的 DataSource 有自己的生命周期。
 					}
 				}
 		);
 
-		// Non-transactional DataSource is optional: fall back to default
-		// DataSource if not explicitly specified.
+		// 非事务性 DataSource 是可选的：如果未显式指定，
+		// 则回退到默认的 DataSource。
 		DataSource nonTxDataSource = SchedulerFactoryBean.getConfigTimeNonTransactionalDataSource();
 		final DataSource nonTxDataSourceToUse = (nonTxDataSource != null ? nonTxDataSource : this.dataSource);
 
-		// Configure non-transactional connection settings for Quartz.
+		// 为 Quartz 配置非事务性连接设置。
 		setNonManagedTXDataSource(NON_TX_DATA_SOURCE_PREFIX + getInstanceName());
 
-		// Register non-transactional ConnectionProvider for Quartz.
+		// 为 Quartz 注册非事务性 ConnectionProvider。
 		DBConnectionManager.getInstance().addConnectionProvider(
 				NON_TX_DATA_SOURCE_PREFIX + getInstanceName(),
 				new ConnectionProvider() {
 					@Override
 					public Connection getConnection() throws SQLException {
-						// Always return a non-transactional Connection.
+						// 始终返回一个非事务性连接。
 						return nonTxDataSourceToUse.getConnection();
 					}
 					@Override
 					public void shutdown() {
-						// Do nothing - a Spring-managed DataSource has its own lifecycle.
+						// 不做任何操作 - Spring 管理的 DataSource 有自己的生命周期。
 					}
 					@Override
 					public void initialize() {
-						// Do nothing - a Spring-managed DataSource has its own lifecycle.
+						// 不做任何操作 - Spring 管理的 DataSource 有自己的生命周期。
 					}
 				}
 		);
 
-		// No, if HSQL is the platform, we really don't want to use locks...
+		// 如果平台是 HSQL，我们确实不想使用锁...
 		try {
 			String productName = JdbcUtils.extractDatabaseMetaData(this.dataSource,
 					DatabaseMetaData::getDatabaseProductName);
@@ -170,7 +169,7 @@ public class LocalDataSourceJobStore extends JobStoreCMT {
 
 	@Override
 	protected void closeConnection(Connection con) {
-		// Will work for transactional and non-transactional connections.
+		// 适用于事务性和非事务性连接。
 		DataSourceUtils.releaseConnection(con, this.dataSource);
 	}
 

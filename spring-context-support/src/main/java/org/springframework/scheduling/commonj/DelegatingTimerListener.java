@@ -22,13 +22,13 @@ import commonj.timers.TimerListener;
 import org.springframework.util.Assert;
 
 /**
- * Simple TimerListener adapter that delegates to a given Runnable.
+ * 一个简单的 TimerListener 适配器，将执行委托给给定的 Runnable。
  *
  * @author Juergen Hoeller
  * @since 2.0
  * @see commonj.timers.TimerListener
  * @see java.lang.Runnable
- * @deprecated as of 5.1, in favor of EE 7's
+ * @deprecated 从 5.1 版本起已弃用，建议使用 EE 7 的
  * {@link org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler}
  */
 @Deprecated
@@ -38,8 +38,8 @@ public class DelegatingTimerListener implements TimerListener {
 
 
 	/**
-	 * Create a new DelegatingTimerListener.
-	 * @param runnable the Runnable implementation to delegate to
+	 * 创建一个新的 DelegatingTimerListener。
+	 * @param runnable 要委托的 Runnable 实现
 	 */
 	public DelegatingTimerListener(Runnable runnable) {
 		Assert.notNull(runnable, "Runnable is required");
@@ -48,7 +48,7 @@ public class DelegatingTimerListener implements TimerListener {
 
 
 	/**
-	 * Delegates execution to the underlying Runnable.
+	 * 将执行委托给底层的 Runnable。
 	 */
 	@Override
 	public void timerExpired(Timer timer) {

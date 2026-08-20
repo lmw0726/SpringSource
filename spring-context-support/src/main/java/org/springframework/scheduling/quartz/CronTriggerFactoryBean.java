@@ -35,17 +35,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A Spring {@link FactoryBean} for creating a Quartz {@link org.quartz.CronTrigger}
- * instance, supporting bean-style usage for trigger configuration.
+ * 用于创建 Quartz {@link org.quartz.CronTrigger} 实例的 Spring {@link FactoryBean}，
+ * 支持以 bean 风格配置触发器。
  *
- * <p>{@code CronTrigger(Impl)} itself is already a JavaBean but lacks sensible defaults.
- * This class uses the Spring bean name as job name, the Quartz default group ("DEFAULT")
- * as job group, the current time as start time, and indefinite repetition, if not specified.
+ * <p>{@code CronTrigger(Impl)} 本身已经是一个 JavaBean，但缺乏合理的默认值。
+ * 本类使用 Spring bean 名称作为任务名称，使用 Quartz 默认组（"DEFAULT"）
+ * 作为任务组，使用当前时间作为开始时间，如果未指定则无限重复执行。
  *
- * <p>This class will also register the trigger with the job name and group of
- * a given {@link org.quartz.JobDetail}. This allows {@link SchedulerFactoryBean}
- * to automatically register a trigger for the corresponding JobDetail,
- * instead of registering the JobDetail separately.
+ * <p>本类还将使用给定 {@link org.quartz.JobDetail} 的任务名称和组来注册触发器。
+ * 这使得 {@link SchedulerFactoryBean} 能够自动为对应的 JobDetail 注册触发器，
+ * 而无需单独注册 JobDetail。
  *
  * @author Juergen Hoeller
  * @since 3.1
@@ -58,7 +57,7 @@ import org.springframework.util.Assert;
  */
 public class CronTriggerFactoryBean implements FactoryBean<CronTrigger>, BeanNameAware, InitializingBean {
 
-	/** Constants for the CronTrigger class. */
+	/** CronTrigger 类的常量。 */
 	private static final Constants constants = new Constants(CronTrigger.class);
 
 
@@ -102,28 +101,28 @@ public class CronTriggerFactoryBean implements FactoryBean<CronTrigger>, BeanNam
 
 
 	/**
-	 * Specify the trigger's name.
+	 * 设置触发器的名称。
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * Specify the trigger's group.
+	 * 设置触发器的分组。
 	 */
 	public void setGroup(String group) {
 		this.group = group;
 	}
 
 	/**
-	 * Set the JobDetail that this trigger should be associated with.
+	 * 设置此触发器应关联的 JobDetail。
 	 */
 	public void setJobDetail(JobDetail jobDetail) {
 		this.jobDetail = jobDetail;
 	}
 
 	/**
-	 * Set the trigger's JobDataMap.
+	 * 设置触发器的 JobDataMap。
 	 * @see #setJobDataAsMap
 	 */
 	public void setJobDataMap(JobDataMap jobDataMap) {
@@ -131,36 +130,36 @@ public class CronTriggerFactoryBean implements FactoryBean<CronTrigger>, BeanNam
 	}
 
 	/**
-	 * Return the trigger's JobDataMap.
+	 * 返回触发器的 JobDataMap。
 	 */
 	public JobDataMap getJobDataMap() {
 		return this.jobDataMap;
 	}
 
 	/**
-	 * Register objects in the JobDataMap via a given Map.
-	 * <p>These objects will be available to this Trigger only,
-	 * in contrast to objects in the JobDetail's data map.
-	 * @param jobDataAsMap a Map with String keys and any objects as values
-	 * (for example Spring-managed beans)
+	 * 通过给定的 Map 在 JobDataMap 中注册对象。
+	 * <p>这些对象将仅对此 Trigger 可用，
+	 * 而 JobDetail 的数据映射中的对象则不同。
+	 * @param jobDataAsMap 包含 String 键和任意对象值的 Map
+	 *（例如 Spring 管理的 bean）
 	 */
 	public void setJobDataAsMap(Map<String, ?> jobDataAsMap) {
 		this.jobDataMap.putAll(jobDataAsMap);
 	}
 
 	/**
-	 * Set a specific start time for the trigger.
-	 * <p>Note that a dynamically computed {@link #setStartDelay} specification
-	 * overrides a static timestamp set here.
+	 * 设置触发器的特定开始时间。
+	 * <p>请注意，动态计算的 {@link #setStartDelay} 规范
+	 * 会覆盖此处设置的静态时间戳。
 	 */
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 
 	/**
-	 * Set the start delay in milliseconds.
-	 * <p>The start delay is added to the current system time (when the bean starts)
-	 * to control the start time of the trigger.
+	 * 设置启动延迟时间（以毫秒为单位）。
+	 * <p>启动延迟时间会加到当前系统时间上（当 bean 启动时），
+	 * 以控制触发器的开始时间。
 	 */
 	public void setStartDelay(long startDelay) {
 		Assert.isTrue(startDelay >= 0, "Start delay cannot be negative");
@@ -168,44 +167,44 @@ public class CronTriggerFactoryBean implements FactoryBean<CronTrigger>, BeanNam
 	}
 
 	/**
-	 * Specify the cron expression for this trigger.
+	 * 设置此触发器的 cron 表达式。
 	 */
 	public void setCronExpression(String cronExpression) {
 		this.cronExpression = cronExpression;
 	}
 
 	/**
-	 * Specify the time zone for this trigger's cron expression.
+	 * 设置此触发器 cron 表达式的时区。
 	 */
 	public void setTimeZone(TimeZone timeZone) {
 		this.timeZone = timeZone;
 	}
 
 	/**
-	 * Associate a specific calendar with this cron trigger.
+	 * 将特定日历与此 cron 触发器关联。
 	 */
 	public void setCalendarName(String calendarName) {
 		this.calendarName = calendarName;
 	}
 
 	/**
-	 * Specify the priority of this trigger.
+	 * 设置此触发器的优先级。
 	 */
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
 
 	/**
-	 * Specify a misfire instruction for this trigger.
+	 * 设置此触发器的 misfire 指令。
 	 */
 	public void setMisfireInstruction(int misfireInstruction) {
 		this.misfireInstruction = misfireInstruction;
 	}
 
 	/**
-	 * Set the misfire instruction via the name of the corresponding
-	 * constant in the {@link org.quartz.CronTrigger} class.
-	 * Default is {@code MISFIRE_INSTRUCTION_SMART_POLICY}.
+	 * 通过 {@link org.quartz.CronTrigger} 类中对应常量的名称
+	 * 设置 misfire 指令。
+	 * 默认值为 {@code MISFIRE_INSTRUCTION_SMART_POLICY}。
 	 * @see org.quartz.CronTrigger#MISFIRE_INSTRUCTION_FIRE_ONCE_NOW
 	 * @see org.quartz.CronTrigger#MISFIRE_INSTRUCTION_DO_NOTHING
 	 * @see org.quartz.Trigger#MISFIRE_INSTRUCTION_SMART_POLICY
@@ -215,7 +214,7 @@ public class CronTriggerFactoryBean implements FactoryBean<CronTrigger>, BeanNam
 	}
 
 	/**
-	 * Associate a textual description with this trigger.
+	 * 将文本描述与此触发器关联。
 	 */
 	public void setDescription(String description) {
 		this.description = description;

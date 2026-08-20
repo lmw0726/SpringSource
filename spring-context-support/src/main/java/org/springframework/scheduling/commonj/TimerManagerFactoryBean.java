@@ -31,28 +31,28 @@ import org.springframework.context.Lifecycle;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link org.springframework.beans.factory.FactoryBean} that retrieves a
- * CommonJ {@link commonj.timers.TimerManager} and exposes it for bean references.
+ * {@link org.springframework.beans.factory.FactoryBean} 用于获取
+ * CommonJ {@link commonj.timers.TimerManager} 并将其暴露为 Bean 引用。
  *
- * <p><b>This is the central convenience class for setting up a
- * CommonJ TimerManager in a Spring context.</b>
+ * <p><b>这是在 Spring 上下文中设置
+ * CommonJ TimerManager 的核心便捷类。</b>
  *
- * <p>Allows for registration of ScheduledTimerListeners. This is the main
- * purpose of this class; the TimerManager itself could also be fetched
- * from JNDI via {@link org.springframework.jndi.JndiObjectFactoryBean}.
- * In scenarios that just require static registration of tasks at startup,
- * there is no need to access the TimerManager itself in application code.
+ * <p>允许注册 ScheduledTimerListener。这是该类的主要目的；
+ * TimerManager 本身也可以通过
+ * {@link org.springframework.jndi.JndiObjectFactoryBean} 从 JNDI 获取。
+ * 在仅需要在启动时静态注册任务的场景中，
+ * 应用代码无需直接访问 TimerManager 本身。
  *
- * <p>Note that the TimerManager uses a TimerListener instance that is
- * shared between repeated executions, in contrast to Quartz which
- * instantiates a new Job for each execution.
+ * <p>请注意，TimerManager 使用的 TimerListener 实例
+ * 在重复执行之间是共享的，这与 Quartz 为每次执行
+ * 创建新 Job 实例的方式不同。
  *
  * @author Juergen Hoeller
  * @since 2.0
  * @see ScheduledTimerListener
  * @see commonj.timers.TimerManager
  * @see commonj.timers.TimerListener
- * @deprecated as of 5.1, in favor of EE 7's
+ * @deprecated 从 5.1 版本起已弃用，建议使用 EE 7 的
  * {@link org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler}
  */
 @Deprecated
@@ -67,9 +67,9 @@ public class TimerManagerFactoryBean extends TimerManagerAccessor
 
 
 	/**
-	 * Register a list of ScheduledTimerListener objects with the TimerManager
-	 * that this FactoryBean creates. Depending on each ScheduledTimerListener's settings,
-	 * it will be registered via one of TimerManager's schedule methods.
+	 * 向该 FactoryBean 创建的 TimerManager 注册 ScheduledTimerListener 对象列表。
+	 * 根据每个 ScheduledTimerListener 的设置，
+	 * 将通过 TimerManager 的某个 schedule 方法进行注册。
 	 * @see commonj.timers.TimerManager#schedule(commonj.timers.TimerListener, long)
 	 * @see commonj.timers.TimerManager#schedule(commonj.timers.TimerListener, long, long)
 	 * @see commonj.timers.TimerManager#scheduleAtFixedRate(commonj.timers.TimerListener, long, long)
@@ -80,7 +80,7 @@ public class TimerManagerFactoryBean extends TimerManagerAccessor
 
 
 	//---------------------------------------------------------------------
-	// Implementation of InitializingBean interface
+	// InitializingBean 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -112,7 +112,7 @@ public class TimerManagerFactoryBean extends TimerManagerAccessor
 
 
 	//---------------------------------------------------------------------
-	// Implementation of FactoryBean interface
+	// FactoryBean 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -134,18 +134,18 @@ public class TimerManagerFactoryBean extends TimerManagerAccessor
 
 
 	//---------------------------------------------------------------------
-	// Implementation of DisposableBean interface
+	// DisposableBean 接口的实现
 	//---------------------------------------------------------------------
 
 	/**
-	 * Cancels all statically registered Timers on shutdown,
-	 * and stops the underlying TimerManager (if not shared).
+	 * 在关闭时取消所有静态注册的 Timer，
+	 * 并停止底层的 TimerManager（如果未被共享）。
 	 * @see commonj.timers.Timer#cancel()
 	 * @see commonj.timers.TimerManager#stop()
 	 */
 	@Override
 	public void destroy() {
-		// Cancel all registered timers.
+		// 取消所有已注册的定时器。
 		if (this.timers != null) {
 			for (Timer timer : this.timers) {
 				try {
@@ -158,7 +158,7 @@ public class TimerManagerFactoryBean extends TimerManagerAccessor
 			this.timers.clear();
 		}
 
-		// Stop the TimerManager itself.
+		// 停止 TimerManager 本身。
 		super.destroy();
 	}
 

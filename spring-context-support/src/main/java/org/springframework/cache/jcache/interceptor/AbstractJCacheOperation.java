@@ -35,11 +35,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.ExceptionTypeFilter;
 
 /**
- * A base {@link JCacheOperation} implementation.
+ * 一个基础的 {@link JCacheOperation} 实现。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @param <A> the annotation type
+ * @param <A> 注解类型
  */
 abstract class AbstractJCacheOperation<A extends Annotation> implements JCacheOperation<A> {
 
@@ -51,9 +51,9 @@ abstract class AbstractJCacheOperation<A extends Annotation> implements JCacheOp
 
 
 	/**
-	 * Construct a new {@code AbstractJCacheOperation}.
-	 * @param methodDetails the {@link CacheMethodDetails} related to the cached method
-	 * @param cacheResolver the cache resolver to resolve regular caches
+	 * 构造一个新的 {@code AbstractJCacheOperation}。
+	 * @param methodDetails 与被缓存方法相关的 {@link CacheMethodDetails}
+	 * @param cacheResolver 用于解析常规缓存的缓存解析器
 	 */
 	protected AbstractJCacheOperation(CacheMethodDetails<A> methodDetails, CacheResolver cacheResolver) {
 		Assert.notNull(methodDetails, "CacheMethodDetails must not be null");
@@ -119,14 +119,13 @@ abstract class AbstractJCacheOperation<A extends Annotation> implements JCacheOp
 
 
 	/**
-	 * Return the {@link ExceptionTypeFilter} to use to filter exceptions thrown while
-	 * invoking the method.
+	 * 返回用于过滤方法调用过程中抛出的异常的 {@link ExceptionTypeFilter}。
 	 * @see #createExceptionTypeFilter
 	 */
 	public abstract ExceptionTypeFilter getExceptionTypeFilter();
 
 	/**
-	 * Convenience method for subclasses to create a specific {@code ExceptionTypeFilter}.
+	 * 子类用来创建特定 {@code ExceptionTypeFilter} 的便捷方法。
 	 * @see #getExceptionTypeFilter()
 	 */
 	protected ExceptionTypeFilter createExceptionTypeFilter(
@@ -142,8 +141,8 @@ abstract class AbstractJCacheOperation<A extends Annotation> implements JCacheOp
 	}
 
 	/**
-	 * Return an identifying description for this caching operation.
-	 * <p>Available to subclasses, for inclusion in their {@code toString()} result.
+	 * 返回此缓存操作的标识性描述。
+	 * <p>可供子类使用，以包含在其 {@code toString()} 结果中。
 	 */
 	protected StringBuilder getOperationDescription() {
 		StringBuilder result = new StringBuilder();
@@ -155,7 +154,7 @@ abstract class AbstractJCacheOperation<A extends Annotation> implements JCacheOp
 
 
 	/**
-	 * Details for a single cache parameter.
+	 * 单个缓存参数的详细信息。
 	 */
 	protected static class CacheParameterDetail {
 
@@ -207,7 +206,7 @@ abstract class AbstractJCacheOperation<A extends Annotation> implements JCacheOp
 
 
 	/**
-	 * A single cache invocation parameter.
+	 * 单个缓存调用参数。
 	 */
 	protected static class CacheInvocationParameterImpl implements CacheInvocationParameter {
 

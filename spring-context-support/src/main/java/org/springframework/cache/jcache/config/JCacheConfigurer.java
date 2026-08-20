@@ -21,16 +21,13 @@ import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.lang.Nullable;
 
 /**
- * Extension of {@link CachingConfigurer} for the JSR-107 implementation.
+ * JSR-107 实现的 {@link CachingConfigurer} 扩展。
  *
- * <p>To be implemented by classes annotated with
- * {@link org.springframework.cache.annotation.EnableCaching} that wish
- * or need to specify explicitly how exception caches are resolved for
- * annotation-driven cache management.
+ * <p>由使用 {@link org.springframework.cache.annotation.EnableCaching} 注解的类实现，
+ * 这些类希望或需要显式指定注解驱动缓存管理中异常缓存的解析方式。
  *
- * <p>See {@link org.springframework.cache.annotation.EnableCaching} for
- * general examples and context; see {@link #exceptionCacheResolver()} for
- * detailed instructions.
+ * <p>有关通用示例和上下文，请参阅 {@link org.springframework.cache.annotation.EnableCaching}；
+ * 有关详细说明，请参阅 {@link #exceptionCacheResolver()}。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -40,22 +37,21 @@ import org.springframework.lang.Nullable;
 public interface JCacheConfigurer extends CachingConfigurer {
 
 	/**
-	 * Return the {@link CacheResolver} bean to use to resolve exception caches for
-	 * annotation-driven cache management. Implementations must explicitly declare
-	 * {@link org.springframework.context.annotation.Bean @Bean}, e.g.
+	 * 返回用于解析注解驱动缓存管理中异常缓存的 {@link CacheResolver} bean。
+	 * 实现类必须显式声明 {@link org.springframework.context.annotation.Bean @Bean}，例如：
 	 * <pre class="code">
 	 * &#064;Configuration
 	 * &#064;EnableCaching
 	 * public class AppConfig extends JCacheConfigurerSupport {
-	 *     &#064;Bean // important!
+	 *     &#064;Bean // 重要！
 	 *     &#064;Override
 	 *     public CacheResolver exceptionCacheResolver() {
-	 *         // configure and return CacheResolver instance
+	 *         // 配置并返回 CacheResolver 实例
 	 *     }
 	 *     // ...
 	 * }
 	 * </pre>
-	 * See {@link org.springframework.cache.annotation.EnableCaching} for more complete examples.
+	 * 有关更完整的示例，请参阅 {@link org.springframework.cache.annotation.EnableCaching}。
 	 */
 	@Nullable
 	default CacheResolver exceptionCacheResolver() {

@@ -31,14 +31,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.function.SingletonSupplier;
 
 /**
- * AOP Alliance MethodInterceptor for declarative cache
- * management using JSR-107 caching annotations.
+ * 用于使用 JSR-107 缓存注解进行声明式缓存管理的 AOP Alliance MethodInterceptor。
  *
- * <p>Derives from the {@link JCacheAspectSupport} class which
- * contains the integration with Spring's underlying caching API.
- * JCacheInterceptor simply calls the relevant superclass method.
+ * <p>继承自 {@link JCacheAspectSupport} 类，该类包含与 Spring 底层缓存 API 的集成。
+ * JCacheInterceptor 仅调用相关的父类方法。
  *
- * <p>JCacheInterceptors are thread-safe.
+ * <p>JCacheInterceptor 是线程安全的。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller
@@ -49,15 +47,14 @@ import org.springframework.util.function.SingletonSupplier;
 public class JCacheInterceptor extends JCacheAspectSupport implements MethodInterceptor, Serializable {
 
 	/**
-	 * Construct a new {@code JCacheInterceptor} with the default error handler.
+	 * 使用默认错误处理器构造一个新的 {@code JCacheInterceptor}。
 	 */
 	public JCacheInterceptor() {
 	}
 
 	/**
-	 * Construct a new {@code JCacheInterceptor} with the given error handler.
-	 * @param errorHandler a supplier for the error handler to use,
-	 * applying the default error handler if the supplier is not resolvable
+	 * 使用给定的错误处理器构造一个新的 {@code JCacheInterceptor}。
+	 * @param errorHandler 用于提供错误处理器的 Supplier，如果 Supplier 无法解析，则应用默认错误处理器
 	 * @since 5.1
 	 */
 	public JCacheInterceptor(@Nullable Supplier<CacheErrorHandler> errorHandler) {

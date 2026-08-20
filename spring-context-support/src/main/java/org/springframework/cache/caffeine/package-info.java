@@ -1,7 +1,6 @@
 /**
- * Support classes for the open source cache in
- * <a href="https://github.com/ben-manes/caffeine/">Caffeine</a> library,
- * allowing to set up Caffeine caches within Spring's cache abstraction.
+ * 对开源缓存库 <a href="https://github.com/ben-manes/caffeine/">Caffeine</a> 的支持类，
+ * 允许在 Spring 的缓存抽象中设置 Caffeine 缓存。
  */
 @NonNullApi
 @NonNullFields

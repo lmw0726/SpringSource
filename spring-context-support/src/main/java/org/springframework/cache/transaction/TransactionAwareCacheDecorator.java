@@ -25,16 +25,14 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.Assert;
 
 /**
- * Cache decorator which synchronizes its {@link #put}, {@link #evict} and
- * {@link #clear} operations with Spring-managed transactions (through Spring's
- * {@link TransactionSynchronizationManager}, performing the actual cache
- * put/evict/clear operation only in the after-commit phase of a successful
- * transaction. If no transaction is active, {@link #put}, {@link #evict} and
- * {@link #clear} operations will be performed immediately, as usual.
+ * 缓存装饰器，将其 {@link #put}、{@link #evict} 和 {@link #clear} 操作
+ * 与 Spring 管理的事务同步（通过 Spring 的 {@link TransactionSynchronizationManager}），
+ * 仅在成功事务的提交后阶段执行实际的缓存 put/evict/clear 操作。
+ * 如果没有活跃的事务，{@link #put}、{@link #evict} 和 {@link #clear} 操作
+ * 将像往常一样立即执行。
  *
- * <p><b>Note:</b> Use of immediate operations such as {@link #putIfAbsent} and
- * {@link #evictIfPresent} cannot be deferred to the after-commit phase of a
- * running transaction. Use these with care in a transactional environment.
+ * <p><b>注意：</b>像 {@link #putIfAbsent} 和 {@link #evictIfPresent} 这样的
+ * 立即执行操作不能延迟到正在运行的事务的提交后阶段。在事务环境中使用这些操作时请谨慎。
  *
  * @author Juergen Hoeller
  * @author Stephane Nicoll
@@ -48,7 +46,7 @@ public class TransactionAwareCacheDecorator implements Cache {
 
 
 	/**
-	 * Create a new TransactionAwareCache for the given target Cache.
+	 * 为给定的目标 Cache 创建一个新的 TransactionAwareCache。
 	 * @param targetCache the target Cache to decorate
 	 */
 	public TransactionAwareCacheDecorator(Cache targetCache) {
@@ -58,7 +56,7 @@ public class TransactionAwareCacheDecorator implements Cache {
 
 
 	/**
-	 * Return the target Cache that this Cache should delegate to.
+	 * 返回此 Cache 应委派的目标 Cache。
 	 */
 	public Cache getTargetCache() {
 		return this.targetCache;

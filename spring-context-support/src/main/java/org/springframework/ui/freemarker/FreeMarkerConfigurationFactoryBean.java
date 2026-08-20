@@ -27,22 +27,20 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.lang.Nullable;
 
 /**
- * Factory bean that creates a FreeMarker Configuration and provides it as
- * bean reference. This bean is intended for any kind of usage of FreeMarker
- * in application code, e.g. for generating email content. For web views,
- * FreeMarkerConfigurer is used to set up a FreeMarkerConfigurationFactory.
+ * 工厂 bean，用于创建 FreeMarker Configuration 并将其作为 bean 引用提供。
+ * 此 bean 适用于在应用代码中使用 FreeMarker 的各种场景，例如生成电子邮件内容。
+ * 对于 Web 视图，使用 FreeMarkerConfigurer 来设置 FreeMarkerConfigurationFactory。
  *
- * The simplest way to use this class is to specify just a "templateLoaderPath";
- * you do not need any further configuration then. For example, in a web
- * application context:
+ * 使用此类最简单的方式是指定 "templateLoaderPath"，无需进一步配置。
+ * 例如，在 Web 应用上下文中：
  *
- * <pre class="code"> &lt;bean id="freemarkerConfiguration" class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean"&gt;
- *   &lt;property name="templateLoaderPath" value="/WEB-INF/freemarker/"/&gt;
- * &lt;/bean&gt;</pre>
-
- * See the base class FreeMarkerConfigurationFactory for configuration details.
+ * <pre class="code"> <bean id="freemarkerConfiguration" class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
+ *   <property name="templateLoaderPath" value="/WEB-INF/freemarker/"/>
+ * </bean></pre>
  *
- * <p>Note: Spring's FreeMarker support requires FreeMarker 2.3 or higher.
+ * 参见 FreeMarkerConfigurationFactory 基类获取配置详情。
+ *
+ * <p>注意：Spring 的 FreeMarker 支持需要 FreeMarker 2.3 或更高版本。
  *
  * @author Darren Davison
  * @since 03.03.2004

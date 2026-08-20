@@ -32,9 +32,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Wrapper that adapts from the Quartz {@link ClassLoadHelper} interface
- * onto Spring's {@link ResourceLoader} interface. Used by default when
- * the SchedulerFactoryBean runs in a Spring ApplicationContext.
+ * 将 Quartz 的 {@link ClassLoadHelper} 接口适配到 Spring 的 {@link ResourceLoader} 接口的包装器。
+ * 当 SchedulerFactoryBean 在 Spring ApplicationContext 中运行时默认使用。
  *
  * @author Juergen Hoeller
  * @since 2.5.5
@@ -49,16 +48,15 @@ public class ResourceLoaderClassLoadHelper implements ClassLoadHelper {
 
 
 	/**
-	 * Create a new ResourceLoaderClassLoadHelper for the default
-	 * ResourceLoader.
+	 * 为默认的 ResourceLoader 创建一个新的 ResourceLoaderClassLoadHelper。
 	 * @see SchedulerFactoryBean#getConfigTimeResourceLoader()
 	 */
 	public ResourceLoaderClassLoadHelper() {
 	}
 
 	/**
-	 * Create a new ResourceLoaderClassLoadHelper for the given ResourceLoader.
-	 * @param resourceLoader the ResourceLoader to delegate to
+	 * 为给定的 ResourceLoader 创建一个新的 ResourceLoaderClassLoadHelper。
+	 * @param resourceLoader 要委托的 ResourceLoader
 	 */
 	public ResourceLoaderClassLoadHelper(@Nullable ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;

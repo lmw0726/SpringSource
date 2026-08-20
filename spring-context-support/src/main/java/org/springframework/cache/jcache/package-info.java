@@ -1,8 +1,8 @@
 /**
- * Implementation package for JSR-107 (javax.cache aka "JCache") based caches.
- * Provides a {@link org.springframework.cache.CacheManager CacheManager}
- * and {@link org.springframework.cache.Cache Cache} implementation for
- * use in a Spring context, using a JSR-107 compliant cache provider.
+ * 基于 JSR-107（javax.cache，又称 "JCache"）的缓存实现包。
+ * 提供 {@link org.springframework.cache.CacheManager CacheManager}
+ * 和 {@link org.springframework.cache.Cache Cache} 实现，
+ * 用于 Spring 上下文中，使用兼容 JSR-107 的缓存提供者。
  */
 @NonNullApi
 @NonNullFields

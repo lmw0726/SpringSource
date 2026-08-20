@@ -24,33 +24,33 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 
 /**
- * Extended {@link org.springframework.mail.MailSender} interface for JavaMail,
- * supporting MIME messages both as direct arguments and through preparation
- * callbacks. Typically used in conjunction with the {@link MimeMessageHelper}
- * class for convenient creation of JavaMail {@link MimeMessage MimeMessages},
- * including attachments etc.
+ * 扩展的 {@link org.springframework.mail.MailSender} 接口，用于 JavaMail，
+ * 支持将 MIME 消息作为直接参数传递，也支持通过预处理回调进行传递。
+ * 通常与 {@link MimeMessageHelper} 类结合使用，以便于创建 JavaMail
+ * {@link MimeMessage MimeMessages}，包括附件等功能。
  *
- * <p>Clients should talk to the mail sender through this interface if they need
- * mail functionality beyond {@link org.springframework.mail.SimpleMailMessage}.
- * The production implementation is {@link JavaMailSenderImpl}; for testing,
- * mocks can be created based on this interface. Clients will typically receive
- * the JavaMailSender reference through dependency injection.
+ * <p>如果客户端需要超出 {@link org.springframework.mail.SimpleMailMessage}
+ * 功能的邮件功能，应通过此接口与邮件发送器进行通信。
+ * 生产环境的实现是 {@link JavaMailSenderImpl}；用于测试时，
+ * 可以基于此接口创建模拟对象。客户端通常通过依赖注入获取
+ * JavaMailSender 引用。
  *
- * <p>The recommended way of using this interface is the {@link MimeMessagePreparator}
- * mechanism, possibly using a {@link MimeMessageHelper} for populating the message.
- * See {@link MimeMessageHelper MimeMessageHelper's javadoc} for an example.
+ * <p>推荐使用此接口的方式是 {@link MimeMessagePreparator}
+ * 机制，可以配合 {@link MimeMessageHelper} 来填充消息内容。
+ * 参见 {@link MimeMessageHelper MimeMessageHelper 的 javadoc} 了解示例。
  *
- * <p>The entire JavaMail {@link javax.mail.Session} management is abstracted
- * by the JavaMailSender. Client code should not deal with a Session in any way,
- * rather leave the entire JavaMail configuration and resource handling to the
- * JavaMailSender implementation. This also increases testability.
+ * <p>整个 JavaMail {@link javax.mail.Session} 管理被
+ * JavaMailSender 抽象化了。客户端代码不应以任何方式处理 Session，
+ * 而应将整个 JavaMail 配置和资源处理交由
+ * JavaMailSender 实现来完成。这也增强了可测试性。
  *
- * <p>A JavaMailSender client is not as easy to test as a plain
- * {@link org.springframework.mail.MailSender} client, but still straightforward
- * compared to traditional JavaMail code: Just let {@link #createMimeMessage()}
- * return a plain {@link MimeMessage} created with a
- * {@code Session.getInstance(new Properties())} call, and check the passed-in
- * messages in your mock implementations of the various {@code send} methods.
+ * <p>JavaMailSender 客户端不像普通的
+ * {@link org.springframework.mail.MailSender} 客户端那样容易测试，
+ * 但与传统 JavaMail 代码相比仍然比较直观：只需让
+ * {@link #createMimeMessage()} 返回一个使用
+ * {@code Session.getInstance(new Properties())} 调用创建的普通
+ * {@link MimeMessage}，然后在各种 {@code send} 方法的
+ * 模拟实现中检查传入的消息即可。
  *
  * @author Juergen Hoeller
  * @since 07.10.2003
@@ -63,80 +63,80 @@ import org.springframework.mail.MailSender;
 public interface JavaMailSender extends MailSender {
 
 	/**
-	 * Create a new JavaMail MimeMessage for the underlying JavaMail Session
-	 * of this sender. Needs to be called to create MimeMessage instances
-	 * that can be prepared by the client and passed to send(MimeMessage).
-	 * @return the new MimeMessage instance
+	 * 为发送器底层的 JavaMail Session 创建一个新的 JavaMail MimeMessage。
+	 * 需要调用此方法来创建 MimeMessage 实例，客户端可以对其进行预处理
+	 * 并传递给 send(MimeMessage)。
+	 * @return 新的 MimeMessage 实例
 	 * @see #send(MimeMessage)
 	 * @see #send(MimeMessage[])
 	 */
 	MimeMessage createMimeMessage();
 
 	/**
-	 * Create a new JavaMail MimeMessage for the underlying JavaMail Session
-	 * of this sender, using the given input stream as the message source.
-	 * @param contentStream the raw MIME input stream for the message
-	 * @return the new MimeMessage instance
+	 * 为发送器底层的 JavaMail Session 创建一个新的 JavaMail MimeMessage，
+	 * 使用给定的输入流作为消息源。
+	 * @param contentStream 消息的原始 MIME 输入流
+	 * @return 新的 MimeMessage 实例
 	 * @throws org.springframework.mail.MailParseException
-	 * in case of message creation failure
+	 * 消息创建失败时抛出
 	*/
 	MimeMessage createMimeMessage(InputStream contentStream) throws MailException;
 
 	/**
-	 * Send the given JavaMail MIME message.
-	 * The message needs to have been created with {@link #createMimeMessage()}.
-	 * @param mimeMessage message to send
+	 * 发送给定的 JavaMail MIME 消息。
+	 * 该消息需要通过 {@link #createMimeMessage()} 创建。
+	 * @param mimeMessage 要发送的消息
 	 * @throws org.springframework.mail.MailAuthenticationException
-	 * in case of authentication failure
+	 * 认证失败时抛出
 	 * @throws org.springframework.mail.MailSendException
-	 * in case of failure when sending the message
+	 * 发送消息失败时抛出
 	 * @see #createMimeMessage
 	 */
 	void send(MimeMessage mimeMessage) throws MailException;
 
 	/**
-	 * Send the given array of JavaMail MIME messages in batch.
-	 * The messages need to have been created with {@link #createMimeMessage()}.
-	 * @param mimeMessages messages to send
+	 * 批量发送给定的 JavaMail MIME 消息数组。
+	 * 这些消息需要通过 {@link #createMimeMessage()} 创建。
+	 * @param mimeMessages 要发送的消息
 	 * @throws org.springframework.mail.MailAuthenticationException
-	 * in case of authentication failure
+	 * 认证失败时抛出
 	 * @throws org.springframework.mail.MailSendException
-	 * in case of failure when sending a message
+	 * 发送消息失败时抛出
 	 * @see #createMimeMessage
 	 */
 	void send(MimeMessage... mimeMessages) throws MailException;
 
 	/**
-	 * Send the JavaMail MIME message prepared by the given MimeMessagePreparator.
-	 * <p>Alternative way to prepare MimeMessage instances, instead of
-	 * {@link #createMimeMessage()} and {@link #send(MimeMessage)} calls.
-	 * Takes care of proper exception conversion.
-	 * @param mimeMessagePreparator the preparator to use
+	 * 发送由给定的 MimeMessagePreparator 准备的 JavaMail MIME 消息。
+	 * <p>这是准备 MimeMessage 实例的另一种方式，替代
+	 * {@link #createMimeMessage()} 和 {@link #send(MimeMessage)} 调用。
+	 * 负责进行适当的异常转换。
+	 * @param mimeMessagePreparator 要使用的预处理器
 	 * @throws org.springframework.mail.MailPreparationException
-	 * in case of failure when preparing the message
+	 * 准备消息失败时抛出
 	 * @throws org.springframework.mail.MailParseException
-	 * in case of failure when parsing the message
+	 * 解析消息失败时抛出
 	 * @throws org.springframework.mail.MailAuthenticationException
-	 * in case of authentication failure
+	 * 认证失败时抛出
 	 * @throws org.springframework.mail.MailSendException
-	 * in case of failure when sending the message
+	 * 发送消息失败时抛出
 	 */
 	void send(MimeMessagePreparator mimeMessagePreparator) throws MailException;
 
 	/**
-	 * Send the JavaMail MIME messages prepared by the given MimeMessagePreparators.
-	 * <p>Alternative way to prepare MimeMessage instances, instead of
-	 * {@link #createMimeMessage()} and {@link #send(MimeMessage[])} calls.
-	 * Takes care of proper exception conversion.
-	 * @param mimeMessagePreparators the preparator to use
+	 * 发送由给定的 MimeMessagePreparators 准备的 JavaMail MIME 消息。
+	 * <p>这是准备 MimeMessage 实例的另一种方式，替代
+	 * {@link #createMimeMessage()} 和 {@link #send(MimeMessage[])} 调用。
+	 * 负责进行适当的异常转换。
+	 * @param mimeMessagePreparators 要使用的预处理器
 	 * @throws org.springframework.mail.MailPreparationException
-	 * in case of failure when preparing a message
+	 * 准备消息失败时抛出
 	 * @throws org.springframework.mail.MailParseException
-	 * in case of failure when parsing a message
+	 * 解析消息失败时抛出
 	 * @throws org.springframework.mail.MailAuthenticationException
-	 * in case of authentication failure
+	 * 认证失败时抛出
 	 * @throws org.springframework.mail.MailSendException
-	 * in case of failure when sending a message
+	 * 发送消息失败时抛出
 	 */
 	void send(MimeMessagePreparator... mimeMessagePreparators) throws MailException;
 

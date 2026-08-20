@@ -24,11 +24,10 @@ import javax.mail.internet.InternetAddress;
 import org.springframework.util.StringUtils;
 
 /**
- * Editor for {@code java.mail.internet.InternetAddress},
- * to directly populate an InternetAddress property.
+ * {@code java.mail.internet.InternetAddress} 的编辑器，
+ * 用于直接填充 InternetAddress 属性。
  *
- * <p>Expects the same syntax as InternetAddress's constructor with
- * a String argument. Converts empty Strings into null values.
+ * <p>接受与 InternetAddress 带 String 参数的构造函数相同的语法。将空字符串转换为 null 值。
  *
  * @author Juergen Hoeller
  * @since 1.2.3

@@ -1,6 +1,6 @@
 /**
- * Spring's generic mail infrastructure.
- * Concrete implementations are provided in the subpackages.
+ * Spring 的通用邮件基础设施。
+ * 具体实现在子包中提供。
  */
 @NonNullApi
 @NonNullFields

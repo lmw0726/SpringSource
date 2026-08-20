@@ -29,9 +29,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 
 /**
- * FreeMarker {@link TemplateLoader} adapter that loads via a Spring {@link ResourceLoader}.
- * Used by {@link FreeMarkerConfigurationFactory} for any resource loader path that cannot
- * be resolved to a {@link java.io.File}.
+ * 通过 Spring {@link ResourceLoader} 加载的 FreeMarker {@link TemplateLoader} 适配器。
+ * 由 {@link FreeMarkerConfigurationFactory} 使用，适用于无法解析为
+ * {@link java.io.File} 的资源加载器路径。
  *
  * @author Juergen Hoeller
  * @since 14.03.2004
@@ -48,9 +48,9 @@ public class SpringTemplateLoader implements TemplateLoader {
 
 
 	/**
-	 * Create a new SpringTemplateLoader.
-	 * @param resourceLoader the Spring ResourceLoader to use
-	 * @param templateLoaderPath the template loader path to use
+	 * 创建一个新的 SpringTemplateLoader。
+	 * @param resourceLoader 要使用的 Spring ResourceLoader
+	 * @param templateLoaderPath 要使用的模板加载器路径
 	 */
 	public SpringTemplateLoader(ResourceLoader resourceLoader, String templateLoaderPath) {
 		this.resourceLoader = resourceLoader;

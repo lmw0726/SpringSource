@@ -25,28 +25,25 @@ import org.springframework.cache.interceptor.BasicOperation;
 import org.springframework.cache.interceptor.CacheResolver;
 
 /**
- * Model the base of JSR-107 cache operation through an interface contract.
+ * 通过接口契约建模 JSR-107 缓存操作的基础。
  *
- * <p>A cache operation can be statically cached as it does not contain any
- * runtime operation of a specific cache invocation.
+ * <p>缓存操作可以被静态缓存，因为它不包含任何特定缓存调用的运行时操作。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @param <A> the type of the JSR-107 annotation
+ * @param <A> JSR-107 注解的类型
  */
 public interface JCacheOperation<A extends Annotation> extends BasicOperation, CacheMethodDetails<A> {
 
 	/**
-	 * Return the {@link CacheResolver} instance to use to resolve the cache
-	 * to use for this operation.
+	 * 返回用于解析此操作缓存的 {@link CacheResolver} 实例。
 	 */
 	CacheResolver getCacheResolver();
 
 	/**
-	 * Return the {@link CacheInvocationParameter} instances based on the
-	 * specified method arguments.
-	 * <p>The method arguments must match the signature of the related method invocation
-	 * @param values the parameters value for a particular invocation
+	 * 根据指定的方法参数返回 {@link CacheInvocationParameter} 实例。
+	 * <p>方法参数必须与相关方法调用的签名匹配
+	 * @param values 特定调用的参数值
 	 */
 	CacheInvocationParameter[] getAllParameters(Object... values);
 

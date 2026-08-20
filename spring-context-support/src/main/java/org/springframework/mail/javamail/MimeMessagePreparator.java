@@ -19,16 +19,14 @@ package org.springframework.mail.javamail;
 import javax.mail.internet.MimeMessage;
 
 /**
- * Callback interface for the preparation of JavaMail MIME messages.
+ * 用于准备 JavaMail MIME 消息的回调接口。
  *
- * <p>The corresponding {@code send} methods of {@link JavaMailSender}
- * will take care of the actual creation of a {@link MimeMessage} instance,
- * and of proper exception conversion.
+ * <p>对应的 {@link JavaMailSender} 的 {@code send} 方法
+ * 将负责 {@link MimeMessage} 实例的实际创建以及适当的异常转换。
  *
- * <p>It is often convenient to use a {@link MimeMessageHelper} for populating
- * the passed-in MimeMessage, in particular when working with attachments or
- * special character encodings.
- * See {@link MimeMessageHelper MimeMessageHelper's javadoc} for an example.
+ * <p>通常使用 {@link MimeMessageHelper} 来填充传入的 MimeMessage 会更加方便，
+ * 特别是在处理附件或特殊字符编码时。
+ * 参见 {@link MimeMessageHelper MimeMessageHelper 的 javadoc} 获取示例。
  *
  * @author Juergen Hoeller
  * @since 07.10.2003
@@ -40,14 +38,13 @@ import javax.mail.internet.MimeMessage;
 public interface MimeMessagePreparator {
 
 	/**
-	 * Prepare the given new MimeMessage instance.
-	 * @param mimeMessage the message to prepare
-	 * @throws javax.mail.MessagingException passing any exceptions thrown by MimeMessage
-	 * methods through for automatic conversion to the MailException hierarchy
-	 * @throws java.io.IOException passing any exceptions thrown by MimeMessage methods
-	 * through for automatic conversion to the MailException hierarchy
-	 * @throws Exception if mail preparation failed, for example when a
-	 * FreeMarker template cannot be rendered for the mail text
+	 * 准备给定的 MimeMessage 实例。
+	 * @param mimeMessage 要准备的消息
+	 * @throws javax.mail.MessagingException 传递 MimeMessage 方法抛出的任何异常，
+	 * 以便自动转换到 MailException 层次结构
+	 * @throws java.io.IOException 传递 MimeMessage 方法抛出的任何异常，
+	 * 以便自动转换到 MailException 层次结构
+	 * @throws Exception 如果邮件准备失败，例如无法为邮件文本渲染 FreeMarker 模板
 	 */
 	void prepare(MimeMessage mimeMessage) throws Exception;
 

@@ -21,12 +21,11 @@ import org.quartz.SchedulerContext;
 import org.springframework.beans.factory.Aware;
 
 /**
- * Callback interface to be implemented by Spring-managed
- * Quartz artifacts that need access to the SchedulerContext
- * (without having natural access to it).
+ * 需要访问 SchedulerContext（但无法自然访问）的
+ * Spring 管理的 Quartz 工件需要实现的回调接口。
  *
- * <p>Currently only supported for custom JobFactory implementations
- * that are passed in via Spring's SchedulerFactoryBean.
+ * <p>目前仅支持通过 Spring 的 SchedulerFactoryBean
+ * 传入的自定义 JobFactory 实现。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -37,7 +36,7 @@ import org.springframework.beans.factory.Aware;
 public interface SchedulerContextAware extends Aware {
 
 	/**
-	 * Set the SchedulerContext of the current Quartz Scheduler.
+	 * 设置当前 Quartz 调度器的 SchedulerContext。
 	 * @see org.quartz.Scheduler#getContext()
 	 */
 	void setSchedulerContext(SchedulerContext schedulerContext);

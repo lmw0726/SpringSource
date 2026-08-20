@@ -28,8 +28,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Quartz {@link ThreadPool} adapter that delegates to a Spring-managed
- * {@link Executor} instance, specified on {@link SchedulerFactoryBean}.
+ * Quartz {@link ThreadPool} 适配器，委托给 Spring 管理的
+ * {@link Executor} 实例，该实例在 {@link SchedulerFactoryBean} 上指定。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -37,7 +37,8 @@ import org.springframework.util.Assert;
  */
 public class LocalTaskExecutorThreadPool implements ThreadPool {
 
-	/** Logger available to subclasses. */
+
+	/** 供子类使用的日志记录器。 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	@Nullable
@@ -55,7 +56,7 @@ public class LocalTaskExecutorThreadPool implements ThreadPool {
 
 	@Override
 	public void initialize() throws SchedulerConfigException {
-		// Absolutely needs thread-bound Executor to initialize.
+		// 初始化时必须使用线程绑定的 Executor。
 		this.taskExecutor = SchedulerFactoryBean.getConfigTimeTaskExecutor();
 		if (this.taskExecutor == null) {
 			throw new SchedulerConfigException("No local Executor found for configuration - " +
@@ -88,11 +89,11 @@ public class LocalTaskExecutorThreadPool implements ThreadPool {
 
 	@Override
 	public int blockForAvailableThreads() {
-		// The present implementation always returns 1, making Quartz
-		// always schedule any tasks that it feels like scheduling.
-		// This could be made smarter for specific TaskExecutors,
-		// for example calling {@code getMaximumPoolSize() - getActiveCount()}
-		// on a {@code java.util.concurrent.ThreadPoolExecutor}.
+		// 当前实现始终返回 1，使 Quartz
+		// 可以调度它想要调度的任何任务。
+		// 对于特定的 TaskExecutors，可以做出更智能的处理，
+		// 例如在 {@code java.util.concurrent.ThreadPoolExecutor} 上
+		// 调用 {@code getMaximumPoolSize() - getActiveCount()}。
 		return 1;
 	}
 

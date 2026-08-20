@@ -29,11 +29,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link FactoryBean} for a JCache {@link CacheManager javax.cache.CacheManager},
- * obtaining a pre-defined {@code CacheManager} by name through the standard
- * JCache {@link Caching javax.cache.Caching} class.
+ * JCache {@link CacheManager javax.cache.CacheManager} 的 {@link FactoryBean} 实现，
+ * 通过标准 JCache {@link Caching javax.cache.Caching} 类按名称获取预定义的 {@code CacheManager}。
  *
- * <p>Note: This class has been updated for JCache 1.0, as of Spring 4.0.
+ * <p>注意：自 Spring 4.0 起，此类已针对 JCache 1.0 进行了更新。
  *
  * @author Juergen Hoeller
  * @since 3.2
@@ -57,16 +56,16 @@ public class JCacheManagerFactoryBean
 
 
 	/**
-	 * Specify the URI for the desired {@code CacheManager}.
-	 * <p>Default is {@code null} (i.e. JCache's default).
+	 * 指定所需 {@code CacheManager} 的 URI。
+	 * <p>默认值为 {@code null}（即使用 JCache 的默认值）。
 	 */
 	public void setCacheManagerUri(@Nullable URI cacheManagerUri) {
 		this.cacheManagerUri = cacheManagerUri;
 	}
 
 	/**
-	 * Specify properties for the to-be-created {@code CacheManager}.
-	 * <p>Default is {@code null} (i.e. no special properties to apply).
+	 * 指定待创建的 {@code CacheManager} 的属性。
+	 * <p>默认值为 {@code null}（即不应用任何特殊属性）。
 	 * @see javax.cache.spi.CachingProvider#getCacheManager(URI, ClassLoader, Properties)
 	 */
 	public void setCacheManagerProperties(@Nullable Properties cacheManagerProperties) {

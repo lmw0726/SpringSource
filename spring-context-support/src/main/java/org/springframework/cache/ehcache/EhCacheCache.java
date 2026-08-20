@@ -28,7 +28,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@link Cache} implementation on top of an {@link Ehcache} instance.
+ * 基于 {@link Ehcache} 实例的 {@link Cache} 实现。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -42,8 +42,8 @@ public class EhCacheCache implements Cache {
 
 
 	/**
-	 * Create an {@link EhCacheCache} instance.
-	 * @param ehcache the backing Ehcache instance
+	 * 创建一个 {@link EhCacheCache} 实例。
+	 * @param ehcache 底层的 Ehcache 实例
 	 */
 	public EhCacheCache(Ehcache ehcache) {
 		Assert.notNull(ehcache, "Ehcache must not be null");
@@ -97,7 +97,7 @@ public class EhCacheCache implements Cache {
 		else {
 			this.cache.acquireWriteLockOnKey(key);
 			try {
-				element = lookup(key);  // one more attempt with the write lock
+				element = lookup(key);  // 在持有写锁的情况下再次尝试
 				if (element != null) {
 					return (T) element.getObjectValue();
 				}

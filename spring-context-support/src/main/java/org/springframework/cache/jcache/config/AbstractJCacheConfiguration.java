@@ -29,8 +29,7 @@ import org.springframework.context.annotation.Role;
 import org.springframework.lang.Nullable;
 
 /**
- * Abstract JSR-107 specific {@code @Configuration} class providing common
- * structure for enabling JSR-107 annotation-driven cache management capability.
+ * 抽象的 JSR-107 特定 {@code @Configuration} 类，提供启用 JSR-107 注解驱动的缓存管理能力的通用结构。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller

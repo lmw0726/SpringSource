@@ -1,6 +1,6 @@
 /**
- * Convenience classes for scheduling based on the CommonJ WorkManager/TimerManager
- * facility, as supported by IBM WebSphere 6.0+ and BEA WebLogic 9.0+.
+ * 用于基于 CommonJ WorkManager/TimerManager 功能进行调度的便捷类，
+ * 受到 IBM WebSphere 6.0+ 和 BEA WebLogic 9.0+ 的支持。
  */
 @NonNullApi
 @NonNullFields

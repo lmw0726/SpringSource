@@ -34,18 +34,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@link CacheManager} implementation that lazily builds {@link CaffeineCache}
- * instances for each {@link #getCache} request. Also supports a 'static' mode
- * where the set of cache names is pre-defined through {@link #setCacheNames},
- * with no dynamic creation of further cache regions at runtime.
+ * {@link CacheManager} 的实现类，为每个 {@link #getCache} 请求延迟构建 {@link CaffeineCache}
+ * 实例。同时支持"静态"模式，通过 {@link #setCacheNames} 预定义缓存名称集合，
+ * 运行时不再动态创建额外的缓存区域。
  *
- * <p>The configuration of the underlying cache can be fine-tuned through a
- * {@link Caffeine} builder or {@link CaffeineSpec}, passed into this
- * CacheManager through {@link #setCaffeine}/{@link #setCaffeineSpec}.
- * A {@link CaffeineSpec}-compliant expression value can also be applied
- * via the {@link #setCacheSpecification "cacheSpecification"} bean property.
+ * <p>底层缓存的配置可以通过 {@link Caffeine} 构建器或 {@link CaffeineSpec} 进行微调，
+ * 并通过 {@link #setCaffeine}/{@link #setCaffeineSpec} 传入此 CacheManager。
+ * 符合 {@link CaffeineSpec} 规范的表达式值也可以通过
+ * {@link #setCacheSpecification "cacheSpecification"} Bean 属性来设置。
  *
- * <p>Requires Caffeine 2.1 or higher.
+ * <p>要求 Caffeine 2.1 或更高版本。
  *
  * @author Ben Manes
  * @author Juergen Hoeller
@@ -71,15 +69,15 @@ public class CaffeineCacheManager implements CacheManager {
 
 
 	/**
-	 * Construct a dynamic CaffeineCacheManager,
-	 * lazily creating cache instances as they are being requested.
+	 * 构造一个动态的 CaffeineCacheManager，
+	 * 在请求时延迟创建缓存实例。
 	 */
 	public CaffeineCacheManager() {
 	}
 
 	/**
-	 * Construct a static CaffeineCacheManager,
-	 * managing caches for the specified cache names only.
+	 * 构造一个静态的 CaffeineCacheManager，
+	 * 仅管理指定缓存名称对应的缓存。
 	 */
 	public CaffeineCacheManager(String... cacheNames) {
 		setCacheNames(Arrays.asList(cacheNames));
@@ -87,11 +85,11 @@ public class CaffeineCacheManager implements CacheManager {
 
 
 	/**
-	 * Specify the set of cache names for this CacheManager's 'static' mode.
-	 * <p>The number of caches and their names will be fixed after a call to this method,
-	 * with no creation of further cache regions at runtime.
-	 * <p>Calling this with a {@code null} collection argument resets the
-	 * mode to 'dynamic', allowing for further creation of caches again.
+	 * 设置此 CacheManager 的"静态"模式下使用的缓存名称集合。
+	 * <p>调用此方法后，缓存的数量和名称将被固定，
+	 * 运行时不再创建额外的缓存区域。
+	 * <p>以 {@code null} 集合作为参数调用此方法会将模式重置为"动态"，
+	 * 允许再次动态创建缓存。
 	 */
 	public void setCacheNames(@Nullable Collection<String> cacheNames) {
 		if (cacheNames != null) {
@@ -106,8 +104,7 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Set the Caffeine to use for building each individual
-	 * {@link CaffeineCache} instance.
+	 * 设置用于构建每个 {@link CaffeineCache} 实例的 Caffeine 对象。
 	 * @see #createNativeCaffeineCache
 	 * @see com.github.benmanes.caffeine.cache.Caffeine#build()
 	 */
@@ -117,8 +114,7 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Set the {@link CaffeineSpec} to use for building each individual
-	 * {@link CaffeineCache} instance.
+	 * 设置用于构建每个 {@link CaffeineCache} 实例的 {@link CaffeineSpec} 对象。
 	 * @see #createNativeCaffeineCache
 	 * @see com.github.benmanes.caffeine.cache.Caffeine#from(CaffeineSpec)
 	 */
@@ -127,9 +123,8 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Set the Caffeine cache specification String to use for building each
-	 * individual {@link CaffeineCache} instance. The given value needs to
-	 * comply with Caffeine's {@link CaffeineSpec} (see its javadoc).
+	 * 设置用于构建每个 {@link CaffeineCache} 实例的 Caffeine 缓存规范字符串。
+	 * 给定的值需要符合 Caffeine 的 {@link CaffeineSpec} 规范（参见其 javadoc）。
 	 * @see #createNativeCaffeineCache
 	 * @see com.github.benmanes.caffeine.cache.Caffeine#from(String)
 	 */
@@ -145,8 +140,8 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Set the Caffeine CacheLoader to use for building each individual
-	 * {@link CaffeineCache} instance, turning it into a LoadingCache.
+	 * 设置用于构建每个 {@link CaffeineCache} 实例的 Caffeine CacheLoader，
+	 * 将其转变为 LoadingCache。
 	 * @see #createNativeCaffeineCache
 	 * @see com.github.benmanes.caffeine.cache.Caffeine#build(CacheLoader)
 	 * @see com.github.benmanes.caffeine.cache.LoadingCache
@@ -159,10 +154,9 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Specify whether to accept and convert {@code null} values for all caches
-	 * in this cache manager.
-	 * <p>Default is "true", despite Caffeine itself not supporting {@code null} values.
-	 * An internal holder object will be used to store user-level {@code null}s.
+	 * 指定是否接受并转换此缓存管理器中所有缓存的 {@code null} 值。
+	 * <p>默认值为 "true"，尽管 Caffeine 本身不支持 {@code null} 值。
+	 * 将使用内部持有对象来存储用户级别的 {@code null} 值。
 	 */
 	public void setAllowNullValues(boolean allowNullValues) {
 		if (this.allowNullValues != allowNullValues) {
@@ -172,8 +166,7 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Return whether this cache manager accepts and converts {@code null} values
-	 * for all of its caches.
+	 * 返回此缓存管理器是否接受并转换其所有缓存的 {@code null} 值。
 	 */
 	public boolean isAllowNullValues() {
 		return this.allowNullValues;
@@ -194,18 +187,16 @@ public class CaffeineCacheManager implements CacheManager {
 
 
 	/**
-	 * Register the given native Caffeine Cache instance with this cache manager,
-	 * adapting it to Spring's cache API for exposure through {@link #getCache}.
-	 * Any number of such custom caches may be registered side by side.
-	 * <p>This allows for custom settings per cache (as opposed to all caches
-	 * sharing the common settings in the cache manager's configuration) and
-	 * is typically used with the Caffeine builder API:
+	 * 将给定的原生 Caffeine Cache 实例注册到此缓存管理器，
+	 * 将其适配为 Spring 的缓存 API，以便通过 {@link #getCache} 进行访问。
+	 * 可以并行注册任意数量的自定义缓存。
+	 * <p>这允许为每个缓存设置自定义配置（而不是所有缓存共享
+	 * 缓存管理器配置中的通用设置），通常与 Caffeine 构建器 API 一起使用：
 	 * {@code registerCustomCache("myCache", Caffeine.newBuilder().maximumSize(10).build())}
-	 * <p>Note that any other caches, whether statically specified through
-	 * {@link #setCacheNames} or dynamically built on demand, still operate
-	 * with the common settings in the cache manager's configuration.
- 	 * @param name the name of the cache
-	 * @param cache the custom Caffeine Cache instance to register
+	 * <p>请注意，其他缓存——无论是通过 {@link #setCacheNames} 静态指定的，
+	 * 还是按需动态构建的——仍然使用缓存管理器配置中的通用设置。
+	 * @param name 缓存名称
+	 * @param cache 要注册的自定义 Caffeine Cache 实例
 	 * @since 5.2.8
 	 * @see #adaptCaffeineCache
 	 */
@@ -215,11 +206,11 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Adapt the given new native Caffeine Cache instance to Spring's {@link Cache}
-	 * abstraction for the specified cache name.
-	 * @param name the name of the cache
-	 * @param cache the native Caffeine Cache instance
-	 * @return the Spring CaffeineCache adapter (or a decorator thereof)
+	 * 将给定的新原生 Caffeine Cache 实例适配为 Spring 的 {@link Cache}
+	 * 抽象，用于指定的缓存名称。
+	 * @param name 缓存名称
+	 * @param cache 原生 Caffeine Cache 实例
+	 * @return Spring CaffeineCache 适配器（或其装饰器）
 	 * @since 5.2.8
 	 * @see CaffeineCache
 	 * @see #isAllowNullValues()
@@ -229,13 +220,12 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Build a common {@link CaffeineCache} instance for the specified cache name,
-	 * using the common Caffeine configuration specified on this cache manager.
-	 * <p>Delegates to {@link #adaptCaffeineCache} as the adaptation method to
-	 * Spring's cache abstraction (allowing for centralized decoration etc),
-	 * passing in a freshly built native Caffeine Cache instance.
-	 * @param name the name of the cache
-	 * @return the Spring CaffeineCache adapter (or a decorator thereof)
+	 * 为指定的缓存名称构建通用的 {@link CaffeineCache} 实例，
+	 * 使用此缓存管理器上指定的通用 Caffeine 配置。
+	 * <p>委托给 {@link #adaptCaffeineCache} 作为适配到 Spring 缓存抽象的方法
+	 * （允许集中装饰等），并传入一个新构建的原生 Caffeine Cache 实例。
+	 * @param name 缓存名称
+	 * @return Spring CaffeineCache 适配器（或其装饰器）
 	 * @see #adaptCaffeineCache
 	 * @see #createNativeCaffeineCache
 	 */
@@ -244,10 +234,10 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Build a common Caffeine Cache instance for the specified cache name,
-	 * using the common Caffeine configuration specified on this cache manager.
-	 * @param name the name of the cache
-	 * @return the native Caffeine Cache instance
+	 * 为指定的缓存名称构建通用的 Caffeine Cache 实例，
+	 * 使用此缓存管理器上指定的通用 Caffeine 配置。
+	 * @param name 缓存名称
+	 * @return 原生 Caffeine Cache 实例
 	 * @see #createCaffeineCache
 	 */
 	protected com.github.benmanes.caffeine.cache.Cache<Object, Object> createNativeCaffeineCache(String name) {
@@ -255,7 +245,7 @@ public class CaffeineCacheManager implements CacheManager {
 	}
 
 	/**
-	 * Recreate the common caches with the current state of this manager.
+	 * 使用此管理器的当前状态重新创建通用缓存。
 	 */
 	private void refreshCommonCaches() {
 		for (Map.Entry<String, Cache> entry : this.cacheMap.entrySet()) {

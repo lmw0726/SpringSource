@@ -26,9 +26,8 @@ import org.springframework.cache.interceptor.CacheOperationInvocationContext;
 import org.springframework.cache.interceptor.CacheResolver;
 
 /**
- * A simple {@link CacheResolver} that resolves the exception cache
- * based on a configurable {@link CacheManager} and the name of the
- * cache: {@link CacheResultOperation#getExceptionCacheName()}.
+ * 一个简单的 {@link CacheResolver}，基于可配置的 {@link CacheManager} 和缓存名称
+ * {@link CacheResultOperation#getExceptionCacheName()} 来解析异常缓存。
  *
  * @author Stephane Nicoll
  * @since 4.1

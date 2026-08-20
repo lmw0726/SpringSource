@@ -32,12 +32,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 /**
- * A base interceptor for JSR-107 cache annotations.
+ * JSR-107 缓存注解的基础拦截器。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @param <O> the operation type
- * @param <A> the annotation type
+ * @param <O> 操作类型
+ * @param <A> 注解类型
  */
 @SuppressWarnings("serial")
 abstract class AbstractCacheInterceptor<O extends AbstractJCacheOperation<A>, A extends Annotation>
@@ -57,9 +57,9 @@ abstract class AbstractCacheInterceptor<O extends AbstractJCacheOperation<A>, A 
 
 
 	/**
-	 * Resolve the cache to use.
-	 * @param context the invocation context
-	 * @return the cache to use (never {@code null})
+	 * 解析要使用的缓存。
+	 * @param context 调用上下文
+	 * @return 要使用的缓存（永不为 {@code null}）
 	 */
 	protected Cache resolveCache(CacheOperationInvocationContext<O> context) {
 		Collection<? extends Cache> caches = context.getOperation().getCacheResolver().resolveCaches(context);
@@ -71,9 +71,9 @@ abstract class AbstractCacheInterceptor<O extends AbstractJCacheOperation<A>, A 
 	}
 
 	/**
-	 * Convert the collection of caches in a single expected element.
-	 * <p>Throw an {@link IllegalStateException} if the collection holds more than one element
-	 * @return the single element, or {@code null} if the collection is empty
+	 * 将缓存集合转换为单个预期元素。
+	 * <p>如果集合包含多个元素则抛出 {@link IllegalStateException}
+	 * @return 单个元素，如果集合为空则为 {@code null}
 	 */
 	@Nullable
 	static Cache extractFrom(Collection<? extends Cache> caches) {

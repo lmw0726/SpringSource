@@ -1,11 +1,11 @@
 /**
- * AOP-based solution for declarative caching demarcation using JSR-107 annotations.
+ * 基于AOP的解决方案，使用JSR-107注解实现声明式缓存划分。
  *
- * <p>Strongly based on the infrastructure in org.springframework.cache.interceptor
- * that deals with Spring's caching annotations.
+ * <p>强烈依赖于org.springframework.cache.interceptor中的基础设施，
+ * 该基础设施处理Spring的缓存注解。
  *
- * <p>Builds on the AOP infrastructure in org.springframework.aop.framework.
- * Any POJO can be cache-advised with Spring.
+ * <p>基于org.springframework.aop.framework中的AOP基础设施构建。
+ * 任何POJO都可以通过Spring实现缓存增强。
  */
 @NonNullApi
 @NonNullFields

@@ -26,11 +26,11 @@ import java.util.Set;
 import javax.cache.annotation.CacheMethodDetails;
 
 /**
- * The default {@link CacheMethodDetails} implementation.
+ * {@link CacheMethodDetails} 的默认实现。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @param <A> the annotation type
+ * @param <A> 注解类型
  */
 class DefaultCacheMethodDetails<A extends Annotation> implements CacheMethodDetails<A> {
 

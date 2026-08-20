@@ -36,9 +36,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Implementation of the {@link JCacheOperationSource} interface that reads
- * the JSR-107 {@link CacheResult}, {@link CachePut}, {@link CacheRemove} and
- * {@link CacheRemoveAll} annotations.
+ * {@link JCacheOperationSource} 接口的实现，用于读取 JSR-107 的
+ * {@link CacheResult}、{@link CachePut}、{@link CacheRemove} 和 {@link CacheRemoveAll} 注解。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -202,9 +201,9 @@ public abstract class AnnotationJCacheOperationSource extends AbstractFallbackJC
 	}
 
 	/**
-	 * Generate a default cache name for the specified {@link Method}.
-	 * @param method the annotated method
-	 * @return the default cache name, according to JSR-107
+	 * 为指定的 {@link Method} 生成默认的缓存名称。
+	 * @param method 带有注解的方法
+	 * @return 根据 JSR-107 规范的默认缓存名称
 	 */
 	protected String generateDefaultCacheName(Method method) {
 		Class<?>[] parameterTypes = method.getParameterTypes();
@@ -230,24 +229,24 @@ public abstract class AnnotationJCacheOperationSource extends AbstractFallbackJC
 
 
 	/**
-	 * Locate or create an instance of the specified cache strategy {@code type}.
-	 * @param type the type of the bean to manage
-	 * @return the required bean
+	 * 定位或创建指定缓存策略 {@code type} 的实例。
+	 * @param type 要管理的 Bean 类型
+	 * @return 所需的 Bean
 	 */
 	protected abstract <T> T getBean(Class<T> type);
 
 	/**
-	 * Return the default {@link CacheResolver} if none is set.
+	 * 如果未设置，则返回默认的 {@link CacheResolver}。
 	 */
 	protected abstract CacheResolver getDefaultCacheResolver();
 
 	/**
-	 * Return the default exception {@link CacheResolver} if none is set.
+	 * 如果未设置，则返回默认的异常 {@link CacheResolver}。
 	 */
 	protected abstract CacheResolver getDefaultExceptionCacheResolver();
 
 	/**
-	 * Return the default {@link KeyGenerator} if none is set.
+	 * 如果未设置，则返回默认的 {@link KeyGenerator}。
 	 */
 	protected abstract KeyGenerator getDefaultKeyGenerator();
 

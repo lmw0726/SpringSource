@@ -33,13 +33,12 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
 
 /**
- * Subclass of Quartz's SimpleThreadPool that implements Spring's
- * {@link org.springframework.core.task.TaskExecutor} interface
- * and listens to Spring lifecycle callbacks.
+ * Quartz 的 SimpleThreadPool 的子类，实现了 Spring 的
+ * {@link org.springframework.core.task.TaskExecutor} 接口，
+ * 并监听 Spring 生命周期回调。
  *
- * <p>Can be shared between a Quartz Scheduler (specified as "taskExecutor")
- * and other TaskExecutor users, or even used completely independent of
- * a Quartz Scheduler (as plain TaskExecutor backend).
+ * <p>可在 Quartz Scheduler（通过 "taskExecutor" 指定）与其他 TaskExecutor 用户之间共享，
+ * 也可以完全独立于 Quartz Scheduler 使用（作为普通的 TaskExecutor 后端）。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -54,8 +53,7 @@ public class SimpleThreadPoolTaskExecutor extends SimpleThreadPool
 
 
 	/**
-	 * Set whether to wait for running jobs to complete on shutdown.
-	 * Default is "false".
+	 * 设置关闭时是否等待正在运行的任务完成。默认值为 "false"。
 	 * @see org.quartz.simpl.SimpleThreadPool#shutdown(boolean)
 	 */
 	public void setWaitForJobsToCompleteOnShutdown(boolean waitForJobsToCompleteOnShutdown) {

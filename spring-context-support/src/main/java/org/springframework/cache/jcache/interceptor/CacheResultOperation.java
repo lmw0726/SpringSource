@@ -26,7 +26,7 @@ import org.springframework.util.ExceptionTypeFilter;
 import org.springframework.util.StringUtils;
 
 /**
- * The {@link JCacheOperation} implementation for a {@link CacheResult} operation.
+ * {@link CacheResult} 操作的 {@link JCacheOperation} 实现。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -61,8 +61,8 @@ class CacheResultOperation extends AbstractJCacheKeyOperation<CacheResult> {
 	}
 
 	/**
-	 * Specify if the method should always be invoked regardless of a cache hit.
-	 * By default, the method is only invoked in case of a cache miss.
+	 * 指定是否无论缓存是否命中都始终调用该方法。
+	 * 默认情况下，仅在缓存未命中时调用该方法。
 	 * @see javax.cache.annotation.CacheResult#skipGet()
 	 */
 	public boolean isAlwaysInvoked() {
@@ -70,8 +70,7 @@ class CacheResultOperation extends AbstractJCacheKeyOperation<CacheResult> {
 	}
 
 	/**
-	 * Return the {@link CacheResolver} instance to use to resolve the cache to
-	 * use for matching exceptions thrown by this operation.
+	 * 返回用于解析与此操作抛出的异常匹配的缓存的 {@link CacheResolver} 实例。
 	 */
 	@Nullable
 	public CacheResolver getExceptionCacheResolver() {
@@ -79,8 +78,7 @@ class CacheResultOperation extends AbstractJCacheKeyOperation<CacheResult> {
 	}
 
 	/**
-	 * Return the name of the cache to cache exceptions, or {@code null} if
-	 * caching exceptions should be disabled.
+	 * 返回用于缓存异常的缓存名称，如果应禁用异常缓存则返回 {@code null}。
 	 * @see javax.cache.annotation.CacheResult#exceptionCacheName()
 	 */
 	@Nullable

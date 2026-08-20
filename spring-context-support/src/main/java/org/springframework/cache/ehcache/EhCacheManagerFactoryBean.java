@@ -30,19 +30,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link FactoryBean} that exposes an EhCache {@link net.sf.ehcache.CacheManager}
- * instance (independent or shared), configured from a specified config location.
+ * {@link FactoryBean} 实现，用于暴露一个 EhCache {@link net.sf.ehcache.CacheManager}
+ * 实例（独立的或共享的），根据指定的配置位置进行配置。
  *
- * <p>If no config location is specified, a CacheManager will be configured from
- * "ehcache.xml" in the root of the class path (that is, default EhCache initialization
- * - as defined in the EhCache docs - will apply).
+ * <p>如果未指定配置位置，则将从类路径根目录下的 "ehcache.xml" 配置 CacheManager
+ * （即应用默认的 EhCache 初始化方式——如 EhCache 文档中所述）。
  *
- * <p>Setting up a separate EhCacheManagerFactoryBean is also advisable when using
- * EhCacheFactoryBean, as it provides a (by default) independent CacheManager instance
- * and cares for proper shutdown of the CacheManager. EhCacheManagerFactoryBean is
- * also necessary for loading EhCache configuration from a non-default config location.
+ * <p>在使用 EhCacheFactoryBean 时，也建议单独设置一个 EhCacheManagerFactoryBean，
+ * 因为它提供了一个（默认）独立的 CacheManager 实例，并负责正确关闭 CacheManager。
+ * EhCacheManagerFactoryBean 对于从非默认配置位置加载 EhCache 配置也是必需的。
  *
- * <p>Note: As of Spring 5.0, Spring's EhCache support requires EhCache 2.10 or higher.
+ * <p>注意：从 Spring 5.0 开始，Spring 的 EhCache 支持要求 EhCache 2.10 或更高版本。
  *
  * @author Juergen Hoeller
  * @author Dmitriy Kopylenko
@@ -73,9 +71,9 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager>, Ini
 
 
 	/**
-	 * Set the location of the EhCache config file. A typical value is "/WEB-INF/ehcache.xml".
-	 * <p>Default is "ehcache.xml" in the root of the class path, or if not found,
-	 * "ehcache-failsafe.xml" in the EhCache jar (default EhCache initialization).
+	 * 设置 EhCache 配置文件的位置。典型值为 "/WEB-INF/ehcache.xml"。
+	 * <p>默认值为类路径根目录下的 "ehcache.xml"，如果未找到，
+	 * 则使用 EhCache jar 中的 "ehcache-failsafe.xml"（默认 EhCache 初始化）。
 	 * @see net.sf.ehcache.CacheManager#create(java.io.InputStream)
 	 * @see net.sf.ehcache.CacheManager#CacheManager(java.io.InputStream)
 	 */
@@ -84,7 +82,7 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager>, Ini
 	}
 
 	/**
-	 * Set the name of the EhCache CacheManager (if a specific name is desired).
+	 * 设置 EhCache CacheManager 的名称（如果需要指定特定名称）。
 	 * @see net.sf.ehcache.config.Configuration#setName(String)
 	 */
 	public void setCacheManagerName(String cacheManagerName) {
@@ -92,14 +90,14 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager>, Ini
 	}
 
 	/**
-	 * Set whether an existing EhCache CacheManager of the same name will be accepted
-	 * for this EhCacheManagerFactoryBean setup. Default is "false".
-	 * <p>Typically used in combination with {@link #setCacheManagerName "cacheManagerName"}
-	 * but will simply work with the default CacheManager name if none specified.
-	 * All references to the same CacheManager name (or the same default) in the
-	 * same ClassLoader space will share the specified CacheManager then.
+	 * 设置是否接受同名的现有 EhCache CacheManager，用于此 EhCacheManagerFactoryBean 的配置。
+	 * 默认值为 "false"。
+	 * <p>通常与 {@link #setCacheManagerName "cacheManagerName"} 配合使用，
+	 * 但即使未指定名称，也会使用默认的 CacheManager 名称正常工作。
+	 * 之后，同一 ClassLoader 空间中所有引用相同 CacheManager 名称（或相同默认值）的
+	 * 代码都将共享指定的 CacheManager。
 	 * @see #setCacheManagerName
-	 * #see #setShared
+	 * @see #setShared
 	 * @see net.sf.ehcache.CacheManager#getCacheManager(String)
 	 * @see net.sf.ehcache.CacheManager#CacheManager()
 	 */
@@ -108,16 +106,16 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager>, Ini
 	}
 
 	/**
-	 * Set whether the EhCache CacheManager should be shared (as a singleton at the
-	 * ClassLoader level) or independent (typically local within the application).
-	 * Default is "false", creating an independent local instance.
-	 * <p><b>NOTE:</b> This feature allows for sharing this EhCacheManagerFactoryBean's
-	 * CacheManager with any code calling <code>CacheManager.create()</code> in the same
-	 * ClassLoader space, with no need to agree on a specific CacheManager name.
-	 * However, it only supports a single EhCacheManagerFactoryBean involved which will
-	 * control the lifecycle of the underlying CacheManager (in particular, its shutdown).
-	 * <p>This flag overrides {@link #setAcceptExisting "acceptExisting"} if both are set,
-	 * since it indicates the 'stronger' mode of sharing.
+	 * 设置 EhCache CacheManager 是否应共享（在 ClassLoader 级别作为单例）
+	 * 或独立使用（通常在应用程序内部独立）。
+	 * 默认值为 "false"，即创建一个独立的本地实例。
+	 * <p><b>注意：</b>此功能允许将此 EhCacheManagerFactoryBean 的 CacheManager
+	 * 与同一 ClassLoader 空间中调用 <code>CacheManager.create()</code> 的任何代码共享，
+	 * 无需约定特定的 CacheManager 名称。
+	 * 但是，它仅支持涉及单个 EhCacheManagerFactoryBean 的场景，
+	 * 该 Bean 将控制底层 CacheManager 的生命周期（特别是其关闭）。
+	 * <p>如果同时设置了此标志和 {@link #setAcceptExisting "acceptExisting"}，
+	 * 则此标志将覆盖后者，因为它表示"更强"的共享模式。
 	 * @see #setCacheManagerName
 	 * @see #setAcceptExisting
 	 * @see net.sf.ehcache.CacheManager#create()
@@ -142,15 +140,15 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager>, Ini
 		}
 
 		if (this.shared) {
-			// Old-school EhCache singleton sharing...
-			// No way to find out whether we actually created a new CacheManager
-			// or just received an existing singleton reference.
+			// 传统的 EhCache 单例共享方式...
+			// 无法确定我们是实际创建了一个新的 CacheManager
+			// 还是只是接收了一个现有的单例引用。
 			this.cacheManager = CacheManager.create(configuration);
 		}
 		else if (this.acceptExisting) {
-			// EhCache 2.5+: Reusing an existing CacheManager of the same name.
-			// Basically the same code as in CacheManager.getInstance(String),
-			// just storing whether we're dealing with an existing instance.
+			// EhCache 2.5+：重用同名的现有 CacheManager。
+			// 基本上与 CacheManager.getInstance(String) 中的代码相同，
+			// 只是记录了我们正在处理的是否为现有实例。
 			synchronized (CacheManager.class) {
 				this.cacheManager = CacheManager.getCacheManager(this.cacheManagerName);
 				if (this.cacheManager == null) {
@@ -162,7 +160,7 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager>, Ini
 			}
 		}
 		else {
-			// Throwing an exception if a CacheManager of the same name exists already...
+			// 如果已存在同名的 CacheManager 则抛出异常...
 			this.cacheManager = new CacheManager(configuration);
 		}
 	}

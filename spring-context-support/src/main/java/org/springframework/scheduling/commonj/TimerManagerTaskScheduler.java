@@ -34,13 +34,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ErrorHandler;
 
 /**
- * Implementation of Spring's {@link TaskScheduler} interface, wrapping
- * a CommonJ {@link commonj.timers.TimerManager}.
+ * Spring {@link TaskScheduler} 接口的实现，包装了
+ * CommonJ {@link commonj.timers.TimerManager}。
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
  * @since 3.0
- * @deprecated as of 5.1, in favor of EE 7's
+ * @deprecated 从 5.1 版本起已弃用，建议使用 EE 7 的
  * {@link org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler}
  */
 @Deprecated
@@ -51,7 +51,7 @@ public class TimerManagerTaskScheduler extends TimerManagerAccessor implements T
 
 
 	/**
-	 * Provide an {@link ErrorHandler} strategy.
+	 * 设置 {@link ErrorHandler} 策略。
 	 */
 	public void setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
@@ -110,7 +110,7 @@ public class TimerManagerTaskScheduler extends TimerManagerAccessor implements T
 
 
 	/**
-	 * ScheduledFuture adapter that wraps a CommonJ Timer.
+	 * 包装 CommonJ Timer 的 ScheduledFuture 适配器。
 	 */
 	private static class TimerScheduledFuture extends FutureTask<Object> implements TimerListener, ScheduledFuture<Object> {
 
@@ -160,7 +160,7 @@ public class TimerManagerTaskScheduler extends TimerManagerAccessor implements T
 
 
 	/**
-	 * ScheduledFuture adapter for trigger-based rescheduling.
+	 * 基于触发器重新调度的 ScheduledFuture 适配器。
 	 */
 	private class ReschedulingTimerListener extends TimerScheduledFuture {
 

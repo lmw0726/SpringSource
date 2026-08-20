@@ -33,12 +33,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A Spring {@link FactoryBean} for creating a Quartz {@link org.quartz.JobDetail}
- * instance, supporting bean-style usage for JobDetail configuration.
+ * 用于创建 Quartz {@link org.quartz.JobDetail} 实例的 Spring {@link FactoryBean}，
+ * 支持以 Bean 风格配置 JobDetail。
  *
- * <p>{@code JobDetail(Impl)} itself is already a JavaBean but lacks
- * sensible defaults. This class uses the Spring bean name as job name,
- * and the Quartz default group ("DEFAULT") as job group if not specified.
+ * <p>{@code JobDetail(Impl)} 本身已经是一个 JavaBean，但缺少合理的默认值。
+ * 本类使用 Spring Bean 名称作为任务名称，如果未指定任务组，则使用 Quartz 默认组（"DEFAULT"）。
  *
  * @author Juergen Hoeller
  * @since 3.1
@@ -82,28 +81,28 @@ public class JobDetailFactoryBean
 
 
 	/**
-	 * Specify the job's name.
+	 * 指定任务的名称。
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * Specify the job's group.
+	 * 指定任务的分组。
 	 */
 	public void setGroup(String group) {
 		this.group = group;
 	}
 
 	/**
-	 * Specify the job's implementation class.
+	 * 指定任务的实现类。
 	 */
 	public void setJobClass(Class<? extends Job> jobClass) {
 		this.jobClass = jobClass;
 	}
 
 	/**
-	 * Set the job's JobDataMap.
+	 * 设置任务的 JobDataMap。
 	 * @see #setJobDataAsMap
 	 */
 	public void setJobDataMap(JobDataMap jobDataMap) {
@@ -111,21 +110,21 @@ public class JobDetailFactoryBean
 	}
 
 	/**
-	 * Return the job's JobDataMap.
+	 * 返回任务的 JobDataMap。
 	 */
 	public JobDataMap getJobDataMap() {
 		return this.jobDataMap;
 	}
 
 	/**
-	 * Register objects in the JobDataMap via a given Map.
-	 * <p>These objects will be available to this Job only,
-	 * in contrast to objects in the SchedulerContext.
-	 * <p>Note: When using persistent Jobs whose JobDetail will be kept in the
-	 * database, do not put Spring-managed beans or an ApplicationContext
-	 * reference into the JobDataMap but rather into the SchedulerContext.
-	 * @param jobDataAsMap a Map with String keys and any objects as values
-	 * (for example Spring-managed beans)
+	 * 通过给定的 Map 将对象注册到 JobDataMap 中。
+	 * <p>这些对象仅对当前任务可用，
+	 * 这与 SchedulerContext 中的对象不同。
+	 * <p>注意：当使用持久化任务（其 JobDetail 将保存在数据库中）时，
+	 * 不要将 Spring 管理的 Bean 或 ApplicationContext 引用放入 JobDataMap，
+	 * 而应放入 SchedulerContext 中。
+	 * @param jobDataAsMap 包含 String 类型键和任意对象值的 Map
+	 * （例如 Spring 管理的 Bean）
 	 * @see org.springframework.scheduling.quartz.SchedulerFactoryBean#setSchedulerContextAsMap
 	 */
 	public void setJobDataAsMap(Map<String, ?> jobDataAsMap) {
@@ -133,23 +132,23 @@ public class JobDetailFactoryBean
 	}
 
 	/**
-	 * Specify the job's durability, i.e. whether it should remain stored
-	 * in the job store even if no triggers point to it anymore.
+	 * 指定任务的持久性，即即使没有触发器指向该任务，
+	 * 该任务是否仍应保留在任务存储中。
 	 */
 	public void setDurability(boolean durability) {
 		this.durability = durability;
 	}
 
 	/**
-	 * Set the recovery flag for this job, i.e. whether or not the job should
-	 * get re-executed if a 'recovery' or 'fail-over' situation is encountered.
+	 * 设置此任务的恢复标志，即当遇到"恢复"或"故障转移"情况时，
+	 * 是否应重新执行该任务。
 	 */
 	public void setRequestsRecovery(boolean requestsRecovery) {
 		this.requestsRecovery = requestsRecovery;
 	}
 
 	/**
-	 * Set a textual description for this job.
+	 * 设置此任务的文本描述。
 	 */
 	public void setDescription(String description) {
 		this.description = description;
@@ -166,18 +165,17 @@ public class JobDetailFactoryBean
 	}
 
 	/**
-	 * Set the key of an ApplicationContext reference to expose in the JobDataMap,
-	 * for example "applicationContext". Default is none.
-	 * Only applicable when running in a Spring ApplicationContext.
-	 * <p>In case of a QuartzJobBean, the reference will be applied to the Job
-	 * instance as bean property. An "applicationContext" attribute will correspond
-	 * to a "setApplicationContext" method in that scenario.
-	 * <p>Note that BeanFactory callback interfaces like ApplicationContextAware
-	 * are not automatically applied to Quartz Job instances, because Quartz
-	 * itself is responsible for the lifecycle of its Jobs.
-	 * <p><b>Note: When using persistent job stores where JobDetail contents will
-	 * be kept in the database, do not put an ApplicationContext reference into
-	 * the JobDataMap but rather into the SchedulerContext.</b>
+	 * 设置要在 JobDataMap 中暴露的 ApplicationContext 引用的键，
+	 * 例如 "applicationContext"。默认为无。
+	 * 仅适用于在 Spring ApplicationContext 中运行的情况。
+	 * <p>对于 QuartzJobBean，该引用将作为 Bean 属性应用到 Job 实例。
+	 * 在这种情况下，"applicationContext" 属性将对应于
+	 * "setApplicationContext" 方法。
+	 * <p>注意，像 ApplicationContextAware 这样的 BeanFactory 回调接口
+	 * 不会自动应用到 Quartz Job 实例上，因为 Quartz 本身负责其 Job 的生命周期。
+	 * <p><b>注意：当使用持久化任务存储（JobDetail 内容将保存在数据库中）时，
+	 * 不要将 ApplicationContext 引用放入 JobDataMap，
+	 * 而应放入 SchedulerContext 中。</b>
 	 * @see org.springframework.scheduling.quartz.SchedulerFactoryBean#setApplicationContextSchedulerContextKey
 	 * @see org.springframework.context.ApplicationContext
 	 */

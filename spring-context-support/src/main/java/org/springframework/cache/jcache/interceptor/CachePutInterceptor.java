@@ -25,7 +25,7 @@ import org.springframework.cache.interceptor.CacheOperationInvocationContext;
 import org.springframework.cache.interceptor.CacheOperationInvoker;
 
 /**
- * Intercept methods annotated with {@link CachePut}.
+ * 拦截使用 {@link CachePut} 注解的方法。
  *
  * @author Stephane Nicoll
  * @since 4.1

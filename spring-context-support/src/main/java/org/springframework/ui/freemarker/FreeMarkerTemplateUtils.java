@@ -23,8 +23,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
- * Utility class for working with FreeMarker.
- * Provides convenience methods to process a FreeMarker template with a model.
+ * 用于处理 FreeMarker 的实用工具类。
+ * 提供了方便的方法来处理 FreeMarker 模板和模型。
  *
  * @author Juergen Hoeller
  * @since 14.03.2004
@@ -32,15 +32,12 @@ import freemarker.template.TemplateException;
 public abstract class FreeMarkerTemplateUtils {
 
 	/**
-	 * Process the specified FreeMarker template with the given model and write
-	 * the result to the given Writer.
-	 * <p>When using this method to prepare a text for a mail to be sent with Spring's
-	 * mail support, consider wrapping IO/TemplateException in MailPreparationException.
-	 * @param model the model object, typically a Map that contains model names
-	 * as keys and model objects as values
-	 * @return the result as String
-	 * @throws IOException if the template wasn't found or couldn't be read
-	 * @throws freemarker.template.TemplateException if rendering failed
+	 * 使用给定的模型处理指定的 FreeMarker 模板，并将结果写入给定的 Writer。
+	 * <p>当使用此方法为通过 Spring 邮件支持发送的邮件准备文本时，请考虑将 IO/TemplateException 包装在 MailPreparationException 中。
+	 * @param model 模型对象，通常是包含模型名称作为键、模型对象作为值的 Map
+	 * @return 结果字符串
+	 * @throws IOException 如果模板未找到或无法读取
+	 * @throws freemarker.template.TemplateException 如果渲染失败
 	 * @see org.springframework.mail.MailPreparationException
 	 */
 	public static String processTemplateIntoString(Template template, Object model)

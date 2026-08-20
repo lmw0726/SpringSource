@@ -28,7 +28,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * CacheManager backed by an EhCache {@link net.sf.ehcache.CacheManager}.
+ * 基于 EhCache {@link net.sf.ehcache.CacheManager} 的 CacheManager 实现。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -43,15 +43,14 @@ public class EhCacheCacheManager extends AbstractTransactionSupportingCacheManag
 
 
 	/**
-	 * Create a new EhCacheCacheManager, setting the target EhCache CacheManager
-	 * through the {@link #setCacheManager} bean property.
+	 * 创建一个新的 EhCacheCacheManager，通过 {@link #setCacheManager} bean 属性设置目标 EhCache CacheManager。
 	 */
 	public EhCacheCacheManager() {
 	}
 
 	/**
-	 * Create a new EhCacheCacheManager for the given backing EhCache CacheManager.
-	 * @param cacheManager the backing EhCache {@link net.sf.ehcache.CacheManager}
+	 * 为给定的底层 EhCache CacheManager 创建一个新的 EhCacheCacheManager。
+	 * @param cacheManager 底层 EhCache {@link net.sf.ehcache.CacheManager}
 	 */
 	public EhCacheCacheManager(net.sf.ehcache.CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
@@ -59,14 +58,14 @@ public class EhCacheCacheManager extends AbstractTransactionSupportingCacheManag
 
 
 	/**
-	 * Set the backing EhCache {@link net.sf.ehcache.CacheManager}.
+	 * 设置底层 EhCache {@link net.sf.ehcache.CacheManager}。
 	 */
 	public void setCacheManager(@Nullable net.sf.ehcache.CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
 	}
 
 	/**
-	 * Return the backing EhCache {@link net.sf.ehcache.CacheManager}.
+	 * 返回底层 EhCache {@link net.sf.ehcache.CacheManager}。
 	 */
 	@Nullable
 	public net.sf.ehcache.CacheManager getCacheManager() {
@@ -106,7 +105,7 @@ public class EhCacheCacheManager extends AbstractTransactionSupportingCacheManag
 		net.sf.ehcache.CacheManager cacheManager = getCacheManager();
 		Assert.state(cacheManager != null, "No CacheManager set");
 
-		// Check the EhCache cache again (in case the cache was added at runtime)
+		// 再次检查 EhCache 缓存（以防缓存是在运行时添加的）
 		Ehcache ehcache = cacheManager.getEhcache(name);
 		if (ehcache != null) {
 			return new EhCacheCache(ehcache);

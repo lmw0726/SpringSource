@@ -31,9 +31,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Spring's {@link KeyGenerator} implementation that either delegates to a standard JSR-107
- * {@link javax.cache.annotation.CacheKeyGenerator}, or wrap a standard {@link KeyGenerator}
- * so that only relevant parameters are handled.
+ * Spring的{@link KeyGenerator}实现，它要么委托给标准的JSR-107
+ * {@link javax.cache.annotation.CacheKeyGenerator}，要么包装标准的{@link KeyGenerator}
+ * 以仅处理相关参数。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller
@@ -51,8 +51,8 @@ class KeyGeneratorAdapter implements KeyGenerator {
 
 
 	/**
-	 * Create an instance with the given {@link KeyGenerator} so that {@link javax.cache.annotation.CacheKey}
-	 * and {@link javax.cache.annotation.CacheValue} are handled according to the spec.
+	 * 使用给定的{@link KeyGenerator}创建实例，使{@link javax.cache.annotation.CacheKey}
+	 * 和{@link javax.cache.annotation.CacheValue}根据规范进行处理。
 	 */
 	public KeyGeneratorAdapter(JCacheOperationSource cacheOperationSource, KeyGenerator target) {
 		Assert.notNull(cacheOperationSource, "JCacheOperationSource must not be null");
@@ -62,7 +62,7 @@ class KeyGeneratorAdapter implements KeyGenerator {
 	}
 
 	/**
-	 * Create an instance used to wrap the specified {@link javax.cache.annotation.CacheKeyGenerator}.
+	 * 创建用于包装指定的{@link javax.cache.annotation.CacheKeyGenerator}的实例。
 	 */
 	public KeyGeneratorAdapter(JCacheOperationSource cacheOperationSource, CacheKeyGenerator target) {
 		Assert.notNull(cacheOperationSource, "JCacheOperationSource must not be null");
@@ -73,8 +73,8 @@ class KeyGeneratorAdapter implements KeyGenerator {
 
 
 	/**
-	 * Return the target key generator to use in the form of either a {@link KeyGenerator}
-	 * or a {@link CacheKeyGenerator}.
+	 * 返回要使用的目标键生成器，形式为{@link KeyGenerator}
+	 * 或{@link CacheKeyGenerator}。
 	 */
 	public Object getTarget() {
 		if (this.cacheKeyGenerator != null) {

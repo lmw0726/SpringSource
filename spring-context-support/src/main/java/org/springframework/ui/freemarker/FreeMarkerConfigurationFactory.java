@@ -41,25 +41,23 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Factory that configures a FreeMarker Configuration. Can be used standalone, but
- * typically you will either use FreeMarkerConfigurationFactoryBean for preparing a
- * Configuration as bean reference, or FreeMarkerConfigurer for web views.
+ * 配置 FreeMarker Configuration 的工厂类。可以独立使用，但通常你会使用
+ * FreeMarkerConfigurationFactoryBean 来准备一个作为 bean 引用的 Configuration，
+ * 或者使用 FreeMarkerConfigurer 用于 Web 视图。
  *
- * <p>The optional "configLocation" property sets the location of a FreeMarker
- * properties file, within the current application. FreeMarker properties can be
- * overridden via "freemarkerSettings". All of these properties will be set by
- * calling FreeMarker's {@code Configuration.setSettings()} method and are
- * subject to constraints set by FreeMarker.
+ * <p>可选的 "configLocation" 属性设置 FreeMarker 配置文件的位置，在当前应用程序中。
+ * FreeMarker 属性可以通过 "freemarkerSettings" 进行覆盖。所有这些属性都将通过
+ * 调用 FreeMarker 的 {@code Configuration.setSettings()} 方法进行设置，
+ * 并受到 FreeMarker 设置的约束。
  *
- * <p>The "freemarkerVariables" property can be used to specify a Map of
- * shared variables that will be applied to the Configuration via the
- * {@code setAllSharedVariables()} method. Like {@code setSettings()},
- * these entries are subject to FreeMarker constraints.
+ * <p>"freemarkerVariables" 属性可用于指定一个共享变量的 Map，
+ * 这些变量将通过 {@code setAllSharedVariables()} 方法应用于 Configuration。
+ * 与 {@code setSettings()} 类似，这些条目也受到 FreeMarker 约束。
  *
- * <p>The simplest way to use this class is to specify a "templateLoaderPath";
- * FreeMarker does not need any further configuration then.
+ * <p>使用此类的最简单方法是指定 "templateLoaderPath"；
+ * 这样 FreeMarker 就不需要任何进一步的配置了。
  *
- * <p>Note: Spring's FreeMarker support requires FreeMarker 2.3 or higher.
+ * <p>注意：Spring 的 FreeMarker 支持需要 FreeMarker 2.3 或更高版本。
  *
  * @author Darren Davison
  * @author Juergen Hoeller
@@ -106,8 +104,8 @@ public class FreeMarkerConfigurationFactory {
 
 
 	/**
-	 * Set the location of the FreeMarker config file.
-	 * Alternatively, you can specify all setting locally.
+	 * 设置 FreeMarker 配置文件的位置。
+	 * 或者，你可以指定所有本地设置。
 	 * @see #setFreemarkerSettings
 	 * @see #setTemplateLoaderPath
 	 */
@@ -116,8 +114,8 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Set properties that contain well-known FreeMarker keys which will be
-	 * passed to FreeMarker's {@code Configuration.setSettings} method.
+	 * 设置包含 FreeMarker 已知键的属性，这些属性将传递给
+	 * FreeMarker 的 {@code Configuration.setSettings} 方法。
 	 * @see freemarker.template.Configuration#setSettings
 	 */
 	public void setFreemarkerSettings(Properties settings) {
@@ -125,8 +123,8 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Set a Map that contains well-known FreeMarker objects which will be passed
-	 * to FreeMarker's {@code Configuration.setAllSharedVariables()} method.
+	 * 设置一个包含 FreeMarker 已知对象的 Map，这些对象将传递给
+	 * FreeMarker 的 {@code Configuration.setAllSharedVariables()} 方法。
 	 * @see freemarker.template.Configuration#setAllSharedVariables
 	 */
 	public void setFreemarkerVariables(Map<String, Object> variables) {
@@ -134,10 +132,10 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Set the default encoding for the FreeMarker configuration.
-	 * If not specified, FreeMarker will use the platform file encoding.
-	 * <p>Used for template rendering unless there is an explicit encoding specified
-	 * for the rendering process (for example, on Spring's FreeMarkerView).
+	 * 设置 FreeMarker 配置的默认编码。
+	 * 如果未指定，FreeMarker 将使用平台文件编码。
+	 * <p>用于模板渲染，除非渲染过程指定了显式编码
+	 *（例如，在 Spring 的 FreeMarkerView 上）。
 	 * @see freemarker.template.Configuration#setDefaultEncoding
 	 * @see org.springframework.web.servlet.view.freemarker.FreeMarkerView#setEncoding
 	 */
@@ -146,13 +144,11 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Set a List of {@code TemplateLoader}s that will be used to search
-	 * for templates. For example, one or more custom loaders such as database
-	 * loaders could be configured and injected here.
-	 * <p>The {@link TemplateLoader TemplateLoaders} specified here will be
-	 * registered <i>before</i> the default template loaders that this factory
-	 * registers (such as loaders for specified "templateLoaderPaths" or any
-	 * loaders registered in {@link #postProcessTemplateLoaders}).
+	 * 设置用于搜索模板的 {@code TemplateLoader} 列表。
+	 * 例如，可以配置和注入一个或多个自定义加载器，如数据库加载器。
+	 * <p>此处指定的 {@link TemplateLoader TemplateLoaders} 将在
+	 * 此工厂注册的默认模板加载器（如指定 "templateLoaderPaths" 的加载器或
+	 * 在 {@link #postProcessTemplateLoaders} 中注册的任何加载器）<i>之前</i>注册。
 	 * @see #setTemplateLoaderPaths
 	 * @see #postProcessTemplateLoaders
 	 */
@@ -161,13 +157,11 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Set a List of {@code TemplateLoader}s that will be used to search
-	 * for templates. For example, one or more custom loaders such as database
-	 * loaders can be configured.
-	 * <p>The {@link TemplateLoader TemplateLoaders} specified here will be
-	 * registered <i>after</i> the default template loaders that this factory
-	 * registers (such as loaders for specified "templateLoaderPaths" or any
-	 * loaders registered in {@link #postProcessTemplateLoaders}).
+	 * 设置用于搜索模板的 {@code TemplateLoader} 列表。
+	 * 例如，可以配置一个或多个自定义加载器，如数据库加载器。
+	 * <p>此处指定的 {@link TemplateLoader TemplateLoaders} 将在
+	 * 此工厂注册的默认模板加载器（如指定 "templateLoaderPaths" 的加载器或
+	 * 在 {@link #postProcessTemplateLoaders} 中注册的任何加载器）<i>之后</i>注册。
 	 * @see #setTemplateLoaderPaths
 	 * @see #postProcessTemplateLoaders
 	 */
@@ -176,8 +170,8 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Set the Freemarker template loader path via a Spring resource location.
-	 * See the "templateLoaderPaths" property for details on path handling.
+	 * 通过 Spring 资源位置设置 Freemarker 模板加载路径。
+	 * 有关路径处理的详细信息，请参阅 "templateLoaderPaths" 属性。
 	 * @see #setTemplateLoaderPaths
 	 */
 	public void setTemplateLoaderPath(String templateLoaderPath) {
@@ -185,18 +179,16 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Set multiple Freemarker template loader paths via Spring resource locations.
-	 * <p>When populated via a String, standard URLs like "file:" and "classpath:"
-	 * pseudo URLs are supported, as understood by ResourceEditor. Allows for
-	 * relative paths when running in an ApplicationContext.
-	 * <p>Will define a path for the default FreeMarker template loader.
-	 * If a specified resource cannot be resolved to a {@code java.io.File},
-	 * a generic SpringTemplateLoader will be used, without modification detection.
-	 * <p>To enforce the use of SpringTemplateLoader, i.e. to not resolve a path
-	 * as file system resource in any case, turn off the "preferFileSystemAccess"
-	 * flag. See the latter's javadoc for details.
-	 * <p>If you wish to specify your own list of TemplateLoaders, do not set this
-	 * property and instead use {@code setTemplateLoaders(List templateLoaders)}
+	 * 通过 Spring 资源位置设置多个 Freemarker 模板加载路径。
+	 * <p>当通过字符串填充时，支持标准 URL 如 "file:" 和 "classpath:" 伪 URL，
+	 * 如 ResourceEditor 所理解的。允许在 ApplicationContext 中运行时使用相对路径。
+	 * <p>将为默认的 FreeMarker 模板加载器定义一个路径。
+	 * 如果指定的资源无法解析为 {@code java.io.File}，
+	 * 将使用通用的 SpringTemplateLoader，不进行修改检测。
+	 * <p>要强制使用 SpringTemplateLoader，即在任何情况下都不将路径解析为文件系统资源，
+	 * 请关闭 "preferFileSystemAccess" 标志。有关详细信息，请参阅后者的 javadoc。
+	 * <p>如果您希望指定自己的 TemplateLoader 列表，请不要设置此属性，
+	 * 而是使用 {@code setTemplateLoaders(List templateLoaders)}
 	 * @see org.springframework.core.io.ResourceEditor
 	 * @see org.springframework.context.ApplicationContext#getResource
 	 * @see freemarker.template.Configuration#setDirectoryForTemplateLoading
@@ -207,9 +199,8 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Set the Spring ResourceLoader to use for loading FreeMarker template files.
-	 * The default is DefaultResourceLoader. Will get overridden by the
-	 * ApplicationContext if running in a context.
+	 * 设置用于加载 FreeMarker 模板文件的 Spring ResourceLoader。
+	 * 默认是 DefaultResourceLoader。如果在上下文中运行，将被 ApplicationContext 覆盖。
 	 * @see org.springframework.core.io.DefaultResourceLoader
 	 */
 	public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -217,22 +208,20 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Return the Spring ResourceLoader to use for loading FreeMarker template files.
+	 * 返回用于加载 FreeMarker 模板文件的 Spring ResourceLoader。
 	 */
 	protected ResourceLoader getResourceLoader() {
 		return this.resourceLoader;
 	}
 
 	/**
-	 * Set whether to prefer file system access for template loading.
-	 * File system access enables hot detection of template changes.
-	 * <p>If this is enabled, FreeMarkerConfigurationFactory will try to resolve
-	 * the specified "templateLoaderPath" as file system resource (which will work
-	 * for expanded class path resources and ServletContext resources too).
-	 * <p>Default is "true". Turn this off to always load via SpringTemplateLoader
-	 * (i.e. as stream, without hot detection of template changes), which might
-	 * be necessary if some of your templates reside in an expanded classes
-	 * directory while others reside in jar files.
+	 * 设置模板加载时是否优先使用文件系统访问。
+	 * 文件系统访问支持模板更改的热检测。
+	 * <p>如果启用此功能，FreeMarkerConfigurationFactory 将尝试将指定的 "templateLoaderPath"
+	 * 解析为文件系统资源（这也适用于展开的类路径资源和 ServletContext 资源）。
+	 * <p>默认为 "true"。关闭此选项将始终通过 SpringTemplateLoader 加载
+	 *（即作为流，不进行模板更改的热检测），如果您的某些模板位于展开的 classes 目录中，
+	 * 而其他模板位于 jar 文件中，这可能是必要的。
 	 * @see #setTemplateLoaderPath
 	 */
 	public void setPreferFileSystemAccess(boolean preferFileSystemAccess) {
@@ -240,7 +229,7 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Return whether to prefer file system access for template loading.
+	 * 返回模板加载时是否优先使用文件系统访问。
 	 */
 	protected boolean isPreferFileSystemAccess() {
 		return this.preferFileSystemAccess;
@@ -248,16 +237,16 @@ public class FreeMarkerConfigurationFactory {
 
 
 	/**
-	 * Prepare the FreeMarker Configuration and return it.
-	 * @return the FreeMarker Configuration object
-	 * @throws IOException if the config file wasn't found
-	 * @throws TemplateException on FreeMarker initialization failure
+	 * 准备 FreeMarker Configuration 并返回它。
+	 * @return FreeMarker Configuration 对象
+	 * @throws IOException 如果找不到配置文件
+	 * @throws TemplateException FreeMarker 初始化失败时抛出
 	 */
 	public Configuration createConfiguration() throws IOException, TemplateException {
 		Configuration config = newConfiguration();
 		Properties props = new Properties();
 
-		// Load config file if specified.
+		// 如果指定了配置文件，则加载它。
 		if (this.configLocation != null) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Loading FreeMarker configuration from " + this.configLocation);
@@ -265,13 +254,13 @@ public class FreeMarkerConfigurationFactory {
 			PropertiesLoaderUtils.fillProperties(props, this.configLocation);
 		}
 
-		// Merge local properties if specified.
+		// 如果指定了本地属性，则合并它们。
 		if (this.freemarkerSettings != null) {
 			props.putAll(this.freemarkerSettings);
 		}
 
-		// FreeMarker will only accept known keys in its setSettings and
-		// setAllSharedVariables methods.
+		// FreeMarker 的 setSettings 和 setAllSharedVariables 方法
+		// 只接受已知的键。
 		if (!props.isEmpty()) {
 			config.setSettings(props);
 		}
@@ -286,12 +275,12 @@ public class FreeMarkerConfigurationFactory {
 
 		List<TemplateLoader> templateLoaders = new ArrayList<>(this.templateLoaders);
 
-		// Register template loaders that are supposed to kick in early.
+		// 注册应该提前生效的模板加载器。
 		if (this.preTemplateLoaders != null) {
 			templateLoaders.addAll(this.preTemplateLoaders);
 		}
 
-		// Register default template loaders.
+		// 注册默认模板加载器。
 		if (this.templateLoaderPaths != null) {
 			for (String path : this.templateLoaderPaths) {
 				templateLoaders.add(getTemplateLoaderForPath(path));
@@ -299,7 +288,7 @@ public class FreeMarkerConfigurationFactory {
 		}
 		postProcessTemplateLoaders(templateLoaders);
 
-		// Register template loaders that are supposed to kick in late.
+		// 注册应该延后生效的模板加载器。
 		if (this.postTemplateLoaders != null) {
 			templateLoaders.addAll(this.postTemplateLoaders);
 		}
@@ -314,13 +303,13 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Return a new Configuration object. Subclasses can override this for custom
-	 * initialization (e.g. specifying a FreeMarker compatibility level which is a
-	 * new feature in FreeMarker 2.3.21), or for using a mock object for testing.
-	 * <p>Called by {@code createConfiguration()}.
-	 * @return the Configuration object
-	 * @throws IOException if a config file wasn't found
-	 * @throws TemplateException on FreeMarker initialization failure
+	 * 返回一个新的 Configuration 对象。子类可以覆盖此方法以进行自定义初始化
+	 *（例如，指定 FreeMarker 兼容性级别，这是 FreeMarker 2.3.21 中的新功能），
+	 * 或用于测试的模拟对象。
+	 * <p>由 {@code createConfiguration()} 调用。
+	 * @return Configuration 对象
+	 * @throws IOException 如果找不到配置文件
+	 * @throws TemplateException FreeMarker 初始化失败时抛出
 	 * @see #createConfiguration()
 	 */
 	protected Configuration newConfiguration() throws IOException, TemplateException {
@@ -328,21 +317,20 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Determine a FreeMarker TemplateLoader for the given path.
-	 * <p>Default implementation creates either a FileTemplateLoader or
-	 * a SpringTemplateLoader.
-	 * @param templateLoaderPath the path to load templates from
-	 * @return an appropriate TemplateLoader
+	 * 确定给定路径的 FreeMarker TemplateLoader。
+	 * <p>默认实现创建 FileTemplateLoader 或 SpringTemplateLoader。
+	 * @param templateLoaderPath 要从中加载模板的路径
+	 * @return 适当的 TemplateLoader
 	 * @see freemarker.cache.FileTemplateLoader
 	 * @see SpringTemplateLoader
 	 */
 	protected TemplateLoader getTemplateLoaderForPath(String templateLoaderPath) {
 		if (isPreferFileSystemAccess()) {
-			// Try to load via the file system, fall back to SpringTemplateLoader
-			// (for hot detection of template changes, if possible).
+			// 尝试通过文件系统加载，失败则回退到 SpringTemplateLoader
+			//（如果可能，用于热检测模板更改）。
 			try {
 				Resource path = getResourceLoader().getResource(templateLoaderPath);
-				File file = path.getFile();  // will fail if not resolvable in the file system
+				File file = path.getFile();  // 如果无法在文件系统中解析则会失败
 				if (logger.isDebugEnabled()) {
 					logger.debug(
 							"Template loader path [" + path + "] resolved to file path [" + file.getAbsolutePath() + "]");
@@ -358,22 +346,20 @@ public class FreeMarkerConfigurationFactory {
 			}
 		}
 		else {
-			// Always load via SpringTemplateLoader (without hot detection of template changes).
+			// 始终通过 SpringTemplateLoader 加载（不进行模板更改的热检测）。
 			logger.debug("File system access not preferred: using SpringTemplateLoader");
 			return new SpringTemplateLoader(getResourceLoader(), templateLoaderPath);
 		}
 	}
 
 	/**
-	 * To be overridden by subclasses that want to register custom
-	 * TemplateLoader instances after this factory created its default
-	 * template loaders.
-	 * <p>Called by {@code createConfiguration()}. Note that specified
-	 * "postTemplateLoaders" will be registered <i>after</i> any loaders
-	 * registered by this callback; as a consequence, they are <i>not</i>
-	 * included in the given List.
-	 * @param templateLoaders the current List of TemplateLoader instances,
-	 * to be modified by a subclass
+	 * 由希望在此工厂创建其默认模板加载器后注册自定义
+	 * TemplateLoader 实例的子类覆盖。
+	 * <p>由 {@code createConfiguration()} 调用。请注意，指定的
+	 * "postTemplateLoaders" 将在此回调注册的任何加载器<i>之后</i>注册；
+	 * 因此，它们<i>不</i>包含在给定的 List 中。
+	 * @param templateLoaders 当前的 TemplateLoader 实例列表，
+	 * 由子类修改
 	 * @see #createConfiguration()
 	 * @see #setPostTemplateLoaders
 	 */
@@ -381,11 +367,10 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * Return a TemplateLoader based on the given TemplateLoader list.
-	 * If more than one TemplateLoader has been registered, a FreeMarker
-	 * MultiTemplateLoader needs to be created.
-	 * @param templateLoaders the final List of TemplateLoader instances
-	 * @return the aggregate TemplateLoader
+	 * 基于给定的 TemplateLoader 列表返回一个 TemplateLoader。
+	 * 如果注册了多个 TemplateLoader，则需要创建一个 FreeMarker MultiTemplateLoader。
+	 * @param templateLoaders 最终的 TemplateLoader 实例列表
+	 * @return 聚合的 TemplateLoader
 	 */
 	@Nullable
 	protected TemplateLoader getAggregateTemplateLoader(List<TemplateLoader> templateLoaders) {
@@ -402,13 +387,12 @@ public class FreeMarkerConfigurationFactory {
 	}
 
 	/**
-	 * To be overridden by subclasses that want to perform custom
-	 * post-processing of the Configuration object after this factory
-	 * performed its default initialization.
-	 * <p>Called by {@code createConfiguration()}.
-	 * @param config the current Configuration object
-	 * @throws IOException if a config file wasn't found
-	 * @throws TemplateException on FreeMarker initialization failure
+	 * 由希望在此工厂执行其默认初始化后对 Configuration 对象
+	 * 进行自定义后处理的子类覆盖。
+	 * <p>由 {@code createConfiguration()} 调用。
+	 * @param config 当前的 Configuration 对象
+	 * @throws IOException 如果找不到配置文件
+	 * @throws TemplateException FreeMarker 初始化失败时抛出
 	 * @see #createConfiguration()
 	 */
 	protected void postProcessConfiguration(Configuration config) throws IOException, TemplateException {

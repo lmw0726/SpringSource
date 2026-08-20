@@ -28,16 +28,16 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.Nullable;
 
 /**
- * Subclass of {@link AdaptableJobFactory} that also supports Spring-style
- * dependency injection on bean properties. This is essentially the direct
- * equivalent of Spring's {@link QuartzJobBean} in the shape of a Quartz
- * {@link org.quartz.spi.JobFactory}.
+ * {@link AdaptableJobFactory} 的子类，同时支持 Spring 风格的
+ * bean 属性依赖注入。本质上是 Spring 的 {@link QuartzJobBean}
+ * 以 Quartz {@link org.quartz.spi.JobFactory} 形式的直接等价实现。
  *
- * <p>Applies scheduler context, job data map and trigger data map entries
- * as bean property values. If no matching bean property is found, the entry
- * is by default simply ignored. This is analogous to QuartzJobBean's behavior.
+ * <p>将调度器上下文（scheduler context）、任务数据映射（job data map）
+ * 和触发器数据映射（trigger data map）中的条目作为 bean 属性值进行应用。
+ * 如果未找到匹配的 bean 属性，默认情况下将直接忽略该条目。
+ * 这与 QuartzJobBean 的行为类似。
  *
- * <p>Compatible with Quartz 2.1.4 and higher, as of Spring 4.1.
+ * <p>自 Spring 4.1 起，兼容 Quartz 2.1.4 及更高版本。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -58,12 +58,11 @@ public class SpringBeanJobFactory extends AdaptableJobFactory
 
 
 	/**
-	 * Specify the unknown properties (not found in the bean) that should be ignored.
-	 * <p>Default is {@code null}, indicating that all unknown properties
-	 * should be ignored. Specify an empty array to throw an exception in case
-	 * of any unknown properties, or a list of property names that should be
-	 * ignored if there is no corresponding property found on the particular
-	 * job class (all other unknown properties will still trigger an exception).
+	 * 指定应忽略的未知属性（在 bean 中未找到的属性）。
+	 * <p>默认值为 {@code null}，表示应忽略所有未知属性。
+	 * 指定一个空数组可在遇到任何未知属性时抛出异常，
+	 * 或指定一个属性名列表，当特定任务类上未找到相应属性时忽略这些属性
+	 * （所有其他未知属性仍会触发异常）。
 	 */
 	public void setIgnoredUnknownProperties(String... ignoredUnknownProperties) {
 		this.ignoredUnknownProperties = ignoredUnknownProperties;
@@ -81,8 +80,8 @@ public class SpringBeanJobFactory extends AdaptableJobFactory
 
 
 	/**
-	 * Create the job instance, populating it with property values taken
-	 * from the scheduler context, job data map and trigger data map.
+	 * 创建任务实例，使用从调度器上下文、任务数据映射和触发器数据映射中
+	 * 获取的属性值来填充该实例。
 	 */
 	@Override
 	protected Object createJobInstance(TriggerFiredBundle bundle) throws Exception {
@@ -116,11 +115,10 @@ public class SpringBeanJobFactory extends AdaptableJobFactory
 	}
 
 	/**
-	 * Return whether the given job object is eligible for having
-	 * its bean properties populated.
-	 * <p>The default implementation ignores {@link QuartzJobBean} instances,
-	 * which will inject bean properties themselves.
-	 * @param jobObject the job object to introspect
+	 * 返回给定的任务对象是否适合填充其 bean 属性。
+	 * <p>默认实现会忽略 {@link QuartzJobBean} 实例，
+	 * 因为它们会自行注入 bean 属性。
+	 * @param jobObject 要检查的任务对象
 	 * @see QuartzJobBean
 	 */
 	protected boolean isEligibleForPropertyPopulation(Object jobObject) {

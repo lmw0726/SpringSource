@@ -27,13 +27,12 @@ import javax.cache.annotation.CacheInvocationParameter;
 import org.springframework.cache.interceptor.CacheOperationInvocationContext;
 
 /**
- * The default {@link CacheOperationInvocationContext} implementation used
- * by all interceptors. Also implements {@link CacheInvocationContext} to
- * act as a proper bridge when calling JSR-107 {@link javax.cache.annotation.CacheResolver}
+ * 所有拦截器使用的默认 {@link CacheOperationInvocationContext} 实现。
+ * 同时实现了 {@link CacheInvocationContext}，在调用 JSR-107 {@link javax.cache.annotation.CacheResolver} 时作为适当的桥接。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @param <A> the annotation type
+ * @param <A> 注解类型
  */
 class DefaultCacheInvocationContext<A extends Annotation>
 		implements CacheInvocationContext<A>, CacheOperationInvocationContext<JCacheOperation<A>> {

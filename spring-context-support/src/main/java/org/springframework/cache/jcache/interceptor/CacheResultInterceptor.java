@@ -29,7 +29,7 @@ import org.springframework.util.ExceptionTypeFilter;
 import org.springframework.util.SerializationUtils;
 
 /**
- * Intercept methods annotated with {@link CacheResult}.
+ * 拦截使用 {@link CacheResult} 注解的方法。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -74,7 +74,7 @@ class CacheResultInterceptor extends AbstractKeyCacheInterceptor<CacheResultOper
 	}
 
 	/**
-	 * Check for a cached exception. If the exception is found, throw it directly.
+	 * 检查是否有缓存的异常。如果找到异常，则直接抛出。
 	 */
 	protected void checkForCachedException(@Nullable Cache exceptionCache, Object cacheKey) {
 		if (exceptionCache == null) {
@@ -108,19 +108,16 @@ class CacheResultInterceptor extends AbstractKeyCacheInterceptor<CacheResultOper
 
 
 	/**
-	 * Rewrite the call stack of the specified {@code exception} so that it matches
-	 * the current call stack up to (included) the specified method invocation.
-	 * <p>Clone the specified exception. If the exception is not {@code serializable},
-	 * the original exception is returned. If no common ancestor can be found, returns
-	 * the original exception.
-	 * <p>Used to make sure that a cached exception has a valid invocation context.
-	 * @param exception the exception to merge with the current call stack
-	 * @param className the class name of the common ancestor
-	 * @param methodName the method name of the common ancestor
-	 * @return a clone exception with a rewritten call stack composed of the current call
-	 * stack up to (included) the common ancestor specified by the {@code className} and
-	 * {@code methodName} arguments, followed by stack trace elements of the specified
-	 * {@code exception} after the common ancestor.
+	 * 重写指定 {@code exception} 的调用栈，使其与当前调用栈匹配，直到（包括）指定的方法调用。
+	 * <p>克隆指定的异常。如果异常不可序列化（{@code serializable}），
+	 * 则返回原始异常。如果找不到公共祖先，则返回原始异常。
+	 * <p>用于确保缓存的异常具有有效的调用上下文。
+	 * @param exception 要与当前调用栈合并的异常
+	 * @param className 公共祖先的类名
+	 * @param methodName 公共祖先的方法名
+	 * @return 一个克隆的异常，其调用栈由当前调用栈（直到并包括由 {@code className} 和
+	 * {@code methodName} 参数指定的公共祖先）以及指定 {@code exception} 在公共祖先之后的
+	 * 堆栈跟踪元素组成。
 	 */
 	private static CacheOperationInvoker.ThrowableWrapper rewriteCallStack(
 			Throwable exception, String className, String methodName) {
@@ -136,7 +133,7 @@ class CacheResultInterceptor extends AbstractKeyCacheInterceptor<CacheResultOper
 		int index = findCommonAncestorIndex(callStack, className, methodName);
 		int cachedIndex = findCommonAncestorIndex(cachedCallStack, className, methodName);
 		if (index == -1 || cachedIndex == -1) {
-			return new CacheOperationInvoker.ThrowableWrapper(exception); // Cannot find common ancestor
+			return new CacheOperationInvoker.ThrowableWrapper(exception); // 无法找到公共祖先
 		}
 		StackTraceElement[] result = new StackTraceElement[cachedIndex + callStack.length - index];
 		System.arraycopy(cachedCallStack, 0, result, 0, cachedIndex);
@@ -153,7 +150,7 @@ class CacheResultInterceptor extends AbstractKeyCacheInterceptor<CacheResultOper
 			return (T) SerializationUtils.deserialize(SerializationUtils.serialize(exception));
 		}
 		catch (Exception ex) {
-			return null;  // exception parameter cannot be cloned
+			return null;  // 异常参数无法被克隆
 		}
 	}
 

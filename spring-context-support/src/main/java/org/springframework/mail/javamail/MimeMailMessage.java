@@ -25,12 +25,11 @@ import org.springframework.mail.MailMessage;
 import org.springframework.mail.MailParseException;
 
 /**
- * Implementation of the MailMessage interface for a JavaMail MIME message,
- * to let message population code interact with a simple message or a MIME
- * message through a common interface.
+ * MailMessage 接口的 JavaMail MIME 消息实现，
+ * 使消息填充代码能够通过统一接口与简单消息或 MIME 消息进行交互。
  *
- * <p>Uses a MimeMessageHelper underneath. Can either be created with a
- * MimeMessageHelper instance or with a JavaMail MimeMessage instance.
+ * <p>底层使用 MimeMessageHelper。可以通过 MimeMessageHelper 实例或
+ * JavaMail MimeMessage 实例来创建。
  *
  * @author Juergen Hoeller
  * @since 1.1.5
@@ -43,30 +42,30 @@ public class MimeMailMessage implements MailMessage {
 
 
 	/**
-	 * Create a new MimeMailMessage based on the given MimeMessageHelper.
-	 * @param mimeMessageHelper the MimeMessageHelper
+	 * 基于给定的 MimeMessageHelper 创建新的 MimeMailMessage。
+	 * @param mimeMessageHelper MimeMessageHelper 实例
 	 */
 	public MimeMailMessage(MimeMessageHelper mimeMessageHelper) {
 		this.helper = mimeMessageHelper;
 	}
 
 	/**
-	 * Create a new MimeMailMessage based on the given JavaMail MimeMessage.
-	 * @param mimeMessage the JavaMail MimeMessage
+	 * 基于给定的 JavaMail MimeMessage 创建新的 MimeMailMessage。
+	 * @param mimeMessage JavaMail MimeMessage 实例
 	 */
 	public MimeMailMessage(MimeMessage mimeMessage) {
 		this.helper = new MimeMessageHelper(mimeMessage);
 	}
 
 	/**
-	 * Return the MimeMessageHelper that this MimeMailMessage is based on.
+	 * 返回此 MimeMailMessage 所基于的 MimeMessageHelper。
 	 */
 	public final MimeMessageHelper getMimeMessageHelper() {
 		return this.helper;
 	}
 
 	/**
-	 * Return the JavaMail MimeMessage that this MimeMailMessage is based on.
+	 * 返回此 MimeMailMessage 所基于的 JavaMail MimeMessage。
 	 */
 	public final MimeMessage getMimeMessage() {
 		return this.helper.getMimeMessage();

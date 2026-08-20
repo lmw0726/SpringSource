@@ -17,7 +17,7 @@
 package org.springframework.mail;
 
 /**
- * Exception thrown on failed authentication.
+ * 认证失败时抛出的异常。
  *
  * @author Dmitriy Kopylenko
  * @author Juergen Hoeller
@@ -25,26 +25,27 @@ package org.springframework.mail;
 @SuppressWarnings("serial")
 public class MailAuthenticationException extends MailException {
 
+
 	/**
-	 * Constructor for MailAuthenticationException.
-	 * @param msg message
+	 * MailAuthenticationException 的构造方法。
+	 * @param msg 消息
 	 */
 	public MailAuthenticationException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Constructor for MailAuthenticationException.
-	 * @param msg the detail message
-	 * @param cause the root cause from the mail API in use
+	 * MailAuthenticationException 的构造方法。
+	 * @param msg 详细消息
+	 * @param cause 所使用邮件 API 的根本原因
 	 */
 	public MailAuthenticationException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
 	/**
-	 * Constructor for MailAuthenticationException.
-	 * @param cause the root cause from the mail API in use
+	 * MailAuthenticationException 的构造方法。
+	 * @param cause 所使用邮件 API 的根本原因
 	 */
 	public MailAuthenticationException(Throwable cause) {
 		super("Authentication failed", cause);

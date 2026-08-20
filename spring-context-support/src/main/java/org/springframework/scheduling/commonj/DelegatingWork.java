@@ -22,11 +22,11 @@ import org.springframework.scheduling.SchedulingAwareRunnable;
 import org.springframework.util.Assert;
 
 /**
- * Simple Work adapter that delegates to a given Runnable.
+ * 简单的 Work 适配器，将任务委托给指定的 Runnable。
  *
  * @author Juergen Hoeller
  * @since 2.0
- * @deprecated as of 5.1, in favor of EE 7's
+ * @deprecated 自 5.1 版本起已弃用，建议使用 EE 7 的
  * {@link org.springframework.scheduling.concurrent.DefaultManagedTaskExecutor}
  */
 @Deprecated
@@ -36,9 +36,9 @@ public class DelegatingWork implements Work {
 
 
 	/**
-	 * Create a new DelegatingWork.
-	 * @param delegate the Runnable implementation to delegate to
-	 * (may be a SchedulingAwareRunnable for extended support)
+	 * 创建一个新的 DelegatingWork。
+	 * @param delegate 要委托的 Runnable 实现
+	 * （可以是 SchedulingAwareRunnable 以获得扩展支持）
 	 * @see org.springframework.scheduling.SchedulingAwareRunnable
 	 * @see #isDaemon()
 	 */
@@ -48,7 +48,7 @@ public class DelegatingWork implements Work {
 	}
 
 	/**
-	 * Return the wrapped Runnable implementation.
+	 * 返回被包装的 Runnable 实现。
 	 */
 	public final Runnable getDelegate() {
 		return this.delegate;
@@ -56,7 +56,7 @@ public class DelegatingWork implements Work {
 
 
 	/**
-	 * Delegates execution to the underlying Runnable.
+	 * 将执行委托给底层的 Runnable。
 	 */
 	@Override
 	public void run() {
@@ -64,9 +64,9 @@ public class DelegatingWork implements Work {
 	}
 
 	/**
-	 * This implementation delegates to
-	 * {@link org.springframework.scheduling.SchedulingAwareRunnable#isLongLived()},
-	 * if available.
+	 * 此实现委托给
+	 * {@link org.springframework.scheduling.SchedulingAwareRunnable#isLongLived()}，
+	 * （如果可用）。
 	 */
 	@Override
 	public boolean isDaemon() {
@@ -75,8 +75,8 @@ public class DelegatingWork implements Work {
 	}
 
 	/**
-	 * This implementation is empty, since we expect the Runnable
-	 * to terminate based on some specific shutdown signal.
+	 * 此实现为空，因为我们期望 Runnable
+	 * 基于某些特定的关闭信号来终止。
 	 */
 	@Override
 	public void release() {

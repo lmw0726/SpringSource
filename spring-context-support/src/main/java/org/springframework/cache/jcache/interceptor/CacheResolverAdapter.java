@@ -28,9 +28,9 @@ import org.springframework.cache.jcache.JCacheCache;
 import org.springframework.util.Assert;
 
 /**
- * Spring's {@link CacheResolver} implementation that delegates to a standard
- * JSR-107 {@link javax.cache.annotation.CacheResolver}.
- * <p>Used internally to invoke user-based JSR-107 cache resolvers.
+ * Spring 的 {@link CacheResolver} 实现，委托给标准的
+ * JSR-107 {@link javax.cache.annotation.CacheResolver}。
+ * <p>内部用于调用基于用户配置的 JSR-107 缓存解析器。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -41,7 +41,7 @@ class CacheResolverAdapter implements CacheResolver {
 
 
 	/**
-	 * Create a new instance with the JSR-107 cache resolver to invoke.
+	 * 使用指定的 JSR-107 缓存解析器创建新实例。
 	 */
 	public CacheResolverAdapter(javax.cache.annotation.CacheResolver target) {
 		Assert.notNull(target, "JSR-107 CacheResolver is required");
@@ -50,8 +50,7 @@ class CacheResolverAdapter implements CacheResolver {
 
 
 	/**
-	 * Return the underlying {@link javax.cache.annotation.CacheResolver}
-	 * that this instance is using.
+	 * 返回此实例使用的底层 {@link javax.cache.annotation.CacheResolver}。
 	 */
 	protected javax.cache.annotation.CacheResolver getTarget() {
 		return this.target;

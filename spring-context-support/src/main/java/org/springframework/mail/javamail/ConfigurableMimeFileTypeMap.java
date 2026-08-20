@@ -29,29 +29,27 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
- * Spring-configurable {@code FileTypeMap} implementation that will read
- * MIME type to file extension mappings from a standard JavaMail MIME type
- * mapping file, using a standard {@code MimetypesFileTypeMap} underneath.
+ * 基于 Spring 配置的 {@code FileTypeMap} 实现，它将从标准 JavaMail MIME 类型
+ * 映射文件中读取 MIME 类型到文件扩展名的映射关系，底层使用标准的
+ * {@code MimetypesFileTypeMap}。
  *
- * <p>The mapping file should be in the following format, as specified by the
- * Java Activation Framework:
+ * <p>映射文件应遵循以下格式（由 Java Activation Framework 定义）：
  *
  * <pre class="code">
- * # map text/html to .htm and .html files
+ * # 将 text/html 映射到 .htm 和 .html 文件
  * text/html  html htm HTML HTM</pre>
  *
- * Lines starting with {@code #} are treated as comments and are ignored. All
- * other lines are treated as mappings. Each mapping line should contain the MIME
- * type as the first entry and then each file extension to map to that MIME type
- * as subsequent entries. Each entry is separated by spaces or tabs.
+ * 以 {@code #} 开头的行被视为注释并被忽略。所有其他行被视为映射条目。
+ * 每个映射行应包含 MIME 类型作为第一个条目，然后是映射到该 MIME 类型的
+ * 各个文件扩展名作为后续条目。各条目之间用空格或制表符分隔。
  *
- * <p>By default, the mappings in the {@code mime.types} file located in the
- * same package as this class are used, which cover many common file extensions
- * (in contrast to the out-of-the-box mappings in {@code activation.jar}).
- * This can be overridden using the {@code mappingLocation} property.
+ * <p>默认情况下，使用位于本类所在包中的 {@code mime.types} 文件中的映射，
+ * 该文件涵盖了许多常见的文件扩展名（与 {@code activation.jar} 中开箱即用
+ * 的映射不同）。
+ * 可以使用 {@code mappingLocation} 属性覆盖此默认设置。
  *
- * <p>Additional mappings can be added via the {@code mappings} bean property,
- * as lines that follow the {@code mime.types} file format.
+ * <p>可以通过 {@code mappings} Bean 属性添加额外的映射，
+ * 其格式应遵循 {@code mime.types} 文件格式。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -63,28 +61,27 @@ import org.springframework.lang.Nullable;
 public class ConfigurableMimeFileTypeMap extends FileTypeMap implements InitializingBean {
 
 	/**
-	 * The {@code Resource} to load the mapping file from.
+	 * 用于加载映射文件的 {@code Resource}。
 	 */
 	private Resource mappingLocation = new ClassPathResource("mime.types", getClass());
 
 	/**
-	 * Used to configure additional mappings.
+	 * 用于配置额外的映射。
 	 */
 	@Nullable
 	private String[] mappings;
 
 	/**
-	 * The delegate FileTypeMap, compiled from the mappings in the mapping file
-	 * and the entries in the {@code mappings} property.
+	 * 委托的 FileTypeMap，由映射文件中的映射和 {@code mappings} 属性中的条目编译而成。
 	 */
 	@Nullable
 	private FileTypeMap fileTypeMap;
 
 
 	/**
-	 * Specify the {@code Resource} from which mappings are loaded.
-	 * <p>Needs to follow the {@code mime.types} file format, as specified
-	 * by the Java Activation Framework, containing lines such as:<br>
+	 * 指定加载映射所用的 {@code Resource}。
+	 * <p>需要遵循 Java Activation Framework 定义的 {@code mime.types} 文件格式，
+	 * 包含如下格式的行：<br>
 	 * {@code text/html  html htm HTML HTM}
 	 */
 	public void setMappingLocation(Resource mappingLocation) {
@@ -92,9 +89,8 @@ public class ConfigurableMimeFileTypeMap extends FileTypeMap implements Initiali
 	}
 
 	/**
-	 * Specify additional MIME type mappings as lines that follow the
-	 * {@code mime.types} file format, as specified by the
-	 * Java Activation Framework. For example:<br>
+	 * 以遵循 Java Activation Framework 定义的 {@code mime.types} 文件格式的行，
+	 * 指定额外的 MIME 类型映射。例如：<br>
 	 * {@code text/html  html htm HTML HTM}
 	 */
 	public void setMappings(String... mappings) {
@@ -103,7 +99,7 @@ public class ConfigurableMimeFileTypeMap extends FileTypeMap implements Initiali
 
 
 	/**
-	 * Creates the final merged mapping set.
+	 * 创建最终的合并映射集合。
 	 */
 	@Override
 	public void afterPropertiesSet() {
@@ -111,8 +107,7 @@ public class ConfigurableMimeFileTypeMap extends FileTypeMap implements Initiali
 	}
 
 	/**
-	 * Return the delegate FileTypeMap, compiled from the mappings in the mapping file
-	 * and the entries in the {@code mappings} property.
+	 * 返回委托的 FileTypeMap，由映射文件中的映射和 {@code mappings} 属性中的条目编译而成。
 	 * @see #setMappingLocation
 	 * @see #setMappings
 	 * @see #createFileTypeMap
@@ -131,15 +126,13 @@ public class ConfigurableMimeFileTypeMap extends FileTypeMap implements Initiali
 	}
 
 	/**
-	 * Compile a {@link FileTypeMap} from the mappings in the given mapping file
-	 * and the given mapping entries.
-	 * <p>The default implementation creates an Activation Framework {@link MimetypesFileTypeMap},
-	 * passing in an InputStream from the mapping resource (if any) and registering
-	 * the mapping lines programmatically.
-	 * @param mappingLocation a {@code mime.types} mapping resource (can be {@code null})
-	 * @param mappings an array of MIME type mapping lines (can be {@code null})
-	 * @return the compiled FileTypeMap
-	 * @throws IOException if resource access failed
+	 * 从给定映射文件中的映射和给定的映射条目编译 {@link FileTypeMap}。
+	 * <p>默认实现创建一个 Activation Framework {@link MimetypesFileTypeMap}，
+	 * 传入映射资源的 InputStream（如果有的话），并通过编程方式注册映射行。
+	 * @param mappingLocation {@code mime.types} 映射资源（可为 {@code null}）
+	 * @param mappings MIME 类型映射行数组（可为 {@code null}）
+	 * @return 编译后的 FileTypeMap
+	 * @throws IOException 如果资源访问失败
 	 * @see javax.activation.MimetypesFileTypeMap#MimetypesFileTypeMap(java.io.InputStream)
 	 * @see javax.activation.MimetypesFileTypeMap#addMimeTypes(String)
 	 */
@@ -163,7 +156,7 @@ public class ConfigurableMimeFileTypeMap extends FileTypeMap implements Initiali
 
 
 	/**
-	 * Delegates to the underlying FileTypeMap.
+	 * 委托给底层的 FileTypeMap。
 	 * @see #getFileTypeMap()
 	 */
 	@Override
@@ -172,7 +165,7 @@ public class ConfigurableMimeFileTypeMap extends FileTypeMap implements Initiali
 	}
 
 	/**
-	 * Delegates to the underlying FileTypeMap.
+	 * 委托给底层的 FileTypeMap。
 	 * @see #getFileTypeMap()
 	 */
 	@Override

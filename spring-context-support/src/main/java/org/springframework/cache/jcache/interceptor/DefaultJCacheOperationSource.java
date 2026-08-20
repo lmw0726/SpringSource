@@ -38,9 +38,8 @@ import org.springframework.util.function.SingletonSupplier;
 import org.springframework.util.function.SupplierUtils;
 
 /**
- * The default {@link JCacheOperationSource} implementation delegating
- * default operations to configurable services with sensible defaults
- * when not present.
+ * 默认的 {@link JCacheOperationSource} 实现，将默认操作委托给可配置的服务，
+ * 当未配置时使用合理的默认值。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller
@@ -68,7 +67,7 @@ public class DefaultJCacheOperationSource extends AnnotationJCacheOperationSourc
 
 
 	/**
-	 * Construct a new {@code DefaultJCacheOperationSource} with the default key generator.
+	 * 使用默认的密钥生成器构造一个新的 {@code DefaultJCacheOperationSource}。
 	 * @see SimpleKeyGenerator
 	 */
 	public DefaultJCacheOperationSource() {
@@ -76,9 +75,8 @@ public class DefaultJCacheOperationSource extends AnnotationJCacheOperationSourc
 	}
 
 	/**
-	 * Construct a new {@code DefaultJCacheOperationSource} with the given cache manager,
-	 * cache resolver and key generator suppliers, applying the corresponding default
-	 * if a supplier is not resolvable.
+	 * 使用给定的缓存管理器、缓存解析器和密钥生成器供应商构造一个新的 {@code DefaultJCacheOperationSource}，
+	 * 如果供应商不可解析则应用相应的默认值。
 	 * @since 5.1
 	 */
 	public DefaultJCacheOperationSource(
@@ -93,15 +91,15 @@ public class DefaultJCacheOperationSource extends AnnotationJCacheOperationSourc
 
 
 	/**
-	 * Set the default {@link CacheManager} to use to lookup cache by name.
-	 * Only mandatory if the {@linkplain CacheResolver cache resolver} has not been set.
+	 * 设置默认的 {@link CacheManager}，用于按名称查找缓存。
+	 * 仅在未设置 {@linkplain CacheResolver 缓存解析器} 时是必需的。
 	 */
 	public void setCacheManager(@Nullable CacheManager cacheManager) {
 		this.cacheManager = SingletonSupplier.ofNullable(cacheManager);
 	}
 
 	/**
-	 * Return the specified cache manager to use, if any.
+	 * 返回指定的缓存管理器（如果有的话）。
 	 */
 	@Nullable
 	public CacheManager getCacheManager() {
@@ -109,15 +107,15 @@ public class DefaultJCacheOperationSource extends AnnotationJCacheOperationSourc
 	}
 
 	/**
-	 * Set the {@link CacheResolver} to resolve regular caches. If none is set, a default
-	 * implementation using the specified cache manager will be used.
+	 * 设置用于解析常规缓存的 {@link CacheResolver}。如果未设置，
+	 * 将使用指定的缓存管理器的默认实现。
 	 */
 	public void setCacheResolver(@Nullable CacheResolver cacheResolver) {
 		this.cacheResolver = SingletonSupplier.ofNullable(cacheResolver);
 	}
 
 	/**
-	 * Return the specified cache resolver to use, if any.
+	 * 返回指定的缓存解析器（如果有的话）。
 	 */
 	@Nullable
 	public CacheResolver getCacheResolver() {
@@ -125,15 +123,15 @@ public class DefaultJCacheOperationSource extends AnnotationJCacheOperationSourc
 	}
 
 	/**
-	 * Set the {@link CacheResolver} to resolve exception caches. If none is set, a default
-	 * implementation using the specified cache manager will be used.
+	 * 设置用于解析异常缓存的 {@link CacheResolver}。如果未设置，
+	 * 将使用指定的缓存管理器的默认实现。
 	 */
 	public void setExceptionCacheResolver(@Nullable CacheResolver exceptionCacheResolver) {
 		this.exceptionCacheResolver = SingletonSupplier.ofNullable(exceptionCacheResolver);
 	}
 
 	/**
-	 * Return the specified exception cache resolver to use, if any.
+	 * 返回指定的异常缓存解析器（如果有的话）。
 	 */
 	@Nullable
 	public CacheResolver getExceptionCacheResolver() {
@@ -141,16 +139,16 @@ public class DefaultJCacheOperationSource extends AnnotationJCacheOperationSourc
 	}
 
 	/**
-	 * Set the default {@link KeyGenerator}. If none is set, a {@link SimpleKeyGenerator}
-	 * honoring the JSR-107 {@link javax.cache.annotation.CacheKey} and
-	 * {@link javax.cache.annotation.CacheValue} will be used.
+	 * 设置默认的 {@link KeyGenerator}。如果未设置，将使用遵循 JSR-107
+	 * {@link javax.cache.annotation.CacheKey} 和
+	 * {@link javax.cache.annotation.CacheValue} 的 {@link SimpleKeyGenerator}。
 	 */
 	public void setKeyGenerator(KeyGenerator keyGenerator) {
 		this.keyGenerator = SingletonSupplier.of(keyGenerator);
 	}
 
 	/**
-	 * Return the specified key generator to use.
+	 * 返回指定的密钥生成器。
 	 */
 	public KeyGenerator getKeyGenerator() {
 		return this.keyGenerator.obtain();
@@ -164,8 +162,8 @@ public class DefaultJCacheOperationSource extends AnnotationJCacheOperationSourc
 
 	@Override
 	public void afterSingletonsInstantiated() {
-		// Make sure that the cache resolver is initialized. An exception cache resolver is only
-		// required if the exceptionCacheName attribute is set on an operation.
+		// 确保缓存解析器已初始化。异常缓存解析器仅在
+		// 操作上设置了 exceptionCacheName 属性时才需要。
 		Assert.notNull(getDefaultCacheResolver(), "Cache resolver should have been initialized");
 	}
 
@@ -229,15 +227,13 @@ public class DefaultJCacheOperationSource extends AnnotationJCacheOperationSourc
 
 
 	/**
-	 * Only resolve the default exception cache resolver when an exception needs to be handled.
-	 * <p>A non-JSR-107 setup requires either a {@link CacheManager} or a {@link CacheResolver}.
-	 * If only the latter is specified, it is not possible to extract a default exception
-	 * {@code CacheResolver} from a custom {@code CacheResolver} implementation so we have to
-	 * fall back on the {@code CacheManager}.
-	 * <p>This gives this weird situation of a perfectly valid configuration that breaks all
-	 * the sudden because the JCache support is enabled. To avoid this we resolve the default
-	 * exception {@code CacheResolver} as late as possible to avoid such hard requirement
-	 * in other cases.
+	 * 仅在需要处理异常时才解析默认的异常缓存解析器。
+	 * <p>非 JSR-107 设置需要 {@link CacheManager} 或 {@link CacheResolver}。
+	 * 如果只指定了后者，则无法从自定义 {@code CacheResolver} 实现中提取默认的异常
+	 * {@code CacheResolver}，因此我们必须回退到 {@code CacheManager}。
+	 * <p>这导致了一个奇怪的情况：一个完全有效的配置突然因为启用了 JCache 支持而失效。
+	 * 为了避免这种情况，我们尽可能晚地解析默认的异常 {@code CacheResolver}，
+	 * 以避免在其他情况下产生这种硬性要求。
 	 */
 	class LazyCacheResolver implements CacheResolver {
 

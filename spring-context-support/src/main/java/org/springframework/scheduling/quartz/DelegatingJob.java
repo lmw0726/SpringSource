@@ -23,12 +23,12 @@ import org.quartz.JobExecutionException;
 import org.springframework.util.Assert;
 
 /**
- * Simple Quartz {@link org.quartz.Job} adapter that delegates to a
- * given {@link java.lang.Runnable} instance.
+ * 简单的 Quartz {@link org.quartz.Job} 适配器，将执行委托给
+ * 给定的 {@link java.lang.Runnable} 实例。
  *
- * <p>Typically used in combination with property injection on the
- * Runnable instance, receiving parameters from the Quartz JobDataMap
- * that way instead of via the JobExecutionContext.
+ * <p>通常与 Runnable 实例上的属性注入结合使用，
+ * 通过这种方式从 Quartz JobDataMap 接收参数，
+ * 而不是通过 JobExecutionContext。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -41,8 +41,8 @@ public class DelegatingJob implements Job {
 
 
 	/**
-	 * Create a new DelegatingJob.
-	 * @param delegate the Runnable implementation to delegate to
+	 * 创建一个新的 DelegatingJob。
+	 * @param delegate 要委托的 Runnable 实现
 	 */
 	public DelegatingJob(Runnable delegate) {
 		Assert.notNull(delegate, "Delegate must not be null");
@@ -50,7 +50,7 @@ public class DelegatingJob implements Job {
 	}
 
 	/**
-	 * Return the wrapped Runnable implementation.
+	 * 返回包装的 Runnable 实现。
 	 */
 	public final Runnable getDelegate() {
 		return this.delegate;
@@ -58,7 +58,7 @@ public class DelegatingJob implements Job {
 
 
 	/**
-	 * Delegates execution to the underlying Runnable.
+	 * 将执行委托给底层的 Runnable。
 	 */
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
