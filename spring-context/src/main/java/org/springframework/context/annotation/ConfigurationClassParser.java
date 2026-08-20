@@ -1088,7 +1088,7 @@ class ConfigurationClassParser {
 				}
 			}
 
-			// ASM-based resolution - safe for non-resolvable classes as well
+			// 基于 ASM 的解析方式 — 同样适用于无法解析的类
 			MetadataReader sourceReader = (MetadataReader) sourceToProcess;
 			String[] memberClassNames = sourceReader.getClassMetadata().getMemberClassNames();
 			List<SourceClass> members = new ArrayList<>(memberClassNames.length);
@@ -1184,7 +1184,7 @@ class ConfigurationClassParser {
 					return asSourceClass(clazz, DEFAULT_EXCLUSION_FILTER);
 				}
 				catch (ClassNotFoundException ex) {
-					// Ignore -> 回退到ASM next，核心java类型除外。
+					// 忽略该异常 -> 回退到基于 ASM 的解析，核心 Java 类型除外。
 					if (className.startsWith("java")) {
 						throw new NestedIOException("Failed to load class [" + className + "]", ex);
 					}

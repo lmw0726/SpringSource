@@ -38,13 +38,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Standard implementation of the
  * {@link org.springframework.beans.factory.config.BeanExpressionResolver}
- * interface, parsing and evaluating Spring EL using Spring's expression module.
+ * 接口的标准实现，使用 Spring 的表达式模块解析和求值 Spring EL 表达式。
  *
- * <p>All beans in the containing {@code BeanFactory} are made available as
- * predefined variables with their common bean name, including standard context
- * beans such as "environment", "systemProperties" and "systemEnvironment".
+ * <p>包含的 {@code BeanFactory} 中的所有 bean 都作为预定义变量提供，
+ * 使用其通用的 bean 名称，包括标准的上下文 bean，
+ * 如 "environment"、"systemProperties" 和 "systemEnvironment"。
  *
  * @author Juergen Hoeller
  * @see BeanExpressionContext#getBeanFactory()
@@ -82,7 +81,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 	private ExpressionParser expressionParser;
 
 	/**
-	 * 表单时字符串与表达式类 Map缓存
+	 * 表达式字符串与表达式对象 Map缓存
 	 */
 	private final Map<String, Expression> expressionCache = new ConcurrentHashMap<>(256);
 

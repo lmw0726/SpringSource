@@ -1,5 +1,5 @@
 /**
- * Integration with the JSR-310 <code>java.time</code> package in JDK 8.
+ * 与 JDK 8 中 JSR-310 <code>java.time</code> 包的集成。
  */
 @NonNullApi
 @NonNullFields

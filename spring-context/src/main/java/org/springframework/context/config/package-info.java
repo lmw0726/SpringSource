@@ -1,6 +1,5 @@
 /**
- * Support package for advanced application context configuration,
- * with XML schema being the primary configuration format.
+ * 高级应用上下文配置的支持包，以 XML Schema 作为主要配置格式。
  */
 @NonNullApi
 @NonNullFields

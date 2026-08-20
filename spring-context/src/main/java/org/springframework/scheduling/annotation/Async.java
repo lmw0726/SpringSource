@@ -23,26 +23,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that marks a method as a candidate for <i>asynchronous</i> execution.
- * Can also be used at the type level, in which case all of the type's methods are
- * considered as asynchronous. Note, however, that {@code @Async} is not supported
- * on methods declared within a
- * {@link org.springframework.context.annotation.Configuration @Configuration} class.
+ * 标记方法为<i>异步</i>执行候选的注解。
+ * 也可以用在类级别，此时该类的所有方法都将被视为异步方法。但请注意，{@code @Async} 不支持
+ * 在
+ * {@link org.springframework.context.annotation.Configuration @Configuration} 类中声明的方法上使用。
  *
- * <p>In terms of target method signatures, any parameter types are supported.
- * However, the return type is constrained to either {@code void} or
- * {@link java.util.concurrent.Future}. In the latter case, you may declare the
- * more specific {@link org.springframework.util.concurrent.ListenableFuture} or
- * {@link java.util.concurrent.CompletableFuture} types which allow for richer
- * interaction with the asynchronous task and for immediate composition with
- * further processing steps.
+ * <p>关于目标方法签名，支持任何参数类型。
+ * 但返回类型限定为 {@code void} 或
+ * {@link java.util.concurrent.Future}。在后一种情况下，可以声明更具体的
+ * {@link org.springframework.util.concurrent.ListableFuture} 或
+ * {@link java.util.concurrent.CompletableFuture} 类型，以实现与异步任务的更丰富交互，
+ * 并支持与后续处理步骤的即时组合。
  *
- * <p>A {@code Future} handle returned from the proxy will be an actual asynchronous
- * {@code Future} that can be used to track the result of the asynchronous method
- * execution. However, since the target method needs to implement the same signature,
- * it will have to return a temporary {@code Future} handle that just passes a value
- * through: e.g. Spring's {@link AsyncResult}, EJB 3.1's {@link javax.ejb.AsyncResult},
- * or {@link java.util.concurrent.CompletableFuture#completedFuture(Object)}.
+ * <p>从代理返回的 {@code Future} 句柄将是一个真正的异步 {@code Future}，
+ * 可用于跟踪异步方法执行的结果。但是，由于目标方法需要实现相同的签名，
+ * 它将不得不返回一个仅传递值的临时 {@code Future} 句柄：例如 Spring 的
+ * {@link AsyncResult}、EJB 3.1 的 {@link javax.ejb.AsyncResult}，
+ * 或 {@link java.util.concurrent.CompletableFuture#completedFuture(Object)}。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -56,15 +53,13 @@ import java.lang.annotation.Target;
 public @interface Async {
 
 	/**
-	 * A qualifier value for the specified asynchronous operation(s).
-	 * <p>May be used to determine the target executor to be used when executing
-	 * the asynchronous operation(s), matching the qualifier value (or the bean
-	 * name) of a specific {@link java.util.concurrent.Executor Executor} or
+	 * 指定异步操作的限定符值。
+	 * <p>可用于确定执行异步操作时使用的目标执行器，匹配特定
+	 * {@link java.util.concurrent.Executor Executor} 或
 	 * {@link org.springframework.core.task.TaskExecutor TaskExecutor}
-	 * bean definition.
-	 * <p>When specified on a class-level {@code @Async} annotation, indicates that the
-	 * given executor should be used for all methods within the class. Method-level use
-	 * of {@code Async#value} always overrides any value set at the class level.
+	 * bean 定义的限定符值（或 bean 名称）。
+	 * <p>当在类级别的 {@code @Async} 注解上指定时，表示该类中的所有方法都应使用指定的执行器。
+	 * 方法级别的 {@code Async#value} 始终会覆盖类级别设置的任何值。
 	 * @since 3.1.2
 	 */
 	String value() default "";

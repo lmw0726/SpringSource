@@ -25,8 +25,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link LoadTimeWeaver} implementation for WebSphere's instrumentable ClassLoader.
- * Compatible with WebSphere 7 as well as 8 and 9.
+ * 用于 WebSphere 可检测类加载器的 {@link LoadTimeWeaver} 实现。
+ * 兼容 WebSphere 7 以及 8 和 9。
  *
  * @author Costin Leau
  * @since 3.1
@@ -37,8 +37,7 @@ public class WebSphereLoadTimeWeaver implements LoadTimeWeaver {
 
 
 	/**
-	 * Create a new instance of the {@link WebSphereLoadTimeWeaver} class using
-	 * the default {@link ClassLoader class loader}.
+	 * 使用默认的 {@link ClassLoader class loader} 创建 {@link WebSphereLoadTimeWeaver} 类的新实例。
 	 * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
 	 */
 	public WebSphereLoadTimeWeaver() {
@@ -46,9 +45,8 @@ public class WebSphereLoadTimeWeaver implements LoadTimeWeaver {
 	}
 
 	/**
-	 * Create a new instance of the {@link WebSphereLoadTimeWeaver} class using
-	 * the supplied {@link ClassLoader}.
-	 * @param classLoader the {@code ClassLoader} to delegate to for weaving
+	 * 使用提供的 {@link ClassLoader} 创建 {@link WebSphereLoadTimeWeaver} 类的新实例。
+	 * @param classLoader 用于委托进行织入的 {@code ClassLoader}
 	 */
 	public WebSphereLoadTimeWeaver(@Nullable ClassLoader classLoader) {
 		Assert.notNull(classLoader, "ClassLoader must not be null");

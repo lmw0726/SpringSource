@@ -27,8 +27,8 @@ import org.springframework.scheduling.TriggerContext;
 import org.springframework.util.Assert;
 
 /**
- * {@link Trigger} implementation for cron expressions.
- * Wraps a {@link CronExpression}.
+ * cron 表达式的 {@link Trigger} 实现。
+ * 包装了一个 {@link CronExpression}。
  *
  * @author Juergen Hoeller
  * @author Arjen Poutsma
@@ -43,29 +43,29 @@ public class CronTrigger implements Trigger {
 
 
 	/**
-	 * Build a {@code CronTrigger} from the pattern provided in the default time zone.
-	 * @param expression a space-separated list of time fields, following cron
-	 * expression conventions
+	 * 使用默认时区中的模式构建 {@code CronTrigger}。
+	 * @param expression 以空格分隔的时间字段列表，遵循 cron
+	 * 表达式约定
 	 */
 	public CronTrigger(String expression) {
 		this(expression, ZoneId.systemDefault());
 	}
 
 	/**
-	 * Build a {@code CronTrigger} from the pattern provided in the given time zone.
-	 * @param expression a space-separated list of time fields, following cron
-	 * expression conventions
-	 * @param timeZone a time zone in which the trigger times will be generated
+	 * 使用给定时区中的模式构建 {@code CronTrigger}。
+	 * @param expression 以空格分隔的时间字段列表，遵循 cron
+	 * 表达式约定
+	 * @param timeZone 生成触发器时间的时区
 	 */
 	public CronTrigger(String expression, TimeZone timeZone) {
 		this(expression, timeZone.toZoneId());
 	}
 
 	/**
-	 * Build a {@code CronTrigger} from the pattern provided in the given time zone.
-	 * @param expression a space-separated list of time fields, following cron
-	 * expression conventions
-	 * @param zoneId a time zone in which the trigger times will be generated
+	 * 使用给定时区中的模式构建 {@code CronTrigger}。
+	 * @param expression 以空格分隔的时间字段列表，遵循 cron
+	 * 表达式约定
+	 * @param zoneId 生成触发器时间的时区
 	 * @since 5.3
 	 * @see CronExpression#parse(String)
 	 */
@@ -79,7 +79,7 @@ public class CronTrigger implements Trigger {
 
 
 	/**
-	 * Return the cron pattern that this trigger has been built with.
+	 * 返回构建此触发器所使用的 cron 模式。
 	 */
 	public String getExpression() {
 		return this.expression.toString();
@@ -87,10 +87,10 @@ public class CronTrigger implements Trigger {
 
 
 	/**
-	 * Determine the next execution time according to the given trigger context.
-	 * <p>Next execution times are calculated based on the
-	 * {@linkplain TriggerContext#lastCompletionTime completion time} of the
-	 * previous execution; therefore, overlapping executions won't occur.
+	 * 根据给定的触发器上下文确定下一次执行时间。
+	 * <p>下一次执行时间是根据上一次执行的
+	 * {@linkplain TriggerContext#lastCompletionTime 完成时间}计算的；
+	 * 因此，不会发生重叠执行。
 	 */
 	@Override
 	public Date nextExecutionTime(TriggerContext triggerContext) {
@@ -98,9 +98,9 @@ public class CronTrigger implements Trigger {
 		if (date != null) {
 			Date scheduled = triggerContext.lastScheduledExecutionTime();
 			if (scheduled != null && date.before(scheduled)) {
-				// Previous task apparently executed too early...
-				// Let's simply use the last calculated execution time then,
-				// in order to prevent accidental re-fires in the same second.
+				//之前的任务显然执行得太早了……
+				// 那么我们直接使用上次计算的执行时间，
+				// 以防止在同一秒内意外重新触发。
 				date = scheduled;
 			}
 		}

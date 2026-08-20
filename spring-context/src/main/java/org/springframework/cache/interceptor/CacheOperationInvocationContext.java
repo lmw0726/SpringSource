@@ -19,34 +19,34 @@ package org.springframework.cache.interceptor;
 import java.lang.reflect.Method;
 
 /**
- * Representation of the context of the invocation of a cache operation.
+ * 缓存操作调用上下文的表示。
  *
- * <p>The cache operation is static and independent of a particular invocation;
- * this interface gathers the operation and a particular invocation.
+ * <p>缓存操作是静态的，与特定的调用无关；
+ * 本接口将操作与特定的调用关联起来。
  *
  * @author Stephane Nicoll
  * @since 4.1
- * @param <O> the operation type
+ * @param <O> 操作类型
  */
 public interface CacheOperationInvocationContext<O extends BasicOperation> {
 
 	/**
-	 * Return the cache operation.
+	 * 返回缓存操作。
 	 */
 	O getOperation();
 
 	/**
-	 * Return the target instance on which the method was invoked.
+	 * 返回调用方法时所针对的目标实例。
 	 */
 	Object getTarget();
 
 	/**
-	 * Return the method which was invoked.
+	 * 返回被调用的方法。
 	 */
 	Method getMethod();
 
 	/**
-	 * Return the argument list used to invoke the method.
+	 * 返回用于调用方法的参数列表。
 	 */
 	Object[] getArgs();
 

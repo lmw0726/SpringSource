@@ -1,5 +1,5 @@
 /**
- * Support for class instrumentation on BEA WebLogic 10+.
+ * 支持 BEA WebLogic 10+ 上的类加载器增强（class instrumentation）。
  */
 @NonNullApi
 @NonNullFields

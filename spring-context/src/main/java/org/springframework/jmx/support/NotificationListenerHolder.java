@@ -16,24 +16,22 @@
 
 package org.springframework.jmx.support;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import org.springframework.lang.Nullable;
+import org.springframework.util.ObjectUtils;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
-
-import org.springframework.lang.Nullable;
-import org.springframework.util.ObjectUtils;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
- * Helper class that aggregates a {@link javax.management.NotificationListener},
- * a {@link javax.management.NotificationFilter}, and an arbitrary handback
- * object, as well as the names of MBeans from which the listener wishes
- * to receive {@link javax.management.Notification Notifications}.
+ * 辅助类，用于聚合 {@link javax.management.NotificationListener}、
+ * {@link javax.management.NotificationFilter} 和任意的回调对象，
+ * 以及监听器希望接收 {@link javax.management.Notification 通知} 的 MBean 名称。
  *
  * @author Juergen Hoeller
  * @since 2.5.2
@@ -56,14 +54,14 @@ public class NotificationListenerHolder {
 
 
 	/**
-	 * Set the {@link javax.management.NotificationListener}.
+	 * 设置 {@link javax.management.NotificationListener}。
 	 */
 	public void setNotificationListener(@Nullable NotificationListener notificationListener) {
 		this.notificationListener = notificationListener;
 	}
 
 	/**
-	 * Get the {@link javax.management.NotificationListener}.
+	 * 获取 {@link javax.management.NotificationListener}。
 	 */
 	@Nullable
 	public NotificationListener getNotificationListener() {
@@ -71,18 +69,18 @@ public class NotificationListenerHolder {
 	}
 
 	/**
-	 * Set the {@link javax.management.NotificationFilter} associated
-	 * with the encapsulated {@link #getNotificationFilter() NotificationFilter}.
-	 * <p>May be {@code null}.
+	 * 设置与封装的 {@link #getNotificationFilter() NotificationFilter} 相关联的
+	 * {@link javax.management.NotificationFilter}。
+	 * <p>可以为 {@code null}。
 	 */
 	public void setNotificationFilter(@Nullable NotificationFilter notificationFilter) {
 		this.notificationFilter = notificationFilter;
 	}
 
 	/**
-	 * Return the {@link javax.management.NotificationFilter} associated
-	 * with the encapsulated {@link #getNotificationListener() NotificationListener}.
-	 * <p>May be {@code null}.
+	 * 返回与封装的 {@link #getNotificationListener() NotificationListener} 相关联的
+	 * {@link javax.management.NotificationFilter}。
+	 * <p>可以为 {@code null}。
 	 */
 	@Nullable
 	public NotificationFilter getNotificationFilter() {
@@ -90,10 +88,9 @@ public class NotificationListenerHolder {
 	}
 
 	/**
-	 * Set the (arbitrary) object that will be 'handed back' as-is by an
-	 * {@link javax.management.NotificationBroadcaster} when notifying
-	 * any {@link javax.management.NotificationListener}.
-	 * @param handback the handback object (can be {@code null})
+	 * 设置当 {@link javax.management.NotificationBroadcaster} 通知任何
+	 * {@link javax.management.NotificationListener} 时将原样"回传"的（任意）对象。
+	 * @param handback 回传对象（可以为 {@code null}）
 	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, Object)
 	 */
 	public void setHandback(@Nullable Object handback) {
@@ -101,10 +98,9 @@ public class NotificationListenerHolder {
 	}
 
 	/**
-	 * Return the (arbitrary) object that will be 'handed back' as-is by an
-	 * {@link javax.management.NotificationBroadcaster} when notifying
-	 * any {@link javax.management.NotificationListener}.
-	 * @return the handback object (may be {@code null})
+	 * 返回当 {@link javax.management.NotificationBroadcaster} 通知任何
+	 * {@link javax.management.NotificationListener} 时将原样"回传"的（任意）对象。
+	 * @return 回传对象（可能为 {@code null}）
 	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, Object)
 	 */
 	@Nullable
@@ -113,10 +109,10 @@ public class NotificationListenerHolder {
 	}
 
 	/**
-	 * Set the {@link javax.management.ObjectName}-style name of the single MBean
-	 * that the encapsulated {@link #getNotificationFilter() NotificationFilter}
-	 * will be registered with to listen for {@link javax.management.Notification Notifications}.
-	 * Can be specified as {@code ObjectName} instance or as {@code String}.
+	 * 设置将与封装的 {@link #getNotificationFilter() NotificationFilter} 注册以监听
+	 * {@link javax.management.Notification 通知} 的单个 MBean 的
+	 * {@link javax.management.ObjectName} 格式名称。
+	 * 可以指定为 {@code ObjectName} 实例或 {@code String}。
 	 * @see #setMappedObjectNames
 	 */
 	public void setMappedObjectName(@Nullable Object mappedObjectName) {
@@ -125,10 +121,10 @@ public class NotificationListenerHolder {
 	}
 
 	/**
-	 * Set an array of {@link javax.management.ObjectName}-style names of the MBeans
-	 * that the encapsulated {@link #getNotificationFilter() NotificationFilter}
-	 * will be registered with to listen for {@link javax.management.Notification Notifications}.
-	 * Can be specified as {@code ObjectName} instances or as {@code String}s.
+	 * 设置将与封装的 {@link #getNotificationFilter() NotificationFilter} 注册以监听
+	 * {@link javax.management.Notification 通知} 的 MBean 的
+	 * {@link javax.management.ObjectName} 格式名称数组。
+	 * 可以指定为 {@code ObjectName} 实例或 {@code String}。
 	 * @see #setMappedObjectName
 	 */
 	public void setMappedObjectNames(Object... mappedObjectNames) {
@@ -136,10 +132,9 @@ public class NotificationListenerHolder {
 	}
 
 	/**
-	 * Return the list of {@link javax.management.ObjectName} String representations for
-	 * which the encapsulated {@link #getNotificationFilter() NotificationFilter} will
-	 * be registered as a listener for {@link javax.management.Notification Notifications}.
-	 * @throws MalformedObjectNameException if an {@code ObjectName} is malformed
+	 * 返回将注册封装的 {@link #getNotificationFilter() NotificationFilter} 作为
+	 * {@link javax.management.Notification 通知} 监听器的 {@link javax.management.ObjectName} 字符串表示列表。
+	 * @throws MalformedObjectNameException 如果 {@code ObjectName} 格式不正确
 	 */
 	@Nullable
 	public ObjectName[] getResolvedObjectNames() throws MalformedObjectNameException {

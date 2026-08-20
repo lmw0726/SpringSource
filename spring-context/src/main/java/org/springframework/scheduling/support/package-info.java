@@ -1,6 +1,6 @@
 /**
- * Generic support classes for scheduling.
- * Provides a Runnable adapter for Spring's MethodInvoker.
+ * 用于调度的通用支持类。
+ * 为 Spring 的 MethodInvoker 提供 Runnable 适配器。
  */
 @NonNullApi
 @NonNullFields

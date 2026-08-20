@@ -24,10 +24,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Group annotation for multiple cache annotations (of different or the same type).
+ * 用于多个缓存注解（不同类型或相同类型）的分组注解。
  *
- * <p>This annotation may be used as a <em>meta-annotation</em> to create custom
- * <em>composed annotations</em> with attribute overrides.
+ * <p>该注解可作为<em>元注解</em>使用，通过属性覆盖来创建自定义的
+ * <em>组合注解</em>。
  *
  * @author Costin Leau
  * @author Chris Beams

@@ -29,23 +29,22 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Date sequence generator for a
- * <a href="https://www.manpagez.com/man/5/crontab/">Crontab pattern</a>,
- * allowing clients to specify a pattern that the sequence matches.
+ * 针对
+ * <a href="https://www.manpagez.com/man/5/crontab/">Crontab 模式</a>的日期序列生成器，
+ * 允许客户端指定序列匹配的模式。
  *
- * <p>The pattern is a list of six single space-separated fields: representing
- * second, minute, hour, day, month, weekday. Month and weekday names can be
- * given as the first three letters of the English names.
+ * <p>该模式是一个由六个空格分隔的字段组成的列表，分别表示：
+ * 秒、分、时、日、月、星期。月份和星期名称可以使用英文名称的前三个字母。
  *
- * <p>Example patterns:
+ * <p>示例模式：
  * <ul>
- * <li>"0 0 * * * *" = the top of every hour of every day.</li>
- * <li>"*&#47;10 * * * * *" = every ten seconds.</li>
- * <li>"0 0 8-10 * * *" = 8, 9 and 10 o'clock of every day.</li>
- * <li>"0 0 6,19 * * *" = 6:00 AM and 7:00 PM every day.</li>
- * <li>"0 0/30 8-10 * * *" = 8:00, 8:30, 9:00, 9:30, 10:00 and 10:30 every day.</li>
- * <li>"0 0 9-17 * * MON-FRI" = on the hour nine-to-five weekdays</li>
- * <li>"0 0 0 25 12 ?" = every Christmas Day at midnight</li>
+ * <li>"0 0 * * * *" = 每天每小时的整点。</li>
+ * <li>"*&#47;10 * * * * *" = 每十秒一次。</li>
+ * <li>"0 0 8-10 * * *" = 每天的 8、9 和 10 点。</li>
+ * <li>"0 0 6,19 * * *" = 每天的上午 6:00 和晚上 7:00。</li>
+ * <li>"0 0/30 8-10 * * *" = 每天的 8:00、8:30、9:00、9:30、10:00 和 10:30。</li>
+ * <li>"0 0 9-17 * * MON-FRI" = 工作日每小时的整点，从九点到五点</li>
+ * <li>"0 0 0 25 12 ?" = 每年圣诞节午夜</li>
  * </ul>
  *
  * @author Dave Syer
@@ -77,12 +76,12 @@ public class CronSequenceGenerator {
 
 
 	/**
-	 * Construct a {@code CronSequenceGenerator} from the pattern provided,
-	 * using the default {@link TimeZone}.
-	 * @param expression a space-separated list of time fields
-	 * @throws IllegalArgumentException if the pattern cannot be parsed
+	 * 根据提供的模式构造 {@code CronSequenceGenerator}，
+	 * 使用默认的 {@link TimeZone}。
+	 * @param expression 空格分隔的时间字段列表
+	 * @throws IllegalArgumentException 如果无法解析该模式
 	 * @see java.util.TimeZone#getDefault()
-	 * @deprecated as of 5.3, in favor of {@link CronExpression#parse(String)}
+	 * @deprecated 从 5.3 开始，推荐使用 {@link CronExpression#parse(String)}
 	 */
 	@Deprecated
 	public CronSequenceGenerator(String expression) {
@@ -90,12 +89,12 @@ public class CronSequenceGenerator {
 	}
 
 	/**
-	 * Construct a {@code CronSequenceGenerator} from the pattern provided,
-	 * using the specified {@link TimeZone}.
-	 * @param expression a space-separated list of time fields
-	 * @param timeZone the TimeZone to use for generated trigger times
-	 * @throws IllegalArgumentException if the pattern cannot be parsed
-	 * @deprecated as of 5.3, in favor of {@link CronExpression#parse(String)}
+	 * 根据提供的模式构造 {@code CronSequenceGenerator}，
+	 * 使用指定的 {@link TimeZone}。
+	 * @param expression 空格分隔的时间字段列表
+	 * @param timeZone 用于生成触发时间的时区
+	 * @throws IllegalArgumentException 如果无法解析该模式
+	 * @deprecated 从 5.3 开始，推荐使用 {@link CronExpression#parse(String)}
 	 */
 	@Deprecated
 	public CronSequenceGenerator(String expression, TimeZone timeZone) {
@@ -112,7 +111,7 @@ public class CronSequenceGenerator {
 
 
 	/**
-	 * Return the cron pattern that this sequence generator has been built for.
+	 * 返回该序列生成器所构建的 cron 模式。
 	 */
 	String getExpression() {
 		return this.expression;
@@ -120,41 +119,40 @@ public class CronSequenceGenerator {
 
 
 	/**
-	 * Get the next {@link Date} in the sequence matching the Cron pattern and
-	 * after the value provided. The return value will have a whole number of
-	 * seconds, and will be after the input value.
-	 * @param date a seed value
-	 * @return the next value matching the pattern
+	 * 获取序列中匹配 Cron 模式的下一个 {@link Date}，且在提供的值之后。
+	 * 返回值将包含整数秒，并且在输入值之后。
+	 * @param date 种子值
+	 * @return 匹配模式的下一个值
 	 */
 	public Date next(Date date) {
 		/*
-		The plan:
+		算法步骤：
 
-		1 Start with whole second (rounding up if necessary)
+		1. 从整数秒开始（如有必要向上取整）
 
-		2 If seconds match move on, otherwise find the next match:
-		2.1 If next match is in the next minute then roll forwards
+		2. 如果秒匹配则继续，否则找到下一个匹配：
+		2.1 如果下一个匹配在下一分钟则向前滚动
 
-		3 If minute matches move on, otherwise find the next match
-		3.1 If next match is in the next hour then roll forwards
-		3.2 Reset the seconds and go to 2
+		3. 如果分钟匹配则继续，否则找到下一个匹配
+		3.1 如果下一个匹配在下一小时则向前滚动
+		3.2 重置秒并回到步骤 2
 
-		4 If hour matches move on, otherwise find the next match
-		4.1 If next match is in the next day then roll forwards,
-		4.2 Reset the minutes and seconds and go to 2
+		4. 如果小时匹配则继续，否则找到下一个匹配
+		4.1 如果下一个匹配在下一天则向前滚动，
+		4.2 重置分钟和秒并回到步骤 2
 		*/
 
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTimeZone(this.timeZone);
 		calendar.setTime(date);
 
-		// First, just reset the milliseconds and try to calculate from there...
+		// 首先，重置毫秒并尝试从那里开始计算...
 		calendar.set(Calendar.MILLISECOND, 0);
 		long originalTimestamp = calendar.getTimeInMillis();
 		doNext(calendar, calendar.get(Calendar.YEAR));
 
 		if (calendar.getTimeInMillis() == originalTimestamp) {
-			// We arrived at the original timestamp - round up to the next whole second and try again...
+			// 我们回到了原始时间戳 - 向上取整到下一个整数秒并重试...
 			calendar.add(Calendar.SECOND, 1);
 			doNext(calendar, calendar.get(Calendar.YEAR));
 		}
@@ -217,8 +215,8 @@ public class CronSequenceGenerator {
 
 		int count = 0;
 		int max = 366;
-		// the DAY_OF_WEEK values in java.util.Calendar start with 1 (Sunday),
-		// but in the cron pattern, they start with 0, so we subtract 1 here
+		// java.util.Calendar 中的 DAY_OF_WEEK 值从 1（星期日）开始，
+		// 但在 cron 模式中从 0 开始，所以我们在这里减去 1
 		while ((!daysOfMonth.get(dayOfMonth) || !daysOfWeek.get(dayOfWeek - 1)) && count++ < max) {
 			calendar.add(Calendar.DAY_OF_MONTH, 1);
 			dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
@@ -232,20 +230,20 @@ public class CronSequenceGenerator {
 	}
 
 	/**
-	 * Search the bits provided for the next set bit after the value provided,
-	 * and reset the calendar.
-	 * @param bits a {@link BitSet} representing the allowed values of the field
-	 * @param value the current value of the field
-	 * @param calendar the calendar to increment as we move through the bits
-	 * @param field the field to increment in the calendar (@see
-	 * {@link Calendar} for the static constants defining valid fields)
-	 * @param lowerOrders the Calendar field ids that should be reset (i.e. the
-	 * ones of lower significance than the field of interest)
-	 * @return the value of the calendar field that is next in the sequence
+	 * 在提供的位集中搜索给定值之后的下一个已设置位，
+	 * 并重置日历。
+	 * @param bits 表示字段允许值的 {@link BitSet}
+	 * @param value 字段的当前值
+	 * @param calendar 在遍历位集时递增的日历
+	 * @param field 要在日历中递增的字段（参见
+	 * {@link Calendar} 中定义有效字段的静态常量）
+	 * @param lowerOrders 应被重置的日历字段 ID（即比目标字段
+	 * 低优先级的字段）
+	 * @return 日历字段中序列的下一个值
 	 */
 	private int findNext(BitSet bits, int value, Calendar calendar, int field, int nextField, List<Integer> lowerOrders) {
 		int nextValue = bits.nextSetBit(value);
-		// roll over if needed
+		// 如有必要则翻页
 		if (nextValue == -1) {
 			calendar.add(nextField, 1);
 			reset(calendar, Collections.singletonList(field));

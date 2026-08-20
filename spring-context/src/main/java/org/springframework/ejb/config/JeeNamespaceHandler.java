@@ -19,8 +19,8 @@ package org.springframework.ejb.config;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * {@link org.springframework.beans.factory.xml.NamespaceHandler}
- * for the '{@code jee}' namespace.
+ * 用于 {@code jee} 命名空间的
+ * {@link org.springframework.beans.factory.xml.NamespaceHandler} 实现。
  *
  * @author Rob Harrop
  * @since 2.0

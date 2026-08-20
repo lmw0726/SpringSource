@@ -19,8 +19,8 @@ package org.springframework.remoting.support;
 import org.aopalliance.intercept.MethodInvocation;
 
 /**
- * Default implementation of the {@link RemoteInvocationFactory} interface.
- * Simply creates a new standard {@link RemoteInvocation} object.
+ * {@link RemoteInvocationFactory} 接口的默认实现。
+ * 简单地创建一个新的标准 {@link RemoteInvocation} 对象。
  *
  * @author Juergen Hoeller
  * @since 1.1

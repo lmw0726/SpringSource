@@ -22,9 +22,9 @@ import org.springframework.core.OverridingClassLoader;
 import org.springframework.lang.Nullable;
 
 /**
- * Simplistic implementation of an instrumentable {@code ClassLoader}.
+ * 可 instrumentation（字节码增强）的 {@code ClassLoader} 的简单实现。
  *
- * <p>Usable in tests and standalone environments.
+ * <p>可用于测试和独立环境。
  *
  * @author Rod Johnson
  * @author Costin Leau
@@ -41,8 +41,8 @@ public class SimpleInstrumentableClassLoader extends OverridingClassLoader {
 
 
 	/**
-	 * Create a new SimpleInstrumentableClassLoader for the given ClassLoader.
-	 * @param parent the ClassLoader to build an instrumentable ClassLoader for
+	 * 为指定的 ClassLoader 创建一个新的 SimpleInstrumentableClassLoader。
+	 * @param parent 要为其构建可 instrumentation 的 ClassLoader 的父类加载器
 	 */
 	public SimpleInstrumentableClassLoader(@Nullable ClassLoader parent) {
 		super(parent);
@@ -51,8 +51,8 @@ public class SimpleInstrumentableClassLoader extends OverridingClassLoader {
 
 
 	/**
-	 * Add a {@link ClassFileTransformer} to be applied by this ClassLoader.
-	 * @param transformer the {@link ClassFileTransformer} to register
+	 * 添加一个 {@link ClassFileTransformer}，该转换器将由此 ClassLoader 应用。
+	 * @param transformer 要注册的 {@link ClassFileTransformer}
 	 */
 	public void addTransformer(ClassFileTransformer transformer) {
 		this.weavingTransformer.addTransformer(transformer);

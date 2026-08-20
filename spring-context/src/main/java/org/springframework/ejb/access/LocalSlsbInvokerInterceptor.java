@@ -29,21 +29,20 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.lang.Nullable;
 
 /**
- * Invoker for a local Stateless Session Bean.
- * Designed for EJB 2.x, but works for EJB 3 Session Beans as well.
+ * 本地无状态会话 Bean（Stateless Session Bean）的调用器。
+ * 专为 EJB 2.x 设计，但同样适用于 EJB 3 会话 Bean。
  *
- * <p>Caches the home object, since a local EJB home can never go stale.
- * See {@link org.springframework.jndi.JndiObjectLocator} for info on
- * how to specify the JNDI location of the target EJB.
+ * <p>缓存 home 对象，因为本地 EJB home 永远不会过期。
+ * 有关如何指定目标 EJB 的 JNDI 位置，请参阅
+ * {@link org.springframework.jndi.JndiObjectLocator}。
  *
- * <p>In a bean container, this class is normally best used as a singleton. However,
- * if that bean container pre-instantiates singletons (as do the XML ApplicationContext
- * variants) you may have a problem if the bean container is loaded before the EJB
- * container loads the target EJB. That is because by default the JNDI lookup will be
- * performed in the init method of this class and cached, but the EJB will not have been
- * bound at the target location yet. The best solution is to set the lookupHomeOnStartup
- * property to false, in which case the home will be fetched on first access to the EJB.
- * (This flag is only true by default for backwards compatibility reasons).
+ * <p>在 Bean 容器中，此类通常最好作为单例使用。但是，
+ * 如果 Bean 容器预实例化了单例（如 XML ApplicationContext 的各种变体），
+ * 则在 Bean 容器于 EJB 容器加载目标 EJB 之前加载时可能会出现问题。
+ * 这是因为默认情况下 JNDI 查找将在本类的 init 方法中执行并缓存，
+ * 但此时 EJB 尚未绑定到目标位置。最佳解决方案是将
+ * lookupHomeOnStartup 属性设置为 false，这样 home 对象将在首次访问 EJB 时获取。
+ * （此标志默认为 true 仅为向后兼容）。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -56,11 +55,11 @@ public class LocalSlsbInvokerInterceptor extends AbstractSlsbInvokerInterceptor 
 
 
 	/**
-	 * This implementation "creates" a new EJB instance for each invocation.
-	 * Can be overridden for custom invocation strategies.
-	 * <p>Alternatively, override {@link #getSessionBeanInstance} and
-	 * {@link #releaseSessionBeanInstance} to change EJB instance creation,
-	 * for example to hold a single shared EJB instance.
+	 * 此实现为每次调用"创建"一个新的 EJB 实例。
+	 * 可重写以实现自定义调用策略。
+	 * <p>也可以重写 {@link #getSessionBeanInstance} 和
+	 * {@link #releaseSessionBeanInstance} 来改变 EJB 实例的创建方式，
+	 * 例如持有单个共享 EJB 实例。
 	 */
 	@Override
 	@Nullable
@@ -70,11 +69,11 @@ public class LocalSlsbInvokerInterceptor extends AbstractSlsbInvokerInterceptor 
 			ejb = getSessionBeanInstance();
 			Method method = invocation.getMethod();
 			if (method.getDeclaringClass().isInstance(ejb)) {
-				// directly implemented
+				// 直接实现
 				return method.invoke(ejb, invocation.getArguments());
 			}
 			else {
-				// not directly implemented
+				// 未直接实现
 				Method ejbMethod = ejb.getClass().getMethod(method.getName(), method.getParameterTypes());
 				return ejbMethod.invoke(ejb, invocation.getArguments());
 			}
@@ -106,7 +105,7 @@ public class LocalSlsbInvokerInterceptor extends AbstractSlsbInvokerInterceptor 
 	}
 
 	/**
-	 * Check for EJB3-style home object that serves as EJB component directly.
+	 * 检查是否为 EJB3 风格的 home 对象，该对象直接作为 EJB 组件使用。
 	 */
 	@Override
 	protected Method getCreateMethod(Object home) throws EjbAccessException {
@@ -114,7 +113,7 @@ public class LocalSlsbInvokerInterceptor extends AbstractSlsbInvokerInterceptor 
 			return null;
 		}
 		if (!(home instanceof EJBLocalHome)) {
-			// An EJB3 Session Bean...
+			// 一个 EJB3 会话 Bean...
 			this.homeAsComponent = true;
 			return null;
 		}
@@ -122,10 +121,10 @@ public class LocalSlsbInvokerInterceptor extends AbstractSlsbInvokerInterceptor 
 	}
 
 	/**
-	 * Return an EJB instance to delegate the call to.
-	 * Default implementation delegates to newSessionBeanInstance.
-	 * @throws NamingException if thrown by JNDI
-	 * @throws InvocationTargetException if thrown by the create method
+	 * 返回要委托调用的 EJB 实例。
+	 * 默认实现委托给 newSessionBeanInstance。
+	 * @throws NamingException 如果由 JNDI 抛出
+	 * @throws InvocationTargetException 如果由 create 方法抛出
 	 * @see #newSessionBeanInstance
 	 */
 	protected Object getSessionBeanInstance() throws NamingException, InvocationTargetException {
@@ -133,9 +132,9 @@ public class LocalSlsbInvokerInterceptor extends AbstractSlsbInvokerInterceptor 
 	}
 
 	/**
-	 * Release the given EJB instance.
-	 * Default implementation delegates to removeSessionBeanInstance.
-	 * @param ejb the EJB instance to release
+	 * 释放给定的 EJB 实例。
+	 * 默认实现委托给 removeSessionBeanInstance。
+	 * @param ejb 要释放的 EJB 实例
 	 * @see #removeSessionBeanInstance
 	 */
 	protected void releaseSessionBeanInstance(EJBLocalObject ejb) {
@@ -143,10 +142,10 @@ public class LocalSlsbInvokerInterceptor extends AbstractSlsbInvokerInterceptor 
 	}
 
 	/**
-	 * Return a new instance of the stateless session bean.
-	 * Can be overridden to change the algorithm.
-	 * @throws NamingException if thrown by JNDI
-	 * @throws InvocationTargetException if thrown by the create method
+	 * 返回无状态会话 Bean 的新实例。
+	 * 可重写以更改算法。
+	 * @throws NamingException 如果由 JNDI 抛出
+	 * @throws InvocationTargetException 如果由 create 方法抛出
 	 * @see #create
 	 */
 	protected Object newSessionBeanInstance() throws NamingException, InvocationTargetException {
@@ -161,8 +160,8 @@ public class LocalSlsbInvokerInterceptor extends AbstractSlsbInvokerInterceptor 
 	}
 
 	/**
-	 * Remove the given EJB instance.
-	 * @param ejb the EJB instance to remove
+	 * 移除给定的 EJB 实例。
+	 * @param ejb 要移除的 EJB 实例
 	 * @see javax.ejb.EJBLocalObject#remove()
 	 */
 	protected void removeSessionBeanInstance(@Nullable EJBLocalObject ejb) {

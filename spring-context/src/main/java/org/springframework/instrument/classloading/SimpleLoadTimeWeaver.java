@@ -22,12 +22,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@code LoadTimeWeaver} that builds and exposes a
- * {@link SimpleInstrumentableClassLoader}.
+ * 构建并公开 {@link SimpleInstrumentableClassLoader} 的 {@code LoadTimeWeaver}。
  *
- * <p>Mainly intended for testing environments, where it is sufficient to
- * perform all class transformation on a newly created
- * {@code ClassLoader} instance.
+ * <p>主要用于测试环境，在测试环境中只需在一个新创建的
+ * {@code ClassLoader} 实例上执行所有类转换即可。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -42,8 +40,7 @@ public class SimpleLoadTimeWeaver implements LoadTimeWeaver {
 
 
 	/**
-	 * Create a new {@code SimpleLoadTimeWeaver} for the current context
-	 * {@code ClassLoader}.
+	 * 为当前上下文 {@code ClassLoader} 创建一个新的 {@code SimpleLoadTimeWeaver}。
 	 * @see SimpleInstrumentableClassLoader
 	 */
 	public SimpleLoadTimeWeaver() {
@@ -51,10 +48,8 @@ public class SimpleLoadTimeWeaver implements LoadTimeWeaver {
 	}
 
 	/**
-	 * Create a new {@code SimpleLoadTimeWeaver} for the given
-	 * {@code ClassLoader}.
-	 * @param classLoader the {@code ClassLoader} to build a simple
-	 * instrumentable {@code ClassLoader} on top of
+	 * 为给定的 {@code ClassLoader} 创建一个新的 {@code SimpleLoadTimeWeaver}。
+	 * @param classLoader 用于构建简单可检测 {@code ClassLoader} 的 {@code ClassLoader}
 	 */
 	public SimpleLoadTimeWeaver(SimpleInstrumentableClassLoader classLoader) {
 		Assert.notNull(classLoader, "ClassLoader must not be null");
@@ -73,7 +68,7 @@ public class SimpleLoadTimeWeaver implements LoadTimeWeaver {
 	}
 
 	/**
-	 * This implementation builds a {@link SimpleThrowawayClassLoader}.
+	 * 此实现构建一个 {@link SimpleThrowawayClassLoader}。
 	 */
 	@Override
 	public ClassLoader getThrowawayClassLoader() {

@@ -21,8 +21,7 @@ import java.util.Date;
 import org.springframework.lang.Nullable;
 
 /**
- * Common interface for trigger objects that determine the next execution time
- * of a task that they get associated with.
+ * 触发器对象的通用接口，用于确定与其关联的任务的下一次执行时间。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -32,11 +31,9 @@ import org.springframework.lang.Nullable;
 public interface Trigger {
 
 	/**
-	 * Determine the next execution time according to the given trigger context.
-	 * @param triggerContext context object encapsulating last execution times
-	 * and last completion time
-	 * @return the next execution time as defined by the trigger,
-	 * or {@code null} if the trigger won't fire anymore
+	 * 根据给定的触发器上下文确定下一次执行时间。
+	 * @param triggerContext 封装了上次执行时间和上次完成时间的上下文对象
+	 * @return 触发器定义的下一次执行时间，如果触发器不再触发则返回 {@code null}
 	 */
 	@Nullable
 	Date nextExecutionTime(TriggerContext triggerContext);

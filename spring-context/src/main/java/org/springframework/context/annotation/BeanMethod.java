@@ -22,8 +22,7 @@ import org.springframework.core.type.MethodMetadata;
 import org.springframework.lang.Nullable;
 
 /**
- * Represents a {@link Configuration @Configuration} class method annotated with
- * {@link Bean @Bean}.
+ * 表示一个 {@link Configuration @Configuration} 类中被 {@link Bean @Bean} 注解标注的方法。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -42,13 +41,13 @@ final class BeanMethod extends ConfigurationMethod {
 	@Override
 	public void validate(ProblemReporter problemReporter) {
 		if (getMetadata().isStatic()) {
-			// static @Bean methods have no constraints to validate -> return immediately
+			// 静态 @Bean 方法没有需要验证的约束条件 -> 直接返回
 			return;
 		}
 
 		if (this.configurationClass.getMetadata().isAnnotated(Configuration.class.getName())) {
 			if (!getMetadata().isOverridable()) {
-				// instance @Bean methods within @Configuration classes must be overridable to accommodate CGLIB
+				// @Configuration 类中的实例 @Bean 方法必须是可覆盖的，以适配 CGLIB
 				problemReporter.error(new NonOverridableMethodError());
 			}
 		}

@@ -1,5 +1,5 @@
 /**
- * Integration with the JSR-354 <code>javax.money</code> package.
+ * 与 JSR-354 <code>javax.money</code> 包的集成。
  */
 @NonNullApi
 @NonNullFields

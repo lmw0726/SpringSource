@@ -21,8 +21,8 @@ import java.util.concurrent.ScheduledFuture;
 import org.springframework.lang.Nullable;
 
 /**
- * A representation of a scheduled task at runtime,
- * used as a return value for scheduling methods.
+ * 定时任务在运行时的表示，
+ * 用作调度方法的返回值。
  *
  * @author Juergen Hoeller
  * @since 4.3
@@ -45,8 +45,8 @@ public final class ScheduledTask {
 
 
 	/**
-	 * Return the underlying task (typically a {@link CronTask},
-	 * {@link FixedRateTask} or {@link FixedDelayTask}).
+	 * 返回底层任务（通常是 {@link CronTask}、
+	 * {@link FixedRateTask} 或 {@link FixedDelayTask}）。
 	 * @since 5.0.2
 	 */
 	public Task getTask() {
@@ -54,8 +54,8 @@ public final class ScheduledTask {
 	}
 
 	/**
-	 * Trigger cancellation of this scheduled task.
-	 * <p>This variant will force interruption of the task if still running.
+	 * 触发取消此定时任务。
+	 * <p>此重载方法会在任务仍在运行时强制中断任务。
 	 * @see #cancel(boolean)
 	 */
 	public void cancel() {
@@ -63,9 +63,9 @@ public final class ScheduledTask {
 	}
 
 	/**
-	 * Trigger cancellation of this scheduled task.
-	 * @param mayInterruptIfRunning whether to force interruption of the task
-	 * if still running (specify {@code false} to allow the task to complete)
+	 * 触发取消此定时任务。
+	 * @param mayInterruptIfRunning 是否在任务仍在运行时强制中断任务
+	 * （指定 {@code false} 以允许任务完成）
 	 * @since 5.3.18
 	 * @see ScheduledFuture#cancel(boolean)
 	 */

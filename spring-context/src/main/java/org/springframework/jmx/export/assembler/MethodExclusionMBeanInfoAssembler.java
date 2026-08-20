@@ -29,22 +29,20 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * {@code AbstractReflectiveMBeanInfoAssembler} subclass that allows
- * method names to be explicitly excluded as MBean operations and attributes.
+ * {@code AbstractReflectiveMBeanInfoAssembler} 的子类，允许将方法名
+ * 显式排除为 MBean 操作和属性。
  *
- * <p>Any method not explicitly excluded from the management interface will be exposed to
- * JMX. JavaBean getters and setters will automatically be exposed as JMX attributes.
+ * <p>未在管理接口中显式排除的任何方法都将暴露给 JMX。
+ * JavaBean 的 getter 和 setter 将自动暴露为 JMX 属性。
  *
- * <p>You can supply an array of method names via the {@code ignoredMethods}
- * property. If you have multiple beans and you wish each bean to use a different
- * set of method names, then you can map bean keys (that is the name used to pass
- * the bean to the {@code MBeanExporter}) to a list of method names using the
- * {@code ignoredMethodMappings} property.
+ * <p>您可以通过 {@code ignoredMethods} 属性提供一个方法名数组。
+ * 如果您有多个 Bean，并且希望每个 Bean 使用不同的方法名集合，
+ * 则可以使用 {@code ignoredMethodMappings} 属性将 Bean 键
+ * （即传递给 {@code MBeanExporter} 的名称）映射到方法名列表。
  *
- * <p>If you specify values for both {@code ignoredMethodMappings} and
- * {@code ignoredMethods}, Spring will attempt to find method names in the
- * mappings first. If no method names for the bean are found, it will use the
- * method names defined by {@code ignoredMethods}.
+ * <p>如果同时指定了 {@code ignoredMethodMappings} 和
+ * {@code ignoredMethods} 的值，Spring 将首先尝试在映射中查找方法名。
+ * 如果未找到该 Bean 的方法名，则使用 {@code ignoredMethods} 定义的方法名。
  *
  * @author Rob Harrop
  * @author Seth Ladd
@@ -66,9 +64,9 @@ public class MethodExclusionMBeanInfoAssembler extends AbstractConfigurableMBean
 
 
 	/**
-	 * Set the array of method names to be <b>ignored</b> when creating the management info.
-	 * <p>These method names will be used for a bean if no entry corresponding to
-	 * that bean is found in the {@code ignoredMethodsMappings} property.
+	 * 设置在创建管理信息时需要<b>忽略</b>的方法名数组。
+	 * <p>如果在 {@code ignoredMethodMappings} 属性中未找到对应 Bean 的条目，
+	 * 则将使用这些方法名。
 	 * @see #setIgnoredMethodMappings(java.util.Properties)
 	 */
 	public void setIgnoredMethods(String... ignoredMethodNames) {
@@ -76,11 +74,10 @@ public class MethodExclusionMBeanInfoAssembler extends AbstractConfigurableMBean
 	}
 
 	/**
-	 * Set the mappings of bean keys to a comma-separated list of method names.
-	 * <p>These method names are <b>ignored</b> when creating the management interface.
-	 * <p>The property key must match the bean key and the property value must match
-	 * the list of method names. When searching for method names to ignore for a bean,
-	 * Spring will check these mappings first.
+	 * 设置 Bean 键到逗号分隔的方法名列表的映射。
+	 * <p>这些方法名在创建管理接口时将被<b>忽略</b>。
+	 * <p>属性键必须与 Bean 键匹配，属性值必须与方法名列表匹配。
+	 * 在搜索要忽略的 Bean 方法名时，Spring 将首先检查这些映射。
 	 */
 	public void setIgnoredMethodMappings(Properties mappings) {
 		this.ignoredMethodMappings = new HashMap<>();
@@ -108,11 +105,10 @@ public class MethodExclusionMBeanInfoAssembler extends AbstractConfigurableMBean
 	}
 
 	/**
-	 * Determine whether the given method is supposed to be included,
-	 * that is, not configured as to be ignored.
-	 * @param method the operation method
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
+	 * 判断给定方法是否应该被包含，即未被配置为忽略。
+	 * @param method 操作方法
+	 * @param beanKey 与 {@code MBeanExporter} 中 Bean 映射关联的
+	 * MBean 的键
 	 */
 	protected boolean isNotIgnored(Method method, String beanKey) {
 		if (this.ignoredMethodMappings != null) {

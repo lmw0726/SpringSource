@@ -24,38 +24,37 @@ import org.springframework.lang.Nullable;
 import org.springframework.remoting.support.RemoteInvocation;
 
 /**
- * Interface for RMI invocation handlers instances on the server,
- * wrapping exported services. A client uses a stub implementing
- * this interface to access such a service.
+ * 服务器端 RMI 调用处理器实例的接口，用于包装导出的服务。
+ * 客户端使用实现此接口的存根（stub）来访问此类服务。
  *
- * <p>This is an SPI interface, not to be used directly by applications.
+ * <p>这是一个 SPI 接口，不应由应用程序直接使用。
  *
  * @author Juergen Hoeller
  * @since 14.05.2003
- * @deprecated as of 5.3 (phasing out serialization-based remoting)
+ * @deprecated 从 5.3 版本开始弃用（逐步淘汰基于序列化的远程调用）
  */
 @Deprecated
 public interface RmiInvocationHandler extends Remote {
 
 	/**
-	 * Return the name of the target interface that this invoker operates on.
-	 * @return the name of the target interface, or {@code null} if none
-	 * @throws RemoteException in case of communication errors
+	 * 返回此调用器所操作的目标接口的名称。
+	 * @return 目标接口的名称，如果没有则返回 {@code null}
+	 * @throws RemoteException 发生通信错误时
 	 * @see RmiServiceExporter#getServiceInterface()
 	 */
 	@Nullable
 	public String getTargetInterfaceName() throws RemoteException;
 
 	/**
-	 * Apply the given invocation to the target object.
-	 * <p>Called by
-	 * {@link RmiClientInterceptor#doInvoke(org.aopalliance.intercept.MethodInvocation, RmiInvocationHandler)}.
-	 * @param invocation object that encapsulates invocation parameters
-	 * @return the object returned from the invoked method, if any
-	 * @throws RemoteException in case of communication errors
-	 * @throws NoSuchMethodException if the method name could not be resolved
-	 * @throws IllegalAccessException if the method could not be accessed
-	 * @throws InvocationTargetException if the method invocation resulted in an exception
+	 * 将给定的调用应用于目标对象。
+	 * <p>由
+	 * {@link RmiClientInterceptor#doInvoke(org.aopalliance.intercept.MethodInvocation, RmiInvocationHandler)} 调用。
+	 * @param invocation 封装调用参数的对象
+	 * @return 被调用方法返回的对象，如果没有则返回 null
+	 * @throws RemoteException 发生通信错误时
+	 * @throws NoSuchMethodException 如果方法名无法解析
+	 * @throws IllegalAccessException 如果无法访问该方法
+	 * @throws InvocationTargetException 如果方法调用导致了异常
 	 */
 	@Nullable
 	public Object invoke(RemoteInvocation invocation)

@@ -24,11 +24,11 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.Assert;
 
 /**
- * A {@link ScopeMetadataResolver} implementation that by default checks for
- * the presence of Spring's {@link Scope @Scope} annotation on the bean class.
+ * 一个 {@link ScopeMetadataResolver} 的实现，默认情况下会检查 Bean 类上
+ * 是否存在 Spring 的 {@link Scope @Scope} 注解。
  *
- * <p>The exact type of annotation that is checked for is configurable via
- * {@link #setScopeAnnotationType(Class)}.
+ * <p>具体检查的注解类型可通过
+ * {@link #setScopeAnnotationType(Class)} 进行配置。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -44,7 +44,7 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 
 
 	/**
-	 * Construct a new {@code AnnotationScopeMetadataResolver}.
+	 * 创建一个新的 {@code AnnotationScopeMetadataResolver}。
 	 * @see #AnnotationScopeMetadataResolver(ScopedProxyMode)
 	 * @see ScopedProxyMode#NO
 	 */
@@ -53,9 +53,8 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 	}
 
 	/**
-	 * Construct a new {@code AnnotationScopeMetadataResolver} using the
-	 * supplied default {@link ScopedProxyMode}.
-	 * @param defaultProxyMode the default scoped-proxy mode
+	 * 使用指定的默认 {@link ScopedProxyMode} 创建一个新的 {@code AnnotationScopeMetadataResolver}。
+	 * @param defaultProxyMode 默认的作用域代理模式
 	 */
 	public AnnotationScopeMetadataResolver(ScopedProxyMode defaultProxyMode) {
 		Assert.notNull(defaultProxyMode, "'defaultProxyMode' must not be null");
@@ -64,9 +63,8 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 
 
 	/**
-	 * Set the type of annotation that is checked for by this
-	 * {@code AnnotationScopeMetadataResolver}.
-	 * @param scopeAnnotationType the target annotation type
+	 * 设置此 {@code AnnotationScopeMetadataResolver} 检查的注解类型。
+	 * @param scopeAnnotationType 目标注解类型
 	 */
 	public void setScopeAnnotationType(Class<? extends Annotation> scopeAnnotationType) {
 		Assert.notNull(scopeAnnotationType, "'scopeAnnotationType' must not be null");

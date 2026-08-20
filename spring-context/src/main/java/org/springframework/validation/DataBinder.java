@@ -647,7 +647,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 
 
 	//---------------------------------------------------------------------
-	// Implementation of PropertyEditorRegistry/TypeConverter interface
+	// PropertyEditorRegistry/TypeConverter 接口的实现
 	//---------------------------------------------------------------------
 
 	/**

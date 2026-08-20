@@ -39,20 +39,18 @@ import org.springframework.util.ClassUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * An AOP Alliance {@link MethodInterceptor} implementation that delegates to a
- * JSR-303 provider for performing method-level validation on annotated methods.
+ * 一个 AOP Alliance {@link MethodInterceptor} 实现，它委托给
+ * JSR-303 提供者来对带注解的方法执行方法级别的验证。
  *
- * <p>Applicable methods have JSR-303 constraint annotations on their parameters
- * and/or on their return value (in the latter case specified at the method level,
- * typically as inline annotation).
+ * <p>适用的方法在其参数和/或返回值上具有 JSR-303 约束注解（在后一种情况下在方法级别指定，
+ * 通常作为内联注解）。
  *
- * <p>E.g.: {@code public @NotNull Object myValidMethod(@NotNull String arg1, @Max(10) int arg2)}
+ * <p>例如：{@code public @NotNull Object myValidMethod(@NotNull String arg1, @Max(10) int arg2)}
  *
- * <p>Validation groups can be specified through Spring's {@link Validated} annotation
- * at the type level of the containing target class, applying to all public service methods
- * of that class. By default, JSR-303 will validate against its default group only.
+ * <p>验证组可以通过包含目标类的类型级别的 Spring {@link Validated} 注解来指定，
+ * 应用于该类的所有公共服务方法。默认情况下，JSR-303 仅针对其默认组进行验证。
  *
- * <p>As of Spring 5.0, this functionality requires a Bean Validation 1.1+ provider.
+ * <p>从 Spring 5.0 开始，此功能需要 Bean Validation 1.1+ 提供者。
  *
  * @author Juergen Hoeller
  * @since 3.1
@@ -65,23 +63,23 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 
 
 	/**
-	 * Create a new MethodValidationInterceptor using a default JSR-303 validator underneath.
+	 * 使用底层默认的 JSR-303 验证器创建一个新的 MethodValidationInterceptor。
 	 */
 	public MethodValidationInterceptor() {
 		this(Validation.buildDefaultValidatorFactory());
 	}
 
 	/**
-	 * Create a new MethodValidationInterceptor using the given JSR-303 ValidatorFactory.
-	 * @param validatorFactory the JSR-303 ValidatorFactory to use
+	 * 使用给定的 JSR-303 ValidatorFactory 创建一个新的 MethodValidationInterceptor。
+	 * @param validatorFactory 要使用的 JSR-303 ValidatorFactory
 	 */
 	public MethodValidationInterceptor(ValidatorFactory validatorFactory) {
 		this(validatorFactory.getValidator());
 	}
 
 	/**
-	 * Create a new MethodValidationInterceptor using the given JSR-303 Validator.
-	 * @param validator the JSR-303 Validator to use
+	 * 使用给定的 JSR-303 Validator 创建一个新的 MethodValidationInterceptor。
+	 * @param validator 要使用的 JSR-303 Validator
 	 */
 	public MethodValidationInterceptor(Validator validator) {
 		this.validator = validator;
@@ -91,14 +89,14 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		// Avoid Validator invocation on FactoryBean.getObjectType/isSingleton
+		// 避免对 FactoryBean.getObjectType/isSingleton 进行 Validator 调用
 		if (isFactoryBeanMetadataMethod(invocation.getMethod())) {
 			return invocation.proceed();
 		}
 
 		Class<?>[] groups = determineValidationGroups(invocation);
 
-		// Standard Bean Validation 1.1 API
+		// 标准 Bean Validation 1.1 API
 		ExecutableValidator execVal = this.validator.forExecutables();
 		Method methodToValidate = invocation.getMethod();
 		Set<ConstraintViolation<Object>> result;
@@ -110,8 +108,8 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 			result = execVal.validateParameters(target, methodToValidate, invocation.getArguments(), groups);
 		}
 		catch (IllegalArgumentException ex) {
-			// Probably a generic type mismatch between interface and impl as reported in SPR-12237 / HV-1011
-			// Let's try to find the bridged method on the implementation class...
+			// 可能是接口和实现之间的泛型类型不匹配，如 SPR-12237 / HV-1011 中报告的
+			// 让我们尝试在实现类上查找桥接方法...
 			methodToValidate = BridgeMethodResolver.findBridgedMethod(
 					ClassUtils.getMostSpecificMethod(invocation.getMethod(), target.getClass()));
 			result = execVal.validateParameters(target, methodToValidate, invocation.getArguments(), groups);
@@ -133,13 +131,13 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 	private boolean isFactoryBeanMetadataMethod(Method method) {
 		Class<?> clazz = method.getDeclaringClass();
 
-		// Call from interface-based proxy handle, allowing for an efficient check?
+		// 从基于接口的代理句柄调用，允许进行高效检查？
 		if (clazz.isInterface()) {
 			return ((clazz == FactoryBean.class || clazz == SmartFactoryBean.class) &&
 					!method.getName().equals("getObject"));
 		}
 
-		// Call from CGLIB proxy handle, potentially implementing a FactoryBean method?
+		// 从 CGLIB 代理句柄调用，可能实现了 FactoryBean 方法？
 		Class<?> factoryBeanType = null;
 		if (SmartFactoryBean.class.isAssignableFrom(clazz)) {
 			factoryBeanType = SmartFactoryBean.class;
@@ -152,11 +150,10 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Determine the validation groups to validate against for the given method invocation.
-	 * <p>Default are the validation groups as specified in the {@link Validated} annotation
-	 * on the containing target class of the method.
-	 * @param invocation the current MethodInvocation
-	 * @return the applicable validation groups as a Class array
+	 * 确定给定方法调用要验证的验证组。
+	 * <p>默认是方法所在目标类上的 {@link Validated} 注解中指定的验证组。
+	 * @param invocation 当前的 MethodInvocation
+	 * @return 作为 Class 数组的适用验证组
 	 */
 	protected Class<?>[] determineValidationGroups(MethodInvocation invocation) {
 		Validated validatedAnn = AnnotationUtils.findAnnotation(invocation.getMethod(), Validated.class);

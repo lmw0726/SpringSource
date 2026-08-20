@@ -27,9 +27,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link org.springframework.instrument.classloading.LoadTimeWeaver} implementation
- * for Tomcat's new {@code org.apache.tomcat.InstrumentableClassLoader}.
- * Also capable of handling Spring's TomcatInstrumentableClassLoader when encountered.
+ * 针对 Tomcat 新版 {@code org.apache.tomcat.InstrumentableClassLoader} 的
+ * {@link org.springframework.instrument.classloading.LoadTimeWeaver} 实现。
+ * 也能处理遇到 Spring 的 TomcatInstrumentableClassLoader 的情况。
  *
  * @author Juergen Hoeller
  * @since 4.0
@@ -47,8 +47,7 @@ public class TomcatLoadTimeWeaver implements LoadTimeWeaver {
 
 
 	/**
-	 * Create a new instance of the {@link TomcatLoadTimeWeaver} class using
-	 * the default {@link ClassLoader class loader}.
+	 * 使用默认的 {@link ClassLoader 类加载器}创建 {@link TomcatLoadTimeWeaver} 类的新实例。
 	 * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
 	 */
 	public TomcatLoadTimeWeaver() {
@@ -56,9 +55,8 @@ public class TomcatLoadTimeWeaver implements LoadTimeWeaver {
 	}
 
 	/**
-	 * Create a new instance of the {@link TomcatLoadTimeWeaver} class using
-	 * the supplied {@link ClassLoader}.
-	 * @param classLoader the {@code ClassLoader} to delegate to for weaving
+	 * 使用提供的 {@link ClassLoader}创建 {@link TomcatLoadTimeWeaver} 类的新实例。
+	 * @param classLoader 用于委派进行织入的 {@code ClassLoader}
 	 */
 	public TomcatLoadTimeWeaver(@Nullable ClassLoader classLoader) {
 		Assert.notNull(classLoader, "ClassLoader must not be null");
@@ -68,21 +66,21 @@ public class TomcatLoadTimeWeaver implements LoadTimeWeaver {
 		try {
 			instrumentableLoaderClass = classLoader.loadClass(INSTRUMENTABLE_LOADER_CLASS_NAME);
 			if (!instrumentableLoaderClass.isInstance(classLoader)) {
-				// Could still be a custom variant of a convention-compatible ClassLoader
+				// 仍可能是一个符合约定的自定义 ClassLoader 变体
 				instrumentableLoaderClass = classLoader.getClass();
 			}
 		}
 		catch (ClassNotFoundException ex) {
-			// We're on an earlier version of Tomcat, probably with Spring's TomcatInstrumentableClassLoader
+			// 我们处于较早版本的 Tomcat 上，可能使用的是 Spring 的 TomcatInstrumentableClassLoader
 			instrumentableLoaderClass = classLoader.getClass();
 		}
 
 		try {
 			this.addTransformerMethod = instrumentableLoaderClass.getMethod("addTransformer", ClassFileTransformer.class);
-			// Check for Tomcat's new copyWithoutTransformers on InstrumentableClassLoader first
+			// 首先检查 Tomcat InstrumentableClassLoader 上的新 copyWithoutTransformers 方法
 			Method copyMethod = ClassUtils.getMethodIfAvailable(instrumentableLoaderClass, "copyWithoutTransformers");
 			if (copyMethod == null) {
-				// Fallback: expecting TomcatInstrumentableClassLoader's getThrowawayClassLoader
+				// 回退方案：期望 TomcatInstrumentableClassLoader 的 getThrowawayClassLoader 方法
 				copyMethod = instrumentableLoaderClass.getMethod("getThrowawayClassLoader");
 			}
 			this.copyMethod = copyMethod;

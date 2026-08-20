@@ -20,9 +20,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * General utilities for handling remote invocations.
+ * 用于处理远程调用的通用工具类。
  *
- * <p>Mainly intended for use within the remoting framework.
+ * <p>主要供远程调用框架内部使用。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -30,13 +30,11 @@ import java.util.Set;
 public abstract class RemoteInvocationUtils {
 
 	/**
-	 * Fill the current client-side stack trace into the given exception.
-	 * <p>The given exception is typically thrown on the server and serialized
-	 * as-is, with the client wanting it to contain the client-side portion
-	 * of the stack trace as well. What we can do here is to update the
-	 * {@code StackTraceElement} array with the current client-side stack
-	 * trace, provided that we run on JDK 1.4+.
-	 * @param ex the exception to update
+	 * 将当前客户端堆栈跟踪信息填充到给定的异常中。
+	 * <p>给定的异常通常在服务器上抛出并原样序列化，客户端希望它也包含客户端堆栈跟踪信息。
+	 * 我们可以在此处更新 {@code StackTraceElement} 数组，添加当前客户端堆栈跟踪信息，
+	 * 前提是我们在 JDK 1.4+ 环境下运行。
+	 * @param ex 要更新的异常
 	 * @see Throwable#getStackTrace()
 	 * @see Throwable#setStackTrace(StackTraceElement[])
 	 */

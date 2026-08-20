@@ -17,7 +17,7 @@
 package org.springframework.cache.interceptor;
 
 /**
- * Class describing a cache 'evict' operation.
+ * 描述缓存“evict（清除）”操作的类。
  *
  * @author Costin Leau
  * @author Marcin Kamionowski
@@ -31,7 +31,7 @@ public class CacheEvictOperation extends CacheOperation {
 
 
 	/**
-	 * Create a new {@link CacheEvictOperation} instance from the given builder.
+	 * 根据给定的 builder 创建一个新的 {@link CacheEvictOperation} 实例。
 	 * @since 4.3
 	 */
 	public CacheEvictOperation(CacheEvictOperation.Builder b) {
@@ -51,7 +51,7 @@ public class CacheEvictOperation extends CacheOperation {
 
 
 	/**
-	 * A builder that can be used to create a {@link CacheEvictOperation}.
+	 * 可用于创建 {@link CacheEvictOperation} 的 builder。
 	 * @since 4.3
 	 */
 	public static class Builder extends CacheOperation.Builder {

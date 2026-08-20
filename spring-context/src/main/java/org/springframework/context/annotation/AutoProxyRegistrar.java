@@ -27,9 +27,8 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
- * Registers an auto proxy creator against the current {@link BeanDefinitionRegistry}
- * as appropriate based on an {@code @Enable*} annotation having {@code mode} and
- * {@code proxyTargetClass} attributes set to the correct values.
+ * 根据 {@code @Enable*} 注解中 {@code mode} 和 {@code proxyTargetClass} 属性的正确值，
+ * 向当前 {@link BeanDefinitionRegistry} 注册适当的自动代理创建器（Auto Proxy Creator）。
  *
  * @author Chris Beams
  * @since 3.1
@@ -41,19 +40,16 @@ public class AutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 	private final Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * Register, escalate, and configure the standard auto proxy creator (APC) against the
-	 * given registry. Works by finding the nearest annotation declared on the importing
-	 * {@code @Configuration} class that has both {@code mode} and {@code proxyTargetClass}
-	 * attributes. If {@code mode} is set to {@code PROXY}, the APC is registered; if
-	 * {@code proxyTargetClass} is set to {@code true}, then the APC is forced to use
-	 * subclass (CGLIB) proxying.
-	 * <p>Several {@code @Enable*} annotations expose both {@code mode} and
-	 * {@code proxyTargetClass} attributes. It is important to note that most of these
-	 * capabilities end up sharing a {@linkplain AopConfigUtils#AUTO_PROXY_CREATOR_BEAN_NAME
-	 * single APC}. For this reason, this implementation doesn't "care" exactly which
-	 * annotation it finds -- as long as it exposes the right {@code mode} and
-	 * {@code proxyTargetClass} attributes, the APC can be registered and configured all
-	 * the same.
+	 * 向给定的注册表注册、升级并配置标准自动代理创建器（APC）。通过查找导入
+	 * {@code @Configuration} 类上声明的最近注解来工作，该注解必须同时具有
+	 * {@code mode} 和 {@code proxyTargetClass} 属性。如果 {@code mode} 设置为
+	 * {@code PROXY}，则注册 APC；如果 {@code proxyTargetClass} 设置为 {@code true}，
+	 * 则强制 APC 使用子类（CGLIB）代理。
+	 * <p>多个 {@code @Enable*} 注解都暴露了 {@code mode} 和 {@code proxyTargetClass}
+	 * 属性。需要注意的是，这些功能大多最终共享一个
+	 * {@linkplain AopConfigUtils#AUTO_PROXY_CREATOR_BEAN_NAME 单例 APC}。
+	 * 因此，此实现并不"关心"它找到的是哪个注解——只要该注解暴露了正确的
+	 * {@code mode} 和 {@code proxyTargetClass} 属性，APC 就可以被注册和配置。
 	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {

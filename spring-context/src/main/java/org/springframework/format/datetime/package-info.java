@@ -1,5 +1,5 @@
 /**
- * Formatters for {@code java.util.Date} properties.
+ * {@code java.util.Date} 属性的格式化器。
  */
 @NonNullApi
 @NonNullFields

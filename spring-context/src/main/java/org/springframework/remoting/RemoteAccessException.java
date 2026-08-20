@@ -19,52 +19,46 @@ package org.springframework.remoting;
 import org.springframework.core.NestedRuntimeException;
 
 /**
- * Generic remote access exception. A service proxy for any remoting
- * protocol should throw this exception or subclasses of it, in order
- * to transparently expose a plain Java business interface.
+ * 通用远程访问异常。任意远程调用协议的服务代理都应抛出此异常或其子类，
+ * 以便透明地暴露一个纯 Java 业务接口。
  *
- * <p>When using conforming proxies, switching the actual remoting protocol
- * e.g. from Hessian does not affect client code. Clients work with a plain
- * natural Java business interface that the service exposes. A client object
- * simply receives an implementation for the interface that it needs via a
- * bean reference, like it does for a local bean as well.
+ * <p>当使用规范代理时，切换实际的远程调用协议（例如从 Hessian 切换到其他协议）
+ * 不会影响客户端代码。客户端使用服务暴露的纯自然 Java 业务接口。
+ * 客户端对象只需通过 bean 引用即可获得所需接口的实现，
+ * 与使用本地 bean 的方式相同。
  *
- * <p>A client may catch RemoteAccessException if it wants to, but as
- * remote access errors are typically unrecoverable, it will probably let
- * such exceptions propagate to a higher level that handles them generically.
- * In this case, the client code doesn't show any signs of being involved in
- * remote access, as there aren't any remoting-specific dependencies.
+ * <p>客户端可以选择捕获 RemoteAccessException，但由于远程访问错误通常不可恢复，
+ * 它可能会让此类异常传播到更高层级进行统一处理。
+ * 在这种情况下，客户端代码不会显示任何参与远程访问的迹象，
+ * 因为不存在远程调用相关的依赖。
  *
- * <p>Even when switching from a remote service proxy to a local implementation
- * of the same interface, this amounts to just a matter of configuration. Obviously,
- * the client code should be somewhat aware that it <i>might be working</i>
- * against a remote service, for example in terms of repeated method calls that
- * cause unnecessary roundtrips etc. However, it doesn't have to be aware whether
- * it is <i>actually working</i> against a remote service or a local implementation,
- * or with which remoting protocol it is working under the hood.
+ * <p>即使将远程服务代理切换为同一接口的本地实现，这也只是配置层面的事情。
+ * 显然，客户端代码应当意识到它 <i>可能在与远程服务交互</i>，
+ * 例如重复方法调用会导致不必要的网络往返等。但是，它不需要知道
+ * 自己 <i>实际在与远程服务还是本地实现交互</i>，
+ * 也不需要关心底层使用的是哪种远程调用协议。
  *
  * @author Juergen Hoeller
  * @since 14.05.2003
  */
 public class RemoteAccessException extends NestedRuntimeException {
 
-	/** Use serialVersionUID from Spring 1.2 for interoperability. */
+	/** 使用 Spring 1.2 的 serialVersionUID 以保持互操作性。 */
 	private static final long serialVersionUID = -4906825139312227864L;
 
 
 	/**
-	 * Constructor for RemoteAccessException.
-	 * @param msg the detail message
+	 * RemoteAccessException 的构造方法。
+	 * @param msg 详细信息
 	 */
 	public RemoteAccessException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Constructor for RemoteAccessException.
-	 * @param msg the detail message
-	 * @param cause the root cause (usually from using an underlying
-	 * remoting API such as RMI)
+	 * RemoteAccessException 的构造方法。
+	 * @param msg 详细信息
+	 * @param cause 根本原因（通常来自底层远程调用 API，如 RMI）
 	 */
 	public RemoteAccessException(String msg, Throwable cause) {
 		super(msg, cause);

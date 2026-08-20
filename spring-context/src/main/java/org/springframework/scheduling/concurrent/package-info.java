@@ -1,9 +1,7 @@
 /**
- * Scheduling convenience classes for the {@code java.util.concurrent}
- * and {@code javax.enterprise.concurrent} packages, allowing to set up a
- * ThreadPoolExecutor or ScheduledThreadPoolExecutor as a bean in a Spring
- * context. Provides support for the native {@code java.util.concurrent}
- * interfaces as well as the Spring {@code TaskExecutor} mechanism.
+ * 针对 {@code java.util.concurrent} 和 {@code javax.enterprise.concurrent} 包的调度便捷类，
+ * 允许在 Spring 上下文中将 ThreadPoolExecutor 或 ScheduledThreadPoolExecutor 作为 Bean 进行配置。
+ * 既支持原生 {@code java.util.concurrent} 接口，也支持 Spring {@code TaskExecutor} 机制。
  */
 @NonNullApi
 @NonNullFields

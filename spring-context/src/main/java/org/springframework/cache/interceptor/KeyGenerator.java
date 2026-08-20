@@ -19,8 +19,7 @@ package org.springframework.cache.interceptor;
 import java.lang.reflect.Method;
 
 /**
- * Cache key generator. Used for creating a key based on the given method
- * (used as context) and its parameters.
+ * 缓存键生成器。用于根据给定的方法（作为上下文）及其参数创建一个键。
  *
  * @author Costin Leau
  * @author Chris Beams
@@ -31,11 +30,11 @@ import java.lang.reflect.Method;
 public interface KeyGenerator {
 
 	/**
-	 * Generate a key for the given method and its parameters.
-	 * @param target the target instance
-	 * @param method the method being called
-	 * @param params the method parameters (with any var-args expanded)
-	 * @return a generated key
+	 * 为给定的方法及其参数生成一个键。
+	 * @param target 目标实例
+	 * @param method 正在被调用的方法
+	 * @param params 方法参数（可变参数已展开）
+	 * @return 生成的键
 	 */
 	Object generate(Object target, Method method, Object... params);
 

@@ -27,94 +27,76 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Indicates that a method produces a bean to be managed by the Spring container.
+ * 标识一个方法，该方法生产一个由 Spring 容器管理的 bean。
  *
- * <h3>Overview</h3>
+ * <h3>概述</h3>
  *
- * <p>The names and semantics of the attributes to this annotation are intentionally
- * similar to those of the {@code <bean/>} element in the Spring XML schema. For
- * example:
+ * <p>此注解的属性名称和语义有意与 Spring XML 模式中的 {@code <bean/>} 元素保持一致。例如：
  *
  * <pre class="code">
  *     &#064;Bean
  *     public MyBean myBean() {
- *         // instantiate and configure MyBean obj
+ *         // 实例化并配置 MyBean 对象
  *         return obj;
  *     }
  * </pre>
  *
- * <h3>Bean Names</h3>
+ * <h3>Bean 名称</h3>
  *
- * <p>While a {@link #name} attribute is available, the default strategy for
- * determining the name of a bean is to use the name of the {@code @Bean} method.
- * This is convenient and intuitive, but if explicit naming is desired, the
- * {@code name} attribute (or its alias {@code value}) may be used. Also note
- * that {@code name} accepts an array of Strings, allowing for multiple names
- * (i.e. a primary bean name plus one or more aliases) for a single bean.
+ * <p>虽然提供了 {@link #name} 属性，但确定 bean 名称的默认策略是使用 {@code @Bean} 方法的名称。
+ * 这种方式方便且直观，但如果需要显式命名，可以使用 {@code name} 属性（或其别名 {@code value}）。
+ * 另请注意，{@code name} 接受一个字符串数组，允许为单个 bean 指定多个名称（即一个主 bean 名称加上一个或多个别名）。
  *
  * <pre class="code">
- *     &#064;Bean({"b1", "b2"}) // bean available as 'b1' and 'b2', but not 'myBean'
+ *     &#064;Bean({"b1", "b2"}) // bean 可通过 'b1' 和 'b2' 访问，但不能通过 'myBean'
  *     public MyBean myBean() {
- *         // instantiate and configure MyBean obj
+ *         // 实例化并配置 MyBean 对象
  *         return obj;
  *     }
  * </pre>
  *
- * <h3>Profile, Scope, Lazy, DependsOn, Primary, Order</h3>
+ * <h3>Profile、Scope、Lazy、DependsOn、Primary、Order</h3>
  *
- * <p>Note that the {@code @Bean} annotation does not provide attributes for profile,
- * scope, lazy, depends-on or primary. Rather, it should be used in conjunction with
- * {@link Scope @Scope}, {@link Lazy @Lazy}, {@link DependsOn @DependsOn} and
- * {@link Primary @Primary} annotations to declare those semantics. For example:
+ * <p>请注意，{@code @Bean} 注解并未提供 profile、scope、lazy、depends-on 或 primary 属性。
+ * 相反，它应与 {@link Scope @Scope}、{@link Lazy @Lazy}、{@link DependsOn @DependsOn} 和
+ * {@link Primary @Primary} 注解配合使用来声明这些语义。例如：
  *
  * <pre class="code">
  *     &#064;Bean
  *     &#064;Profile("production")
  *     &#064;Scope("prototype")
  *     public MyBean myBean() {
- *         // instantiate and configure MyBean obj
+ *         // 实例化并配置 MyBean 对象
  *         return obj;
  *     }
  * </pre>
  *
- * The semantics of the above-mentioned annotations match their use at the component
- * class level: {@code @Profile} allows for selective inclusion of certain beans.
- * {@code @Scope} changes the bean's scope from singleton to the specified scope.
- * {@code @Lazy} only has an actual effect in case of the default singleton scope.
- * {@code @DependsOn} enforces the creation of specific other beans before this
- * bean will be created, in addition to any dependencies that the bean expressed
- * through direct references, which is typically helpful for singleton startup.
- * {@code @Primary} is a mechanism to resolve ambiguity at the injection point level
- * if a single target component needs to be injected but several beans match by type.
+ * 上述注解的语义与在组件类级别上的使用相同：{@code @Profile} 允许有选择地包含某些 bean。
+ * {@code @Scope} 将 bean 的作用域从 singleton 更改为指定的作用域。
+ * {@code @Lazy} 仅在默认的 singleton 作用域下才实际生效。
+ * {@code @DependsOn} 强制在此 bean 创建之前先创建特定的其他 bean，
+ * 此外还包括 bean 通过直接引用表达的依赖关系，这对 singleton 的启动通常很有帮助。
+ * {@code @Primary} 是一种在注入点级别解决歧义的机制，当需要注入单个目标组件但多个 bean 按类型匹配时使用。
  *
- * <p>Additionally, {@code @Bean} methods may also declare qualifier annotations
- * and {@link org.springframework.core.annotation.Order @Order} values, to be
- * taken into account during injection point resolution just like corresponding
- * annotations on the corresponding component classes but potentially being very
- * individual per bean definition (in case of multiple definitions with the same
- * bean class). Qualifiers narrow the set of candidates after the initial type match;
- * order values determine the order of resolved elements in case of collection
- * injection points (with several target beans matching by type and qualifier).
+ * <p>此外，{@code @Bean} 方法还可以声明限定符注解和 {@link org.springframework.core.annotation.Order @Order} 值，
+ * 在注入点解析时会加以考虑，就像在相应的组件类上使用相应的注解一样，
+ * 但可以针对每个 bean 定义单独配置（当多个定义使用相同的 bean 类时）。
+ * 限定符在初始类型匹配后缩小候选集；在集合注入点的情况下（多个目标 bean 按类型和限定符匹配），
+ * order 值决定解析后的元素顺序。
  *
- * <p><b>NOTE:</b> {@code @Order} values may influence priorities at injection points,
- * but please be aware that they do not influence singleton startup order which is an
- * orthogonal concern determined by dependency relationships and {@code @DependsOn}
- * declarations as mentioned above. Also, {@link javax.annotation.Priority} is not
- * available at this level since it cannot be declared on methods; its semantics can
- * be modeled through {@code @Order} values in combination with {@code @Primary} on
- * a single bean per type.
+ * <p><b>注意：</b> {@code @Order} 值可能影响注入点的优先级，但请注意它们不会影响 singleton 的启动顺序，
+ * 启动顺序是一个独立的关注点，由依赖关系和上述 {@code @DependsOn} 声明决定。
+ * 此外，{@link javax.annotation.Priority} 在此级别不可用，因为它不能在方法上声明；
+ * 其语义可以通过在每个类型的单个 bean 上使用 {@code @Order} 值配合 {@code @Primary} 来建模。
  *
- * <h3>{@code @Bean} Methods in {@code @Configuration} Classes</h3>
+ * <h3>{@code @Configuration} 类中的 {@code @Bean} 方法</h3>
  *
- * <p>Typically, {@code @Bean} methods are declared within {@code @Configuration}
- * classes. In this case, bean methods may reference other {@code @Bean} methods in the
- * same class by calling them <i>directly</i>. This ensures that references between beans
- * are strongly typed and navigable. Such so-called <em>'inter-bean references'</em> are
- * guaranteed to respect scoping and AOP semantics, just like {@code getBean()} lookups
- * would. These are the semantics known from the original 'Spring JavaConfig' project
- * which require CGLIB subclassing of each such configuration class at runtime. As a
- * consequence, {@code @Configuration} classes and their factory methods must not be
- * marked as final or private in this mode. For example:
+ * <p>通常，{@code @Bean} 方法在 {@code @Configuration} 类中声明。在这种情况下，
+ * bean 方法可以通过 <i>直接</i> 调用同一类中的其他 {@code @Bean} 方法来引用它们。
+ * 这确保了 bean 之间的引用是强类型且可导航的。这种所谓的 <em>'bean 间引用'</em>
+ * 保证了作用域和 AOP 语义的正确性，就像 {@code getBean()} 查找一样。
+ * 这些是原始 'Spring JavaConfig' 项目中已知的语义，它要求在运行时对每个此类配置类进行 CGLIB 子类化。
+ * 因此，在此模式下，{@code @Configuration} 类及其工厂方法不得标记为 final 或 private。例如：
  *
  * <pre class="code">
  * &#064;Configuration
@@ -133,28 +115,24 @@ import org.springframework.core.annotation.AliasFor;
  *     // ...
  * }</pre>
  *
- * <h3>{@code @Bean} <em>Lite</em> Mode</h3>
+ * <h3>{@code @Bean} <em>轻量</em> 模式</h3>
  *
- * <p>{@code @Bean} methods may also be declared within classes that are <em>not</em>
- * annotated with {@code @Configuration}. For example, bean methods may be declared
- * in a {@code @Component} class or even in a <em>plain old class</em>. In such cases,
- * a {@code @Bean} method will get processed in a so-called <em>'lite'</em> mode.
+ * <p>{@code @Bean} 方法也可以在 <em>未</em> 被 {@code @Configuration} 注解的类中声明。
+ * 例如，bean 方法可以在 {@code @Component} 类中声明，甚至可以在 <em>普通类</em> 中声明。
+ * 在这种情况下，{@code @Bean} 方法将以所谓的 <em>'轻量'</em> 模式进行处理。
  *
- * <p>Bean methods in <em>lite</em> mode will be treated as plain <em>factory
- * methods</em> by the container (similar to {@code factory-method} declarations
- * in XML), with scoping and lifecycle callbacks properly applied. The containing
- * class remains unmodified in this case, and there are no unusual constraints for
- * the containing class or the factory methods.
+ * <p><em>轻量</em> 模式中的 bean 方法将被容器视为普通的 <em>工厂方法</em>
+ * （类似于 XML 中的 {@code factory-method} 声明），作用域和生命周期回调会被正确应用。
+ * 在这种情况下，包含类保持不变，对包含类或工厂方法没有特殊的限制。
  *
- * <p>In contrast to the semantics for bean methods in {@code @Configuration} classes,
- * <em>'inter-bean references'</em> are not supported in <em>lite</em> mode. Instead,
- * when one {@code @Bean}-method invokes another {@code @Bean}-method in <em>lite</em>
- * mode, the invocation is a standard Java method invocation; Spring does not intercept
- * the invocation via a CGLIB proxy. This is analogous to inter-{@code @Transactional}
- * method calls where in proxy mode, Spring does not intercept the invocation &mdash;
- * Spring does so only in AspectJ mode.
+ * <p>与 {@code @Configuration} 类中 bean 方法的语义相比，
+ * <em>轻量</em> 模式不支持 <em>'bean 间引用'</em>。
+ * 相反，当一个 {@code @Bean} 方法在 <em>轻量</em> 模式下调用另一个 {@code @Bean} 方法时，
+ * 该调用是一个标准的 Java 方法调用；Spring 不会通过 CGLIB 代理拦截该调用。
+ * 这类似于 {@code @Transactional} 方法之间的调用，在代理模式下，Spring 不会拦截调用 &mdash;
+ * Spring 只在 AspectJ 模式下才会这样做。
  *
- * <p>For example:
+ * <p>例如：
  *
  * <pre class="code">
  * &#064;Component
@@ -169,34 +147,31 @@ import org.springframework.core.annotation.AliasFor;
  *     }
  * }</pre>
  *
- * <h3>Bootstrapping</h3>
+ * <h3>引导启动</h3>
  *
- * <p>See the @{@link Configuration} javadoc for further details including how to bootstrap
- * the container using {@link AnnotationConfigApplicationContext} and friends.
+ * <p>有关更多详细信息，包括如何使用 {@link AnnotationConfigApplicationContext} 等引导容器，
+ * 请参阅 @{@link Configuration} 的 Javadoc。
  *
- * <h3>{@code BeanFactoryPostProcessor}-returning {@code @Bean} methods</h3>
+ * <h3>返回 {@code BeanFactoryPostProcessor} 的 {@code @Bean} 方法</h3>
  *
- * <p>Special consideration must be taken for {@code @Bean} methods that return Spring
- * {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor BeanFactoryPostProcessor}
- * ({@code BFPP}) types. Because {@code BFPP} objects must be instantiated very early in the
- * container lifecycle, they can interfere with processing of annotations such as {@code @Autowired},
- * {@code @Value}, and {@code @PostConstruct} within {@code @Configuration} classes. To avoid these
- * lifecycle issues, mark {@code BFPP}-returning {@code @Bean} methods as {@code static}. For example:
+ * <p>对于返回 Spring {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor BeanFactoryPostProcessor}
+ * （{@code BFPP}）类型的 {@code @Bean} 方法必须特别注意。因为 {@code BFPP} 对象必须在容器生命周期的
+ * 非常早期实例化，它们可能会干扰 {@code @Configuration} 类中 {@code @Autowired}、{@code @Value} 和
+ * {@code @PostConstruct} 等注解的处理。为避免这些生命周期问题，请将返回 {@code BFPP} 的 {@code @Bean}
+ * 方法标记为 {@code static}。例如：
  *
  * <pre class="code">
  *     &#064;Bean
  *     public static PropertySourcesPlaceholderConfigurer pspc() {
- *         // instantiate, configure and return pspc ...
+ *         // 实例化、配置并返回 pspc ...
  *     }
  * </pre>
  *
- * By marking this method as {@code static}, it can be invoked without causing instantiation of its
- * declaring {@code @Configuration} class, thus avoiding the above-mentioned lifecycle conflicts.
- * Note however that {@code static} {@code @Bean} methods will not be enhanced for scoping and AOP
- * semantics as mentioned above. This works out in {@code BFPP} cases, as they are not typically
- * referenced by other {@code @Bean} methods. As a reminder, an INFO-level log message will be
- * issued for any non-static {@code @Bean} methods having a return type assignable to
- * {@code BeanFactoryPostProcessor}.
+ * 通过将此方法标记为 {@code static}，可以在不实例化其声明的 {@code @Configuration} 类的情况下调用它，
+ * 从而避免上述生命周期冲突。但请注意，{@code static} {@code @Bean} 方法不会像上述那样被增强以应用
+ * 作用域和 AOP 语义。这在 {@code BFPP} 的情况下是可以接受的，因为它们通常不会被其他 {@code @Bean}
+ * 方法引用。作为提醒，对于任何返回类型可分配给 {@code BeanFactoryPostProcessor} 的非静态 {@code @Bean}
+ * 方法，都会发出 INFO 级别的日志消息。
  *
  * @author Rod Johnson
  * @author Costin Leau
@@ -218,10 +193,11 @@ import org.springframework.core.annotation.AliasFor;
 @Documented
 public @interface Bean {
 
+
 	/**
-	 * Alias for {@link #name}.
-	 * <p>Intended to be used when no other attributes are needed, for example:
-	 * {@code @Bean("customBeanName")}.
+	 * {@link #name} 的别名。
+	 * <p>当不需要其他属性时使用，例如：
+	 * {@code @Bean("customBeanName")}。
 	 * @since 4.3.3
 	 * @see #name
 	 */
@@ -229,73 +205,64 @@ public @interface Bean {
 	String[] value() default {};
 
 	/**
-	 * The name of this bean, or if several names, a primary bean name plus aliases.
-	 * <p>If left unspecified, the name of the bean is the name of the annotated method.
-	 * If specified, the method name is ignored.
-	 * <p>The bean name and aliases may also be configured via the {@link #value}
-	 * attribute if no other attributes are declared.
+	 * 此 bean 的名称，或者如果有多个名称，则为主 bean 名称加上别名。
+	 * <p>如果未指定，则 bean 的名称为被注解方法的名称。
+	 * 如果指定了，则方法名将被忽略。
+	 * <p>如果未声明其他属性，bean 名称和别名也可以通过 {@link #value} 属性配置。
 	 * @see #value
 	 */
 	@AliasFor("value")
 	String[] name() default {};
 
 	/**
-	 * Are dependencies to be injected via convention-based autowiring by name or type?
-	 * <p>Note that this autowire mode is just about externally driven autowiring based
-	 * on bean property setter methods by convention, analogous to XML bean definitions.
-	 * <p>The default mode does allow for annotation-driven autowiring. "no" refers to
-	 * externally driven autowiring only, not affecting any autowiring demands that the
-	 * bean class itself expresses through annotations.
+	 * 是否通过基于约定的按名称或按类型自动装配来注入依赖？
+	 * <p>请注意，此自动装配模式仅涉及基于 bean 属性 setter 方法的外部驱动自动装配，
+	 * 类似于 XML bean 定义中的自动装配。
+	 * <p>默认模式确实允许基于注解的自动装配。"no" 仅指外部驱动的自动装配，
+	 * 不影响 bean 类本身通过注解表达的任何自动装配需求。
 	 * @see Autowire#BY_NAME
 	 * @see Autowire#BY_TYPE
-	 * @deprecated as of 5.1, since {@code @Bean} factory method argument resolution and
-	 * {@code @Autowired} processing supersede name/type-based bean property injection
+	 * @deprecated 自 5.1 起，因为 {@code @Bean} 工厂方法参数解析和 {@code @Autowired}
+	 * 处理已取代基于名称/类型的 bean 属性注入。
 	 */
 	@Deprecated
 	Autowire autowire() default Autowire.NO;
 
 	/**
-	 * Is this bean a candidate for getting autowired into some other bean?
-	 * <p>Default is {@code true}; set this to {@code false} for internal delegates
-	 * that are not meant to get in the way of beans of the same type in other places.
+	 * 此 bean 是否可以作为自动装配到其他 bean 的候选项？
+	 * <p>默认为 {@code true}；对于不打算干扰其他位置相同类型的 bean 的内部委托，
+	 * 请将此值设置为 {@code false}。
 	 * @since 5.1
 	 */
 	boolean autowireCandidate() default true;
 
 	/**
-	 * The optional name of a method to call on the bean instance during initialization.
-	 * Not commonly used, given that the method may be called programmatically directly
-	 * within the body of a Bean-annotated method.
-	 * <p>The default value is {@code ""}, indicating no init method to be called.
+	 * 在初始化期间要在 bean 实例上调用的方法的可选名称。
+	 * 由于可以在 Bean 注解方法的方法体中直接以编程方式调用该方法，因此通常不需要使用此属性。
+	 * <p>默认值为 {@code ""}，表示不调用任何初始化方法。
 	 * @see org.springframework.beans.factory.InitializingBean
 	 * @see org.springframework.context.ConfigurableApplicationContext#refresh()
 	 */
 	String initMethod() default "";
 
 	/**
-	 * The optional name of a method to call on the bean instance upon closing the
-	 * application context, for example a {@code close()} method on a JDBC
-	 * {@code DataSource} implementation, or a Hibernate {@code SessionFactory} object.
-	 * The method must have no arguments but may throw any exception.
-	 * <p>As a convenience to the user, the container will attempt to infer a destroy
-	 * method against an object returned from the {@code @Bean} method. For example, given
-	 * an {@code @Bean} method returning an Apache Commons DBCP {@code BasicDataSource},
-	 * the container will notice the {@code close()} method available on that object and
-	 * automatically register it as the {@code destroyMethod}. This 'destroy method
-	 * inference' is currently limited to detecting only public, no-arg methods named
-	 * 'close' or 'shutdown'. The method may be declared at any level of the inheritance
-	 * hierarchy and will be detected regardless of the return type of the {@code @Bean}
-	 * method (i.e., detection occurs reflectively against the bean instance itself at
-	 * creation time).
-	 * <p>To disable destroy method inference for a particular {@code @Bean}, specify an
-	 * empty string as the value, e.g. {@code @Bean(destroyMethod="")}. Note that the
-	 * {@link org.springframework.beans.factory.DisposableBean} callback interface will
-	 * nevertheless get detected and the corresponding destroy method invoked: In other
-	 * words, {@code destroyMethod=""} only affects custom close/shutdown methods and
-	 * {@link java.io.Closeable}/{@link java.lang.AutoCloseable} declared close methods.
-	 * <p>Note: Only invoked on beans whose lifecycle is under the full control of the
-	 * factory, which is always the case for singletons but not guaranteed for any
-	 * other scope.
+	 * 在关闭应用上下文时要在 bean 实例上调用的方法的可选名称，
+	 * 例如 JDBC {@code DataSource} 实现上的 {@code close()} 方法，
+	 * 或 Hibernate {@code SessionFactory} 对象上的方法。
+	 * 该方法必须没有参数，但可以抛出任何异常。
+	 * <p>为了方便用户，容器将尝试对 {@code @Bean} 方法返回的对象推断销毁方法。
+	 * 例如，给定一个返回 Apache Commons DBCP {@code BasicDataSource} 的 {@code @Bean} 方法，
+	 * 容器会注意到该对象上可用的 {@code close()} 方法，并自动将其注册为 {@code destroyMethod}。
+	 * 这种"销毁方法推断"目前仅限于检测名为 'close' 或 'shutdown' 的公共无参方法。
+	 * 该方法可以在继承层次结构的任何层级上声明，并且无论 {@code @Bean} 方法的返回类型如何
+	 * 都可以被检测到（即，在创建时对 bean 实例本身进行反射检测）。
+	 * <p>要为特定的 {@code @Bean} 禁用销毁方法推断，请指定空字符串作为值，
+	 * 例如 {@code @Bean(destroyMethod="")}。请注意，{@link org.springframework.beans.factory.DisposableBean}
+	 * 回调接口仍将被检测到，并且相应的销毁方法将被调用：换句话说，
+	 * {@code destroyMethod=""} 只影响自定义的 close/shutdown 方法和
+	 * {@link java.io.Closeable}/{@link java.lang.AutoCloseable} 声明的 close 方法。
+	 * <p>注意：仅在生命周期完全由工厂控制的 bean 上调用，对于 singleton 始终如此，
+	 * 但对于其他作用域则不保证。
 	 * @see org.springframework.beans.factory.DisposableBean
 	 * @see org.springframework.context.ConfigurableApplicationContext#close()
 	 */

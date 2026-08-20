@@ -22,13 +22,13 @@ import org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler;
 import org.springframework.jmx.export.naming.MetadataNamingStrategy;
 
 /**
- * Convenient subclass of Spring's standard {@link MBeanExporter},
- * activating annotation usage for JMX exposure of Spring beans:
- * {@link ManagedResource}, {@link ManagedAttribute}, {@link ManagedOperation}, etc.
+ * Spring 标准 {@link MBeanExporter} 的便捷子类，
+ * 通过激活注解方式对 Spring Bean 进行 JMX 暴露：
+ * {@link ManagedResource}、{@link ManagedAttribute}、{@link ManagedOperation} 等。
  *
- * <p>Sets a {@link MetadataNamingStrategy} and a {@link MetadataMBeanInfoAssembler}
- * with an {@link AnnotationJmxAttributeSource}, and activates the
- * {@link #AUTODETECT_ALL} mode by default.
+ * <p>使用 {@link AnnotationJmxAttributeSource} 设置
+ * {@link MetadataNamingStrategy} 和 {@link MetadataMBeanInfoAssembler}，
+ * 并默认激活 {@link #AUTODETECT_ALL} 模式。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -53,11 +53,10 @@ public class AnnotationMBeanExporter extends MBeanExporter {
 
 
 	/**
-	 * Specify the default domain to be used for generating ObjectNames
-	 * when no source-level metadata has been specified.
-	 * <p>The default is to use the domain specified in the bean name
-	 * (if the bean name follows the JMX ObjectName syntax); else,
-	 * the package name of the managed bean class.
+	 * 指定在未指定源级别元数据时用于生成 ObjectName 的默认域。
+	 * <p>默认使用 bean 名称中指定的域
+	 * （如果 bean 名称遵循 JMX ObjectName 语法）；否则，
+	 * 使用被管理 bean 类的包名。
 	 * @see MetadataNamingStrategy#setDefaultDomain
 	 */
 	public void setDefaultDomain(String defaultDomain) {

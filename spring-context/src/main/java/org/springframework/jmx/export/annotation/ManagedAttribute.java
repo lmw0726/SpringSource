@@ -23,11 +23,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Method-level annotation that indicates to expose a given bean property as a
- * JMX attribute, corresponding to the
- * {@link org.springframework.jmx.export.metadata.ManagedAttribute}.
+ * 方法级别的注解，表示将给定的 bean 属性暴露为
+ * JMX 属性，对应于
+ * {@link org.springframework.jmx.export.metadata.ManagedAttribute}。
  *
- * <p>Only valid when used on a JavaBean getter or setter.
+ * <p>仅在 JavaBean 的 getter 或 setter 上使用时有效。
  *
  * @author Rob Harrop
  * @since 1.2
@@ -39,27 +39,27 @@ import java.lang.annotation.Target;
 public @interface ManagedAttribute {
 
 	/**
-	 * Set the default value for the attribute in a {@link javax.management.Descriptor}.
+	 * 在 {@link javax.management.Descriptor} 中设置属性的默认值。
 	 */
 	String defaultValue() default "";
 
 	/**
-	 * Set the description for the attribute in a {@link javax.management.Descriptor}.
+	 * 在 {@link javax.management.Descriptor} 中设置属性的描述。
 	 */
 	String description() default "";
 
 	/**
-	 * Set the currency time limit field in a {@link javax.management.Descriptor}.
+	 * 在 {@link javax.management.Descriptor} 中设置 currencyTimeLimit 字段。
 	 */
 	int currencyTimeLimit() default -1;
 
 	/**
-	 * Set the persistPolicy field in a {@link javax.management.Descriptor}.
+	 * 在 {@link javax.management.Descriptor} 中设置 persistPolicy 字段。
 	 */
 	String persistPolicy() default "";
 
 	/**
-	 * Set the persistPeriod field in a {@link javax.management.Descriptor}.
+	 * 在 {@link javax.management.Descriptor} 中设置 persistPeriod 字段。
 	 */
 	int persistPeriod() default -1;
 

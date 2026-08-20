@@ -22,11 +22,11 @@ import org.springframework.ui.context.Theme;
 import org.springframework.ui.context.ThemeSource;
 
 /**
- * Empty ThemeSource that delegates all calls to the parent ThemeSource.
- * If no parent is available, it simply won't resolve any theme.
+ * 空的 ThemeSource 实现，将所有调用委托给父 ThemeSource。
+ * 如果没有父 ThemeSource 可用，则不会解析任何主题。
  *
- * <p>Used as placeholder by UiApplicationContextUtils, if a context doesn't
- * define its own ThemeSource. Not intended for direct use in applications.
+ * <p>由 UiApplicationContextUtils 用作占位符，当上下文未定义自己的 ThemeSource 时使用。
+ * 不打算在应用程序中直接使用。
  *
  * @author Juergen Hoeller
  * @since 1.2.4

@@ -21,7 +21,7 @@ import org.springframework.beans.factory.parsing.ProblemReporter;
 import org.springframework.core.type.MethodMetadata;
 
 /**
- * Base class for a {@link Configuration @Configuration} class method.
+ * {@link Configuration @Configuration} 类方法的基类。
  *
  * @author Chris Beams
  * @since 3.1

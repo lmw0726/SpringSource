@@ -26,9 +26,8 @@ import java.lang.reflect.Proxy;
 import org.springframework.util.Assert;
 
 /**
- * Reflective wrapper around a WebLogic 10 class loader. Used to
- * encapsulate the classloader-specific methods (discovered and
- * called through reflection) from the load-time weaver.
+ * WebLogic 10 类加载器的反射包装器。用于从加载时织入器中封装类加载器特定的方法
+ * （通过反射发现和调用）。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -103,7 +102,7 @@ class WebLogicClassLoaderAdapter {
 		try {
 			Object classFinder = this.getClassFinderMethod.invoke(this.classLoader);
 			Object parent = this.getParentMethod.invoke(this.classLoader);
-			// arguments for 'clone'-like method
+			// 类似于 'clone' 方法的参数
 			return (ClassLoader) this.wlGenericClassLoaderConstructor.newInstance(classFinder, parent);
 		}
 		catch (InvocationTargetException ex) {

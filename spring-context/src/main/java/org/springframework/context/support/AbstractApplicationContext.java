@@ -257,7 +257,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ApplicationContext interface
+	// ApplicationContext 接口的实现
 	//---------------------------------------------------------------------
 
 	/**
@@ -486,7 +486,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ConfigurableApplicationContext interface
+	// ConfigurableApplicationContext 接口的实现
 	//---------------------------------------------------------------------
 
 	/**
@@ -711,8 +711,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
 
-		// Register default environment beans.
-		//注册默认环境Bean
+		// 注册默认环境Bean
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());
 		}
@@ -1196,7 +1195,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of BeanFactory interface
+	// BeanFactory 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1291,7 +1290,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ListableBeanFactory interface
+	// ListableBeanFactory 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1394,7 +1393,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of HierarchicalBeanFactory interface
+	// HierarchicalBeanFactory 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1422,7 +1421,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of MessageSource interface
+	// MessageSource 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1468,7 +1467,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ResourcePatternResolver interface
+	// ResourcePatternResolver 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1478,7 +1477,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of Lifecycle interface
+	// Lifecycle 接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1500,7 +1499,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Abstract methods that must be implemented by subclasses
+	// 子类必须实现的抽象方法
 	//---------------------------------------------------------------------
 
 	/**

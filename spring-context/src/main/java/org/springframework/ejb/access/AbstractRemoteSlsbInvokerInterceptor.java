@@ -31,11 +31,11 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import org.springframework.remoting.RemoteLookupFailureException;
 
 /**
- * Base class for interceptors proxying remote Stateless Session Beans.
- * Designed for EJB 2.x, but works for EJB 3 Session Beans as well.
+ * 代理远程无状态会话 Bean（Stateless Session Bean）的拦截器基类。
+ * 专为 EJB 2.x 设计，但也适用于 EJB 3 会话 Bean。
  *
- * <p>Such an interceptor must be the last interceptor in the advice chain.
- * In this case, there is no target object.
+ * <p>此类拦截器必须是通知链中的最后一个拦截器。
+ * 在这种情况下，不存在目标对象。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -49,12 +49,11 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 
 
 	/**
-	 * Set whether to refresh the EJB home on connect failure.
-	 * Default is "false".
-	 * <p>Can be turned on to allow for hot restart of the EJB server.
-	 * If a cached EJB home throws an RMI exception that indicates a
-	 * remote connect failure, a fresh home will be fetched and the
-	 * invocation will be retried.
+	 * 设置连接失败时是否刷新 EJB 主对象（home）。
+	 * 默认值为 "false"。
+	 * <p>可以开启此选项以允许 EJB 服务器热重启。
+	 * 如果缓存的 EJB 主对象抛出指示远程连接失败的 RMI 异常，
+	 * 则会获取新的主对象并重试调用。
 	 * @see java.rmi.ConnectException
 	 * @see java.rmi.ConnectIOException
 	 * @see java.rmi.NoSuchObjectException
@@ -70,7 +69,7 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 
 
 	/**
-	 * Check for EJB3-style home object that serves as EJB component directly.
+	 * 检查是否为 EJB3 风格的主对象，该对象可直接作为 EJB 组件使用。
 	 */
 	@Override
 	protected Method getCreateMethod(Object home) throws EjbAccessException {
@@ -78,7 +77,7 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 			return null;
 		}
 		if (!(home instanceof EJBHome)) {
-			// An EJB3 Session Bean...
+			// 一个 EJB3 会话 Bean...
 			this.homeAsComponent = true;
 			return null;
 		}
@@ -87,9 +86,9 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 
 
 	/**
-	 * Fetches an EJB home object and delegates to {@code doInvoke}.
-	 * <p>If configured to refresh on connect failure, it will call
-	 * {@link #refreshAndRetry} on corresponding RMI exceptions.
+	 * 获取 EJB 主对象并委托给 {@code doInvoke}。
+	 * <p>如果配置了连接失败时刷新，则在遇到相应的 RMI 异常时
+	 * 会调用 {@link #refreshAndRetry}。
 	 * @see #getHome
 	 * @see #doInvoke
 	 * @see #refreshAndRetry
@@ -114,8 +113,8 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 	}
 
 	/**
-	 * Determine whether the given RMI exception indicates a connect failure.
-	 * <p>The default implementation delegates to RmiClientInterceptorUtils.
+	 * 判断给定的 RMI 异常是否表示连接失败。
+	 * <p>默认实现委托给 RmiClientInterceptorUtils。
 	 * @param ex the RMI exception to check
 	 * @return whether the exception should be treated as connect failure
 	 * @see org.springframework.remoting.rmi.RmiClientInterceptorUtils#isConnectFailure
@@ -142,8 +141,8 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 	}
 
 	/**
-	 * Refresh the EJB home object and retry the given invocation.
-	 * Called by invoke on connect failure.
+	 * 刷新 EJB 主对象并重试给定的调用。
+	 * 在连接失败时由 invoke 方法调用。
 	 * @param invocation the AOP method invocation
 	 * @return the invocation result, if any
 	 * @throws Throwable in case of invocation failure
@@ -162,8 +161,8 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 
 
 	/**
-	 * Perform the given invocation on the current EJB home.
-	 * Template method to be implemented by subclasses.
+	 * 在当前 EJB 主对象上执行给定的调用。
+	 * 需要由子类实现的模板方法。
 	 * @param invocation the AOP method invocation
 	 * @return the invocation result, if any
 	 * @throws Throwable in case of invocation failure
@@ -175,9 +174,9 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 
 
 	/**
-	 * Return a new instance of the stateless session bean.
-	 * To be invoked by concrete remote SLSB invoker subclasses.
-	 * <p>Can be overridden to change the algorithm.
+	 * 返回一个新的无状态会话 Bean 实例。
+	 * 由具体的远程 SLSB 调用器子类调用。
+	 * <p>可以重写此方法以更改算法。
 	 * @throws NamingException if thrown by JNDI
 	 * @throws InvocationTargetException if thrown by the create method
 	 * @see #create
@@ -194,8 +193,8 @@ public abstract class AbstractRemoteSlsbInvokerInterceptor extends AbstractSlsbI
 	}
 
 	/**
-	 * Remove the given EJB instance.
-	 * To be invoked by concrete remote SLSB invoker subclasses.
+	 * 移除给定的 EJB 实例。
+	 * 由具体的远程 SLSB 调用器子类调用。
 	 * @param ejb the EJB instance to remove
 	 * @see javax.ejb.EJBObject#remove
 	 */

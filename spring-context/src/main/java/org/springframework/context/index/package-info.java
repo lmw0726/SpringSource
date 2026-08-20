@@ -1,5 +1,5 @@
 /**
- * Support package for reading and managing the components index.
+ * 用于读取和管理组件索引的支持包。
  */
 @NonNullApi
 @NonNullFields

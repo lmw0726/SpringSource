@@ -17,17 +17,17 @@
 package org.springframework.context.support;
 
 /**
- * MBean operation interface for the {@link LiveBeansView} feature.
+ * {@link LiveBeansView} 功能的 MBean 操作接口。
  *
  * @author Juergen Hoeller
  * @since 3.2
- * @deprecated as of 5.3, in favor of using Spring Boot actuators for such needs
+ * @deprecated 自 5.3 起已弃用，建议改用 Spring Boot Actuator 来满足此类需求
  */
 @Deprecated
 public interface LiveBeansViewMBean {
 
 	/**
-	 * Generate a JSON snapshot of current beans and their dependencies.
+	 * 生成当前 Bean 及其依赖关系的 JSON 快照。
 	 */
 	String getSnapshotAsJson();
 

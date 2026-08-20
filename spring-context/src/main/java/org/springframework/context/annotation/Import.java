@@ -23,24 +23,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates one or more <em>component classes</em> to import &mdash; typically
- * {@link Configuration @Configuration} classes.
+ * 表示要导入的一个或多个<em>组件类</em>——通常是
+ * {@link Configuration @Configuration} 类。
  *
- * <p>Provides functionality equivalent to the {@code <import/>} element in Spring XML.
- * Allows for importing {@code @Configuration} classes, {@link ImportSelector} and
- * {@link ImportBeanDefinitionRegistrar} implementations, as well as regular component
- * classes (as of 4.2; analogous to {@link AnnotationConfigApplicationContext#register}).
+ * <p>提供了与 Spring XML 中 {@code <import/>} 元素等效的功能。
+ * 允许导入 {@code @Configuration} 类、{@link ImportSelector} 和
+ * {@link ImportBeanDefinitionRegistrar} 实现，以及普通组件类
+ * （自 4.2 版本起；类似于 {@link AnnotationConfigApplicationContext#register}）。
  *
- * <p>{@code @Bean} definitions declared in imported {@code @Configuration} classes should be
- * accessed by using {@link org.springframework.beans.factory.annotation.Autowired @Autowired}
- * injection. Either the bean itself can be autowired, or the configuration class instance
- * declaring the bean can be autowired. The latter approach allows for explicit, IDE-friendly
- * navigation between {@code @Configuration} class methods.
+ * <p>导入的 {@code @Configuration} 类中声明的 {@code @Bean} 定义应该通过
+ * {@link org.springframework.beans.factory.annotation.Autowired @Autowired}
+ * 注入来访问。可以自动注入 bean 本身，或者自动注入声明该 bean 的配置类实例。
+ * 后者允许在 {@code @Configuration} 类方法之间进行明确的、IDE 友好的导航。
  *
- * <p>May be declared at the class level or as a meta-annotation.
+ * <p>可以在类级别或作为元注解声明。
  *
- * <p>If XML or other non-{@code @Configuration} bean definition resources need to be
- * imported, use the {@link ImportResource @ImportResource} annotation instead.
+ * <p>如果需要导入 XML 或其他非 {@code @Configuration} bean 定义资源，
+ * 请改用 {@link ImportResource @ImportResource} 注解。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -56,8 +55,8 @@ import java.lang.annotation.Target;
 public @interface Import {
 
 	/**
-	 * {@link Configuration @Configuration}, {@link ImportSelector},
-	 * {@link ImportBeanDefinitionRegistrar}, or regular component classes to import.
+	 * 要导入的 {@link Configuration @Configuration}、{@link ImportSelector}、
+	 * {@link ImportBeanDefinitionRegistrar} 或普通组件类。
 	 */
 	Class<?>[] value();
 

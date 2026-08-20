@@ -19,8 +19,7 @@ package org.springframework.jmx.export;
 import javax.management.ObjectName;
 
 /**
- * A listener that allows application code to be notified when an MBean is
- * registered and unregistered via an {@link MBeanExporter}.
+ * 允许应用程序代码在 MBean 通过 {@link MBeanExporter} 注册和注销时得到通知的监听器。
  *
  * @author Rob Harrop
  * @since 1.2.2
@@ -28,17 +27,16 @@ import javax.management.ObjectName;
  */
 public interface MBeanExporterListener {
 
+
 	/**
-	 * Called by {@link MBeanExporter} after an MBean has been <i>successfully</i>
-	 * registered with an {@link javax.management.MBeanServer}.
-	 * @param objectName the {@code ObjectName} of the registered MBean
+	 * 在 MBean <i>成功</i>注册到 {@link javax.management.MBeanServer} 后由 {@link MBeanExporter} 调用。
+	 * @param objectName 已注册 MBean 的 {@code ObjectName}
 	 */
 	void mbeanRegistered(ObjectName objectName);
 
 	/**
-	 * Called by {@link MBeanExporter} after an MBean has been <i>successfully</i>
-	 * unregistered from an {@link javax.management.MBeanServer}.
-	 * @param objectName the {@code ObjectName} of the unregistered MBean
+	 * 在 MBean <i>成功</i>从 {@link javax.management.MBeanServer} 注销后由 {@link MBeanExporter} 调用。
+	 * @param objectName 已注销 MBean 的 {@code ObjectName}
 	 */
 	void mbeanUnregistered(ObjectName objectName);
 

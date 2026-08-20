@@ -29,20 +29,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Subclass of {@code AbstractReflectiveMBeanInfoAssembler} that allows
- * to specify method names to be exposed as MBean operations and attributes.
- * JavaBean getters and setters will automatically be exposed as JMX attributes.
+ * {@code AbstractReflectiveMBeanInfoAssembler} 的子类，允许指定要公开为 MBean 操作和属性的方法名。
+ * JavaBean 的 getter 和 setter 方法将自动公开为 JMX 属性。
  *
- * <p>You can supply an array of method names via the {@code managedMethods}
- * property. If you have multiple beans and you wish each bean to use a different
- * set of method names, then you can map bean keys (that is the name used to pass
- * the bean to the {@code MBeanExporter}) to a list of method names using the
- * {@code methodMappings} property.
+ * <p>您可以通过 {@code managedMethods} 属性提供方法名数组。如果您有多个 Bean，并且希望每个 Bean 使用不同的
+ * 方法名集合，则可以使用 {@code methodMappings} 属性将 Bean 键（即传递给 {@code MBeanExporter} 的名称）
+ * 映射到方法名列表。
  *
- * <p>If you specify values for both {@code methodMappings} and
- * {@code managedMethods}, Spring will attempt to find method names in the
- * mappings first. If no method names for the bean are found, it will use the
- * method names defined by {@code managedMethods}.
+ * <p>如果同时指定了 {@code methodMappings} 和 {@code managedMethods} 的值，Spring 将首先尝试在
+ * 映射中查找方法名。如果未找到该 Bean 的方法名，则将使用 {@code managedMethods} 定义的方法名。
  *
  * @author Juergen Hoeller
  * @since 1.2
@@ -56,23 +51,23 @@ import org.springframework.util.StringUtils;
 public class MethodNameBasedMBeanInfoAssembler extends AbstractConfigurableMBeanInfoAssembler {
 
 	/**
-	 * Stores the set of method names to use for creating the management interface.
+	 * 存储用于创建管理接口的方法名集合。
 	 */
 	@Nullable
 	private Set<String> managedMethods;
 
 	/**
-	 * Stores the mappings of bean keys to an array of method names.
+	 * 存储 Bean 键到方法名数组的映射关系。
 	 */
 	@Nullable
 	private Map<String, Set<String>> methodMappings;
 
 
 	/**
-	 * Set the array of method names to use for creating the management info.
-	 * These method names will be used for a bean if no entry corresponding to
-	 * that bean is found in the {@code methodMappings} property.
-	 * @param methodNames an array of method names indicating the methods to use
+	 * 设置用于创建管理信息的方法名数组。
+	 * 如果在 {@code methodMappings} 属性中未找到对应 Bean 的条目，
+	 * 则将使用这些方法名。
+	 * @param methodNames 表示要使用的方法的方法名数组
 	 * @see #setMethodMappings
 	 */
 	public void setManagedMethods(String... methodNames) {
@@ -80,11 +75,10 @@ public class MethodNameBasedMBeanInfoAssembler extends AbstractConfigurableMBean
 	}
 
 	/**
-	 * Set the mappings of bean keys to a comma-separated list of method names.
-	 * The property key should match the bean key and the property value should match
-	 * the list of method names. When searching for method names for a bean, Spring
-	 * will check these mappings first.
-	 * @param mappings the mappings of bean keys to method names
+	 * 设置 Bean 键到以逗号分隔的方法名列表的映射关系。
+	 * 属性键应与 Bean 键匹配，属性值应与方法名列表匹配。在查找 Bean 的方法名时，
+	 * Spring 将首先检查这些映射。
+	 * @param mappings Bean 键到方法名的映射关系
 	 */
 	public void setMethodMappings(Properties mappings) {
 		this.methodMappings = new HashMap<>();

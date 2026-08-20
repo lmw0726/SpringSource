@@ -31,13 +31,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Abstract base class for remote service exporters that explicitly deserialize
- * {@link org.springframework.remoting.support.RemoteInvocation} objects and serialize
- * {@link org.springframework.remoting.support.RemoteInvocationResult} objects,
- * for example Spring's HTTP invoker.
+ * 远程服务导出器的抽象基类，用于显式反序列化
+ * {@link org.springframework.remoting.support.RemoteInvocation} 对象并序列化
+ * {@link org.springframework.remoting.support.RemoteInvocationResult} 对象，
+ * 例如 Spring 的 HTTP 调用器。
  *
- * <p>Provides template methods for {@code ObjectInputStream} and
- * {@code ObjectOutputStream} handling.
+ * <p>为 {@code ObjectInputStream} 和
+ * {@code ObjectOutputStream} 处理提供模板方法。
  *
  * @author Juergen Hoeller
  * @since 2.5.1
@@ -45,14 +45,15 @@ import org.springframework.util.ClassUtils;
  * @see java.io.ObjectOutputStream
  * @see #doReadRemoteInvocation
  * @see #doWriteRemoteInvocationResult
- * @deprecated as of 5.3 (phasing out serialization-based remoting)
+ * @deprecated 从 5.3 版本开始弃用（逐步淘汰基于序列化的远程调用）
  */
 @Deprecated
 public abstract class RemoteInvocationSerializingExporter extends RemoteInvocationBasedExporter
 		implements InitializingBean {
 
+
 	/**
-	 * Default content type: "application/x-java-serialized-object".
+	 * 默认内容类型："application/x-java-serialized-object"。
 	 */
 	public static final String CONTENT_TYPE_SERIALIZED_OBJECT = "application/x-java-serialized-object";
 
@@ -65,8 +66,8 @@ public abstract class RemoteInvocationSerializingExporter extends RemoteInvocati
 
 
 	/**
-	 * Specify the content type to use for sending remote invocation responses.
-	 * <p>Default is "application/x-java-serialized-object".
+	 * 设置用于发送远程调用响应的内容类型。
+	 * <p>默认值为 "application/x-java-serialized-object"。
 	 */
 	public void setContentType(String contentType) {
 		Assert.notNull(contentType, "'contentType' must not be null");
@@ -74,22 +75,22 @@ public abstract class RemoteInvocationSerializingExporter extends RemoteInvocati
 	}
 
 	/**
-	 * Return the content type to use for sending remote invocation responses.
+	 * 返回用于发送远程调用响应的内容类型。
 	 */
 	public String getContentType() {
 		return this.contentType;
 	}
 
 	/**
-	 * Set whether to accept deserialization of proxy classes.
-	 * <p>Default is "true". May be deactivated as a security measure.
+	 * 设置是否接受代理类的反序列化。
+	 * <p>默认值为 "true"。可出于安全考虑禁用此选项。
 	 */
 	public void setAcceptProxyClasses(boolean acceptProxyClasses) {
 		this.acceptProxyClasses = acceptProxyClasses;
 	}
 
 	/**
-	 * Return whether to accept deserialization of proxy classes.
+	 * 返回是否接受代理类的反序列化。
 	 */
 	public boolean isAcceptProxyClasses() {
 		return this.acceptProxyClasses;
@@ -102,7 +103,7 @@ public abstract class RemoteInvocationSerializingExporter extends RemoteInvocati
 	}
 
 	/**
-	 * Initialize this service exporter.
+	 * 初始化此服务导出器。
 	 */
 	public void prepare() {
 		this.proxy = getProxyForService();
@@ -117,28 +118,26 @@ public abstract class RemoteInvocationSerializingExporter extends RemoteInvocati
 
 
 	/**
-	 * Create an ObjectInputStream for the given InputStream.
-	 * <p>The default implementation creates a Spring {@link CodebaseAwareObjectInputStream}.
-	 * @param is the InputStream to read from
-	 * @return the new ObjectInputStream instance to use
-	 * @throws java.io.IOException if creation of the ObjectInputStream failed
+	 * 为给定的 InputStream 创建一个 ObjectInputStream。
+	 * <p>默认实现会创建一个 Spring {@link CodebaseAwareObjectInputStream}。
+	 * @param is 要读取的 InputStream
+	 * @return 要使用的新 ObjectInputStream 实例
+	 * @throws java.io.IOException 如果创建 ObjectInputStream 失败
 	 */
 	protected ObjectInputStream createObjectInputStream(InputStream is) throws IOException {
 		return new CodebaseAwareObjectInputStream(is, getBeanClassLoader(), isAcceptProxyClasses());
 	}
 
 	/**
-	 * Perform the actual reading of an invocation result object from the
-	 * given ObjectInputStream.
-	 * <p>The default implementation simply calls
-	 * {@link java.io.ObjectInputStream#readObject()}.
-	 * Can be overridden for deserialization of a custom wrapper object rather
-	 * than the plain invocation, for example an encryption-aware holder.
-	 * @param ois the ObjectInputStream to read from
-	 * @return the RemoteInvocationResult object
-	 * @throws java.io.IOException in case of I/O failure
-	 * @throws ClassNotFoundException if case of a transferred class not
-	 * being found in the local ClassLoader
+	 * 从给定的 ObjectInputStream 中执行实际的调用结果对象读取操作。
+	 * <p>默认实现直接调用
+	 * {@link java.io.ObjectInputStream#readObject()}。
+	 * 可重写此方法以反序列化自定义包装对象（例如加密感知的持有者），
+	 * 而非直接反序列化普通的调用对象。
+	 * @param ois 要读取的 ObjectInputStream
+	 * @return RemoteInvocationResult 对象
+	 * @throws java.io.IOException 发生 I/O 故障时
+	 * @throws ClassNotFoundException 如果在本地 ClassLoader 中找不到传输的类
 	 */
 	protected RemoteInvocation doReadRemoteInvocation(ObjectInputStream ois)
 			throws IOException, ClassNotFoundException {
@@ -152,27 +151,26 @@ public abstract class RemoteInvocationSerializingExporter extends RemoteInvocati
 	}
 
 	/**
-	 * Create an ObjectOutputStream for the given OutputStream.
-	 * <p>The default implementation creates a plain
-	 * {@link java.io.ObjectOutputStream}.
-	 * @param os the OutputStream to write to
-	 * @return the new ObjectOutputStream instance to use
-	 * @throws java.io.IOException if creation of the ObjectOutputStream failed
+	 * 为给定的 OutputStream 创建一个 ObjectOutputStream。
+	 * <p>默认实现创建一个普通的
+	 * {@link java.io.ObjectOutputStream}。
+	 * @param os 要写入的 OutputStream
+	 * @return 要使用的新 ObjectOutputStream 实例
+	 * @throws java.io.IOException 如果创建 ObjectOutputStream 失败
 	 */
 	protected ObjectOutputStream createObjectOutputStream(OutputStream os) throws IOException {
 		return new ObjectOutputStream(os);
 	}
 
 	/**
-	 * Perform the actual writing of the given invocation result object
-	 * to the given ObjectOutputStream.
-	 * <p>The default implementation simply calls
-	 * {@link java.io.ObjectOutputStream#writeObject}.
-	 * Can be overridden for serialization of a custom wrapper object rather
-	 * than the plain invocation, for example an encryption-aware holder.
-	 * @param result the RemoteInvocationResult object
-	 * @param oos the ObjectOutputStream to write to
-	 * @throws java.io.IOException if thrown by I/O methods
+	 * 将给定的调用结果对象写入给定的 ObjectOutputStream。
+	 * <p>默认实现直接调用
+	 * {@link java.io.ObjectOutputStream#writeObject}。
+	 * 可重写此方法以序列化自定义包装对象（例如加密感知的持有者），
+	 * 而非直接序列化普通的调用结果对象。
+	 * @param result RemoteInvocationResult 对象
+	 * @param oos 要写入的 ObjectOutputStream
+	 * @throws java.io.IOException 如果 I/O 方法抛出异常
 	 */
 	protected void doWriteRemoteInvocationResult(RemoteInvocationResult result, ObjectOutputStream oos)
 			throws IOException {

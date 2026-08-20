@@ -20,8 +20,8 @@ import org.springframework.cache.Cache;
 import org.springframework.lang.Nullable;
 
 /**
- * A simple {@link CacheErrorHandler} that does not handle the
- * exception at all, simply throwing it back at the client.
+ * 一个简单的 {@link CacheErrorHandler}，它完全不处理异常，
+ * 只是将异常直接抛回给客户端。
  *
  * @author Stephane Nicoll
  * @since 4.1

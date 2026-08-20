@@ -19,8 +19,8 @@ package org.springframework.scheduling.config;
 import org.springframework.util.Assert;
 
 /**
- * Holder class defining a {@code Runnable} to be executed as a task, typically at a
- * scheduled time or interval. See subclass hierarchy for various scheduling approaches.
+ * 定义 {@code Runnable} 作为任务执行的持有者类，通常在指定的时间或间隔执行。
+ * 有关各种调度方式，请参阅子类层次结构。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -32,8 +32,8 @@ public class Task {
 
 
 	/**
-	 * Create a new {@code Task}.
-	 * @param runnable the underlying task to execute
+	 * 创建一个新的 {@code Task}。
+	 * @param runnable 要执行的底层任务
 	 */
 	public Task(Runnable runnable) {
 		Assert.notNull(runnable, "Runnable must not be null");
@@ -42,7 +42,7 @@ public class Task {
 
 
 	/**
-	 * Return the underlying task.
+	 * 返回底层任务。
 	 */
 	public Runnable getRunnable() {
 		return this.runnable;

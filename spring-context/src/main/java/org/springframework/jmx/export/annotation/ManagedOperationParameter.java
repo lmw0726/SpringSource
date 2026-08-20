@@ -24,11 +24,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Method-level annotation used to provide metadata about operation parameters, corresponding
- * to a {@link org.springframework.jmx.export.metadata.ManagedOperationParameter} attribute.
+ * 用于提供操作参数元数据的方法级注解，对应
+ * {@link org.springframework.jmx.export.metadata.ManagedOperationParameter} 属性。
  *
- * <p>This annotation is a {@linkplain java.lang.annotation.Repeatable repeatable}
- * annotation.
+ * <p>此注解是 {@linkplain java.lang.annotation.Repeatable 可重复} 注解。
  *
  * @author Rob Harrop
  * @since 1.2

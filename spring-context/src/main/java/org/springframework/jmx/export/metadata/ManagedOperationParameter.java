@@ -17,8 +17,8 @@
 package org.springframework.jmx.export.metadata;
 
 /**
- * Metadata about JMX operation parameters.
- * Used in conjunction with a {@link ManagedOperation} attribute.
+ * 关于JMX操作参数的元数据。
+ * 与 {@link ManagedOperation} 属性结合使用。
  *
  * @author Rob Harrop
  * @since 1.2
@@ -33,42 +33,42 @@ public class ManagedOperationParameter {
 
 
 	/**
-	 * Set the index of this parameter in the operation signature.
+	 * 设置此参数在操作签名中的索引。
 	 */
 	public void setIndex(int index) {
 		this.index = index;
 	}
 
 	/**
-	 * Return the index of this parameter in the operation signature.
+	 * 返回此参数在操作签名中的索引。
 	 */
 	public int getIndex() {
 		return this.index;
 	}
 
 	/**
-	 * Set the name of this parameter in the operation signature.
+	 * 设置此参数在操作签名中的名称。
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * Return the name of this parameter in the operation signature.
+	 * 返回此参数在操作签名中的名称。
 	 */
 	public String getName() {
 		return this.name;
 	}
 
 	/**
-	 * Set a description for this parameter.
+	 * 设置此参数的描述。
 	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
 	/**
-	 * Return a description for this parameter.
+	 * 返回此参数的描述。
 	 */
 	public String getDescription() {
 		return this.description;

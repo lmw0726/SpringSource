@@ -25,30 +25,26 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * Convenient {@link FactoryBean} for remote SLSB proxies.
- * Designed for EJB 2.x, but works for EJB 3 Session Beans as well.
+ * 用于远程 SLSB（Stateless Session Bean）代理的便捷 {@link FactoryBean}。
+ * 专为 EJB 2.x 设计，但也适用于 EJB 3 Session Bean。
  *
- * <p>See {@link org.springframework.jndi.JndiObjectLocator} for info on
- * how to specify the JNDI location of the target EJB.
+ * <p>有关如何指定目标 EJB 的 JNDI 位置的信息，请参阅
+ * {@link org.springframework.jndi.JndiObjectLocator}。
  *
- * <p>If you want control over interceptor chaining, use an AOP ProxyFactoryBean
- * with SimpleRemoteSlsbInvokerInterceptor rather than rely on this class.
+ * <p>如果需要控制拦截器链，请使用带有 SimpleRemoteSlsbInvokerInterceptor 的
+ * AOP ProxyFactoryBean，而不是依赖此类。
  *
- * <p>In a bean container, this class is normally best used as a singleton. However,
- * if that bean container pre-instantiates singletons (as do the XML ApplicationContext
- * variants) you may have a problem if the bean container is loaded before the EJB
- * container loads the target EJB. That is because by default the JNDI lookup will be
- * performed in the init method of this class and cached, but the EJB will not have been
- * bound at the target location yet. The best solution is to set the lookupHomeOnStartup
- * property to false, in which case the home will be fetched on first access to the EJB.
- * (This flag is only true by default for backwards compatibility reasons).
+ * <p>在 Bean 容器中，此类通常最好作为单例使用。但是，如果该 Bean 容器预实例化单例
+ * （如 XML ApplicationContext 变体所示），则在 Bean 容器在 EJB 容器加载目标 EJB 之前
+ * 加载时，可能会出现问题。这是因为默认情况下，JNDI 查找将在本类的 init 方法中执行并
+ * 缓存，但此时 EJB 尚未绑定到目标位置。最佳解决方案是将 lookupHomeOnStartup 属性
+ * 设置为 false，这样将在首次访问 EJB 时获取 Home 对象。
+ * （此标志默认为 true 仅为向后兼容的原因）。
  *
- * <p>This proxy factory is typically used with an RMI business interface, which serves
- * as super-interface of the EJB component interface. Alternatively, this factory
- * can also proxy a remote SLSB with a matching non-RMI business interface, i.e. an
- * interface that mirrors the EJB business methods but does not declare RemoteExceptions.
- * In the latter case, RemoteExceptions thrown by the EJB stub will automatically get
- * converted to Spring's unchecked RemoteAccessException.
+ * <p>此代理工厂通常与 RMI 业务接口一起使用，该接口作为 EJB 组件接口的超接口。
+ * 或者，此工厂也可以代理具有匹配的非 RMI 业务接口的远程 SLSB，即镜像 EJB 业务方法
+ * 但不声明 RemoteException 的接口。在后一种情况下，EJB 存根抛出的 RemoteException
+ * 将自动转换为 Spring 的未检查异常 RemoteAccessException。
  *
  * @author Rod Johnson
  * @author Colin Sampaleanu
@@ -62,34 +58,33 @@ import org.springframework.util.ClassUtils;
 public class SimpleRemoteStatelessSessionProxyFactoryBean extends SimpleRemoteSlsbInvokerInterceptor
 	implements FactoryBean<Object>, BeanClassLoaderAware {
 
-	/** The business interface of the EJB we're proxying. */
+	/** 我们正在代理的 EJB 的业务接口。 */
 	@Nullable
 	private Class<?> businessInterface;
 
 	@Nullable
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
-	/** EJBObject. */
+	/** EJB 对象。 */
 	@Nullable
 	private Object proxy;
 
 
 	/**
-	 * Set the business interface of the EJB we're proxying.
-	 * This will normally be a super-interface of the EJB remote component interface.
-	 * Using a business methods interface is a best practice when implementing EJBs.
-	 * <p>You can also specify a matching non-RMI business interface, i.e. an interface
-	 * that mirrors the EJB business methods but does not declare RemoteExceptions.
-	 * In this case, RemoteExceptions thrown by the EJB stub will automatically get
-	 * converted to Spring's generic RemoteAccessException.
-	 * @param businessInterface the business interface of the EJB
+	 * 设置我们正在代理的 EJB 的业务接口。
+	 * 这通常是 EJB 远程组件接口的超接口。
+	 * 在实现 EJB 时，使用业务方法接口是最佳实践。
+	 * <p>也可以指定匹配的非 RMI 业务接口，即镜像 EJB 业务方法但不声明
+	 * RemoteException 的接口。在这种情况下，EJB 存根抛出的 RemoteException
+	 * 将自动转换为 Spring 的通用 RemoteAccessException。
+	 * @param businessInterface EJB 的业务接口
 	 */
 	public void setBusinessInterface(@Nullable Class<?> businessInterface) {
 		this.businessInterface = businessInterface;
 	}
 
 	/**
-	 * Return the business interface of the EJB we're proxying.
+	 * 返回我们正在代理的 EJB 的业务接口。
 	 */
 	@Nullable
 	public Class<?> getBusinessInterface() {

@@ -19,19 +19,17 @@ package org.springframework.scheduling;
 import org.springframework.core.task.AsyncTaskExecutor;
 
 /**
- * A {@link org.springframework.core.task.TaskExecutor} extension exposing
- * scheduling characteristics that are relevant to potential task submitters.
+ * {@link org.springframework.core.task.TaskExecutor} 的扩展接口，
+ * 向潜在的任务提交者暴露与调度相关的特性。
  *
- * <p>Scheduling clients are encouraged to submit
- * {@link Runnable Runnables} that match the exposed preferences
- * of the {@code TaskExecutor} implementation in use.
+ * <p>建议调度客户端提交的 {@link Runnable Runnables} 匹配所使用的
+ * {@code TaskExecutor} 实现所公开的偏好设置。
  *
- * <p>Note: {@link SchedulingTaskExecutor} implementations are encouraged to also
- * implement the {@link org.springframework.core.task.AsyncListenableTaskExecutor}
- * interface. This is not required due to the dependency on Spring 4.0's new
- * {@link org.springframework.util.concurrent.ListenableFuture} interface,
- * which would make it impossible for third-party executor implementations
- * to remain compatible with both Spring 4.0 and Spring 3.x.
+ * <p>注意：建议 {@link SchedulingTaskExecutor} 的实现类同时实现
+ * {@link org.springframework.core.task.AsyncListenableTaskExecutor} 接口。
+ * 这并非强制要求，因为它依赖于 Spring 4.0 新引入的
+ * {@link org.springframework.util.concurrent.ListenableFuture} 接口，
+ * 这会使第三方执行器实现无法同时兼容 Spring 4.0 和 Spring 3.x。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -42,17 +40,15 @@ import org.springframework.core.task.AsyncTaskExecutor;
 public interface SchedulingTaskExecutor extends AsyncTaskExecutor {
 
 	/**
-	 * Does this {@code TaskExecutor} prefer short-lived tasks over long-lived tasks?
-	 * <p>A {@code SchedulingTaskExecutor} implementation can indicate whether it
-	 * prefers submitted tasks to perform as little work as they can within a single
-	 * task execution. For example, submitted tasks might break a repeated loop into
-	 * individual subtasks which submit a follow-up task afterwards (if feasible).
-	 * <p>This should be considered a hint. Of course {@code TaskExecutor} clients
-	 * are free to ignore this flag and hence the {@code SchedulingTaskExecutor}
-	 * interface overall. However, thread pools will usually indicated a preference
-	 * for short-lived tasks, allowing for more fine-grained scheduling.
-	 * @return {@code true} if this executor prefers short-lived tasks (the default),
-	 * {@code false} otherwise (for treatment like a regular {@code TaskExecutor})
+	 * 此 {@code TaskExecutor} 是否偏好短期任务而非长期任务？
+	 * <p>{@code SchedulingTaskExecutor} 的实现可以表明它是否偏好提交的任务
+	 * 在单次任务执行中执行尽可能少的工作。例如，提交的任务可能会将一个重复循环
+	 * 拆分为多个单独的子任务，在每个子任务之后提交后续任务（如果可行的话）。
+	 * <p>这应被视为一个提示。当然，{@code TaskExecutor} 客户端可以自由地
+	 * 忽略此标志，从而也忽略 {@code SchedulingTaskExecutor} 接口的整体约束。
+	 * 然而，线程池通常会表明对短期任务的偏好，以允许更细粒度的调度。
+	 * @return 如果此执行器偏好短期任务（默认值）则返回 {@code true}，
+	 * 否则返回 {@code false}（此时作为常规 {@code TaskExecutor} 处理）
 	 */
 	default boolean prefersShortLivedTasks() {
 		return true;

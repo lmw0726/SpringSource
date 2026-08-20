@@ -25,8 +25,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 
 /**
- * {@link BeanDefinitionParser} responsible for parsing the
- * {@code <context:spring-configured/>} tag.
+ * 负责解析 {@code <context:spring-configured/>} 标签的 {@link BeanDefinitionParser} 实现。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -34,7 +33,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 class SpringConfiguredBeanDefinitionParser implements BeanDefinitionParser {
 
 	/**
-	 * The bean name of the internally managed bean configurer aspect.
+	 * 内部管理的 Bean 配置器切面的 Bean 名称。
 	 */
 	public static final String BEAN_CONFIGURER_ASPECT_BEAN_NAME =
 			"org.springframework.context.config.internalBeanConfigurerAspect";

@@ -23,11 +23,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Method-level annotation that indicates to expose a given method as a JMX operation,
- * corresponding to the {@link org.springframework.jmx.export.metadata.ManagedOperation}
- * attribute.
+ * 方法级别的注解，表示将给定方法公开为 JMX 操作，
+ * 对应 {@link org.springframework.jmx.export.metadata.ManagedOperation} 属性。
  *
- * <p>Only valid when used on a method that is not a JavaBean getter or setter.
+ * <p>仅当用于非 JavaBean getter 或 setter 的方法时才有效。
  *
  * @author Rob Harrop
  * @since 1.2

@@ -1,6 +1,5 @@
 /**
- * Support package for declarative scheduling configuration,
- * with XML schema being the primary configuration format.
+ * 用于声明式调度配置的支持包，其中 XML schema 是主要的配置格式。
  */
 @NonNullApi
 @NonNullFields

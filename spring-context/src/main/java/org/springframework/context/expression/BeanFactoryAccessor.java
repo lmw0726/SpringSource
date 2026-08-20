@@ -25,8 +25,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * EL property accessor that knows how to traverse the beans of a
- * Spring {@link org.springframework.beans.factory.BeanFactory}.
+ * 能够遍历 Spring {@link org.springframework.beans.factory.BeanFactory} 中 bean 的 EL 属性访问器。
  *
  * @author Juergen Hoeller
  * @author Andy Clement

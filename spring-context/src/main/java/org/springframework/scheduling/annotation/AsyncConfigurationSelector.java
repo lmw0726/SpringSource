@@ -21,9 +21,8 @@ import org.springframework.context.annotation.AdviceModeImportSelector;
 import org.springframework.lang.Nullable;
 
 /**
- * Selects which implementation of {@link AbstractAsyncConfiguration} should
- * be used based on the value of {@link EnableAsync#mode} on the importing
- * {@code @Configuration} class.
+ * 根据导入的 {@code @Configuration} 类上 {@link EnableAsync#mode} 的值，
+ * 选择使用 {@link AbstractAsyncConfiguration} 的哪个实现。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -38,9 +37,8 @@ public class AsyncConfigurationSelector extends AdviceModeImportSelector<EnableA
 
 
 	/**
-	 * Returns {@link ProxyAsyncConfiguration} or {@code AspectJAsyncConfiguration}
-	 * for {@code PROXY} and {@code ASPECTJ} values of {@link EnableAsync#mode()},
-	 * respectively.
+	 * 根据 {@link EnableAsync#mode()} 的 {@code PROXY} 和 {@code ASPECTJ} 值，
+	 * 分别返回 {@link ProxyAsyncConfiguration} 或 {@code AspectJAsyncConfiguration}。
 	 */
 	@Override
 	@Nullable

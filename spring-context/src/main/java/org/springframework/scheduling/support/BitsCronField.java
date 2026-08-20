@@ -25,8 +25,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Efficient bitwise-operator extension of {@link CronField}.
- * Created using the {@code parse*} methods.
+ * {@link CronField} 的高效位运算扩展。
+ * 使用 {@code parse*} 方法创建。
  *
  * @author Arjen Poutsma
  * @since 5.3
@@ -40,7 +40,7 @@ final class BitsCronField extends CronField {
 	private static BitsCronField zeroNanos = null;
 
 
-	// we store at most 60 bits, for seconds and minutes, so a 64-bit long suffices
+	// 我们最多存储 60 位，用于秒和分钟，因此一个 64 位的 long 就足够了
 	private long bits;
 
 
@@ -49,7 +49,7 @@ final class BitsCronField extends CronField {
 	}
 
 	/**
-	 * Return a {@code BitsCronField} enabled for 0 nano seconds.
+	 * 返回一个启用 0 纳秒的 {@code BitsCronField}。
 	 */
 	public static BitsCronField zeroNanos() {
 		if (zeroNanos == null) {
@@ -61,47 +61,47 @@ final class BitsCronField extends CronField {
 	}
 
 	/**
-	 * Parse the given value into a seconds {@code BitsCronField}, the first entry of a cron expression.
+	 * 将给定值解析为秒级别的 {@code BitsCronField}，即 cron 表达式的第一个条目。
 	 */
 	public static BitsCronField parseSeconds(String value) {
 		return parseField(value, Type.SECOND);
 	}
 
 	/**
-	 * Parse the given value into a minutes {@code BitsCronField}, the second entry of a cron expression.
+	 * 将给定值解析为分钟级别的 {@code BitsCronField}，即 cron 表达式的第二个条目。
 	 */
 	public static BitsCronField parseMinutes(String value) {
 		return BitsCronField.parseField(value, Type.MINUTE);
 	}
 
 	/**
-	 * Parse the given value into a hours {@code BitsCronField}, the third entry of a cron expression.
+	 * 将给定值解析为小时级别的 {@code BitsCronField}，即 cron 表达式的第三个条目。
 	 */
 	public static BitsCronField parseHours(String value) {
 		return BitsCronField.parseField(value, Type.HOUR);
 	}
 
 	/**
-	 * Parse the given value into a days of months {@code BitsCronField}, the fourth entry of a cron expression.
+	 * 将给定值解析为月份日期级别的 {@code BitsCronField}，即 cron 表达式的第四个条目。
 	 */
 	public static BitsCronField parseDaysOfMonth(String value) {
 		return parseDate(value, Type.DAY_OF_MONTH);
 	}
 
 	/**
-	 * Parse the given value into a month {@code BitsCronField}, the fifth entry of a cron expression.
+	 * 将给定值解析为月级别的 {@code BitsCronField}，即 cron 表达式的第五个条目。
 	 */
 	public static BitsCronField parseMonth(String value) {
 		return BitsCronField.parseField(value, Type.MONTH);
 	}
 
 	/**
-	 * Parse the given value into a days of week {@code BitsCronField}, the sixth entry of a cron expression.
+	 * 将给定值解析为星期级别的 {@code BitsCronField}，即 cron 表达式的第六个条目。
 	 */
 	public static BitsCronField parseDaysOfWeek(String value) {
 		BitsCronField result = parseDate(value, Type.DAY_OF_WEEK);
 		if (result.getBit(0)) {
-			// cron supports 0 for Sunday; we use 7 like java.time
+			// cron 支持 0 表示星期日；我们像 java.time 一样使用 7
 			result.setBit(7);
 			result.clearBit(0);
 		}
@@ -166,7 +166,7 @@ final class BitsCronField extends CronField {
 				min = type.checkValidValue(min);
 				max = type.checkValidValue(max);
 				if (type == Type.DAY_OF_WEEK && min == 7) {
-					// If used as a minimum in a range, Sunday means 0 (not 7)
+					// 如果作为范围的最小值使用，星期日表示 0（而不是 7）
 					min = 0;
 				}
 				return ValueRange.of(min, max);

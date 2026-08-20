@@ -19,8 +19,8 @@ package org.springframework.remoting.support;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * Abstract base class for classes that access remote services via URLs.
- * Provides a "serviceUrl" bean property, which is considered as required.
+ * 通过 URL 访问远程服务的类的抽象基类。
+ * 提供了一个 "serviceUrl" bean 属性，该属性为必需属性。
  *
  * @author Juergen Hoeller
  * @since 15.12.2003
@@ -31,15 +31,15 @@ public abstract class UrlBasedRemoteAccessor extends RemoteAccessor implements I
 
 
 	/**
-	 * Set the URL of this remote accessor's target service.
-	 * The URL must be compatible with the rules of the particular remoting provider.
+	 * 设置此远程访问器的目标服务的 URL。
+	 * URL 必须与特定远程提供者的规则兼容。
 	 */
 	public void setServiceUrl(String serviceUrl) {
 		this.serviceUrl = serviceUrl;
 	}
 
 	/**
-	 * Return the URL of this remote accessor's target service.
+	 * 返回此远程访问器的目标服务的 URL。
 	 */
 	public String getServiceUrl() {
 		return this.serviceUrl;

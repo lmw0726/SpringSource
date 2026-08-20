@@ -25,11 +25,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.format.Parser;
 
 /**
- * Parses Joda {@link DateTime} instances using a {@link DateTimeFormatter}.
+ * 使用 {@link DateTimeFormatter} 解析 Joda {@link DateTime} 实例。
  *
  * @author Keith Donald
  * @since 3.0
- * @deprecated as of 5.3, in favor of standard JSR-310 support
+ * @deprecated 从 5.3 开始，推荐使用标准的 JSR-310 支持
  */
 @Deprecated
 public final class DateTimeParser implements Parser<DateTime> {
@@ -38,8 +38,8 @@ public final class DateTimeParser implements Parser<DateTime> {
 
 
 	/**
-	 * Create a new DateTimeParser.
-	 * @param formatter the Joda DateTimeFormatter instance
+	 * 创建一个新的 DateTimeParser。
+	 * @param formatter Joda DateTimeFormatter 实例
 	 */
 	public DateTimeParser(DateTimeFormatter formatter) {
 		this.formatter = formatter;

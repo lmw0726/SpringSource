@@ -31,23 +31,19 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Subclass of {@code AbstractReflectiveMBeanInfoAssembler} that allows for
- * the management interface of a bean to be defined using arbitrary interfaces.
- * Any methods or properties that are defined in those interfaces are exposed
- * as MBean operations and attributes.
+ * {@code AbstractReflectiveMBeanInfoAssembler} 的子类，允许使用任意接口
+ * 来定义 bean 的管理接口。这些接口中定义的任何方法或属性都将被暴露为
+ * MBean 操作和属性。
  *
- * <p>By default, this class votes on the inclusion of each operation or attribute
- * based on the interfaces implemented by the bean class. However, you can supply an
- * array of interfaces via the {@code managedInterfaces} property that will be
- * used instead. If you have multiple beans and you wish each bean to use a different
- * set of interfaces, then you can map bean keys (that is the name used to pass the
- * bean to the {@code MBeanExporter}) to a list of interface names using the
- * {@code interfaceMappings} property.
+ * <p>默认情况下，此类根据 bean 类实现的接口来决定是否包含每个操作或属性。
+ * 但是，你可以通过 {@code managedInterfaces} 属性提供一个接口数组来替代。
+ * 如果你有多个 bean 并且希望每个 bean 使用不同的接口集，那么可以使用
+ * {@code interfaceMappings} 属性将 bean 键（即传递给 {@code MBeanExporter}
+ * 的名称）映射到接口名称列表。
  *
- * <p>If you specify values for both {@code interfaceMappings} and
- * {@code managedInterfaces}, Spring will attempt to find interfaces in the
- * mappings first. If no interfaces for the bean are found, it will use the
- * interfaces defined by {@code managedInterfaces}.
+ * <p>如果你同时指定了 {@code interfaceMappings} 和 {@code managedInterfaces}
+ * 的值，Spring 将首先尝试在映射中查找接口。如果找不到该 bean 对应的接口，
+ * 则将使用 {@code managedInterfaces} 定义的接口。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -61,27 +57,28 @@ import org.springframework.util.StringUtils;
 public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanInfoAssembler
 		implements BeanClassLoaderAware, InitializingBean {
 
+
 	@Nullable
 	private Class<?>[] managedInterfaces;
 
-	/** Mappings of bean keys to an array of classes. */
+	/** bean 键到类数组的映射。 */
 	@Nullable
 	private Properties interfaceMappings;
 
 	@Nullable
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
-	/** Mappings of bean keys to an array of classes. */
+	/** bean 键到类数组的映射。 */
 	@Nullable
 	private Map<String, Class<?>[]> resolvedInterfaceMappings;
 
 
 	/**
-	 * Set the array of interfaces to use for creating the management info.
-	 * These interfaces will be used for a bean if no entry corresponding to
-	 * that bean is found in the {@code interfaceMappings} property.
-	 * @param managedInterfaces an array of classes indicating the interfaces to use.
-	 * Each entry <strong>MUST</strong> be an interface.
+	 * 设置用于创建管理信息的接口数组。
+	 * 如果在 {@code interfaceMappings} 属性中没有找到对应的 bean 条目，
+	 * 则将使用这些接口。
+	 * @param managedInterfaces 表示要使用的接口的类数组。
+	 * 每个条目<strong>必须</strong>是一个接口。
 	 * @see #setInterfaceMappings
 	 */
 	public void setManagedInterfaces(@Nullable Class<?>... managedInterfaces) {
@@ -97,11 +94,10 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	}
 
 	/**
-	 * Set the mappings of bean keys to a comma-separated list of interface names.
-	 * <p>The property key should match the bean key and the property value should match
-	 * the list of interface names. When searching for interfaces for a bean, Spring
-	 * will check these mappings first.
-	 * @param mappings the mappings of bean keys to interface names
+	 * 设置 bean 键到逗号分隔的接口名称列表的映射。
+	 * <p>属性键应与 bean 键匹配，属性值应与接口名称列表匹配。
+	 * 当为 bean 搜索接口时，Spring 将首先检查这些映射。
+	 * @param mappings bean 键到接口名称的映射
 	 */
 	public void setInterfaceMappings(@Nullable Properties mappings) {
 		this.interfaceMappings = mappings;
@@ -121,9 +117,9 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	}
 
 	/**
-	 * Resolve the given interface mappings, turning class names into Class objects.
-	 * @param mappings the specified interface mappings
-	 * @return the resolved interface mappings (with Class objects as values)
+	 * 解析给定的接口映射，将类名转换为 Class 对象。
+	 * @param mappings 指定的接口映射
+	 * @return 解析后的接口映射（值为 Class 对象）
 	 */
 	private Map<String, Class<?>[]> resolveInterfaceMappings(Properties mappings) {
 		Map<String, Class<?>[]> resolvedMappings = CollectionUtils.newHashMap(mappings.size());
@@ -137,10 +133,10 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	}
 
 	/**
-	 * Resolve the given class names into Class objects.
-	 * @param classNames the class names to resolve
-	 * @param beanKey the bean key that the class names are associated with
-	 * @return the resolved Class
+	 * 将给定的类名解析为 Class 对象。
+	 * @param classNames 要解析的类名
+	 * @param beanKey 类名关联的 bean 键
+	 * @return 解析后的 Class 对象
 	 */
 	private Class<?>[] resolveClassNames(String[] classNames, String beanKey) {
 		Class<?>[] classes = new Class<?>[classNames.length];
@@ -157,13 +153,13 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 
 
 	/**
-	 * Check to see if the {@code Method} is declared in
-	 * one of the configured interfaces and that it is public.
-	 * @param method the accessor {@code Method}.
-	 * @param beanKey the key associated with the MBean in the
-	 * {@code beans} {@code Map}.
-	 * @return {@code true} if the {@code Method} is declared in one of the
-	 * configured interfaces, otherwise {@code false}.
+	 * 检查 {@code Method} 是否在配置的某个接口中声明，
+	 * 并且是公共方法。
+	 * @param method 访问器 {@code Method}。
+	 * @param beanKey 与 {@code beans} {@code Map} 中
+	 * MBean 关联的键。
+	 * @return 如果 {@code Method} 在配置的某个接口中声明，
+	 * 则返回 {@code true}，否则返回 {@code false}。
 	 */
 	@Override
 	protected boolean includeReadAttribute(Method method, String beanKey) {
@@ -171,13 +167,13 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	}
 
 	/**
-	 * Check to see if the {@code Method} is declared in
-	 * one of the configured interfaces and that it is public.
-	 * @param method the mutator {@code Method}.
-	 * @param beanKey the key associated with the MBean in the
-	 * {@code beans} {@code Map}.
-	 * @return {@code true} if the {@code Method} is declared in one of the
-	 * configured interfaces, otherwise {@code false}.
+	 * 检查 {@code Method} 是否在配置的某个接口中声明，
+	 * 并且是公共方法。
+	 * @param method 修改器 {@code Method}。
+	 * @param beanKey 与 {@code beans} {@code Map} 中
+	 * MBean 关联的键。
+	 * @return 如果 {@code Method} 在配置的某个接口中声明，
+	 * 则返回 {@code true}，否则返回 {@code false}。
 	 */
 	@Override
 	protected boolean includeWriteAttribute(Method method, String beanKey) {
@@ -185,13 +181,13 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	}
 
 	/**
-	 * Check to see if the {@code Method} is declared in
-	 * one of the configured interfaces and that it is public.
-	 * @param method the operation {@code Method}.
-	 * @param beanKey the key associated with the MBean in the
-	 * {@code beans} {@code Map}.
-	 * @return {@code true} if the {@code Method} is declared in one of the
-	 * configured interfaces, otherwise {@code false}.
+	 * 检查 {@code Method} 是否在配置的某个接口中声明，
+	 * 并且是公共方法。
+	 * @param method 操作 {@code Method}。
+	 * @param beanKey 与 {@code beans} {@code Map} 中
+	 * MBean 关联的键。
+	 * @return 如果 {@code Method} 在配置的某个接口中声明，
+	 * 则返回 {@code true}，否则返回 {@code false}。
 	 */
 	@Override
 	protected boolean includeOperation(Method method, String beanKey) {
@@ -199,20 +195,20 @@ public class InterfaceBasedMBeanInfoAssembler extends AbstractConfigurableMBeanI
 	}
 
 	/**
-	 * Check to see if the {@code Method} is both public and declared in
-	 * one of the configured interfaces.
-	 * @param method the {@code Method} to check.
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * @return {@code true} if the {@code Method} is declared in one of the
-	 * configured interfaces and is public, otherwise {@code false}.
+	 * 检查 {@code Method} 是否既是公共方法，又在
+	 * 配置的某个接口中声明。
+	 * @param method 要检查的 {@code Method}。
+	 * @param beanKey 与 beans 映射中 MBean 关联的键
+	 * @return 如果 {@code Method} 在配置的某个接口中声明
+	 * 并且是公共方法，则返回 {@code true}，否则返回 {@code false}。
 	 */
 	private boolean isPublicInInterface(Method method, String beanKey) {
 		return Modifier.isPublic(method.getModifiers()) && isDeclaredInInterface(method, beanKey);
 	}
 
 	/**
-	 * Checks to see if the given method is declared in a managed
-	 * interface for the given bean.
+	 * 检查给定的方法是否在给定 bean 的
+	 * 管理接口中声明。
 	 */
 	private boolean isDeclaredInInterface(Method method, String beanKey) {
 		Class<?>[] ifaces = null;

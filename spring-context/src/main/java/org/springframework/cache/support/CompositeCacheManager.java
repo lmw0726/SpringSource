@@ -30,20 +30,16 @@ import org.springframework.cache.CacheManager;
 import org.springframework.lang.Nullable;
 
 /**
- * Composite {@link CacheManager} implementation that iterates over
- * a given collection of delegate {@link CacheManager} instances.
+ * 组合 {@link CacheManager} 实现，遍历给定的委托 {@link CacheManager} 实例集合。
  *
- * <p>Allows {@link NoOpCacheManager} to be automatically added to the end of
- * the list for handling cache declarations without a backing store. Otherwise,
- * any custom {@link CacheManager} may play that role of the last delegate as
- * well, lazily creating cache regions for any requested name.
+ * <p>允许在列表末尾自动添加 {@link NoOpCacheManager}，用于处理没有后备存储的缓存声明。
+ * 否则，任何自定义 {@link CacheManager} 也可以充当最后一个委托角色，
+ * 为任何请求的名称延迟创建缓存区域。
  *
- * <p>Note: Regular CacheManagers that this composite manager delegates to need
- * to return {@code null} from {@link #getCache(String)} if they are unaware of
- * the specified cache name, allowing for iteration to the next delegate in line.
- * However, most {@link CacheManager} implementations fall back to lazy creation
- * of named caches once requested; check out the specific configuration details
- * for a 'static' mode with fixed cache names, if available.
+ * <p>注意：此组合管理器委托的常规 CacheManager 在不知道指定缓存名称时，
+ * 需要从 {@link #getCache(String)} 返回 {@code null}，以便迭代到下一个委托。
+ * 但是，大多数 {@link CacheManager} 实现在被请求时会回退到延迟创建命名缓存；
+ * 如果可用，请查看特定配置以了解具有固定缓存名称的"静态"模式。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -53,21 +49,22 @@ import org.springframework.lang.Nullable;
  */
 public class CompositeCacheManager implements CacheManager, InitializingBean {
 
+
 	private final List<CacheManager> cacheManagers = new ArrayList<>();
 
 	private boolean fallbackToNoOpCache = false;
 
 
 	/**
-	 * Construct an empty CompositeCacheManager, with delegate CacheManagers to
-	 * be added via the {@link #setCacheManagers "cacheManagers"} property.
+	 * 构造一个空的 CompositeCacheManager，委托的 CacheManager 通过
+	 * {@link #setCacheManagers "cacheManagers"} 属性添加。
 	 */
 	public CompositeCacheManager() {
 	}
 
 	/**
-	 * Construct a CompositeCacheManager from the given delegate CacheManagers.
-	 * @param cacheManagers the CacheManagers to delegate to
+	 * 从给定的委托 CacheManager 构造 CompositeCacheManager。
+	 * @param cacheManagers 要委托的 CacheManager
 	 */
 	public CompositeCacheManager(CacheManager... cacheManagers) {
 		setCacheManagers(Arrays.asList(cacheManagers));
@@ -75,16 +72,16 @@ public class CompositeCacheManager implements CacheManager, InitializingBean {
 
 
 	/**
-	 * Specify the CacheManagers to delegate to.
+	 * 指定要委托的 CacheManager。
 	 */
 	public void setCacheManagers(Collection<CacheManager> cacheManagers) {
 		this.cacheManagers.addAll(cacheManagers);
 	}
 
 	/**
-	 * Indicate whether a {@link NoOpCacheManager} should be added at the end of the delegate list.
-	 * In this case, any {@code getCache} requests not handled by the configured CacheManagers will
-	 * be automatically handled by the {@link NoOpCacheManager} (and hence never return {@code null}).
+	 * 指示是否应在委托列表末尾添加 {@link NoOpCacheManager}。
+	 * 在这种情况下，任何未被已配置 CacheManager 处理的 {@code getCache} 请求
+	 * 将由 {@link NoOpCacheManager} 自动处理（因此永远不会返回 {@code null}）。
 	 */
 	public void setFallbackToNoOpCache(boolean fallbackToNoOpCache) {
 		this.fallbackToNoOpCache = fallbackToNoOpCache;

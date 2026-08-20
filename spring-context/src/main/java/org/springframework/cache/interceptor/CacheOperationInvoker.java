@@ -19,12 +19,11 @@ package org.springframework.cache.interceptor;
 import org.springframework.lang.Nullable;
 
 /**
- * Abstract the invocation of a cache operation.
+ * 抽象一次缓存操作的调用。
  *
- * <p>Does not provide a way to transmit checked exceptions but
- * provide a special exception that should be used to wrap any
- * exception that was thrown by the underlying invocation.
- * Callers are expected to handle this issue type specifically.
+ * <p>不提供传递受检异常（checked exception）的方式，但提供了一个特殊的异常，
+ * 该异常用于包装底层调用过程中抛出的任何异常。
+ * 调用方需要专门处理这一类型的异常。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -33,17 +32,17 @@ import org.springframework.lang.Nullable;
 public interface CacheOperationInvoker {
 
 	/**
-	 * Invoke the cache operation defined by this instance. Wraps any exception
-	 * that is thrown during the invocation in a {@link ThrowableWrapper}.
-	 * @return the result of the operation
-	 * @throws ThrowableWrapper if an error occurred while invoking the operation
+	 * 调用由本实例定义的缓存操作。将调用过程中抛出的任何异常
+	 * 包装在一个 {@link ThrowableWrapper} 中。
+	 * @return 操作的结果
+	 * @throws ThrowableWrapper 如果在调用操作时发生错误
 	 */
 	@Nullable
 	Object invoke() throws ThrowableWrapper;
 
 
 	/**
-	 * Wrap any exception thrown while invoking {@link #invoke()}.
+	 * 包装调用 {@link #invoke()} 时抛出的任何异常。
 	 */
 	@SuppressWarnings("serial")
 	class ThrowableWrapper extends RuntimeException {

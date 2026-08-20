@@ -1,6 +1,6 @@
 /**
- * Abstraction for determining the current Locale,
- * plus global holder that exposes a thread-bound Locale.
+ * 用于确定当前 Locale 的抽象，
+ * 以及暴露线程绑定 Locale 的全局持有者。
  */
 @NonNullApi
 @NonNullFields

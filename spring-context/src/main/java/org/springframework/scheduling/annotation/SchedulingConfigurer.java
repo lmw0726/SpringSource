@@ -19,17 +19,16 @@ package org.springframework.scheduling.annotation;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 /**
- * Optional interface to be implemented by {@link
- * org.springframework.context.annotation.Configuration @Configuration} classes annotated
- * with {@link EnableScheduling @EnableScheduling}. Typically used for setting a specific
- * {@link org.springframework.scheduling.TaskScheduler TaskScheduler} bean to be used when
- * executing scheduled tasks or for registering scheduled tasks in a <em>programmatic</em>
- * fashion as opposed to the <em>declarative</em> approach of using the
- * {@link Scheduled @Scheduled} annotation. For example, this may be necessary
- * when implementing {@link org.springframework.scheduling.Trigger Trigger}-based
- * tasks, which are not supported by the {@code @Scheduled} annotation.
+ * 可选接口，由使用了 {@link EnableScheduling @EnableScheduling} 注解的
+ * {@link org.springframework.context.annotation.Configuration @Configuration}
+ * 类来实现。通常用于设置特定的
+ * {@link org.springframework.scheduling.TaskScheduler TaskScheduler} Bean，
+ * 以便在执行定时任务时使用，或者用于以<em>编程式</em>方式注册定时任务，
+ * 与使用 {@link Scheduled @Scheduled} 注解的<em>声明式</em>方法相对应。
+ * 例如，当实现基于 {@link org.springframework.scheduling.Trigger Trigger} 的任务时
+ * （该任务不受 {@code @Scheduled} 注解支持），可能需要使用此接口。
  *
- * <p>See {@link EnableScheduling @EnableScheduling} for detailed usage examples.
+ * <p>详细用法示例请参阅 {@link EnableScheduling @EnableScheduling}。
  *
  * @author Chris Beams
  * @since 3.1
@@ -40,10 +39,10 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 public interface SchedulingConfigurer {
 
 	/**
-	 * Callback allowing a {@link org.springframework.scheduling.TaskScheduler
-	 * TaskScheduler} and specific {@link org.springframework.scheduling.config.Task Task}
-	 * instances to be registered against the given the {@link ScheduledTaskRegistrar}.
-	 * @param taskRegistrar the registrar to be configured.
+	 * 回调方法，允许将 {@link org.springframework.scheduling.TaskScheduler TaskScheduler}
+	 * 和特定的 {@link org.springframework.scheduling.config.Task Task} 实例
+	 * 注册到给定的 {@link ScheduledTaskRegistrar} 中。
+	 * @param taskRegistrar 要配置的注册器。
 	 */
 	void configureTasks(ScheduledTaskRegistrar taskRegistrar);
 

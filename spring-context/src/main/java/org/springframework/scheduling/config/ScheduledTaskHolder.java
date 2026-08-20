@@ -19,7 +19,7 @@ package org.springframework.scheduling.config;
 import java.util.Set;
 
 /**
- * Common interface for exposing locally scheduled tasks.
+ * 用于暴露本地计划任务的通用接口。
  *
  * @author Juergen Hoeller
  * @since 5.0.2
@@ -29,7 +29,7 @@ import java.util.Set;
 public interface ScheduledTaskHolder {
 
 	/**
-	 * Return an overview of the tasks that have been scheduled by this instance.
+	 * 返回此实例已计划执行的任务概览。
 	 */
 	Set<ScheduledTask> getScheduledTasks();
 

@@ -25,10 +25,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link LoadTimeWeaver} implementation for WebLogic's instrumentable
- * ClassLoader.
+ * 针对 WebLogic 可检测 ClassLoader 的 {@link LoadTimeWeaver} 实现。
  *
- * <p><b>NOTE:</b> Requires BEA WebLogic version 10 or higher.
+ * <p><b>注意：</b> 需要 BEA WebLogic 10 或更高版本。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -40,8 +39,7 @@ public class WebLogicLoadTimeWeaver implements LoadTimeWeaver {
 
 
 	/**
-	 * Creates a new instance of the {@link WebLogicLoadTimeWeaver} class using
-	 * the default {@link ClassLoader class loader}.
+	 * 使用默认的 {@link ClassLoader 类加载器} 创建 {@link WebLogicLoadTimeWeaver} 类的新实例。
 	 * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
 	 */
 	public WebLogicLoadTimeWeaver() {
@@ -49,9 +47,8 @@ public class WebLogicLoadTimeWeaver implements LoadTimeWeaver {
 	}
 
 	/**
-	 * Creates a new instance of the {@link WebLogicLoadTimeWeaver} class using
-	 * the supplied {@link ClassLoader}.
-	 * @param classLoader the {@code ClassLoader} to delegate to for weaving
+	 * 使用提供的 {@link ClassLoader} 创建 {@link WebLogicLoadTimeWeaver} 类的新实例。
+	 * @param classLoader 用于委托进行织入的 {@code ClassLoader}
 	 */
 	public WebLogicLoadTimeWeaver(@Nullable ClassLoader classLoader) {
 		Assert.notNull(classLoader, "ClassLoader must not be null");

@@ -16,25 +16,20 @@
 
 package org.springframework.stereotype;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.core.annotation.AliasFor;
 
+import java.lang.annotation.*;
+
 /**
- * Indicates that an annotated class is a "Service", originally defined by Domain-Driven
- * Design (Evans, 2003) as "an operation offered as an interface that stands alone in the
- * model, with no encapsulated state."
+ * 表示被注解的类是一个"Service（服务）"，最初由领域驱动设计（Evans, 2003）定义为
+ * "作为独立接口提供的操作，模型中不包含封装状态"。
  *
- * <p>May also indicate that a class is a "Business Service Facade" (in the Core J2EE
- * patterns sense), or something similar. This annotation is a general-purpose stereotype
- * and individual teams may narrow their semantics and use as appropriate.
+ * <p>也可表示一个类是"Business Service Facade（业务服务外观）"（符合 Core J2EE
+ * 设计模式的含义），或类似的东西。此注解是一个通用的刻板印象（stereotype），
+ * 各团队可根据实际情况缩小其语义范围并适当使用。
  *
- * <p>This annotation serves as a specialization of {@link Component @Component},
- * allowing for implementation classes to be autodetected through classpath scanning.
+ * <p>此注解作为 {@link Component @Component} 的特化，
+ * 允许实现类通过类路径扫描被自动检测。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -48,9 +43,9 @@ import org.springframework.core.annotation.AliasFor;
 public @interface Service {
 
 	/**
-	 * The value may indicate a suggestion for a logical component name,
-	 * to be turned into a Spring bean in case of an autodetected component.
-	 * @return the suggested component name, if any (or empty String otherwise)
+	 * 该值可指定一个逻辑组件名称的建议，
+	 * 在自动检测组件时将其转换为 Spring bean。
+	 * @return 建议的组件名称（如有），否则返回空字符串
 	 */
 	@AliasFor(annotation = Component.class)
 	String value() default "";

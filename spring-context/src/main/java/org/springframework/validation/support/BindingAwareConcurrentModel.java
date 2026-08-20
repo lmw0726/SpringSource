@@ -47,12 +47,12 @@ public class BindingAwareConcurrentModel extends ConcurrentModel {
 	private void removeBindingResultIfNecessary(String key, @Nullable Object value) {
 		if (!key.startsWith(BindingResult.MODEL_KEY_PREFIX)) {
 			// 如果键不是以模型键前缀开头
-			// 拼接模型建和键名作为结果键。
+			// 拼接模型键和键名作为结果键。
 			String resultKey = BindingResult.MODEL_KEY_PREFIX + key;
 			// 获取绑定结果
 			BindingResult result = (BindingResult) get(resultKey);
 			if (result != null && result.getTarget() != value) {
-				// 如果绑定结果不为工，并且绑定结果的目标值不是当前值，则去除结果键。
+				// 如果绑定结果不为空，并且绑定结果的目标值不是当前值，则去除结果键。
 				remove(resultKey);
 			}
 		}

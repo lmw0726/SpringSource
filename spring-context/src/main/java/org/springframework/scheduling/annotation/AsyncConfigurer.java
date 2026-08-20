@@ -22,13 +22,13 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface to be implemented by @{@link org.springframework.context.annotation.Configuration
- * Configuration} classes annotated with @{@link EnableAsync} that wish to customize the
- * {@link Executor} instance used when processing async method invocations or the
- * {@link AsyncUncaughtExceptionHandler} instance used to process exception thrown from
- * async method with {@code void} return type.
+ * 需要由标注了 @{@link EnableAsync} 的
+ * @{@link org.springframework.context.annotation.Configuration Configuration} 类实现的接口，
+ * 用于自定义处理异步方法调用时使用的 {@link Executor} 实例，
+ * 以及用于处理返回 {@code void} 类型的异步方法抛出的异常的
+ * {@link AsyncUncaughtExceptionHandler} 实例。
  *
- * <p>See @{@link EnableAsync} for usage examples.
+ * <p>使用示例请参见 @{@link EnableAsync}。
  *
  * @author Chris Beams
  * @author Stephane Nicoll
@@ -39,8 +39,7 @@ import org.springframework.lang.Nullable;
 public interface AsyncConfigurer {
 
 	/**
-	 * The {@link Executor} instance to be used when processing async
-	 * method invocations.
+	 * 处理异步方法调用时使用的 {@link Executor} 实例。
 	 */
 	@Nullable
 	default Executor getAsyncExecutor() {
@@ -48,9 +47,8 @@ public interface AsyncConfigurer {
 	}
 
 	/**
-	 * The {@link AsyncUncaughtExceptionHandler} instance to be used
-	 * when an exception is thrown during an asynchronous method execution
-	 * with {@code void} return type.
+	 * 当返回 {@code void} 类型的异步方法执行过程中抛出异常时使用的
+	 * {@link AsyncUncaughtExceptionHandler} 实例。
 	 */
 	@Nullable
 	default AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {

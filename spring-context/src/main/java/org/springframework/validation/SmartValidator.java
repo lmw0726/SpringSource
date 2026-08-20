@@ -19,8 +19,7 @@ package org.springframework.validation;
 import org.springframework.lang.Nullable;
 
 /**
- * Extended variant of the {@link Validator} interface, adding support for
- * validation 'hints'.
+ * {@link Validator} 接口的扩展变体，增加了对验证"提示"的支持。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -29,32 +28,27 @@ import org.springframework.lang.Nullable;
 public interface SmartValidator extends Validator {
 
 	/**
-	 * Validate the supplied {@code target} object, which must be of a type of {@link Class}
-	 * for which the {@link #supports(Class)} method typically returns {@code true}.
-	 * <p>The supplied {@link Errors errors} instance can be used to report any
-	 * resulting validation errors.
-	 * <p><b>This variant of {@code validate()} supports validation hints, such as
-	 * validation groups against a JSR-303 provider</b> (in which case, the provided hint
-	 * objects need to be annotation arguments of type {@code Class}).
-	 * <p>Note: Validation hints may get ignored by the actual target {@code Validator},
-	 * in which case this method should behave just like its regular
-	 * {@link #validate(Object, Errors)} sibling.
-	 * @param target the object that is to be validated
-	 * @param errors contextual state about the validation process
-	 * @param validationHints one or more hint objects to be passed to the validation engine
+	 * 验证传入的 {@code target} 对象，该对象必须是 {@link Class} 类型，
+	 * 且其 {@link #supports(Class)} 方法通常返回 {@code true}。
+	 * <p>传入的 {@link Errors errors} 实例可用于报告任何产生的验证错误。
+	 * <p><b>此版本的 {@code validate()} 方法支持验证提示（hints），例如针对
+	 * JSR-303 提供程序的验证组</b>（此时，提供的提示对象需要是 {@code Class} 类型的注解参数）。
+	 * <p>注意：验证提示可能会被实际的目标 {@code Validator} 忽略，
+	 * 此时此方法的行为应与其常规的 {@link #validate(Object, Errors)} 方法保持一致。
+	 * @param target 要验证的对象
+	 * @param errors 验证过程的上下文状态
+	 * @param validationHints 要传递给验证引擎的一个或多个提示对象
 	 * @see javax.validation.Validator#validate(Object, Class[])
 	 */
 	void validate(Object target, Errors errors, Object... validationHints);
 
 	/**
-	 * Validate the supplied value for the specified field on the target type,
-	 * reporting the same validation errors as if the value would be bound to
-	 * the field on an instance of the target class.
-	 * @param targetType the target type
-	 * @param fieldName the name of the field
-	 * @param value the candidate value
-	 * @param errors contextual state about the validation process
-	 * @param validationHints one or more hint objects to be passed to the validation engine
+	 * 验证指定目标类型上字段的传入值，报告与将该值绑定到目标类实例时相同的验证错误。
+	 * @param targetType 目标类型
+	 * @param fieldName 字段名称
+	 * @param value 候选值
+	 * @param errors 验证过程的上下文状态
+	 * @param validationHints 要传递给验证引擎的一个或多个提示对象
 	 * @since 5.1
 	 * @see javax.validation.Validator#validateValue(Class, String, Object, Class[])
 	 */

@@ -25,7 +25,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 
 /**
- * A {@link BeanDefinitionParser} for use when loading scripting XML.
+ * 用于加载脚本XML的{@link BeanDefinitionParser}。
  *
  * @author Mark Fisher
  * @since 2.5

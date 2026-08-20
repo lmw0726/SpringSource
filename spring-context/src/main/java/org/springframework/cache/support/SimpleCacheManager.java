@@ -22,13 +22,12 @@ import java.util.Collections;
 import org.springframework.cache.Cache;
 
 /**
- * Simple cache manager working against a given collection of caches.
- * Useful for testing or simple caching declarations.
+ * 简单的缓存管理器，基于给定的缓存集合工作。
+ * 适用于测试或简单的缓存声明。
  * <p>
- * When using this implementation directly, i.e. not via a regular
- * bean registration, {@link #initializeCaches()} should be invoked
- * to initialize its internal state once the
- * {@linkplain #setCaches(Collection) caches have been provided}.
+ * 当直接使用此实现（即不通过常规 Bean 注册方式）时，
+ * 一旦 {@linkplain #setCaches(Collection) 缓存已提供}，
+ * 就应该调用 {@link #initializeCaches()} 来初始化其内部状态。
  *
  * @author Costin Leau
  * @since 3.1
@@ -39,7 +38,7 @@ public class SimpleCacheManager extends AbstractCacheManager {
 
 
 	/**
-	 * Specify the collection of Cache instances to use for this CacheManager.
+	 * 指定此 CacheManager 要使用的 Cache 实例集合。
 	 * @see #initializeCaches()
 	 */
 	public void setCaches(Collection<? extends Cache> caches) {

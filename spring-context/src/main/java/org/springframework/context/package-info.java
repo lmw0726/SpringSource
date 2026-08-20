@@ -1,14 +1,9 @@
 /**
- * This package builds on the beans package to add support for
- * message sources and for the Observer design pattern, and the
- * ability for application objects to obtain resources using a
- * consistent API.
+ * 本包建立在 beans 包的基础上，增加了对消息源（Message Source）和观察者设计模式（Observer Pattern）的支持，
+ * 并为应用对象提供了一致的 API 来获取资源。
  *
- * <p>There is no necessity for Spring applications to depend
- * on ApplicationContext or even BeanFactory functionality
- * explicitly. One of the strengths of the Spring architecture
- * is that application objects can often be configured without
- * any dependency on Spring-specific APIs.
+ * <p>Spring 应用无需显式依赖 ApplicationContext 甚至 BeanFactory 的功能。
+ * Spring 架构的优势之一在于，应用对象通常可以在不依赖 Spring 特定 API 的情况下进行配置。
  */
 @NonNullApi
 @NonNullFields

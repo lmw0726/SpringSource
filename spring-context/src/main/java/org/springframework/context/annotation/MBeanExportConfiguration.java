@@ -39,10 +39,10 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@code @Configuration} class that registers a {@link AnnotationMBeanExporter} bean.
+ * 注册 {@link AnnotationMBeanExporter} Bean 的 {@code @Configuration} 配置类。
  *
- * <p>This configuration class is automatically imported when using the
- * {@link EnableMBeanExport} annotation. See its javadoc for complete usage details.
+ * <p>使用 {@link EnableMBeanExport} 注解时，此配置类会自动导入。
+ * 完整的使用详情请参阅其 Javadoc。
  *
  * @author Phillip Webb
  * @author Chris Beams
@@ -134,12 +134,12 @@ public class MBeanExportConfiguration implements ImportAware, EnvironmentAware, 
 
 
 	/**
-	 * Specific platforms that might need custom MBean handling.
+	 * 可能需要自定义 MBean 处理的特定平台。
 	 */
 	public enum SpecificPlatform {
 
 		/**
-		 * Weblogic.
+		 * Weblogic 平台。
 		 */
 		WEBLOGIC("weblogic.management.Helper") {
 			@Override
@@ -154,7 +154,7 @@ public class MBeanExportConfiguration implements ImportAware, EnvironmentAware, 
 		},
 
 		/**
-		 * Websphere.
+		 * Websphere 平台。
 		 */
 		WEBSPHERE("com.ibm.websphere.management.AdminServiceFactory") {
 			@Override

@@ -28,8 +28,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link FactoryBean} for creating {@link ThreadPoolTaskExecutor} instances,
- * primarily used behind the XML task namespace.
+ * 用于创建 {@link ThreadPoolTaskExecutor} 实例的 {@link FactoryBean}，
+ * 主要在 XML task 命名空间背后使用。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -113,15 +113,15 @@ public class TaskExecutorFactoryBean implements
 								"Lower bound of pool-size range must not exceed the upper bound");
 					}
 					if (this.queueCapacity == null) {
-						// No queue-capacity provided, so unbounded
+						// 未提供 queue-capacity，因此是无界的
 						if (corePoolSize == 0) {
-							// Actually set 'corePoolSize' to the upper bound of the range
-							// but allow core threads to timeout...
+							// 实际将 'corePoolSize' 设置为范围的上限
+							// 但允许核心线程超时...
 							executor.setAllowCoreThreadTimeOut(true);
 							corePoolSize = maxPoolSize;
 						}
 						else {
-							// Non-zero lower bound implies a core-max size range...
+							// 非零下限意味着存在核心-最大大小范围...
 							throw new IllegalArgumentException(
 									"A non-zero lower bound for the size range requires a queue-capacity value");
 						}

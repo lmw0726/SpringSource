@@ -26,17 +26,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Simple {@link org.springframework.cache.Cache} implementation based on the
- * core JDK {@code java.util.concurrent} package.
+ * 基于核心 JDK {@code java.util.concurrent} 包的简单 {@link org.springframework.cache.Cache} 实现。
  *
- * <p>Useful for testing or simple caching scenarios, typically in combination
- * with {@link org.springframework.cache.support.SimpleCacheManager} or
- * dynamically through {@link ConcurrentMapCacheManager}.
+ * <p>适用于测试或简单的缓存场景，通常与
+ * {@link org.springframework.cache.support.SimpleCacheManager} 配合使用，
+ * 或通过 {@link ConcurrentMapCacheManager} 动态使用。
  *
- * <p><b>Note:</b> As {@link ConcurrentHashMap} (the default implementation used)
- * does not allow for {@code null} values to be stored, this class will replace
- * them with a predefined internal object. This behavior can be changed through the
- * {@link #ConcurrentMapCache(String, ConcurrentMap, boolean)} constructor.
+ * <p><b>注意：</b>由于 {@link ConcurrentHashMap}（默认使用的实现）
+ * 不允许存储 {@code null} 值，本类会将 {@code null} 值替换为预定义的内部对象。
+ * 该行为可以通过 {@link #ConcurrentMapCache(String, ConcurrentMap, boolean)} 构造函数进行更改。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -55,46 +53,43 @@ public class ConcurrentMapCache extends AbstractValueAdaptingCache {
 
 
 	/**
-	 * Create a new ConcurrentMapCache with the specified name.
-	 * @param name the name of the cache
+	 * 使用指定名称创建一个新的 ConcurrentMapCache。
+	 * @param name 缓存的名称
 	 */
 	public ConcurrentMapCache(String name) {
 		this(name, new ConcurrentHashMap<>(256), true);
 	}
 
 	/**
-	 * Create a new ConcurrentMapCache with the specified name.
-	 * @param name the name of the cache
-	 * @param allowNullValues whether to accept and convert {@code null}
-	 * values for this cache
+	 * 使用指定名称创建一个新的 ConcurrentMapCache。
+	 * @param name 缓存的名称
+	 * @param allowNullValues 是否接受并转换此缓存的 {@code null} 值
 	 */
 	public ConcurrentMapCache(String name, boolean allowNullValues) {
 		this(name, new ConcurrentHashMap<>(256), allowNullValues);
 	}
 
 	/**
-	 * Create a new ConcurrentMapCache with the specified name and the
-	 * given internal {@link ConcurrentMap} to use.
-	 * @param name the name of the cache
-	 * @param store the ConcurrentMap to use as an internal store
-	 * @param allowNullValues whether to allow {@code null} values
-	 * (adapting them to an internal null holder value)
+	 * 使用指定名称和给定的内部 {@link ConcurrentMap} 创建一个新的 ConcurrentMapCache。
+	 * @param name 缓存的名称
+	 * @param store 用作内部存储的 ConcurrentMap
+	 * @param allowNullValues 是否允许 {@code null} 值
+	 * （将其适配为内部 null 持有者值）
 	 */
 	public ConcurrentMapCache(String name, ConcurrentMap<Object, Object> store, boolean allowNullValues) {
 		this(name, store, allowNullValues, null);
 	}
 
 	/**
-	 * Create a new ConcurrentMapCache with the specified name and the
-	 * given internal {@link ConcurrentMap} to use. If the
-	 * {@link SerializationDelegate} is specified,
-	 * {@link #isStoreByValue() store-by-value} is enabled
-	 * @param name the name of the cache
-	 * @param store the ConcurrentMap to use as an internal store
-	 * @param allowNullValues whether to allow {@code null} values
-	 * (adapting them to an internal null holder value)
-	 * @param serialization the {@link SerializationDelegate} to use
-	 * to serialize cache entry or {@code null} to store the reference
+	 * 使用指定名称和给定的内部 {@link ConcurrentMap} 创建一个新的 ConcurrentMapCache。
+	 * 如果指定了 {@link SerializationDelegate}，则启用
+	 * {@link #isStoreByValue() store-by-value}（按值存储）。
+	 * @param name 缓存的名称
+	 * @param store 用作内部存储的 ConcurrentMap
+	 * @param allowNullValues 是否允许 {@code null} 值
+	 * （将其适配为内部 null 持有者值）
+	 * @param serialization 用于序列化缓存条目的 {@link SerializationDelegate}，
+	 * 或传 {@code null} 以存储引用
 	 * @since 4.3
 	 */
 	protected ConcurrentMapCache(String name, ConcurrentMap<Object, Object> store,
@@ -110,9 +105,9 @@ public class ConcurrentMapCache extends AbstractValueAdaptingCache {
 
 
 	/**
-	 * Return whether this cache stores a copy of each entry ({@code true}) or
-	 * a reference ({@code false}, default). If store by value is enabled, each
-	 * entry in the cache must be serializable.
+	 * 返回此缓存是存储每个条目的副本（{@code true}）还是
+	 * 存储引用（{@code false}，默认值）。如果启用了按值存储，
+	 * 缓存中的每个条目都必须是可序列化的。
 	 * @since 4.3
 	 */
 	public final boolean isStoreByValue() {

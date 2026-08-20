@@ -32,15 +32,13 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * An implementation of the {@link ObjectNamingStrategy} interface
- * that reads the {@code ObjectName} from the source-level metadata.
- * Falls back to the bean key (bean name) if no {@code ObjectName}
- * can be found in source-level metadata.
+ * {@link ObjectNamingStrategy} 接口的实现类，用于从源码级元数据中读取 {@code ObjectName}。
+ * 如果源码级元数据中未找到 {@code ObjectName}，则回退使用 bean key（即 bean 名称）。
  *
- * <p>Uses the {@link JmxAttributeSource} strategy interface, so that
- * metadata can be read using any supported implementation. Out of the box,
+ * <p>使用 {@link JmxAttributeSource} 策略接口，以便通过任何支持的实现来读取元数据。
+ * 开箱即用时，
  * {@link org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource}
- * introspects a well-defined set of annotations that come with Spring.
+ * 会对 Spring 提供的一组定义良好的注解进行内省。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -51,7 +49,7 @@ import org.springframework.util.StringUtils;
 public class MetadataNamingStrategy implements ObjectNamingStrategy, InitializingBean {
 
 	/**
-	 * The {@code JmxAttributeSource} implementation to use for reading metadata.
+	 * 用于读取元数据的 {@code JmxAttributeSource} 实现。
 	 */
 	@Nullable
 	private JmxAttributeSource attributeSource;
@@ -61,16 +59,14 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 
 
 	/**
-	 * Create a new {@code MetadataNamingStrategy} which needs to be
-	 * configured through the {@link #setAttributeSource} method.
+	 * 创建一个新的 {@code MetadataNamingStrategy}，需要通过 {@link #setAttributeSource} 方法进行配置。
 	 */
 	public MetadataNamingStrategy() {
 	}
 
 	/**
-	 * Create a new {@code MetadataNamingStrategy} for the given
-	 * {@code JmxAttributeSource}.
-	 * @param attributeSource the JmxAttributeSource to use
+	 * 为给定的 {@code JmxAttributeSource} 创建一个新的 {@code MetadataNamingStrategy}。
+	 * @param attributeSource 要使用的 JmxAttributeSource
 	 */
 	public MetadataNamingStrategy(JmxAttributeSource attributeSource) {
 		Assert.notNull(attributeSource, "JmxAttributeSource must not be null");
@@ -79,8 +75,7 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 
 
 	/**
-	 * Set the implementation of the {@code JmxAttributeSource} interface to use
-	 * when reading the source-level metadata.
+	 * 设置在读取源码级元数据时要使用的 {@code JmxAttributeSource} 接口实现。
 	 */
 	public void setAttributeSource(JmxAttributeSource attributeSource) {
 		Assert.notNull(attributeSource, "JmxAttributeSource must not be null");
@@ -88,11 +83,9 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 	}
 
 	/**
-	 * Specify the default domain to be used for generating ObjectNames
-	 * when no source-level metadata has been specified.
-	 * <p>The default is to use the domain specified in the bean name
-	 * (if the bean name follows the JMX ObjectName syntax); else,
-	 * the package name of the managed bean class.
+	 * 指定在未指定源码级元数据时用于生成 ObjectName 的默认域。
+	 * <p>默认情况下使用 bean 名称中指定的域（如果 bean 名称遵循 JMX ObjectName 语法）；
+	 * 否则使用被管理 bean 类的包名。
 	 */
 	public void setDefaultDomain(String defaultDomain) {
 		this.defaultDomain = defaultDomain;
@@ -107,8 +100,7 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 
 
 	/**
-	 * Reads the {@code ObjectName} from the source-level metadata associated
-	 * with the managed resource's {@code Class}.
+	 * 从与被管理资源的 {@code Class} 关联的源码级元数据中读取 {@code ObjectName}。
 	 */
 	@Override
 	public ObjectName getObjectName(Object managedBean, @Nullable String beanKey) throws MalformedObjectNameException {
@@ -116,7 +108,7 @@ public class MetadataNamingStrategy implements ObjectNamingStrategy, Initializin
 		Class<?> managedClass = AopUtils.getTargetClass(managedBean);
 		ManagedResource mr = this.attributeSource.getManagedResource(managedClass);
 
-		// Check that an object name has been specified.
+		// 检查是否已指定对象名称。
 		if (mr != null && StringUtils.hasText(mr.getObjectName())) {
 			return ObjectNameManager.getInstance(mr.getObjectName());
 		}

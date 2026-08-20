@@ -28,8 +28,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
- * {@link GenericApplicationListener} adapter that determines supported event types
- * through introspecting the generically declared type of the target listener.
+ * 通过内省目标监听器的泛型声明类型来确定所支持事件类型的
+ * {@link GenericApplicationListener} 适配器。
  *
  * @author Juergen Hoeller
  * @author Stephane Nicoll
@@ -48,8 +48,8 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 
 
 	/**
-	 * Create a new GenericApplicationListener for the given delegate.
-	 * @param delegate the delegate listener to be invoked
+	 * 为给定的委托创建一个新的 GenericApplicationListener。
+	 * @param delegate 要调用的委托监听器
 	 */
 	@SuppressWarnings("unchecked")
 	public GenericApplicationListenerAdapter(ApplicationListener<?> delegate) {

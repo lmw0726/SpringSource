@@ -30,8 +30,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.PatternMatchUtils;
 
 /**
- * Simple {@link CacheOperationSource} implementation that allows attributes to be matched
- * by registered name.
+ * 一个简单的 {@link CacheOperationSource} 实现，允许根据已注册的名称来匹配属性。
  *
  * @author Costin Leau
  * @since 3.1
@@ -40,20 +39,20 @@ import org.springframework.util.PatternMatchUtils;
 public class NameMatchCacheOperationSource implements CacheOperationSource, Serializable {
 
 	/**
-	 * Logger available to subclasses.
-	 * <p>Static for optimal serialization.
+	 * 可供子类使用的日志记录器。
+	 * <p>声明为静态以利于序列化。
 	 */
 	protected static final Log logger = LogFactory.getLog(NameMatchCacheOperationSource.class);
 
 
-	/** Keys are method names; values are TransactionAttributes. */
+	/** 键是方法名；值是对应的 TransactionAttributes。 */
 	private Map<String, Collection<CacheOperation>> nameMap = new LinkedHashMap<>();
 
 
 	/**
-	 * Set a name/attribute map, consisting of method names
-	 * (e.g. "myMethod") and CacheOperation instances
-	 * (or Strings to be converted to CacheOperation instances).
+	 * 设置一个名称/属性映射，包含方法名
+	 * （例如 "myMethod"）和 CacheOperation 实例
+	 * （或者将被转换为 CacheOperation 实例的字符串）。
 	 * @see CacheOperation
 	 */
 	public void setNameMap(Map<String, Collection<CacheOperation>> nameMap) {
@@ -61,11 +60,11 @@ public class NameMatchCacheOperationSource implements CacheOperationSource, Seri
 	}
 
 	/**
-	 * Add an attribute for a cacheable method.
-	 * <p>Method names can be exact matches, or of the pattern "xxx*",
-	 * "*xxx" or "*xxx*" for matching multiple methods.
-	 * @param methodName the name of the method
-	 * @param ops operation associated with the method
+	 * 为可缓存方法添加一个属性。
+	 * <p>方法名可以是精确匹配，也可以是 "xxx*"、"*xxx" 或 "*xxx*" 这样的模式，
+	 * 用于匹配多个方法。
+	 * @param methodName 方法的名称
+	 * @param ops 与方法关联的操作
 	 */
 	public void addCacheMethod(String methodName, Collection<CacheOperation> ops) {
 		if (logger.isDebugEnabled()) {
@@ -77,12 +76,12 @@ public class NameMatchCacheOperationSource implements CacheOperationSource, Seri
 	@Override
 	@Nullable
 	public Collection<CacheOperation> getCacheOperations(Method method, @Nullable Class<?> targetClass) {
-		// look for direct name match
+		// 查找直接匹配的名称
 		String methodName = method.getName();
 		Collection<CacheOperation> ops = this.nameMap.get(methodName);
 
 		if (ops == null) {
-			// Look for most specific name match.
+			// 查找最具体的名称匹配。
 			String bestNameMatch = null;
 			for (String mappedName : this.nameMap.keySet()) {
 				if (isMatch(methodName, mappedName)
@@ -97,12 +96,12 @@ public class NameMatchCacheOperationSource implements CacheOperationSource, Seri
 	}
 
 	/**
-	 * Return if the given method name matches the mapped name.
-	 * <p>The default implementation checks for "xxx*", "*xxx" and "*xxx*" matches,
-	 * as well as direct equality. Can be overridden in subclasses.
-	 * @param methodName the method name of the class
-	 * @param mappedName the name in the descriptor
-	 * @return if the names match
+	 * 返回给定的方法名是否与映射的名称匹配。
+	 * <p>默认实现会检查 "xxx*"、"*xxx" 和 "*xxx*" 的匹配，
+	 * 以及直接相等。可以在子类中重写。
+	 * @param methodName 类的方法名称
+	 * @param mappedName 描述符中的名称
+	 * @return 名称是否匹配
 	 * @see org.springframework.util.PatternMatchUtils#simpleMatch(String, String)
 	 */
 	protected boolean isMatch(String methodName, String mappedName) {

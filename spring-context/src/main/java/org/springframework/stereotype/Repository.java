@@ -25,27 +25,21 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Indicates that an annotated class is a "Repository", originally defined by
- * Domain-Driven Design (Evans, 2003) as "a mechanism for encapsulating storage,
- * retrieval, and search behavior which emulates a collection of objects".
+ * 表示被注解的类是一个"Repository"（仓储），最初由领域驱动设计（Evans, 2003）定义为
+ * "一种封装存储、检索和搜索行为的机制，模拟对象集合"。
  *
- * <p>Teams implementing traditional Java EE patterns such as "Data Access Object"
- * may also apply this stereotype to DAO classes, though care should be taken to
- * understand the distinction between Data Access Object and DDD-style repositories
- * before doing so. This annotation is a general-purpose stereotype and individual teams
- * may narrow their semantics and use as appropriate.
+ * <p>实现传统 Java EE 模式（如"Data Access Object"）的团队也可以将此构造型应用于
+ * DAO 类，但在这样做之前应该理解数据访问对象与 DDD 风格仓储之间的区别。
+ * 此注解是一个通用的构造型，各个团队可以根据需要缩小其语义和用法范围。
  *
- * <p>A class thus annotated is eligible for Spring
- * {@link org.springframework.dao.DataAccessException DataAccessException} translation
- * when used in conjunction with a {@link
+ * <p>这样注解的类在与 {@link
  * org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor
- * PersistenceExceptionTranslationPostProcessor}. The annotated class is also clarified as
- * to its role in the overall application architecture for the purpose of tooling,
- * aspects, etc.
+ * PersistenceExceptionTranslationPostProcessor} 结合使用时，符合 Spring
+ * {@link org.springframework.dao.DataAccessException DataAccessException} 翻译的条件。
+ * 被注解的类还可以明确其在整体应用程序架构中的角色，用于工具、切面等目的。
  *
- * <p>As of Spring 2.5, this annotation also serves as a specialization of
- * {@link Component @Component}, allowing for implementation classes to be autodetected
- * through classpath scanning.
+ * <p>从 Spring 2.5 开始，此注解还作为 {@link Component @Component} 的特化，
+ * 允许实现类通过类路径扫描被自动检测。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -62,9 +56,9 @@ import org.springframework.core.annotation.AliasFor;
 public @interface Repository {
 
 	/**
-	 * The value may indicate a suggestion for a logical component name,
-	 * to be turned into a Spring bean in case of an autodetected component.
-	 * @return the suggested component name, if any (or empty String otherwise)
+	 * 该值可能指示逻辑组件名称的建议，
+	 * 在自动检测组件的情况下将转换为 Spring bean。
+	 * @return 建议的组件名称（如果有），否则为空字符串
 	 */
 	@AliasFor(annotation = Component.class)
 	String value() default "";

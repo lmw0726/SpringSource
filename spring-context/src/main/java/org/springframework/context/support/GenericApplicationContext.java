@@ -212,7 +212,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 
 	//---------------------------------------------------------------------
-	// ResourceLoader / ResourcePatternResolver override if necessary
+	// ResourceLoader / ResourcePatternResolver 的必要重写
 	//---------------------------------------------------------------------
 
 	/**
@@ -263,7 +263,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 
 	//---------------------------------------------------------------------
-	// Implementations of AbstractApplicationContext's template methods
+	// AbstractApplicationContext 模板方法的实现
 	//---------------------------------------------------------------------
 
 	/**
@@ -321,7 +321,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 
 	//---------------------------------------------------------------------
-	// Implementation of BeanDefinitionRegistry
+	// BeanDefinitionRegistry 的实现
 	//---------------------------------------------------------------------
 
 	@Override

@@ -17,11 +17,10 @@
 package org.springframework.context.annotation;
 
 /**
- * A {@link Condition} that offers more fine-grained control when used with
- * {@code @Configuration}. Allows certain conditions to adapt when they match
- * based on the configuration phase. For example, a condition that checks if a bean
- * has already been registered might choose to only be evaluated during the
- * {@link ConfigurationPhase#REGISTER_BEAN REGISTER_BEAN} {@link ConfigurationPhase}.
+ * 一个 {@link Condition}，当与 {@code @Configuration} 一起使用时提供更细粒度的控制。
+ * 允许某些条件根据配置阶段（configuration phase）调整其匹配行为。
+ * 例如，一个检查 bean 是否已注册的条件，可能选择仅在
+ * {@link ConfigurationPhase#REGISTER_BEAN REGISTER_BEAN} {@link ConfigurationPhase} 阶段进行求值。
  *
  * @author Phillip Webb
  * @since 4.0
@@ -30,30 +29,26 @@ package org.springframework.context.annotation;
 public interface ConfigurationCondition extends Condition {
 
 	/**
-	 * Return the {@link ConfigurationPhase} in which the condition should be evaluated.
+	 * 返回该条件应被求值的 {@link ConfigurationPhase}。
 	 */
 	ConfigurationPhase getConfigurationPhase();
 
 
 	/**
-	 * The various configuration phases where the condition could be evaluated.
+	 * 条件可能被求值的各种配置阶段。
 	 */
 	enum ConfigurationPhase {
 
 		/**
-		 * The {@link Condition} should be evaluated as a {@code @Configuration}
-		 * class is being parsed.
-		 * <p>If the condition does not match at this point, the {@code @Configuration}
-		 * class will not be added.
+		 * 当 {@code @Configuration} 类正在被解析时，应对 {@link Condition} 进行求值。
+		 * <p>如果此时条件不匹配，则不会添加该 {@code @Configuration} 类。
 		 */
 		PARSE_CONFIGURATION,
 
 		/**
-		 * The {@link Condition} should be evaluated when adding a regular
-		 * (non {@code @Configuration}) bean. The condition will not prevent
-		 * {@code @Configuration} classes from being added.
-		 * <p>At the time that the condition is evaluated, all {@code @Configuration}
-		 * classes will have been parsed.
+		 * 当添加普通（非 {@code @Configuration}）bean 时，应对 {@link Condition} 进行求值。
+		 * 该条件不会阻止 {@code @Configuration} 类被添加。
+		 * <p>在条件被求值时，所有 {@code @Configuration} 类都将已被解析。
 		 */
 		REGISTER_BEAN
 	}

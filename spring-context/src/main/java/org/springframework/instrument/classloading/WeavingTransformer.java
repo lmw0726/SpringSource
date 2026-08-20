@@ -27,11 +27,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * ClassFileTransformer-based weaver, allowing for a list of transformers to be
- * applied on a class byte array. Normally used inside class loaders.
+ * 基于 ClassFileTransformer 的织入器，允许将一系列转换器应用于类的字节数组。
+ * 通常在类加载器内部使用。
  *
- * <p>Note: This class is deliberately implemented for minimal external dependencies,
- * since it is included in weaver jars (to be deployed into application servers).
+ * <p>注意：此类特意设计为尽量减少外部依赖，因为它会被包含在织入器 jar 中
+ * （需要部署到应用服务器中）。
  *
  * @author Rod Johnson
  * @author Costin Leau
@@ -40,6 +40,7 @@ import org.springframework.util.StringUtils;
  */
 public class WeavingTransformer {
 
+
 	@Nullable
 	private final ClassLoader classLoader;
 
@@ -47,8 +48,8 @@ public class WeavingTransformer {
 
 
 	/**
-	 * Create a new WeavingTransformer for the given class loader.
-	 * @param classLoader the ClassLoader to build a transformer for
+	 * 为指定的类加载器创建一个新的 WeavingTransformer。
+	 * @param classLoader 要为其构建转换器的 ClassLoader
 	 */
 	public WeavingTransformer(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
@@ -56,8 +57,8 @@ public class WeavingTransformer {
 
 
 	/**
-	 * Add a class file transformer to be applied by this weaver.
-	 * @param transformer the class file transformer to register
+	 * 添加一个类文件转换器，供此织入器应用。
+	 * @param transformer 要注册的类文件转换器
 	 */
 	public void addTransformer(ClassFileTransformer transformer) {
 		Assert.notNull(transformer, "Transformer must not be null");
@@ -66,12 +67,11 @@ public class WeavingTransformer {
 
 
 	/**
-	 * Apply transformation on a given class byte definition.
-	 * The method will always return a non-null byte array (if no transformation has taken place
-	 * the array content will be identical to the original one).
-	 * @param className the full qualified name of the class in dot format (i.e. some.package.SomeClass)
-	 * @param bytes class byte definition
-	 * @return (possibly transformed) class byte definition
+	 * 对给定的类字节定义应用转换。
+	 * 该方法始终返回一个非空的字节数组（如果未发生转换，数组内容将与原始内容相同）。
+	 * @param className 类的完全限定名，采用点分隔格式（例如 some.package.SomeClass）
+	 * @param bytes 类的字节定义
+	 * @return （可能经过转换的）类字节定义
 	 */
 	public byte[] transformIfNecessary(String className, byte[] bytes) {
 		String internalName = StringUtils.replace(className, ".", "/");
@@ -79,14 +79,13 @@ public class WeavingTransformer {
 	}
 
 	/**
-	 * Apply transformation on a given class byte definition.
-	 * The method will always return a non-null byte array (if no transformation has taken place
-	 * the array content will be identical to the original one).
-	 * @param className the full qualified name of the class in dot format (i.e. some.package.SomeClass)
-	 * @param internalName class name internal name in / format (i.e. some/package/SomeClass)
-	 * @param bytes class byte definition
-	 * @param pd protection domain to be used (can be null)
-	 * @return (possibly transformed) class byte definition
+	 * 对给定的类字节定义应用转换。
+	 * 该方法始终返回一个非空的字节数组（如果未发生转换，数组内容将与原始内容相同）。
+	 * @param className 类的完全限定名，采用点分隔格式（例如 some.package.SomeClass）
+	 * @param internalName 类的内部名称，采用 / 分隔格式（例如 some/package/SomeClass）
+	 * @param bytes 类的字节定义
+	 * @param pd 要使用的保护域（可以为 null）
+	 * @return （可能经过转换的）类字节定义
 	 */
 	public byte[] transformIfNecessary(String className, String internalName, byte[] bytes, @Nullable ProtectionDomain pd) {
 		byte[] result = bytes;

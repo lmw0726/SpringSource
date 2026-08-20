@@ -33,10 +33,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 
 /**
- * Base class for setting up a {@link java.util.concurrent.ExecutorService}
- * (typically a {@link java.util.concurrent.ThreadPoolExecutor} or
- * {@link java.util.concurrent.ScheduledThreadPoolExecutor}).
- * Defines common configuration settings and common lifecycle handling.
+ * 设置 {@link java.util.concurrent.ExecutorService} 的基类
+ * （通常是 {@link java.util.concurrent.ThreadPoolExecutor} 或
+ * {@link java.util.concurrent.ScheduledThreadPoolExecutor}）。
+ * 定义通用配置设置和通用生命周期处理。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -69,15 +69,15 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 
 
 	/**
-	 * Set the ThreadFactory to use for the ExecutorService's thread pool.
-	 * Default is the underlying ExecutorService's default thread factory.
-	 * <p>In a Java EE 7 or other managed environment with JSR-236 support,
-	 * consider specifying a JNDI-located ManagedThreadFactory: by default,
-	 * to be found at "java:comp/DefaultManagedThreadFactory".
-	 * Use the "jee:jndi-lookup" namespace element in XML or the programmatic
-	 * {@link org.springframework.jndi.JndiLocatorDelegate} for convenient lookup.
-	 * Alternatively, consider using Spring's {@link DefaultManagedAwareThreadFactory}
-	 * with its fallback to local threads in case of no managed thread factory found.
+	 * 设置 ExecutorService 线程池使用的 ThreadFactory。
+	 * 默认是底层 ExecutorService 的默认线程工厂。
+	 * <p>在支持 JSR-236 的 Java EE 7 或其他托管环境中，
+	 * 可以考虑指定 JNDI 定位的 ManagedThreadFactory：默认情况下，
+	 * 位于 "java:comp/DefaultManagedThreadFactory"。
+	 * 使用 XML 中的 "jee:jndi-lookup" 命名空间元素或编程式的
+	 * {@link org.springframework.jndi.JndiLocatorDelegate} 进行便捷查找。
+	 * 或者，考虑使用 Spring 的 {@link DefaultManagedAwareThreadFactory}，
+	 * 它可以在找不到托管线程工厂时回退到本地线程。
 	 * @see java.util.concurrent.Executors#defaultThreadFactory()
 	 * @see javax.enterprise.concurrent.ManagedThreadFactory
 	 * @see DefaultManagedAwareThreadFactory
@@ -93,8 +93,8 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Set the RejectedExecutionHandler to use for the ExecutorService.
-	 * Default is the ExecutorService's default abort policy.
+	 * 设置 ExecutorService 使用的 RejectedExecutionHandler。
+	 * 默认是 ExecutorService 的默认终止策略。
 	 * @see java.util.concurrent.ThreadPoolExecutor.AbortPolicy
 	 */
 	public void setRejectedExecutionHandler(@Nullable RejectedExecutionHandler rejectedExecutionHandler) {
@@ -103,17 +103,15 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Set whether to wait for scheduled tasks to complete on shutdown,
-	 * not interrupting running tasks and executing all tasks in the queue.
-	 * <p>Default is "false", shutting down immediately through interrupting
-	 * ongoing tasks and clearing the queue. Switch this flag to "true" if you
-	 * prefer fully completed tasks at the expense of a longer shutdown phase.
-	 * <p>Note that Spring's container shutdown continues while ongoing tasks
-	 * are being completed. If you want this executor to block and wait for the
-	 * termination of tasks before the rest of the container continues to shut
-	 * down - e.g. in order to keep up other resources that your tasks may need -,
-	 * set the {@link #setAwaitTerminationSeconds "awaitTerminationSeconds"}
-	 * property instead of or in addition to this property.
+	 * 设置关闭时是否等待计划任务完成，
+	 * 不中断运行中的任务并执行队列中的所有任务。
+	 * <p>默认为 "false"，通过中断正在执行的任务并清空队列立即关闭。
+	 * 如果您更倾向于完全完成任务但代价是更长的关闭阶段，请将此标志切换为 "true"。
+	 * <p>请注意，Spring 的容器关闭会在正在完成的任务时继续进行。
+	 * 如果您希望此执行器在容器其余部分继续关闭之前阻塞并等待任务终止
+	 * （例如，为了保持任务可能需要的其他资源），
+	 * 请设置 {@link #setAwaitTerminationSeconds "awaitTerminationSeconds"}
+	 * 属性，而不是或除了此属性之外。
 	 * @see java.util.concurrent.ExecutorService#shutdown()
 	 * @see java.util.concurrent.ExecutorService#shutdownNow()
 	 */
@@ -122,25 +120,20 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Set the maximum number of seconds that this executor is supposed to block
-	 * on shutdown in order to wait for remaining tasks to complete their execution
-	 * before the rest of the container continues to shut down. This is particularly
-	 * useful if your remaining tasks are likely to need access to other resources
-	 * that are also managed by the container.
-	 * <p>By default, this executor won't wait for the termination of tasks at all.
-	 * It will either shut down immediately, interrupting ongoing tasks and clearing
-	 * the remaining task queue - or, if the
+	 * 设置此执行器在关闭时应阻塞的最大秒数，
+	 * 以便等待剩余任务完成执行，
+	 * 然后容器的其余部分继续关闭。如果您的剩余任务可能需要访问容器管理的其他资源，则此功能特别有用。
+	 * <p>默认情况下，此执行器根本不会等待任务终止。
+	 * 它将立即关闭，中断正在执行的任务并清空剩余任务队列 - 或者，如果
 	 * {@link #setWaitForTasksToCompleteOnShutdown "waitForTasksToCompleteOnShutdown"}
-	 * flag has been set to {@code true}, it will continue to fully execute all
-	 * ongoing tasks as well as all remaining tasks in the queue, in parallel to
-	 * the rest of the container shutting down.
-	 * <p>In either case, if you specify an await-termination period using this property,
-	 * this executor will wait for the given time (max) for the termination of tasks.
-	 * As a rule of thumb, specify a significantly higher timeout here if you set
-	 * "waitForTasksToCompleteOnShutdown" to {@code true} at the same time,
-	 * since all remaining tasks in the queue will still get executed - in contrast
-	 * to the default shutdown behavior where it's just about waiting for currently
-	 * executing tasks that aren't reacting to thread interruption.
+	 * 标志已设置为 {@code true}，它将继续完全执行所有正在执行的任务以及队列中所有剩余任务，
+	 * 与容器的其余部分关闭并行进行。
+	 * <p>无论哪种情况，如果您使用此属性指定等待终止时间，
+	 * 此执行器将等待给定时间（最大值）以等待任务终止。
+	 * 作为经验法则，如果您同时将 "waitForTasksToCompleteOnShutdown" 设置为 {@code true}，
+	 * 请在此处指定明显更高的超时时间，
+	 * 因为队列中所有剩余任务仍将被执行 - 与默认关闭行为相反，
+	 * 默认行为只是等待当前正在执行且未响应线程中断的任务。
 	 * @see #setAwaitTerminationMillis
 	 * @see java.util.concurrent.ExecutorService#shutdown()
 	 * @see java.util.concurrent.ExecutorService#awaitTermination
@@ -150,7 +143,7 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Variant of {@link #setAwaitTerminationSeconds} with millisecond precision.
+	 * {@link #setAwaitTerminationSeconds} 的毫秒精度变体。
 	 * @since 5.2.4
 	 * @see #setAwaitTerminationSeconds
 	 */
@@ -165,7 +158,7 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 
 
 	/**
-	 * Calls {@code initialize()} after the container applied all property values.
+	 * 在容器应用所有属性值后调用 {@code initialize()}。
 	 * @see #initialize()
 	 */
 	@Override
@@ -174,7 +167,7 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Set up the ExecutorService.
+	 * 设置 ExecutorService。
 	 */
 	public void initialize() {
 		if (logger.isDebugEnabled()) {
@@ -187,11 +180,11 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Create the target {@link java.util.concurrent.ExecutorService} instance.
-	 * Called by {@code afterPropertiesSet}.
-	 * @param threadFactory the ThreadFactory to use
-	 * @param rejectedExecutionHandler the RejectedExecutionHandler to use
-	 * @return a new ExecutorService instance
+	 * 创建目标 {@link java.util.concurrent.ExecutorService} 实例。
+	 * 由 {@code afterPropertiesSet} 调用。
+	 * @param threadFactory 要使用的 ThreadFactory
+	 * @param rejectedExecutionHandler 要使用的 RejectedExecutionHandler
+	 * @return 一个新的 ExecutorService 实例
 	 * @see #afterPropertiesSet()
 	 */
 	protected abstract ExecutorService initializeExecutor(
@@ -199,8 +192,7 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 
 
 	/**
-	 * Calls {@code shutdown} when the BeanFactory destroys
-	 * the task executor instance.
+	 * 当 BeanFactory 销毁任务执行器实例时调用 {@code shutdown}。
 	 * @see #shutdown()
 	 */
 	@Override
@@ -209,7 +201,7 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Perform a shutdown on the underlying ExecutorService.
+	 * 对底层 ExecutorService 执行关闭操作。
 	 * @see java.util.concurrent.ExecutorService#shutdown()
 	 * @see java.util.concurrent.ExecutorService#shutdownNow()
 	 */
@@ -231,9 +223,9 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Cancel the given remaining task which never commended execution,
-	 * as returned from {@link ExecutorService#shutdownNow()}.
-	 * @param task the task to cancel (typically a {@link RunnableFuture})
+	 * 取消给定的剩余任务，该任务从未开始执行，
+	 * 如 {@link ExecutorService#shutdownNow()} 返回的那样。
+	 * @param task 要取消的任务（通常是 {@link RunnableFuture}）
 	 * @since 5.0.5
 	 * @see #shutdown()
 	 * @see RunnableFuture#cancel(boolean)
@@ -245,8 +237,7 @@ public abstract class ExecutorConfigurationSupport extends CustomizableThreadFac
 	}
 
 	/**
-	 * Wait for the executor to terminate, according to the value of the
-	 * {@link #setAwaitTerminationSeconds "awaitTerminationSeconds"} property.
+	 * 等待执行器终止，根据 {@link #setAwaitTerminationSeconds "awaitTerminationSeconds"} 属性的值。
 	 */
 	private void awaitTerminationIfNecessary(ExecutorService executor) {
 		if (this.awaitTerminationMillis > 0) {

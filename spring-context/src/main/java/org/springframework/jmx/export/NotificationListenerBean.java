@@ -23,19 +23,19 @@ import org.springframework.jmx.support.NotificationListenerHolder;
 import org.springframework.util.Assert;
 
 /**
- * Helper class that aggregates a {@link javax.management.NotificationListener},
- * a {@link javax.management.NotificationFilter}, and an arbitrary handback object.
+ * 聚合 {@link javax.management.NotificationListener}、
+ * {@link javax.management.NotificationFilter} 和任意回传对象的辅助类。
  *
- * <p>Also provides support for associating the encapsulated
- * {@link javax.management.NotificationListener} with any number of
- * MBeans from which it wishes to receive
- * {@link javax.management.Notification Notifications} via the
- * {@link #setMappedObjectNames mappedObjectNames} property.
+ * <p>还支持将封装的
+ * {@link javax.management.NotificationListener} 与任意数量的 MBean 关联，
+ * 通过 {@link #setMappedObjectNames mappedObjectNames} 属性
+ * 指定希望从这些 MBean 接收
+ * {@link javax.management.Notification Notifications}。
  *
- * <p>Note: This class supports Spring bean names as
- * {@link #setMappedObjectNames "mappedObjectNames"} as well, as alternative
- * to specifying JMX object names. Note that only beans exported by the
- * same {@link MBeanExporter} are supported for such bean names.
+ * <p>注意：此类还支持使用 Spring bean 名称作为
+ * {@link #setMappedObjectNames "mappedObjectNames"}，作为指定 JMX 对象名称的替代方案。
+ * 请注意，对于此类 bean 名称，仅支持由同一个
+ * {@link MBeanExporter} 导出的 bean。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -45,14 +45,14 @@ import org.springframework.util.Assert;
 public class NotificationListenerBean extends NotificationListenerHolder implements InitializingBean {
 
 	/**
-	 * Create a new instance of the {@link NotificationListenerBean} class.
+	 * 创建 {@link NotificationListenerBean} 类的新实例。
 	 */
 	public NotificationListenerBean() {
 	}
 
 	/**
-	 * Create a new instance of the {@link NotificationListenerBean} class.
-	 * @param notificationListener the encapsulated listener
+	 * 创建 {@link NotificationListenerBean} 类的新实例。
+	 * @param notificationListener 封装的监听器
 	 */
 	public NotificationListenerBean(NotificationListener notificationListener) {
 		Assert.notNull(notificationListener, "NotificationListener must not be null");

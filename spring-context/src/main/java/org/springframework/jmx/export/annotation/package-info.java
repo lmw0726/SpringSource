@@ -1,8 +1,8 @@
 /**
- * Annotations for MBean exposure.
+ * 用于 MBean 暴露的注解。
  *
- * <p>Hooked into Spring's JMX export infrastructure via a special
- * {@link org.springframework.jmx.export.metadata.JmxAttributeSource} implementation.
+ * <p>通过特殊的 {@link org.springframework.jmx.export.metadata.JmxAttributeSource} 实现，
+ * 接入 Spring 的 JMX 导出基础设施。
  */
 @NonNullApi
 @NonNullFields

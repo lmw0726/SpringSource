@@ -41,35 +41,35 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
 
 /**
- * JavaBean that allows for configuring a {@link java.util.concurrent.ThreadPoolExecutor}
- * in bean style (through its "corePoolSize", "maxPoolSize", "keepAliveSeconds", "queueCapacity"
- * properties) and exposing it as a Spring {@link org.springframework.core.task.TaskExecutor}.
- * This class is also well suited for management and monitoring (e.g. through JMX),
- * providing several useful attributes: "corePoolSize", "maxPoolSize", "keepAliveSeconds"
- * (all supporting updates at runtime); "poolSize", "activeCount" (for introspection only).
+ * JavaBean，允许以 Bean 方式配置 {@link java.util.concurrent.ThreadPoolExecutor}
+ * （通过其 "corePoolSize"、"maxPoolSize"、"keepAliveSeconds"、"queueCapacity"
+ * 属性），并将其暴露为 Spring 的 {@link org.springframework.core.task.TaskExecutor}。
+ * 该类也非常适合管理与监控（例如通过 JMX），
+ * 提供了多个有用的属性："corePoolSize"、"maxPoolSize"、"keepAliveSeconds"
+ * （均支持运行时更新）；"poolSize"、"activeCount"（仅用于自省）。
  *
- * <p>The default configuration is a core pool size of 1, with unlimited max pool size
- * and unlimited queue capacity. This is roughly equivalent to
- * {@link java.util.concurrent.Executors#newSingleThreadExecutor()}, sharing a single
- * thread for all tasks. Setting {@link #setQueueCapacity "queueCapacity"} to 0 mimics
- * {@link java.util.concurrent.Executors#newCachedThreadPool()}, with immediate scaling
- * of threads in the pool to a potentially very high number. Consider also setting a
- * {@link #setMaxPoolSize "maxPoolSize"} at that point, as well as possibly a higher
- * {@link #setCorePoolSize "corePoolSize"} (see also the
- * {@link #setAllowCoreThreadTimeOut "allowCoreThreadTimeOut"} mode of scaling).
+ * <p>默认配置为 corePoolSize 为 1，maxPoolSize 无限制，
+ * 队列容量无限制。这大致等同于
+ * {@link java.util.concurrent.Executors#newSingleThreadExecutor()}，即所有任务共享
+ * 单个线程。将 {@link #setQueueCapacity "queueCapacity"} 设置为 0 则模拟
+ * {@link java.util.concurrent.Executors#newCachedThreadPool()}，线程池中的线程会
+ * 立即扩展到可能非常大的数量。此时建议同时设置
+ * {@link #setMaxPoolSize "maxPoolSize"}，以及可能更高的
+ * {@link #setCorePoolSize "corePoolSize"}（另请参阅
+ * {@link #setAllowCoreThreadTimeOut "allowCoreThreadTimeOut"} 的扩展模式）。
  *
- * <p><b>NOTE:</b> This class implements Spring's
- * {@link org.springframework.core.task.TaskExecutor} interface as well as the
- * {@link java.util.concurrent.Executor} interface, with the former being the primary
- * interface, the other just serving as secondary convenience. For this reason, the
- * exception handling follows the TaskExecutor contract rather than the Executor contract,
- * in particular regarding the {@link org.springframework.core.task.TaskRejectedException}.
+ * <p><b>注意：</b>本类实现了 Spring 的
+ * {@link org.springframework.core.task.TaskExecutor} 接口以及
+ * {@link java.util.concurrent.Executor} 接口，其中前者为主接口，
+ * 后者仅作为辅助便利接口。因此，异常处理遵循 TaskExecutor 契约
+ * 而非 Executor 契约，
+ * 特别是在 {@link org.springframework.core.task.TaskRejectedException} 方面。
  *
- * <p>For an alternative, you may set up a ThreadPoolExecutor instance directly using
- * constructor injection, or use a factory method definition that points to the
- * {@link java.util.concurrent.Executors} class. To expose such a raw Executor as a
- * Spring {@link org.springframework.core.task.TaskExecutor}, simply wrap it with a
- * {@link org.springframework.scheduling.concurrent.ConcurrentTaskExecutor} adapter.
+ * <p>作为替代方案，您可以直接通过构造函数注入来配置 ThreadPoolExecutor 实例，
+ * 或者使用指向 {@link java.util.concurrent.Executors} 类的工厂方法定义。
+ * 要将此类原始 Executor 暴露为 Spring
+ * {@link org.springframework.core.task.TaskExecutor}，只需使用
+ * {@link org.springframework.scheduling.concurrent.ConcurrentTaskExecutor} 适配器进行包装即可。
  *
  * @author Juergen Hoeller
  * @author Rémy Guihard
@@ -104,15 +104,15 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	@Nullable
 	private ThreadPoolExecutor threadPoolExecutor;
 
-	// Runnable decorator to user-level FutureTask, if different
+	// Runnable 装饰器到用户级 FutureTask 的映射（如果不同的话）
 	private final Map<Runnable, Object> decoratedTaskMap =
 			new ConcurrentReferenceHashMap<>(16, ConcurrentReferenceHashMap.ReferenceType.WEAK);
 
 
 	/**
-	 * Set the ThreadPoolExecutor's core pool size.
-	 * Default is 1.
-	 * <p><b>This setting can be modified at runtime, for example through JMX.</b>
+	 * 设置 ThreadPoolExecutor 的核心线程池大小。
+	 * 默认值为 1。
+	 * <p><b>此设置可以在运行时修改，例如通过 JMX。</b>
 	 */
 	public void setCorePoolSize(int corePoolSize) {
 		synchronized (this.poolSizeMonitor) {
@@ -124,7 +124,7 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Return the ThreadPoolExecutor's core pool size.
+	 * 返回 ThreadPoolExecutor 的核心线程池大小。
 	 */
 	public int getCorePoolSize() {
 		synchronized (this.poolSizeMonitor) {
@@ -133,9 +133,9 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Set the ThreadPoolExecutor's maximum pool size.
-	 * Default is {@code Integer.MAX_VALUE}.
-	 * <p><b>This setting can be modified at runtime, for example through JMX.</b>
+	 * 设置 ThreadPoolExecutor 的最大线程池大小。
+	 * 默认值为 {@code Integer.MAX_VALUE}。
+	 * <p><b>此设置可以在运行时修改，例如通过 JMX。</b>
 	 */
 	public void setMaxPoolSize(int maxPoolSize) {
 		synchronized (this.poolSizeMonitor) {
@@ -147,7 +147,7 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Return the ThreadPoolExecutor's maximum pool size.
+	 * 返回 ThreadPoolExecutor 的最大线程池大小。
 	 */
 	public int getMaxPoolSize() {
 		synchronized (this.poolSizeMonitor) {
@@ -156,9 +156,9 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Set the ThreadPoolExecutor's keep-alive seconds.
-	 * <p>Default is 60.
-	 * <p><b>This setting can be modified at runtime, for example through JMX.</b>
+	 * 设置 ThreadPoolExecutor 的线程保持活跃时间（秒）。
+	 * <p>默认值为 60。
+	 * <p><b>此设置可以在运行时修改，例如通过 JMX。</b>
 	 */
 	public void setKeepAliveSeconds(int keepAliveSeconds) {
 		synchronized (this.poolSizeMonitor) {
@@ -170,7 +170,7 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Return the ThreadPoolExecutor's keep-alive seconds.
+	 * 返回 ThreadPoolExecutor 的线程保持活跃时间（秒）。
 	 */
 	public int getKeepAliveSeconds() {
 		synchronized (this.poolSizeMonitor) {
@@ -179,10 +179,10 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Set the capacity for the ThreadPoolExecutor's BlockingQueue.
-	 * <p>Default is {@code Integer.MAX_VALUE}.
-	 * <p>Any positive value will lead to a LinkedBlockingQueue instance;
-	 * any other value will lead to a SynchronousQueue instance.
+	 * 设置 ThreadPoolExecutor 的 BlockingQueue 容量。
+	 * <p>默认值为 {@code Integer.MAX_VALUE}。
+	 * <p>任何正数值将创建 LinkedBlockingQueue 实例；
+	 * 其他值将创建 SynchronousQueue 实例。
 	 * @see java.util.concurrent.LinkedBlockingQueue
 	 * @see java.util.concurrent.SynchronousQueue
 	 */
@@ -191,7 +191,7 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Return the capacity for the ThreadPoolExecutor's BlockingQueue.
+	 * 返回 ThreadPoolExecutor 的 BlockingQueue 容量。
 	 * @since 5.3.21
 	 * @see #setQueueCapacity(int)
 	 */
@@ -200,10 +200,9 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Specify whether to allow core threads to time out. This enables dynamic
-	 * growing and shrinking even in combination with a non-zero queue (since
-	 * the max pool size will only grow once the queue is full).
-	 * <p>Default is "false".
+	 * 指定是否允许核心线程超时。这使得即使在非零队列的情况下也能
+	 * 动态扩展和收缩（因为最大线程池大小仅在队列满时才会增长）。
+	 * <p>默认值为 "false"。
 	 * @see java.util.concurrent.ThreadPoolExecutor#allowCoreThreadTimeOut(boolean)
 	 */
 	public void setAllowCoreThreadTimeOut(boolean allowCoreThreadTimeOut) {
@@ -211,8 +210,8 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Specify whether to start all core threads, causing them to idly wait for work.
-	 * <p>Default is "false".
+	 * 指定是否启动所有核心线程，使其空闲等待工作。
+	 * <p>默认值为 "false"。
 	 * @since 5.3.14
 	 * @see java.util.concurrent.ThreadPoolExecutor#prestartAllCoreThreads
 	 */
@@ -221,20 +220,18 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Specify a custom {@link TaskDecorator} to be applied to any {@link Runnable}
-	 * about to be executed.
-	 * <p>Note that such a decorator is not necessarily being applied to the
-	 * user-supplied {@code Runnable}/{@code Callable} but rather to the actual
-	 * execution callback (which may be a wrapper around the user-supplied task).
-	 * <p>The primary use case is to set some execution context around the task's
-	 * invocation, or to provide some monitoring/statistics for task execution.
-	 * <p><b>NOTE:</b> Exception handling in {@code TaskDecorator} implementations
-	 * is limited to plain {@code Runnable} execution via {@code execute} calls.
-	 * In case of {@code #submit} calls, the exposed {@code Runnable} will be a
-	 * {@code FutureTask} which does not propagate any exceptions; you might
-	 * have to cast it and call {@code Future#get} to evaluate exceptions.
-	 * See the {@code ThreadPoolExecutor#afterExecute} javadoc for an example
-	 * of how to access exceptions in such a {@code Future} case.
+	 * 指定一个自定义 {@link TaskDecorator}，应用于即将执行的任何 {@link Runnable}。
+	 * <p>请注意，该装饰器不一定应用于用户提供的 {@code Runnable}/{@code Callable}，
+	 * 而是应用于实际的执行回调（它可能是用户所提供任务的包装器）。
+	 * <p>主要用例是在任务调用前后设置执行上下文，
+	 * 或为任务执行提供监控/统计功能。
+	 * <p><b>注意：</b>{@code TaskDecorator} 实现中的异常处理
+	 * 仅限于通过 {@code execute} 调用执行的普通 {@code Runnable}。
+	 * 在 {@code #submit} 调用的情况下，暴露的 {@code Runnable} 将是一个
+	 * {@code FutureTask}，它不会传播任何异常；您可能需要
+	 * 进行类型转换并调用 {@code Future#get} 来评估异常。
+	 * 有关如何在 {@code Future} 情况下访问异常的示例，
+	 * 请参阅 {@code ThreadPoolExecutor#afterExecute} 的 Javadoc。
 	 * @since 4.3
 	 */
 	public void setTaskDecorator(TaskDecorator taskDecorator) {
@@ -243,10 +240,10 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 
 
 	/**
-	 * Note: This method exposes an {@link ExecutorService} to its base class
-	 * but stores the actual {@link ThreadPoolExecutor} handle internally.
-	 * Do not override this method for replacing the executor, rather just for
-	 * decorating its {@code ExecutorService} handle or storing custom state.
+	 * 注意：此方法将 {@link ExecutorService} 暴露给其基类，
+	 * 但在内部存储实际的 {@link ThreadPoolExecutor} 句柄。
+	 * 不要重写此方法来替换执行器，而仅用于
+	 * 装饰其 {@code ExecutorService} 句柄或存储自定义状态。
 	 */
 	@Override
 	protected ExecutorService initializeExecutor(
@@ -288,11 +285,11 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Create the BlockingQueue to use for the ThreadPoolExecutor.
-	 * <p>A LinkedBlockingQueue instance will be created for a positive
-	 * capacity value; a SynchronousQueue else.
-	 * @param queueCapacity the specified queue capacity
-	 * @return the BlockingQueue instance
+	 * 创建供 ThreadPoolExecutor 使用的 BlockingQueue。
+	 * <p>当容量值为正数时将创建 LinkedBlockingQueue 实例；
+	 * 否则创建 SynchronousQueue 实例。
+	 * @param queueCapacity 指定的队列容量
+	 * @return BlockingQueue 实例
 	 * @see java.util.concurrent.LinkedBlockingQueue
 	 * @see java.util.concurrent.SynchronousQueue
 	 */
@@ -306,9 +303,9 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Return the underlying ThreadPoolExecutor for native access.
-	 * @return the underlying ThreadPoolExecutor (never {@code null})
-	 * @throws IllegalStateException if the ThreadPoolTaskExecutor hasn't been initialized yet
+	 * 返回底层的 ThreadPoolExecutor 以进行原生访问。
+	 * @return 底层的 ThreadPoolExecutor（不为 {@code null}）
+	 * @throws IllegalStateException 如果 ThreadPoolTaskExecutor 尚未初始化
 	 */
 	public ThreadPoolExecutor getThreadPoolExecutor() throws IllegalStateException {
 		Assert.state(this.threadPoolExecutor != null, "ThreadPoolTaskExecutor not initialized");
@@ -316,37 +313,37 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	}
 
 	/**
-	 * Return the current pool size.
+	 * 返回当前线程池大小。
 	 * @see java.util.concurrent.ThreadPoolExecutor#getPoolSize()
 	 */
 	public int getPoolSize() {
 		if (this.threadPoolExecutor == null) {
-			// Not initialized yet: assume core pool size.
+			// 尚未初始化：假设为核心线程池大小。
 			return this.corePoolSize;
 		}
 		return this.threadPoolExecutor.getPoolSize();
 	}
 
 	/**
-	 * Return the current queue size.
+	 * 返回当前队列大小。
 	 * @since 5.3.21
 	 * @see java.util.concurrent.ThreadPoolExecutor#getQueue()
 	 */
 	public int getQueueSize() {
 		if (this.threadPoolExecutor == null) {
-			// Not initialized yet: assume no queued tasks.
+			// 尚未初始化：假设没有排队任务。
 			return 0;
 		}
 		return this.threadPoolExecutor.getQueue().size();
 	}
 
 	/**
-	 * Return the number of currently active threads.
+	 * 返回当前活跃线程数。
 	 * @see java.util.concurrent.ThreadPoolExecutor#getActiveCount()
 	 */
 	public int getActiveCount() {
 		if (this.threadPoolExecutor == null) {
-			// Not initialized yet: assume no active threads.
+			// 尚未初始化：假设没有活跃线程。
 			return 0;
 		}
 		return this.threadPoolExecutor.getActiveCount();
@@ -421,7 +418,7 @@ public class ThreadPoolTaskExecutor extends ExecutorConfigurationSupport
 	@Override
 	protected void cancelRemainingTask(Runnable task) {
 		super.cancelRemainingTask(task);
-		// Cancel associated user-level Future handle as well
+		// 同时取消关联的用户级 Future 句柄
 		Object original = this.decoratedTaskMap.get(task);
 		if (original instanceof Future) {
 			((Future<?>) original).cancel(true);

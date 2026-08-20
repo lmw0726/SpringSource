@@ -24,8 +24,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.lang.Nullable;
 
 /**
- * A {@link CacheResolver} that forces the resolution to a configurable
- * collection of name(s) against a given {@link CacheManager}.
+ * 强制针对给定的 {@link CacheManager} 对一组可配置的名称进行解析的 {@link CacheResolver}。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -46,7 +45,7 @@ public class NamedCacheResolver extends AbstractCacheResolver {
 
 
 	/**
-	 * Set the cache name(s) that this resolver should use.
+	 * 设置此解析器应使用的缓存名称（一个或多个）。
 	 */
 	public void setCacheNames(Collection<String> cacheNames) {
 		this.cacheNames = cacheNames;

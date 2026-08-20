@@ -35,22 +35,22 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * {@link org.springframework.beans.factory.FactoryBean} that creates a simple
- * HTTP server, based on the HTTP server that is included in Sun's JRE 1.6.
- * Starts the HTTP server on initialization and stops it on destruction.
- * Exposes the resulting {@link com.sun.net.httpserver.HttpServer} object.
+ * 基于 Sun JRE 1.6 中内置的 HTTP 服务器创建简单 HTTP 服务器的
+ * {@link org.springframework.beans.factory.FactoryBean}。
+ * 在初始化时启动 HTTP 服务器，在销毁时停止它。
+ * 公开生成的 {@link com.sun.net.httpserver.HttpServer} 对象。
  *
- * <p>Allows for registering {@link com.sun.net.httpserver.HttpHandler HttpHandlers}
- * for specific {@link #setContexts context paths}. Alternatively,
- * register such context-specific handlers programmatically on the
- * {@link com.sun.net.httpserver.HttpServer} itself.
+ * <p>允许为特定的 {@link #setContexts 上下文路径}注册
+ * {@link com.sun.net.httpserver.HttpHandler HttpHandler}。
+ * 或者，也可以在 {@link com.sun.net.httpserver.HttpServer} 本身上
+ * 以编程方式注册此类特定于上下文的处理器。
  *
  * @author Juergen Hoeller
  * @author Arjen Poutsma
  * @since 2.5.1
  * @see #setPort
  * @see #setContexts
- * @deprecated as of Spring Framework 5.1, in favor of embedded Tomcat/Jetty/Undertow
+ * @deprecated 从 Spring Framework 5.1 开始弃用，建议使用内嵌的 Tomcat/Jetty/Undertow
  */
 @Deprecated
 @org.springframework.lang.UsesSunHttpServer
@@ -78,38 +78,37 @@ public class SimpleHttpServerFactoryBean implements FactoryBean<HttpServer>, Ini
 
 
 	/**
-	 * Specify the HTTP server's port. Default is 8080.
+	 * 指定 HTTP 服务器的端口。默认值为 8080。
 	 */
 	public void setPort(int port) {
 		this.port = port;
 	}
 
 	/**
-	 * Specify the HTTP server's hostname to bind to. Default is localhost;
-	 * can be overridden with a specific network address to bind to.
+	 * 指定 HTTP 服务器要绑定的主机名。默认为 localhost；
+	 * 可以用特定的网络地址来覆盖，以绑定到指定地址。
 	 */
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
 	}
 
 	/**
-	 * Specify the HTTP server's TCP backlog. Default is -1,
-	 * indicating the system's default value.
+	 * 指定 HTTP 服务器的 TCP backlog 值。默认值为 -1，
+	 * 表示使用系统默认值。
 	 */
 	public void setBacklog(int backlog) {
 		this.backlog = backlog;
 	}
 
 	/**
-	 * Specify the number of seconds to wait until HTTP exchanges have
-	 * completed when shutting down the HTTP server. Default is 0.
+	 * 指定在关闭 HTTP 服务器时等待 HTTP 交换完成的秒数。默认值为 0。
 	 */
 	public void setShutdownDelay(int shutdownDelay) {
 		this.shutdownDelay = shutdownDelay;
 	}
 
 	/**
-	 * Set the JDK concurrent executor to use for dispatching incoming requests.
+	 * 设置用于分发传入请求的 JDK 并发执行器。
 	 * @see com.sun.net.httpserver.HttpServer#setExecutor
 	 */
 	public void setExecutor(Executor executor) {
@@ -117,10 +116,8 @@ public class SimpleHttpServerFactoryBean implements FactoryBean<HttpServer>, Ini
 	}
 
 	/**
-	 * Register {@link com.sun.net.httpserver.HttpHandler HttpHandlers}
-	 * for specific context paths.
-	 * @param contexts a Map with context paths as keys and HttpHandler
-	 * objects as values
+	 * 为特定上下文路径注册 {@link com.sun.net.httpserver.HttpHandler HttpHandler}。
+	 * @param contexts 以上下文路径为键、HttpHandler 对象为值的 Map
 	 * @see org.springframework.remoting.httpinvoker.SimpleHttpInvokerServiceExporter
 	 * @see org.springframework.remoting.caucho.SimpleHessianServiceExporter
 	 */
@@ -129,16 +126,16 @@ public class SimpleHttpServerFactoryBean implements FactoryBean<HttpServer>, Ini
 	}
 
 	/**
-	 * Register common {@link com.sun.net.httpserver.Filter Filters} to be
-	 * applied to all locally registered {@link #setContexts contexts}.
+	 * 注册要应用于所有本地注册的 {@link #setContexts 上下文}的通用
+	 * {@link com.sun.net.httpserver.Filter 过滤器}。
 	 */
 	public void setFilters(List<Filter> filters) {
 		this.filters = filters;
 	}
 
 	/**
-	 * Register a common {@link com.sun.net.httpserver.Authenticator} to be
-	 * applied to all locally registered {@link #setContexts contexts}.
+	 * 注册要应用于所有本地注册的 {@link #setContexts 上下文}的通用
+	 * {@link com.sun.net.httpserver.Authenticator 验证器}。
 	 */
 	public void setAuthenticator(Authenticator authenticator) {
 		this.authenticator = authenticator;

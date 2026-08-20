@@ -25,7 +25,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 
 /**
- * Parser for the 'executor' element of the 'task' namespace.
+ * task 命名空间下 'executor' 元素的解析器。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller

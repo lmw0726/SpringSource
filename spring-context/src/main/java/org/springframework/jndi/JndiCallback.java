@@ -22,17 +22,15 @@ import javax.naming.NamingException;
 import org.springframework.lang.Nullable;
 
 /**
- * Callback interface to be implemented by classes that need to perform an
- * operation (such as a lookup) in a JNDI context. This callback approach
- * is valuable in simplifying error handling, which is performed by the
- * JndiTemplate class. This is a similar to JdbcTemplate's approach.
+ * 需要在 JNDI 上下文中执行操作（如查找）的类应实现的回调接口。
+ * 这种回调方式有助于简化错误处理，由 JndiTemplate 类来完成。
+ * 这与 JdbcTemplate 的处理方式类似。
  *
- * <p>Note that there is hardly any need to implement this callback
- * interface, as JndiTemplate provides all usual JNDI operations via
- * convenience methods.
+ * <p>注意，几乎不需要实现此回调接口，因为 JndiTemplate 已通过
+ * 便捷方法提供了所有常用的 JNDI 操作。
  *
  * @author Rod Johnson
- * @param <T> the resulting object type
+ * @param <T> 返回结果的对象类型
  * @see JndiTemplate
  * @see org.springframework.jdbc.core.JdbcTemplate
  */
@@ -40,12 +38,11 @@ import org.springframework.lang.Nullable;
 public interface JndiCallback<T> {
 
 	/**
-	 * Do something with the given JNDI context.
-	 * <p>Implementations don't need to worry about error handling
-	 * or cleanup, as the JndiTemplate class will handle this.
-	 * @param ctx the current JNDI context
-	 * @return a result object, or {@code null}
-	 * @throws NamingException if thrown by JNDI methods
+	 * 在给定的 JNDI 上下文中执行某些操作。
+	 * <p>实现类无需担心错误处理或资源清理，JndiTemplate 类会处理这些事项。
+	 * @param ctx 当前 JNDI 上下文
+	 * @return 结果对象，或 {@code null}
+	 * @throws NamingException 若 JNDI 方法抛出异常
 	 */
 	@Nullable
 	T doInContext(Context ctx) throws NamingException;

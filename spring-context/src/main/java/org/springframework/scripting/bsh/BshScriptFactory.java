@@ -30,12 +30,10 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * {@link org.springframework.scripting.ScriptFactory} implementation
- * for a BeanShell script.
+ * BeanShell 脚本的 {@link org.springframework.scripting.ScriptFactory} 实现。
  *
- * <p>Typically used in combination with a
- * {@link org.springframework.scripting.support.ScriptFactoryPostProcessor};
- * see the latter's javadoc for a configuration example.
+ * <p>通常与 {@link org.springframework.scripting.support.ScriptFactoryPostProcessor} 配合使用；
+ * 请参阅后者的 javadoc 了解配置示例。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -62,11 +60,9 @@ public class BshScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 
 
 	/**
-	 * Create a new BshScriptFactory for the given script source.
-	 * <p>With this {@code BshScriptFactory} variant, the script needs to
-	 * declare a full class or return an actual instance of the scripted object.
-	 * @param scriptSourceLocator a locator that points to the source of the script.
-	 * Interpreted by the post-processor that actually creates the script.
+	 * 为给定的脚本源创建一个新的 BshScriptFactory。
+	 * <p>使用此 {@code BshScriptFactory} 变体时，脚本需要声明一个完整的类或返回脚本化对象的实际实例。
+	 * @param scriptSourceLocator 指向脚本源的定位器。由实际创建脚本的后处理器解释。
 	 */
 	public BshScriptFactory(String scriptSourceLocator) {
 		Assert.hasText(scriptSourceLocator, "'scriptSourceLocator' must not be empty");
@@ -75,15 +71,11 @@ public class BshScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 	}
 
 	/**
-	 * Create a new BshScriptFactory for the given script source.
-	 * <p>The script may either be a simple script that needs a corresponding proxy
-	 * generated (implementing the specified interfaces), or declare a full class
-	 * or return an actual instance of the scripted object (in which case the
-	 * specified interfaces, if any, need to be implemented by that class/instance).
-	 * @param scriptSourceLocator a locator that points to the source of the script.
-	 * Interpreted by the post-processor that actually creates the script.
-	 * @param scriptInterfaces the Java interfaces that the scripted object
-	 * is supposed to implement (may be {@code null})
+	 * 为给定的脚本源创建一个新的 BshScriptFactory。
+	 * <p>脚本可以是需要生成相应代理（实现指定接口）的简单脚本，也可以声明一个完整的类或返回脚本化对象的实际实例
+	 * （在这种情况下，指定的接口（如果有）需要由该类/实例实现）。
+	 * @param scriptSourceLocator 指向脚本源的定位器。由实际创建脚本的后处理器解释。
+	 * @param scriptInterfaces 脚本化对象应实现的 Java 接口（可以为 {@code null}）
 	 */
 	public BshScriptFactory(String scriptSourceLocator, @Nullable Class<?>... scriptInterfaces) {
 		Assert.hasText(scriptSourceLocator, "'scriptSourceLocator' must not be empty");
@@ -110,7 +102,7 @@ public class BshScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 	}
 
 	/**
-	 * BeanShell scripts do require a config interface.
+	 * BeanShell 脚本确实需要配置接口。
 	 */
 	@Override
 	public boolean requiresConfigInterface() {
@@ -118,7 +110,7 @@ public class BshScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 	}
 
 	/**
-	 * Load and parse the BeanShell script via {@link BshScriptUtils}.
+	 * 通过 {@link BshScriptUtils} 加载并解析 BeanShell 脚本。
 	 * @see BshScriptUtils#createBshObject(String, Class[], ClassLoader)
 	 */
 	@Override
@@ -134,19 +126,17 @@ public class BshScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 				this.wasModifiedForTypeCheck = false;
 
 				if (scriptSource.isModified() || requiresScriptEvaluation) {
-					// New script content: Let's check whether it evaluates to a Class.
+					// 新脚本内容：让我们检查它是否解析为一个 Class。
 					Object result = BshScriptUtils.evaluateBshScript(
 							scriptSource.getScriptAsString(), actualInterfaces, this.beanClassLoader);
 					if (result instanceof Class) {
-						// A Class: We'll cache the Class here and create an instance
-						// outside of the synchronized block.
+						// 一个 Class：我们将在此处缓存这个 Class，并在同步块外创建实例。
 						this.scriptClass = (Class<?>) result;
 					}
 					else {
-						// Not a Class: OK, we'll simply create BeanShell objects
-						// through evaluating the script for every call later on.
-						// For this first-time check, let's simply return the
-						// already evaluated object.
+						// 不是一个 Class：好的，我们将在后续每次调用时
+						// 通过评估脚本简单地创建 BeanShell 对象。
+						// 对于这个首次检查，我们只需返回已评估的对象。
 						return result;
 					}
 				}
@@ -159,7 +149,7 @@ public class BshScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 		}
 
 		if (clazz != null) {
-			// A Class: We need to create an instance for every call.
+			// 一个 Class：我们需要为每次调用创建一个实例。
 			try {
 				return ReflectionUtils.accessibleConstructor(clazz).newInstance();
 			}
@@ -169,7 +159,7 @@ public class BshScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 			}
 		}
 		else {
-			// Not a Class: We need to evaluate the script for every call.
+			// 不是一个 Class：我们需要为每次调用评估脚本。
 			try {
 				return BshScriptUtils.createBshObject(
 						scriptSource.getScriptAsString(), actualInterfaces, this.beanClassLoader);
@@ -188,7 +178,7 @@ public class BshScriptFactory implements ScriptFactory, BeanClassLoaderAware {
 		synchronized (this.scriptClassMonitor) {
 			try {
 				if (scriptSource.isModified()) {
-					// New script content: Let's check whether it evaluates to a Class.
+					// 新脚本内容：让我们检查它是否解析为一个 Class。
 					this.wasModifiedForTypeCheck = true;
 					this.scriptClass = BshScriptUtils.determineBshObjectType(
 							scriptSource.getScriptAsString(), this.beanClassLoader);

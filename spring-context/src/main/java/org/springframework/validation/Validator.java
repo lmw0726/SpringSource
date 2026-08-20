@@ -17,21 +17,16 @@
 package org.springframework.validation;
 
 /**
- * A validator for application-specific objects.
+ * 针对应用程序特定对象的验证器。
  *
- * <p>This interface is totally divorced from any infrastructure
- * or context; that is to say it is not coupled to validating
- * only objects in the web tier, the data-access tier, or the
- * whatever-tier. As such it is amenable to being used in any layer
- * of an application, and supports the encapsulation of validation
- * logic as a first-class citizen in its own right.
+ * <p>该接口完全独立于任何基础设施或上下文；也就是说，它不与仅验证
+ * Web 层、数据访问层或其他任何特定层的对象耦合。因此，它适用于
+ * 应用程序的任何层，并支持将验证逻辑作为一等公民进行封装。
  *
- * <p>Find below a simple but complete {@code Validator}
- * implementation, which validates that the various {@link String}
- * properties of a {@code UserLogin} instance are not empty
- * (that is they are not {@code null} and do not consist
- * wholly of whitespace), and that any password that is present is
- * at least {@code 'MINIMUM_PASSWORD_LENGTH'} characters in length.
+ * <p>下面是一个简单但完整的 {@code Validator} 实现示例，
+ * 它验证 {@code UserLogin} 实例的各个 {@link String} 属性
+ * 不为空（即不为 {@code null} 且不完全由空白字符组成），
+ * 并且任何存在的密码长度至少为 {@code 'MINIMUM_PASSWORD_LENGTH'} 个字符。
  *
  * <pre class="code">public class UserLoginValidator implements Validator {
  *
@@ -54,9 +49,8 @@ package org.springframework.validation;
  *    }
  * }</pre>
  *
- * <p>See also the Spring reference manual for a fuller discussion of
- * the {@code Validator} interface and its role in an enterprise
- * application.
+ * <p>另请参阅 Spring 参考手册，其中更全面地讨论了
+ * {@code Validator} 接口及其在企业应用程序中的作用。
  *
  * @author Rod Johnson
  * @see SmartValidator
@@ -66,28 +60,25 @@ package org.springframework.validation;
 public interface Validator {
 
 	/**
-	 * Can this {@link Validator} {@link #validate(Object, Errors) validate}
-	 * instances of the supplied {@code clazz}?
-	 * <p>This method is <i>typically</i> implemented like so:
+	 * 此 {@link Validator} 能否对传入的 {@code clazz} 实例
+	 * 进行 {@link #validate(Object, Errors) 验证}？
+	 * <p>此方法的实现<i>通常</i>如下所示：
 	 * <pre class="code">return Foo.class.isAssignableFrom(clazz);</pre>
-	 * (Where {@code Foo} is the class (or superclass) of the actual
-	 * object instance that is to be {@link #validate(Object, Errors) validated}.)
-	 * @param clazz the {@link Class} that this {@link Validator} is
-	 * being asked if it can {@link #validate(Object, Errors) validate}
-	 * @return {@code true} if this {@link Validator} can indeed
-	 * {@link #validate(Object, Errors) validate} instances of the
-	 * supplied {@code clazz}
+	 * （其中 {@code Foo} 是将要被 {@link #validate(Object, Errors) 验证} 的
+	 * 实际对象实例的类（或超类）。）
+	 * @param clazz 被询问此 {@link Validator} 能否 {@link #validate(Object, Errors) 验证} 的 {@link Class}
+	 * @return 如果此 {@link Validator} 确实能够
+	 * {@link #validate(Object, Errors) 验证} 传入的 {@code clazz} 实例，则返回 {@code true}
 	 */
 	boolean supports(Class<?> clazz);
 
 	/**
-	 * Validate the supplied {@code target} object, which must be
-	 * of a {@link Class} for which the {@link #supports(Class)} method
-	 * typically has (or would) return {@code true}.
-	 * <p>The supplied {@link Errors errors} instance can be used to report
-	 * any resulting validation errors.
-	 * @param target the object that is to be validated
-	 * @param errors contextual state about the validation process
+	 * 验证传入的 {@code target} 对象，该对象必须属于
+	 * {@link #supports(Class)} 方法通常会（或将会）返回 {@code true} 的 {@link Class}。
+	 * <p>传入的 {@link Errors errors} 实例可用于报告
+	 * 产生的任何验证错误。
+	 * @param target 要验证的对象
+	 * @param errors 关于验证过程的上下文状态
 	 * @see ValidationUtils
 	 */
 	void validate(Object target, Errors errors);

@@ -23,14 +23,12 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Default {@link BindingErrorProcessor} implementation.
+ * {@link BindingErrorProcessor} 的默认实现。
  *
- * <p>Uses the "required" error code and the field name to resolve message codes
- * for a missing field error.
+ * <p>使用"required"错误码和字段名来解析字段缺失错误的消息码。
  *
- * <p>Creates a {@code FieldError} for each {@code PropertyAccessException}
- * given, using the {@code PropertyAccessException}'s error code ("typeMismatch",
- * "methodInvocation") for resolving message codes.
+ * <p>为给定的每个 {@code PropertyAccessException} 创建一个 {@code FieldError}，
+ * 使用该异常的错误码（"typeMismatch"、"methodInvocation"）来解析消息码。
  *
  * @author Alef Arendsen
  * @author Juergen Hoeller
@@ -46,16 +44,14 @@ import org.springframework.util.StringUtils;
 public class DefaultBindingErrorProcessor implements BindingErrorProcessor {
 
 	/**
-	 * Error code that a missing field error (i.e. a required field not
-	 * found in the list of property values) will be registered with:
-	 * "required".
+	 * 字段缺失错误（即在属性值列表中未找到的必填字段）将使用此错误码进行注册："required"。
 	 */
 	public static final String MISSING_FIELD_ERROR_CODE = "required";
 
 
 	@Override
 	public void processMissingFieldError(String missingField, BindingResult bindingResult) {
-		// Create field error with code "required".
+		// 使用"required"错误码创建字段错误。
 		String fixedField = bindingResult.getNestedPath() + missingField;
 		String[] codes = bindingResult.resolveMessageCodes(MISSING_FIELD_ERROR_CODE, missingField);
 		Object[] arguments = getArgumentsForBindError(bindingResult.getObjectName(), fixedField);
@@ -66,7 +62,7 @@ public class DefaultBindingErrorProcessor implements BindingErrorProcessor {
 
 	@Override
 	public void processPropertyAccessException(PropertyAccessException ex, BindingResult bindingResult) {
-		// Create field error with the exceptions's code, e.g. "typeMismatch".
+		// 使用异常的错误码（例如"typeMismatch"）创建字段错误。
 		String field = ex.getPropertyName();
 		Assert.state(field != null, "No field in exception");
 		String[] codes = bindingResult.resolveMessageCodes(ex.getErrorCode(), field);
@@ -82,13 +78,13 @@ public class DefaultBindingErrorProcessor implements BindingErrorProcessor {
 	}
 
 	/**
-	 * Return FieldError arguments for a binding error on the given field.
-	 * Invoked for each missing required field and each type mismatch.
-	 * <p>The default implementation returns a single argument indicating the field name
-	 * (of type DefaultMessageSourceResolvable, with "objectName.field" and "field" as codes).
-	 * @param objectName the name of the target object
-	 * @param field the field that caused the binding error
-	 * @return the Object array that represents the FieldError arguments
+	 * 返回给定字段绑定错误的 FieldError 参数。
+	 * 对每个缺失的必填字段和每个类型不匹配的情况都会调用此方法。
+	 * <p>默认实现返回一个参数，表示字段名
+	 * （类型为 DefaultMessageSourceResolvable，使用 "objectName.field" 和 "field" 作为码）。
+	 * @param objectName 目标对象的名称
+	 * @param field 导致绑定错误的字段
+	 * @return 表示 FieldError 参数的 Object 数组
 	 * @see org.springframework.validation.FieldError#getArguments
 	 * @see org.springframework.context.support.DefaultMessageSourceResolvable
 	 */

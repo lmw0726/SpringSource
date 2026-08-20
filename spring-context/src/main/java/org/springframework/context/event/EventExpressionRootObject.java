@@ -19,7 +19,7 @@ package org.springframework.context.event;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * Root object used during event listener expression evaluation.
+ * 事件监听器表达式求值过程中使用的根对象。
  *
  * @author Stephane Nicoll
  * @since 4.2

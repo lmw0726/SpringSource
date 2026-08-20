@@ -19,11 +19,10 @@ package org.springframework.remoting.support;
 import org.aopalliance.intercept.MethodInvocation;
 
 /**
- * Strategy interface for creating a {@link RemoteInvocation} from an AOP Alliance
- * {@link org.aopalliance.intercept.MethodInvocation}.
+ * 从 AOP Alliance {@link org.aopalliance.intercept.MethodInvocation} 创建 {@link RemoteInvocation} 的策略接口。
  *
- * <p>Used by {@link org.springframework.remoting.rmi.RmiClientInterceptor} (for RMI invokers)
- * and by {@link org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor}.
+ * <p>被 {@link org.springframework.remoting.rmi.RmiClientInterceptor}（用于 RMI 调用器）
+ * 和 {@link org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor} 使用。
  *
  * @author Juergen Hoeller
  * @since 1.1
@@ -34,12 +33,10 @@ import org.aopalliance.intercept.MethodInvocation;
 public interface RemoteInvocationFactory {
 
 	/**
-	 * Create a serializable RemoteInvocation object from the given AOP
-	 * MethodInvocation.
-	 * <p>Can be implemented to add custom context information to the
-	 * remote invocation, for example user credentials.
-	 * @param methodInvocation the original AOP MethodInvocation object
-	 * @return the RemoteInvocation object
+	 * 从给定的 AOP MethodInvocation 创建一个可序列化的 RemoteInvocation 对象。
+	 * <p>可以实现来向远程调用添加自定义上下文信息，例如用户凭证。
+	 * @param methodInvocation 原始的 AOP MethodInvocation 对象
+	 * @return RemoteInvocation 对象
 	 */
 	RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation);
 

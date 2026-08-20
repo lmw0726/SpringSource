@@ -37,19 +37,15 @@ import org.springframework.jmx.support.JmxUtils;
 import org.springframework.lang.Nullable;
 
 /**
- * Builds on the {@link AbstractMBeanInfoAssembler} superclass to
- * add a basic algorithm for building metadata based on the
- * reflective metadata of the MBean class.
+ * 基于 {@link AbstractMBeanInfoAssembler} 父类构建，添加了基于 MBean 类的
+ * 反射元数据来构建元数据的基本算法。
  *
- * <p>The logic for creating MBean metadata from the reflective metadata
- * is contained in this class, but this class makes no decisions as to
- * which methods and properties are to be exposed. Instead it gives
- * subclasses a chance to 'vote' on each property or method through
- * the {@code includeXXX} methods.
+ * <p>从反射元数据创建 MBean 元数据的逻辑包含在此类中，但此类不会决定
+ * 哪些方法和属性需要暴露。而是通过 {@code includeXXX} 方法让子类有机会
+ * 对每个属性或方法进行"投票"。
  *
- * <p>Subclasses are also given the opportunity to populate attribute
- * and operation metadata with additional descriptors once the metadata
- * is assembled through the {@code populateXXXDescriptor} methods.
+ * <p>元数据组装完成后，子类还可以通过 {@code populateXXXDescriptor} 方法
+ * 为属性和操作元数据填充额外的描述符。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -64,120 +60,119 @@ import org.springframework.lang.Nullable;
 public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBeanInfoAssembler {
 
 	/**
-	 * Identifies a getter method in a JMX {@link Descriptor}.
+	 * 在 JMX {@link Descriptor} 中标识 getter 方法。
 	 */
 	protected static final String FIELD_GET_METHOD = "getMethod";
 
 	/**
-	 * Identifies a setter method in a JMX {@link Descriptor}.
+	 * 在 JMX {@link Descriptor} 中标识 setter 方法。
 	 */
 	protected static final String FIELD_SET_METHOD = "setMethod";
 
 	/**
-	 * Constant identifier for the role field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 role 字段的常量标识符。
 	 */
 	protected static final String FIELD_ROLE = "role";
 
 	/**
-	 * Constant identifier for the getter role field value in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 getter 角色字段值的常量标识符。
 	 */
 	protected static final String ROLE_GETTER = "getter";
 
 	/**
-	 * Constant identifier for the setter role field value in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 setter 角色字段值的常量标识符。
 	 */
 	protected static final String ROLE_SETTER = "setter";
 
 	/**
-	 * Identifies an operation (method) in a JMX {@link Descriptor}.
+	 * 在 JMX {@link Descriptor} 中标识操作（方法）。
 	 */
 	protected static final String ROLE_OPERATION = "operation";
 
 	/**
-	 * Constant identifier for the visibility field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 visibility 字段的常量标识符。
 	 */
 	protected static final String FIELD_VISIBILITY = "visibility";
 
 	/**
-	 * Lowest visibility, used for operations that correspond to
-	 * accessors or mutators for attributes.
+	 * 最低可见性，用于对应属性的访问器或修改器的操作。
 	 * @see #FIELD_VISIBILITY
 	 */
 	protected static final int ATTRIBUTE_OPERATION_VISIBILITY = 4;
 
 	/**
-	 * Constant identifier for the class field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 class 字段的常量标识符。
 	 */
 	protected static final String FIELD_CLASS = "class";
 	/**
-	 * Constant identifier for the log field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 log 字段的常量标识符。
 	 */
 	protected static final String FIELD_LOG = "log";
 
 	/**
-	 * Constant identifier for the logfile field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 logFile 字段的常量标识符。
 	 */
 	protected static final String FIELD_LOG_FILE = "logFile";
 
 	/**
-	 * Constant identifier for the currency time limit field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 currencyTimeLimit 字段的常量标识符。
 	 */
 	protected static final String FIELD_CURRENCY_TIME_LIMIT = "currencyTimeLimit";
 
 	/**
-	 * Constant identifier for the default field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 default 字段的常量标识符。
 	 */
 	protected static final String FIELD_DEFAULT = "default";
 
 	/**
-	 * Constant identifier for the persistPolicy field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 persistPolicy 字段的常量标识符。
 	 */
 	protected static final String FIELD_PERSIST_POLICY = "persistPolicy";
 
 	/**
-	 * Constant identifier for the persistPeriod field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 persistPeriod 字段的常量标识符。
 	 */
 	protected static final String FIELD_PERSIST_PERIOD = "persistPeriod";
 
 	/**
-	 * Constant identifier for the persistLocation field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 persistLocation 字段的常量标识符。
 	 */
 	protected static final String FIELD_PERSIST_LOCATION = "persistLocation";
 
 	/**
-	 * Constant identifier for the persistName field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 persistName 字段的常量标识符。
 	 */
 	protected static final String FIELD_PERSIST_NAME = "persistName";
 
 	/**
-	 * Constant identifier for the displayName field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 displayName 字段的常量标识符。
 	 */
 	protected static final String FIELD_DISPLAY_NAME = "displayName";
 
 	/**
-	 * Constant identifier for the units field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 units 字段的常量标识符。
 	 */
 	protected static final String FIELD_UNITS = "units";
 
 	/**
-	 * Constant identifier for the metricType field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中 metricType 字段的常量标识符。
 	 */
 	protected static final String FIELD_METRIC_TYPE = "metricType";
 
 	/**
-	 * Constant identifier for the custom metricCategory field in a JMX {@link Descriptor}.
+	 * JMX {@link Descriptor} 中自定义 metricCategory 字段的常量标识符。
 	 */
 	protected static final String FIELD_METRIC_CATEGORY = "metricCategory";
 
 
 	/**
-	 * Default value for the JMX field "currencyTimeLimit".
+	 * JMX 字段 "currencyTimeLimit" 的默认值。
 	 */
 	@Nullable
 	private Integer defaultCurrencyTimeLimit;
 
 	/**
-	 * Indicates whether or not strict casing is being used for attributes.
+	 * 指示是否对属性使用严格大小写。
 	 */
 	private boolean useStrictCasing = true;
 
@@ -188,22 +183,19 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 
 
 	/**
-	 * Set the default for the JMX field "currencyTimeLimit".
-	 * The default will usually indicate to never cache attribute values.
-	 * <p>Default is none, not explicitly setting that field, as recommended by the
-	 * JMX 1.2 specification. This should result in "never cache" behavior, always
-	 * reading attribute values freshly (which corresponds to a "currencyTimeLimit"
-	 * of {@code -1} in JMX 1.2).
-	 * <p>However, some JMX implementations (that do not follow the JMX 1.2 spec
-	 * in that respect) might require an explicit value to be set here to get
-	 * "never cache" behavior: for example, JBoss 3.2.x.
-	 * <p>Note that the "currencyTimeLimit" value can also be specified on a
-	 * managed attribute or operation. The default value will apply if not
-	 * overridden with a "currencyTimeLimit" value {@code >= 0} there:
-	 * a metadata "currencyTimeLimit" value of {@code -1} indicates
-	 * to use the default; a value of {@code 0} indicates to "always cache"
-	 * and will be translated to {@code Integer.MAX_VALUE}; a positive
-	 * value indicates the number of cache seconds.
+	 * 设置 JMX 字段 "currencyTimeLimit" 的默认值。
+	 * 默认值通常表示永不缓存属性值。
+	 * <p>默认为 none（不显式设置该字段），这是 JMX 1.2 规范的建议。
+	 * 这应该产生"永不缓存"的行为，总是重新读取属性值
+	 * （对应于 JMX 1.2 中的 "currencyTimeLimit" 为 {@code -1}）。
+	 * <p>但是，某些 JMX 实现（在该方面未遵循 JMX 1.2 规范）
+	 * 可能需要在此处显式设置值才能获得"永不缓存"行为：
+	 * 例如 JBoss 3.2.x。
+	 * <p>请注意，"currencyTimeLimit" 值也可以在受管属性或操作上指定。
+	 * 如果在该处未使用 {@code >= 0} 的 "currencyTimeLimit" 值覆盖，
+	 * 则将应用默认值：元数据 "currencyTimeLimit" 值为 {@code -1}
+	 * 表示使用默认值；值为 {@code 0} 表示"始终缓存"并将被转换为
+	 * {@code Integer.MAX_VALUE}；正值表示缓存秒数。
 	 * @see org.springframework.jmx.export.metadata.AbstractJmxAttribute#setCurrencyTimeLimit
 	 * @see #applyCurrencyTimeLimit(javax.management.Descriptor, int)
 	 */
@@ -212,7 +204,7 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Return default value for the JMX field "currencyTimeLimit", if any.
+	 * 返回 JMX 字段 "currencyTimeLimit" 的默认值（如果有）。
 	 */
 	@Nullable
 	protected Integer getDefaultCurrencyTimeLimit() {
@@ -220,37 +212,33 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Set whether to use strict casing for attributes. Enabled by default.
-	 * <p>When using strict casing, a JavaBean property with a getter such as
-	 * {@code getFoo()} translates to an attribute called {@code Foo}.
-	 * With strict casing disabled, {@code getFoo()} would translate to just
-	 * {@code foo}.
+	 * 设置是否对属性使用严格大小写。默认启用。
+	 * <p>使用严格大小写时，具有 {@code getFoo()} 等 getter 的
+	 * JavaBean 属性将转换为名为 {@code Foo} 的属性。
+	 * 禁用严格大小写时，{@code getFoo()} 将仅转换为 {@code foo}。
 	 */
 	public void setUseStrictCasing(boolean useStrictCasing) {
 		this.useStrictCasing = useStrictCasing;
 	}
 
 	/**
-	 * Return whether strict casing for attributes is enabled.
+	 * 返回是否启用了属性的严格大小写。
 	 */
 	protected boolean isUseStrictCasing() {
 		return this.useStrictCasing;
 	}
 
 	/**
-	 * Set whether to expose the JMX descriptor field "class" for managed operations.
-	 * Default is "false", letting the JMX implementation determine the actual class
-	 * through reflection.
-	 * <p>Set this property to {@code true} for JMX implementations that
-	 * require the "class" field to be specified, for example WebLogic's.
-	 * In that case, Spring will expose the target class name there, in case of
-	 * a plain bean instance or a CGLIB proxy. When encountering a JDK dynamic
-	 * proxy, the <b>first</b> interface implemented by the proxy will be specified.
-	 * <p><b>WARNING:</b> Review your proxy definitions when exposing a JDK dynamic
-	 * proxy through JMX, in particular with this property turned to {@code true}:
-	 * the specified interface list should start with your management interface in
-	 * this case, with all other interfaces following. In general, consider exposing
-	 * your target bean directly or a CGLIB proxy for it instead.
+	 * 设置是否为受管操作暴露 JMX 描述符字段 "class"。
+	 * 默认为 "false"，让 JMX 实现通过反射确定实际类。
+	 * <p>对于需要指定 "class" 字段的 JMX 实现（例如 WebLogic），
+	 * 请将此属性设置为 {@code true}。在这种情况下，对于普通 bean
+	 * 实例或 CGLIB 代理，Spring 将在该处暴露目标类名。遇到 JDK
+	 * 动态代理时，将指定代理实现的<b>第一个</b>接口。
+	 * <p><b>警告：</b>通过 JMX 暴露 JDK 动态代理时，请检查代理定义，
+	 * 特别是将此属性设置为 {@code true} 时：在这种情况下，指定的
+	 * 接口列表应以管理接口开头，后面跟着所有其他接口。通常，
+	 * 考虑直接暴露目标 bean 或其 CGLIB 代理。
 	 * @see #getClassForDescriptor(Object)
 	 */
 	public void setExposeClassDescriptor(boolean exposeClassDescriptor) {
@@ -258,24 +246,24 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Return whether to expose the JMX descriptor field "class" for managed operations.
+	 * 返回是否为受管操作暴露 JMX 描述符字段 "class"。
 	 */
 	protected boolean isExposeClassDescriptor() {
 		return this.exposeClassDescriptor;
 	}
 
 	/**
-	 * Set the ParameterNameDiscoverer to use for resolving method parameter
-	 * names if needed (e.g. for parameter names of MBean operation methods).
-	 * <p>Default is a {@link DefaultParameterNameDiscoverer}.
+	 * 设置用于在需要时解析方法参数名称的 ParameterNameDiscoverer
+	 * （例如用于 MBean 操作方法的参数名称）。
+	 * <p>默认为 {@link DefaultParameterNameDiscoverer}。
 	 */
 	public void setParameterNameDiscoverer(@Nullable ParameterNameDiscoverer parameterNameDiscoverer) {
 		this.parameterNameDiscoverer = parameterNameDiscoverer;
 	}
 
 	/**
-	 * Return the ParameterNameDiscoverer to use for resolving method parameter
-	 * names if needed (may be {@code null} in order to skip parameter detection).
+	 * 返回用于在需要时解析方法参数名称的 ParameterNameDiscoverer
+	 * （可能为 {@code null} 以跳过参数检测）。
 	 */
 	@Nullable
 	protected ParameterNameDiscoverer getParameterNameDiscoverer() {
@@ -284,15 +272,13 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 
 
 	/**
-	 * Iterate through all properties on the MBean class and gives subclasses
-	 * the chance to vote on the inclusion of both the accessor and mutator.
-	 * If a particular accessor or mutator is voted for inclusion, the appropriate
-	 * metadata is assembled and passed to the subclass for descriptor population.
-	 * @param managedBean the bean instance (might be an AOP proxy)
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return the attribute metadata
-	 * @throws JMException in case of errors
+	 * 遍历 MBean 类上的所有属性，并让子类有机会对访问器和修改器的
+	 * 包含进行投票。如果某个特定的访问器或修改器被投票包含，则组装
+	 * 相应的元数据并传递给子类以填充描述符。
+	 * @param managedBean bean 实例（可能是 AOP 代理）
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return 属性元数据
+	 * @throws JMException 出错时抛出
 	 * @see #populateAttributeDescriptor
 	 */
 	@Override
@@ -315,7 +301,7 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 			}
 
 			if (getter != null || setter != null) {
-				// If both getter and setter are null, then this does not need exposing.
+				// 如果 getter 和 setter 都为 null，则无需暴露。
 				String attrName = JmxUtils.getAttributeName(prop, isUseStrictCasing());
 				String description = getAttributeDescription(prop, beanKey);
 				ModelMBeanAttributeInfo info = new ModelMBeanAttributeInfo(attrName, description, getter, setter);
@@ -338,15 +324,12 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Iterate through all methods on the MBean class and gives subclasses the chance
-	 * to vote on their inclusion. If a particular method corresponds to the accessor
-	 * or mutator of an attribute that is included in the management interface, then
-	 * the corresponding operation is exposed with the &quot;role&quot; descriptor
-	 * field set to the appropriate value.
-	 * @param managedBean the bean instance (might be an AOP proxy)
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return the operation metadata
+	 * 遍历 MBean 类上的所有方法，并让子类有机会对其包含进行投票。
+	 * 如果某个特定方法对应于管理接口中包含的属性的访问器或修改器，
+	 * 则将相应的操作暴露出来，并将 "role" 描述符字段设置为适当的值。
+	 * @param managedBean bean 实例（可能是 AOP 代理）
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return 操作元数据
 	 * @see #populateOperationDescriptor
 	 */
 	@Override
@@ -365,9 +348,8 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 			ModelMBeanOperationInfo info = null;
 			PropertyDescriptor pd = BeanUtils.findPropertyForMethod(method);
 			if (pd != null && ((method.equals(pd.getReadMethod()) && includeReadAttribute(method, beanKey)) ||
-						(method.equals(pd.getWriteMethod()) && includeWriteAttribute(method, beanKey)))) {
-				// Attributes need to have their methods exposed as
-				// operations to the JMX server as well.
+							(method.equals(pd.getWriteMethod()) && includeWriteAttribute(method, beanKey)))) {
+				// 属性的方法也需要作为操作暴露给 JMX 服务器。
 				info = createModelMBeanOperationInfo(method, pd.getName(), beanKey);
 				Descriptor desc = info.getDescriptor();
 				if (method.equals(pd.getReadMethod())) {
@@ -383,7 +365,7 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 				info.setDescriptor(desc);
 			}
 
-			// allow getters and setters to be marked as operations directly
+			// 允许将 getter 和 setter 直接标记为操作
 			if (info == null && includeOperation(method, beanKey)) {
 				info = createModelMBeanOperationInfo(method, method.getName(), beanKey);
 				Descriptor desc = info.getDescriptor();
@@ -404,14 +386,13 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Creates an instance of {@code ModelMBeanOperationInfo} for the
-	 * given method. Populates the parameter info for the operation.
-	 * @param method the {@code Method} to create a {@code ModelMBeanOperationInfo} for
-	 * @param name the logical name for the operation (method name or property name);
-	 * not used by the default implementation but possibly by subclasses
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return the {@code ModelMBeanOperationInfo}
+	 * 为给定方法创建 {@code ModelMBeanOperationInfo} 实例。
+	 * 填充操作的参数信息。
+	 * @param method 要为其创建 {@code ModelMBeanOperationInfo} 的 {@code Method}
+	 * @param name 操作的逻辑名称（方法名或属性名）；
+	 * 默认实现不使用此参数，但子类可能会使用
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return {@code ModelMBeanOperationInfo}
 	 */
 	protected ModelMBeanOperationInfo createModelMBeanOperationInfo(Method method, String name, String beanKey) {
 		MBeanParameterInfo[] params = getOperationParameters(method, beanKey);
@@ -428,12 +409,12 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Return the class to be used for the JMX descriptor field "class".
-	 * Only applied when the "exposeClassDescriptor" property is "true".
-	 * <p>The default implementation returns the first implemented interface
-	 * for a JDK proxy, and the target class else.
-	 * @param managedBean the bean instance (might be an AOP proxy)
-	 * @return the class to expose in the descriptor field "class"
+	 * 返回用于 JMX 描述符字段 "class" 的类。
+	 * 仅在 "exposeClassDescriptor" 属性为 "true" 时应用。
+	 * <p>默认实现对于 JDK 代理返回第一个实现的接口，
+	 * 否则返回目标类。
+	 * @param managedBean bean 实例（可能是 AOP 代理）
+	 * @return 要在描述符字段 "class" 中暴露的类
 	 * @see #setExposeClassDescriptor
 	 * @see #getClassToExpose(Class)
 	 * @see org.springframework.aop.framework.AopProxyUtils#proxiedUserInterfaces(Object)
@@ -447,67 +428,57 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 
 
 	/**
-	 * Allows subclasses to vote on the inclusion of a particular attribute accessor.
-	 * @param method the accessor {@code Method}
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return {@code true} if the accessor should be included in the management interface,
-	 * otherwise {@code false}
+	 * 允许子类对特定属性访问器的包含进行投票。
+	 * @param method 访问器 {@code Method}
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return 如果访问器应包含在管理接口中则返回 {@code true}，否则返回 {@code false}
 	 */
 	protected abstract boolean includeReadAttribute(Method method, String beanKey);
 
 	/**
-	 * Allows subclasses to vote on the inclusion of a particular attribute mutator.
-	 * @param method the mutator {@code Method}.
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return {@code true} if the mutator should be included in the management interface,
-	 * otherwise {@code false}
+	 * 允许子类对特定属性修改器的包含进行投票。
+	 * @param method 修改器 {@code Method}。
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return 如果修改器应包含在管理接口中则返回 {@code true}，否则返回 {@code false}
 	 */
 	protected abstract boolean includeWriteAttribute(Method method, String beanKey);
 
 	/**
-	 * Allows subclasses to vote on the inclusion of a particular operation.
-	 * @param method the operation method
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return whether the operation should be included in the management interface
+	 * 允许子类对特定操作的包含进行投票。
+	 * @param method 操作方法
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return 操作是否应包含在管理接口中
 	 */
 	protected abstract boolean includeOperation(Method method, String beanKey);
 
 	/**
-	 * Get the description for a particular attribute.
-	 * <p>The default implementation returns a description for the operation
-	 * that is the name of corresponding {@code Method}.
-	 * @param propertyDescriptor the PropertyDescriptor for the attribute
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return the description for the attribute
+	 * 获取特定属性的描述。
+	 * <p>默认实现返回操作的描述，即对应 {@code Method} 的名称。
+	 * @param propertyDescriptor 属性的 PropertyDescriptor
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return 属性的描述
 	 */
 	protected String getAttributeDescription(PropertyDescriptor propertyDescriptor, String beanKey) {
 		return propertyDescriptor.getDisplayName();
 	}
 
 	/**
-	 * Get the description for a particular operation.
-	 * <p>The default implementation returns a description for the operation
-	 * that is the name of corresponding {@code Method}.
-	 * @param method the operation method
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return the description for the operation
+	 * 获取特定操作的描述。
+	 * <p>默认实现返回操作的描述，即对应 {@code Method} 的名称。
+	 * @param method 操作方法
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return 操作的描述
 	 */
 	protected String getOperationDescription(Method method, String beanKey) {
 		return method.getName();
 	}
 
 	/**
-	 * Create parameter info for the given method.
-	 * <p>The default implementation returns an empty array of {@code MBeanParameterInfo}.
-	 * @param method the {@code Method} to get the parameter information for
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
-	 * @return the {@code MBeanParameterInfo} array
+	 * 为给定方法创建参数信息。
+	 * <p>默认实现返回空的 {@code MBeanParameterInfo} 数组。
+	 * @param method 要获取参数信息的 {@code Method}
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
+	 * @return {@code MBeanParameterInfo} 数组
 	 */
 	protected MBeanParameterInfo[] getOperationParameters(Method method, String beanKey) {
 		ParameterNameDiscoverer paramNameDiscoverer = getParameterNameDiscoverer();
@@ -526,13 +497,12 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Allows subclasses to add extra fields to the {@code Descriptor} for an MBean.
-	 * <p>The default implementation sets the {@code currencyTimeLimit} field to
-	 * the specified "defaultCurrencyTimeLimit", if any (by default none).
-	 * @param descriptor the {@code Descriptor} for the MBean resource.
-	 * @param managedBean the bean instance (might be an AOP proxy)
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
+	 * 允许子类为 MBean 的 {@code Descriptor} 添加额外字段。
+	 * <p>默认实现将 {@code currencyTimeLimit} 字段设置为指定的
+	 * "defaultCurrencyTimeLimit"（如果有，默认为无）。
+	 * @param descriptor MBean 资源的 {@code Descriptor}
+	 * @param managedBean bean 实例（可能是 AOP 代理）
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
 	 * @see #setDefaultCurrencyTimeLimit(Integer)
 	 * @see #applyDefaultCurrencyTimeLimit(javax.management.Descriptor)
 	 */
@@ -542,15 +512,13 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Allows subclasses to add extra fields to the {@code Descriptor} for a
-	 * particular attribute.
-	 * <p>The default implementation sets the {@code currencyTimeLimit} field to
-	 * the specified "defaultCurrencyTimeLimit", if any (by default none).
-	 * @param desc the attribute descriptor
-	 * @param getter the accessor method for the attribute
-	 * @param setter the mutator method for the attribute
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
+	 * 允许子类为特定属性的 {@code Descriptor} 添加额外字段。
+	 * <p>默认实现将 {@code currencyTimeLimit} 字段设置为指定的
+	 * "defaultCurrencyTimeLimit"（如果有，默认为无）。
+	 * @param desc 属性描述符
+	 * @param getter 属性的访问器方法
+	 * @param setter 属性的修改器方法
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
 	 * @see #setDefaultCurrencyTimeLimit(Integer)
 	 * @see #applyDefaultCurrencyTimeLimit(javax.management.Descriptor)
 	 */
@@ -561,14 +529,12 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Allows subclasses to add extra fields to the {@code Descriptor} for a
-	 * particular operation.
-	 * <p>The default implementation sets the {@code currencyTimeLimit} field to
-	 * the specified "defaultCurrencyTimeLimit", if any (by default none).
-	 * @param desc the operation descriptor
-	 * @param method the method corresponding to the operation
-	 * @param beanKey the key associated with the MBean in the beans map
-	 * of the {@code MBeanExporter}
+	 * 允许子类为特定操作的 {@code Descriptor} 添加额外字段。
+	 * <p>默认实现将 {@code currencyTimeLimit} 字段设置为指定的
+	 * "defaultCurrencyTimeLimit"（如果有，默认为无）。
+	 * @param desc 操作描述符
+	 * @param method 对应操作的方法
+	 * @param beanKey MBean 在 {@code MBeanExporter} 的 beans 映射中关联的键
 	 * @see #setDefaultCurrencyTimeLimit(Integer)
 	 * @see #applyDefaultCurrencyTimeLimit(javax.management.Descriptor)
 	 */
@@ -577,9 +543,9 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Set the {@code currencyTimeLimit} field to the specified
-	 * "defaultCurrencyTimeLimit", if any (by default none).
-	 * @param desc the JMX attribute or operation descriptor
+	 * 将 {@code currencyTimeLimit} 字段设置为指定的
+	 * "defaultCurrencyTimeLimit"（如果有，默认为无）。
+	 * @param desc JMX 属性或操作描述符
 	 * @see #setDefaultCurrencyTimeLimit(Integer)
 	 */
 	protected final void applyDefaultCurrencyTimeLimit(Descriptor desc) {
@@ -589,27 +555,27 @@ public abstract class AbstractReflectiveMBeanInfoAssembler extends AbstractMBean
 	}
 
 	/**
-	 * Apply the given JMX "currencyTimeLimit" value to the given descriptor.
-	 * <p>The default implementation sets a value {@code >0} as-is (as number of cache seconds),
-	 * turns a value of {@code 0} into {@code Integer.MAX_VALUE} ("always cache")
-	 * and sets the "defaultCurrencyTimeLimit" (if any, indicating "never cache") in case of
-	 * a value {@code <0}. This follows the recommendation in the JMX 1.2 specification.
-	 * @param desc the JMX attribute or operation descriptor
-	 * @param currencyTimeLimit the "currencyTimeLimit" value to apply
+	 * 将给定的 JMX "currencyTimeLimit" 值应用于给定的描述符。
+	 * <p>默认实现将 {@code >0} 的值原样设置（作为缓存秒数），
+	 * 将 {@code 0} 的值转换为 {@code Integer.MAX_VALUE}（"始终缓存"），
+	 * 并在值为 {@code <0} 时设置 "defaultCurrencyTimeLimit"（如果有，
+	 * 表示"永不缓存"）。这遵循 JMX 1.2 规范中的建议。
+	 * @param desc JMX 属性或操作描述符
+	 * @param currencyTimeLimit 要应用的 "currencyTimeLimit" 值
 	 * @see #setDefaultCurrencyTimeLimit(Integer)
 	 * @see #applyDefaultCurrencyTimeLimit(javax.management.Descriptor)
 	 */
 	protected void applyCurrencyTimeLimit(Descriptor desc, int currencyTimeLimit) {
 		if (currencyTimeLimit > 0) {
-			// number of cache seconds
+			// 缓存秒数
 			desc.setField(FIELD_CURRENCY_TIME_LIMIT, Integer.toString(currencyTimeLimit));
 		}
 		else if (currencyTimeLimit == 0) {
-			// "always cache"
+			// "始终缓存"
 			desc.setField(FIELD_CURRENCY_TIME_LIMIT, Integer.toString(Integer.MAX_VALUE));
 		}
 		else {
-			// "never cache"
+			// "永不缓存"
 			applyDefaultCurrencyTimeLimit(desc);
 		}
 	}

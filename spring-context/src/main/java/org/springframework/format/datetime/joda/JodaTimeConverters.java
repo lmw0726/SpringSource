@@ -32,12 +32,11 @@ import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.format.datetime.DateFormatterRegistrar;
 
 /**
- * Installs lower-level type converters required to integrate
- * Joda-Time support into Spring's field formatting system.
+ * 安装将 Joda-Time 支持集成到 Spring 字段格式化系统中所需的底层类型转换器。
  *
- * <p>Note: {@link JodaTimeFormatterRegistrar} installs these converters
- * and relies on several of them for its formatters. Some additional
- * converters are just being registered for custom conversion scenarios.
+ * <p>注意：{@link JodaTimeFormatterRegistrar} 会安装这些转换器，
+ * 并在其格式化器中依赖其中的若干个。还有一些额外的转换器
+ * 仅为自定义转换场景而注册。
  *
  * @author Keith Donald
  * @author Phillip Webb
@@ -51,8 +50,8 @@ final class JodaTimeConverters {
 
 
 	/**
-	 * Install the converters into the converter registry.
-	 * @param registry the converter registry
+	 * 将转换器安装到转换器注册表中。
+	 * @param registry 转换器注册表
 	 */
 	@SuppressWarnings("deprecation")
 	public static void registerConverters(ConverterRegistry registry) {
@@ -158,7 +157,7 @@ final class JodaTimeConverters {
 
 
 	/**
-	 * Used when printing a {@code java.util.Date} field with a ReadableInstantPrinter.
+	 * 在使用 ReadableInstantPrinter 打印 {@code java.util.Date} 字段时使用。
 	 * @see MillisecondInstantPrinter
 	 * @see JodaDateTimeFormatAnnotationFormatterFactory
 	 */
@@ -172,7 +171,7 @@ final class JodaTimeConverters {
 
 
 	/**
-	 * Used when printing a {@code java.util.Calendar} field with a ReadableInstantPrinter.
+	 * 在使用 ReadableInstantPrinter 打印 {@code java.util.Calendar} 字段时使用。
 	 * @see MillisecondInstantPrinter
 	 * @see JodaDateTimeFormatAnnotationFormatterFactory
 	 */
@@ -186,7 +185,7 @@ final class JodaTimeConverters {
 
 
 	/**
-	 * Used when printing a Long field with a ReadableInstantPrinter.
+	 * 在使用 ReadableInstantPrinter 打印 Long 字段时使用。
 	 * @see MillisecondInstantPrinter
 	 * @see JodaDateTimeFormatAnnotationFormatterFactory
 	 */

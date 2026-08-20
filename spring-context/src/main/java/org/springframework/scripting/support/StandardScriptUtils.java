@@ -29,7 +29,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 
 /**
- * Common operations for dealing with a JSR-223 {@link ScriptEngine}.
+ * 处理 JSR-223 {@link ScriptEngine} 的通用操作。
  *
  * @author Juergen Hoeller
  * @since 4.2.2
@@ -37,14 +37,14 @@ import javax.script.SimpleBindings;
 public abstract class StandardScriptUtils {
 
 	/**
-	 * Retrieve a {@link ScriptEngine} from the given {@link ScriptEngineManager}
-	 * by name, delegating to {@link ScriptEngineManager#getEngineByName} but
-	 * throwing a descriptive exception if not found or if initialization failed.
-	 * @param scriptEngineManager the ScriptEngineManager to use
-	 * @param engineName the name of the engine
-	 * @return a corresponding ScriptEngine (never {@code null})
-	 * @throws IllegalArgumentException if no matching engine has been found
-	 * @throws IllegalStateException if the desired engine failed to initialize
+	 * 根据名称从给定的 {@link ScriptEngineManager} 中检索
+	 * {@link ScriptEngine}，委托给 {@link ScriptEngineManager#getEngineByName}，
+	 * 但在未找到或初始化失败时抛出描述性异常。
+	 * @param scriptEngineManager 要使用的 ScriptEngineManager
+	 * @param engineName 引擎名称
+	 * @return 对应的 ScriptEngine（不为 {@code null}）
+	 * @throws IllegalArgumentException 如果未找到匹配的引擎
+	 * @throws IllegalStateException 如果所需引擎初始化失败
 	 */
 	public static ScriptEngine retrieveEngineByName(ScriptEngineManager scriptEngineManager, String engineName) {
 		ScriptEngine engine = scriptEngineManager.getEngineByName(engineName);
@@ -53,9 +53,9 @@ public abstract class StandardScriptUtils {
 			for (ScriptEngineFactory engineFactory : scriptEngineManager.getEngineFactories()) {
 				List<String> factoryNames = engineFactory.getNames();
 				if (factoryNames.contains(engineName)) {
-					// Special case: getEngineByName returned null but engine is present...
-					// Let's assume it failed to initialize (which ScriptEngineManager silently swallows).
-					// If it happens to initialize fine now, alright, but we really expect an exception.
+					// 特殊情况：getEngineByName 返回 null 但引擎实际存在...
+					// 假设初始化失败（ScriptEngineManager 会静默吞掉此类异常）。
+					// 如果现在恰好初始化成功了，那没问题，但我们预期会抛出异常。
 					try {
 						engine = engineFactory.getScriptEngine();
 						engine.setBindings(scriptEngineManager.getBindings(), ScriptContext.GLOBAL_SCOPE);

@@ -17,15 +17,12 @@
 package org.springframework.scheduling;
 
 /**
- * Extension of the Runnable interface, adding special callbacks
- * for long-running operations.
+ * Runnable 接口的扩展，为长时间运行的操作添加了特殊回调。
  *
- * <p>This interface closely corresponds to the CommonJ Work interface,
- * but is kept separate to avoid a required CommonJ dependency.
+ * <p>此接口与 CommonJ Work 接口紧密对应，但保持独立以避免对 CommonJ 的强制依赖。
  *
- * <p>Scheduling-capable TaskExecutors are encouraged to check a submitted
- * Runnable, detecting whether this interface is implemented and reacting
- * as appropriately as they are able to.
+ * <p>建议具有调度能力的 TaskExecutor 检查提交的 Runnable，
+ * 检测是否实现了此接口，并根据自身能力做出适当反应。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -37,12 +34,10 @@ package org.springframework.scheduling;
 public interface SchedulingAwareRunnable extends Runnable {
 
 	/**
-	 * Return whether the Runnable's operation is long-lived
-	 * ({@code true}) versus short-lived ({@code false}).
-	 * <p>In the former case, the task will not allocate a thread from the thread
-	 * pool (if any) but rather be considered as long-running background thread.
-	 * <p>This should be considered a hint. Of course TaskExecutor implementations
-	 * are free to ignore this flag and the SchedulingAwareRunnable interface overall.
+	 * 返回 Runnable 的操作是否为长时间运行（{@code true}）而非短时间运行（{@code false}）。
+	 * <p>在前一种情况下，任务将不会从线程池（如果有的话）中分配线程，
+	 * 而是被视为长时间运行的后台线程。
+	 * <p>这应被视为一个提示。当然，TaskExecutor 的实现可以自由忽略此标志以及整个 SchedulingAwareRunnable 接口。
 	 */
 	boolean isLongLived();
 

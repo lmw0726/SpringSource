@@ -1,6 +1,6 @@
 /**
- * Support package for Spring's dynamic language machinery,
- * with XML schema being the primary configuration format.
+ * Spring 动态语言机制的支持包，
+ * 主要使用 XML schema 作为配置格式。
  */
 @NonNullApi
 @NonNullFields

@@ -25,10 +25,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Type-level annotation that indicates a JMX notification emitted by a bean.
+ * 类型级别的注解，表示由 Bean 发出的 JMX 通知。
  *
- * <p>This annotation is a {@linkplain java.lang.annotation.Repeatable repeatable}
- * annotation.
+ * <p>此注解是{@linkplain java.lang.annotation.Repeatable 可重复的}注解。
  *
  * @author Rob Harrop
  * @since 2.0

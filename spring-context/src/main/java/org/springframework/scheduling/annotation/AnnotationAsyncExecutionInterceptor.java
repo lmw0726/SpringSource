@@ -25,11 +25,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.Nullable;
 
 /**
- * Specialization of {@link AsyncExecutionInterceptor} that delegates method execution to
- * an {@code Executor} based on the {@link Async} annotation. Specifically designed to
- * support use of {@link Async#value()} executor qualification mechanism introduced in
- * Spring 3.1.2. Supports detecting qualifier metadata via {@code @Async} at the method or
- * declaring class level. See {@link #getExecutorQualifier(Method)} for details.
+ * {@link AsyncExecutionInterceptor} 的特化实现，它将方法执行委托给基于 {@link Async} 注解的 {@code Executor}。专门设计用于支持 Spring 3.1.2 引入的 {@link Async#value()} 执行器限定符机制。支持通过方法或声明类级别的 {@code @Async} 检测限定符元数据。详见 {@link #getExecutorQualifier(Method)}。
  *
  * @author Chris Beams
  * @author Stephane Nicoll
@@ -40,24 +36,17 @@ import org.springframework.lang.Nullable;
 public class AnnotationAsyncExecutionInterceptor extends AsyncExecutionInterceptor {
 
 	/**
-	 * Create a new {@code AnnotationAsyncExecutionInterceptor} with the given executor
-	 * and a simple {@link AsyncUncaughtExceptionHandler}.
-	 * @param defaultExecutor the executor to be used by default if no more specific
-	 * executor has been qualified at the method level using {@link Async#value()};
-	 * as of 4.2.6, a local executor for this interceptor will be built otherwise
+	 * 使用给定的执行器和简单的 {@link AsyncUncaughtExceptionHandler} 创建新的 {@code AnnotationAsyncExecutionInterceptor}。
+	 * @param defaultExecutor 如果在方法级别没有通过 {@link Async#value()} 指定更具体的执行器时使用的默认执行器；从 4.2.6 版本开始，如果未指定，则为此拦截器构建一个本地执行器
 	 */
 	public AnnotationAsyncExecutionInterceptor(@Nullable Executor defaultExecutor) {
 		super(defaultExecutor);
 	}
 
 	/**
-	 * Create a new {@code AnnotationAsyncExecutionInterceptor} with the given executor.
-	 * @param defaultExecutor the executor to be used by default if no more specific
-	 * executor has been qualified at the method level using {@link Async#value()};
-	 * as of 4.2.6, a local executor for this interceptor will be built otherwise
-	 * @param exceptionHandler the {@link AsyncUncaughtExceptionHandler} to use to
-	 * handle exceptions thrown by asynchronous method executions with {@code void}
-	 * return type
+	 * 使用给定的执行器创建新的 {@code AnnotationAsyncExecutionInterceptor}。
+	 * @param defaultExecutor 如果在方法级别没有通过 {@link Async#value()} 指定更具体的执行器时使用的默认执行器；从 4.2.6 版本开始，如果未指定，则为此拦截器构建一个本地执行器
+	 * @param exceptionHandler 用于处理具有 {@code void} 返回类型的异步方法执行所抛出异常的 {@link AsyncUncaughtExceptionHandler}
 	 */
 	public AnnotationAsyncExecutionInterceptor(@Nullable Executor defaultExecutor, AsyncUncaughtExceptionHandler exceptionHandler) {
 		super(defaultExecutor, exceptionHandler);
@@ -65,21 +54,15 @@ public class AnnotationAsyncExecutionInterceptor extends AsyncExecutionIntercept
 
 
 	/**
-	 * Return the qualifier or bean name of the executor to be used when executing the
-	 * given method, specified via {@link Async#value} at the method or declaring
-	 * class level. If {@code @Async} is specified at both the method and class level, the
-	 * method's {@code #value} takes precedence (even if empty string, indicating that
-	 * the default executor should be used preferentially).
-	 * @param method the method to inspect for executor qualifier metadata
-	 * @return the qualifier if specified, otherwise empty string indicating that the
-	 * {@linkplain #setExecutor(Executor) default executor} should be used
+	 * 返回执行给定方法时要使用的执行器的限定符或 Bean 名称，该限定符通过方法或声明类级别的 {@link Async#value} 指定。如果在方法和类级别都指定了 {@code @Async}，则方法的 {@code #value} 优先（即使是空字符串，表示应优先使用默认执行器）。
+	 * @param method 要检查执行器限定符元数据的方法
+	 * @return 如果指定了限定符则返回限定符，否则返回空字符串表示应使用 {@linkplain #setExecutor(Executor) 默认执行器}
 	 * @see #determineAsyncExecutor(Method)
 	 */
 	@Override
 	@Nullable
 	protected String getExecutorQualifier(Method method) {
-		// Maintainer's note: changes made here should also be made in
-		// AnnotationAsyncExecutionAspect#getExecutorQualifier
+		// 维护者注意：此处所做的更改也应在 AnnotationAsyncExecutionAspect#getExecutorQualifier 中进行
 		Async async = AnnotatedElementUtils.findMergedAnnotation(method, Async.class);
 		if (async == null) {
 			async = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Async.class);

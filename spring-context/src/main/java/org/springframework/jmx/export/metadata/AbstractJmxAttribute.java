@@ -17,7 +17,7 @@
 package org.springframework.jmx.export.metadata;
 
 /**
- * Base class for all JMX metadata classes.
+ * 所有 JMX 元数据类的基类。
  *
  * @author Rob Harrop
  * @since 1.2
@@ -30,28 +30,28 @@ public abstract class AbstractJmxAttribute {
 
 
 	/**
-	 * Set a description for this attribute.
+	 * 为该属性设置描述。
 	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
 	/**
-	 * Return a description for this attribute.
+	 * 返回该属性的描述。
 	 */
 	public String getDescription() {
 		return this.description;
 	}
 
 	/**
-	 * Set a currency time limit for this attribute.
+	 * 为该属性设置时效性时间限制。
 	 */
 	public void setCurrencyTimeLimit(int currencyTimeLimit) {
 		this.currencyTimeLimit = currencyTimeLimit;
 	}
 
 	/**
-	 * Return a currency time limit for this attribute.
+	 * 返回该属性的时效性时间限制。
 	 */
 	public int getCurrencyTimeLimit() {
 		return this.currencyTimeLimit;

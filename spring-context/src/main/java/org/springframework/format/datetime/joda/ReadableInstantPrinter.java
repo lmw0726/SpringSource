@@ -24,11 +24,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.format.Printer;
 
 /**
- * Prints Joda-Time {@link ReadableInstant} instances using a {@link DateTimeFormatter}.
+ * 使用 {@link DateTimeFormatter} 打印 Joda-Time {@link ReadableInstant} 实例。
  *
  * @author Keith Donald
  * @since 3.0
- * @deprecated as of 5.3, in favor of standard JSR-310 support
+ * @deprecated 从 5.3 版本起已弃用，建议使用标准的 JSR-310 支持
  */
 @Deprecated
 public final class ReadableInstantPrinter implements Printer<ReadableInstant> {
@@ -37,8 +37,8 @@ public final class ReadableInstantPrinter implements Printer<ReadableInstant> {
 
 
 	/**
-	 * Create a new ReadableInstantPrinter.
-	 * @param formatter the Joda DateTimeFormatter instance
+	 * 创建一个新的 ReadableInstantPrinter。
+	 * @param formatter Joda DateTimeFormatter 实例
 	 */
 	public ReadableInstantPrinter(DateTimeFormatter formatter) {
 		this.formatter = formatter;

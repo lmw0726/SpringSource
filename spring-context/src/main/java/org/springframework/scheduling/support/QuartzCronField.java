@@ -28,10 +28,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Extension of {@link CronField} for
- * <a href="https://www.quartz-scheduler.org>Quartz</a> -specific fields.
- * Created using the {@code parse*} methods, uses a {@link TemporalAdjuster}
- * internally.
+ * {@link CronField} 的扩展，用于
+ * <a href="https://www.quartz-scheduler.org>Quartz</a> 特定字段。
+ * 使用 {@code parse*} 方法创建，内部使用 {@link TemporalAdjuster}。
  *
  * @author Arjen Poutsma
  * @since 5.3
@@ -50,8 +49,8 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Constructor for fields that need to roll forward over a different type
-	 * than the type this field represents. See {@link #parseDaysOfWeek(String)}.
+	 * 构造函数，用于需要向前滚动到与当前字段类型不同的类型的字段。
+	 * 参见 {@link #parseDaysOfWeek(String)}。
 	 */
 	private QuartzCronField(Type type, Type rollForwardType, TemporalAdjuster adjuster, String value) {
 		super(type);
@@ -61,15 +60,15 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Returns whether the given value is a Quartz day-of-month field.
+	 * 判断给定的值是否为 Quartz 月内日字段。
 	 */
 	public static boolean isQuartzDaysOfMonthField(String value) {
 		return value.contains("L") || value.contains("W");
 	}
 
 	/**
-	 * Parse the given value into a days of months {@code QuartzCronField}, the fourth entry of a cron expression.
-	 * Expects a "L" or "W" in the given value.
+	 * 将给定的值解析为月内日 {@code QuartzCronField}，即 cron 表达式的第四项。
+	 * 期望给定的值中包含 "L" 或 "W"。
 	 */
 	public static QuartzCronField parseDaysOfMonth(String value) {
 		int idx = value.lastIndexOf('L');
@@ -114,15 +113,15 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Returns whether the given value is a Quartz day-of-week field.
+	 * 判断给定的值是否为 Quartz 星期字段。
 	 */
 	public static boolean isQuartzDaysOfWeekField(String value) {
 		return value.contains("L") || value.contains("#");
 	}
 
 	/**
-	 * Parse the given value into a days of week {@code QuartzCronField}, the sixth entry of a cron expression.
-	 * Expects a "L" or "#" in the given value.
+	 * 将给定的值解析为星期 {@code QuartzCronField}，即 cron 表达式的第六项。
+	 * 期望给定的值中包含 "L" 或 "#"。
 	 */
 	public static QuartzCronField parseDaysOfWeek(String value) {
 		int idx = value.lastIndexOf('L');
@@ -179,7 +178,7 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Returns an adjuster that resets to midnight.
+	 * 返回一个重置到午夜的调整器。
 	 */
 	private static TemporalAdjuster atMidnight() {
 		return temporal -> {
@@ -193,8 +192,7 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Returns an adjuster that returns a new temporal set to the last
-	 * day of the current month at midnight.
+	 * 返回一个调整器，该调整器将返回设置为当前月最后一天午夜的新时间值。
 	 */
 	private static TemporalAdjuster lastDayOfMonth() {
 		TemporalAdjuster adjuster = TemporalAdjusters.lastDayOfMonth();
@@ -205,7 +203,7 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Returns an adjuster that returns the last weekday of the month.
+	 * 返回一个调整器，该调整器返回当月的最后一个工作日。
 	 */
 	private static TemporalAdjuster lastWeekdayOfMonth() {
 		TemporalAdjuster adjuster = TemporalAdjusters.lastDayOfMonth();
@@ -227,9 +225,9 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Return a temporal adjuster that finds the nth-to-last day of the month.
-	 * @param offset the negative offset, i.e. -3 means third-to-last
-	 * @return a nth-to-last day-of-month adjuster
+	 * 返回一个时间调整器，用于查找当月倒数第 N 天。
+	 * @param offset 负偏移量，例如 -3 表示倒数第三天
+	 * @return 倒数第 N 天的月内日调整器
 	 */
 	private static TemporalAdjuster lastDayWithOffset(int offset) {
 		Assert.isTrue(offset < 0, "Offset should be < 0");
@@ -241,12 +239,12 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Return a temporal adjuster that finds the weekday nearest to the given
-	 * day-of-month. If {@code dayOfMonth} falls on a Saturday, the date is
-	 * moved back to Friday; if it falls on a Sunday (or if {@code dayOfMonth}
-	 * is 1 and it falls on a Saturday), it is moved forward to Monday.
-	 * @param dayOfMonth the goal day-of-month
-	 * @return the weekday-nearest-to adjuster
+	 * 返回一个时间调整器，用于查找最接近给定月内日的工作日。
+	 * 如果 {@code dayOfMonth} 落在星期六，日期将向前移到星期五；
+	 * 如果落在星期日（或者 {@code dayOfMonth} 为 1 且落在星期六），
+	 * 日期将向后移到星期一。
+	 * @param dayOfMonth 目标月内日
+	 * @return 最接近该工作日的调整器
 	 */
 	private static TemporalAdjuster weekdayNearestTo(int dayOfMonth) {
 		return temporal -> {
@@ -292,8 +290,7 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Return a temporal adjuster that finds the last of the given doy-of-week
-	 * in a month.
+	 * 返回一个调整器，该调整器返回当月给定星期几的最后一天。
 	 */
 	private static TemporalAdjuster lastInMonth(DayOfWeek dayOfWeek) {
 		TemporalAdjuster adjuster = TemporalAdjusters.lastInMonth(dayOfWeek);
@@ -304,8 +301,7 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Returns a temporal adjuster that finds {@code ordinal}-th occurrence of
-	 * the given day-of-week in a month.
+	 * 返回一个时间调整器，用于查找当月第 {@code ordinal} 次出现的给定星期几。
 	 */
 	private static TemporalAdjuster dayOfWeekInMonth(int ordinal, DayOfWeek dayOfWeek) {
 		TemporalAdjuster adjuster = TemporalAdjusters.dayOfWeekInMonth(ordinal, dayOfWeek);
@@ -316,9 +312,9 @@ final class QuartzCronField extends CronField {
 	}
 
 	/**
-	 * Rolls back the given {@code result} to midnight. When
-	 * {@code current} has the same day of month as {@code result}, the former
-	 * is returned, to make sure that we don't end up before where we started.
+	 * 将给定的 {@code result} 回滚到午夜。当
+	 * {@code current} 与 {@code result} 具有相同的月内日时，返回前者，
+	 * 以确保我们不会得到比开始时间更早的结果。
 	 */
 	private static Temporal rollbackToMidnight(Temporal current, Temporal result) {
 		if (result.get(ChronoField.DAY_OF_MONTH) == current.get(ChronoField.DAY_OF_MONTH)) {

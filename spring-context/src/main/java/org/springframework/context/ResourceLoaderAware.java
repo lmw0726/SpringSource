@@ -20,36 +20,27 @@ import org.springframework.beans.factory.Aware;
 import org.springframework.core.io.ResourceLoader;
 
 /**
- * Interface to be implemented by any object that wishes to be notified of the
- * {@link ResourceLoader} (typically the ApplicationContext) that it runs in.
- * This is an alternative to a full {@link ApplicationContext} dependency via
- * the {@link org.springframework.context.ApplicationContextAware} interface.
+ * 希望获知其运行所在 {@link ResourceLoader}（通常是 ApplicationContext）的任何对象都应实现此接口。
+ * 这是通过 {@link org.springframework.context.ApplicationContextAware} 接口获取完整
+ * {@link ApplicationContext} 依赖的一种替代方案。
  *
- * <p>Note that {@link org.springframework.core.io.Resource} dependencies can also
- * be exposed as bean properties of type {@code Resource} or {@code Resource[]},
- * populated via Strings with automatic type conversion by the bean factory. This
- * removes the need for implementing any callback interface just for the purpose
- * of accessing specific file resources.
+ * <p>请注意，{@link org.springframework.core.io.Resource} 依赖也可以通过 {@code Resource}
+ * 或 {@code Resource[]} 类型的 bean 属性来暴露，由 bean 工厂通过字符串自动类型转换来填充。
+ * 这样就无需为了访问特定的文件资源而实现任何回调接口。
  *
- * <p>You typically need a {@link ResourceLoader} when your application object has to
- * access a variety of file resources whose names are calculated. A good strategy is
- * to make the object use a {@link org.springframework.core.io.DefaultResourceLoader}
- * but still implement {@code ResourceLoaderAware} to allow for overriding when
- * running in an {@code ApplicationContext}. See
- * {@link org.springframework.context.support.ReloadableResourceBundleMessageSource}
- * for an example.
+ * <p>当应用程序对象需要访问名称经过计算的各种文件资源时，通常需要一个 {@link ResourceLoader}。
+ * 一个好的策略是让该对象使用 {@link org.springframework.core.io.DefaultResourceLoader}，
+ * 但仍实现 {@code ResourceLoaderAware}，以便在 {@code ApplicationContext} 中运行时可以进行覆盖。
+ * 请参阅 {@link org.springframework.context.support.ReloadableResourceBundleMessageSource} 中的示例。
  *
- * <p>A passed-in {@code ResourceLoader} can also be checked for the
- * {@link org.springframework.core.io.support.ResourcePatternResolver} interface
- * and cast accordingly, in order to resolve resource patterns into arrays of
- * {@code Resource} objects. This will always work when running in an ApplicationContext
- * (since the context interface extends the ResourcePatternResolver interface). Use a
- * {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver} as
- * default; see also the {@code ResourcePatternUtils.getResourcePatternResolver} method.
+ * <p>传入的 {@code ResourceLoader} 还可以检查 {@link org.springframework.core.io.support.ResourcePatternResolver}
+ * 接口并进行相应转换，以便将资源模式解析为 {@code Resource} 对象数组。这在 ApplicationContext 中运行时总是有效的
+ *（因为上下文接口扩展了 ResourcePatternResolver 接口）。使用
+ * {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver} 作为默认实现；
+ * 另请参阅 {@code ResourcePatternUtils.getResourcePatternResolver} 方法。
  *
- * <p>As an alternative to a {@code ResourcePatternResolver} dependency, consider
- * exposing bean properties of type {@code Resource[]} array, populated via pattern
- * Strings with automatic type conversion by the bean factory at binding time.
+ * <p>作为 {@code ResourcePatternResolver} 依赖的替代方案，可以考虑暴露 {@code Resource[]}
+ * 数组类型的 bean 属性，由 bean 工厂在绑定时通过模式字符串自动类型转换来填充。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -62,14 +53,13 @@ import org.springframework.core.io.ResourceLoader;
 public interface ResourceLoaderAware extends Aware {
 
 	/**
-	 * Set the ResourceLoader that this object runs in.
-	 * <p>This might be a ResourcePatternResolver, which can be checked
-	 * through {@code instanceof ResourcePatternResolver}. See also the
-	 * {@code ResourcePatternUtils.getResourcePatternResolver} method.
-	 * <p>Invoked after population of normal bean properties but before an init callback
-	 * like InitializingBean's {@code afterPropertiesSet} or a custom init-method.
-	 * Invoked before ApplicationContextAware's {@code setApplicationContext}.
-	 * @param resourceLoader the ResourceLoader object to be used by this object
+	 * 设置此对象运行所在的 ResourceLoader。
+	 * <p>这可能是一个 ResourcePatternResolver，可以通过 {@code instanceof ResourcePatternResolver}
+	 * 进行检查。另请参阅 {@code ResourcePatternUtils.getResourcePatternResolver} 方法。
+	 * <p>在普通 bean 属性填充之后、初始化回调之前调用，例如 InitializingBean 的
+	 * {@code afterPropertiesSet} 或自定义的 init-method。在 ApplicationContextAware 的
+	 * {@code setApplicationContext} 之前调用。
+	 * @param resourceLoader 供此对象使用的 ResourceLoader 对象
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.core.io.support.ResourcePatternUtils#getResourcePatternResolver
 	 */

@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * Utilities for processing {@link Bean}-annotated methods.
+ * 处理 {@link Bean} 注解方法的工具类。
  *
  * @author Chris Beams
  * @author Juergen Hoeller

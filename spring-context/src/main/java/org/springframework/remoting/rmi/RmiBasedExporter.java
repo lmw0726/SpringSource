@@ -23,40 +23,39 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 
 /**
- * Convenient superclass for RMI-based remote exporters. Provides a facility
- * to automatically wrap a given plain Java service object with an
- * RmiInvocationWrapper, exposing the {@link RmiInvocationHandler} remote interface.
+ * 基于 RMI 的远程导出器的便捷超类。提供了将给定的普通 Java 服务对象
+ * 自动包装为 RmiInvocationWrapper 的功能，从而暴露 {@link RmiInvocationHandler} 远程接口。
  *
- * <p>Using the RMI invoker mechanism, RMI communication operates at the {@link RmiInvocationHandler}
- * level, sharing a common invoker stub for any number of services. Service interfaces are <i>not</i>
- * required to extend {@code java.rmi.Remote} or declare {@code java.rmi.RemoteException}
- * on all service methods. However, in and out parameters still have to be serializable.
+ * <p>使用 RMI 调用器机制，RMI 通信在 {@link RmiInvocationHandler} 层面进行，
+ * 所有服务共享同一个通用的调用器存根。服务接口<i>不需要</i>继承
+ * {@code java.rmi.Remote}，也不需要在所有服务方法上声明
+ * {@code java.rmi.RemoteException}。但输入和输出参数仍然必须是可序列化的。
  *
  * @author Juergen Hoeller
  * @since 1.2.5
  * @see RmiServiceExporter
  * @see JndiRmiServiceExporter
- * @deprecated as of 5.3 (phasing out serialization-based remoting)
+ * @deprecated 自 5.3 版本起已弃用（逐步淘汰基于序列化的远程调用）
  */
 @Deprecated
 public abstract class RmiBasedExporter extends RemoteInvocationBasedExporter {
 
 	/**
-	 * Determine the object to export: either the service object itself
-	 * or a RmiInvocationWrapper in case of a non-RMI service object.
-	 * @return the RMI object to export
+	 * 确定要导出的对象：如果服务对象本身是 RMI 服务，则返回服务对象本身；
+	 * 如果是普通的非 RMI 服务对象，则返回一个 RmiInvocationWrapper。
+	 * @return 要导出的 RMI 对象
 	 * @see #setService
 	 * @see #setServiceInterface
 	 */
 	protected Remote getObjectToExport() {
-		// determine remote object
+		// 确定远程对象
 		if (getService() instanceof Remote &&
 				(getServiceInterface() == null || Remote.class.isAssignableFrom(getServiceInterface()))) {
-			// conventional RMI service
+			// 传统的 RMI 服务
 			return (Remote) getService();
 		}
 		else {
-			// RMI invoker
+			// RMI 调用器
 			if (logger.isDebugEnabled()) {
 				logger.debug("RMI service [" + getService() + "] is an RMI invoker");
 			}
@@ -65,8 +64,8 @@ public abstract class RmiBasedExporter extends RemoteInvocationBasedExporter {
 	}
 
 	/**
-	 * Redefined here to be visible to RmiInvocationWrapper.
-	 * Simply delegates to the corresponding superclass method.
+	 * 在此重新定义以使 RmiInvocationWrapper 可以访问。
+	 * 只是委托给相应的父类方法。
 	 */
 	@Override
 	protected Object invoke(RemoteInvocation invocation, Object targetObject)

@@ -30,17 +30,16 @@ import org.springframework.core.serializer.support.SerializationDelegate;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link CacheManager} implementation that lazily builds {@link ConcurrentMapCache}
- * instances for each {@link #getCache} request. Also supports a 'static' mode where
- * the set of cache names is pre-defined through {@link #setCacheNames}, with no
- * dynamic creation of further cache regions at runtime.
+ * {@link CacheManager} 实现，针对每个 {@link #getCache} 请求延迟构建
+ * {@link ConcurrentMapCache} 实例。还支持"静态"模式，即通过
+ * {@link #setCacheNames} 预先定义缓存名称集合，在运行时不再动态创建
+ * 额外的缓存区域。
  *
- * <p>Note: This is by no means a sophisticated CacheManager; it comes with no
- * cache configuration options. However, it may be useful for testing or simple
- * caching scenarios. For advanced local caching needs, consider
- * {@link org.springframework.cache.jcache.JCacheCacheManager},
- * {@link org.springframework.cache.ehcache.EhCacheCacheManager},
- * {@link org.springframework.cache.caffeine.CaffeineCacheManager}.
+ * <p>注意：这绝不是一个功能完善的 CacheManager；它不提供任何缓存配置选项。
+ * 不过，它可能对测试或简单的缓存场景很有用。对于高级的本地缓存需求，
+ * 可以考虑 {@link org.springframework.cache.jcache.JCacheCacheManager}、
+ * {@link org.springframework.cache.ehcache.EhCacheCacheManager}、
+ * {@link org.springframework.cache.caffeine.CaffeineCacheManager}。
  *
  * @author Juergen Hoeller
  * @since 3.1
@@ -61,15 +60,15 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 
 
 	/**
-	 * Construct a dynamic ConcurrentMapCacheManager,
-	 * lazily creating cache instances as they are being requested.
+	 * 构造一个动态的 ConcurrentMapCacheManager，
+	 * 在缓存实例被请求时才延迟创建。
 	 */
 	public ConcurrentMapCacheManager() {
 	}
 
 	/**
-	 * Construct a static ConcurrentMapCacheManager,
-	 * managing caches for the specified cache names only.
+	 * 构造一个静态的 ConcurrentMapCacheManager，
+	 * 仅管理指定缓存名称对应的缓存。
 	 */
 	public ConcurrentMapCacheManager(String... cacheNames) {
 		setCacheNames(Arrays.asList(cacheNames));
@@ -77,11 +76,11 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 
 
 	/**
-	 * Specify the set of cache names for this CacheManager's 'static' mode.
-	 * <p>The number of caches and their names will be fixed after a call to this method,
-	 * with no creation of further cache regions at runtime.
-	 * <p>Calling this with a {@code null} collection argument resets the
-	 * mode to 'dynamic', allowing for further creation of caches again.
+	 * 为此 CacheManager 的"静态"模式指定缓存名称集合。
+	 * <p>调用此方法后，缓存的数量及其名称将被固定下来，
+	 * 运行时不会再创建额外的缓存区域。
+	 * <p>以 {@code null} 集合参数调用此方法会将
+	 * 模式重置为"动态"，从而允许再次创建缓存。
 	 */
 	public void setCacheNames(@Nullable Collection<String> cacheNames) {
 		if (cacheNames != null) {
@@ -96,50 +95,47 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 	}
 
 	/**
-	 * Specify whether to accept and convert {@code null} values for all caches
-	 * in this cache manager.
-	 * <p>Default is "true", despite ConcurrentHashMap itself not supporting {@code null}
-	 * values. An internal holder object will be used to store user-level {@code null}s.
-	 * <p>Note: A change of the null-value setting will reset all existing caches,
-	 * if any, to reconfigure them with the new null-value requirement.
+	 * 指定此缓存管理器中的所有缓存是否接受并转换 {@code null} 值。
+	 * <p>默认为 "true"，尽管 ConcurrentHashMap 本身不支持 {@code null}
+	 * 值。将使用一个内部持有者对象来存储用户级别的 {@code null}。
+	 * <p>注意：更改 null 值设置将重置所有现有缓存（如果有的话），
+	 * 以使用新的 null 值要求重新配置它们。
 	 */
 	public void setAllowNullValues(boolean allowNullValues) {
 		if (allowNullValues != this.allowNullValues) {
 			this.allowNullValues = allowNullValues;
-			// Need to recreate all Cache instances with the new null-value configuration...
+			// 需要使用新的 null 值配置重新创建所有 Cache 实例……
 			recreateCaches();
 		}
 	}
 
 	/**
-	 * Return whether this cache manager accepts and converts {@code null} values
-	 * for all of its caches.
+	 * 返回此缓存管理器是否接受并转换其所有缓存的 {@code null} 值。
 	 */
 	public boolean isAllowNullValues() {
 		return this.allowNullValues;
 	}
 
 	/**
-	 * Specify whether this cache manager stores a copy of each entry ({@code true}
-	 * or the reference ({@code false} for all of its caches.
-	 * <p>Default is "false" so that the value itself is stored and no serializable
-	 * contract is required on cached values.
-	 * <p>Note: A change of the store-by-value setting will reset all existing caches,
-	 * if any, to reconfigure them with the new store-by-value requirement.
+	 * 指定此缓存管理器是为其所有缓存存储每个条目的副本（{@code true}）
+	 * 还是引用（{@code false}）。
+	 * <p>默认为 "false"，因此存储的是值本身，缓存值无需满足可序列化
+	 * 契约。
+	 * <p>注意：更改 store-by-value 设置将重置所有现有缓存（如果有的话），
+	 * 以使用新的 store-by-value 要求重新配置它们。
 	 * @since 4.3
 	 */
 	public void setStoreByValue(boolean storeByValue) {
 		if (storeByValue != this.storeByValue) {
 			this.storeByValue = storeByValue;
-			// Need to recreate all Cache instances with the new store-by-value configuration...
+			// 需要使用新的 store-by-value 配置重新创建所有 Cache 实例……
 			recreateCaches();
 		}
 	}
 
 	/**
-	 * Return whether this cache manager stores a copy of each entry or
-	 * a reference for all its caches. If store by value is enabled, any
-	 * cache entry must be serializable.
+	 * 返回此缓存管理器是为其所有缓存存储每个条目的副本还是引用。
+	 * 如果启用了按值存储，任何缓存条目都必须是可序列化的。
 	 * @since 4.3
 	 */
 	public boolean isStoreByValue() {
@@ -149,7 +145,7 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.serialization = new SerializationDelegate(classLoader);
-		// Need to recreate all Cache instances with new ClassLoader in store-by-value mode...
+		// 在 store-by-value 模式下，需要使用新的 ClassLoader 重新创建所有 Cache 实例……
 		if (isStoreByValue()) {
 			recreateCaches();
 		}
@@ -184,9 +180,9 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 	}
 
 	/**
-	 * Create a new ConcurrentMapCache instance for the specified cache name.
-	 * @param name the name of the cache
-	 * @return the ConcurrentMapCache (or a decorator thereof)
+	 * 为指定的缓存名称创建新的 ConcurrentMapCache 实例。
+	 * @param name 缓存的名称
+	 * @return ConcurrentMapCache（或其装饰器）
 	 */
 	protected Cache createConcurrentMapCache(String name) {
 		SerializationDelegate actualSerialization = (isStoreByValue() ? this.serialization : null);

@@ -29,9 +29,9 @@ import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.TRUE_VALUE;
 
 /**
- * Abstract base class for BeanDefinitionParsers which build
- * JNDI-locating beans, supporting an optional "jndiEnvironment"
- * bean property, populated from an "environment" XML sub-element.
+ * 构建 JNDI 定位 Bean 的 BeanDefinitionParser 的抽象基类，
+ * 支持可选的 "jndiEnvironment" bean 属性，
+ * 该属性通过 "environment" XML 子元素进行填充。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -58,11 +58,11 @@ abstract class AbstractJndiLocatingBeanDefinitionParser extends AbstractSimpleBe
 	protected void postProcess(BeanDefinitionBuilder definitionBuilder, Element element) {
 		Object envValue = DomUtils.getChildElementValueByTagName(element, ENVIRONMENT);
 		if (envValue != null) {
-			// Specific environment settings defined, overriding any shared properties.
+			// 定义了特定的环境设置，覆盖任何共享属性。
 			definitionBuilder.addPropertyValue(JNDI_ENVIRONMENT, envValue);
 		}
 		else {
-			// Check whether there is a reference to shared environment properties...
+			// 检查是否存在对共享环境属性的引用...
 			String envRef = element.getAttribute(ENVIRONMENT_REF);
 			if (StringUtils.hasLength(envRef)) {
 				definitionBuilder.addPropertyValue(JNDI_ENVIRONMENT, new RuntimeBeanReference(envRef));

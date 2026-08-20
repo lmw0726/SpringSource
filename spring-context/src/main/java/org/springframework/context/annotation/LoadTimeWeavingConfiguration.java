@@ -30,11 +30,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * {@code @Configuration} class that registers a {@link LoadTimeWeaver} bean.
+ * 注册 {@link LoadTimeWeaver} bean 的 {@code @Configuration} 配置类。
  *
- * <p>This configuration class is automatically imported when using the
- * {@link EnableLoadTimeWeaving} annotation. See {@code @EnableLoadTimeWeaving}
- * javadoc for complete usage details.
+ * <p>当使用 {@link EnableLoadTimeWeaving} 注解时，此配置类会被自动导入。
+ * 详细的使用说明请参阅 {@code @EnableLoadTimeWeaving} 的 javadoc。
  *
  * @author Chris Beams
  * @since 3.1
@@ -82,12 +81,12 @@ public class LoadTimeWeavingConfiguration implements ImportAware, BeanClassLoade
 		LoadTimeWeaver loadTimeWeaver = null;
 
 		if (this.ltwConfigurer != null) {
-			// The user has provided a custom LoadTimeWeaver instance
+			// 用户提供了自定义的 LoadTimeWeaver 实例
 			loadTimeWeaver = this.ltwConfigurer.getLoadTimeWeaver();
 		}
 
 		if (loadTimeWeaver == null) {
-			// No custom LoadTimeWeaver provided -> fall back to the default
+			// 未提供自定义 LoadTimeWeaver -> 回退到默认实现
 			loadTimeWeaver = new DefaultContextLoadTimeWeaver(this.beanClassLoader);
 		}
 
@@ -95,14 +94,14 @@ public class LoadTimeWeavingConfiguration implements ImportAware, BeanClassLoade
 			AspectJWeaving aspectJWeaving = this.enableLTW.getEnum("aspectjWeaving");
 			switch (aspectJWeaving) {
 				case DISABLED:
-					// AJ weaving is disabled -> do nothing
+					// AJ 织入已禁用 -> 不做任何操作
 					break;
 				case AUTODETECT:
 					if (this.beanClassLoader.getResource(AspectJWeavingEnabler.ASPECTJ_AOP_XML_RESOURCE) == null) {
-						// No aop.xml present on the classpath -> treat as 'disabled'
+						// classpath 中不存在 aop.xml -> 视为"禁用"状态
 						break;
 					}
-					// aop.xml is present on the classpath -> enable
+					// classpath 中存在 aop.xml -> 启用织入
 					AspectJWeavingEnabler.enableAspectJWeaving(loadTimeWeaver, this.beanClassLoader);
 					break;
 				case ENABLED:

@@ -22,14 +22,15 @@ import org.springframework.ejb.access.SimpleRemoteStatelessSessionProxyFactoryBe
 
 /**
  * {@link org.springframework.beans.factory.xml.BeanDefinitionParser}
- * implementation for parsing '{@code remote-slsb}' tags and
- * creating {@link SimpleRemoteStatelessSessionProxyFactoryBean} definitions.
+ * 实现，用于解析 '{@code remote-slsb}' 标签并
+ * 创建 {@link SimpleRemoteStatelessSessionProxyFactoryBean} 定义。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
  */
 class RemoteStatelessSessionBeanDefinitionParser extends AbstractJndiLocatingBeanDefinitionParser {
+
 
 	@Override
 	protected String getBeanClassName(Element element) {

@@ -23,7 +23,7 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.util.StringUtils;
 
 /**
- * Parser for the 'scheduler' element of the 'task' namespace.
+ * 'task' 命名空间中 'scheduler' 元素的解析器。
  *
  * @author Mark Fisher
  * @since 3.0

@@ -29,7 +29,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 
 /**
- * Parser for the 'scheduled-tasks' element of the scheduling namespace.
+ * 调度命名空间中 'scheduled-tasks' 元素的解析器。
  *
  * @author Mark Fisher
  * @author Chris Beams
@@ -54,7 +54,7 @@ public class ScheduledTasksBeanDefinitionParser extends AbstractSingleBeanDefini
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		builder.setLazyInit(false); // lazy scheduled tasks are a contradiction in terms -> force to false
+		builder.setLazyInit(false); // 懒加载定时任务是矛盾的概念 -> 强制设为 false
 		ManagedList<RuntimeBeanReference> cronTaskList = new ManagedList<>();
 		ManagedList<RuntimeBeanReference> fixedDelayTaskList = new ManagedList<>();
 		ManagedList<RuntimeBeanReference> fixedRateTaskList = new ManagedList<>();
@@ -69,10 +69,10 @@ public class ScheduledTasksBeanDefinitionParser extends AbstractSingleBeanDefini
 			String ref = taskElement.getAttribute("ref");
 			String method = taskElement.getAttribute("method");
 
-			// Check that 'ref' and 'method' are specified
+			// 检查是否指定了 'ref' 和 'method'
 			if (!StringUtils.hasText(ref) || !StringUtils.hasText(method)) {
 				parserContext.getReaderContext().error("Both 'ref' and 'method' are required", taskElement);
-				// Continue with the possible next task element
+				// 继续处理可能的下一个任务元素
 				continue;
 			}
 
@@ -91,13 +91,13 @@ public class ScheduledTasksBeanDefinitionParser extends AbstractSingleBeanDefini
 			if (!(hasCronAttribute || hasFixedDelayAttribute || hasFixedRateAttribute || hasTriggerAttribute)) {
 				parserContext.getReaderContext().error(
 						"one of the 'cron', 'fixed-delay', 'fixed-rate', or 'trigger' attributes is required", taskElement);
-				continue; // with the possible next task element
+				continue; // 继续处理可能的下一个任务元素
 			}
 
 			if (hasInitialDelayAttribute && (hasCronAttribute || hasTriggerAttribute)) {
 				parserContext.getReaderContext().error(
 						"the 'initial-delay' attribute may not be used with cron and trigger tasks", taskElement);
-				continue; // with the possible next task element
+				continue; // 继续处理可能的下一个任务元素
 			}
 
 			String runnableName =
@@ -174,7 +174,7 @@ public class ScheduledTasksBeanDefinitionParser extends AbstractSingleBeanDefini
 
 	private RuntimeBeanReference beanReference(Element taskElement,
 			ParserContext parserContext, BeanDefinitionBuilder builder) {
-		// Extract the source of the current task
+		// 提取当前任务的来源
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(taskElement));
 		String generatedName = parserContext.getReaderContext().generateBeanName(builder.getRawBeanDefinition());
 		parserContext.registerBeanComponent(new BeanComponentDefinition(builder.getBeanDefinition(), generatedName));

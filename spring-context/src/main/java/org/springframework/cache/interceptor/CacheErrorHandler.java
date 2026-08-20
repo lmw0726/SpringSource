@@ -20,14 +20,12 @@ import org.springframework.cache.Cache;
 import org.springframework.lang.Nullable;
 
 /**
- * A strategy for handling cache-related errors. In most cases, any
- * exception thrown by the provider should simply be thrown back at
- * the client but, in some circumstances, the infrastructure may need
- * to handle cache-provider exceptions in a different way.
+ * 处理缓存相关错误的策略。在大多数情况下，缓存提供者抛出的任何异常
+ * 都应直接抛回给客户端，但在某些情况下，基础设施可能需要以不同的
+ * 方式处理缓存提供者抛出的异常。
  *
- * <p>Typically, failing to retrieve an object from the cache with
- * a given id can be transparently managed as a cache miss by not
- * throwing back such exception.
+ * <p>通常，使用给定 id 从缓存中获取对象失败时，可以不抛出该异常，
+ * 而是将其透明地当作缓存未命中（cache miss）来处理。
  *
  * @author Stephane Nicoll
  * @since 4.1
@@ -35,44 +33,40 @@ import org.springframework.lang.Nullable;
 public interface CacheErrorHandler {
 
 	/**
-	 * Handle the given runtime exception thrown by the cache provider when
-	 * retrieving an item with the specified {@code key}, possibly
-	 * rethrowing it as a fatal exception.
-	 * @param exception the exception thrown by the cache provider
-	 * @param cache the cache
-	 * @param key the key used to get the item
+	 * 处理缓存提供者在按指定 {@code key} 获取条目时抛出的给定运行时异常，
+	 * 可能会将其作为致命异常重新抛出。
+	 * @param exception 缓存提供者抛出的异常
+	 * @param cache 缓存
+	 * @param key 用于获取条目的键
 	 * @see Cache#get(Object)
 	 */
 	void handleCacheGetError(RuntimeException exception, Cache cache, Object key);
 
 	/**
-	 * Handle the given runtime exception thrown by the cache provider when
-	 * updating an item with the specified {@code key} and {@code value},
-	 * possibly rethrowing it as a fatal exception.
-	 * @param exception the exception thrown by the cache provider
-	 * @param cache the cache
-	 * @param key the key used to update the item
-	 * @param value the value to associate with the key
+	 * 处理缓存提供者在按指定 {@code key} 和 {@code value} 更新条目时抛出的
+	 * 给定运行时异常，可能会将其作为致命异常重新抛出。
+	 * @param exception 缓存提供者抛出的异常
+	 * @param cache 缓存
+	 * @param key 用于更新条目的键
+	 * @param value 要与该键关联的值
 	 * @see Cache#put(Object, Object)
 	 */
 	void handleCachePutError(RuntimeException exception, Cache cache, Object key, @Nullable Object value);
 
 	/**
-	 * Handle the given runtime exception thrown by the cache provider when
-	 * clearing an item with the specified {@code key}, possibly rethrowing
-	 * it as a fatal exception.
-	 * @param exception the exception thrown by the cache provider
-	 * @param cache the cache
-	 * @param key the key used to clear the item
+	 * 处理缓存提供者在按指定 {@code key} 清除条目时抛出的给定运行时异常，
+	 * 可能会将其作为致命异常重新抛出。
+	 * @param exception 缓存提供者抛出的异常
+	 * @param cache 缓存
+	 * @param key 用于清除条目的键
 	 */
 	void handleCacheEvictError(RuntimeException exception, Cache cache, Object key);
 
 	/**
-	 * Handle the given runtime exception thrown by the cache provider when
-	 * clearing the specified {@link Cache}, possibly rethrowing it as a
-	 * fatal exception.
-	 * @param exception the exception thrown by the cache provider
-	 * @param cache the cache to clear
+	 * 处理缓存提供者在清除指定 {@link Cache} 时抛出的给定运行时异常，
+	 * 可能会将其作为致命异常重新抛出。
+	 * @param exception 缓存提供者抛出的异常
+	 * @param cache 要清除的缓存
 	 */
 	void handleCacheClearError(RuntimeException exception, Cache cache);
 

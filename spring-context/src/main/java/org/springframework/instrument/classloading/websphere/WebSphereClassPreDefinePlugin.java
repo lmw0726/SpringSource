@@ -24,11 +24,10 @@ import java.security.CodeSource;
 import org.springframework.util.FileCopyUtils;
 
 /**
- * Adapter that implements WebSphere 7.0 ClassPreProcessPlugin interface,
- * delegating to a standard JDK {@link ClassFileTransformer} underneath.
+ * 实现 WebSphere 7.0 ClassPreProcessPlugin 接口的适配器，
+ * 内部委托给标准的 JDK {@link ClassFileTransformer}。
  *
- * <p>To avoid compile time checks again the vendor API, a dynamic proxy is
- * being used.
+ * <p>为避免对供应商 API 的编译时检查，使用了动态代理。
  *
  * @author Costin Leau
  * @since 3.1
@@ -39,15 +38,14 @@ class WebSphereClassPreDefinePlugin implements InvocationHandler {
 
 
 	/**
-	 * Create a new {@link WebSphereClassPreDefinePlugin}.
-	 * @param transformer the {@link ClassFileTransformer} to be adapted
-	 * (must not be {@code null})
+	 * 创建一个新的 {@link WebSphereClassPreDefinePlugin}。
+	 * @param transformer 要适配的 {@link ClassFileTransformer}（不能为 {@code null}）
 	 */
 	public WebSphereClassPreDefinePlugin(ClassFileTransformer transformer) {
 		this.transformer = transformer;
 		ClassLoader classLoader = transformer.getClass().getClassLoader();
 
-		// First force the full class loading of the weaver by invoking transformation on a dummy class
+		// 首先通过在虚拟类上调用转换来强制织入器的完整类加载
 		try {
 			String dummyClass = Dummy.class.getName().replace('.', '/');
 			byte[] bytes = FileCopyUtils.copyToByteArray(classLoader.getResourceAsStream(dummyClass + ".class"));
@@ -78,7 +76,7 @@ class WebSphereClassPreDefinePlugin implements InvocationHandler {
 	protected byte[] transform(String className, byte[] classfileBuffer, CodeSource codeSource, ClassLoader classLoader)
 			throws Exception {
 
-		// NB: WebSphere passes className as "." without class while the transformer expects a VM "/" format
+		// 注意：WebSphere 传递的 className 是不带类的 "."，而转换器期望的是 VM 的 "/" 格式
 		byte[] result = this.transformer.transform(classLoader, className.replace('.', '/'), null, null, classfileBuffer);
 		return (result != null ? result : classfileBuffer);
 	}

@@ -24,8 +24,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.Assert;
 
 /**
- * Delegates to a target {@link MessageInterpolator} implementation but enforces Spring's
- * managed Locale. Typically used to wrap the validation provider's default interpolator.
+ * 委托给目标 {@link MessageInterpolator} 实现，但强制使用 Spring 管理的 Locale。
+ * 通常用于包装验证提供者的默认插值器。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -37,8 +37,8 @@ public class LocaleContextMessageInterpolator implements MessageInterpolator {
 
 
 	/**
-	 * Create a new LocaleContextMessageInterpolator, wrapping the given target interpolator.
-	 * @param targetInterpolator the target MessageInterpolator to wrap
+	 * 创建新的 LocaleContextMessageInterpolator，包装给定的目标插值器。
+	 * @param targetInterpolator 要包装的目标 MessageInterpolator
 	 */
 	public LocaleContextMessageInterpolator(MessageInterpolator targetInterpolator) {
 		Assert.notNull(targetInterpolator, "Target MessageInterpolator must not be null");

@@ -25,7 +25,7 @@ import java.util.Locale;
  *
  * <p>Spring提供了两个生产环境的内置实现:
  * <ul>
- * <li>{@link org.springframework.context.support.ResourceBundleMessageSource}：构建在标准{@link java.util.ResourceBundle}之上，共享其限制。
+ * <li>{@link org.springframework.context.support.ResourceBundleMessageSource}：构建在标准{@link java.util.ResourceBundle}之上，共享其限制条件。
  * <li>{@link org.springframework.context.support.ReloadableResourceBundleMessageSource}：高度可配置，特别是在重新加载消息定义方面。
  * </ul>
  *
@@ -72,7 +72,7 @@ public interface MessageSource {
 	 *
 	 * @param resolvable 存储解析消息所需属性的值对象（可能包括默认消息）
 	 * @param locale     进行查找的区域设置
-	 * @return 已解析的消息（永远不为{@code null}，因为即使是{@code MessageSourceResolvable}提供的默认消息也需要是非null的）
+	 * @return 已解析的消息（永远不为{@code null}，因为即使是{@code MessageSourceResolvable}提供的默认消息也必须是非null的）
 	 * @throws NoSuchMessageException 如果未找到相应的消息（并且{@code MessageSourceResolvable}未提供默认消息）
 	 * @see MessageSourceResolvable#getCodes()
 	 * @see MessageSourceResolvable#getArguments()

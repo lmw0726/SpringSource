@@ -27,9 +27,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 
 /**
- * Configurable bean class that exposes a specific JSR-303 Validator
- * through its original interface as well as through the Spring
- * {@link org.springframework.validation.Validator} interface.
+ * 可配置的 Bean 类，通过 JSR-303 Validator 的原始接口以及
+ * Spring 的 {@link org.springframework.validation.Validator} 接口
+ * 暴露特定的 Validator。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -47,22 +47,22 @@ public class CustomValidatorBean extends SpringValidatorAdapter implements Valid
 
 
 	/**
-	 * Set the ValidatorFactory to obtain the target Validator from.
-	 * <p>Default is {@link javax.validation.Validation#buildDefaultValidatorFactory()}.
+	 * 设置用于获取目标 Validator 的 ValidatorFactory。
+	 * <p>默认值为 {@link javax.validation.Validation#buildDefaultValidatorFactory()}。
 	 */
 	public void setValidatorFactory(ValidatorFactory validatorFactory) {
 		this.validatorFactory = validatorFactory;
 	}
 
 	/**
-	 * Specify a custom MessageInterpolator to use for this Validator.
+	 * 指定用于此 Validator 的自定义 MessageInterpolator。
 	 */
 	public void setMessageInterpolator(MessageInterpolator messageInterpolator) {
 		this.messageInterpolator = messageInterpolator;
 	}
 
 	/**
-	 * Specify a custom TraversableResolver to use for this Validator.
+	 * 指定用于此 Validator 的自定义 TraversableResolver。
 	 */
 	public void setTraversableResolver(TraversableResolver traversableResolver) {
 		this.traversableResolver = traversableResolver;

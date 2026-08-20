@@ -24,7 +24,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Base class for cache operations.
+ * 缓存操作的基类。
  *
  * @author Costin Leau
  * @author Stephane Nicoll
@@ -51,7 +51,7 @@ public abstract class CacheOperation implements BasicOperation {
 
 
 	/**
-	 * Create a new {@link CacheOperation} instance from the given builder.
+	 * 根据给定的构建器（builder）创建一个新的 {@link CacheOperation} 实例。
 	 * @since 4.3
 	 */
 	protected CacheOperation(Builder b) {
@@ -97,7 +97,7 @@ public abstract class CacheOperation implements BasicOperation {
 
 
 	/**
-	 * This implementation compares the {@code toString()} results.
+	 * 该实现会比较 {@code toString()} 的结果。
 	 * @see #toString()
 	 */
 	@Override
@@ -106,7 +106,7 @@ public abstract class CacheOperation implements BasicOperation {
 	}
 
 	/**
-	 * This implementation returns {@code toString()}'s hash code.
+	 * 该实现返回 {@code toString()} 的哈希码。
 	 * @see #toString()
 	 */
 	@Override
@@ -115,10 +115,10 @@ public abstract class CacheOperation implements BasicOperation {
 	}
 
 	/**
-	 * Return an identifying description for this cache operation.
-	 * <p>Returned value is produced by calling {@link Builder#getOperationDescription()}
-	 * during object construction. This method is used in {@link #hashCode} and
-	 * {@link #equals}.
+	 * 返回此缓存操作的标识性描述。
+	 * <p>返回值是在对象构建期间调用 {@link Builder#getOperationDescription()}
+	 * 生成的。该方法用于 {@link #hashCode} 和
+	 * {@link #equals}。
 	 * @see Builder#getOperationDescription()
 	 */
 	@Override
@@ -128,7 +128,7 @@ public abstract class CacheOperation implements BasicOperation {
 
 
 	/**
-	 * Base class for builders that can be used to create a {@link CacheOperation}.
+	 * 可用于创建 {@link CacheOperation} 的构建器（builder）的基类。
 	 * @since 4.3
 	 */
 	public abstract static class Builder {
@@ -211,8 +211,8 @@ public abstract class CacheOperation implements BasicOperation {
 		}
 
 		/**
-		 * Return an identifying description for this caching operation.
-		 * <p>Available to subclasses, for inclusion in their {@code toString()} result.
+		 * 返回此缓存操作的标识性描述。
+		 * <p>可供子类使用，以便包含在其 {@code toString()} 的结果中。
 		 */
 		protected StringBuilder getOperationDescription() {
 			StringBuilder result = new StringBuilder(getClass().getSimpleName());

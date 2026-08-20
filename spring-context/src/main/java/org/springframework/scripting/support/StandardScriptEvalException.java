@@ -19,15 +19,15 @@ package org.springframework.scripting.support;
 import javax.script.ScriptException;
 
 /**
- * Exception decorating a {@link javax.script.ScriptException} coming out of
- * JSR-223 script evaluation, i.e. a {@link javax.script.ScriptEngine#eval}
- * call or {@link javax.script.Invocable#invokeMethod} /
- * {@link javax.script.Invocable#invokeFunction} call.
+ * 装饰从 JSR-223 脚本求值中产生的 {@link javax.script.ScriptException} 的异常，
+ * 即 {@link javax.script.ScriptEngine#eval} 调用或
+ * {@link javax.script.Invocable#invokeMethod} /
+ * {@link javax.script.Invocable#invokeFunction} 调用产生的异常。
  *
- * <p>This exception does not print the Java stacktrace, since the JSR-223
- * {@link ScriptException} results in a rather convoluted text output.
- * From that perspective, this exception is primarily a decorator for a
- * {@link ScriptException} root cause passed into an outer exception.
+ * <p>此异常不会打印 Java 堆栈跟踪，因为 JSR-223
+ * {@link ScriptException} 产生的文本输出相当复杂。
+ * 从这个角度来看，此异常主要是传递给外部异常的
+ * {@link ScriptException} 根因的装饰器。
  *
  * @author Juergen Hoeller
  * @author Sebastien Deleuze
@@ -40,7 +40,7 @@ public class StandardScriptEvalException extends RuntimeException {
 
 
 	/**
-	 * Construct a new script eval exception with the specified original exception.
+	 * 使用指定的原始异常构造一个新的脚本求值异常。
 	 */
 	public StandardScriptEvalException(ScriptException ex) {
 		super(ex.getMessage());

@@ -27,13 +27,13 @@ import org.springframework.jndi.JndiTemplate;
 import org.springframework.lang.Nullable;
 
 /**
- * JNDI-based variant of {@link ConcurrentTaskExecutor}, performing a default lookup for
- * JSR-236's "java:comp/DefaultManagedExecutorService" in a Java EE 7/8 environment.
+ * {@link ConcurrentTaskExecutor} 的基于 JNDI 的变体，在 Java EE 7/8 环境中执行对
+ * JSR-236 的 "java:comp/DefaultManagedExecutorService" 的默认查找。
  *
- * <p>Note: This class is not strictly JSR-236 based; it can work with any regular
- * {@link java.util.concurrent.Executor} that can be found in JNDI.
- * The actual adapting to {@link javax.enterprise.concurrent.ManagedExecutorService}
- * happens in the base class {@link ConcurrentTaskExecutor} itself.
+ * <p>注意：此类并非严格基于 JSR-236；它可以与任何可在 JNDI 中找到的常规
+ * {@link java.util.concurrent.Executor} 协同工作。
+ * 实际适配到 {@link javax.enterprise.concurrent.ManagedExecutorService}
+ * 的工作发生在基类 {@link ConcurrentTaskExecutor} 本身中。
  *
  * @author Juergen Hoeller
  * @since 4.0
@@ -48,7 +48,7 @@ public class DefaultManagedTaskExecutor extends ConcurrentTaskExecutor implement
 
 
 	/**
-	 * Set the JNDI template to use for JNDI lookups.
+	 * 设置用于 JNDI 查找的 JNDI 模板。
 	 * @see org.springframework.jndi.JndiAccessor#setJndiTemplate
 	 */
 	public void setJndiTemplate(JndiTemplate jndiTemplate) {
@@ -56,7 +56,7 @@ public class DefaultManagedTaskExecutor extends ConcurrentTaskExecutor implement
 	}
 
 	/**
-	 * Set the JNDI environment to use for JNDI lookups.
+	 * 设置用于 JNDI 查找的 JNDI 环境。
 	 * @see org.springframework.jndi.JndiAccessor#setJndiEnvironment
 	 */
 	public void setJndiEnvironment(Properties jndiEnvironment) {
@@ -64,9 +64,8 @@ public class DefaultManagedTaskExecutor extends ConcurrentTaskExecutor implement
 	}
 
 	/**
-	 * Set whether the lookup occurs in a Java EE container, i.e. if the prefix
-	 * "java:comp/env/" needs to be added if the JNDI name doesn't already
-	 * contain it. PersistenceAnnotationBeanPostProcessor's default is "true".
+	 * 设置查找是否在 Java EE 容器中进行，即如果 JNDI 名称尚未包含该前缀，
+	 * 是否需要添加 "java:comp/env/" 前缀。PersistenceAnnotationBeanPostProcessor 的默认值为 "true"。
 	 * @see org.springframework.jndi.JndiLocatorSupport#setResourceRef
 	 */
 	public void setResourceRef(boolean resourceRef) {
@@ -74,10 +73,10 @@ public class DefaultManagedTaskExecutor extends ConcurrentTaskExecutor implement
 	}
 
 	/**
-	 * Specify a JNDI name of the {@link java.util.concurrent.Executor} to delegate to,
-	 * replacing the default JNDI name "java:comp/DefaultManagedExecutorService".
-	 * <p>This can either be a fully qualified JNDI name, or the JNDI name relative
-	 * to the current environment naming context if "resourceRef" is set to "true".
+	 * 指定要委托的 {@link java.util.concurrent.Executor} 的 JNDI 名称，
+	 * 替换默认的 JNDI 名称 "java:comp/DefaultManagedExecutorService"。
+	 * <p>这可以是完全限定的 JNDI 名称，也可以是如果 "resourceRef" 设置为 "true" 时
+	 * 相对于当前环境命名上下文的 JNDI 名称。
 	 * @see #setConcurrentExecutor
 	 * @see #setResourceRef
 	 */

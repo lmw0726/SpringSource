@@ -33,8 +33,8 @@ import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.Assert;
 
 /**
- * Collection of utilities for working with {@link ComponentScan @ComponentScan}
- * {@linkplain ComponentScan.Filter type filters}.
+ * 用于处理 {@link ComponentScan @ComponentScan}
+ * {@linkplain ComponentScan.Filter 类型过滤器}的工具类集合。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -46,20 +46,17 @@ import org.springframework.util.Assert;
 public abstract class TypeFilterUtils {
 
 	/**
-	 * Create {@linkplain TypeFilter type filters} from the supplied
-	 * {@link AnnotationAttributes}, such as those sourced from
-	 * {@link ComponentScan#includeFilters()} or {@link ComponentScan#excludeFilters()}.
-	 * <p>Each {@link TypeFilter} will be instantiated using an appropriate
-	 * constructor, with {@code BeanClassLoaderAware}, {@code BeanFactoryAware},
-	 * {@code EnvironmentAware}, and {@code ResourceLoaderAware} contracts
-	 * invoked if they are implemented by the type filter.
-	 * @param filterAttributes {@code AnnotationAttributes} for a
-	 * {@link ComponentScan.Filter @Filter} declaration
-	 * @param environment the {@code Environment} to make available to filters
-	 * @param resourceLoader the {@code ResourceLoader} to make available to filters
-	 * @param registry the {@code BeanDefinitionRegistry} to make available to filters
-	 * as a {@link org.springframework.beans.factory.BeanFactory} if applicable
-	 * @return a list of instantiated and configured type filters
+	 * 根据提供的 {@link AnnotationAttributes}（例如来自
+	 * {@link ComponentScan#includeFilters()} 或 {@link ComponentScan#excludeFilters()} 的注解属性）
+	 * 创建 {@linkplain TypeFilter 类型过滤器}。
+	 * <p>每个 {@link TypeFilter} 将使用合适的构造函数进行实例化，
+	 * 如果类型过滤器实现了 {@code BeanClassLoaderAware}、{@code BeanFactoryAware}、
+	 * {@code EnvironmentAware} 和 {@code ResourceLoaderAware} 接口，则会调用相应的回调方法。
+	 * @param filterAttributes {@link ComponentScan.Filter @Filter} 声明的 {@code AnnotationAttributes}
+	 * @param environment 提供给过滤器使用的 {@code Environment}
+	 * @param resourceLoader 提供给过滤器使用的 {@code ResourceLoader}
+	 * @param registry 在适用时作为 {@link org.springframework.beans.factory.BeanFactory} 提供给过滤器使用的 {@code BeanDefinitionRegistry}
+	 * @return 实例化并配置好的类型过滤器列表
 	 * @see TypeFilter
 	 * @see AnnotationTypeFilter
 	 * @see AssignableTypeFilter

@@ -1,6 +1,6 @@
 /**
- * Contains support classes for connecting to local and remote {@code MBeanServer}s
- * and for exposing an {@code MBeanServer} to remote clients.
+ * 包含用于连接本地和远程 {@code MBeanServer} 的支持类，
+ * 以及用于将 {@code MBeanServer} 暴露给远程客户端的支持类。
  */
 @NonNullApi
 @NonNullFields

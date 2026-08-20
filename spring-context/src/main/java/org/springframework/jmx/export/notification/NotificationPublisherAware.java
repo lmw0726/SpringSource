@@ -19,20 +19,19 @@ package org.springframework.jmx.export.notification;
 import org.springframework.beans.factory.Aware;
 
 /**
- * Interface to be implemented by any Spring-managed resource that is to be
- * registered with an {@link javax.management.MBeanServer} and wishes to send
- * JMX {@link javax.management.Notification javax.management.Notifications}.
+ * 需要由任何通过 Spring 管理的、要注册到 {@link javax.management.MBeanServer}
+ * 的资源实现的接口，该资源希望发送 JMX
+ * {@link javax.management.Notification javax.management.Notifications}。
  *
- * <p>Provides Spring-created managed resources with a {@link NotificationPublisher}
- * as soon as they are registered with the {@link javax.management.MBeanServer}.
+ * <p>为通过 Spring 创建的托管资源提供 {@link NotificationPublisher}，
+ * 一旦它们注册到 {@link javax.management.MBeanServer} 即可使用。
  *
- * <p><b>NOTE:</b> This interface only applies to simple Spring-managed
- * beans which happen to get exported through Spring's
- * {@link org.springframework.jmx.export.MBeanExporter}.
- * It does not apply to any non-exported beans; neither does it apply
- * to standard MBeans exported by Spring. For standard JMX MBeans,
- * consider implementing the {@link javax.management.modelmbean.ModelMBeanNotificationBroadcaster}
- * interface (or implementing a full {@link javax.management.modelmbean.ModelMBean}).
+ * <p><b>注意：</b>此接口仅适用于通过 Spring 的
+ * {@link org.springframework.jmx.export.MBeanExporter} 导出的简单 Spring 管理的 Bean。
+ * 它不适用于任何未导出的 Bean；也不适用于由 Spring 导出的标准 MBean。
+ * 对于标准 JMX MBean，请考虑实现
+ * {@link javax.management.modelmbean.ModelMBeanNotificationBroadcaster}
+ * 接口（或实现完整的 {@link javax.management.modelmbean.ModelMBean}）。
  *
  * @author Rob Harrop
  * @author Chris Beams
@@ -42,7 +41,7 @@ import org.springframework.beans.factory.Aware;
 public interface NotificationPublisherAware extends Aware {
 
 	/**
-	 * Set the {@link NotificationPublisher} instance for the current managed resource instance.
+	 * 为当前托管资源实例设置 {@link NotificationPublisher} 实例。
 	 */
 	void setNotificationPublisher(NotificationPublisher notificationPublisher);
 

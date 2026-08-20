@@ -29,17 +29,16 @@ import org.springframework.jmx.MBeanServerNotFoundException;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link FactoryBean} that obtains a {@link javax.management.MBeanServer} reference
- * through the standard JMX 1.2 {@link javax.management.MBeanServerFactory}
- * API.
+ * 通过标准 JMX 1.2 {@link javax.management.MBeanServerFactory}
+ * API 获取 {@link javax.management.MBeanServer} 引用的 {@link FactoryBean}。
  *
- * <p>Exposes the {@code MBeanServer} for bean references.
+ * <p>将 {@code MBeanServer} 暴露为 bean 引用。
  *
- * <p>By default, {@code MBeanServerFactoryBean} will always create
- * a new {@code MBeanServer} even if one is already running. To have
- * the {@code MBeanServerFactoryBean} attempt to locate a running
- * {@code MBeanServer} first, set the value of the
- * "locateExistingServerIfPossible" property to "true".
+ * <p>默认情况下，{@code MBeanServerFactoryBean} 总是会创建一个新的
+ * {@code MBeanServer}，即使已经有一个正在运行。要让
+ * {@code MBeanServerFactoryBean} 先尝试定位正在运行的
+ * {@code MBeanServer}，请将 "locateExistingServerIfPossible"
+ * 属性的值设置为 "true"。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -54,6 +53,7 @@ import org.springframework.lang.Nullable;
  * @see ConnectorServerFactoryBean
  */
 public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, InitializingBean, DisposableBean {
+
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -74,22 +74,20 @@ public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, Initial
 
 
 	/**
-	 * Set whether or not the {@code MBeanServerFactoryBean} should attempt
-	 * to locate a running {@code MBeanServer} before creating one.
-	 * <p>Default is {@code false}.
+	 * 设置 {@code MBeanServerFactoryBean} 是否应在创建新的 MBeanServer
+	 * 之前尝试定位正在运行的 {@code MBeanServer}。
+	 * <p>默认值为 {@code false}。
 	 */
 	public void setLocateExistingServerIfPossible(boolean locateExistingServerIfPossible) {
 		this.locateExistingServerIfPossible = locateExistingServerIfPossible;
 	}
 
 	/**
-	 * Set the agent id of the {@code MBeanServer} to locate.
-	 * <p>Default is none. If specified, this will result in an
-	 * automatic attempt being made to locate the attendant MBeanServer,
-	 * and (importantly) if said MBeanServer cannot be located no
-	 * attempt will be made to create a new MBeanServer (and an
-	 * MBeanServerNotFoundException will be thrown at resolution time).
-	 * <p>Specifying the empty String indicates the platform MBeanServer.
+	 * 设置要定位的 {@code MBeanServer} 的 agent id。
+	 * <p>默认为无。如果指定了此值，将会自动尝试定位对应的 MBeanServer，
+	 * 并且（重要的是）如果无法定位到该 MBeanServer，则不会尝试创建新的
+	 * MBeanServer（并在解析时抛出 MBeanServerNotFoundException）。
+	 * <p>指定空字符串表示平台 MBeanServer。
 	 * @see javax.management.MBeanServerFactory#findMBeanServer(String)
 	 */
 	public void setAgentId(String agentId) {
@@ -97,10 +95,10 @@ public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, Initial
 	}
 
 	/**
-	 * Set the default domain to be used by the {@code MBeanServer},
-	 * to be passed to {@code MBeanServerFactory.createMBeanServer()}
-	 * or {@code MBeanServerFactory.findMBeanServer()}.
-	 * <p>Default is none.
+	 * 设置 {@code MBeanServer} 使用的默认域，该值将传递给
+	 * {@code MBeanServerFactory.createMBeanServer()}
+	 * 或 {@code MBeanServerFactory.findMBeanServer()}。
+	 * <p>默认为无。
 	 * @see javax.management.MBeanServerFactory#createMBeanServer(String)
 	 * @see javax.management.MBeanServerFactory#findMBeanServer(String)
 	 */
@@ -109,10 +107,10 @@ public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, Initial
 	}
 
 	/**
-	 * Set whether to register the {@code MBeanServer} with the
-	 * {@code MBeanServerFactory}, making it available through
-	 * {@code MBeanServerFactory.findMBeanServer()}.
-	 * <p>Default is {@code true}.
+	 * 设置是否将 {@code MBeanServer} 注册到
+	 * {@code MBeanServerFactory}，使其可通过
+	 * {@code MBeanServerFactory.findMBeanServer()} 访问。
+	 * <p>默认值为 {@code true}。
 	 * @see javax.management.MBeanServerFactory#createMBeanServer
 	 * @see javax.management.MBeanServerFactory#findMBeanServer
 	 */
@@ -122,18 +120,18 @@ public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, Initial
 
 
 	/**
-	 * Creates the {@code MBeanServer} instance.
+	 * 创建 {@code MBeanServer} 实例。
 	 */
 	@Override
 	public void afterPropertiesSet() throws MBeanServerNotFoundException {
-		// Try to locate existing MBeanServer, if desired.
+		// 如果需要，尝试定位现有的 MBeanServer。
 		if (this.locateExistingServerIfPossible || this.agentId != null) {
 			try {
 				this.server = locateMBeanServer(this.agentId);
 			}
 			catch (MBeanServerNotFoundException ex) {
-				// If agentId was specified, we were only supposed to locate that
-				// specific MBeanServer; so let's bail if we can't find it.
+				// 如果指定了 agentId，则只需要定位该特定的 MBeanServer；
+				// 因此如果找不到就直接退出。
 				if (this.agentId != null) {
 					throw ex;
 				}
@@ -141,7 +139,7 @@ public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, Initial
 			}
 		}
 
-		// Create a new MBeanServer and register it, if desired.
+		// 如果需要，创建一个新的 MBeanServer 并注册它。
 		if (this.server == null) {
 			this.server = createMBeanServer(this.defaultDomain, this.registerWithFactory);
 			this.newlyRegistered = this.registerWithFactory;
@@ -149,16 +147,15 @@ public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, Initial
 	}
 
 	/**
-	 * Attempt to locate an existing {@code MBeanServer}.
-	 * Called if {@code locateExistingServerIfPossible} is set to {@code true}.
-	 * <p>The default implementation attempts to find an {@code MBeanServer} using
-	 * a standard lookup. Subclasses may override to add additional location logic.
-	 * @param agentId the agent identifier of the MBeanServer to retrieve.
-	 * If this parameter is {@code null}, all registered MBeanServers are
-	 * considered.
-	 * @return the {@code MBeanServer} if found
+	 * 尝试定位现有的 {@code MBeanServer}。
+	 * 当 {@code locateExistingServerIfPossible} 设置为 {@code true} 时调用。
+	 * <p>默认实现尝试使用标准查找来定位 {@code MBeanServer}。
+	 * 子类可以重写此方法以添加额外的定位逻辑。
+	 * @param agentId 要检索的 MBeanServer 的 agent 标识符。
+	 * 如果此参数为 {@code null}，则考虑所有已注册的 MBeanServer。
+	 * @return 如果找到则返回 {@code MBeanServer}
 	 * @throws org.springframework.jmx.MBeanServerNotFoundException
-	 * if no {@code MBeanServer} could be found
+	 * 如果找不到 {@code MBeanServer}
 	 * @see #setLocateExistingServerIfPossible
 	 * @see JmxUtils#locateMBeanServer(String)
 	 * @see javax.management.MBeanServerFactory#findMBeanServer(String)
@@ -168,11 +165,11 @@ public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, Initial
 	}
 
 	/**
-	 * Create a new {@code MBeanServer} instance and register it with the
-	 * {@code MBeanServerFactory}, if desired.
-	 * @param defaultDomain the default domain, or {@code null} if none
-	 * @param registerWithFactory whether to register the {@code MBeanServer}
-	 * with the {@code MBeanServerFactory}
+	 * 创建一个新的 {@code MBeanServer} 实例，并根据需要将其注册到
+	 * {@code MBeanServerFactory}。
+	 * @param defaultDomain 默认域，如果无则为 {@code null}
+	 * @param registerWithFactory 是否将 {@code MBeanServer}
+	 * 注册到 {@code MBeanServerFactory}
 	 * @see javax.management.MBeanServerFactory#createMBeanServer
 	 * @see javax.management.MBeanServerFactory#newMBeanServer
 	 */
@@ -204,7 +201,7 @@ public class MBeanServerFactoryBean implements FactoryBean<MBeanServer>, Initial
 
 
 	/**
-	 * Unregisters the {@code MBeanServer} instance, if necessary.
+	 * 如果需要，取消注册 {@code MBeanServer} 实例。
 	 */
 	@Override
 	public void destroy() {

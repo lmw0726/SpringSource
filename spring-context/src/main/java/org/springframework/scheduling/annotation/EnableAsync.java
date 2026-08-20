@@ -29,11 +29,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 
 /**
- * Enables Spring's asynchronous method execution capability, similar to functionality
- * found in Spring's {@code <task:*>} XML namespace.
+ * 启用 Spring 的异步方法执行能力，类似于 Spring 的 {@code <task:*>} XML 命名空间中的功能。
  *
- * <p>To be used together with @{@link Configuration Configuration} classes as follows,
- * enabling annotation-driven async processing for an entire Spring application context:
+ * <p>与 @{@link Configuration Configuration} 类一起使用如下，
+ * 为整个 Spring 应用上下文启用注解驱动的异步处理：
  *
  * <pre class="code">
  * &#064;Configuration
@@ -42,11 +41,10 @@ import org.springframework.core.Ordered;
  *
  * }</pre>
  *
- * {@code MyAsyncBean} is a user-defined type with one or more methods annotated with
- * either Spring's {@code @Async} annotation, the EJB 3.1 {@code @javax.ejb.Asynchronous}
- * annotation, or any custom annotation specified via the {@link #annotation} attribute.
- * The aspect is added transparently for any registered bean, for instance via this
- * configuration:
+ * {@code MyAsyncBean} 是一个用户定义的类型，其一个或多个方法使用了 Spring 的
+ * {@code @Async} 注解、EJB 3.1 的 {@code @javax.ejb.Asynchronous} 注解，
+ * 或通过 {@link #annotation} 属性指定的任何自定义注解。
+ * 切面会透明地添加到任何已注册的 Bean 上，例如通过以下配置：
  *
  * <pre class="code">
  * &#064;Configuration
@@ -58,28 +56,27 @@ import org.springframework.core.Ordered;
  *     }
  * }</pre>
  *
- * <p>By default, Spring will be searching for an associated thread pool definition:
- * either a unique {@link org.springframework.core.task.TaskExecutor} bean in the context,
- * or an {@link java.util.concurrent.Executor} bean named "taskExecutor" otherwise. If
- * neither of the two is resolvable, a {@link org.springframework.core.task.SimpleAsyncTaskExecutor}
- * will be used to process async method invocations. Besides, annotated methods having a
- * {@code void} return type cannot transmit any exception back to the caller. By default,
- * such uncaught exceptions are only logged.
+ * <p>默认情况下，Spring 将搜索关联的线程池定义：
+ * 要么是上下文中唯一的 {@link org.springframework.core.task.TaskExecutor} Bean，
+ * 要么是名为 "taskExecutor" 的 {@link java.util.concurrent.Executor} Bean。
+ * 如果这两个都无法解析，则将使用
+ * {@link org.springframework.core.task.SimpleAsyncTaskExecutor} 来处理异步方法调用。
+ * 此外，返回类型为 {@code void} 的注解方法无法将任何异常传递回调用者。
+ * 默认情况下，这些未捕获的异常仅被记录日志。
  *
- * <p>To customize all this, implement {@link AsyncConfigurer} and provide:
+ * <p>要自定义以上所有配置，请实现 {@link AsyncConfigurer} 并提供：
  * <ul>
- * <li>your own {@link java.util.concurrent.Executor Executor} through the
- * {@link AsyncConfigurer#getAsyncExecutor getAsyncExecutor()} method, and</li>
- * <li>your own {@link org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
- * AsyncUncaughtExceptionHandler} through the {@link AsyncConfigurer#getAsyncUncaughtExceptionHandler
- * getAsyncUncaughtExceptionHandler()}
- * method.</li>
+ * <li>通过 {@link AsyncConfigurer#getAsyncExecutor getAsyncExecutor()} 方法提供
+ * 您自己的 {@link java.util.concurrent.Executor Executor}，以及</li>
+ * <li>通过 {@link AsyncConfigurer#getAsyncUncaughtExceptionHandler
+ * getAsyncUncaughtExceptionHandler()} 方法提供
+ * 您自己的 {@link org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
+ * AsyncUncaughtExceptionHandler}。</li>
  * </ul>
  *
- * <p><b>NOTE: {@link AsyncConfigurer} configuration classes get initialized early
- * in the application context bootstrap. If you need any dependencies on other beans
- * there, make sure to declare them 'lazy' as far as possible in order to let them
- * go through other post-processors as well.</b>
+ * <p><b>注意：{@link AsyncConfigurer} 配置类在应用上下文引导过程中较早初始化。
+ * 如果您在那里需要依赖其他 Bean，请确保尽可能将它们声明为"延迟加载"，
+ * 以便它们也能经过其他后处理器的处理。</b>
  *
  * <pre class="code">
  * &#064;Configuration
@@ -103,18 +100,15 @@ import org.springframework.core.Ordered;
  *     }
  * }</pre>
  *
- * <p>If only one item needs to be customized, {@code null} can be returned to
- * keep the default settings. Consider also extending from {@link AsyncConfigurerSupport}
- * when possible.
+ * <p>如果只需要自定义其中一项，可以返回 {@code null} 以保留默认设置。
+ * 尽可能考虑也继承 {@link AsyncConfigurerSupport}。
  *
- * <p>Note: In the above example the {@code ThreadPoolTaskExecutor} is not a fully managed
- * Spring bean. Add the {@code @Bean} annotation to the {@code getAsyncExecutor()} method
- * if you want a fully managed bean. In such circumstances it is no longer necessary to
- * manually call the {@code executor.initialize()} method as this will be invoked
- * automatically when the bean is initialized.
+ * <p>注意：在上面的示例中，{@code ThreadPoolTaskExecutor} 不是一个完全受管理的
+ * Spring Bean。如果您想要一个完全受管理的 Bean，请在 {@code getAsyncExecutor()} 方法上
+ * 添加 {@code @Bean} 注解。在这种情况下，不再需要手动调用
+ * {@code executor.initialize()} 方法，因为该方法会在 Bean 初始化时自动调用。
  *
- * <p>For reference, the example above can be compared to the following Spring XML
- * configuration:
+ * <p>作为参考，上述示例可以与以下 Spring XML 配置进行比较：
  *
  * <pre class="code">
  * &lt;beans&gt;
@@ -130,22 +124,20 @@ import org.springframework.core.Ordered;
  * &lt;/beans&gt;
  * </pre>
  *
- * The above XML-based and JavaConfig-based examples are equivalent except for the
- * setting of the <em>thread name prefix</em> of the {@code Executor}; this is because
- * the {@code <task:executor>} element does not expose such an attribute. This
- * demonstrates how the JavaConfig-based approach allows for maximum configurability
- * through direct access to actual componentry.
+ * 上述基于 XML 和基于 JavaConfig 的示例是等价的，唯一的区别在于
+ * {@code Executor} 的<em>线程名称前缀</em>设置；这是因为
+ * {@code <task:executor>} 元素没有暴露这样的属性。
+ * 这演示了基于 JavaConfig 的方法如何通过直接访问实际组件来实现最大的可配置性。
  *
- * <p>The {@link #mode} attribute controls how advice is applied: If the mode is
- * {@link AdviceMode#PROXY} (the default), then the other attributes control the behavior
- * of the proxying. Please note that proxy mode allows for interception of calls through
- * the proxy only; local calls within the same class cannot get intercepted that way.
+ * <p>{@link #mode} 属性控制通知的应用方式：如果模式是
+ * {@link AdviceMode#PROXY}（默认值），则其他属性控制代理的行为。
+ * 请注意，代理模式仅允许拦截通过代理的调用；
+ * 同一类中的本地调用无法以这种方式被拦截。
  *
- * <p>Note that if the {@linkplain #mode} is set to {@link AdviceMode#ASPECTJ}, then the
- * value of the {@link #proxyTargetClass} attribute will be ignored. Note also that in
- * this case the {@code spring-aspects} module JAR must be present on the classpath, with
- * compile-time weaving or load-time weaving applying the aspect to the affected classes.
- * There is no proxy involved in such a scenario; local calls will be intercepted as well.
+ * <p>请注意，如果 {@linkplain #mode} 设置为 {@link AdviceMode#ASPECTJ}，
+ * 则 {@link #proxyTargetClass} 属性的值将被忽略。另请注意，在这种情况下，
+ * {@code spring-aspects} 模块 JAR 必须在类路径上，并且需要编译时织入或加载时织入
+ * 将切面应用于受影响的类。在这种场景中不涉及代理；本地调用也将被拦截。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -163,48 +155,41 @@ import org.springframework.core.Ordered;
 public @interface EnableAsync {
 
 	/**
-	 * Indicate the 'async' annotation type to be detected at either class
-	 * or method level.
-	 * <p>By default, both Spring's @{@link Async} annotation and the EJB 3.1
-	 * {@code @javax.ejb.Asynchronous} annotation will be detected.
-	 * <p>This attribute exists so that developers can provide their own
-	 * custom annotation type to indicate that a method (or all methods of
-	 * a given class) should be invoked asynchronously.
+	 * 指定在类级别或方法级别检测的"异步"注解类型。
+	 * <p>默认情况下，将同时检测 Spring 的 @{@link Async} 注解和
+	 * EJB 3.1 的 {@code @javax.ejb.Asynchronous} 注解。
+	 * <p>此属性的存在是为了让开发者可以提供自己的自定义注解类型，
+	 * 以指示某个方法（或给定类的所有方法）应被异步调用。
 	 */
 	Class<? extends Annotation> annotation() default Annotation.class;
 
 	/**
-	 * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed
-	 * to standard Java interface-based proxies.
-	 * <p><strong>Applicable only if the {@link #mode} is set to {@link AdviceMode#PROXY}</strong>.
-	 * <p>The default is {@code false}.
-	 * <p>Note that setting this attribute to {@code true} will affect <em>all</em>
-	 * Spring-managed beans requiring proxying, not just those marked with {@code @Async}.
-	 * For example, other beans marked with Spring's {@code @Transactional} annotation
-	 * will be upgraded to subclass proxying at the same time. This approach has no
-	 * negative impact in practice unless one is explicitly expecting one type of proxy
-	 * vs. another &mdash; for example, in tests.
+	 * 指定是否创建基于子类（CGLIB）的代理，而不是标准的基于 Java 接口的代理。
+	 * <p><strong>仅当 {@link #mode} 设置为 {@link AdviceMode#PROXY} 时适用。</strong>
+	 * <p>默认值为 {@code false}。
+	 * <p>请注意，将此属性设置为 {@code true} 将影响<em>所有</em>需要代理的
+	 * Spring 管理 Bean，而不仅仅是标记了 {@code @Async} 的 Bean。
+	 * 例如，其他标记了 Spring 的 {@code @Transactional} 注解的 Bean
+	 * 也将同时升级为子类代理。这种方法在实践中没有负面影响，除非有人明确期望
+	 * 某种类型的代理 &mdash; 例如在测试中。
 	 */
 	boolean proxyTargetClass() default false;
 
 	/**
-	 * Indicate how async advice should be applied.
-	 * <p><b>The default is {@link AdviceMode#PROXY}.</b>
-	 * Please note that proxy mode allows for interception of calls through the proxy
-	 * only. Local calls within the same class cannot get intercepted that way; an
-	 * {@link Async} annotation on such a method within a local call will be ignored
-	 * since Spring's interceptor does not even kick in for such a runtime scenario.
-	 * For a more advanced mode of interception, consider switching this to
-	 * {@link AdviceMode#ASPECTJ}.
+	 * 指定异步通知的应用方式。
+	 * <p><b>默认值为 {@link AdviceMode#PROXY}。</b>
+	 * 请注意，代理模式仅允许拦截通过代理的调用。
+	 * 同一类中的本地调用无法以这种方式被拦截；在本地调用中
+	 * 方法上的 {@link Async} 注解将被忽略，因为 Spring 的拦截器在这种运行时场景下根本不会启动。
+	 * 要使用更高级的拦截模式，请考虑将其切换为
+	 * {@link AdviceMode#ASPECTJ}。
 	 */
 	AdviceMode mode() default AdviceMode.PROXY;
 
 	/**
-	 * Indicate the order in which the {@link AsyncAnnotationBeanPostProcessor}
-	 * should be applied.
-	 * <p>The default is {@link Ordered#LOWEST_PRECEDENCE} in order to run
-	 * after all other post-processors, so that it can add an advisor to
-	 * existing proxies rather than double-proxy.
+	 * 指定 {@link AsyncAnnotationBeanPostProcessor} 的应用顺序。
+	 * <p>默认值为 {@link Ordered#LOWEST_PRECEDENCE}，以便在所有其他后处理器之后运行，
+	 * 这样它可以向现有代理添加通知器，而不是进行双重代理。
 	 */
 	int order() default Ordered.LOWEST_PRECEDENCE;
 

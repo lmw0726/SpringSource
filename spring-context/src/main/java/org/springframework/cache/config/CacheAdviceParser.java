@@ -42,7 +42,7 @@ import org.springframework.util.xml.DomUtils;
 
 /**
  * {@link org.springframework.beans.factory.xml.BeanDefinitionParser
- * BeanDefinitionParser} for the {@code <tx:advice/>} tag.
+ * BeanDefinitionParser}，用于解析 {@code <tx:advice/>} 标签。
  *
  * @author Costin Leau
  * @author Phillip Webb
@@ -73,12 +73,12 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 
 		List<Element> cacheDefs = DomUtils.getChildElementsByTagName(element, DEFS_ELEMENT);
 		if (!cacheDefs.isEmpty()) {
-			// Using attributes source.
+			// 使用基于属性（attributes）的来源。
 			List<RootBeanDefinition> attributeSourceDefinitions = parseDefinitionsSources(cacheDefs, parserContext);
 			builder.addPropertyValue("cacheOperationSources", attributeSourceDefinitions);
 		}
 		else {
-			// Assume annotations source.
+			// 假定为基于注解（annotations）的来源。
 			builder.addPropertyValue("cacheOperationSources",
 					new RootBeanDefinition("org.springframework.cache.annotation.AnnotationCacheOperationSource"));
 		}
@@ -87,7 +87,7 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 	private List<RootBeanDefinition> parseDefinitionsSources(List<Element> definitions, ParserContext parserContext) {
 		ManagedList<RootBeanDefinition> defs = new ManagedList<>(definitions.size());
 
-		// extract default param for the definition
+		// 提取该 definition 的默认参数
 		for (Element element : definitions) {
 			defs.add(parseDefinitionSource(element, parserContext));
 		}
@@ -97,7 +97,7 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 
 	private RootBeanDefinition parseDefinitionSource(Element definition, ParserContext parserContext) {
 		Props prop = new Props(definition);
-		// add cacheable first
+		// 先添加 cacheable 操作
 
 		ManagedMap<TypedStringValue, Collection<CacheOperation>> cacheOpMap = new ManagedMap<>();
 		cacheOpMap.setSource(parserContext.extractSource(definition));
@@ -171,7 +171,7 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 
 
 	/**
-	 * Simple, reusable class used for overriding defaults.
+	 * 用于覆盖默认值的简单、可复用的类。
 	 */
 	private static class Props {
 
@@ -204,7 +204,7 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 		<T extends CacheOperation.Builder> T merge(Element element, ReaderContext readerCtx, T builder) {
 			String cache = element.getAttribute("cache");
 
-			// sanity check
+			// 合理性检查
 			String[] localCaches = this.caches;
 			if (StringUtils.hasText(cache)) {
 				localCaches = StringUtils.commaDelimitedListToStringArray(cache.trim());

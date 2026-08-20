@@ -25,14 +25,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * A method-based {@link org.springframework.expression.EvaluationContext} that
- * provides explicit support for method-based invocations.
+ * 基于方法的 {@link org.springframework.expression.EvaluationContext}，
+ * 为基于方法的调用提供显式支持。
  *
- * <p>Expose the actual method arguments using the following aliases:
+ * <p>使用以下别名暴露实际的方法参数：
  * <ol>
- * <li>pX where X is the index of the argument (p0 for the first argument)</li>
- * <li>aX where X is the index of the argument (a1 for the second argument)</li>
- * <li>the name of the parameter as discovered by a configurable {@link ParameterNameDiscoverer}</li>
+ * <li>pX，其中 X 是参数的索引（p0 表示第一个参数）</li>
+ * <li>aX，其中 X 是参数的索引（a1 表示第二个参数）</li>
+ * <li>由可配置的 {@link ParameterNameDiscoverer} 发现的参数名称</li>
  * </ol>
  *
  * @author Stephane Nicoll
@@ -76,15 +76,15 @@ public class MethodBasedEvaluationContext extends StandardEvaluationContext {
 	}
 
 	/**
-	 * Load the param information only when needed.
+	 * 仅在需要时加载参数信息。
 	 */
 	protected void lazyLoadArguments() {
-		// Shortcut if no args need to be loaded
+		// 如果没有参数需要加载，则直接返回
 		if (ObjectUtils.isEmpty(this.arguments)) {
 			return;
 		}
 
-		// Expose indexed variables as well as parameter names (if discoverable)
+		// 暴露索引变量以及参数名称（如果可发现）
 		String[] paramNames = this.parameterNameDiscoverer.getParameterNames(this.method);
 		int paramCount = (paramNames != null ? paramNames.length : this.method.getParameterCount());
 		int argsCount = this.arguments.length;
@@ -92,11 +92,11 @@ public class MethodBasedEvaluationContext extends StandardEvaluationContext {
 		for (int i = 0; i < paramCount; i++) {
 			Object value = null;
 			if (argsCount > paramCount && i == paramCount - 1) {
-				// Expose remaining arguments as vararg array for last parameter
+				// 将剩余参数作为可变参数数组暴露给最后一个参数
 				value = Arrays.copyOfRange(this.arguments, i, argsCount);
 			}
 			else if (argsCount > i) {
-				// Actual argument found - otherwise left as null
+				// 找到实际参数 - 否则保持为 null
 				value = this.arguments[i];
 			}
 			setVariable("a" + i, value);

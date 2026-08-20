@@ -23,8 +23,8 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.lang.Nullable;
 
 /**
- * An implementation of {@link CachingConfigurer} with empty methods allowing
- * sub-classes to override only the methods they're interested in.
+ * {@link CachingConfigurer} 的一个实现，其方法均为空实现，允许
+ * 子类只覆写它们感兴趣的方法。
  *
  * @author Stephane Nicoll
  * @since 4.1

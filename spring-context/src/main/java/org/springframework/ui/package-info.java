@@ -1,6 +1,6 @@
 /**
- * Generic support for UI layer concepts.
- * Provides a generic ModelMap for model holding.
+ * 通用的 UI 层概念支持。
+ * 提供通用的 ModelMap 用于模型持有。
  */
 @NonNullApi
 @NonNullFields

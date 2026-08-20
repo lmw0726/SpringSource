@@ -27,8 +27,7 @@ import org.springframework.scheduling.config.TaskManagementConfigUtils;
 import org.springframework.util.Assert;
 
 /**
- * {@code @Configuration} class that registers the Spring infrastructure beans necessary
- * to enable proxy-based asynchronous method execution.
+ * {@code @Configuration} 类，用于注册启用基于代理的异步方法执行所需的 Spring 基础设施 Bean。
  *
  * @author Chris Beams
  * @author Stephane Nicoll

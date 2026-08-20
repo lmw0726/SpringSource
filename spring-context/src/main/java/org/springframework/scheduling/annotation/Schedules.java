@@ -23,15 +23,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Container annotation that aggregates several {@link Scheduled} annotations.
+ * 聚合多个 {@link Scheduled} 注解的容器注解。
  *
- * <p>Can be used natively, declaring several nested {@link Scheduled} annotations.
- * Can also be used in conjunction with Java 8's support for repeatable annotations,
- * where {@link Scheduled} can simply be declared several times on the same method,
- * implicitly generating this container annotation.
+ * <p>可以直接使用，声明多个嵌套的 {@link Scheduled} 注解。
+ * 也可以与 Java 8 的可重复注解支持结合使用，
+ * 在同一个方法上多次声明 {@link Scheduled} 注解，
+ * 会隐式生成此容器注解。
  *
- * <p>This annotation may be used as a <em>meta-annotation</em> to create custom
- * <em>composed annotations</em>.
+ * <p>此注解可用作<em>元注解</em>来创建自定义<em>组合注解</em>。
  *
  * @author Juergen Hoeller
  * @since 4.0

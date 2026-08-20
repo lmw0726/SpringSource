@@ -23,13 +23,12 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.util.Assert;
 
 /**
- * JSR-303 {@link ConstraintValidatorFactory} implementation that delegates to a
- * Spring BeanFactory for creating autowired {@link ConstraintValidator} instances.
+ * JSR-303 {@link ConstraintValidatorFactory} 实现，委托给 Spring BeanFactory
+ * 创建自动装配的 {@link ConstraintValidator} 实例。
  *
- * <p>Note that this class is meant for programmatic use, not for declarative use
- * in a standard {@code validation.xml} file. Consider
- * {@link org.springframework.web.bind.support.SpringWebConstraintValidatorFactory}
- * for declarative use in a web application, e.g. with JAX-RS or JAX-WS.
+ * <p>注意，此类适用于编程式使用，而不适用于在标准 {@code validation.xml} 文件中的声明式使用。
+ * 对于在 Web 应用程序中（例如使用 JAX-RS 或 JAX-WS）的声明式使用，请考虑使用
+ * {@link org.springframework.web.bind.support.SpringWebConstraintValidatorFactory}。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -42,8 +41,8 @@ public class SpringConstraintValidatorFactory implements ConstraintValidatorFact
 
 
 	/**
-	 * Create a new SpringConstraintValidatorFactory for the given BeanFactory.
-	 * @param beanFactory the target BeanFactory
+	 * 为给定的 BeanFactory 创建一个新的 SpringConstraintValidatorFactory。
+	 * @param beanFactory 目标 BeanFactory
 	 */
 	public SpringConstraintValidatorFactory(AutowireCapableBeanFactory beanFactory) {
 		Assert.notNull(beanFactory, "BeanFactory must not be null");
@@ -56,7 +55,7 @@ public class SpringConstraintValidatorFactory implements ConstraintValidatorFact
 		return this.beanFactory.createBean(key);
 	}
 
-	// Bean Validation 1.1 releaseInstance method
+	// Bean Validation 1.1 版本的 releaseInstance 方法
 	@Override
 	public void releaseInstance(ConstraintValidator<?, ?> instance) {
 		this.beanFactory.destroyBean(instance);

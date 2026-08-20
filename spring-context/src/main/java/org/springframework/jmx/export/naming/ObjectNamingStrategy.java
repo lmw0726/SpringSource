@@ -22,10 +22,10 @@ import javax.management.ObjectName;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface that encapsulates the creation of {@code ObjectName} instances.
+ * 封装 {@code ObjectName} 实例创建策略的接口。
  *
- * <p>Used by the {@code MBeanExporter} to obtain {@code ObjectName}s
- * when registering beans.
+ * <p>由 {@code MBeanExporter} 在注册 Bean 时使用，
+ * 用于获取 {@code ObjectName}。
  *
  * @author Rob Harrop
  * @since 1.2
@@ -36,13 +36,11 @@ import org.springframework.lang.Nullable;
 public interface ObjectNamingStrategy {
 
 	/**
-	 * Obtain an {@code ObjectName} for the supplied bean.
-	 * @param managedBean the bean that will be exposed under the
-	 * returned {@code ObjectName}
-	 * @param beanKey the key associated with this bean in the beans map
-	 * passed to the {@code MBeanExporter}
-	 * @return the {@code ObjectName} instance
-	 * @throws MalformedObjectNameException if the resulting {@code ObjectName} is invalid
+	 * 获取指定 Bean 的 {@code ObjectName}。
+	 * @param managedBean 将在返回的 {@code ObjectName} 下暴露的 Bean
+	 * @param beanKey 该 Bean 在传递给 {@code MBeanExporter} 的 Bean 映射中的键
+	 * @return {@code ObjectName} 实例
+	 * @throws MalformedObjectNameException 如果生成的 {@code ObjectName} 无效
 	 */
 	ObjectName getObjectName(Object managedBean, @Nullable String beanKey) throws MalformedObjectNameException;
 

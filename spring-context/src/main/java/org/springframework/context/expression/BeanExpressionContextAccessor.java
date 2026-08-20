@@ -25,8 +25,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * EL property accessor that knows how to traverse the beans and contextual objects
- * of a Spring {@link org.springframework.beans.factory.config.BeanExpressionContext}.
+ * EL 属性访问器，知道如何遍历 Spring {@link org.springframework.beans.factory.config.BeanExpressionContext}
+ * 中的 Bean 和上下文对象。
  *
  * @author Juergen Hoeller
  * @author Andy Clement

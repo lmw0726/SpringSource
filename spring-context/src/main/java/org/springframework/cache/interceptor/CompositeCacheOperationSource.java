@@ -25,8 +25,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Composite {@link CacheOperationSource} implementation that iterates
- * over a given array of {@code CacheOperationSource} instances.
+ * {@link CacheOperationSource}（缓存操作来源）的复合实现，它会遍历
+ * 给定的 {@code CacheOperationSource} 实例数组。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -39,8 +39,8 @@ public class CompositeCacheOperationSource implements CacheOperationSource, Seri
 
 
 	/**
-	 * Create a new CompositeCacheOperationSource for the given sources.
-	 * @param cacheOperationSources the CacheOperationSource instances to combine
+	 * 为给定的来源创建一个新的 CompositeCacheOperationSource。
+	 * @param cacheOperationSources 要组合的 CacheOperationSource 实例
 	 */
 	public CompositeCacheOperationSource(CacheOperationSource... cacheOperationSources) {
 		Assert.notEmpty(cacheOperationSources, "CacheOperationSource array must not be empty");
@@ -48,8 +48,8 @@ public class CompositeCacheOperationSource implements CacheOperationSource, Seri
 	}
 
 	/**
-	 * Return the {@code CacheOperationSource} instances that this
-	 * {@code CompositeCacheOperationSource} combines.
+	 * 返回此 {@code CompositeCacheOperationSource} 所组合的
+	 * {@code CacheOperationSource} 实例。
 	 */
 	public final CacheOperationSource[] getCacheOperationSources() {
 		return this.cacheOperationSources;

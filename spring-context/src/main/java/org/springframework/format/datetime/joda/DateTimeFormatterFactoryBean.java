@@ -23,8 +23,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link FactoryBean} that creates a Joda-Time {@link DateTimeFormatter}.
- * See the {@link DateTimeFormatterFactory base class} for configuration details.
+ * 用于创建 Joda-Time {@link DateTimeFormatter} 的 {@link FactoryBean}。
+ * 配置详情请参阅 {@link DateTimeFormatterFactory 基类}。
  *
  * @author Phillip Webb
  * @author Sam Brannen
@@ -33,7 +33,7 @@ import org.springframework.lang.Nullable;
  * @see #setIso
  * @see #setStyle
  * @see DateTimeFormatterFactory
- * @deprecated as of 5.3, in favor of standard JSR-310 support
+ * @deprecated 自 5.3 起，建议使用标准的 JSR-310 支持
  */
 @Deprecated
 public class DateTimeFormatterFactoryBean extends DateTimeFormatterFactory

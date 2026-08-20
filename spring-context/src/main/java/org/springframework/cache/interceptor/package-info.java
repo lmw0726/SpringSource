@@ -1,7 +1,7 @@
 /**
- * AOP-based solution for declarative caching demarcation.
- * Builds on the AOP infrastructure in org.springframework.aop.framework.
- * Any POJO can be cache-advised with Spring.
+ * 基于 AOP 的声明式缓存边界（demarcation）解决方案。
+ * 构建在 org.springframework.aop.framework 中的 AOP 基础设施之上。
+ * 任何 POJO 都可以通过 Spring 进行缓存增强（cache-advised）。
  */
 @NonNullApi
 @NonNullFields

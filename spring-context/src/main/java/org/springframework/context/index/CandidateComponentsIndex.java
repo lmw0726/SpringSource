@@ -16,32 +16,30 @@
 
 package org.springframework.context.index;
 
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
 /**
- * Provide access to the candidates that are defined in {@code META-INF/spring.components}.
+ * 提供对在 {@code META-INF/spring.components} 中定义的候选组件的访问。
  *
- * <p>An arbitrary number of stereotypes can be registered (and queried) on the index: a
- * typical example is the fully qualified name of an annotation that flags the class for
- * a certain use case. The following call returns all the {@code @Component}
- * <b>candidate</b> types for the {@code com.example} package (and its sub-packages):
+ * <p>可以在索引上注册（和查询）任意数量的刻板印象：一个典型的例子是用于标记类
+ * 特定用例的注解的完全限定名称。以下调用返回 {@code com.example} 包（及其子包）中
+ * 所有 {@code @Component} <b>候选</b>类型：
  * <pre class="code">
  * Set&lt;String&gt; candidates = index.getCandidateTypes(
  *         "com.example", "org.springframework.stereotype.Component");
  * </pre>
  *
- * <p>The {@code type} is usually the fully qualified name of a class, though this is
- * not a rule. Similarly, the {@code stereotype} is usually the fully qualified name of
- * a target type but it can be any marker really.
+ * <p>{@code type} 通常是类的完全限定名称，但这不是规则。类似地，{@code stereotype}
+ * 通常是目标类型的完全限定名称，但它可以是任何标记。
  *
  * @author Stephane Nicoll
  * @since 5.0
@@ -72,11 +70,11 @@ public class CandidateComponentsIndex {
 
 
 	/**
-	 * Return the candidate types that are associated with the specified stereotype.
-	 * @param basePackage the package to check for candidates
-	 * @param stereotype the stereotype to use
-	 * @return the candidate types associated with the specified {@code stereotype}
-	 * or an empty set if none has been found for the specified {@code basePackage}
+	 * 返回与指定刻板印象关联的候选类型。
+	 * @param basePackage 要检查候选组件的包
+	 * @param stereotype 要使用的刻板印象
+	 * @return 与指定 {@code stereotype} 关联的候选类型，
+	 * 如果在指定 {@code basePackage} 中未找到则返回空集
 	 */
 	public Set<String> getCandidateTypes(String basePackage, String stereotype) {
 		List<Entry> candidates = this.index.get(stereotype);

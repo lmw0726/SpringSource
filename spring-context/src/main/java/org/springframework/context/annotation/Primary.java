@@ -23,17 +23,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that a bean should be given preference when multiple candidates
- * are qualified to autowire a single-valued dependency. If exactly one
- * 'primary' bean exists among the candidates, it will be the autowired value.
+ * 当多个候选 Bean 都满足自动注入单一值依赖的条件时，表示应优先选择该 Bean。
+ * 如果候选者中恰好存在一个"主"（primary）Bean，则该 Bean 将作为自动注入的值。
  *
- * <p>This annotation is semantically equivalent to the {@code <bean>} element's
- * {@code primary} attribute in Spring XML.
+ * <p>该注解在语义上等同于 Spring XML 配置中 {@code <bean>} 元素的
+ * {@code primary} 属性。
  *
- * <p>May be used on any class directly or indirectly annotated with
- * {@code @Component} or on methods annotated with @{@link Bean}.
+ * <p>可直接或间接用于任何标注了 {@code @Component} 的类上，
+ * 也可用于标注了 @{@link Bean} 的方法上。
  *
- * <h2>Example</h2>
+ * <h2>示例</h2>
  * <pre class="code">
  * &#064;Component
  * public class FooService {
@@ -64,15 +63,15 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
- * <p>Because {@code HibernateFooRepository} is marked with {@code @Primary},
- * it will be injected preferentially over the jdbc-based variant assuming both
- * are present as beans within the same Spring application context, which is
- * often the case when component-scanning is applied liberally.
+ * <p>由于 {@code HibernateFooRepository} 标注了 {@code @Primary}，
+ * 在同一个 Spring 应用上下文中同时存在该 Bean 和基于 JDBC 的变体时，
+ * 将优先注入 {@code HibernateFooRepository}。当大量使用组件扫描时，
+ * 这种情况很常见。
  *
- * <p>Note that using {@code @Primary} at the class level has no effect unless
- * component-scanning is being used. If a {@code @Primary}-annotated class is
- * declared via XML, {@code @Primary} annotation metadata is ignored, and
- * {@code <bean primary="true|false"/>} is respected instead.
+ * <p>请注意，在类级别使用 {@code @Primary} 仅在使用组件扫描时才生效。
+ * 如果一个标注了 {@code @Primary} 的类是通过 XML 声明的，
+ * 则 {@code @Primary} 注解的元数据将被忽略，取而代之的是
+ * {@code <bean primary="true|false"/>} 的配置。
  *
  * @author Chris Beams
  * @author Juergen Hoeller

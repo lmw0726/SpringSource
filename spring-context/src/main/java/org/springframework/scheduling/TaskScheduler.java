@@ -25,22 +25,16 @@ import java.util.concurrent.ScheduledFuture;
 import org.springframework.lang.Nullable;
 
 /**
- * Task scheduler interface that abstracts the scheduling of
- * {@link Runnable Runnables} based on different kinds of triggers.
+ * 任务调度器接口，抽象了基于不同类型的触发器来调度 {@link Runnable Runnables} 的方式。
  *
- * <p>This interface is separate from {@link SchedulingTaskExecutor} since it
- * usually represents for a different kind of backend, i.e. a thread pool with
- * different characteristics and capabilities. Implementations may implement
- * both interfaces if they can handle both kinds of execution characteristics.
+ * <p>此接口与 {@link SchedulingTaskExecutor} 分离，因为它通常代表不同类型的后端，
+ * 即具有不同特性和能力的线程池。如果实现能够处理两种执行特性，则可以同时实现这两个接口。
  *
- * <p>The 'default' implementation is
- * {@link org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler},
- * wrapping a native {@link java.util.concurrent.ScheduledExecutorService}
- * and adding extended trigger capabilities.
+ * <p>"默认"实现是 {@link org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler}，
+ * 它包装了原生的 {@link java.util.concurrent.ScheduledExecutorService} 并添加了扩展的触发器能力。
  *
- * <p>This interface is roughly equivalent to a JSR-236
- * {@code ManagedScheduledExecutorService} as supported in Java EE 7
- * environments but aligned with Spring's {@code TaskExecutor} model.
+ * <p>此接口大致等同于 JSR-236 {@code ManagedScheduledExecutorService}，
+ * 该服务在 Java EE 7 环境中受支持，但与 Spring 的 {@code TaskExecutor} 模型对齐。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -51,7 +45,7 @@ import org.springframework.lang.Nullable;
 public interface TaskScheduler {
 
 	/**
-	 * Return the clock to use for scheduling purposes.
+	 * 返回用于调度目的的时钟。
 	 * @since 5.3
 	 * @see Clock#systemDefaultZone()
 	 */
@@ -60,34 +54,29 @@ public interface TaskScheduler {
 	}
 
 	/**
-	 * Schedule the given {@link Runnable}, invoking it whenever the trigger
-	 * indicates a next execution time.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param trigger an implementation of the {@link Trigger} interface,
-	 * e.g. a {@link org.springframework.scheduling.support.CronTrigger} object
-	 * wrapping a cron expression
-	 * @return a {@link ScheduledFuture} representing pending completion of the task,
-	 * or {@code null} if the given Trigger object never fires (i.e. returns
-	 * {@code null} from {@link Trigger#nextExecutionTime})
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，在触发器指示下一次执行时间时调用它。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param trigger {@link Trigger} 接口的实现，
+	 * 例如包装 cron 表达式的 {@link org.springframework.scheduling.support.CronTrigger} 对象
+	 * @return 表示任务待完成的 {@link ScheduledFuture}，
+	 * 如果给定的 Trigger 对象从不触发（即从 {@link Trigger#nextExecutionTime} 返回 {@code null}）则返回 {@code null}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 * @see org.springframework.scheduling.support.CronTrigger
 	 */
 	@Nullable
 	ScheduledFuture<?> schedule(Runnable task, Trigger trigger);
 
 	/**
-	 * Schedule the given {@link Runnable}, invoking it at the specified execution time.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param startTime the desired execution time for the task
-	 * (if this is in the past, the task will be executed immediately, i.e. as soon as possible)
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，在指定的执行时间调用它。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param startTime 任务的期望执行时间
+	 * （如果这是过去时间，任务将立即执行，即尽快执行）
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 * @since 5.0
 	 * @see #schedule(Runnable, Date)
 	 */
@@ -96,30 +85,27 @@ public interface TaskScheduler {
 	}
 
 	/**
-	 * Schedule the given {@link Runnable}, invoking it at the specified execution time.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param startTime the desired execution time for the task
-	 * (if this is in the past, the task will be executed immediately, i.e. as soon as possible)
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，在指定的执行时间调用它。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param startTime 任务的期望执行时间
+	 * （如果这是过去时间，任务将立即执行，即尽快执行）
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 */
 	ScheduledFuture<?> schedule(Runnable task, Date startTime);
 
 	/**
-	 * Schedule the given {@link Runnable}, invoking it at the specified execution time
-	 * and subsequently with the given period.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param startTime the desired first execution time for the task
-	 * (if this is in the past, the task will be executed immediately, i.e. as soon as possible)
-	 * @param period the interval between successive executions of the task
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if  the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，在指定的执行时间调用它，然后按照给定的周期调用。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param startTime 任务的期望首次执行时间
+	 * （如果这是过去时间，任务将立即执行，即尽快执行）
+	 * @param period 任务连续执行之间的时间间隔
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 * @since 5.0
 	 * @see #scheduleAtFixedRate(Runnable, Date, long)
 	 */
@@ -128,30 +114,26 @@ public interface TaskScheduler {
 	}
 
 	/**
-	 * Schedule the given {@link Runnable}, invoking it at the specified execution time
-	 * and subsequently with the given period.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param startTime the desired first execution time for the task
-	 * (if this is in the past, the task will be executed immediately, i.e. as soon as possible)
-	 * @param period the interval between successive executions of the task (in milliseconds)
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if  the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，在指定的执行时间调用它，然后按照给定的周期调用。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param startTime 任务的期望首次执行时间
+	 * （如果这是过去时间，任务将立即执行，即尽快执行）
+	 * @param period 任务连续执行之间的时间间隔（以毫秒为单位）
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 */
 	ScheduledFuture<?> scheduleAtFixedRate(Runnable task, Date startTime, long period);
 
 	/**
-	 * Schedule the given {@link Runnable}, starting as soon as possible and
-	 * invoking it with the given period.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param period the interval between successive executions of the task
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，尽快开始并按照给定的周期调用它。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param period 任务连续执行之间的时间间隔
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 * @since 5.0
 	 * @see #scheduleAtFixedRate(Runnable, long)
 	 */
@@ -160,31 +142,26 @@ public interface TaskScheduler {
 	}
 
 	/**
-	 * Schedule the given {@link Runnable}, starting as soon as possible and
-	 * invoking it with the given period.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param period the interval between successive executions of the task (in milliseconds)
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，尽快开始并按照给定的周期调用它。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param period 任务连续执行之间的时间间隔（以毫秒为单位）
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 */
 	ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long period);
 
 	/**
-	 * Schedule the given {@link Runnable}, invoking it at the specified execution time
-	 * and subsequently with the given delay between the completion of one execution
-	 * and the start of the next.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param startTime the desired first execution time for the task
-	 * (if this is in the past, the task will be executed immediately, i.e. as soon as possible)
-	 * @param delay the delay between the completion of one execution and the start of the next
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，在指定的执行时间调用它，然后在一次执行完成与下一次执行开始之间按照给定的延迟调用。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param startTime 任务的期望首次执行时间
+	 * （如果这是过去时间，任务将立即执行，即尽快执行）
+	 * @param delay 一次执行完成与下一次执行开始之间的延迟
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 * @since 5.0
 	 * @see #scheduleWithFixedDelay(Runnable, Date, long)
 	 */
@@ -193,32 +170,26 @@ public interface TaskScheduler {
 	}
 
 	/**
-	 * Schedule the given {@link Runnable}, invoking it at the specified execution time
-	 * and subsequently with the given delay between the completion of one execution
-	 * and the start of the next.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param startTime the desired first execution time for the task
-	 * (if this is in the past, the task will be executed immediately, i.e. as soon as possible)
-	 * @param delay the delay between the completion of one execution and the start of the next
-	 * (in milliseconds)
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，在指定的执行时间调用它，然后在一次执行完成与下一次执行开始之间按照给定的延迟调用。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param startTime 任务的期望首次执行时间
+	 * （如果这是过去时间，任务将立即执行，即尽快执行）
+	 * @param delay 一次执行完成与下一次执行开始之间的延迟（以毫秒为单位）
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 */
 	ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, Date startTime, long delay);
 
 	/**
-	 * Schedule the given {@link Runnable}, starting as soon as possible and invoking it with
-	 * the given delay between the completion of one execution and the start of the next.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param delay the delay between the completion of one execution and the start of the next
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，尽快开始并在一次执行完成与下一次执行开始之间按照给定的延迟调用它。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param delay 一次执行完成与下一次执行开始之间的延迟
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 * @since 5.0
 	 * @see #scheduleWithFixedDelay(Runnable, long)
 	 */
@@ -227,16 +198,13 @@ public interface TaskScheduler {
 	}
 
 	/**
-	 * Schedule the given {@link Runnable}, starting as soon as possible and invoking it with
-	 * the given delay between the completion of one execution and the start of the next.
-	 * <p>Execution will end once the scheduler shuts down or the returned
-	 * {@link ScheduledFuture} gets cancelled.
-	 * @param task the Runnable to execute whenever the trigger fires
-	 * @param delay the delay between the completion of one execution and the start of the next
-	 * (in milliseconds)
-	 * @return a {@link ScheduledFuture} representing pending completion of the task
-	 * @throws org.springframework.core.task.TaskRejectedException if the given task was not accepted
-	 * for internal reasons (e.g. a pool overload handling policy or a pool shutdown in progress)
+	 * 调度给定的 {@link Runnable}，尽快开始并在一次执行完成与下一次执行开始之间按照给定的延迟调用它。
+	 * <p>一旦调度器关闭或返回的 {@link ScheduledFuture} 被取消，执行将结束。
+	 * @param task 每次触发器触发时要执行的 Runnable
+	 * @param delay 一次执行完成与下一次执行开始之间的延迟（以毫秒为单位）
+	 * @return 表示任务待完成的 {@link ScheduledFuture}
+	 * @throws org.springframework.core.task.TaskRejectedException 如果给定的任务由于内部原因未被接受
+	 * （例如池过载处理策略或池正在关闭）
 	 */
 	ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long delay);
 

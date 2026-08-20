@@ -21,8 +21,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.springframework.util.Assert;
 
 /**
- * Default implementation of the {@link RemoteInvocationExecutor} interface.
- * Simply delegates to {@link RemoteInvocation}'s invoke method.
+ * {@link RemoteInvocationExecutor} 接口的默认实现。
+ * 简单地委托给 {@link RemoteInvocation} 的 invoke 方法。
  *
  * @author Juergen Hoeller
  * @since 1.1

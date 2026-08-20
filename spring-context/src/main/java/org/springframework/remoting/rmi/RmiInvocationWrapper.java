@@ -24,11 +24,11 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.util.Assert;
 
 /**
- * Server-side implementation of {@link RmiInvocationHandler}. An instance
- * of this class exists for each remote object. Automatically created
- * by {@link RmiServiceExporter} for non-RMI service implementations.
+ * {@link RmiInvocationHandler} 的服务器端实现。每个远程对象都有
+ * 该类的一个实例。由 {@link RmiServiceExporter} 为非 RMI 服务
+ * 实现自动创建。
  *
- * <p>This is an SPI class, not to be used directly by applications.
+ * <p>这是一个 SPI 类，不应直接在应用程序中使用。
  *
  * @author Juergen Hoeller
  * @since 14.05.2003
@@ -43,9 +43,9 @@ class RmiInvocationWrapper implements RmiInvocationHandler {
 
 
 	/**
-	 * Create a new RmiInvocationWrapper for the given object.
-	 * @param wrappedObject the object to wrap with an RmiInvocationHandler
-	 * @param rmiExporter the RMI exporter to handle the actual invocation
+	 * 为给定对象创建新的 RmiInvocationWrapper。
+	 * @param wrappedObject 要用 RmiInvocationHandler 包装的对象
+	 * @param rmiExporter 用于处理实际调用的 RMI 导出器
 	 */
 	public RmiInvocationWrapper(Object wrappedObject, RmiBasedExporter rmiExporter) {
 		Assert.notNull(wrappedObject, "Object to wrap is required");
@@ -56,7 +56,7 @@ class RmiInvocationWrapper implements RmiInvocationHandler {
 
 
 	/**
-	 * Exposes the exporter's service interface, if any, as target interface.
+	 * 将导出器的服务接口（如果有）作为目标接口暴露。
 	 * @see RmiBasedExporter#getServiceInterface()
 	 */
 	@Override
@@ -67,7 +67,7 @@ class RmiInvocationWrapper implements RmiInvocationHandler {
 	}
 
 	/**
-	 * Delegates the actual invocation handling to the RMI exporter.
+	 * 将实际的调用处理委托给 RMI 导出器。
 	 * @see RmiBasedExporter#invoke(org.springframework.remoting.support.RemoteInvocation, Object)
 	 */
 	@Override

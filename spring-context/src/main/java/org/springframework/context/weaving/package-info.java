@@ -1,6 +1,6 @@
 /**
- * Load-time weaving support for a Spring application context, building on Spring's
- * {@link org.springframework.instrument.classloading.LoadTimeWeaver} abstraction.
+ * Spring 应用上下文的加载时织入（Load-time Weaving）支持，构建于 Spring 的
+ * {@link org.springframework.instrument.classloading.LoadTimeWeaver} 抽象之上。
  */
 @NonNullApi
 @NonNullFields

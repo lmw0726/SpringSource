@@ -17,7 +17,7 @@
 package org.springframework.scheduling.config;
 
 /**
- * Specialization of {@link IntervalTask} for fixed-rate semantics.
+ * 固定频率语义的 {@link IntervalTask} 特化实现。
  *
  * @author Juergen Hoeller
  * @since 5.0.2
@@ -27,10 +27,10 @@ package org.springframework.scheduling.config;
 public class FixedRateTask extends IntervalTask {
 
 	/**
-	 * Create a new {@code FixedRateTask}.
-	 * @param runnable the underlying task to execute
-	 * @param interval how often in milliseconds the task should be executed
-	 * @param initialDelay the initial delay before first execution of the task
+	 * 创建一个新的 {@code FixedRateTask}。
+	 * @param runnable 要执行的基础任务
+	 * @param interval 任务执行的间隔时间（毫秒）
+	 * @param initialDelay 任务首次执行前的初始延迟时间
 	 */
 	public FixedRateTask(Runnable runnable, long interval, long initialDelay) {
 		super(runnable, interval, initialDelay);

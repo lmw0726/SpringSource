@@ -22,7 +22,7 @@ import java.util.Collection;
 import org.springframework.cache.Cache;
 
 /**
- * Class describing the root object used during the expression evaluation.
+ * 描述表达式求值期间所使用的根对象的类。
  *
  * @author Costin Leau
  * @author Sam Brannen

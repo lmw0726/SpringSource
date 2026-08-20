@@ -31,7 +31,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Parser for the 'annotation-driven' element of the 'task' namespace.
+ * 'task' 命名空间下 'annotation-driven' 元素的解析器。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -51,20 +51,20 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		Object source = parserContext.extractSource(element);
 
-		// Register component for the surrounding <task:annotation-driven> element.
+		// 为周围的 <task:annotation-driven> 元素注册组件。
 		CompositeComponentDefinition compDefinition = new CompositeComponentDefinition(element.getTagName(), source);
 		parserContext.pushContainingComponent(compDefinition);
 
-		// Nest the concrete post-processor bean in the surrounding component.
+		// 将具体的后处理器 Bean 嵌套在周围的组件中。
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 
 		String mode = element.getAttribute("mode");
 		if ("aspectj".equals(mode)) {
-			// mode="aspectj"
+			// mode="aspectj" 模式
 			registerAsyncExecutionAspect(element, parserContext);
 		}
 		else {
-			// mode="proxy"
+			// mode="proxy" 模式
 			if (registry.containsBeanDefinition(TaskManagementConfigUtils.ASYNC_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 				parserContext.getReaderContext().error(
 						"Only one AsyncAnnotationBeanPostProcessor may exist within the context.", source);
@@ -103,7 +103,7 @@ public class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParse
 			registerPostProcessor(parserContext, builder, TaskManagementConfigUtils.SCHEDULED_ANNOTATION_PROCESSOR_BEAN_NAME);
 		}
 
-		// Finally register the composite component.
+		// 最后注册组合组件。
 		parserContext.popAndRegisterContainingComponent();
 
 		return null;

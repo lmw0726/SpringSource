@@ -16,9 +16,6 @@
 
 package org.springframework.scripting.groovy;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
@@ -26,7 +23,6 @@ import groovy.lang.Script;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
-
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -40,15 +36,17 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+
 /**
- * {@link org.springframework.scripting.ScriptFactory} implementation
- * for a Groovy script.
+ * 针对 Groovy 脚本的 {@link org.springframework.scripting.ScriptFactory} 实现。
  *
- * <p>Typically used in combination with a
- * {@link org.springframework.scripting.support.ScriptFactoryPostProcessor};
- * see the latter's javadoc for a configuration example.
+ * <p>通常与
+ * {@link org.springframework.scripting.support.ScriptFactoryPostProcessor} 配合使用；
+ * 配置示例请参见后者的 javadoc。
  *
- * <p>Note: Spring 4.0 supports Groovy 1.8 and higher.
+ * <p>注意：Spring 4.0 支持 Groovy 1.8 及更高版本。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -85,11 +83,11 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 
 
 	/**
-	 * Create a new GroovyScriptFactory for the given script source.
-	 * <p>We don't need to specify script interfaces here, since
-	 * a Groovy script defines its Java interfaces itself.
-	 * @param scriptSourceLocator a locator that points to the source of the script.
-	 * Interpreted by the post-processor that actually creates the script.
+	 * 为给定的脚本源创建一个新的 GroovyScriptFactory。
+	 * <p>此处无需指定脚本接口，因为
+	 * Groovy 脚本自身会定义其 Java 接口。
+	 * @param scriptSourceLocator 指向脚本源的定位器，
+	 * 由实际创建脚本的后处理器进行解释。
 	 */
 	public GroovyScriptFactory(String scriptSourceLocator) {
 		Assert.hasText(scriptSourceLocator, "'scriptSourceLocator' must not be empty");
@@ -97,14 +95,14 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 	}
 
 	/**
-	 * Create a new GroovyScriptFactory for the given script source,
-	 * specifying a strategy interface that can create a custom MetaClass
-	 * to supply missing methods and otherwise change the behavior of the object.
-	 * @param scriptSourceLocator a locator that points to the source of the script.
-	 * Interpreted by the post-processor that actually creates the script.
-	 * @param groovyObjectCustomizer a customizer that can set a custom metaclass
-	 * or make other changes to the GroovyObject created by this factory
-	 * (may be {@code null})
+	 * 为给定的脚本源创建一个新的 GroovyScriptFactory，
+	 * 指定一个策略接口，可以创建自定义 MetaClass
+	 * 以提供缺失的方法并以其他方式更改对象的行为。
+	 * @param scriptSourceLocator 指向脚本源的定位器，
+	 * 由实际创建脚本的后处理器进行解释。
+	 * @param groovyObjectCustomizer 可以设置自定义元类
+	 * 或对此工厂创建的 GroovyObject 进行其他更改的定制器
+	 * （可能为 {@code null}）
 	 * @see GroovyObjectCustomizer#customize
 	 */
 	public GroovyScriptFactory(String scriptSourceLocator, @Nullable GroovyObjectCustomizer groovyObjectCustomizer) {
@@ -113,13 +111,13 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 	}
 
 	/**
-	 * Create a new GroovyScriptFactory for the given script source,
-	 * specifying a strategy interface that can create a custom MetaClass
-	 * to supply missing methods and otherwise change the behavior of the object.
-	 * @param scriptSourceLocator a locator that points to the source of the script.
-	 * Interpreted by the post-processor that actually creates the script.
-	 * @param compilerConfiguration a custom compiler configuration to be applied
-	 * to the GroovyClassLoader (may be {@code null})
+	 * 为给定的脚本源创建一个新的 GroovyScriptFactory，
+	 * 指定一个策略接口，可以创建自定义 MetaClass
+	 * 以提供缺失的方法并以其他方式更改对象的行为。
+	 * @param scriptSourceLocator 指向脚本源的定位器，
+	 * 由实际创建脚本的后处理器进行解释。
+	 * @param compilerConfiguration 要应用于
+	 * GroovyClassLoader 的自定义编译器配置（可能为 {@code null}）
 	 * @since 4.3.3
 	 * @see GroovyClassLoader#GroovyClassLoader(ClassLoader, CompilerConfiguration)
 	 */
@@ -129,13 +127,13 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 	}
 
 	/**
-	 * Create a new GroovyScriptFactory for the given script source,
-	 * specifying a strategy interface that can customize Groovy's compilation
-	 * process within the underlying GroovyClassLoader.
-	 * @param scriptSourceLocator a locator that points to the source of the script.
-	 * Interpreted by the post-processor that actually creates the script.
-	 * @param compilationCustomizers one or more customizers to be applied to the
-	 * GroovyClassLoader compiler configuration
+	 * 为给定的脚本源创建一个新的 GroovyScriptFactory，
+	 * 指定一个策略接口，可以自定义底层 GroovyClassLoader 中
+	 * Groovy 的编译过程。
+	 * @param scriptSourceLocator 指向脚本源的定位器，
+	 * 由实际创建脚本的后处理器进行解释。
+	 * @param compilationCustomizers 要应用于
+	 * GroovyClassLoader 编译器配置的一个或多个定制器
 	 * @since 4.3.3
 	 * @see CompilerConfiguration#addCompilationCustomizers
 	 * @see org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -169,7 +167,7 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 	}
 
 	/**
-	 * Return the GroovyClassLoader used by this script factory.
+	 * 返回此脚本工厂使用的 GroovyClassLoader。
 	 */
 	public GroovyClassLoader getGroovyClassLoader() {
 		synchronized (this.scriptClassMonitor) {
@@ -181,8 +179,8 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 	}
 
 	/**
-	 * Build a {@link GroovyClassLoader} for the given {@code ClassLoader}.
-	 * @param classLoader the ClassLoader to build a GroovyClassLoader for
+	 * 为给定的 {@code ClassLoader} 构建一个 {@link GroovyClassLoader}。
+	 * @param classLoader 要为其构建 GroovyClassLoader 的 ClassLoader
 	 * @since 4.3.3
 	 */
 	protected GroovyClassLoader buildGroovyClassLoader(@Nullable ClassLoader classLoader) {
@@ -197,9 +195,9 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 	}
 
 	/**
-	 * Groovy scripts determine their interfaces themselves,
-	 * hence we don't need to explicitly expose interfaces here.
-	 * @return {@code null} always
+	 * Groovy 脚本自行确定其接口，
+	 * 因此我们无需在此显式暴露接口。
+	 * @return 始终为 {@code null}
 	 */
 	@Override
 	@Nullable
@@ -208,8 +206,8 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 	}
 
 	/**
-	 * Groovy scripts do not need a config interface,
-	 * since they expose their setters as public methods.
+	 * Groovy 脚本不需要配置接口，
+	 * 因为其 setter 方法已作为公共方法暴露。
 	 */
 	@Override
 	public boolean requiresConfigInterface() {
@@ -218,7 +216,7 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 
 
 	/**
-	 * Loads and parses the Groovy script via the GroovyClassLoader.
+	 * 通过 GroovyClassLoader 加载并解析 Groovy 脚本。
 	 * @see groovy.lang.GroovyClassLoader
 	 */
 	@Override
@@ -238,12 +236,12 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 				}
 
 				if (this.scriptClass == null || scriptSource.isModified()) {
-					// New script content...
+					// 新的脚本内容...
 					this.scriptClass = getGroovyClassLoader().parseClass(
 							scriptSource.getScriptAsString(), scriptSource.suggestedClassName());
 
 					if (Script.class.isAssignableFrom(this.scriptClass)) {
-						// A Groovy script, probably creating an instance: let's execute it.
+						// 一个 Groovy 脚本，可能在创建实例：让我们执行它。
 						Object result = executeScript(scriptSource, this.scriptClass);
 						this.scriptResultClass = (result != null ? result.getClass() : null);
 						return result;
@@ -254,7 +252,7 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 				}
 				scriptClassToExecute = this.scriptClass;
 
-				// Process re-execution outside of the synchronized block.
+				// 在 synchronized 块之外处理重新执行。
 				return executeScript(scriptSource, scriptClassToExecute);
 			}
 			catch (CompilationFailedException ex) {
@@ -273,13 +271,13 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 		synchronized (this.scriptClassMonitor) {
 			try {
 				if (this.scriptClass == null || scriptSource.isModified()) {
-					// New script content...
+					// 新的脚本内容...
 					this.wasModifiedForTypeCheck = true;
 					this.scriptClass = getGroovyClassLoader().parseClass(
 							scriptSource.getScriptAsString(), scriptSource.suggestedClassName());
 
 					if (Script.class.isAssignableFrom(this.scriptClass)) {
-						// A Groovy script, probably creating an instance: let's execute it.
+						// 一个 Groovy 脚本，可能在创建实例：让我们执行它。
 						Object result = executeScript(scriptSource, this.scriptClass);
 						this.scriptResultClass = (result != null ? result.getClass() : null);
 						this.cachedResult = new CachedResultHolder(result);
@@ -308,12 +306,12 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 
 
 	/**
-	 * Instantiate the given Groovy script class and run it if necessary.
-	 * @param scriptSource the source for the underlying script
-	 * @param scriptClass the Groovy script class
-	 * @return the result object (either an instance of the script class
-	 * or the result of running the script instance)
-	 * @throws ScriptCompilationException in case of instantiation failure
+	 * 实例化给定的 Groovy 脚本类，并在必要时运行它。
+	 * @param scriptSource 底层脚本的源
+	 * @param scriptClass Groovy 脚本类
+	 * @return 结果对象（脚本类的实例
+	 * 或运行脚本实例的结果）
+	 * @throws ScriptCompilationException 实例化失败时抛出
 	 */
 	@Nullable
 	protected Object executeScript(ScriptSource scriptSource, Class<?> scriptClass) throws ScriptCompilationException {
@@ -321,16 +319,16 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 			GroovyObject goo = (GroovyObject) ReflectionUtils.accessibleConstructor(scriptClass).newInstance();
 
 			if (this.groovyObjectCustomizer != null) {
-				// Allow metaclass and other customization.
+				// 允许元类和其他定制。
 				this.groovyObjectCustomizer.customize(goo);
 			}
 
 			if (goo instanceof Script) {
-				// A Groovy script, probably creating an instance: let's execute it.
+				// 一个 Groovy 脚本，可能在创建实例：让我们执行它。
 				return ((Script) goo).run();
 			}
 			else {
-				// An instance of the scripted class: let's return it as-is.
+				// 脚本类的一个实例：直接返回。
 				return goo;
 			}
 		}
@@ -360,7 +358,7 @@ public class GroovyScriptFactory implements ScriptFactory, BeanFactoryAware, Bea
 
 
 	/**
-	 * Wrapper that holds a temporarily cached result object.
+	 * 用于临时缓存结果对象的包装器。
 	 */
 	private static class CachedResultHolder {
 

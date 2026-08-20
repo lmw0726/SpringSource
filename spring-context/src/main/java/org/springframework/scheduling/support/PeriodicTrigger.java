@@ -25,21 +25,17 @@ import org.springframework.scheduling.TriggerContext;
 import org.springframework.util.Assert;
 
 /**
- * A trigger for periodic task execution. The period may be applied as either
- * fixed-rate or fixed-delay, and an initial delay value may also be configured.
- * The default initial delay is 0, and the default behavior is fixed-delay
- * (i.e. the interval between successive executions is measured from each
- * <i>completion</i> time). To measure the interval between the
- * scheduled <i>start</i> time of each execution instead, set the
- * 'fixedRate' property to {@code true}.
+ * 用于周期性任务执行的触发器。周期可以按固定速率或固定延迟应用，
+ * 也可以配置初始延迟值。默认初始延迟为 0，默认行为是固定延迟
+ * （即每次执行之间的时间间隔是从每次<i>完成</i>时间开始计算的）。
+ * 要改为按每次执行的计划<i>开始</i>时间来计算间隔，
+ * 请将 'fixedRate' 属性设置为 {@code true}。
  *
- * <p>Note that the TaskScheduler interface already defines methods for scheduling
- * tasks at fixed-rate or with fixed-delay. Both also support an optional value
- * for the initial delay. Those methods should be used directly whenever
- * possible. The value of this Trigger implementation is that it can be used
- * within components that rely on the Trigger abstraction. For example, it may
- * be convenient to allow periodic triggers, cron-based triggers, and even
- * custom Trigger implementations to be used interchangeably.
+ * <p>请注意，TaskScheduler 接口已经定义了按固定速率或固定延迟调度
+ * 任务的方法。这些方法也都支持可选的初始延迟值。只要有可能，
+ * 应该直接使用那些方法。这个 Trigger 实现的价值在于它可以用于
+ * 依赖 Trigger 抽象的组件中。例如，允许周期触发器、基于 cron 的
+ * 触发器，甚至自定义 Trigger 实现可以互换使用，这可能很方便。
  *
  * @author Mark Fisher
  * @since 3.0
@@ -56,16 +52,16 @@ public class PeriodicTrigger implements Trigger {
 
 
 	/**
-	 * Create a trigger with the given period in milliseconds.
+	 * 使用给定的毫秒周期创建触发器。
 	 */
 	public PeriodicTrigger(long period) {
 		this(period, null);
 	}
 
 	/**
-	 * Create a trigger with the given period and time unit. The time unit will
-	 * apply not only to the period but also to any 'initialDelay' value, if
-	 * configured on this Trigger later via {@link #setInitialDelay(long)}.
+	 * 使用给定的周期和时间单位创建触发器。该时间单位不仅适用于周期，
+	 * 也适用于后续通过 {@link #setInitialDelay(long)} 在此 Trigger 上
+	 * 配置的任何 'initialDelay' 值。
 	 */
 	public PeriodicTrigger(long period, @Nullable TimeUnit timeUnit) {
 		Assert.isTrue(period >= 0, "period must not be negative");
@@ -75,7 +71,7 @@ public class PeriodicTrigger implements Trigger {
 
 
 	/**
-	 * Return this trigger's period.
+	 * 返回此触发器的周期。
 	 * @since 5.0.2
 	 */
 	public long getPeriod() {
@@ -83,7 +79,7 @@ public class PeriodicTrigger implements Trigger {
 	}
 
 	/**
-	 * Return this trigger's time unit (milliseconds by default).
+	 * 返回此触发器的时间单位（默认为毫秒）。
 	 * @since 5.0.2
 	 */
 	public TimeUnit getTimeUnit() {
@@ -91,16 +87,15 @@ public class PeriodicTrigger implements Trigger {
 	}
 
 	/**
-	 * Specify the delay for the initial execution. It will be evaluated in
-	 * terms of this trigger's {@link TimeUnit}. If no time unit was explicitly
-	 * provided upon instantiation, the default is milliseconds.
+	 * 指定初始执行的延迟时间。它将根据此触发器的 {@link TimeUnit} 进行评估。
+	 * 如果实例化时未明确提供时间单位，则默认为毫秒。
 	 */
 	public void setInitialDelay(long initialDelay) {
 		this.initialDelay = this.timeUnit.toMillis(initialDelay);
 	}
 
 	/**
-	 * Return the initial delay, or 0 if none.
+	 * 返回初始延迟，如果没有则返回 0。
 	 * @since 5.0.2
 	 */
 	public long getInitialDelay() {
@@ -108,17 +103,15 @@ public class PeriodicTrigger implements Trigger {
 	}
 
 	/**
-	 * Specify whether the periodic interval should be measured between the
-	 * scheduled start times rather than between actual completion times.
-	 * The latter, "fixed delay" behavior, is the default.
+	 * 指定周期性间隔是否应在计划开始时间之间测量，而不是在实际完成时间之间测量。
+	 * 后者，即"固定延迟"行为，是默认行为。
 	 */
 	public void setFixedRate(boolean fixedRate) {
 		this.fixedRate = fixedRate;
 	}
 
 	/**
-	 * Return whether this trigger uses fixed rate ({@code true}) or
-	 * fixed delay ({@code false}) behavior.
+	 * 返回此触发器是否使用固定速率（{@code true}）或固定延迟（{@code false}）行为。
 	 * @since 5.0.2
 	 */
 	public boolean isFixedRate() {
@@ -127,7 +120,7 @@ public class PeriodicTrigger implements Trigger {
 
 
 	/**
-	 * Returns the time after which a task should run again.
+	 * 返回任务应再次运行的时间。
 	 */
 	@Override
 	public Date nextExecutionTime(TriggerContext triggerContext) {

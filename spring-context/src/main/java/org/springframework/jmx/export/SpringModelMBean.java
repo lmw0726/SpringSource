@@ -29,9 +29,9 @@ import javax.management.modelmbean.ModelMBeanInfo;
 import javax.management.modelmbean.RequiredModelMBean;
 
 /**
- * Extension of the {@link RequiredModelMBean} class that ensures the
- * {@link Thread#getContextClassLoader() thread context ClassLoader} is switched
- * for the managed resource's {@link ClassLoader} before any invocations occur.
+ * {@link RequiredModelMBean} 类的扩展，确保在任何调用发生之前，
+ * 将 {@link Thread#getContextClassLoader() 线程上下文类加载器}切换为
+ * 托管资源的 {@link ClassLoader}。
  *
  * @author Rob Harrop
  * @since 2.0
@@ -40,14 +40,13 @@ import javax.management.modelmbean.RequiredModelMBean;
 public class SpringModelMBean extends RequiredModelMBean {
 
 	/**
-	 * Stores the {@link ClassLoader} to use for invocations. Defaults
-	 * to the current thread {@link ClassLoader}.
+	 * 存储用于调用的 {@link ClassLoader}。默认为当前线程的 {@link ClassLoader}。
 	 */
 	private ClassLoader managedResourceClassLoader = Thread.currentThread().getContextClassLoader();
 
 
 	/**
-	 * Construct a new SpringModelMBean instance with an empty {@link ModelMBeanInfo}.
+	 * 使用空的 {@link ModelMBeanInfo} 构造一个新的 SpringModelMBean 实例。
 	 * @see javax.management.modelmbean.RequiredModelMBean#RequiredModelMBean()
 	 */
 	public SpringModelMBean() throws MBeanException, RuntimeOperationsException {
@@ -55,7 +54,7 @@ public class SpringModelMBean extends RequiredModelMBean {
 	}
 
 	/**
-	 * Construct a new SpringModelMBean instance with the given {@link ModelMBeanInfo}.
+	 * 使用给定的 {@link ModelMBeanInfo} 构造一个新的 SpringModelMBean 实例。
 	 * @see javax.management.modelmbean.RequiredModelMBean#RequiredModelMBean(ModelMBeanInfo)
 	 */
 	public SpringModelMBean(ModelMBeanInfo mbi) throws MBeanException, RuntimeOperationsException {
@@ -64,7 +63,7 @@ public class SpringModelMBean extends RequiredModelMBean {
 
 
 	/**
-	 * Sets managed resource to expose and stores its {@link ClassLoader}.
+	 * 设置要暴露的托管资源并存储其 {@link ClassLoader}。
 	 */
 	@Override
 	public void setManagedResource(Object managedResource, String managedResourceType)
@@ -76,8 +75,8 @@ public class SpringModelMBean extends RequiredModelMBean {
 
 
 	/**
-	 * Switches the {@link Thread#getContextClassLoader() context ClassLoader} for the
-	 * managed resources {@link ClassLoader} before allowing the invocation to occur.
+	 * 在允许调用发生之前，将 {@link Thread#getContextClassLoader() 上下文类加载器}切换为
+	 * 托管资源的 {@link ClassLoader}。
 	 * @see javax.management.modelmbean.ModelMBean#invoke
 	 */
 	@Override
@@ -95,8 +94,8 @@ public class SpringModelMBean extends RequiredModelMBean {
 	}
 
 	/**
-	 * Switches the {@link Thread#getContextClassLoader() context ClassLoader} for the
-	 * managed resources {@link ClassLoader} before allowing the invocation to occur.
+	 * 在允许调用发生之前，将 {@link Thread#getContextClassLoader() 上下文类加载器}切换为
+	 * 托管资源的 {@link ClassLoader}。
 	 * @see javax.management.modelmbean.ModelMBean#getAttribute
 	 */
 	@Override
@@ -114,8 +113,8 @@ public class SpringModelMBean extends RequiredModelMBean {
 	}
 
 	/**
-	 * Switches the {@link Thread#getContextClassLoader() context ClassLoader} for the
-	 * managed resources {@link ClassLoader} before allowing the invocation to occur.
+	 * 在允许调用发生之前，将 {@link Thread#getContextClassLoader() 上下文类加载器}切换为
+	 * 托管资源的 {@link ClassLoader}。
 	 * @see javax.management.modelmbean.ModelMBean#getAttributes
 	 */
 	@Override
@@ -131,8 +130,8 @@ public class SpringModelMBean extends RequiredModelMBean {
 	}
 
 	/**
-	 * Switches the {@link Thread#getContextClassLoader() context ClassLoader} for the
-	 * managed resources {@link ClassLoader} before allowing the invocation to occur.
+	 * 在允许调用发生之前，将 {@link Thread#getContextClassLoader() 上下文类加载器}切换为
+	 * 托管资源的 {@link ClassLoader}。
 	 * @see javax.management.modelmbean.ModelMBean#setAttribute
 	 */
 	@Override
@@ -150,8 +149,8 @@ public class SpringModelMBean extends RequiredModelMBean {
 	}
 
 	/**
-	 * Switches the {@link Thread#getContextClassLoader() context ClassLoader} for the
-	 * managed resources {@link ClassLoader} before allowing the invocation to occur.
+	 * 在允许调用发生之前，将 {@link Thread#getContextClassLoader() 上下文类加载器}切换为
+	 * 托管资源的 {@link ClassLoader}。
 	 * @see javax.management.modelmbean.ModelMBean#setAttributes
 	 */
 	@Override

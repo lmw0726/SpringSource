@@ -25,11 +25,10 @@ import java.util.Hashtable;
 import org.springframework.lang.Nullable;
 
 /**
- * Adapter that implements WebLogic ClassPreProcessor interface, delegating to a
- * standard JDK {@link ClassFileTransformer} underneath.
+ * 实现 WebLogic ClassPreProcessor 接口的适配器，底层委托给标准的
+ * JDK {@link ClassFileTransformer}。
  *
- * <p>To avoid compile time checks again the vendor API, a dynamic proxy is
- * being used.
+ * <p>为避免对供应商 API 的编译时检查，使用了动态代理。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -43,7 +42,7 @@ class WebLogicClassPreProcessorAdapter implements InvocationHandler {
 
 
 	/**
-	 * Construct a new {@link WebLogicClassPreProcessorAdapter}.
+	 * 构造一个新的 {@link WebLogicClassPreProcessorAdapter}。
 	 */
 	public WebLogicClassPreProcessorAdapter(ClassFileTransformer transformer, ClassLoader loader) {
 		this.transformer = transformer;

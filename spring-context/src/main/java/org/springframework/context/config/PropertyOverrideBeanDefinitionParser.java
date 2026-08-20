@@ -23,7 +23,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 
 /**
- * Parser for the &lt;context:property-override/&gt; element.
+ * &lt;context:property-override/&gt; 元素的解析器。
  *
  * @author Juergen Hoeller
  * @author Dave Syer

@@ -31,14 +31,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * {@code BeanPostProcessor} that detects beans which implement the {@code ApplicationListener}
- * interface. This catches beans that can't reliably be detected by {@code getBeanNamesForType}
- * and related operations which only work against top-level beans.
+ * {@code BeanPostProcessor}，用于检测实现了 {@code ApplicationListener} 接口的 bean。
+ * 该处理器捕获那些无法通过 {@code getBeanNamesForType} 及相关操作可靠检测的 bean，
+ * 因为这些操作仅对顶层 bean 有效。
  *
- * <p>With standard Java serialization, this post-processor won't get serialized as part of
- * {@code DisposableBeanAdapter} to begin with. However, with alternative serialization
- * mechanisms, {@code DisposableBeanAdapter.writeReplace} might not get used at all, so we
- * defensively mark this post-processor's field state as {@code transient}.
+ * <p>在标准 Java 序列化下，该后处理器本身不会作为 {@code DisposableBeanAdapter} 的一部分
+ * 被序列化。然而，使用其他序列化机制时，{@code DisposableBeanAdapter.writeReplace} 可能
+ * 完全不会被调用，因此我们出于防御性考虑将该后处理器的字段状态标记为 {@code transient}。
  *
  * @author Juergen Hoeller
  * @since 4.3.4
@@ -72,15 +71,15 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		if (bean instanceof ApplicationListener) {
-			// potentially not detected as a listener by getBeanNamesForType retrieval
+			// 可能未被 getBeanNamesForType 检索检测为监听器
 			Boolean flag = this.singletonNames.get(beanName);
 			if (Boolean.TRUE.equals(flag)) {
-				// singleton bean (top-level or inner): register on the fly
+				// 单例 bean（顶层或内部）：即时注册
 				this.applicationContext.addApplicationListener((ApplicationListener<?>) bean);
 			}
 			else if (Boolean.FALSE.equals(flag)) {
 				if (logger.isWarnEnabled() && !this.applicationContext.containsBean(beanName)) {
-					// inner bean with other scope - can't reliably process events
+					// 非单例作用域的内部 bean - 无法可靠地处理事件
 					logger.warn("Inner bean '" + beanName + "' implements ApplicationListener interface " +
 							"but is not reachable for event multicasting by its containing ApplicationContext " +
 							"because it does not have singleton scope. Only top-level listener beans are allowed " +
@@ -101,7 +100,7 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 				multicaster.removeApplicationListenerBean(beanName);
 			}
 			catch (IllegalStateException ex) {
-				// ApplicationEventMulticaster not initialized yet - no need to remove a listener
+				// ApplicationEventMulticaster 尚未初始化 - 无需移除监听器
 			}
 		}
 	}

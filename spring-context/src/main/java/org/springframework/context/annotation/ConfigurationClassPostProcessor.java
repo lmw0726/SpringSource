@@ -57,17 +57,13 @@ import org.springframework.util.ClassUtils;
 import java.util.*;
 
 /**
- * {@link BeanFactoryPostProcessor} used for bootstrapping processing of
- * {@link Configuration @Configuration} classes.
+ * 用于引导处理 {@link Configuration @Configuration} 类的 {@link BeanFactoryPostProcessor}。
  *
- * <p>Registered by default when using {@code <context:annotation-config/>} or
- * {@code <context:component-scan/>}. Otherwise, may be declared manually as
- * with any other {@link BeanFactoryPostProcessor}.
+ * <p>使用 {@code <context:annotation-config/>} 或 {@code <context:component-scan/>} 时默认注册。
+ * 否则，可以像其他任何 {@link BeanFactoryPostProcessor} 一样手动声明。
  *
- * <p>This post processor is priority-ordered as it is important that any
- * {@link Bean @Bean} methods declared in {@code @Configuration} classes have
- * their corresponding bean definitions registered before any other
- * {@code BeanFactoryPostProcessor} executes.
+ * <p>此后处理器具有优先排序，因为在任何其他 {@code BeanFactoryPostProcessor} 执行之前，
+ * 必须先注册 {@code @Configuration} 类中声明的所有 {@link Bean @Bean} 方法对应的 Bean 定义。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -78,12 +74,12 @@ import java.util.*;
 public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor,
 		PriorityOrdered, ResourceLoaderAware, ApplicationStartupAware, BeanClassLoaderAware, EnvironmentAware {
 
+
 	/**
-	 * A {@code BeanNameGenerator} using fully qualified class names as default bean names.
-	 * <p>This default for configuration-level import purposes may be overridden through
-	 * {@link #setBeanNameGenerator}. Note that the default for component scanning purposes
-	 * is a plain {@link AnnotationBeanNameGenerator#INSTANCE}, unless overridden through
-	 * {@link #setBeanNameGenerator} with a unified user-level bean name generator.
+	 * 使用完全限定类名作为默认 Bean 名称的 {@code BeanNameGenerator}。
+	 * <p>此默认值用于配置级别的导入目的，可通过 {@link #setBeanNameGenerator} 覆盖。
+	 * 请注意，组件扫描目的的默认值是普通的 {@link AnnotationBeanNameGenerator#INSTANCE}，
+	 * 除非通过 {@link #setBeanNameGenerator} 指定了统一的用户级 Bean 名称生成器。
 	 *
 	 * @see #setBeanNameGenerator
 	 * @since 5.2
@@ -122,10 +118,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	private boolean localBeanNameGeneratorSet = false;
 
-	/* Using short class names as default bean names by default. */
+	/* 默认使用短类名作为 Bean 名称。 */
 	private BeanNameGenerator componentScanBeanNameGenerator = AnnotationBeanNameGenerator.INSTANCE;
 
-	/* Using fully qualified class names as default bean names by default. */
+	/* 默认使用完全限定类名作为 Bean 名称。 */
 	private BeanNameGenerator importBeanNameGenerator = IMPORT_BEAN_NAME_GENERATOR;
 
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
@@ -133,31 +129,30 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	@Override
 	public int getOrder() {
-		return Ordered.LOWEST_PRECEDENCE;  // within PriorityOrdered
+		return Ordered.LOWEST_PRECEDENCE;  // 在 PriorityOrdered 中的排序
 	}
 
 	/**
-	 * Set the {@link SourceExtractor} to use for generated bean definitions
-	 * that correspond to {@link Bean} factory methods.
+	 * 设置用于与 {@link Bean} 工厂方法对应的生成 Bean 定义的 {@link SourceExtractor}。
 	 */
 	public void setSourceExtractor(@Nullable SourceExtractor sourceExtractor) {
 		this.sourceExtractor = (sourceExtractor != null ? sourceExtractor : new PassThroughSourceExtractor());
 	}
 
 	/**
-	 * Set the {@link ProblemReporter} to use.
-	 * <p>Used to register any problems detected with {@link Configuration} or {@link Bean}
-	 * declarations. For instance, an @Bean method marked as {@code final} is illegal
-	 * and would be reported as a problem. Defaults to {@link FailFastProblemReporter}.
+	 * 设置要使用的 {@link ProblemReporter}。
+	 * <p>用于注册在 {@link Configuration} 或 {@link Bean} 声明中检测到的任何问题。
+	 * 例如，标记为 {@code final} 的 @Bean 方法是非法的，将作为问题被报告。
+	 * 默认为 {@link FailFastProblemReporter}。
 	 */
 	public void setProblemReporter(@Nullable ProblemReporter problemReporter) {
 		this.problemReporter = (problemReporter != null ? problemReporter : new FailFastProblemReporter());
 	}
 
 	/**
-	 * Set the {@link MetadataReaderFactory} to use.
-	 * <p>Default is a {@link CachingMetadataReaderFactory} for the specified
-	 * {@linkplain #setBeanClassLoader bean class loader}.
+	 * 设置要使用的 {@link MetadataReaderFactory}。
+	 * <p>默认是针对指定的 {@linkplain #setBeanClassLoader bean class loader} 的
+	 * {@link CachingMetadataReaderFactory}。
 	 */
 	public void setMetadataReaderFactory(MetadataReaderFactory metadataReaderFactory) {
 		Assert.notNull(metadataReaderFactory, "MetadataReaderFactory must not be null");
@@ -166,17 +161,14 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 	/**
-	 * Set the {@link BeanNameGenerator} to be used when triggering component scanning
-	 * from {@link Configuration} classes and when registering {@link Import}'ed
-	 * configuration classes. The default is a standard {@link AnnotationBeanNameGenerator}
-	 * for scanned components (compatible with the default in {@link ClassPathBeanDefinitionScanner})
-	 * and a variant thereof for imported configuration classes (using unique fully-qualified
-	 * class names instead of standard component overriding).
-	 * <p>Note that this strategy does <em>not</em> apply to {@link Bean} methods.
-	 * <p>This setter is typically only appropriate when configuring the post-processor as a
-	 * standalone bean definition in XML, e.g. not using the dedicated {@code AnnotationConfig*}
-	 * application contexts or the {@code <context:annotation-config>} element. Any bean name
-	 * generator specified against the application context will take precedence over any set here.
+	 * 设置在从 {@link Configuration} 类触发组件扫描以及注册 {@link Import}'ed 配置类时使用的
+	 * {@link BeanNameGenerator}。默认情况下，扫描组件使用标准的 {@link AnnotationBeanNameGenerator}
+	 * （与 {@link ClassPathBeanDefinitionScanner} 中的默认值兼容），而导入的配置类使用其变体
+	 * （使用唯一的完全限定类名而非标准的组件覆盖）。
+	 * <p>请注意，此策略 <em>不</em> 适用于 {@link Bean} 方法。
+	 * <p>此 setter 通常仅适用于在 XML 中将后处理器配置为独立 Bean 定义时使用，
+	 * 例如不使用专用的 {@code AnnotationConfig*} 应用上下文或 {@code <context:annotation-config>} 元素。
+	 * 针对应用上下文指定的任何 Bean 名称生成器将优先于此处设置的生成器。
 	 *
 	 * @see AnnotationConfigApplicationContext#setBeanNameGenerator(BeanNameGenerator)
 	 * @see AnnotationConfigUtils#CONFIGURATION_BEAN_NAME_GENERATOR
@@ -245,8 +237,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 	/**
-	 * Prepare the Configuration classes for servicing bean requests at runtime
-	 * by replacing them with CGLIB-enhanced subclasses.
+	 * 准备配置类以便在运行时通过 CGLIB 增强的子类来服务 Bean 请求。
 	 */
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
@@ -257,8 +248,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.factoriesPostProcessed.add(factoryId);
 		if (!this.registriesPostProcessed.contains(factoryId)) {
-			// BeanDefinitionRegistryPostProcessor hook apparently not supported...
-			// Simply call processConfigurationClasses lazily at this point then.
+			// BeanDefinitionRegistryPostProcessor 钩子显然不受支持...
+			// 那么在此处延迟调用 processConfigurationClasses。
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
 
@@ -381,9 +372,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 	/**
-	 * Post-processes a BeanFactory in search of Configuration class BeanDefinitions;
-	 * any candidates are then enhanced by a {@link ConfigurationClassEnhancer}.
-	 * Candidate status is determined by BeanDefinition attribute metadata.
+	 * 后处理 BeanFactory 以查找 Configuration 类的 BeanDefinition；
+	 * 然后通过 {@link ConfigurationClassEnhancer} 增强所有候选项。
+	 * 候选状态由 BeanDefinition 属性元数据确定。
 	 *
 	 * @see ConfigurationClassEnhancer
 	 */
@@ -401,9 +392,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				methodMetadata = annotatedBeanDefinition.getFactoryMethodMetadata();
 			}
 			if ((configClassAttr != null || methodMetadata != null) && beanDef instanceof AbstractBeanDefinition) {
-				// Configuration class (full or lite) or a configuration-derived @Bean method
-				// -> eagerly resolve bean class at this point, unless it's a 'lite' configuration
-				// or component class without @Bean methods.
+				// 配置类（完整或轻量）或配置派生的 @Bean 方法
+				// -> 在此点提前解析 Bean 类，除非是"轻量"配置
+				// 或没有 @Bean 方法的组件类。
 				AbstractBeanDefinition abd = (AbstractBeanDefinition) beanDef;
 				if (!abd.hasBeanClass()) {
 					boolean liteConfigurationCandidateWithoutBeanMethods =
@@ -433,7 +424,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			}
 		}
 		if (configBeanDefs.isEmpty() || NativeDetector.inNativeImage()) {
-			// nothing to enhance -> return immediately
+			// 没有需要增强的内容 -> 立即返回
 			enhanceConfigClasses.end();
 			return;
 		}
@@ -441,9 +432,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer();
 		for (Map.Entry<String, AbstractBeanDefinition> entry : configBeanDefs.entrySet()) {
 			AbstractBeanDefinition beanDef = entry.getValue();
-			// If a @Configuration class gets proxied, always proxy the target class
+			// 如果 @Configuration 类被代理，则始终代理目标类
 			beanDef.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
-			// Set enhanced subclass of the user-specified bean class
+			// 设置用户指定 Bean 类的增强子类
 			Class<?> configClass = beanDef.getBeanClass();
 			Class<?> enhancedClass = enhancer.enhance(configClass, this.beanClassLoader);
 			if (configClass != enhancedClass) {
@@ -468,8 +459,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 		@Override
 		public PropertyValues postProcessProperties(@Nullable PropertyValues pvs, Object bean, String beanName) {
-			// Inject the BeanFactory before AutowiredAnnotationBeanPostProcessor's
-			// postProcessProperties method attempts to autowire other configuration beans.
+			// 在 AutowiredAnnotationBeanPostProcessor 的 postProcessProperties 方法
+			// 尝试自动装配其他配置 Bean 之前注入 BeanFactory。
 			if (bean instanceof EnhancedConfiguration) {
 				((EnhancedConfiguration) bean).setBeanFactory(this.beanFactory);
 			}

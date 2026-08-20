@@ -22,8 +22,8 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 
 /**
  * {@link org.springframework.beans.factory.xml.BeanDefinitionParser}
- * implementation for parsing '{@code local-slsb}' tags and
- * creating {@link LocalStatelessSessionProxyFactoryBean} definitions.
+ * 的实现，用于解析 '{@code local-slsb}' 标签并
+ * 创建 {@link LocalStatelessSessionProxyFactoryBean} 定义。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

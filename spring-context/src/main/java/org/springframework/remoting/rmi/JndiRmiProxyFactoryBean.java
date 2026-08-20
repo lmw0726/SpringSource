@@ -25,27 +25,24 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link FactoryBean} for RMI proxies from JNDI.
+ * 用于从 JNDI 获取 RMI 代理的 {@link FactoryBean}。
  *
- * <p>Typically used for RMI-IIOP (CORBA), but can also be used for EJB home objects
- * (for example, a Stateful Session Bean home). In contrast to a plain JNDI lookup,
- * this accessor also performs narrowing through {@link javax.rmi.PortableRemoteObject}.
+ * <p>通常用于 RMI-IIOP（CORBA），但也可用于 EJB home 对象（例如有状态 Session Bean 的 home）。
+ * 与简单的 JNDI 查找相比，此访问器还会通过 {@link javax.rmi.PortableRemoteObject} 执行 narrowing 操作。
  *
- * <p>With conventional RMI services, this invoker is typically used with the RMI
- * service interface. Alternatively, this invoker can also proxy a remote RMI service
- * with a matching non-RMI business interface, i.e. an interface that mirrors the RMI
- * service methods but does not declare RemoteExceptions. In the latter case,
- * RemoteExceptions thrown by the RMI stub will automatically get converted to
- * Spring's unchecked RemoteAccessException.
+ * <p>对于传统的 RMI 服务，此调用器通常与 RMI 服务接口一起使用。或者，此调用器也可以用匹配的
+ * 非 RMI 业务接口来代理远程 RMI 服务，即一个镜像了 RMI 服务方法但不声明 RemoteException 的接口。
+ * 在后一种情况下，RMI 存根抛出的 RemoteException 将自动转换为
+ * Spring 的非受检异常 RemoteAccessException。
  *
- * <p>The JNDI environment can be specified as "jndiEnvironment" property,
- * or be configured in a {@code jndi.properties} file or as system properties.
- * For example:
+ * <p>JNDI 环境可以通过 "jndiEnvironment" 属性指定，
+ * 也可以在 {@code jndi.properties} 文件或系统属性中配置。
+ * 例如：
  *
  * <pre class="code">&lt;property name="jndiEnvironment"&gt;
  * 	 &lt;props&gt;
- *		 &lt;prop key="java.naming.factory.initial"&gt;com.sun.jndi.cosnaming.CNCtxFactory&lt;/prop&gt;
- *		 &lt;prop key="java.naming.provider.url"&gt;iiop://localhost:1050&lt;/prop&gt;
+ *		&lt;prop key="java.naming.factory.initial"&gt;com.sun.jndi.cosnaming.CNCtxFactory&lt;/prop&gt;
+ *		&lt;prop key="java.naming.provider.url"&gt;iiop://localhost:1050&lt;/prop&gt;
  *	 &lt;/props&gt;
  * &lt;/property&gt;</pre>
  *

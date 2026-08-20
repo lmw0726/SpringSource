@@ -23,14 +23,12 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface to be implemented by @{@link org.springframework.context.annotation.Configuration
- * Configuration} classes annotated with @{@link EnableCaching} that wish or need to
- * specify explicitly how caches are resolved and how keys are generated for annotation-driven
- * cache management.
+ * 供标注了 @{@link org.springframework.context.annotation.Configuration
+ * Configuration} 注解且带有 @{@link EnableCaching} 注解的类实现的接口，这些类希望或需要
+ * 显式指定如何解析缓存，以及如何为基于注解的缓存管理生成键。
  *
- * <p>See @{@link EnableCaching} for general examples and context; see
- * {@link #cacheManager()}, {@link #cacheResolver()} and {@link #keyGenerator()}
- * for detailed instructions.
+ * <p>一般示例和上下文请参阅 @{@link EnableCaching}；详细说明请参阅
+ * {@link #cacheManager()}、{@link #cacheResolver()} 和 {@link #keyGenerator()}。
  *
  * @author Chris Beams
  * @author Stephane Nicoll
@@ -40,26 +38,25 @@ import org.springframework.lang.Nullable;
 public interface CachingConfigurer {
 
 	/**
-	 * Return the cache manager bean to use for annotation-driven cache
-	 * management. A default {@link CacheResolver} will be initialized
-	 * behind the scenes with this cache manager. For more fine-grained
-	 * management of the cache resolution, consider setting the
-	 * {@link CacheResolver} directly.
-	 * <p>Implementations must explicitly declare
-	 * {@link org.springframework.context.annotation.Bean @Bean}, e.g.
+	 * 返回用于基于注解的缓存管理的缓存管理器（CacheManager）Bean。
+	 * 默认的 {@link CacheResolver} 会在幕后使用该缓存管理器进行初始化。
+	 * 若需要对缓存解析进行更细粒度的管理，可考虑直接设置
+	 * {@link CacheResolver}。
+	 * <p>实现类必须显式声明
+	 * {@link org.springframework.context.annotation.Bean @Bean}，例如
 	 * <pre class="code">
 	 * &#064;Configuration
 	 * &#064;EnableCaching
 	 * public class AppConfig extends CachingConfigurerSupport {
-	 *     &#064;Bean // important!
+	 *     &#064;Bean // 重要！
 	 *     &#064;Override
 	 *     public CacheManager cacheManager() {
-	 *         // configure and return CacheManager instance
+	 *         // 配置并返回 CacheManager 实例
 	 *     }
 	 *     // ...
 	 * }
 	 * </pre>
-	 * See @{@link EnableCaching} for more complete examples.
+	 * 更完整的示例请参阅 @{@link EnableCaching}。
 	 */
 	@Nullable
 	default CacheManager cacheManager() {
@@ -67,26 +64,25 @@ public interface CachingConfigurer {
 	}
 
 	/**
-	 * Return the {@link CacheResolver} bean to use to resolve regular caches for
-	 * annotation-driven cache management. This is an alternative and more powerful
-	 * option of specifying the {@link CacheManager} to use.
-	 * <p>If both a {@link #cacheManager()} and {@code #cacheResolver()} are set,
-	 * the cache manager is ignored.
-	 * <p>Implementations must explicitly declare
-	 * {@link org.springframework.context.annotation.Bean @Bean}, e.g.
+	 * 返回用于基于注解的缓存管理中解析常规缓存的 {@link CacheResolver} Bean。
+	 * 这是指定要使用的 {@link CacheManager} 的一种替代且更强大的方式。
+	 * <p>如果同时设置了 {@link #cacheManager()} 和 {@code #cacheResolver()}，
+	 * 则缓存管理器（cache manager）将被忽略。
+	 * <p>实现类必须显式声明
+	 * {@link org.springframework.context.annotation.Bean @Bean}，例如
 	 * <pre class="code">
 	 * &#064;Configuration
 	 * &#064;EnableCaching
 	 * public class AppConfig extends CachingConfigurerSupport {
-	 *     &#064;Bean // important!
+	 *     &#064;Bean // 重要！
 	 *     &#064;Override
 	 *     public CacheResolver cacheResolver() {
-	 *         // configure and return CacheResolver instance
+	 *         // 配置并返回 CacheResolver 实例
 	 *     }
 	 *     // ...
 	 * }
 	 * </pre>
-	 * See {@link EnableCaching} for more complete examples.
+	 * 更完整的示例请参阅 {@link EnableCaching}。
 	 */
 	@Nullable
 	default CacheResolver cacheResolver() {
@@ -94,22 +90,22 @@ public interface CachingConfigurer {
 	}
 
 	/**
-	 * Return the key generator bean to use for annotation-driven cache management.
-	 * Implementations must explicitly declare
-	 * {@link org.springframework.context.annotation.Bean @Bean}, e.g.
+	 * 返回用于基于注解的缓存管理的键生成器（KeyGenerator）Bean。
+	 * 实现类必须显式声明
+	 * {@link org.springframework.context.annotation.Bean @Bean}，例如
 	 * <pre class="code">
 	 * &#064;Configuration
 	 * &#064;EnableCaching
 	 * public class AppConfig extends CachingConfigurerSupport {
-	 *     &#064;Bean // important!
+	 *     &#064;Bean // 重要！
 	 *     &#064;Override
 	 *     public KeyGenerator keyGenerator() {
-	 *         // configure and return KeyGenerator instance
+	 *         // 配置并返回 KeyGenerator 实例
 	 *     }
 	 *     // ...
 	 * }
 	 * </pre>
-	 * See @{@link EnableCaching} for more complete examples.
+	 * 更完整的示例请参阅 @{@link EnableCaching}。
 	 */
 	@Nullable
 	default KeyGenerator keyGenerator() {
@@ -117,24 +113,24 @@ public interface CachingConfigurer {
 	}
 
 	/**
-	 * Return the {@link CacheErrorHandler} to use to handle cache-related errors.
-	 * <p>By default,{@link org.springframework.cache.interceptor.SimpleCacheErrorHandler}
-	 * is used and simply throws the exception back at the client.
-	 * <p>Implementations must explicitly declare
-	 * {@link org.springframework.context.annotation.Bean @Bean}, e.g.
+	 * 返回用于处理缓存相关错误的 {@link CacheErrorHandler}。
+	 * <p>默认情况下，使用 {@link org.springframework.cache.interceptor.SimpleCacheErrorHandler}，
+	 * 它会直接将异常抛回给客户端。
+	 * <p>实现类必须显式声明
+	 * {@link org.springframework.context.annotation.Bean @Bean}，例如
 	 * <pre class="code">
 	 * &#064;Configuration
 	 * &#064;EnableCaching
 	 * public class AppConfig extends CachingConfigurerSupport {
-	 *     &#064;Bean // important!
+	 *     &#064;Bean // 重要！
 	 *     &#064;Override
 	 *     public CacheErrorHandler errorHandler() {
-	 *         // configure and return CacheErrorHandler instance
+	 *         // 配置并返回 CacheErrorHandler 实例
 	 *     }
 	 *     // ...
 	 * }
 	 * </pre>
-	 * See @{@link EnableCaching} for more complete examples.
+	 * 更完整的示例请参阅 @{@link EnableCaching}。
 	 */
 	@Nullable
 	default CacheErrorHandler errorHandler() {

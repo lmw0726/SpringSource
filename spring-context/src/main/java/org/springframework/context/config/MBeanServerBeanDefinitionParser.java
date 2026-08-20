@@ -31,11 +31,11 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Parser for the &lt;context:mbean-server/&gt; element.
+ * &lt;context:mbean-server/&gt; 元素的解析器。
  *
- * <p>Registers an instance of
+ * <p>在应用上下文中注册一个
  * {@link org.springframework.jmx.export.annotation.AnnotationMBeanExporter}
- * within the context.
+ * 实例。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -81,7 +81,7 @@ class MBeanServerBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		RootBeanDefinition bd = new RootBeanDefinition(MBeanServerFactoryBean.class);
 		bd.getPropertyValues().add("locateExistingServerIfPossible", Boolean.TRUE);
 
-		// Mark as infrastructure bean and attach source location.
+		// 标记为基础设施 Bean 并附加源码位置信息。
 		bd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		bd.setSource(parserContext.extractSource(element));
 		return bd;

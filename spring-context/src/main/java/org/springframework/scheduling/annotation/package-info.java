@@ -1,5 +1,5 @@
 /**
- * Annotation support for asynchronous method execution.
+ * 异步方法执行的注解支持。
  */
 @NonNullApi
 @NonNullFields

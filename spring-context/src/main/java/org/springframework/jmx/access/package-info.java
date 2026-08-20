@@ -1,5 +1,5 @@
 /**
- * Provides support for accessing remote MBean resources.
+ * 提供对远程 MBean 资源的访问支持。
  */
 @NonNullApi
 @NonNullFields

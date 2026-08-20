@@ -24,9 +24,9 @@ import org.springframework.ui.context.HierarchicalThemeSource;
 import org.springframework.ui.context.ThemeSource;
 
 /**
- * Utility class for UI application context implementations.
- * Provides support for a special bean named "themeSource",
- * of type {@link org.springframework.ui.context.ThemeSource}.
+ * UI 应用上下文实现的工具类。
+ * 提供对名为 "themeSource" 的特殊 bean 的支持，
+ * 该 bean 类型为 {@link org.springframework.ui.context.ThemeSource}。
  *
  * @author Jean-Pierre Pawlak
  * @author Juergen Hoeller
@@ -35,8 +35,8 @@ import org.springframework.ui.context.ThemeSource;
 public abstract class UiApplicationContextUtils {
 
 	/**
-	 * Name of the ThemeSource bean in the factory.
-	 * If none is supplied, theme resolution is delegated to the parent.
+	 * 工厂中 ThemeSource bean 的名称。
+	 * 如果未提供，则主题解析将委托给父级。
 	 * @see org.springframework.ui.context.ThemeSource
 	 */
 	public static final String THEME_SOURCE_BEAN_NAME = "themeSource";
@@ -46,22 +46,22 @@ public abstract class UiApplicationContextUtils {
 
 
 	/**
-	 * Initialize the ThemeSource for the given application context,
-	 * autodetecting a bean with the name "themeSource". If no such
-	 * bean is found, a default (empty) ThemeSource will be used.
-	 * @param context current application context
-	 * @return the initialized theme source (will never be {@code null})
+	 * 为给定的应用上下文初始化 ThemeSource，
+	 * 自动检测名为 "themeSource" 的 bean。如果未找到该 bean，
+	 * 将使用默认的（空的）ThemeSource。
+	 * @param context 当前应用上下文
+	 * @return 初始化后的主题源（永远不会为 {@code null}）
 	 * @see #THEME_SOURCE_BEAN_NAME
 	 */
 	public static ThemeSource initThemeSource(ApplicationContext context) {
 		if (context.containsLocalBean(THEME_SOURCE_BEAN_NAME)) {
 			ThemeSource themeSource = context.getBean(THEME_SOURCE_BEAN_NAME, ThemeSource.class);
-			// Make ThemeSource aware of parent ThemeSource.
+			// 让 ThemeSource 感知父 ThemeSource。
 			if (context.getParent() instanceof ThemeSource && themeSource instanceof HierarchicalThemeSource) {
 				HierarchicalThemeSource hts = (HierarchicalThemeSource) themeSource;
 				if (hts.getParentThemeSource() == null) {
-					// Only set parent context as parent ThemeSource if no parent ThemeSource
-					// registered already.
+					// 仅在尚未注册父 ThemeSource 时，
+					// 将父上下文设置为父 ThemeSource。
 					hts.setParentThemeSource((ThemeSource) context.getParent());
 				}
 			}
@@ -71,8 +71,8 @@ public abstract class UiApplicationContextUtils {
 			return themeSource;
 		}
 		else {
-			// Use default ThemeSource to be able to accept getTheme calls, either
-			// delegating to parent context's default or to local ResourceBundleThemeSource.
+			// 使用默认的 ThemeSource 以能够接受 getTheme 调用，
+			// 或委托给父上下文的默认值，或使用本地 ResourceBundleThemeSource。
 			HierarchicalThemeSource themeSource = null;
 			if (context.getParent() instanceof ThemeSource) {
 				themeSource = new DelegatingThemeSource();

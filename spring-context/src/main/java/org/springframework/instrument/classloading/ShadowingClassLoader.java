@@ -34,8 +34,8 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * ClassLoader decorator that shadows an enclosing ClassLoader,
- * applying registered transformers to all affected classes.
+ * 对指定的外层 ClassLoader 进行装饰的 ClassLoader，
+ * 将已注册的转换器应用到所有受影响的类上。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -46,7 +46,7 @@ import org.springframework.util.StringUtils;
  */
 public class ShadowingClassLoader extends DecoratingClassLoader {
 
-	/** Packages that are excluded by default. */
+	/** 默认被排除的包。 */
 	public static final String[] DEFAULT_EXCLUDED_PACKAGES =
 			new String[] {"java.", "javax.", "jdk.", "sun.", "oracle.", "com.sun.", "com.ibm.", "COM.ibm.",
 					"org.w3c.", "org.xml.", "org.dom4j.", "org.eclipse", "org.aspectj.", "net.sf.cglib",
@@ -61,9 +61,9 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 
 
 	/**
-	 * Create a new ShadowingClassLoader, decorating the given ClassLoader,
-	 * applying {@link #DEFAULT_EXCLUDED_PACKAGES}.
-	 * @param enclosingClassLoader the ClassLoader to decorate
+	 * 创建一个新的 ShadowingClassLoader，对给定的 ClassLoader 进行装饰，
+	 * 并应用 {@link #DEFAULT_EXCLUDED_PACKAGES}。
+	 * @param enclosingClassLoader 要装饰的 ClassLoader
 	 * @see #ShadowingClassLoader(ClassLoader, boolean)
 	 */
 	public ShadowingClassLoader(ClassLoader enclosingClassLoader) {
@@ -71,9 +71,9 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	}
 
 	/**
-	 * Create a new ShadowingClassLoader, decorating the given ClassLoader.
-	 * @param enclosingClassLoader the ClassLoader to decorate
-	 * @param defaultExcludes whether to apply {@link #DEFAULT_EXCLUDED_PACKAGES}
+	 * 创建一个新的 ShadowingClassLoader，对给定的 ClassLoader 进行装饰。
+	 * @param enclosingClassLoader 要装饰的 ClassLoader
+	 * @param defaultExcludes 是否应用 {@link #DEFAULT_EXCLUDED_PACKAGES}
 	 * @since 4.3.8
 	 */
 	public ShadowingClassLoader(ClassLoader enclosingClassLoader, boolean defaultExcludes) {
@@ -88,9 +88,8 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 
 
 	/**
-	 * Add the given ClassFileTransformer to the list of transformers that this
-	 * ClassLoader will apply.
-	 * @param transformer the ClassFileTransformer
+	 * 将给定的 ClassFileTransformer 添加到此 ClassLoader 将要应用的转换器列表中。
+	 * @param transformer ClassFileTransformer 实例
 	 */
 	public void addTransformer(ClassFileTransformer transformer) {
 		Assert.notNull(transformer, "Transformer must not be null");
@@ -98,9 +97,8 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	}
 
 	/**
-	 * Copy all ClassFileTransformers from the given ClassLoader to the list of
-	 * transformers that this ClassLoader will apply.
-	 * @param other the ClassLoader to copy from
+	 * 将给定 ClassLoader 中的所有 ClassFileTransformer 复制到此 ClassLoader 将要应用的转换器列表中。
+	 * @param other 要从中复制转换器的 ClassLoader
 	 */
 	public void copyTransformers(ShadowingClassLoader other) {
 		Assert.notNull(other, "Other ClassLoader must not be null");
@@ -123,9 +121,9 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	}
 
 	/**
-	 * Determine whether the given class should be excluded from shadowing.
-	 * @param className the name of the class
-	 * @return whether the specified class should be shadowed
+	 * 判断给定的类是否应被排除在遮蔽处理之外。
+	 * @param className 类名
+	 * @return 指定的类是否应被遮蔽
 	 */
 	private boolean shouldShadow(String className) {
 		return (!className.equals(getClass().getName()) && !className.endsWith("ShadowingClassLoader") &&
@@ -133,10 +131,9 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 	}
 
 	/**
-	 * Determine whether the specified class is eligible for shadowing
-	 * by this class loader.
-	 * @param className the class name to check
-	 * @return whether the specified class is eligible
+	 * 判断指定的类是否符合被此类加载器遮蔽的条件。
+	 * @param className 要检查的类名
+	 * @return 指定的类是否符合条件
 	 * @see #isExcluded
 	 */
 	protected boolean isEligibleForShadowing(String className) {
@@ -154,7 +151,7 @@ public class ShadowingClassLoader extends DecoratingClassLoader {
 			byte[] bytes = FileCopyUtils.copyToByteArray(is);
 			bytes = applyTransformers(name, bytes);
 			Class<?> cls = defineClass(name, bytes, 0, bytes.length);
-			// Additional check for defining the package, if not defined yet.
+			// 额外检查：如果包尚未定义，则进行定义。
 			if (cls.getPackage() == null) {
 				int packageSeparator = name.lastIndexOf('.');
 				if (packageSeparator != -1) {

@@ -1,6 +1,6 @@
 /**
- * This package contains Spring's JMX support, which includes registration of
- * Spring-managed beans as JMX MBeans as well as access to remote JMX MBeans.
+ * 本包包含 Spring 的 JMX 支持，包括将 Spring 管理的 Bean 注册为 JMX MBean，
+ * 以及访问远程 JMX MBean。
  */
 @NonNullApi
 @NonNullFields

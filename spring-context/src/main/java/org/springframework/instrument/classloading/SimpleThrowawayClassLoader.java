@@ -20,9 +20,8 @@ import org.springframework.core.OverridingClassLoader;
 import org.springframework.lang.Nullable;
 
 /**
- * ClassLoader that can be used to load classes without bringing them
- * into the parent loader. Intended to support JPA "temp class loader"
- * requirement, but not JPA-specific.
+ * 一个可以用来加载类的 ClassLoader，而不会将这些类带入父加载器。
+ * 旨在支持 JPA 的"临时类加载器"需求，但并不局限于 JPA。
  *
  * @author Rod Johnson
  * @since 2.0
@@ -35,8 +34,8 @@ public class SimpleThrowawayClassLoader extends OverridingClassLoader {
 
 
 	/**
-	 * Create a new SimpleThrowawayClassLoader for the given ClassLoader.
-	 * @param parent the ClassLoader to build a throwaway ClassLoader for
+	 * 为给定的 ClassLoader 创建一个新的 SimpleThrowawayClassLoader。
+	 * @param parent 要为其构建临时 ClassLoader 的 ClassLoader
 	 */
 	public SimpleThrowawayClassLoader(@Nullable ClassLoader parent) {
 		super(parent);

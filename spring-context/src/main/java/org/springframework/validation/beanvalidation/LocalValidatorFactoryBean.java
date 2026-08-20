@@ -41,27 +41,21 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * This is the central class for {@code javax.validation} (JSR-303) setup in a Spring
- * application context: It bootstraps a {@code javax.validation.ValidationFactory} and
- * exposes it through the Spring {@link org.springframework.validation.Validator} interface
- * as well as through the JSR-303 {@link javax.validation.Validator} interface and the
- * {@link javax.validation.ValidatorFactory} interface itself.
+ * 这是Spring应用上下文中{@code javax.validation}（JSR-303）配置的核心类：它引导{@code javax.validation.ValidationFactory}，
+ * 并通过Spring的{@link org.springframework.validation.Validator}接口、JSR-303的{@link javax.validation.Validator}
+ * 接口以及{@link javax.validation.ValidatorFactory}接口本身暴露该工厂。
  *
- * <p>When talking to an instance of this bean through the Spring or JSR-303 Validator interfaces,
- * you'll be talking to the default Validator of the underlying ValidatorFactory. This is very
- * convenient in that you don't have to perform yet another call on the factory, assuming that
- * you will almost always use the default Validator anyway. This can also be injected directly
- * into any target dependency of type {@link org.springframework.validation.Validator}!
+ * <p>当通过Spring或JSR-303的Validator接口与此bean的实例交互时，您实际上是在与底层ValidatorFactory的默认Validator通信。
+ * 这非常方便，因为您不必再对工厂执行额外的调用，假设您几乎总是使用默认Validator。这也可以直接注入到任何
+ * 类型为{@link org.springframework.validation.Validator}的目标依赖中！
  *
- * <p><b>As of Spring 5.0, this class requires Bean Validation 1.1+, with special support
- * for Hibernate Validator 5.x</b> (see {@link #setValidationMessageSource}).
- * This class is also runtime-compatible with Bean Validation 2.0 and Hibernate Validator 6.0,
- * with one special note: If you'd like to call BV 2.0's {@code getClockProvider()} method,
- * obtain the native {@code ValidatorFactory} through {@code #unwrap(ValidatorFactory.class)}
- * and call the {@code getClockProvider()} method on the returned native reference there.
+ * <p><b>从Spring 5.0开始，此类需要Bean Validation 1.1+，并对Hibernate Validator 5.x提供特殊支持
+ * </b>（参见{@link #setValidationMessageSource}）。此类也与Bean Validation 2.0和Hibernate Validator 6.0运行时兼容，
+ * 但有一个特别注意：如果您想调用BV 2.0的{@code getClockProvider()}方法，请通过
+ * {@code #unwrap(ValidatorFactory.class)}获取原生{@code ValidatorFactory}，然后在返回的原生引用上调用
+ * {@code getClockProvider()}方法。
  *
- * <p>This class is also being used by Spring's MVC configuration namespace, in case of the
- * {@code javax.validation} API being present but no explicit Validator having been configured.
+ * <p>此类也被Spring的MVC配置命名空间使用，以防{@code javax.validation} API存在但未配置显式Validator的情况。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -108,8 +102,8 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 
 
 	/**
-	 * Specify the desired provider class, if any.
-	 * <p>If not specified, JSR-303's default search mechanism will be used.
+	 * 指定所需的提供程序类（如果有的话）。
+	 * <p>如果未指定，将使用JSR-303的默认搜索机制。
 	 * @see javax.validation.Validation#byProvider(Class)
 	 * @see javax.validation.Validation#byDefaultProvider()
 	 */
@@ -119,8 +113,8 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 	}
 
 	/**
-	 * Specify a JSR-303 {@link ValidationProviderResolver} for bootstrapping the
-	 * provider of choice, as an alternative to {@code META-INF} driven resolution.
+	 * 指定用于引导所选提供程序的JSR-303 {@link ValidationProviderResolver}，
+	 * 作为{@code META-INF}驱动解析的替代方案。
 	 * @since 4.3
 	 */
 	public void setValidationProviderResolver(ValidationProviderResolver validationProviderResolver) {
@@ -128,8 +122,7 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 	}
 
 	/**
-	 * Specify a custom MessageInterpolator to use for this ValidatorFactory
-	 * and its exposed default Validator.
+	 * 指定用于此ValidatorFactory及其暴露的默认Validator的自定义MessageInterpolator。
 	 */
 	public void setMessageInterpolator(MessageInterpolator messageInterpolator) {
 		this.messageInterpolator = messageInterpolator;
@@ -153,42 +146,39 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 	}
 
 	/**
-	 * Specify a custom TraversableResolver to use for this ValidatorFactory
-	 * and its exposed default Validator.
+	 * 指定用于此ValidatorFactory及其暴露的默认Validator的自定义TraversableResolver。
 	 */
 	public void setTraversableResolver(TraversableResolver traversableResolver) {
 		this.traversableResolver = traversableResolver;
 	}
 
 	/**
-	 * Specify a custom ConstraintValidatorFactory to use for this ValidatorFactory.
-	 * <p>Default is a {@link SpringConstraintValidatorFactory}, delegating to the
-	 * containing ApplicationContext for creating autowired ConstraintValidator instances.
+	 * 指定用于此ValidatorFactory的自定义ConstraintValidatorFactory。
+	 * <p>默认是{@link SpringConstraintValidatorFactory}，它委托给包含的ApplicationContext来创建
+	 * 自动装配的ConstraintValidator实例。
 	 */
 	public void setConstraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 	}
 
 	/**
-	 * Set the ParameterNameDiscoverer to use for resolving method and constructor
-	 * parameter names if needed for message interpolation.
-	 * <p>Default is a {@link org.springframework.core.DefaultParameterNameDiscoverer}.
+	 * 设置用于解析方法和构造函数参数名称的ParameterNameDiscoverer（如果消息插值需要）。
+	 * <p>默认是{@link org.springframework.core.DefaultParameterNameDiscoverer}。
 	 */
 	public void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
 		this.parameterNameDiscoverer = parameterNameDiscoverer;
 	}
 
 	/**
-	 * Specify resource locations to load XML constraint mapping files from, if any.
+	 * 指定要从何处加载XML约束映射文件的资源位置（如果有的话）。
 	 */
 	public void setMappingLocations(Resource... mappingLocations) {
 		this.mappingLocations = mappingLocations;
 	}
 
 	/**
-	 * Specify bean validation properties to be passed to the validation provider.
-	 * <p>Can be populated with a String "value" (parsed via PropertiesEditor)
-	 * or a "props" element in XML bean definitions.
+	 * 指定要传递给验证提供程序的bean验证属性。
+	 * <p>可以使用String "value"（通过PropertiesEditor解析）或XML bean定义中的"props"元素进行填充。
 	 * @see javax.validation.Configuration#addProperty(String, String)
 	 */
 	public void setValidationProperties(Properties jpaProperties) {
@@ -196,8 +186,8 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 	}
 
 	/**
-	 * Specify bean validation properties to be passed to the validation provider as a Map.
-	 * <p>Can be populated with a "map" or "props" element in XML bean definitions.
+	 * 以Map形式指定要传递给验证提供程序的bean验证属性。
+	 * <p>可以使用XML bean定义中的"map"或"props"元素进行填充。
 	 * @see javax.validation.Configuration#addProperty(String, String)
 	 */
 	public void setValidationPropertyMap(@Nullable Map<String, String> validationProperties) {
@@ -207,20 +197,20 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 	}
 
 	/**
-	 * Allow Map access to the bean validation properties to be passed to the validation provider,
-	 * with the option to add or override specific entries.
-	 * <p>Useful for specifying entries directly, for example via "validationPropertyMap[myKey]".
+	 * 允许通过Map访问要传递给验证提供程序的bean验证属性，
+	 * 可选择添加或覆盖特定条目。
+	 * <p>对于直接指定条目很有用，例如通过"validationPropertyMap[myKey]"。
 	 */
 	public Map<String, String> getValidationPropertyMap() {
 		return this.validationPropertyMap;
 	}
 
 	/**
-	 * Specify a callback for customizing the Bean Validation {@code Configuration} instance,
-	 * as an alternative to overriding the {@link #postProcessConfiguration(Configuration)}
-	 * method in custom {@code LocalValidatorFactoryBean} subclasses.
-	 * <p>This enables convenient customizations for application purposes. Infrastructure
-	 * extensions may keep overriding the {@link #postProcessConfiguration} template method.
+	 * 指定用于自定义Bean Validation {@code Configuration}实例的回调，
+	 * 作为在自定义{@code LocalValidatorFactoryBean}子类中覆盖
+	 * {@link #postProcessConfiguration(Configuration)}方法的替代方案。
+	 * <p>这为应用程序目的提供了方便的自定义。基础结构扩展可以继续覆盖
+	 * {@link #postProcessConfiguration}模板方法。
 	 * @since 5.3.19
 	 */
 	public void setConfigurationInitializer(Consumer<Configuration<?>> configurationInitializer) {
@@ -252,14 +242,14 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 			configuration = bootstrap.configure();
 		}
 
-		// Try Hibernate Validator 5.2's externalClassLoader(ClassLoader) method
+		// 尝试使用Hibernate Validator 5.2的externalClassLoader(ClassLoader)方法
 		if (this.applicationContext != null) {
 			try {
 				Method eclMethod = configuration.getClass().getMethod("externalClassLoader", ClassLoader.class);
 				ReflectionUtils.invokeMethod(eclMethod, configuration, this.applicationContext.getClassLoader());
 			}
 			catch (NoSuchMethodException ex) {
-				// Ignore - no Hibernate Validator 5.2+ or similar provider
+				// 忽略 - 没有Hibernate Validator 5.2+或类似提供程序
 			}
 		}
 
@@ -304,7 +294,7 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 
 		this.validationPropertyMap.forEach(configuration::addProperty);
 
-		// Allow for custom post-processing before we actually build the ValidatorFactory.
+		// 允许在实际构建ValidatorFactory之前进行自定义后处理。
 		if (this.configurationInitializer != null) {
 			this.configurationInitializer.accept(configuration);
 		}
@@ -350,11 +340,10 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 	}
 
 	/**
-	 * Post-process the given Bean Validation configuration,
-	 * adding to or overriding any of its settings.
-	 * <p>Invoked right before building the {@link ValidatorFactory}.
-	 * @param configuration the Configuration object, pre-populated with
-	 * settings driven by LocalValidatorFactoryBean's properties
+	 * 对给定的Bean Validation配置进行后处理，
+	 * 添加或覆盖其任何设置。
+	 * <p>在构建{@link ValidatorFactory}之前调用。
+	 * @param configuration 预填充了由LocalValidatorFactoryBean属性驱动的设置的Configuration对象
 	 */
 	protected void postProcessConfiguration(Configuration<?> configuration) {
 	}
@@ -396,11 +385,11 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 		return this.validatorFactory.getParameterNameProvider();
 	}
 
-	// Bean Validation 2.0: currently not implemented here since it would imply
-	// a hard dependency on the new javax.validation.ClockProvider interface.
-	// To be resolved once Spring Framework requires Bean Validation 2.0+.
-	// Obtain the native ValidatorFactory through unwrap(ValidatorFactory.class)
-	// instead which will fully support a getClockProvider() call as well.
+	// Bean Validation 2.0：目前未在此处实现，因为这将意味着
+	// 对新的javax.validation.ClockProvider接口的硬依赖。
+	// 一旦Spring Framework要求Bean Validation 2.0+，将解决此问题。
+	// 通过unwrap(ValidatorFactory.class)获取原生ValidatorFactory
+	// 它将完全支持getClockProvider()调用。
 	/*
 	@Override
 	public javax.validation.ClockProvider getClockProvider() {
@@ -417,7 +406,7 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 				return super.unwrap(type);
 			}
 			catch (ValidationException ex) {
-				// Ignore - we'll try ValidatorFactory unwrapping next
+				// 忽略 - 我们接下来将尝试ValidatorFactory解包
 			}
 		}
 		if (this.validatorFactory != null) {
@@ -425,7 +414,7 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 				return this.validatorFactory.unwrap(type);
 			}
 			catch (ValidationException ex) {
-				// Ignore if just being asked for ValidatorFactory
+				// 如果只是请求ValidatorFactory则忽略
 				if (ValidatorFactory.class == type) {
 					return (T) this.validatorFactory;
 				}
@@ -449,7 +438,7 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
 
 
 	/**
-	 * Inner class to avoid a hard-coded Hibernate Validator dependency.
+	 * 内部类，以避免对Hibernate Validator的硬编码依赖。
 	 */
 	private static class HibernateValidatorDelegate {
 

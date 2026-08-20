@@ -29,12 +29,12 @@ import org.springframework.jndi.JndiObjectLocator;
 import org.springframework.lang.Nullable;
 
 /**
- * Base class for AOP interceptors invoking local or remote Stateless Session Beans.
- * Designed for EJB 2.x, but works for EJB 3 Session Beans as well.
+ * 调用本地或远程无状态会话 Bean 的 AOP 拦截器基类。
+ * 专为 EJB 2.x 设计，但同样适用于 EJB 3 会话 Bean。
  *
- * <p>Such an interceptor must be the last interceptor in the advice chain.
- * In this case, there is no direct target object: The call is handled in a
- * special way, getting executed on an EJB instance retrieved via an EJB home.
+ * <p>此类拦截器必须是通知链中的最后一个拦截器。
+ * 在这种情况下，不存在直接的目标对象：调用以特殊方式处理，
+ * 在通过 EJB Home 获取的 EJB 实例上执行。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -49,14 +49,14 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 	private boolean exposeAccessContext = false;
 
 	/**
-	 * The EJB's home object, potentially cached.
-	 * The type must be Object as it could be either EJBHome or EJBLocalHome.
+	 * EJB 的 Home 对象，可能会被缓存。
+	 * 类型必须为 Object，因为它可能是 EJBHome 或 EJBLocalHome。
 	 */
 	@Nullable
 	private Object cachedHome;
 
 	/**
-	 * The no-arg create() method required on EJB homes, potentially cached.
+	 * EJB Home 所需的无参 create() 方法，可能会被缓存。
 	 */
 	@Nullable
 	private Method createMethod;
@@ -65,10 +65,10 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 
 
 	/**
-	 * Set whether to look up the EJB home object on startup.
-	 * Default is "true".
-	 * <p>Can be turned off to allow for late start of the EJB server.
-	 * In this case, the EJB home object will be fetched on first access.
+	 * 设置是否在启动时查找 EJB Home 对象。
+	 * 默认值为 "true"。
+	 * <p>可以关闭此选项以允许 EJB 服务器延迟启动。
+	 * 在这种情况下，EJB Home 对象将在首次访问时获取。
 	 * @see #setCacheHome
 	 */
 	public void setLookupHomeOnStartup(boolean lookupHomeOnStartup) {
@@ -76,10 +76,10 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 	}
 
 	/**
-	 * Set whether to cache the EJB home object once it has been located.
-	 * Default is "true".
-	 * <p>Can be turned off to allow for hot restart of the EJB server.
-	 * In this case, the EJB home object will be fetched for each invocation.
+	 * 设置是否在定位 EJB Home 对象后对其进行缓存。
+	 * 默认值为 "true"。
+	 * <p>可以关闭此选项以允许 EJB 服务器热重启。
+	 * 在这种情况下，每次调用都将获取 EJB Home 对象。
 	 * @see #setLookupHomeOnStartup
 	 */
 	public void setCacheHome(boolean cacheHome) {
@@ -87,12 +87,11 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 	}
 
 	/**
-	 * Set whether to expose the JNDI environment context for all access to the target
-	 * EJB, i.e. for all method invocations on the exposed object reference.
-	 * <p>Default is "false", i.e. to only expose the JNDI context for object lookup.
-	 * Switch this flag to "true" in order to expose the JNDI environment (including
-	 * the authorization context) for each EJB invocation, as needed by WebLogic
-	 * for EJBs with authorization requirements.
+	 * 设置是否为所有对目标 EJB 的访问公开 JNDI 环境上下文，
+	 * 即为公开对象引用上的所有方法调用公开。
+	 * <p>默认值为 "false"，即仅为对象查找公开 JNDI 上下文。
+	 * 将此标志切换为 "true" 以在每次 EJB 调用时公开 JNDI 环境
+	 * （包括授权上下文），如 WebLogic 对具有授权要求的 EJB 所需。
 	 */
 	public void setExposeAccessContext(boolean exposeAccessContext) {
 		this.exposeAccessContext = exposeAccessContext;
@@ -100,7 +99,7 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 
 
 	/**
-	 * Fetches EJB home on startup, if necessary.
+	 * 在启动时获取 EJB Home（如果必要）。
 	 * @see #setLookupHomeOnStartup
 	 * @see #refreshHome
 	 */
@@ -108,15 +107,15 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 	public void afterPropertiesSet() throws NamingException {
 		super.afterPropertiesSet();
 		if (this.lookupHomeOnStartup) {
-			// look up EJB home and create method
+			// 查找 EJB Home 和 create 方法
 			refreshHome();
 		}
 	}
 
 	/**
-	 * Refresh the cached home object, if applicable.
-	 * Also caches the create method on the home object.
-	 * @throws NamingException if thrown by the JNDI lookup
+	 * 刷新缓存的 Home 对象（如果适用）。
+	 * 同时缓存 Home 对象上的 create 方法。
+	 * @throws NamingException 如果 JNDI 查找抛出异常
 	 * @see #lookup
 	 * @see #getCreateMethod
 	 */
@@ -131,15 +130,15 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 	}
 
 	/**
-	 * Determine the create method of the given EJB home object.
-	 * @param home the EJB home object
-	 * @return the create method
-	 * @throws EjbAccessException if the method couldn't be retrieved
+	 * 确定给定 EJB Home 对象的 create 方法。
+	 * @param home EJB Home 对象
+	 * @return create 方法
+	 * @throws EjbAccessException 如果无法获取该方法
 	 */
 	@Nullable
 	protected Method getCreateMethod(Object home) throws EjbAccessException {
 		try {
-			// Cache the EJB create() method that must be declared on the home interface.
+			// 缓存必须在 Home 接口上声明的 EJB create() 方法。
 			return home.getClass().getMethod("create");
 		}
 		catch (NoSuchMethodException ex) {
@@ -148,14 +147,13 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 	}
 
 	/**
-	 * Return the EJB home object to use. Called for each invocation.
-	 * <p>Default implementation returns the home created on initialization,
-	 * if any; else, it invokes lookup to get a new proxy for each invocation.
-	 * <p>Can be overridden in subclasses, for example to cache a home object
-	 * for a given amount of time before recreating it, or to test the home
-	 * object whether it is still alive.
-	 * @return the EJB home object to use for an invocation
-	 * @throws NamingException if proxy creation failed
+	 * 返回要使用的 EJB Home 对象。每次调用时都会被调用。
+	 * <p>默认实现返回初始化时创建的 Home（如果有）；
+	 * 否则，它会调用 lookup 为每次调用获取新的代理。
+	 * <p>可以在子类中重写此方法，例如在指定时间内缓存 Home 对象
+	 * 然后重新创建，或者测试 Home 对象是否仍然存活。
+	 * @return 用于调用的 EJB Home 对象
+	 * @throws NamingException 如果代理创建失败
 	 * @see #lookup
 	 * @see #getCreateMethod
 	 */
@@ -175,8 +173,8 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 	}
 
 	/**
-	 * Return whether the cached EJB home object is potentially
-	 * subject to on-demand refreshing. Default is "false".
+	 * 返回缓存的 EJB Home 对象是否可能支持按需刷新。
+	 * 默认值为 "false"。
 	 */
 	protected boolean isHomeRefreshable() {
 		return false;
@@ -184,8 +182,8 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 
 
 	/**
-	 * Prepares the thread context if necessary, and delegates to
-	 * {@link #invokeInContext}.
+	 * 在必要时准备线程上下文，并委托给
+	 * {@link #invokeInContext}。
 	 */
 	@Override
 	@Nullable
@@ -200,22 +198,22 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 	}
 
 	/**
-	 * Perform the given invocation on the current EJB home,
-	 * within the thread context being prepared accordingly.
-	 * Template method to be implemented by subclasses.
-	 * @param invocation the AOP method invocation
-	 * @return the invocation result, if any
-	 * @throws Throwable in case of invocation failure
+	 * 在当前 EJB Home 上执行给定的调用，
+	 * 在相应准备的线程上下文中进行。
+	 * 由子类实现的模板方法。
+	 * @param invocation AOP 方法调用
+	 * @return 调用结果（如果有）
+	 * @throws Throwable 如果调用失败
 	 */
 	@Nullable
 	protected abstract Object invokeInContext(MethodInvocation invocation) throws Throwable;
 
 
 	/**
-	 * Invokes the {@code create()} method on the cached EJB home object.
-	 * @return a new EJBObject or EJBLocalObject
-	 * @throws NamingException if thrown by JNDI
-	 * @throws InvocationTargetException if thrown by the create method
+	 * 在缓存的 EJB Home 对象上调用 {@code create()} 方法。
+	 * @return 新的 EJBObject 或 EJBLocalObject
+	 * @throws NamingException 如果 JNDI 抛出异常
+	 * @throws InvocationTargetException 如果 create 方法抛出异常
 	 */
 	protected Object create() throws NamingException, InvocationTargetException {
 		try {
@@ -227,7 +225,7 @@ public abstract class AbstractSlsbInvokerInterceptor extends JndiObjectLocator
 			if (createMethodToUse == null) {
 				return home;
 			}
-			// Invoke create() method on EJB home object.
+			// 在 EJB Home 对象上调用 create() 方法。
 			return createMethodToUse.invoke(home, (Object[]) null);
 		}
 		catch (IllegalAccessException ex) {

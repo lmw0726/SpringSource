@@ -22,7 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Extension of {@link CronField} that wraps an array of cron fields.
+ * {@link CronField} 的扩展，用于封装一组 cron 字段数组。
  *
  * @author Arjen Poutsma
  * @since 5.3.3
@@ -41,7 +41,7 @@ final class CompositeCronField extends CronField {
 	}
 
 	/**
-	 * Composes the given fields into a {@link CronField}.
+	 * 将给定的字段组合成一个 {@link CronField}。
 	 */
 	public static CronField compose(CronField[] fields, Type type, String value) {
 		Assert.notEmpty(fields, "Fields must not be empty");

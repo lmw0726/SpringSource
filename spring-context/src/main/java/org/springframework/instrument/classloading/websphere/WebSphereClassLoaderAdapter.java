@@ -28,9 +28,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 /**
- * Reflective wrapper around a WebSphere 7+ class loader. Used to
- * encapsulate the classloader-specific methods (discovered and
- * called through reflection) from the load-time weaver.
+ * WebSphere 7+ 类加载器的反射包装器。用于将负载时编织器中特定于类加载器的方法（通过反射发现和调用）封装起来。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -104,7 +102,7 @@ class WebSphereClassLoaderAdapter {
 	public ClassLoader getThrowawayClassLoader() {
 		try {
 			ClassLoader loader = this.cloneConstructor.newInstance(getClassLoader());
-			// Clear out the transformers (copied as well)
+			// 清除已复制的转换器
 			List<?> list = (List<?>) this.transformerList.get(loader);
 			list.clear();
 			return loader;

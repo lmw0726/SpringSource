@@ -27,19 +27,19 @@ import org.springframework.jmx.MBeanServerNotFoundException;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link FactoryBean} that obtains a WebSphere {@link javax.management.MBeanServer}
- * reference through WebSphere's proprietary {@code AdminServiceFactory} API,
- * available on WebSphere 5.1 and higher.
+ * 通过 WebSphere 专有的 {@code AdminServiceFactory} API 获取
+ * WebSphere {@link javax.management.MBeanServer} 引用的 {@link FactoryBean}，
+ * 该 API 在 WebSphere 5.1 及更高版本中可用。
  *
- * <p>Exposes the {@code MBeanServer} for bean references.
+ * <p>将 {@code MBeanServer} 暴露为 bean 引用。
  *
- * <p>This {@code FactoryBean} is a direct alternative to {@link MBeanServerFactoryBean},
- * which uses standard JMX 1.2 API to access the platform's {@link MBeanServer}.
+ * <p>此 {@code FactoryBean} 是 {@link MBeanServerFactoryBean} 的直接替代方案，
+ * 后者使用标准 JMX 1.2 API 来访问平台的 {@link MBeanServer}。
  *
- * <p>See the javadocs for WebSphere's
+ * <p>参阅 WebSphere 的
  * <a href="https://www.ibm.com/support/knowledgecenter/SSEQTJ_9.0.0/com.ibm.websphere.javadoc.doc/web/apidocs/com/ibm/websphere/management/AdminServiceFactory.html">{@code AdminServiceFactory}</a>
- * and
- * <a href="https://www.ibm.com/support/knowledgecenter/SSEQTJ_9.0.0/com.ibm.websphere.javadoc.doc/web/apidocs/com/ibm/websphere/management/MBeanFactory.html">{@code MBeanFactory}</a>.
+ * 和
+ * <a href="https://www.ibm.com/support/knowledgecenter/SSEQTJ_9.0.0/com.ibm.websphere.javadoc.doc/web/apidocs/com/ibm/websphere/management/MBeanFactory.html">{@code MBeanFactory}</a> 的 Javadoc。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop

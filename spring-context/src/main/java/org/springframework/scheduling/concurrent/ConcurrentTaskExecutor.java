@@ -36,22 +36,21 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
 /**
- * Adapter that takes a {@code java.util.concurrent.Executor} and exposes
- * a Spring {@link org.springframework.core.task.TaskExecutor} for it.
- * Also detects an extended {@code java.util.concurrent.ExecutorService}, adapting
- * the {@link org.springframework.core.task.AsyncTaskExecutor} interface accordingly.
+ * 适配器，接受一个 {@code java.util.concurrent.Executor} 并将其暴露为
+ * Spring 的 {@link org.springframework.core.task.TaskExecutor}。
+ * 同时检测扩展的 {@code java.util.concurrent.ExecutorService}，
+ * 相应地适配 {@link org.springframework.core.task.AsyncTaskExecutor} 接口。
  *
- * <p>Autodetects a JSR-236 {@link javax.enterprise.concurrent.ManagedExecutorService}
- * in order to expose {@link javax.enterprise.concurrent.ManagedTask} adapters for it,
- * exposing a long-running hint based on {@link SchedulingAwareRunnable} and an identity
- * name based on the given Runnable/Callable's {@code toString()}. For JSR-236 style
- * lookup in a Java EE 7 environment, consider using {@link DefaultManagedTaskExecutor}.
+ * <p>自动检测 JSR-236 {@link javax.enterprise.concurrent.ManagedExecutorService}，
+ * 以便为其暴露 {@link javax.enterprise.concurrent.ManagedTask} 适配器，
+ * 基于 {@link SchedulingAwareRunnable} 暴露长时间运行提示，并基于给定的
+ * Runnable/Callable 的 {@code toString()} 提供标识名称。对于 Java EE 7 环境中的
+ * JSR-236 风格查找，请考虑使用 {@link DefaultManagedTaskExecutor}。
  *
- * <p>Note that there is a pre-built {@link ThreadPoolTaskExecutor} that allows
- * for defining a {@link java.util.concurrent.ThreadPoolExecutor} in bean style,
- * exposing it as a Spring {@link org.springframework.core.task.TaskExecutor} directly.
- * This is a convenient alternative to a raw ThreadPoolExecutor definition with
- * a separate definition of the present adapter class.
+ * <p>请注意，已有一个预构建的 {@link ThreadPoolTaskExecutor}，允许以 bean 风格
+ * 定义 {@link java.util.concurrent.ThreadPoolExecutor}，并直接将其暴露为
+ * Spring 的 {@link org.springframework.core.task.TaskExecutor}。
+ * 这是原始 ThreadPoolExecutor 定义配合本适配器类单独定义的一种便捷替代方案。
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -74,7 +73,7 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 					ConcurrentTaskScheduler.class.getClassLoader());
 		}
 		catch (ClassNotFoundException ex) {
-			// JSR-236 API not available...
+			// JSR-236 API 不可用...
 			managedExecutorServiceClass = null;
 		}
 	}
@@ -85,7 +84,7 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 
 
 	/**
-	 * Create a new ConcurrentTaskExecutor, using a single thread executor as default.
+		 * 创建新的 ConcurrentTaskExecutor，使用单线程执行器作为默认值。
 	 * @see java.util.concurrent.Executors#newSingleThreadExecutor()
 	 */
 	public ConcurrentTaskExecutor() {
@@ -94,10 +93,10 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 	}
 
 	/**
-	 * Create a new ConcurrentTaskExecutor, using the given {@link java.util.concurrent.Executor}.
-	 * <p>Autodetects a JSR-236 {@link javax.enterprise.concurrent.ManagedExecutorService}
-	 * in order to expose {@link javax.enterprise.concurrent.ManagedTask} adapters for it.
-	 * @param executor the {@link java.util.concurrent.Executor} to delegate to
+		 * 创建新的 ConcurrentTaskExecutor，使用给定的 {@link java.util.concurrent.Executor}。
+		 * <p>自动检测 JSR-236 {@link javax.enterprise.concurrent.ManagedExecutorService}，
+		 * 以便为其暴露 {@link javax.enterprise.concurrent.ManagedTask} 适配器。
+		 * @param executor 要委托的 {@link java.util.concurrent.Executor}
 	 */
 	public ConcurrentTaskExecutor(@Nullable Executor executor) {
 		this.concurrentExecutor = (executor != null ? executor : Executors.newSingleThreadExecutor());
@@ -106,9 +105,9 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 
 
 	/**
-	 * Specify the {@link java.util.concurrent.Executor} to delegate to.
-	 * <p>Autodetects a JSR-236 {@link javax.enterprise.concurrent.ManagedExecutorService}
-	 * in order to expose {@link javax.enterprise.concurrent.ManagedTask} adapters for it.
+		 * 指定要委托的 {@link java.util.concurrent.Executor}。
+		 * <p>自动检测 JSR-236 {@link javax.enterprise.concurrent.ManagedExecutorService}，
+		 * 以便为其暴露 {@link javax.enterprise.concurrent.ManagedTask} 适配器。
 	 */
 	public final void setConcurrentExecutor(@Nullable Executor executor) {
 		this.concurrentExecutor = (executor != null ? executor : Executors.newSingleThreadExecutor());
@@ -116,25 +115,22 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 	}
 
 	/**
-	 * Return the {@link java.util.concurrent.Executor} that this adapter delegates to.
+		 * 返回此适配器委托的 {@link java.util.concurrent.Executor}。
 	 */
 	public final Executor getConcurrentExecutor() {
 		return this.concurrentExecutor;
 	}
 
 	/**
-	 * Specify a custom {@link TaskDecorator} to be applied to any {@link Runnable}
-	 * about to be executed.
-	 * <p>Note that such a decorator is not necessarily being applied to the
-	 * user-supplied {@code Runnable}/{@code Callable} but rather to the actual
-	 * execution callback (which may be a wrapper around the user-supplied task).
-	 * <p>The primary use case is to set some execution context around the task's
-	 * invocation, or to provide some monitoring/statistics for task execution.
-	 * <p><b>NOTE:</b> Exception handling in {@code TaskDecorator} implementations
-	 * is limited to plain {@code Runnable} execution via {@code execute} calls.
-	 * In case of {@code #submit} calls, the exposed {@code Runnable} will be a
-	 * {@code FutureTask} which does not propagate any exceptions; you might
-	 * have to cast it and call {@code Future#get} to evaluate exceptions.
+		 * 指定要应用于即将执行的任何 {@link Runnable} 的自定义 {@link TaskDecorator}。
+		 * <p>请注意，此类装饰器不一定应用于用户提供的 {@code Runnable}/{@code Callable}，
+		 * 而是应用于实际的执行回调（可能是用户提供的任务的包装器）。
+		 * <p>主要用例是在任务调用前后设置一些执行上下文，或为任务执行提供一些监控/统计信息。
+		 * <p><b>注意：</b> {@code TaskDecorator} 实现中的异常处理仅限于通过
+		 * {@code execute} 调用的普通 {@code Runnable} 执行。
+		 * 在 {@code #submit} 调用的情况下，暴露的 {@code Runnable} 将是
+		 * 不会传播任何异常的 {@code FutureTask}；您可能需要对其进行强制转换
+		 * 并调用 {@code Future#get} 来评估异常。
 	 * @since 4.3
 	 */
 	public final void setTaskDecorator(TaskDecorator taskDecorator) {
@@ -183,10 +179,9 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 
 
 	/**
-	 * TaskExecutorAdapter subclass that wraps all provided Runnables and Callables
-	 * with a JSR-236 ManagedTask, exposing a long-running hint based on
-	 * {@link SchedulingAwareRunnable} and an identity name based on the task's
-	 * {@code toString()} representation.
+		 * TaskExecutorAdapter 子类，将所有提供的 Runnable 和 Callable
+		 * 包装为 JSR-236 ManagedTask，基于 {@link SchedulingAwareRunnable}
+		 * 暴露长时间运行提示，并基于任务的 {@code toString()} 表示提供标识名称。
 	 */
 	private static class ManagedTaskExecutorAdapter extends TaskExecutorAdapter {
 
@@ -222,9 +217,9 @@ public class ConcurrentTaskExecutor implements AsyncListenableTaskExecutor, Sche
 
 
 	/**
-	 * Delegate that wraps a given Runnable/Callable  with a JSR-236 ManagedTask,
-	 * exposing a long-running hint based on {@link SchedulingAwareRunnable}
-	 * and a given identity name.
+		 * 委托类，将给定的 Runnable/Callable 包装为 JSR-236 ManagedTask，
+		 * 基于 {@link SchedulingAwareRunnable} 暴露长时间运行提示，
+		 * 并提供给定的标识名称。
 	 */
 	protected static class ManagedTaskBuilder {
 

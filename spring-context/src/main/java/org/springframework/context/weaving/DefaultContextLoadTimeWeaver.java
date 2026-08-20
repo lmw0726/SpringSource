@@ -36,19 +36,20 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Default {@link LoadTimeWeaver} bean for use in an application context,
- * decorating an automatically detected internal {@code LoadTimeWeaver}.
+ * 用于应用上下文的默认 {@link LoadTimeWeaver} Bean，
+ * 对自动检测到的内部 {@code LoadTimeWeaver} 进行装饰。
  *
- * <p>Typically registered for the default bean name "{@code loadTimeWeaver}";
- * the most convenient way to achieve this is Spring's
- * {@code <context:load-time-weaver>} XML tag or {@code @EnableLoadTimeWeaving}
- * on a {@code @Configuration} class.
+ * <p>通常以默认 Bean 名称 "{@code loadTimeWeaver}" 进行注册；
+ * 最便捷的方式是使用 Spring 的
+ * {@code <context:load-time-weaver>} XML 标签或在 {@code @Configuration} 类上
+ * 添加 {@code @EnableLoadTimeWeaving} 注解。
  *
- * <p>This class implements a runtime environment check for obtaining the
- * appropriate weaver implementation. As of Spring Framework 5.0, it detects
- * Oracle WebLogic 10+, GlassFish 4+, Tomcat 8+, WildFly 8+, IBM WebSphere 8.5+,
- * {@link InstrumentationSavingAgent Spring's VM agent}, and any {@link ClassLoader}
- * supported by Spring's {@link ReflectiveLoadTimeWeaver} (such as Liberty's).
+ * <p>该类通过运行时环境检查来获取适当的织入器（Weaver）实现。
+ * 从 Spring Framework 5.0 起，它可检测 Oracle WebLogic 10+、GlassFish 4+、
+ * Tomcat 8+、WildFly 8+、IBM WebSphere 8.5+、
+ * {@link InstrumentationSavingAgent Spring 的 JVM Agent}，
+ * 以及 Spring 的 {@link ReflectiveLoadTimeWeaver} 所支持的任何
+ * {@link ClassLoader}（如 Liberty 的类加载器）。
  *
  * @author Juergen Hoeller
  * @author Ramnivas Laddad
@@ -102,10 +103,9 @@ public class DefaultContextLoadTimeWeaver implements LoadTimeWeaver, BeanClassLo
 	}
 
 	/*
-	 * This method never fails, allowing to try other possible ways to use an
-	 * server-agnostic weaver. This non-failure logic is required since
-	 * determining a load-time weaver based on the ClassLoader name alone may
-	 * legitimately fail due to other mismatches.
+	 * 该方法不会失败，从而允许尝试其他可能的方式来使用与服务器无关的织入器。
+	 * 这种不失败的逻辑是必需的，因为仅根据 ClassLoader 名称来确定
+	 * 加载时织入器可能会因其他不匹配而合法地失败。
 	 */
 	@Nullable
 	protected LoadTimeWeaver createServerSpecificLoadTimeWeaver(ClassLoader classLoader) {

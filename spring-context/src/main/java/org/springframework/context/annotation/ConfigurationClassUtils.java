@@ -42,7 +42,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
- * Utilities for identifying {@link Configuration} classes.
+ * 用于识别 {@link Configuration} 配置类的工具类。
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -75,12 +75,12 @@ abstract class ConfigurationClassUtils {
 
 
 	/**
-	 * Check whether the given bean definition is a candidate for a configuration class
-	 * (or a nested component class declared within a configuration/component class,
-	 * to be auto-registered as well), and mark it accordingly.
-	 * @param beanDef the bean definition to check
-	 * @param metadataReaderFactory the current factory in use by the caller
-	 * @return whether the candidate qualifies as (any kind of) configuration class
+	 * 检查给定的 bean 定义是否为配置类候选者
+	 * （或在配置/组件类中声明的嵌套组件类，也会自动注册），
+	 * 并相应地进行标记。
+	 * @param beanDef 要检查的 bean 定义
+	 * @param metadataReaderFactory 调用者当前使用的元数据读取器工厂
+	 * @return 该候选者是否符合（任何类型的）配置类条件
 	 */
 	public static boolean checkConfigurationClassCandidate(
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
@@ -93,12 +93,12 @@ abstract class ConfigurationClassUtils {
 		AnnotationMetadata metadata;
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
-			// Can reuse the pre-parsed metadata from the given BeanDefinition...
+			// 可以复用给定 BeanDefinition 中已预解析的元数据...
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
 		}
 		else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
-			// Check already loaded Class if present...
-			// since we possibly can't even load the class file for this Class.
+			// 检查已加载的 Class（如果存在）...
+			// 因为可能甚至无法加载该 Class 的类文件。
 			Class<?> beanClass = ((AbstractBeanDefinition) beanDef).getBeanClass();
 			if (BeanFactoryPostProcessor.class.isAssignableFrom(beanClass) ||
 					BeanPostProcessor.class.isAssignableFrom(beanClass) ||
@@ -133,7 +133,7 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
-		// It's a full or lite configuration candidate... Let's determine the order value, if any.
+		// 这是一个 full 或 lite 配置候选者... 让我们确定排序值（如果有的话）。
 		Integer order = getOrder(metadata);
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
@@ -143,26 +143,25 @@ abstract class ConfigurationClassUtils {
 	}
 
 	/**
-	 * Check the given metadata for a configuration class candidate
-	 * (or nested component class declared within a configuration/component class).
-	 * @param metadata the metadata of the annotated class
-	 * @return {@code true} if the given class is to be registered for
-	 * configuration class processing; {@code false} otherwise
+	 * 检查给定的元数据是否为配置类候选者
+	 * （或在配置/组件类中声明的嵌套组件类）。
+	 * @param metadata 注解类的元数据
+	 * @return 如果给定类需要注册进行配置类处理则返回 {@code true}；否则返回 {@code false}
 	 */
 	public static boolean isConfigurationCandidate(AnnotationMetadata metadata) {
-		// Do not consider an interface or an annotation...
+		// 不考虑接口或注解...
 		if (metadata.isInterface()) {
 			return false;
 		}
 
-		// Any of the typical annotations found?
+		// 是否存在典型的注解？
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
 				return true;
 			}
 		}
 
-		// Finally, let's look for @Bean methods...
+		// 最后，让我们查找 @Bean 方法...
 		return hasBeanMethods(metadata);
 	}
 
@@ -179,10 +178,10 @@ abstract class ConfigurationClassUtils {
 	}
 
 	/**
-	 * Determine the order for the given configuration class metadata.
-	 * @param metadata the metadata of the annotated class
-	 * @return the {@code @Order} annotation value on the configuration class,
-	 * or {@code Ordered.LOWEST_PRECEDENCE} if none declared
+	 * 确定给定配置类元数据的排序值。
+	 * @param metadata 注解类的元数据
+	 * @return 配置类上的 {@code @Order} 注解值，
+	 * 如果未声明则返回 {@code Ordered.LOWEST_PRECEDENCE}
 	 * @since 5.0
 	 */
 	@Nullable
@@ -192,11 +191,11 @@ abstract class ConfigurationClassUtils {
 	}
 
 	/**
-	 * Determine the order for the given configuration class bean definition,
-	 * as set by {@link #checkConfigurationClassCandidate}.
-	 * @param beanDef the bean definition to check
-	 * @return the {@link Order @Order} annotation value on the configuration class,
-	 * or {@link Ordered#LOWEST_PRECEDENCE} if none declared
+	 * 确定给定配置类 bean 定义的排序值，
+	 * 如 {@link #checkConfigurationClassCandidate} 所设置。
+	 * @param beanDef 要检查的 bean 定义
+	 * @return 配置类上的 {@link Order @Order} 注解值，
+	 * 如果未声明则返回 {@link Ordered#LOWEST_PRECEDENCE}
 	 * @since 4.2
 	 */
 	public static int getOrder(BeanDefinition beanDef) {

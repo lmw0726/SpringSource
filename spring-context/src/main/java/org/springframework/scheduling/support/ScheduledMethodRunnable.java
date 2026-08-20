@@ -23,9 +23,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Variant of {@link MethodInvokingRunnable} meant to be used for processing
- * of no-arg scheduled methods. Propagates user exceptions to the caller,
- * assuming that an error strategy for Runnables is in place.
+ * {@link MethodInvokingRunnable} 的变体，用于处理无参的定时方法。
+ * 将用户异常传播给调用方，前提是已建立针对 Runnable 的错误处理策略。
  *
  * @author Juergen Hoeller
  * @since 3.0.6
@@ -39,10 +38,9 @@ public class ScheduledMethodRunnable implements Runnable {
 
 
 	/**
-	 * Create a {@code ScheduledMethodRunnable} for the given target instance,
-	 * calling the specified method.
-	 * @param target the target instance to call the method on
-	 * @param method the target method to call
+	 * 创建一个 {@code ScheduledMethodRunnable}，针对给定的目标实例调用指定方法。
+	 * @param target 要调用方法的目标实例
+	 * @param method 要调用的目标方法
 	 */
 	public ScheduledMethodRunnable(Object target, Method method) {
 		this.target = target;
@@ -50,11 +48,10 @@ public class ScheduledMethodRunnable implements Runnable {
 	}
 
 	/**
-	 * Create a {@code ScheduledMethodRunnable} for the given target instance,
-	 * calling the specified method by name.
-	 * @param target the target instance to call the method on
-	 * @param methodName the name of the target method
-	 * @throws NoSuchMethodException if the specified method does not exist
+	 * 创建一个 {@code ScheduledMethodRunnable}，针对给定的目标实例通过方法名调用指定方法。
+	 * @param target 要调用方法的目标实例
+	 * @param methodName 目标方法的名称
+	 * @throws NoSuchMethodException 如果指定的方法不存在
 	 */
 	public ScheduledMethodRunnable(Object target, String methodName) throws NoSuchMethodException {
 		this.target = target;
@@ -63,14 +60,14 @@ public class ScheduledMethodRunnable implements Runnable {
 
 
 	/**
-	 * Return the target instance to call the method on.
+	 * 返回要调用方法的目标实例。
 	 */
 	public Object getTarget() {
 		return this.target;
 	}
 
 	/**
-	 * Return the target method to call.
+	 * 返回要调用的目标方法。
 	 */
 	public Method getMethod() {
 		return this.method;

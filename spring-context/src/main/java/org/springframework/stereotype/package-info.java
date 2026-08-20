@@ -1,8 +1,7 @@
 /**
- * Annotations denoting the roles of types or methods in the overall architecture
- * (at a conceptual, rather than implementation, level).
+ * 标注类型或方法在整体架构中的角色（概念层面，而非实现层面）的注解。
  *
- * <p>Intended for use by tools and aspects (making an ideal target for pointcuts).
+ * <p>供工具和切面使用（使其成为理想的切入点目标）。
  */
 @NonNullApi
 @NonNullFields

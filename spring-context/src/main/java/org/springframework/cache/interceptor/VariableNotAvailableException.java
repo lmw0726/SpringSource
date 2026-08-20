@@ -19,8 +19,8 @@ package org.springframework.cache.interceptor;
 import org.springframework.expression.EvaluationException;
 
 /**
- * A specific {@link EvaluationException} to mention that a given variable
- * used in the expression is not available in the context.
+ * 一种特定的 {@link EvaluationException}，用于说明表达式中使用的某个变量
+ * 在上下文中不可用。
  *
  * @author Stephane Nicoll
  * @since 4.0.6

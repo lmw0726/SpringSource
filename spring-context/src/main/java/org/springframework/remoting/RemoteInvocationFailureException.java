@@ -17,9 +17,8 @@
 package org.springframework.remoting;
 
 /**
- * RemoteAccessException subclass to be thrown when the execution
- * of the target method failed on the server side, for example
- * when a method was not found on the target object.
+ * 当目标方法在服务器端执行失败时抛出的 RemoteAccessException 子类，
+ * 例如在目标对象上未找到相应方法时。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -29,9 +28,9 @@ package org.springframework.remoting;
 public class RemoteInvocationFailureException extends RemoteAccessException {
 
 	/**
-	 * Constructor for RemoteInvocationFailureException.
-	 * @param msg the detail message
-	 * @param cause the root cause from the remoting API in use
+	 * RemoteInvocationFailureException 的构造方法。
+	 * @param msg 详细错误消息
+	 * @param cause 来自所使用的远程 API 的根本原因
 	 */
 	public RemoteInvocationFailureException(String msg, Throwable cause) {
 		super(msg, cause);

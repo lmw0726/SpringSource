@@ -23,7 +23,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.scheduling.TriggerContext;
 
 /**
- * Simple data holder implementation of the {@link TriggerContext} interface.
+ * {@link TriggerContext} 接口的简单数据持有者实现。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -43,19 +43,19 @@ public class SimpleTriggerContext implements TriggerContext {
 
 
 	/**
-	 * Create a SimpleTriggerContext with all time values set to {@code null},
-	 * exposing the system clock for the default time zone.
+	 * 创建一个所有时间值均设为 {@code null} 的 SimpleTriggerContext，
+	 * 并使用默认时区的系统时钟。
 	 */
 	public SimpleTriggerContext() {
 		this.clock = Clock.systemDefaultZone();
 	}
 
 	/**
-	 * Create a SimpleTriggerContext with the given time values,
-	 * exposing the system clock for the default time zone.
-	 * @param lastScheduledExecutionTime last <i>scheduled</i> execution time
-	 * @param lastActualExecutionTime last <i>actual</i> execution time
-	 * @param lastCompletionTime last completion time
+	 * 使用给定的时间值创建 SimpleTriggerContext，
+	 * 并使用默认时区的系统时钟。
+	 * @param lastScheduledExecutionTime 上一次 <i>计划</i> 执行时间
+	 * @param lastActualExecutionTime 上一次 <i>实际</i> 执行时间
+	 * @param lastCompletionTime 上一次完成时间
 	 */
 	public SimpleTriggerContext(Date lastScheduledExecutionTime, Date lastActualExecutionTime, Date lastCompletionTime) {
 		this();
@@ -65,9 +65,9 @@ public class SimpleTriggerContext implements TriggerContext {
 	}
 
 	/**
-	 * Create a SimpleTriggerContext with all time values set to {@code null},
-	 * exposing the given clock.
-	 * @param clock the clock to use for trigger calculation
+	 * 创建一个所有时间值均设为 {@code null} 的 SimpleTriggerContext，
+	 * 并使用给定的时钟。
+	 * @param clock 用于触发器计算的时钟
 	 * @since 5.3
 	 * @see #update(Date, Date, Date)
 	 */
@@ -77,10 +77,10 @@ public class SimpleTriggerContext implements TriggerContext {
 
 
 	/**
-	 * Update this holder's state with the latest time values.
- 	 * @param lastScheduledExecutionTime last <i>scheduled</i> execution time
-	 * @param lastActualExecutionTime last <i>actual</i> execution time
-	 * @param lastCompletionTime last completion time
+	 * 使用最新的时间值更新此持有者的状态。
+	 * @param lastScheduledExecutionTime 上一次 <i>计划</i> 执行时间
+	 * @param lastActualExecutionTime 上一次 <i>实际</i> 执行时间
+	 * @param lastCompletionTime 上一次完成时间
 	 */
 	public void update(Date lastScheduledExecutionTime, Date lastActualExecutionTime, Date lastCompletionTime) {
 		this.lastScheduledExecutionTime = lastScheduledExecutionTime;

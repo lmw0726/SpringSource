@@ -27,8 +27,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Shared utility class used to evaluate and cache SpEL expressions that
- * are defined on {@link java.lang.reflect.AnnotatedElement}.
+ * 用于求值和缓存定义在 {@link java.lang.reflect.AnnotatedElement} 上的
+ * SpEL 表达式的共享工具类。
  *
  * @author Stephane Nicoll
  * @since 4.2
@@ -42,7 +42,7 @@ public abstract class CachedExpressionEvaluator {
 
 
 	/**
-	 * Create a new instance with the specified {@link SpelExpressionParser}.
+	 * 使用指定的 {@link SpelExpressionParser} 创建新实例。
 	 */
 	protected CachedExpressionEvaluator(SpelExpressionParser parser) {
 		Assert.notNull(parser, "SpelExpressionParser must not be null");
@@ -50,7 +50,7 @@ public abstract class CachedExpressionEvaluator {
 	}
 
 	/**
-	 * Create a new instance with a default {@link SpelExpressionParser}.
+	 * 使用默认的 {@link SpelExpressionParser} 创建新实例。
 	 */
 	protected CachedExpressionEvaluator() {
 		this(new SpelExpressionParser());
@@ -58,14 +58,14 @@ public abstract class CachedExpressionEvaluator {
 
 
 	/**
-	 * Return the {@link SpelExpressionParser} to use.
+	 * 返回要使用的 {@link SpelExpressionParser}。
 	 */
 	protected SpelExpressionParser getParser() {
 		return this.parser;
 	}
 
 	/**
-	 * Return a shared parameter name discoverer which caches data internally.
+	 * 返回内部缓存数据的共享参数名发现器。
 	 * @since 4.3
 	 */
 	protected ParameterNameDiscoverer getParameterNameDiscoverer() {
@@ -74,11 +74,11 @@ public abstract class CachedExpressionEvaluator {
 
 
 	/**
-	 * Return the {@link Expression} for the specified SpEL value
-	 * <p>{@link #parseExpression(String) Parse the expression} if it hasn't been already.
-	 * @param cache the cache to use
-	 * @param elementKey the element on which the expression is defined
-	 * @param expression the expression to parse
+	 * 返回指定 SpEL 值对应的 {@link Expression}。
+	 * <p>如果尚未解析，则 {@link #parseExpression(String) 解析该表达式}。
+	 * @param cache 要使用的缓存
+	 * @param elementKey 定义该表达式的元素
+	 * @param expression 要解析的表达式
 	 */
 	protected Expression getExpression(Map<ExpressionKey, Expression> cache,
 			AnnotatedElementKey elementKey, String expression) {
@@ -93,8 +93,8 @@ public abstract class CachedExpressionEvaluator {
 	}
 
 	/**
-	 * Parse the specified {@code expression}.
-	 * @param expression the expression to parse
+	 * 解析指定的 {@code expression}。
+	 * @param expression 要解析的表达式
 	 * @since 5.3.13
 	 */
 	protected Expression parseExpression(String expression) {
@@ -107,7 +107,7 @@ public abstract class CachedExpressionEvaluator {
 
 
 	/**
-	 * An expression key.
+	 * 表达式键。
 	 */
 	protected static class ExpressionKey implements Comparable<ExpressionKey> {
 

@@ -17,12 +17,11 @@
 package org.springframework.jmx.export.assembler;
 
 /**
- * Extends the {@code MBeanInfoAssembler} to add autodetection logic.
- * Implementations of this interface are given the opportunity by the
- * {@code MBeanExporter} to include additional beans in the registration process.
+ * 扩展 {@code MBeanInfoAssembler} 以添加自动检测逻辑。
+ * {@code MBeanExporter} 会给予此接口的实现类一个机会，使其能够
+ * 在注册过程中包含额外的 bean。
  *
- * <p>The exact mechanism for deciding which beans to include is left to
- * implementing classes.
+ * <p>决定包含哪些 bean 的具体机制交由实现类自行决定。
  *
  * @author Rob Harrop
  * @since 1.2
@@ -30,12 +29,12 @@ package org.springframework.jmx.export.assembler;
  */
 public interface AutodetectCapableMBeanInfoAssembler extends MBeanInfoAssembler {
 
+
 	/**
-	 * Indicate whether a particular bean should be included in the registration
-	 * process, if it is not specified in the {@code beans} map of the
-	 * {@code MBeanExporter}.
-	 * @param beanClass the class of the bean (might be a proxy class)
-	 * @param beanName the name of the bean in the bean factory
+	 * 指示某个特定的 bean 是否应该被包含在注册过程中，
+	 * 即使该 bean 未在 {@code MBeanExporter} 的 {@code beans} 映射中指定。
+	 * @param beanClass bean 的类（可能是代理类）
+	 * @param beanName bean 在 bean 工厂中的名称
 	 */
 	boolean includeBean(Class<?> beanClass, String beanName);
 

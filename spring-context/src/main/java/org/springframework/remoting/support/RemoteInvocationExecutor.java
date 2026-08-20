@@ -19,10 +19,10 @@ package org.springframework.remoting.support;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Strategy interface for executing a {@link RemoteInvocation} on a target object.
+ * 在目标对象上执行 {@link RemoteInvocation} 的策略接口。
  *
- * <p>Used by {@link org.springframework.remoting.rmi.RmiServiceExporter} (for RMI invokers)
- * and by {@link org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter}.
+ * <p>由 {@link org.springframework.remoting.rmi.RmiServiceExporter}（用于 RMI 调用器）
+ * 和 {@link org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter} 使用。
  *
  * @author Juergen Hoeller
  * @since 1.1
@@ -33,14 +33,14 @@ import java.lang.reflect.InvocationTargetException;
 public interface RemoteInvocationExecutor {
 
 	/**
-	 * Perform this invocation on the given target object.
-	 * Typically called when a RemoteInvocation is received on the server.
-	 * @param invocation the RemoteInvocation
-	 * @param targetObject the target object to apply the invocation to
-	 * @return the invocation result
-	 * @throws NoSuchMethodException if the method name could not be resolved
-	 * @throws IllegalAccessException if the method could not be accessed
-	 * @throws InvocationTargetException if the method invocation resulted in an exception
+	 * 在给定的目标对象上执行此调用。
+	 * 通常在服务器端收到 RemoteInvocation 时被调用。
+	 * @param invocation RemoteInvocation 实例
+	 * @param targetObject 要对其应用调用的目标对象
+	 * @return 调用结果
+	 * @throws NoSuchMethodException 如果无法解析方法名称
+	 * @throws IllegalAccessException 如果无法访问该方法
+	 * @throws InvocationTargetException 如果方法调用导致了异常
 	 * @see java.lang.reflect.Method#invoke
 	 */
 	Object invoke(RemoteInvocation invocation, Object targetObject)

@@ -87,7 +87,7 @@ public class ConversionServiceFactoryBean implements FactoryBean<ConversionServi
 	}
 
 
-	// implementing FactoryBean
+	// 实现 FactoryBean 接口
 
 	@Override
 	@Nullable

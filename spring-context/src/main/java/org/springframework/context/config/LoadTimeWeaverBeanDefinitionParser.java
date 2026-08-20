@@ -31,7 +31,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * Parser for the &lt;context:load-time-weaver/&gt; element.
+ * &lt;context:load-time-weaver/&gt; 元素的解析器。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -39,7 +39,7 @@ import org.springframework.util.ClassUtils;
 class LoadTimeWeaverBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	/**
-	 * The bean name of the internally managed AspectJ weaving enabler.
+	 * 内部管理的 AspectJ 织入启用器的 Bean 名称。
 	 * @since 4.3.1
 	 */
 	public static final String ASPECTJ_WEAVING_ENABLER_BEAN_NAME =
@@ -94,7 +94,7 @@ class LoadTimeWeaverBeanDefinitionParser extends AbstractSingleBeanDefinitionPar
 			return false;
 		}
 		else {
-			// Determine default...
+			// 确定默认值...
 			ClassLoader cl = parserContext.getReaderContext().getBeanClassLoader();
 			return (cl != null && cl.getResource(AspectJWeavingEnabler.ASPECTJ_AOP_XML_RESOURCE) != null);
 		}

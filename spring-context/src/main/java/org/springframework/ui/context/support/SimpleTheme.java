@@ -21,8 +21,7 @@ import org.springframework.ui.context.Theme;
 import org.springframework.util.Assert;
 
 /**
- * Default {@link Theme} implementation, wrapping a name and an
- * underlying {@link org.springframework.context.MessageSource}.
+ * 默认的 {@link Theme} 实现，封装了一个名称和一个底层的 {@link org.springframework.context.MessageSource}。
  *
  * @author Juergen Hoeller
  * @since 17.06.2003
@@ -35,9 +34,9 @@ public class SimpleTheme implements Theme {
 
 
 	/**
-	 * Create a SimpleTheme.
-	 * @param name the name of the theme
-	 * @param messageSource the MessageSource that resolves theme messages
+	 * 创建一个 SimpleTheme。
+	 * @param name 主题的名称
+	 * @param messageSource 用于解析主题消息的 MessageSource
 	 */
 	public SimpleTheme(String name, MessageSource messageSource) {
 		Assert.notNull(name, "Name must not be null");

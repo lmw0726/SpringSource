@@ -1,6 +1,6 @@
 /**
- * Support package for EJB/Java EE-related configuration,
- * with XML schema being the primary configuration format.
+ * EJB/Java EE 相关配置的支持包，
+ * 以 XML Schema 作为主要配置格式。
  */
 @NonNullApi
 @NonNullFields

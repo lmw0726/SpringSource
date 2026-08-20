@@ -37,28 +37,27 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Adapter for live beans view exposure, building a snapshot of current beans
- * and their dependencies from either a local {@code ApplicationContext} (with a
- * local {@code LiveBeansView} bean definition) or all registered ApplicationContexts
- * (driven by the {@value #MBEAN_DOMAIN_PROPERTY_NAME} environment property).
+ * 用于实时Bean视图暴露的适配器，构建当前Bean及其依赖关系的快照，
+ * 来源于本地 {@code ApplicationContext}（带有本地 {@code LiveBeansView} Bean定义）或所有已注册的ApplicationContexts
+ * （由 {@value #MBEAN_DOMAIN_PROPERTY_NAME} 环境属性驱动）。
  *
  * @author Juergen Hoeller
  * @author Stephane Nicoll
  * @since 3.2
  * @see #getSnapshotAsJson()
  * @see org.springframework.web.context.support.LiveBeansViewServlet
- * @deprecated as of 5.3, in favor of using Spring Boot actuators for such needs
+ * @deprecated 自5.3版本起，建议使用Spring Boot actuators来满足此类需求
  */
 @Deprecated
 public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAware {
 
 	/**
-	 * The "MBean Domain" property name.
+	 * "MBean Domain" 属性名称。
 	 */
 	public static final String MBEAN_DOMAIN_PROPERTY_NAME = "spring.liveBeansView.mbeanDomain";
 
 	/**
-	 * The MBean application key.
+	 * MBean 应用程序键。
 	 */
 	public static final String MBEAN_APPLICATION_KEY = "application";
 
@@ -122,9 +121,9 @@ public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAwar
 
 
 	/**
-	 * Generate a JSON snapshot of current beans and their dependencies,
-	 * finding all active ApplicationContexts through {@link #findApplicationContexts()},
-	 * then delegating to {@link #generateJson(java.util.Set)}.
+	 * 生成当前Bean及其依赖关系的JSON快照，
+	 * 通过 {@link #findApplicationContexts()} 查找所有活动的ApplicationContexts，
+	 * 然后委托给 {@link #generateJson(java.util.Set)}。
 	 */
 	@Override
 	public String getSnapshotAsJson() {
@@ -139,9 +138,9 @@ public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAwar
 	}
 
 	/**
-	 * Find all applicable ApplicationContexts for the current application.
-	 * <p>Called if no specific ApplicationContext has been set for this LiveBeansView.
-	 * @return the set of ApplicationContexts
+	 * 查找当前应用程序的所有适用的ApplicationContexts。
+	 * <p>如果未为此LiveBeansView设置特定的ApplicationContext，则调用此方法。
+	 * @return ApplicationContexts集合
 	 */
 	protected Set<ConfigurableApplicationContext> findApplicationContexts() {
 		synchronized (applicationContexts) {
@@ -150,15 +149,13 @@ public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAwar
 	}
 
 	/**
-	 * Actually generate a JSON snapshot of the beans in the given ApplicationContexts.
-	 * <p>This implementation doesn't use any JSON parsing libraries in order to avoid
-	 * third-party library dependencies. It produces an array of context description
-	 * objects, each containing a context and parent attribute as well as a beans
-	 * attribute with nested bean description objects. Each bean object contains a
-	 * bean, scope, type and resource attribute, as well as a dependencies attribute
-	 * with a nested array of bean names that the present bean depends on.
-	 * @param contexts the set of ApplicationContexts
-	 * @return the JSON document
+	 * 实际生成给定ApplicationContexts中Bean的JSON快照。
+	 * <p>此实现不使用任何JSON解析库以避免第三方库依赖。它生成一个上下文描述对象数组，
+	 * 每个对象包含context和parent属性，以及带有嵌套Bean描述对象的beans属性。
+	 * 每个Bean对象包含bean、scope、type和resource属性，以及dependencies属性，
+	 * 其中包含当前Bean所依赖的Bean名称的嵌套数组。
+	 * @param contexts ApplicationContexts集合
+	 * @return JSON文档
 	 */
 	protected String generateJson(Set<ConfigurableApplicationContext> contexts) {
 		StringBuilder result = new StringBuilder("[\n");
@@ -215,12 +212,11 @@ public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAwar
 	}
 
 	/**
-	 * Determine whether the specified bean is eligible for inclusion in the
-	 * LiveBeansView JSON snapshot.
-	 * @param beanName the name of the bean
-	 * @param bd the corresponding bean definition
-	 * @param bf the containing bean factory
-	 * @return {@code true} if the bean is to be included; {@code false} otherwise
+	 * 确定指定Bean是否适合包含在LiveBeansView JSON快照中。
+	 * @param beanName Bean名称
+	 * @param bd 对应的Bean定义
+	 * @param bf 包含的Bean工厂
+	 * @return 如果Bean应被包含则返回 {@code true}；否则返回 {@code false}
 	 */
 	protected boolean isBeanEligible(String beanName, BeanDefinition bd, ConfigurableBeanFactory bf) {
 		return (bd.getRole() != BeanDefinition.ROLE_INFRASTRUCTURE &&
@@ -228,10 +224,9 @@ public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAwar
 	}
 
 	/**
-	 * Determine a resource description for the given bean definition and
-	 * apply basic JSON escaping (backslashes, double quotes) to it.
-	 * @param bd the bean definition to build the resource description for
-	 * @return the JSON-escaped resource description
+	 * 确定给定Bean定义的资源描述并应用基本的JSON转义（反斜杠、双引号）。
+	 * @param bd 要构建资源描述的Bean定义
+	 * @return JSON转义后的资源描述
 	 */
 	@Nullable
 	protected String getEscapedResourceDescription(BeanDefinition bd) {

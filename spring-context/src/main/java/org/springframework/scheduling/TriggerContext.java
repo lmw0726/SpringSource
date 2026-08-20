@@ -22,8 +22,7 @@ import java.util.Date;
 import org.springframework.lang.Nullable;
 
 /**
- * Context object encapsulating last execution times and last completion time
- * of a given task.
+ * 封装给定任务的上次执行时间和上次完成时间的上下文对象。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -31,7 +30,7 @@ import org.springframework.lang.Nullable;
 public interface TriggerContext {
 
 	/**
-	 * Return the clock to use for trigger calculation.
+	 * 返回用于触发器计算的时钟。
 	 * @since 5.3
 	 * @see TaskScheduler#getClock()
 	 * @see Clock#systemDefaultZone()
@@ -41,22 +40,22 @@ public interface TriggerContext {
 	}
 
 	/**
-	 * Return the last <i>scheduled</i> execution time of the task,
-	 * or {@code null} if not scheduled before.
+	 * 返回任务上次<i>计划</i>执行的时间，
+	 * 如果之前没有计划过则返回 {@code null}。
 	 */
 	@Nullable
 	Date lastScheduledExecutionTime();
 
 	/**
-	 * Return the last <i>actual</i> execution time of the task,
-	 * or {@code null} if not scheduled before.
+	 * 返回任务上次<i>实际</i>执行的时间，
+	 * 如果之前没有计划过则返回 {@code null}。
 	 */
 	@Nullable
 	Date lastActualExecutionTime();
 
 	/**
-	 * Return the last completion time of the task,
-	 * or {@code null} if not scheduled before.
+	 * 返回任务上次完成的时间，
+	 * 如果之前没有计划过则返回 {@code null}。
 	 */
 	@Nullable
 	Date lastCompletionTime();

@@ -17,9 +17,8 @@
 package org.springframework.remoting;
 
 /**
- * RemoteAccessException subclass to be thrown when the execution
- * of the target method did not complete before a configurable
- * timeout, for example when a reply message was not received.
+ * 当目标方法的执行在可配置的超时时间前未完成时抛出的RemoteAccessException子类，
+ * 例如当未收到回复消息时。
  * @author Stephane Nicoll
  * @since 4.2
  */
@@ -27,17 +26,17 @@ package org.springframework.remoting;
 public class RemoteTimeoutException extends RemoteAccessException {
 
 	/**
-	 * Constructor for RemoteTimeoutException.
-	 * @param msg the detail message
+	 * RemoteTimeoutException的构造函数。
+	 * @param msg 详细信息
 	 */
 	public RemoteTimeoutException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * Constructor for RemoteTimeoutException.
-	 * @param msg the detail message
-	 * @param cause the root cause from the remoting API in use
+	 * RemoteTimeoutException的构造函数。
+	 * @param msg 详细信息
+	 * @param cause 来自所使用远程API的根本原因
 	 */
 	public RemoteTimeoutException(String msg, Throwable cause) {
 		super(msg, cause);

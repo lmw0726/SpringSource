@@ -1,5 +1,5 @@
 /**
- * Support classes for handling validation results.
+ * 用于处理验证结果的支持类。
  */
 @NonNullApi
 @NonNullFields

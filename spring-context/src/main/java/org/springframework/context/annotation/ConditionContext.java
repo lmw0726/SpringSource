@@ -23,7 +23,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 
 /**
- * Context information for use by {@link Condition} implementations.
+ * 供 {@link Condition} 实现使用的上下文信息。
  *
  * @author Phillip Webb
  * @author Juergen Hoeller
@@ -32,34 +32,31 @@ import org.springframework.lang.Nullable;
 public interface ConditionContext {
 
 	/**
-	 * Return the {@link BeanDefinitionRegistry} that will hold the bean definition
-	 * should the condition match.
-	 * @throws IllegalStateException if no registry is available (which is unusual:
-	 * only the case with a plain {@link ClassPathScanningCandidateComponentProvider})
+	 * 返回在条件匹配时将持有 Bean 定义的 {@link BeanDefinitionRegistry}。
+	 * @throws IllegalStateException 如果没有可用的注册表（这很不常见：仅在使用普通的 {@link ClassPathScanningCandidateComponentProvider} 时才会出现）
 	 */
 	BeanDefinitionRegistry getRegistry();
 
 	/**
-	 * Return the {@link ConfigurableListableBeanFactory} that will hold the bean
-	 * definition should the condition match, or {@code null} if the bean factory is
-	 * not available (or not downcastable to {@code ConfigurableListableBeanFactory}).
+	 * 返回在条件匹配时将持有 Bean 定义的 {@link ConfigurableListableBeanFactory}，
+	 * 如果 Bean 工厂不可用（或无法向下转型为 {@code ConfigurableListableBeanFactory}），
+	 * 则返回 {@code null}。
 	 */
 	@Nullable
 	ConfigurableListableBeanFactory getBeanFactory();
 
 	/**
-	 * Return the {@link Environment} for which the current application is running.
+	 * 返回当前应用程序运行所使用的 {@link Environment}。
 	 */
 	Environment getEnvironment();
 
 	/**
-	 * Return the {@link ResourceLoader} currently being used.
+	 * 返回当前正在使用的 {@link ResourceLoader}。
 	 */
 	ResourceLoader getResourceLoader();
 
 	/**
-	 * Return the {@link ClassLoader} that should be used to load additional classes
-	 * (only {@code null} if even the system ClassLoader isn't accessible).
+	 * 返回应该用于加载额外类的 {@link ClassLoader}（仅在系统 ClassLoader 也不可访问时返回 {@code null}）。
 	 * @see org.springframework.util.ClassUtils#forName(String, ClassLoader)
 	 */
 	@Nullable

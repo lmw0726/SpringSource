@@ -1,6 +1,6 @@
 /**
- * General exceptions for Spring's scheduling support,
- * independent of any specific scheduling system.
+ * Spring 调度支持的通用异常，
+ * 独立于任何特定的调度系统。
  */
 @NonNullApi
 @NonNullFields

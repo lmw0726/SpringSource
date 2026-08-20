@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * A simple key as returned from the {@link SimpleKeyGenerator}.
+ * 由 {@link SimpleKeyGenerator} 返回的一个简单键。
  *
  * @author Phillip Webb
  * @author Juergen Hoeller
@@ -37,25 +37,25 @@ import org.springframework.util.StringUtils;
 public class SimpleKey implements Serializable {
 
 	/**
-	 * An empty key.
+	 * 一个空键。
 	 */
 	public static final SimpleKey EMPTY = new SimpleKey();
 
 
 	private final Object[] params;
 
-	// Effectively final, just re-calculated on deserialization
+	// 实际上是 final 的，仅在反序列化时重新计算
 	private transient int hashCode;
 
 
 	/**
-	 * Create a new {@link SimpleKey} instance.
-	 * @param elements the elements of the key
+	 * 创建一个新的 {@link SimpleKey} 实例。
+	 * @param elements 该键的元素
 	 */
 	public SimpleKey(Object... elements) {
 		Assert.notNull(elements, "Elements must not be null");
 		this.params = elements.clone();
-		// Pre-calculate hashCode field
+		// 预先计算 hashCode 字段
 		this.hashCode = Arrays.deepHashCode(this.params);
 	}
 
@@ -68,7 +68,7 @@ public class SimpleKey implements Serializable {
 
 	@Override
 	public final int hashCode() {
-		// Expose pre-calculated hashCode field
+		// 暴露预先计算的 hashCode 字段
 		return this.hashCode;
 	}
 
@@ -79,7 +79,7 @@ public class SimpleKey implements Serializable {
 
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		ois.defaultReadObject();
-		// Re-calculate hashCode field on deserialization
+		// 反序列化时重新计算 hashCode 字段
 		this.hashCode = Arrays.deepHashCode(this.params);
 	}
 

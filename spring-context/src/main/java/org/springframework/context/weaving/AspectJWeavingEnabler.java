@@ -32,10 +32,8 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.lang.Nullable;
 
 /**
- * Post-processor that registers AspectJ's
- * {@link org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter}
- * with the Spring application context's default
- * {@link org.springframework.instrument.classloading.LoadTimeWeaver}.
+ * 后处理器，将 AspectJ 的 {@link org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter}
+ * 注册到 Spring 应用上下文的默认 {@link org.springframework.instrument.classloading.LoadTimeWeaver} 中。
  *
  * @author Juergen Hoeller
  * @author Ramnivas Laddad
@@ -45,7 +43,7 @@ public class AspectJWeavingEnabler
 		implements BeanFactoryPostProcessor, BeanClassLoaderAware, LoadTimeWeaverAware, Ordered {
 
 	/**
-	 * The {@code aop.xml} resource location.
+	 * {@code aop.xml} 资源位置。
 	 */
 	public static final String ASPECTJ_AOP_XML_RESOURCE = "META-INF/aop.xml";
 
@@ -79,9 +77,9 @@ public class AspectJWeavingEnabler
 
 
 	/**
-	 * Enable AspectJ weaving with the given {@link LoadTimeWeaver}.
-	 * @param weaverToUse the LoadTimeWeaver to apply to (or {@code null} for a default weaver)
-	 * @param beanClassLoader the class loader to create a default weaver for (if necessary)
+	 * 使用给定的 {@link LoadTimeWeaver} 启用 AspectJ 织入。
+	 * @param weaverToUse 要应用的 LoadTimeWeaver（如果为 {@code null}，则使用默认的织入器）
+	 * @param beanClassLoader 用于创建默认织入器的类加载器（如果需要）
 	 */
 	public static void enableAspectJWeaving(
 			@Nullable LoadTimeWeaver weaverToUse, @Nullable ClassLoader beanClassLoader) {
@@ -100,8 +98,7 @@ public class AspectJWeavingEnabler
 
 
 	/**
-	 * ClassFileTransformer decorator that suppresses processing of AspectJ
-	 * classes in order to avoid potential LinkageErrors.
+	 * ClassFileTransformer 装饰器，用于抑制 AspectJ 类的处理，以避免潜在的 LinkageError。
 	 * @see org.springframework.context.annotation.LoadTimeWeavingConfiguration
 	 */
 	private static class AspectJClassBypassingClassFileTransformer implements ClassFileTransformer {

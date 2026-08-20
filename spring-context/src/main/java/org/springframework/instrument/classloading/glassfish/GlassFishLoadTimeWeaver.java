@@ -27,10 +27,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link LoadTimeWeaver} implementation for GlassFish's
- * {@code org.glassfish.api.deployment.InstrumentableClassLoader InstrumentableClassLoader}.
+ * {@link LoadTimeWeaver} 的 GlassFish {@code org.glassfish.api.deployment.InstrumentableClassLoader InstrumentableClassLoader} 实现。
  *
- * <p>As of Spring Framework 5.0, this weaver supports GlassFish 4+.
+ * <p>从 Spring Framework 5.0 开始，此编织器支持 GlassFish 4+。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -50,8 +49,7 @@ public class GlassFishLoadTimeWeaver implements LoadTimeWeaver {
 
 
 	/**
-	 * Create a new instance of the {@link GlassFishLoadTimeWeaver} class using
-	 * the default {@link ClassLoader class loader}.
+	 * 使用默认的 {@link ClassLoader 类加载器} 创建 {@link GlassFishLoadTimeWeaver} 类的新实例。
 	 * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
 	 */
 	public GlassFishLoadTimeWeaver() {
@@ -59,9 +57,8 @@ public class GlassFishLoadTimeWeaver implements LoadTimeWeaver {
 	}
 
 	/**
-	 * Create a new instance of the {@link GlassFishLoadTimeWeaver} class using
-	 * the supplied {@link ClassLoader}.
-	 * @param classLoader the {@code ClassLoader} to delegate to for weaving
+	 * 使用提供的 {@link ClassLoader} 创建 {@link GlassFishLoadTimeWeaver} 类的新实例。
+	 * @param classLoader 用于委托进行编织的 {@code ClassLoader}
 	 */
 	public GlassFishLoadTimeWeaver(@Nullable ClassLoader classLoader) {
 		Assert.notNull(classLoader, "ClassLoader must not be null");
@@ -78,8 +75,8 @@ public class GlassFishLoadTimeWeaver implements LoadTimeWeaver {
 		}
 
 		ClassLoader clazzLoader = null;
-		// Detect transformation-aware ClassLoader by traversing the hierarchy
-		// (as in GlassFish, Spring can be loaded by the WebappClassLoader).
+		// 通过遍历层次结构来检测转换感知的 ClassLoader
+		// （因为在 GlassFish 中，Spring 可以由 WebappClassLoader 加载）。
 		for (ClassLoader cl = classLoader; cl != null && clazzLoader == null; cl = cl.getParent()) {
 			if (instrumentableLoaderClass.isInstance(cl)) {
 				clazzLoader = cl;

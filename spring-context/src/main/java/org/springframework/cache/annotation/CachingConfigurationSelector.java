@@ -26,11 +26,10 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Selects which implementation of {@link AbstractCachingConfiguration} should
- * be used based on the value of {@link EnableCaching#mode} on the importing
- * {@code @Configuration} class.
+ * 根据导入的 {@code @Configuration} 类上 {@link EnableCaching#mode} 的值，
+ * 选择应使用哪个 {@link AbstractCachingConfiguration} 实现。
  *
- * <p>Detects the presence of JSR-107 and enables JCache support accordingly.
+ * <p>检测 JSR-107 是否存在，并相应地启用 JCache 支持。
  *
  * @author Chris Beams
  * @author Stephane Nicoll
@@ -62,9 +61,9 @@ public class CachingConfigurationSelector extends AdviceModeImportSelector<Enabl
 
 
 	/**
-	 * Returns {@link ProxyCachingConfiguration} or {@code AspectJCachingConfiguration}
-	 * for {@code PROXY} and {@code ASPECTJ} values of {@link EnableCaching#mode()},
-	 * respectively. Potentially includes corresponding JCache configuration as well.
+	 * 分别针对 {@link EnableCaching#mode()} 的 {@code PROXY} 和 {@code ASPECTJ} 值，
+	 * 返回 {@link ProxyCachingConfiguration} 或 {@code AspectJCachingConfiguration}。
+	 * 也可能包含相应的 JCache 配置。
 	 */
 	@Override
 	public String[] selectImports(AdviceMode adviceMode) {
@@ -79,8 +78,8 @@ public class CachingConfigurationSelector extends AdviceModeImportSelector<Enabl
 	}
 
 	/**
-	 * Return the imports to use if the {@link AdviceMode} is set to {@link AdviceMode#PROXY}.
-	 * <p>Take care of adding the necessary JSR-107 import if it is available.
+	 * 当 {@link AdviceMode} 设置为 {@link AdviceMode#PROXY} 时返回要使用的导入。
+	 * <p>如果 JSR-107 可用，则负责添加必要的 JSR-107 导入。
 	 */
 	private String[] getProxyImports() {
 		List<String> result = new ArrayList<>(3);
@@ -93,8 +92,8 @@ public class CachingConfigurationSelector extends AdviceModeImportSelector<Enabl
 	}
 
 	/**
-	 * Return the imports to use if the {@link AdviceMode} is set to {@link AdviceMode#ASPECTJ}.
-	 * <p>Take care of adding the necessary JSR-107 import if it is available.
+	 * 当 {@link AdviceMode} 设置为 {@link AdviceMode#ASPECTJ} 时返回要使用的导入。
+	 * <p>如果 JSR-107 可用，则负责添加必要的 JSR-107 导入。
 	 */
 	private String[] getAspectJImports() {
 		List<String> result = new ArrayList<>(2);

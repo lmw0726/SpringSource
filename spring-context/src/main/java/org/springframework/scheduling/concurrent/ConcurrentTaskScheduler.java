@@ -39,22 +39,21 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ErrorHandler;
 
 /**
- * Adapter that takes a {@code java.util.concurrent.ScheduledExecutorService} and
- * exposes a Spring {@link org.springframework.scheduling.TaskScheduler} for it.
- * Extends {@link ConcurrentTaskExecutor} in order to implement the
- * {@link org.springframework.scheduling.SchedulingTaskExecutor} interface as well.
+ * 适配器，接收一个 {@code java.util.concurrent.ScheduledExecutorService} 并为其暴露
+ * Spring 的 {@link org.springframework.scheduling.TaskScheduler} 接口。
+ * 继承 {@link ConcurrentTaskExecutor} 以同时实现
+ * {@link org.springframework.scheduling.SchedulingTaskExecutor} 接口。
  *
- * <p>Autodetects a JSR-236 {@link javax.enterprise.concurrent.ManagedScheduledExecutorService}
- * in order to use it for trigger-based scheduling if possible, instead of Spring's
- * local trigger management which ends up delegating to regular delay-based scheduling
- * against the {@code java.util.concurrent.ScheduledExecutorService} API. For JSR-236 style
- * lookup in a Java EE 7 environment, consider using {@link DefaultManagedTaskScheduler}.
+ * <p>自动检测 JSR-236 的 {@link javax.enterprise.concurrent.ManagedScheduledExecutorService}，
+ * 若可用则优先使用基于触发器的调度方式，而非 Spring 的本地触发器管理（后者最终会委托给
+ * {@code java.util.concurrent.ScheduledExecutorService} API 的常规延迟调度）。
+ * 在 Java EE 7 环境中进行 JSR-236 风格的查找时，建议使用 {@link DefaultManagedTaskScheduler}。
  *
- * <p>Note that there is a pre-built {@link ThreadPoolTaskScheduler} that allows for
- * defining a {@link java.util.concurrent.ScheduledThreadPoolExecutor} in bean style,
- * exposing it as a Spring {@link org.springframework.scheduling.TaskScheduler} directly.
- * This is a convenient alternative to a raw ScheduledThreadPoolExecutor definition with
- * a separate definition of the present adapter class.
+ * <p>请注意，已有一个预构建的 {@link ThreadPoolTaskScheduler}，它支持以 Bean 风格定义
+ * {@link java.util.concurrent.ScheduledThreadPoolExecutor}，并直接将其暴露为
+ * Spring 的 {@link org.springframework.scheduling.TaskScheduler}。
+ * 相比直接使用原始的 ScheduledThreadPoolExecutor 定义并单独定义本适配器类，
+ * 这是一种更便捷的替代方案。
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -77,7 +76,7 @@ public class ConcurrentTaskScheduler extends ConcurrentTaskExecutor implements T
 					ConcurrentTaskScheduler.class.getClassLoader());
 		}
 		catch (ClassNotFoundException ex) {
-			// JSR-236 API not available...
+			// JSR-236 API 不可用...
 			managedScheduledExecutorServiceClass = null;
 		}
 	}
@@ -94,8 +93,8 @@ public class ConcurrentTaskScheduler extends ConcurrentTaskExecutor implements T
 
 
 	/**
-	 * Create a new ConcurrentTaskScheduler,
-	 * using a single thread executor as default.
+	 * 创建一个新的 ConcurrentTaskScheduler，
+	 * 默认使用单线程执行器。
 	 * @see java.util.concurrent.Executors#newSingleThreadScheduledExecutor()
 	 */
 	public ConcurrentTaskScheduler() {
@@ -104,14 +103,13 @@ public class ConcurrentTaskScheduler extends ConcurrentTaskExecutor implements T
 	}
 
 	/**
-	 * Create a new ConcurrentTaskScheduler, using the given
-	 * {@link java.util.concurrent.ScheduledExecutorService} as shared delegate.
-	 * <p>Autodetects a JSR-236 {@link javax.enterprise.concurrent.ManagedScheduledExecutorService}
-	 * in order to use it for trigger-based scheduling if possible,
-	 * instead of Spring's local trigger management.
-	 * @param scheduledExecutor the {@link java.util.concurrent.ScheduledExecutorService}
-	 * to delegate to for {@link org.springframework.scheduling.SchedulingTaskExecutor}
-	 * as well as {@link TaskScheduler} invocations
+	 * 创建一个新的 ConcurrentTaskScheduler，使用给定的
+	 * {@link java.util.concurrent.ScheduledExecutorService} 作为共享委托。
+	 * <p>自动检测 JSR-236 的 {@link javax.enterprise.concurrent.ManagedScheduledExecutorService}，
+	 * 若可用则优先使用基于触发器的调度方式，而非 Spring 的本地触发器管理。
+	 * @param scheduledExecutor 要委托的 {@link java.util.concurrent.ScheduledExecutorService}，
+	 * 用于 {@link org.springframework.scheduling.SchedulingTaskExecutor} 和
+	 * {@link TaskScheduler} 的调用
 	 */
 	public ConcurrentTaskScheduler(ScheduledExecutorService scheduledExecutor) {
 		super(scheduledExecutor);
@@ -119,15 +117,15 @@ public class ConcurrentTaskScheduler extends ConcurrentTaskExecutor implements T
 	}
 
 	/**
-	 * Create a new ConcurrentTaskScheduler, using the given {@link java.util.concurrent.Executor}
-	 * and {@link java.util.concurrent.ScheduledExecutorService} as delegates.
-	 * <p>Autodetects a JSR-236 {@link javax.enterprise.concurrent.ManagedScheduledExecutorService}
-	 * in order to use it for trigger-based scheduling if possible,
-	 * instead of Spring's local trigger management.
-	 * @param concurrentExecutor the {@link java.util.concurrent.Executor} to delegate to
-	 * for {@link org.springframework.scheduling.SchedulingTaskExecutor} invocations
-	 * @param scheduledExecutor the {@link java.util.concurrent.ScheduledExecutorService}
-	 * to delegate to for {@link TaskScheduler} invocations
+	 * 创建一个新的 ConcurrentTaskScheduler，使用给定的
+	 * {@link java.util.concurrent.Executor} 和
+	 * {@link java.util.concurrent.ScheduledExecutorService} 作为委托。
+	 * <p>自动检测 JSR-236 的 {@link javax.enterprise.concurrent.ManagedScheduledExecutorService}，
+	 * 若可用则优先使用基于触发器的调度方式，而非 Spring 的本地触发器管理。
+	 * @param concurrentExecutor 要委托的 {@link java.util.concurrent.Executor}，
+	 * 用于 {@link org.springframework.scheduling.SchedulingTaskExecutor} 的调用
+	 * @param scheduledExecutor 要委托的 {@link java.util.concurrent.ScheduledExecutorService}，
+	 * 用于 {@link TaskScheduler} 的调用
 	 */
 	public ConcurrentTaskScheduler(Executor concurrentExecutor, ScheduledExecutorService scheduledExecutor) {
 		super(concurrentExecutor);
@@ -149,14 +147,13 @@ public class ConcurrentTaskScheduler extends ConcurrentTaskExecutor implements T
 	}
 
 	/**
-	 * Specify the {@link java.util.concurrent.ScheduledExecutorService} to delegate to.
-	 * <p>Autodetects a JSR-236 {@link javax.enterprise.concurrent.ManagedScheduledExecutorService}
-	 * in order to use it for trigger-based scheduling if possible,
-	 * instead of Spring's local trigger management.
-	 * <p>Note: This will only apply to {@link TaskScheduler} invocations.
-	 * If you want the given executor to apply to
-	 * {@link org.springframework.scheduling.SchedulingTaskExecutor} invocations
-	 * as well, pass the same executor reference to {@link #setConcurrentExecutor}.
+	 * 指定要委托的 {@link java.util.concurrent.ScheduledExecutorService}。
+	 * <p>自动检测 JSR-236 的 {@link javax.enterprise.concurrent.ManagedScheduledExecutorService}，
+	 * 若可用则优先使用基于触发器的调度方式，而非 Spring 的本地触发器管理。
+	 * <p>注意：此设置仅对 {@link TaskScheduler} 的调用生效。
+	 * 如果希望指定的执行器也适用于
+	 * {@link org.springframework.scheduling.SchedulingTaskExecutor} 的调用，
+	 * 请将相同的执行器引用传递给 {@link #setConcurrentExecutor}。
 	 * @see #setConcurrentExecutor
 	 */
 	public void setScheduledExecutor(@Nullable ScheduledExecutorService scheduledExecutor) {
@@ -164,7 +161,7 @@ public class ConcurrentTaskScheduler extends ConcurrentTaskExecutor implements T
 	}
 
 	/**
-	 * Provide an {@link ErrorHandler} strategy.
+	 * 提供 {@link ErrorHandler} 策略。
 	 */
 	public void setErrorHandler(ErrorHandler errorHandler) {
 		Assert.notNull(errorHandler, "ErrorHandler must not be null");
@@ -172,8 +169,8 @@ public class ConcurrentTaskScheduler extends ConcurrentTaskExecutor implements T
 	}
 
 	/**
-	 * Set the clock to use for scheduling purposes.
-	 * <p>The default clock is the system clock for the default time zone.
+	 * 设置用于调度的时钟。
+	 * <p>默认时钟为默认时区的系统时钟。
 	 * @since 5.3
 	 * @see Clock#systemDefaultZone()
 	 */
@@ -268,8 +265,8 @@ public class ConcurrentTaskScheduler extends ConcurrentTaskExecutor implements T
 
 
 	/**
-	 * Delegate that adapts a Spring Trigger to a JSR-236 Trigger.
-	 * Separated into an inner class in order to avoid a hard dependency on the JSR-236 API.
+	 * 委托类，将 Spring 的 Trigger 适配为 JSR-236 Trigger。
+	 * 分离为内部类，以避免对 JSR-236 API 的硬依赖。
 	 */
 	private class EnterpriseConcurrentTriggerScheduler {
 

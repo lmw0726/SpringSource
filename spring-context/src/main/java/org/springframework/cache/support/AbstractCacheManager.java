@@ -29,8 +29,8 @@ import org.springframework.cache.CacheManager;
 import org.springframework.lang.Nullable;
 
 /**
- * Abstract base class implementing the common {@link CacheManager} methods.
- * Useful for 'static' environments where the backing caches do not change.
+ * 实现通用 {@link CacheManager} 方法的抽象基类。
+ * 适用于底层缓存不会发生变化的"静态"环境。
  *
  * @author Costin Leau
  * @author Juergen Hoeller
@@ -44,7 +44,7 @@ public abstract class AbstractCacheManager implements CacheManager, Initializing
 	private volatile Set<String> cacheNames = Collections.emptySet();
 
 
-	// Early cache initialization on startup
+	// 启动时的早期缓存初始化
 
 	@Override
 	public void afterPropertiesSet() {
@@ -52,9 +52,9 @@ public abstract class AbstractCacheManager implements CacheManager, Initializing
 	}
 
 	/**
-	 * Initialize the static configuration of caches.
-	 * <p>Triggered on startup through {@link #afterPropertiesSet()};
-	 * can also be called to re-initialize at runtime.
+	 * 初始化缓存的静态配置。
+	 * <p>通过 {@link #afterPropertiesSet()} 在启动时触发；
+	 * 也可以在运行时调用以重新初始化。
 	 * @since 4.2.2
 	 * @see #loadCaches()
 	 */
@@ -75,28 +75,28 @@ public abstract class AbstractCacheManager implements CacheManager, Initializing
 	}
 
 	/**
-	 * Load the initial caches for this cache manager.
-	 * <p>Called by {@link #afterPropertiesSet()} on startup.
-	 * The returned collection may be empty but must not be {@code null}.
+	 * 为该缓存管理器加载初始缓存。
+	 * <p>在启动时由 {@link #afterPropertiesSet()} 调用。
+	 * 返回的集合可以为空，但不能为 {@code null}。
 	 */
 	protected abstract Collection<? extends Cache> loadCaches();
 
 
-	// Lazy cache initialization on access
+	// 访问时的延迟缓存初始化
 
 	@Override
 	@Nullable
 	public Cache getCache(String name) {
-		// Quick check for existing cache...
+		// 快速检查是否已存在缓存...
 		Cache cache = this.cacheMap.get(name);
 		if (cache != null) {
 			return cache;
 		}
 
-		// The provider may support on-demand cache creation...
+		// 提供者可能支持按需创建缓存...
 		Cache missingCache = getMissingCache(name);
 		if (missingCache != null) {
-			// Fully synchronize now for missing cache registration
+			// 现在完全同步以进行缺失缓存的注册
 			synchronized (this.cacheMap) {
 				cache = this.cacheMap.get(name);
 				if (cache == null) {
@@ -115,14 +115,14 @@ public abstract class AbstractCacheManager implements CacheManager, Initializing
 	}
 
 
-	// Common cache initialization delegates for subclasses
+	// 子类的通用缓存初始化委托
 
 	/**
-	 * Check for a registered cache of the given name.
-	 * In contrast to {@link #getCache(String)}, this method does not trigger
-	 * the lazy creation of missing caches via {@link #getMissingCache(String)}.
-	 * @param name the cache identifier (must not be {@code null})
-	 * @return the associated Cache instance, or {@code null} if none found
+	 * 检查是否存在指定名称的已注册缓存。
+	 * 与 {@link #getCache(String)} 不同，此方法不会触发
+	 * 通过 {@link #getMissingCache(String)} 延迟创建缺失缓存。
+	 * @param name 缓存标识符（不能为 {@code null}）
+	 * @return 关联的 Cache 实例，如果未找到则返回 {@code null}
 	 * @since 4.1
 	 * @see #getCache(String)
 	 * @see #getMissingCache(String)
@@ -133,9 +133,9 @@ public abstract class AbstractCacheManager implements CacheManager, Initializing
 	}
 
 	/**
-	 * Dynamically register an additional Cache with this manager.
-	 * @param cache the Cache to register
-	 * @deprecated as of Spring 4.3, in favor of {@link #getMissingCache(String)}
+	 * 向该管理器动态注册一个额外的缓存。
+	 * @param cache 要注册的 Cache
+	 * @deprecated 从 Spring 4.3 开始，推荐使用 {@link #getMissingCache(String)}
 	 */
 	@Deprecated
 	protected final void addCache(Cache cache) {
@@ -148,11 +148,11 @@ public abstract class AbstractCacheManager implements CacheManager, Initializing
 	}
 
 	/**
-	 * Update the exposed {@link #cacheNames} set with the given name.
-	 * <p>This will always be called within a full {@link #cacheMap} lock
-	 * and effectively behaves like a {@code CopyOnWriteArraySet} with
-	 * preserved order but exposed as an unmodifiable reference.
-	 * @param name the name of the cache to be added
+	 * 用指定名称更新暴露的 {@link #cacheNames} 集合。
+	 * <p>此方法始终在完整的 {@link #cacheMap} 锁内调用，
+	 * 其行为类似于 {@code CopyOnWriteArraySet}，
+	 * 保持顺序但以不可变引用的形式暴露。
+	 * @param name 要添加的缓存名称
 	 */
 	private void updateCacheNames(String name) {
 		Set<String> cacheNames = new LinkedHashSet<>(this.cacheNames);
@@ -161,28 +161,27 @@ public abstract class AbstractCacheManager implements CacheManager, Initializing
 	}
 
 
-	// Overridable template methods for cache initialization
+	// 可覆盖的缓存初始化模板方法
 
 	/**
-	 * Decorate the given Cache object if necessary.
-	 * @param cache the Cache object to be added to this CacheManager
-	 * @return the decorated Cache object to be used instead,
-	 * or simply the passed-in Cache object by default
+	 * 在必要时装饰给定的 Cache 对象。
+	 * @param cache 要添加到此 CacheManager 的 Cache 对象
+	 * @return 装饰后要使用的 Cache 对象，
+	 * 或默认情况下直接返回传入的 Cache 对象
 	 */
 	protected Cache decorateCache(Cache cache) {
 		return cache;
 	}
 
 	/**
-	 * Return a missing cache with the specified {@code name}, or {@code null} if
-	 * such a cache does not exist or could not be created on demand.
-	 * <p>Caches may be lazily created at runtime if the native provider supports it.
-	 * If a lookup by name does not yield any result, an {@code AbstractCacheManager}
-	 * subclass gets a chance to register such a cache at runtime. The returned cache
-	 * will be automatically added to this cache manager.
-	 * @param name the name of the cache to retrieve
-	 * @return the missing cache, or {@code null} if no such cache exists or could be
-	 * created on demand
+	 * 返回指定 {@code name} 的缺失缓存，如果该缓存不存在
+	 * 或无法按需创建则返回 {@code null}。
+	 * <p>如果原生提供者支持，缓存可以在运行时延迟创建。
+	 * 如果按名称查找没有返回结果，{@code AbstractCacheManager}
+	 * 的子类有机会在运行时注册这样的缓存。返回的缓存将自动添加到
+	 * 此缓存管理器中。
+	 * @param name 要检索的缓存名称
+	 * @return 缺失的缓存，如果不存在或无法按需创建则返回 {@code null}
 	 * @since 4.1
 	 * @see #getCache(String)
 	 */

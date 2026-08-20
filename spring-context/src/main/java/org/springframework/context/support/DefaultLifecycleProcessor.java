@@ -45,7 +45,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Default implementation of the {@link LifecycleProcessor} strategy.
+ * {@link LifecycleProcessor} 策略的默认实现。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -64,9 +64,8 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 
 	/**
-	 * Specify the maximum time allotted in milliseconds for the shutdown of
-	 * any phase (group of SmartLifecycle beans with the same 'phase' value).
-	 * <p>The default value is 30 seconds.
+	 * 指定任何阶段（具有相同 'phase' 值的 SmartLifecycle bean 组）关闭时分配的最大时间（毫秒）。
+	 * <p>默认值为 30 秒。
 	 */
 	public void setTimeoutPerShutdownPhase(long timeoutPerShutdownPhase) {
 		this.timeoutPerShutdownPhase = timeoutPerShutdownPhase;
@@ -88,15 +87,15 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	}
 
 
-	// Lifecycle implementation
+	// Lifecycle 实现
 
 	/**
-	 * Start all registered beans that implement {@link Lifecycle} and are <i>not</i>
-	 * already running. Any bean that implements {@link SmartLifecycle} will be
-	 * started within its 'phase', and all phases will be ordered from lowest to
-	 * highest value. All beans that do not implement {@link SmartLifecycle} will be
-	 * started in the default phase 0. A bean declared as a dependency of another bean
-	 * will be started before the dependent bean regardless of the declared phase.
+	 * 启动所有已注册的实现了 {@link Lifecycle} 且<i>未</i>在运行的 bean。
+	 * 实现了 {@link SmartLifecycle} 的 bean 将在其 'phase'（阶段）内启动，
+	 * 所有阶段将按从最低到最高的值排序。
+	 * 未实现 {@link SmartLifecycle} 的 bean 将在默认阶段 0 中启动。
+	 * 声明为另一个 bean 依赖的 bean 将在其依赖 bean 之前启动，
+	 * 不论声明的阶段值如何。
 	 */
 	@Override
 	public void start() {
@@ -105,12 +104,12 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	}
 
 	/**
-	 * Stop all registered beans that implement {@link Lifecycle} and <i>are</i>
-	 * currently running. Any bean that implements {@link SmartLifecycle} will be
-	 * stopped within its 'phase', and all phases will be ordered from highest to
-	 * lowest value. All beans that do not implement {@link SmartLifecycle} will be
-	 * stopped in the default phase 0. A bean declared as dependent on another bean
-	 * will be stopped before the dependency bean regardless of the declared phase.
+	 * 停止所有已注册的实现了 {@link Lifecycle} 且<i>当前正在</i>运行的 bean。
+	 * 实现了 {@link SmartLifecycle} 的 bean 将在其 'phase'（阶段）内停止，
+	 * 所有阶段将按从最高到最低的值排序。
+	 * 未实现 {@link SmartLifecycle} 的 bean 将在默认阶段 0 中停止。
+	 * 声明为另一个 bean 依赖的 bean 将在其依赖 bean 之前停止，
+	 * 不论声明的阶段值如何。
 	 */
 	@Override
 	public void stop() {
@@ -136,7 +135,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	}
 
 
-	// Internal helpers
+	// 内部辅助方法
 
 	private void startBeans(boolean autoStartupOnly) {
 		Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
@@ -157,10 +156,10 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	}
 
 	/**
-	 * Start the specified bean as part of the given set of Lifecycle beans,
-	 * making sure that any beans that it depends on are started first.
-	 * @param lifecycleBeans a Map with bean name as key and Lifecycle instance as value
-	 * @param beanName the name of the bean to start
+	 * 启动指定的 bean 作为给定 Lifecycle bean 集合的一部分，
+	 * 确保其依赖的 bean 先被启动。
+	 * @param lifecycleBeans 以 bean 名称为键、Lifecycle 实例为值的 Map
+	 * @param beanName 要启动的 bean 的名称
 	 */
 	private void doStart(Map<String, ? extends Lifecycle> lifecycleBeans, String beanName, boolean autoStartupOnly) {
 		Lifecycle bean = lifecycleBeans.remove(beanName);
@@ -209,10 +208,10 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	}
 
 	/**
-	 * Stop the specified bean as part of the given set of Lifecycle beans,
-	 * making sure that any beans that depends on it are stopped first.
-	 * @param lifecycleBeans a Map with bean name as key and Lifecycle instance as value
-	 * @param beanName the name of the bean to stop
+	 * 停止指定的 bean 作为给定 Lifecycle bean 集合的一部分，
+	 * 确保依赖它的 bean 先被停止。
+	 * @param lifecycleBeans 以 bean 名称为键、Lifecycle 实例为值的 Map
+	 * @param beanName 要停止的 bean 的名称
 	 */
 	private void doStop(Map<String, ? extends Lifecycle> lifecycleBeans, final String beanName,
 			final CountDownLatch latch, final Set<String> countDownBeanNames) {
@@ -251,7 +250,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 					}
 				}
 				else if (bean instanceof SmartLifecycle) {
-					// Don't wait for beans that aren't running...
+					// 不要等待未在运行的 bean...
 					latch.countDown();
 				}
 			}
@@ -264,12 +263,12 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	}
 
 
-	// overridable hooks
+	// 可重写的钩子方法
 
 	/**
-	 * Retrieve all applicable Lifecycle beans: all singletons that have already been created,
-	 * as well as all SmartLifecycle beans (even if they are marked as lazy-init).
-	 * @return the Map of applicable beans, with bean names as keys and bean instances as values
+	 * 检索所有适用的 Lifecycle bean：所有已创建的单例 bean，
+	 * 以及所有 SmartLifecycle bean（即使它们被标记为延迟初始化）。
+	 * @return 适用的 bean 的 Map，以 bean 名称为键、bean 实例为值
 	 */
 	protected Map<String, Lifecycle> getLifecycleBeans() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
@@ -297,11 +296,11 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	}
 
 	/**
-	 * Determine the lifecycle phase of the given bean.
-	 * <p>The default implementation checks for the {@link Phased} interface, using
-	 * a default of 0 otherwise. Can be overridden to apply other/further policies.
-	 * @param bean the bean to introspect
-	 * @return the phase (an integer value)
+	 * 确定给定 bean 的生命周期阶段。
+	 * <p>默认实现检查 {@link Phased} 接口，
+	 * 否则使用默认值 0。可以重写以应用其他/更多策略。
+	 * @param bean 要检查的 bean
+	 * @return 阶段（整数值）
 	 * @see Phased#getPhase()
 	 * @see SmartLifecycle
 	 */
@@ -311,8 +310,8 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 
 	/**
-	 * Helper class for maintaining a group of Lifecycle beans that should be started
-	 * and stopped together based on their 'phase' value (or the default value of 0).
+	 * 辅助类，用于维护一组应根据其 'phase' 值
+	 * （或默认值 0）一起启动和停止的 Lifecycle bean。
 	 */
 	private class LifecycleGroup {
 
@@ -373,7 +372,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 					doStop(this.lifecycleBeans, member.name, latch, countDownBeanNames);
 				}
 				else if (member.bean instanceof SmartLifecycle) {
-					// Already removed: must have been a dependent bean from another phase
+					// 已被移除：一定是来自另一个阶段的依赖 bean
 					latch.countDown();
 				}
 			}
@@ -393,7 +392,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 
 	/**
-	 * Adapts the Comparable interface onto the lifecycle phase model.
+	 * 将 Comparable 接口适配到生命周期阶段模型。
 	 */
 	private class LifecycleGroupMember implements Comparable<LifecycleGroupMember> {
 

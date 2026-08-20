@@ -28,11 +28,11 @@ import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.util.StringUtils;
 
 /**
- * Parser for the &lt;context:mbean-export/&gt; element.
+ * &lt;context:mbean-export/&gt; 元素的解析器。
  *
- * <p>Registers an instance of
+ * <p>在上下文中注册一个
  * {@link org.springframework.jmx.export.annotation.AnnotationMBeanExporter}
- * within the context.
+ * 实例。
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -63,7 +63,7 @@ class MBeanExportBeanDefinitionParser extends AbstractBeanDefinitionParser {
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(AnnotationMBeanExporter.class);
 
-		// Mark as infrastructure bean and attach source location.
+		// 标记为基础设施 Bean 并附加源位置。
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
 

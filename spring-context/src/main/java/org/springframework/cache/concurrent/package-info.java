@@ -1,8 +1,8 @@
 /**
- * Implementation package for {@code java.util.concurrent} based caches.
- * Provides a {@link org.springframework.cache.CacheManager CacheManager}
- * and {@link org.springframework.cache.Cache Cache} implementation for
- * use in a Spring context, using a JDK based thread pool at runtime.
+ * 基于 {@code java.util.concurrent} 的缓存实现包。
+ * 提供可在 Spring 容器中使用的 {@link org.springframework.cache.CacheManager CacheManager}
+ * 和 {@link org.springframework.cache.Cache Cache} 实现，
+ * 运行时使用基于 JDK 的线程池。
  */
 @NonNullApi
 @NonNullFields

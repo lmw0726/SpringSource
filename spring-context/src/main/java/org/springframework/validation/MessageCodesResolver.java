@@ -19,11 +19,11 @@ package org.springframework.validation;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for building message codes from validation error codes.
- * Used by DataBinder to build the codes list for ObjectErrors and FieldErrors.
+ * 从验证错误代码构建消息代码的策略接口。
+ * 被 DataBinder 用于构建 ObjectError 和 FieldError 的代码列表。
  *
- * <p>The resulting message codes correspond to the codes of a
- * MessageSourceResolvable (as implemented by ObjectError and FieldError).
+ * <p>生成的消息代码对应于 MessageSourceResolvable
+ * （由 ObjectError 和 FieldError 实现）的代码。
  *
  * @author Juergen Hoeller
  * @since 1.0.1
@@ -35,22 +35,22 @@ import org.springframework.lang.Nullable;
 public interface MessageCodesResolver {
 
 	/**
-	 * Build message codes for the given error code and object name.
-	 * Used for building the codes list of an ObjectError.
-	 * @param errorCode the error code used for rejecting the object
-	 * @param objectName the name of the object
-	 * @return the message codes to use
+	 * 为给定的错误代码和对象名称构建消息代码。
+	 * 用于构建 ObjectError 的代码列表。
+	 * @param errorCode 用于拒绝对象的错误代码
+	 * @param objectName 对象的名称
+	 * @return 要使用的消息代码
 	 */
 	String[] resolveMessageCodes(String errorCode, String objectName);
 
 	/**
-	 * Build message codes for the given error code and field specification.
-	 * Used for building the codes list of an FieldError.
-	 * @param errorCode the error code used for rejecting the value
-	 * @param objectName the name of the object
-	 * @param field the field name
-	 * @param fieldType the field type (may be {@code null} if not determinable)
-	 * @return the message codes to use
+	 * 为给定的错误代码和字段规格构建消息代码。
+	 * 用于构建 FieldError 的代码列表。
+	 * @param errorCode 用于拒绝值的错误代码
+	 * @param objectName 对象的名称
+	 * @param field 字段名称
+	 * @param fieldType 字段类型（如果无法确定则为 {@code null}）
+	 * @return 要使用的消息代码
 	 */
 	String[] resolveMessageCodes(String errorCode, String objectName, String field, @Nullable Class<?> fieldType);
 

@@ -29,7 +29,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.lang.Nullable;
 
 /**
- * Parser for the &lt;context:annotation-config/&gt; element.
+ * &lt;context:annotation-config/&gt; 元素的解析器。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -44,20 +44,20 @@ public class AnnotationConfigBeanDefinitionParser implements BeanDefinitionParse
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		Object source = parserContext.extractSource(element);
 
-		// Obtain bean definitions for all relevant BeanPostProcessors.
+		// 获取所有相关 BeanPostProcessor 的 Bean 定义。
 		Set<BeanDefinitionHolder> processorDefinitions =
 				AnnotationConfigUtils.registerAnnotationConfigProcessors(parserContext.getRegistry(), source);
 
-		// Register component for the surrounding <context:annotation-config> element.
+		// 为外围的 <context:annotation-config> 元素注册组件。
 		CompositeComponentDefinition compDefinition = new CompositeComponentDefinition(element.getTagName(), source);
 		parserContext.pushContainingComponent(compDefinition);
 
-		// Nest the concrete beans in the surrounding component.
+		// 将具体的 bean 嵌套在外围组件中。
 		for (BeanDefinitionHolder processorDefinition : processorDefinitions) {
 			parserContext.registerComponent(new BeanComponentDefinition(processorDefinition));
 		}
 
-		// Finally register the composite component.
+		// 最后注册组合组件。
 		parserContext.popAndRegisterContainingComponent();
 
 		return null;

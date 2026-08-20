@@ -23,11 +23,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.format.Printer;
 
 /**
- * Prints Long instances using a Joda {@link DateTimeFormatter}.
+ * 使用 Joda {@link DateTimeFormatter} 打印 Long 实例。
  *
  * @author Keith Donald
  * @since 3.0
- * @deprecated as of 5.3, in favor of standard JSR-310 support
+ * @deprecated 自 5.3 起已弃用，建议使用标准 JSR-310 支持
  */
 @Deprecated
 public final class MillisecondInstantPrinter implements Printer<Long> {
@@ -36,8 +36,8 @@ public final class MillisecondInstantPrinter implements Printer<Long> {
 
 
 	/**
-	 * Create a new ReadableInstantPrinter.
-	 * @param formatter the Joda DateTimeFormatter instance
+	 * 创建一个新的 ReadableInstantPrinter。
+	 * @param formatter Joda DateTimeFormatter 实例
 	 */
 	public MillisecondInstantPrinter(DateTimeFormatter formatter) {
 		this.formatter = formatter;

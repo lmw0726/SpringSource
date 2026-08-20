@@ -38,14 +38,12 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.function.SingletonSupplier;
 
 /**
- * Advisor that activates asynchronous method execution through the {@link Async}
- * annotation. This annotation can be used at the method and type level in
- * implementation classes as well as in service interfaces.
+ * 通过 {@link Async} 注解激活异步方法执行的顾问（Advisor）。
+ * 此注解可在实现类以及代理接口的方法和类型级别上使用。
  *
- * <p>This advisor detects the EJB 3.1 {@code javax.ejb.Asynchronous}
- * annotation as well, treating it exactly like Spring's own {@code Async}.
- * Furthermore, a custom async annotation type may get specified through the
- * {@link #setAsyncAnnotationType "asyncAnnotationType"} property.
+ * <p>此顾问还会检测 EJB 3.1 {@code javax.ejb.Asynchronous} 注解，
+ * 并将其与 Spring 自身的 {@code Async} 注解同等对待。
+ * 此外，可以通过 {@link #setAsyncAnnotationType "asyncAnnotationType"} 属性指定自定义的异步注解类型。
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -61,18 +59,17 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 
 
 	/**
-	 * Create a new {@code AsyncAnnotationAdvisor} for bean-style configuration.
+	 * 创建一个新的 {@code AsyncAnnotationAdvisor}，用于 bean 风格的配置。
 	 */
 	public AsyncAnnotationAdvisor() {
 		this((Supplier<Executor>) null, (Supplier<AsyncUncaughtExceptionHandler>) null);
 	}
 
 	/**
-	 * Create a new {@code AsyncAnnotationAdvisor} for the given task executor.
-	 * @param executor the task executor to use for asynchronous methods
-	 * (can be {@code null} to trigger default executor resolution)
-	 * @param exceptionHandler the {@link AsyncUncaughtExceptionHandler} to use to
-	 * handle unexpected exception thrown by asynchronous method executions
+	 * 创建一个新的 {@code AsyncAnnotationAdvisor}，使用给定的任务执行器。
+	 * @param executor 用于异步方法的任务执行器
+	 * （可以为 {@code null} 以触发默认执行器解析）
+	 * @param exceptionHandler 用于处理异步方法执行所抛出的意外异常的 {@link AsyncUncaughtExceptionHandler}
 	 * @see AnnotationAsyncExecutionInterceptor#getDefaultExecutor(BeanFactory)
 	 */
 	public AsyncAnnotationAdvisor(
@@ -82,11 +79,10 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 	}
 
 	/**
-	 * Create a new {@code AsyncAnnotationAdvisor} for the given task executor.
-	 * @param executor the task executor to use for asynchronous methods
-	 * (can be {@code null} to trigger default executor resolution)
-	 * @param exceptionHandler the {@link AsyncUncaughtExceptionHandler} to use to
-	 * handle unexpected exception thrown by asynchronous method executions
+	 * 创建一个新的 {@code AsyncAnnotationAdvisor}，使用给定的任务执行器。
+	 * @param executor 用于异步方法的任务执行器
+	 * （可以为 {@code null} 以触发默认执行器解析）
+	 * @param exceptionHandler 用于处理异步方法执行所抛出的意外异常的 {@link AsyncUncaughtExceptionHandler}
 	 * @since 5.1
 	 * @see AnnotationAsyncExecutionInterceptor#getDefaultExecutor(BeanFactory)
 	 */
@@ -101,7 +97,7 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 					ClassUtils.forName("javax.ejb.Asynchronous", AsyncAnnotationAdvisor.class.getClassLoader()));
 		}
 		catch (ClassNotFoundException ex) {
-			// If EJB 3.1 API not present, simply ignore.
+			// 如果 EJB 3.1 API 不存在，则简单忽略。
 		}
 		this.advice = buildAdvice(executor, exceptionHandler);
 		this.pointcut = buildPointcut(asyncAnnotationTypes);
@@ -109,13 +105,12 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 
 
 	/**
-	 * Set the 'async' annotation type.
-	 * <p>The default async annotation type is the {@link Async} annotation, as well
-	 * as the EJB 3.1 {@code javax.ejb.Asynchronous} annotation (if present).
-	 * <p>This setter property exists so that developers can provide their own
-	 * (non-Spring-specific) annotation type to indicate that a method is to
-	 * be executed asynchronously.
-	 * @param asyncAnnotationType the desired annotation type
+	 * 设置 'async' 注解类型。
+	 * <p>默认的异步注解类型是 {@link Async} 注解，
+	 * 以及 EJB 3.1 {@code javax.ejb.Asynchronous} 注解（如果存在）。
+	 * <p>此 setter 属性的存在是为了让开发者可以提供自己的
+	 * （非 Spring 特定的）注解类型来指示方法应异步执行。
+	 * @param asyncAnnotationType 期望的注解类型
 	 */
 	public void setAsyncAnnotationType(Class<? extends Annotation> asyncAnnotationType) {
 		Assert.notNull(asyncAnnotationType, "'asyncAnnotationType' must not be null");
@@ -125,7 +120,7 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 	}
 
 	/**
-	 * Set the {@code BeanFactory} to be used when looking up executors by qualifier.
+	 * 设置在通过限定符（qualifier）查找执行器时使用的 {@code BeanFactory}。
 	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
@@ -155,9 +150,9 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 	}
 
 	/**
-	 * Calculate a pointcut for the given async annotation types, if any.
-	 * @param asyncAnnotationTypes the async annotation types to introspect
-	 * @return the applicable Pointcut object, or {@code null} if none
+	 * 为给定的异步注解类型计算切入点（Pointcut）（如果有的话）。
+	 * @param asyncAnnotationTypes 需要内省的异步注解类型
+	 * @return 适用的 Pointcut 对象，如果没有则返回 {@code null}
 	 */
 	protected Pointcut buildPointcut(Set<Class<? extends Annotation>> asyncAnnotationTypes) {
 		ComposablePointcut result = null;

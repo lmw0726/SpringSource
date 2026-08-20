@@ -33,7 +33,7 @@ import org.springframework.lang.Nullable;
 import java.util.*;
 
 /**
- * Delegate for AbstractApplicationContext's post-processor handling.
+ * AbstractApplicationContext 的后处理器处理委托类。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -312,7 +312,7 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 	/**
-	 * Invoke the given BeanDefinitionRegistryPostProcessor beans.
+	 * 调用给定的 BeanDefinitionRegistryPostProcessor bean。
 	 */
 	private static void invokeBeanDefinitionRegistryPostProcessors(
 			Collection<? extends BeanDefinitionRegistryPostProcessor> postProcessors, BeanDefinitionRegistry registry, ApplicationStartup applicationStartup) {
@@ -366,9 +366,8 @@ final class PostProcessorRegistrationDelegate {
 
 
 	/**
-	 * BeanPostProcessor that logs an info message when a bean is created during
-	 * BeanPostProcessor instantiation, i.e. when a bean is not eligible for
-	 * getting processed by all BeanPostProcessors.
+	 * BeanPostProcessor，在 BeanPostProcessor 实例化期间创建 bean 时记录信息消息，
+	 * 即当 bean 不符合被所有 BeanPostProcessor 处理的条件时。
 	 */
 	private static final class BeanPostProcessorChecker implements BeanPostProcessor {
 

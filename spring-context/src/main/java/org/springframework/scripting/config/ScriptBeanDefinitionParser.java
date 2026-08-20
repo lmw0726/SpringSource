@@ -35,18 +35,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 
 /**
- * BeanDefinitionParser implementation for the '{@code <lang:groovy/>}',
- * '{@code <lang:std/>}' and '{@code <lang:bsh/>}' tags.
- * Allows for objects written using dynamic languages to be easily exposed with
- * the {@link org.springframework.beans.factory.BeanFactory}.
+ * {@code <lang:groovy/>}、{@code <lang:std/>} 和 {@code <lang:bsh/>} 标签的
+ * BeanDefinitionParser 实现。允许使用动态语言编写的对象能够方便地通过
+ * {@link org.springframework.beans.factory.BeanFactory} 进行暴露。
  *
- * <p>The script for each object can be specified either as a reference to the
- * resource containing it (using the '{@code script-source}' attribute) or inline
- * in the XML configuration itself (using the '{@code inline-script}' attribute.
+ * <p>每个对象的脚本可以通过引用包含脚本的资源来指定（使用 {@code script-source}
+ * 属性），也可以直接内联在 XML 配置中（使用 {@code inline-script} 属性）。
  *
- * <p>By default, dynamic objects created with these tags are <strong>not</strong>
- * refreshable. To enable refreshing, specify the refresh check delay for each
- * object (in milliseconds) using the '{@code refresh-check-delay}' attribute.
+ * <p>默认情况下，使用这些标签创建的动态对象是<strong>不可刷新</strong>的。要启用刷新功能，
+ * 请使用 {@code refresh-check-delay} 属性为每个对象指定刷新检查延迟时间（以毫秒为单位）。
  *
  * @author Rob Harrop
  * @author Rod Johnson
@@ -82,16 +79,16 @@ class ScriptBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 
 	/**
-	 * The {@link org.springframework.scripting.ScriptFactory} class that this
-	 * parser instance will create bean definitions for.
+	 * 此解析器实例将为其创建 BeanDefinition 的
+	 * {@link org.springframework.scripting.ScriptFactory} 类。
 	 */
 	private final String scriptFactoryClassName;
 
 
 	/**
-	 * Create a new instance of this parser, creating bean definitions for the
-	 * supplied {@link org.springframework.scripting.ScriptFactory} class.
-	 * @param scriptFactoryClassName the ScriptFactory class to operate on
+	 * 创建此解析器的新实例，为指定的 {@link org.springframework.scripting.ScriptFactory}
+	 * 类创建 BeanDefinition。
+	 * @param scriptFactoryClassName 要操作的 ScriptFactory 类
 	 */
 	public ScriptBeanDefinitionParser(String scriptFactoryClassName) {
 		this.scriptFactoryClassName = scriptFactoryClassName;
@@ -99,41 +96,41 @@ class ScriptBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
 
 	/**
-	 * Parses the dynamic object element and returns the resulting bean definition.
-	 * Registers a {@link ScriptFactoryPostProcessor} if needed.
+	 * 解析动态对象元素并返回生成的 BeanDefinition。
+	 * 如果需要，注册 {@link ScriptFactoryPostProcessor}。
 	 */
 	@Override
 	@SuppressWarnings("deprecation")
 	@Nullable
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-		// Engine attribute only supported for <lang:std>
+		// Engine 属性仅对 <lang:std> 支持
 		String engine = element.getAttribute(ENGINE_ATTRIBUTE);
 
-		// Resolve the script source.
+		// 解析脚本源。
 		String value = resolveScriptSource(element, parserContext.getReaderContext());
 		if (value == null) {
 			return null;
 		}
 
-		// Set up infrastructure.
+		// 设置基础设施。
 		LangNamespaceUtils.registerScriptFactoryPostProcessorIfNecessary(parserContext.getRegistry());
 
-		// Create script factory bean definition.
+		// 创建脚本工厂 BeanDefinition。
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setBeanClassName(this.scriptFactoryClassName);
 		bd.setSource(parserContext.extractSource(element));
 		bd.setAttribute(ScriptFactoryPostProcessor.LANGUAGE_ATTRIBUTE, element.getLocalName());
 
-		// Determine bean scope.
+		// 确定 Bean 作用域。
 		String scope = element.getAttribute(SCOPE_ATTRIBUTE);
 		if (StringUtils.hasLength(scope)) {
 			bd.setScope(scope);
 		}
 
-		// Determine autowire mode.
+		// 确定自动装配模式。
 		String autowire = element.getAttribute(AUTOWIRE_ATTRIBUTE);
 		int autowireMode = parserContext.getDelegate().getAutowireMode(autowire);
-		// Only "byType" and "byName" supported, but maybe other default inherited...
+		// 仅支持 "byType" 和 "byName"，但可能有其他继承的默认值...
 		if (autowireMode == AbstractBeanDefinition.AUTOWIRE_AUTODETECT) {
 			autowireMode = AbstractBeanDefinition.AUTOWIRE_BY_TYPE;
 		}
@@ -142,17 +139,17 @@ class ScriptBeanDefinitionParser extends AbstractBeanDefinitionParser {
 		}
 		bd.setAutowireMode(autowireMode);
 
-		// Parse depends-on list of bean names.
+		// 解析 depends-on 的 Bean 名称列表。
 		String dependsOn = element.getAttribute(DEPENDS_ON_ATTRIBUTE);
 		if (StringUtils.hasLength(dependsOn)) {
 			bd.setDependsOn(StringUtils.tokenizeToStringArray(
 					dependsOn, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
-		// Retrieve the defaults for bean definitions within this parser context
+		// 获取此解析器上下文中 BeanDefinition 的默认值
 		BeanDefinitionDefaults beanDefinitionDefaults = parserContext.getDelegate().getBeanDefinitionDefaults();
 
-		// Determine init method and destroy method.
+		// 确定初始化方法和销毁方法。
 		String initMethod = element.getAttribute(INIT_METHOD_ATTRIBUTE);
 		if (StringUtils.hasLength(initMethod)) {
 			bd.setInitMethodName(initMethod);
@@ -169,19 +166,19 @@ class ScriptBeanDefinitionParser extends AbstractBeanDefinitionParser {
 			bd.setDestroyMethodName(beanDefinitionDefaults.getDestroyMethodName());
 		}
 
-		// Attach any refresh metadata.
+		// 附加任何刷新元数据。
 		String refreshCheckDelay = element.getAttribute(REFRESH_CHECK_DELAY_ATTRIBUTE);
 		if (StringUtils.hasText(refreshCheckDelay)) {
 			bd.setAttribute(ScriptFactoryPostProcessor.REFRESH_CHECK_DELAY_ATTRIBUTE, Long.valueOf(refreshCheckDelay));
 		}
 
-		// Attach any proxy target class metadata.
+		// 附加任何代理目标类元数据。
 		String proxyTargetClass = element.getAttribute(PROXY_TARGET_CLASS_ATTRIBUTE);
 		if (StringUtils.hasText(proxyTargetClass)) {
 			bd.setAttribute(ScriptFactoryPostProcessor.PROXY_TARGET_CLASS_ATTRIBUTE, Boolean.valueOf(proxyTargetClass));
 		}
 
-		// Add constructor arguments.
+		// 添加构造函数参数。
 		ConstructorArgumentValues cav = bd.getConstructorArgumentValues();
 		int constructorArgNum = 0;
 		if (StringUtils.hasLength(engine)) {
@@ -193,7 +190,7 @@ class ScriptBeanDefinitionParser extends AbstractBeanDefinitionParser {
 					constructorArgNum++, element.getAttribute(SCRIPT_INTERFACES_ATTRIBUTE), "java.lang.Class[]");
 		}
 
-		// This is used for Groovy. It's a bean reference to a customizer bean.
+		// 这用于 Groovy。它是一个指向 customizer Bean 的 Bean 引用。
 		if (element.hasAttribute(CUSTOMIZER_REF_ATTRIBUTE)) {
 			String customizerBeanName = element.getAttribute(CUSTOMIZER_REF_ATTRIBUTE);
 			if (!StringUtils.hasText(customizerBeanName)) {
@@ -204,16 +201,16 @@ class ScriptBeanDefinitionParser extends AbstractBeanDefinitionParser {
 			}
 		}
 
-		// Add any property definitions that need adding.
+		// 添加需要添加的任何属性定义。
 		parserContext.getDelegate().parsePropertyElements(element, bd);
 
 		return bd;
 	}
 
 	/**
-	 * Resolves the script source from either the '{@code script-source}' attribute or
-	 * the '{@code inline-script}' element. Logs and {@link XmlReaderContext#error} and
-	 * returns {@code null} if neither or both of these values are specified.
+	 * 从 {@code script-source} 属性或 {@code inline-script} 元素解析脚本源。
+	 * 如果两者都指定了或者都没有指定，则记录日志并调用 {@link XmlReaderContext#error}
+	 * 然后返回 {@code null}。
 	 */
 	@Nullable
 	private String resolveScriptSource(Element element, XmlReaderContext readerContext) {
@@ -237,7 +234,7 @@ class ScriptBeanDefinitionParser extends AbstractBeanDefinitionParser {
 	}
 
 	/**
-	 * Scripted beans may be anonymous as well.
+	 * 脚本化的 Bean 也可以是匿名的。
 	 */
 	@Override
 	protected boolean shouldGenerateIdAsFallback() {

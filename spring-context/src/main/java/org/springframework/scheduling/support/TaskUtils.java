@@ -26,11 +26,10 @@ import org.springframework.util.ErrorHandler;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Utility methods for decorating tasks with error handling.
+ * 用于装饰任务以进行错误处理的实用方法。
  *
- * <p><b>NOTE:</b> This class is intended for internal use by Spring's scheduler
- * implementations. It is only public so that it may be accessed from impl classes
- * within other packages. It is <i>not</i> intended for general use.
+ * <p><b>注意：</b>本类仅供 Spring 调度器实现内部使用。将其声明为 public 是为了其他包中的实现类
+ * 能够访问它，<i>不</i>适用于通用使用场景。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -39,26 +38,23 @@ import org.springframework.util.ReflectionUtils;
 public abstract class TaskUtils {
 
 	/**
-	 * An ErrorHandler strategy that will log the Exception but perform
-	 * no further handling. This will suppress the error so that
-	 * subsequent executions of the task will not be prevented.
+	 * 一种 ErrorHandler 策略，仅记录异常日志而不进行进一步处理。
+	 * 它会抑制错误，以确保任务的后续执行不会被阻止。
 	 */
 	public static final ErrorHandler LOG_AND_SUPPRESS_ERROR_HANDLER = new LoggingErrorHandler();
 
 	/**
-	 * An ErrorHandler strategy that will log at error level and then
-	 * re-throw the Exception. Note: this will typically prevent subsequent
-	 * execution of a scheduled task.
+	 * 一种 ErrorHandler 策略，以 error 级别记录日志后重新抛出异常。
+	 * 注意：这通常会阻止调度任务的后续执行。
 	 */
 	public static final ErrorHandler LOG_AND_PROPAGATE_ERROR_HANDLER = new PropagatingErrorHandler();
 
 
 	/**
-	 * Decorate the task for error handling. If the provided {@link ErrorHandler}
-	 * is not {@code null}, it will be used. Otherwise, repeating tasks will have
-	 * errors suppressed by default whereas one-shot tasks will have errors
-	 * propagated by default since those errors may be expected through the
-	 * returned {@link Future}. In both cases, the errors will be logged.
+	 * 为任务添加错误处理装饰。如果提供的 {@link ErrorHandler}
+	 * 不为 {@code null}，则使用该处理器；否则，重复执行的任务默认抑制错误，
+	 * 而一次性任务默认传播错误（因为可通过返回的 {@link Future} 获取这些异常）。
+	 * 两种情况都会记录错误日志。
 	 */
 	public static DelegatingErrorHandlingRunnable decorateTaskWithErrorHandler(
 			Runnable task, @Nullable ErrorHandler errorHandler, boolean isRepeatingTask) {
@@ -71,10 +67,8 @@ public abstract class TaskUtils {
 	}
 
 	/**
-	 * Return the default {@link ErrorHandler} implementation based on the boolean
-	 * value indicating whether the task will be repeating or not. For repeating tasks
-	 * it will suppress errors, but for one-time tasks it will propagate. In both
-	 * cases, the error will be logged.
+	 * 根据指示任务是否为重复任务的布尔值，返回默认的 {@link ErrorHandler} 实现。
+	 * 重复任务会抑制错误，一次性任务会传播错误。两种情况都会记录错误日志。
 	 */
 	public static ErrorHandler getDefaultErrorHandler(boolean isRepeatingTask) {
 		return (isRepeatingTask ? LOG_AND_SUPPRESS_ERROR_HANDLER : LOG_AND_PROPAGATE_ERROR_HANDLER);
@@ -82,9 +76,8 @@ public abstract class TaskUtils {
 
 
 	/**
-	 * An {@link ErrorHandler} implementation that logs the Throwable at error
- 	 * level. It does not perform any additional error handling. This can be
- 	 * useful when suppression of errors is the intended behavior.
+	 * 一个 {@link ErrorHandler} 实现，以 error 级别记录 Throwable。
+	 * 它不执行任何额外的错误处理。当预期行为是抑制错误时，此类非常有用。
 	 */
 	private static class LoggingErrorHandler implements ErrorHandler {
 
@@ -98,8 +91,7 @@ public abstract class TaskUtils {
 
 
 	/**
-	 * An {@link ErrorHandler} implementation that logs the Throwable at error
-	 * level and then propagates it.
+	 * 一个 {@link ErrorHandler} 实现，以 error 级别记录 Throwable 后将其传播。
 	 */
 	private static class PropagatingErrorHandler extends LoggingErrorHandler {
 

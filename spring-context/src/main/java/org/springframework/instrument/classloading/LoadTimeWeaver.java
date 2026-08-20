@@ -19,11 +19,11 @@ package org.springframework.instrument.classloading;
 import java.lang.instrument.ClassFileTransformer;
 
 /**
- * Defines the contract for adding one or more
- * {@link ClassFileTransformer ClassFileTransformers} to a {@link ClassLoader}.
+ * 定义向 {@link ClassLoader} 添加一个或多个
+ * {@link ClassFileTransformer ClassFileTransformers} 的契约。
  *
- * <p>Implementations may operate on the current context {@code ClassLoader}
- * or expose their own instrumentable {@code ClassLoader}.
+ * <p>实现类可以操作当前上下文的 {@code ClassLoader}，
+ * 也可以暴露自身的可检测 {@code ClassLoader}。
  *
  * @author Rod Johnson
  * @author Costin Leau
@@ -33,30 +33,28 @@ import java.lang.instrument.ClassFileTransformer;
 public interface LoadTimeWeaver {
 
 	/**
-	 * Add a {@code ClassFileTransformer} to be applied by this
-	 * {@code LoadTimeWeaver}.
-	 * @param transformer the {@code ClassFileTransformer} to add
+	 * 添加一个 {@code ClassFileTransformer}，由本
+	 * {@code LoadTimeWeaver} 应用。
+	 * @param transformer 要添加的 {@code ClassFileTransformer}
 	 */
 	void addTransformer(ClassFileTransformer transformer);
 
 	/**
-	 * Return a {@code ClassLoader} that supports instrumentation
-	 * through AspectJ-style load-time weaving based on user-defined
-	 * {@link ClassFileTransformer ClassFileTransformers}.
-	 * <p>May be the current {@code ClassLoader}, or a {@code ClassLoader}
-	 * created by this {@link LoadTimeWeaver} instance.
-	 * @return the {@code ClassLoader} which will expose
-	 * instrumented classes according to the registered transformers
+	 * 返回一个支持基于用户自定义 {@link ClassFileTransformer ClassFileTransformers}
+	 * 的 AspectJ 风格加载时织入（load-time weaving）的检测的 {@code ClassLoader}。
+	 * <p>可以是当前的 {@code ClassLoader}，也可以是由本
+	 * {@link LoadTimeWeaver} 实例创建的 {@code ClassLoader}。
+	 * @return 根据已注册的转换器暴露已检测类的 {@code ClassLoader}
 	 */
 	ClassLoader getInstrumentableClassLoader();
 
 	/**
-	 * Return a throwaway {@code ClassLoader}, enabling classes to be
-	 * loaded and inspected without affecting the parent {@code ClassLoader}.
-	 * <p>Should <i>not</i> return the same instance of the {@link ClassLoader}
-	 * returned from an invocation of {@link #getInstrumentableClassLoader()}.
-	 * @return a temporary throwaway {@code ClassLoader}; should return
-	 * a new instance for each call, with no existing state
+	 * 返回一个临时的 {@code ClassLoader}，使类能够被加载和检查
+	 * 而不影响父 {@code ClassLoader}。
+	 * <p><i>不</i>应返回与 {@link #getInstrumentableClassLoader()} 调用
+	 * 返回的同一实例。
+	 * @return 一个临时的 {@code ClassLoader}；每次调用应返回新实例，
+	 * 不带任何已有状态
 	 */
 	ClassLoader getThrowawayClassLoader();
 

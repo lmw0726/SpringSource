@@ -88,7 +88,7 @@ public class SimpleJndiBeanFactory extends JndiLocatorSupport implements BeanFac
 
 
 	//---------------------------------------------------------------------
-	// Implementation of BeanFactory interface
+	// BeanFactory 接口的实现
 	//---------------------------------------------------------------------
 
 

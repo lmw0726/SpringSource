@@ -24,15 +24,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * Generic support base class for remote accessor and exporters,
- * providing common bean ClassLoader handling.
+ * 远程访问器和导出器的通用支持基类，
+ * 提供通用的 bean ClassLoader 处理。
  *
  * @author Juergen Hoeller
  * @since 2.5.2
  */
 public abstract class RemotingSupport implements BeanClassLoaderAware {
 
-	/** Logger available to subclasses. */
+	/** 子类可用的 Logger。 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
@@ -44,8 +44,8 @@ public abstract class RemotingSupport implements BeanClassLoaderAware {
 	}
 
 	/**
-	 * Return the ClassLoader that this accessor operates in,
-	 * to be used for deserializing and for generating proxies.
+	 * 返回此访问器所使用的 ClassLoader，
+	 * 用于反序列化和生成代理。
 	 */
 	protected ClassLoader getBeanClassLoader() {
 		return this.beanClassLoader;
@@ -53,10 +53,9 @@ public abstract class RemotingSupport implements BeanClassLoaderAware {
 
 
 	/**
-	 * Override the thread context ClassLoader with the environment's bean ClassLoader
-	 * if necessary, i.e. if the bean ClassLoader is not equivalent to the thread
-	 * context ClassLoader already.
-	 * @return the original thread context ClassLoader, or {@code null} if not overridden
+	 * 如有必要，用环境的 bean ClassLoader 覆盖线程上下文 ClassLoader，
+	 * 即当 bean ClassLoader 与线程上下文 ClassLoader 不一致时进行覆盖。
+	 * @return 原始的线程上下文 ClassLoader，如果未被覆盖则返回 {@code null}
 	 */
 	@Nullable
 	protected ClassLoader overrideThreadContextClassLoader() {
@@ -64,9 +63,9 @@ public abstract class RemotingSupport implements BeanClassLoaderAware {
 	}
 
 	/**
-	 * Reset the original thread context ClassLoader if necessary.
-	 * @param original the original thread context ClassLoader,
-	 * or {@code null} if not overridden (and hence nothing to reset)
+	 * 如有必要，重置原始的线程上下文 ClassLoader。
+	 * @param original 原始的线程上下文 ClassLoader，
+	 * 如果未被覆盖则为 {@code null}（此时无需重置）
 	 */
 	protected void resetThreadContextClassLoader(@Nullable ClassLoader original) {
 		if (original != null) {

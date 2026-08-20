@@ -19,17 +19,15 @@ package org.springframework.remoting.support;
 import org.springframework.util.Assert;
 
 /**
- * Abstract base class for classes that access a remote service.
- * Provides a "serviceInterface" bean property.
+ * 访问远程服务的类的抽象基类。
+ * 提供 "serviceInterface" bean 属性。
  *
- * <p>Note that the service interface being used will show some signs of
- * remotability, like the granularity of method calls that it offers.
- * Furthermore, it has to have serializable arguments etc.
+ * <p>请注意，使用的服务接口会表现出一些远程调用的特征，
+ * 例如它所提供的方法调用粒度。此外，它的参数必须是可序列化的。
  *
- * <p>Accessors are supposed to throw Spring's generic
- * {@link org.springframework.remoting.RemoteAccessException} in case
- * of remote invocation failure, provided that the service interface
- * does not declare {@code java.rmi.RemoteException}.
+ * <p>在远程调用失败时，访问器应当抛出 Spring 的通用
+ * {@link org.springframework.remoting.RemoteAccessException}，
+ * 前提是服务接口没有声明 {@code java.rmi.RemoteException}。
  *
  * @author Juergen Hoeller
  * @since 13.05.2003
@@ -38,14 +36,16 @@ import org.springframework.util.Assert;
  */
 public abstract class RemoteAccessor extends RemotingSupport {
 
+
 	private Class<?> serviceInterface;
 
 
+
 	/**
-	 * Set the interface of the service to access.
-	 * The interface must be suitable for the particular service and remoting strategy.
-	 * <p>Typically required to be able to create a suitable service proxy,
-	 * but can also be optional if the lookup returns a typed proxy.
+	 * 设置要访问的服务接口。
+	 * 该接口必须适合特定的服务和远程调用策略。
+	 * <p>通常需要能够创建合适的服务代理，
+	 * 但如果查找返回的是已类型化的代理，则也可以省略。
 	 */
 	public void setServiceInterface(Class<?> serviceInterface) {
 		Assert.notNull(serviceInterface, "'serviceInterface' must not be null");
@@ -54,7 +54,7 @@ public abstract class RemoteAccessor extends RemotingSupport {
 	}
 
 	/**
-	 * Return the interface of the service to access.
+	 * 返回要访问的服务接口。
 	 */
 	public Class<?> getServiceInterface() {
 		return this.serviceInterface;

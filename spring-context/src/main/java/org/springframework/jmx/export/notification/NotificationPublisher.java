@@ -19,23 +19,21 @@ package org.springframework.jmx.export.notification;
 import javax.management.Notification;
 
 /**
- * Simple interface allowing Spring-managed MBeans to publish JMX notifications
- * without being aware of how those notifications are being transmitted to the
- * {@link javax.management.MBeanServer}.
+ * 简单的接口，允许 Spring 管理的 MBean 发布 JMX 通知，
+ * 而无需了解这些通知如何传输到 {@link javax.management.MBeanServer}。
  *
- * <p>Managed resources can access a {@code NotificationPublisher} by
- * implementing the {@link NotificationPublisherAware} interface. After a particular
- * managed resource instance is registered with the {@link javax.management.MBeanServer},
- * Spring will inject a {@code NotificationPublisher} instance into it if that
- * resource implements the {@link NotificationPublisherAware} interface.
+ * <p>托管资源可以通过实现 {@link NotificationPublisherAware} 接口来访问
+ * {@code NotificationPublisher}。当特定的托管资源实例注册到
+ * {@link javax.management.MBeanServer} 后，如果该资源实现了
+ * {@link NotificationPublisherAware} 接口，Spring 将向其注入一个
+ * {@code NotificationPublisher} 实例。
  *
- * <p>Each managed resource instance will have a distinct instance of a
- * {@code NotificationPublisher} implementation. This instance will keep
- * track of all the {@link javax.management.NotificationListener NotificationListeners}
- * registered for a particular mananaged resource.
+ * <p>每个托管资源实例将拥有一个独立的 {@code NotificationPublisher} 实现实例。
+ * 该实例将跟踪为特定托管资源注册的所有
+ * {@link javax.management.NotificationListener NotificationListener}。
  *
- * <p>Any existing, user-defined MBeans should use standard JMX APIs for notification
- * publication; this interface is intended for use only by Spring-created MBeans.
+ * <p>任何现有的、用户定义的 MBean 应使用标准 JMX API 来发布通知；
+ * 此接口仅适用于 Spring 创建的 MBean。
  *
  * @author Rob Harrop
  * @since 2.0
@@ -46,13 +44,13 @@ import javax.management.Notification;
 public interface NotificationPublisher {
 
 	/**
-	 * Send the specified {@link javax.management.Notification} to all registered
-	 * {@link javax.management.NotificationListener NotificationListeners}.
-	 * Managed resources are <strong>not</strong> responsible for managing the list
-	 * of registered {@link javax.management.NotificationListener NotificationListeners};
-	 * that is performed automatically.
-	 * @param notification the JMX Notification to send
-	 * @throws UnableToSendNotificationException if sending failed
+	 * 将指定的 {@link javax.management.Notification} 发送给所有已注册的
+	 * {@link javax.management.NotificationListener NotificationListener}。
+	 * 托管资源<strong>不</strong>负责管理已注册的
+	 * {@link javax.management.NotificationListener NotificationListener} 列表；
+	 * 该操作将自动完成。
+	 * @param notification 要发送的 JMX 通知
+	 * @throws UnableToSendNotificationException 如果发送失败
 	 */
 	void sendNotification(Notification notification) throws UnableToSendNotificationException;
 

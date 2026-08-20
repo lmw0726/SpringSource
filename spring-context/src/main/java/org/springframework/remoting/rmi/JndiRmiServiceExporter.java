@@ -31,25 +31,24 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Service exporter which binds RMI services to JNDI.
- * Typically used for RMI-IIOP (CORBA).
+ * 将 RMI 服务绑定到 JNDI 的服务导出器。
+ * 通常用于 RMI-IIOP（CORBA）。
  *
- * <p>Exports services via the {@link javax.rmi.PortableRemoteObject} class.
- * You need to run "rmic" with the "-iiop" option to generate corresponding
- * stubs and skeletons for each exported service.
+ * <p>通过 {@link javax.rmi.PortableRemoteObject} 类导出服务。
+ * 需要使用 "-iiop" 选项运行 "rmic" 来为每个导出的服务生成对应的存根和骨架。
  *
- * <p>Also supports exposing any non-RMI service via RMI invokers, to be accessed
- * via {@link JndiRmiClientInterceptor} / {@link JndiRmiProxyFactoryBean}'s
- * automatic detection of such invokers.
+ * <p>也支持通过 RMI 调用器暴露任意非 RMI 服务，
+ * 供 {@link JndiRmiClientInterceptor} / {@link JndiRmiProxyFactoryBean}
+ * 自动检测并访问此类调用器。
  *
- * <p>With an RMI invoker, RMI communication works on the {@link RmiInvocationHandler}
- * level, needing only one stub for any service. Service interfaces do not have to
- * extend {@code java.rmi.Remote} or throw {@code java.rmi.RemoteException}
- * on all methods, but in and out parameters have to be serializable.
+ * <p>使用 RMI 调用器时，RMI 通信工作在 {@link RmiInvocationHandler}
+ * 层级，任何服务只需一个存根即可。服务接口不必继承
+ * {@code java.rmi.Remote} 或在所有方法上抛出 {@code java.rmi.RemoteException}，
+ * 但入参和出参必须可序列化。
  *
- * <p>The JNDI environment can be specified as "jndiEnvironment" bean property,
- * or be configured in a {@code jndi.properties} file or as system properties.
- * For example:
+ * <p>JNDI 环境可以通过 "jndiEnvironment" bean 属性指定，
+ * 也可以在 {@code jndi.properties} 文件中配置或作为系统属性设置。
+ * 例如：
  *
  * <pre class="code">&lt;property name="jndiEnvironment"&gt;
  * 	 &lt;props&gt;
@@ -67,7 +66,7 @@ import org.springframework.util.ReflectionUtils;
  * @see JndiRmiClientInterceptor
  * @see JndiRmiProxyFactoryBean
  * @see javax.rmi.PortableRemoteObject#exportObject
- * @deprecated as of 5.3 (phasing out serialization-based remoting)
+ * @deprecated 5.3 起弃用（逐步淘汰基于序列化的远程调用）
  */
 @Deprecated
 public class JndiRmiServiceExporter extends RmiBasedExporter implements InitializingBean, DisposableBean {
@@ -86,7 +85,7 @@ public class JndiRmiServiceExporter extends RmiBasedExporter implements Initiali
 			unexportObject = portableRemoteObject.getMethod("unexportObject", Remote.class);
 		}
 		catch (Throwable ex) {
-			// java.corba module not available on JDK 9+
+			// JDK 9+ 中 java.corba 模块不可用
 			exportObject = null;
 			unexportObject = null;
 		}
@@ -101,8 +100,8 @@ public class JndiRmiServiceExporter extends RmiBasedExporter implements Initiali
 
 
 	/**
-	 * Set the JNDI template to use for JNDI lookups.
-	 * You can also specify JNDI environment settings via "jndiEnvironment".
+	 * 设置用于 JNDI 查找的 JNDI 模板。
+	 * 也可以通过 "jndiEnvironment" 指定 JNDI 环境设置。
 	 * @see #setJndiEnvironment
 	 */
 	public void setJndiTemplate(JndiTemplate jndiTemplate) {
@@ -110,8 +109,8 @@ public class JndiRmiServiceExporter extends RmiBasedExporter implements Initiali
 	}
 
 	/**
-	 * Set the JNDI environment to use for JNDI lookups.
-	 * Creates a JndiTemplate with the given environment settings.
+	 * 设置用于 JNDI 查找的 JNDI 环境。
+	 * 使用给定的环境设置创建一个 JndiTemplate。
 	 * @see #setJndiTemplate
 	 */
 	public void setJndiEnvironment(Properties jndiEnvironment) {
@@ -119,7 +118,7 @@ public class JndiRmiServiceExporter extends RmiBasedExporter implements Initiali
 	}
 
 	/**
-	 * Set the JNDI name of the exported RMI service.
+	 * 设置导出的 RMI 服务的 JNDI 名称。
 	 */
 	public void setJndiName(String jndiName) {
 		this.jndiName = jndiName;
@@ -132,16 +131,16 @@ public class JndiRmiServiceExporter extends RmiBasedExporter implements Initiali
 	}
 
 	/**
-	 * Initialize this service exporter, binding the specified service to JNDI.
-	 * @throws NamingException if service binding failed
-	 * @throws RemoteException if service export failed
+	 * 初始化此服务导出器，将指定服务绑定到 JNDI。
+	 * @throws NamingException 如果服务绑定失败
+	 * @throws RemoteException 如果服务导出失败
 	 */
 	public void prepare() throws NamingException, RemoteException {
 		if (this.jndiName == null) {
 			throw new IllegalArgumentException("Property 'jndiName' is required");
 		}
 
-		// Initialize and cache exported object.
+		// 初始化并缓存导出的对象。
 		this.exportedObject = getObjectToExport();
 		invokePortableRemoteObject(exportObject);
 
@@ -149,9 +148,8 @@ public class JndiRmiServiceExporter extends RmiBasedExporter implements Initiali
 	}
 
 	/**
-	 * Rebind the specified service to JNDI, for recovering in case
-	 * of the target registry having been restarted.
-	 * @throws NamingException if service binding failed
+	 * 将指定服务重新绑定到 JNDI，用于在目标注册中心重启后恢复连接。
+	 * @throws NamingException 如果服务绑定失败
 	 */
 	public void rebind() throws NamingException {
 		if (logger.isDebugEnabled()) {
@@ -161,7 +159,7 @@ public class JndiRmiServiceExporter extends RmiBasedExporter implements Initiali
 	}
 
 	/**
-	 * Unbind the RMI service from JNDI on bean factory shutdown.
+	 * 在 Bean 工厂关闭时从 JNDI 解除 RMI 服务的绑定。
 	 */
 	@Override
 	public void destroy() throws NamingException, RemoteException {

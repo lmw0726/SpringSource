@@ -24,8 +24,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * A {@link CacheErrorHandler} implementation that logs error message. Can be
- * used when underlying cache errors should be ignored.
+ * 一个记录错误消息的{@link CacheErrorHandler}实现。当需要忽略底层缓存错误时，
+ * 可以使用该实现。
  *
  * @author Adam Ostrožlík
  * @author Stephane Nicoll
@@ -39,9 +39,9 @@ public class LoggingCacheErrorHandler implements CacheErrorHandler {
 
 
 	/**
-	 * Create an instance with the {@link Log logger} to use.
-	 * @param logger the logger to use
-	 * @param logStacktrace whether to log stack trace
+	 * 使用给定的{@link Log 日志}创建一个实例。
+	 * @param logger 要使用的日志记录器
+	 * @param logStacktrace 是否记录堆栈轨迹
 	 */
 	public LoggingCacheErrorHandler(Log logger, boolean logStacktrace) {
 		Assert.notNull(logger, "Logger must not be null");
@@ -50,7 +50,7 @@ public class LoggingCacheErrorHandler implements CacheErrorHandler {
 	}
 
 	/**
-	 * Create an instance that does not log stack traces.
+	 * 创建一个不记录堆栈轨迹的实例。
 	 */
 	public LoggingCacheErrorHandler() {
 		this(LogFactory.getLog(LoggingCacheErrorHandler.class), false);
@@ -84,10 +84,10 @@ public class LoggingCacheErrorHandler implements CacheErrorHandler {
 	}
 
 	/**
-	 * Log the specified message.
-	 * @param logger the logger
-	 * @param message the message
-	 * @param ex the exception
+	 * 记录指定的消息。
+	 * @param logger 日志记录器
+	 * @param message 消息
+	 * @param ex 异常
 	 */
 	protected void logCacheError(Log logger, String message, RuntimeException ex) {
 		if (this.logStacktrace) {

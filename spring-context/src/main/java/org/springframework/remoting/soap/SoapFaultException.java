@@ -21,8 +21,7 @@ import javax.xml.namespace.QName;
 import org.springframework.remoting.RemoteInvocationFailureException;
 
 /**
- * RemoteInvocationFailureException subclass that provides the details
- * of a SOAP fault.
+ * RemoteInvocationFailureException 的子类，提供 SOAP 故障的详细信息。
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -33,9 +32,9 @@ import org.springframework.remoting.RemoteInvocationFailureException;
 public abstract class SoapFaultException extends RemoteInvocationFailureException {
 
 	/**
-	 * Constructor for SoapFaultException.
-	 * @param msg the detail message
-	 * @param cause the root cause from the SOAP API in use
+	 * SoapFaultException 的构造方法。
+	 * @param msg 详细消息
+	 * @param cause 来自所使用的 SOAP API 的根本原因
 	 */
 	protected SoapFaultException(String msg, Throwable cause) {
 		super(msg, cause);
@@ -43,22 +42,22 @@ public abstract class SoapFaultException extends RemoteInvocationFailureExceptio
 
 
 	/**
-	 * Return the SOAP fault code.
+	 * 返回 SOAP 故障代码。
 	 */
 	public abstract String getFaultCode();
 
 	/**
-	 * Return the SOAP fault code as a {@code QName} object.
+	 * 以 {@code QName} 对象的形式返回 SOAP 故障代码。
 	 */
 	public abstract QName getFaultCodeAsQName();
 
 	/**
-	 * Return the descriptive SOAP fault string.
+	 * 返回描述性的 SOAP 故障字符串。
 	 */
 	public abstract String getFaultString();
 
 	/**
-	 * Return the actor that caused this fault.
+	 * 返回导致此故障的参与者。
 	 */
 	public abstract String getFaultActor();
 

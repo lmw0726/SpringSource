@@ -17,7 +17,7 @@
 package org.springframework.scheduling.config;
 
 /**
- * Configuration constants for internal sharing across subpackages.
+ * 用于子包之间内部共享的配置常量。
  *
  * @author Juergen Hoeller
  * @since 4.1
@@ -25,19 +25,19 @@ package org.springframework.scheduling.config;
 public abstract class TaskManagementConfigUtils {
 
 	/**
-	 * The bean name of the internally managed Scheduled annotation processor.
+	 * 内部管理的 Scheduled 注解处理器的 Bean 名称。
 	 */
 	public static final String SCHEDULED_ANNOTATION_PROCESSOR_BEAN_NAME =
 			"org.springframework.context.annotation.internalScheduledAnnotationProcessor";
 
 	/**
-	 * The bean name of the internally managed Async annotation processor.
+	 * 内部管理的 Async 注解处理器的 Bean 名称。
 	 */
 	public static final String ASYNC_ANNOTATION_PROCESSOR_BEAN_NAME =
 			"org.springframework.context.annotation.internalAsyncAnnotationProcessor";
 
 	/**
-	 * The bean name of the internally managed AspectJ async execution aspect.
+	 * 内部管理的 AspectJ 异步执行切面的 Bean 名称。
 	 */
 	public static final String ASYNC_EXECUTION_ASPECT_BEAN_NAME =
 			"org.springframework.scheduling.config.internalAsyncExecutionAspect";

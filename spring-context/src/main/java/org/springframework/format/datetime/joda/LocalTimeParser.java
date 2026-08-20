@@ -25,12 +25,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.format.Parser;
 
 /**
- * Parses Joda {@link org.joda.time.LocalTime} instances using a
- * {@link org.joda.time.format.DateTimeFormatter}.
+ * 使用 {@link org.joda.time.format.DateTimeFormatter} 解析 Joda {@link org.joda.time.LocalTime} 实例。
  *
  * @author Juergen Hoeller
  * @since 4.0
- * @deprecated as of 5.3, in favor of standard JSR-310 support
+ * @deprecated 从 5.3 版本起弃用，建议使用标准 JSR-310 支持
  */
 @Deprecated
 public final class LocalTimeParser implements Parser<LocalTime> {
@@ -39,8 +38,8 @@ public final class LocalTimeParser implements Parser<LocalTime> {
 
 
 	/**
-	 * Create a new DateTimeParser.
-	 * @param formatter the Joda DateTimeFormatter instance
+	 * 创建一个新的 DateTimeParser。
+	 * @param formatter Joda DateTimeFormatter 实例
 	 */
 	public LocalTimeParser(DateTimeFormatter formatter) {
 		this.formatter = formatter;

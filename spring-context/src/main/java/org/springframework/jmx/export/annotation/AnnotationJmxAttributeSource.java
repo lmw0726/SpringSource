@@ -46,8 +46,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringValueResolver;
 
 /**
- * Implementation of the {@link JmxAttributeSource} interface that
- * reads annotations and exposes the corresponding attributes.
+ * {@link JmxAttributeSource} 接口的实现，用于读取注解并暴露相应的属性。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

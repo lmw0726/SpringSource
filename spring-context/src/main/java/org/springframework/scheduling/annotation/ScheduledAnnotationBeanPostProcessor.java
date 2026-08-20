@@ -78,20 +78,17 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
 /**
- * Bean post-processor that registers methods annotated with
- * {@link Scheduled @Scheduled} to be invoked by a
- * {@link org.springframework.scheduling.TaskScheduler} according to the
- * "fixedRate", "fixedDelay", or "cron" expression provided via the annotation.
+ * Bean 后处理器，用于注册使用 {@link Scheduled @Scheduled} 注解的方法，
+ * 使其按照注解中提供的 "fixedRate"、"fixedDelay" 或 "cron" 表达式
+ * 由 {@link org.springframework.scheduling.TaskScheduler} 调度执行。
  *
- * <p>This post-processor is automatically registered by Spring's
- * {@code <task:annotation-driven>} XML element, and also by the
- * {@link EnableScheduling @EnableScheduling} annotation.
+ * <p>此后处理器由 Spring 的 {@code <task:annotation-driven>} XML 元素
+ * 以及 {@link EnableScheduling @EnableScheduling} 注解自动注册。
  *
- * <p>Autodetects any {@link SchedulingConfigurer} instances in the container,
- * allowing for customization of the scheduler to be used or for fine-grained
- * control over task registration (e.g. registration of {@link Trigger} tasks).
- * See the {@link EnableScheduling @EnableScheduling} javadocs for complete usage
- * details.
+ * <p>自动检测容器中的任何 {@link SchedulingConfigurer} 实例，
+ * 允许对使用的调度器进行自定义，或对任务注册进行细粒度控制
+ * （例如注册 {@link Trigger} 任务）。
+ * 有关完整的使用详情，请参阅 {@link EnableScheduling @EnableScheduling} 的 Javadoc。
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
@@ -113,9 +110,8 @@ public class ScheduledAnnotationBeanPostProcessor
 		SmartInitializingSingleton, ApplicationListener<ContextRefreshedEvent>, DisposableBean {
 
 	/**
-	 * The default name of the {@link TaskScheduler} bean to pick up: {@value}.
-	 * <p>Note that the initial lookup happens by type; this is just the fallback
-	 * in case of multiple scheduler beans found in the context.
+	 * 要获取的 {@link TaskScheduler} Bean 的默认名称：{@value}。
+	 * <p>注意，初始查找按类型进行；这仅是在上下文中找到多个调度器 Bean 时的备用方案。
 	 * @since 4.2
 	 */
 	public static final String DEFAULT_TASK_SCHEDULER_BEAN_NAME = "taskScheduler";
@@ -146,17 +142,15 @@ public class ScheduledAnnotationBeanPostProcessor
 
 
 	/**
-	 * Create a default {@code ScheduledAnnotationBeanPostProcessor}.
+	 * 创建默认的 {@code ScheduledAnnotationBeanPostProcessor}。
 	 */
 	public ScheduledAnnotationBeanPostProcessor() {
 		this.registrar = new ScheduledTaskRegistrar();
 	}
 
 	/**
-	 * Create a {@code ScheduledAnnotationBeanPostProcessor} delegating to the
-	 * specified {@link ScheduledTaskRegistrar}.
-	 * @param registrar the ScheduledTaskRegistrar to register {@code @Scheduled}
-	 * tasks on
+	 * 创建一个委托给指定 {@link ScheduledTaskRegistrar} 的 {@code ScheduledAnnotationBeanPostProcessor}。
+	 * @param registrar 用于注册 {@code @Scheduled} 任务的 ScheduledTaskRegistrar
 	 * @since 5.1
 	 */
 	public ScheduledAnnotationBeanPostProcessor(ScheduledTaskRegistrar registrar) {
@@ -171,14 +165,12 @@ public class ScheduledAnnotationBeanPostProcessor
 	}
 
 	/**
-	 * Set the {@link org.springframework.scheduling.TaskScheduler} that will invoke
-	 * the scheduled methods, or a {@link java.util.concurrent.ScheduledExecutorService}
-	 * to be wrapped as a TaskScheduler.
-	 * <p>If not specified, default scheduler resolution will apply: searching for a
-	 * unique {@link TaskScheduler} bean in the context, or for a {@link TaskScheduler}
-	 * bean named "taskScheduler" otherwise; the same lookup will also be performed for
-	 * a {@link ScheduledExecutorService} bean. If neither of the two is resolvable,
-	 * a local single-threaded default scheduler will be created within the registrar.
+	 * 设置将调用已调度方法的 {@link org.springframework.scheduling.TaskScheduler}，
+	 * 或将被包装为 TaskScheduler 的 {@link java.util.concurrent.ScheduledExecutorService}。
+	 * <p>如果未指定，则应用默认调度器解析逻辑：在上下文中查找唯一的 {@link TaskScheduler} Bean，
+	 * 否则查找名为 "taskScheduler" 的 {@link TaskScheduler} Bean；
+	 * 同样也会查找 {@link ScheduledExecutorService} Bean。
+	 * 如果两者都无法解析，将在 registrar 中创建一个本地单线程的默认调度器。
 	 * @see #DEFAULT_TASK_SCHEDULER_BEAN_NAME
 	 */
 	public void setScheduler(Object scheduler) {
@@ -196,9 +188,9 @@ public class ScheduledAnnotationBeanPostProcessor
 	}
 
 	/**
-	 * Making a {@link BeanFactory} available is optional; if not set,
-	 * {@link SchedulingConfigurer} beans won't get autodetected and
-	 * a {@link #setScheduler scheduler} has to be explicitly configured.
+	 * 提供 {@link BeanFactory} 是可选的；如果未设置，
+	 * {@link SchedulingConfigurer} Bean 将不会被自动检测，
+	 * 必须显式配置 {@link #setScheduler scheduler}。
 	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
@@ -206,9 +198,9 @@ public class ScheduledAnnotationBeanPostProcessor
 	}
 
 	/**
-	 * Setting an {@link ApplicationContext} is optional: If set, registered
-	 * tasks will be activated in the {@link ContextRefreshedEvent} phase;
-	 * if not set, it will happen at {@link #afterSingletonsInstantiated} time.
+	 * 设置 {@link ApplicationContext} 是可选的：如果已设置，已注册的任务将在
+	 * {@link ContextRefreshedEvent} 阶段被激活；如果未设置，将在
+	 * {@link #afterSingletonsInstantiated} 时激活。
 	 */
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) {
@@ -221,11 +213,11 @@ public class ScheduledAnnotationBeanPostProcessor
 
 	@Override
 	public void afterSingletonsInstantiated() {
-		// Remove resolved singleton classes from cache
+		// 从缓存中移除已解析的单例类
 		this.nonAnnotatedClasses.clear();
 
 		if (this.applicationContext == null) {
-			// Not running in an ApplicationContext -> register tasks early...
+			// 未在 ApplicationContext 中运行 -> 提前注册任务...
 			finishRegistration();
 		}
 	}
@@ -233,9 +225,9 @@ public class ScheduledAnnotationBeanPostProcessor
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		if (event.getApplicationContext() == this.applicationContext) {
-			// Running in an ApplicationContext -> register tasks this late...
-			// giving other ContextRefreshedEvent listeners a chance to perform
-			// their work at the same time (e.g. Spring Batch's job registration).
+			// 在 ApplicationContext 中运行 -> 延迟注册任务...
+			// 给其他 ContextRefreshedEvent 监听器一个机会同时执行其工作
+			// （例如 Spring Batch 的作业注册）。
 			finishRegistration();
 		}
 	}
@@ -258,7 +250,7 @@ public class ScheduledAnnotationBeanPostProcessor
 		if (this.registrar.hasTasks() && this.registrar.getScheduler() == null) {
 			Assert.state(this.beanFactory != null, "BeanFactory must be set to find scheduler by type");
 			try {
-				// Search for TaskScheduler bean...
+				// 搜索 TaskScheduler Bean...
 				this.registrar.setTaskScheduler(resolveSchedulerBean(this.beanFactory, TaskScheduler.class, false));
 			}
 			catch (NoUniqueBeanDefinitionException ex) {
@@ -284,7 +276,7 @@ public class ScheduledAnnotationBeanPostProcessor
 					logger.trace("Could not find default TaskScheduler bean - attempting to find ScheduledExecutorService: " +
 							ex.getMessage());
 				}
-				// Search for ScheduledExecutorService bean next...
+				// 接下来搜索 ScheduledExecutorService Bean...
 				try {
 					this.registrar.setScheduler(resolveSchedulerBean(this.beanFactory, ScheduledExecutorService.class, false));
 				}
@@ -311,7 +303,7 @@ public class ScheduledAnnotationBeanPostProcessor
 						logger.trace("Could not find default ScheduledExecutorService bean - falling back to default: " +
 								ex2.getMessage());
 					}
-					// Giving up -> falling back to default scheduler within the registrar...
+					// 放弃 -> 回退到 registrar 中的默认调度器...
 					logger.info("No TaskScheduler/ScheduledExecutorService bean found for scheduled processing");
 				}
 			}
@@ -355,7 +347,7 @@ public class ScheduledAnnotationBeanPostProcessor
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		if (bean instanceof AopInfrastructureBean || bean instanceof TaskScheduler ||
 				bean instanceof ScheduledExecutorService) {
-			// Ignore AOP infrastructure such as scoped proxies.
+			// 忽略 AOP 基础设施（例如作用域代理）。
 			return bean;
 		}
 
@@ -375,7 +367,7 @@ public class ScheduledAnnotationBeanPostProcessor
 				}
 			}
 			else {
-				// Non-empty set of methods
+				// 非空的方法集合
 				annotatedMethods.forEach((method, scheduledAnnotations) ->
 						scheduledAnnotations.forEach(scheduled -> processScheduled(scheduled, method, bean)));
 				if (logger.isTraceEnabled()) {
@@ -388,10 +380,10 @@ public class ScheduledAnnotationBeanPostProcessor
 	}
 
 	/**
-	 * Process the given {@code @Scheduled} method declaration on the given bean.
-	 * @param scheduled the {@code @Scheduled} annotation
-	 * @param method the method that the annotation has been declared on
-	 * @param bean the target bean instance
+	 * 处理给定 Bean 上的 {@code @Scheduled} 方法声明。
+	 * @param scheduled {@code @Scheduled} 注解
+	 * @param method 声明了该注解的方法
+	 * @param bean 目标 Bean 实例
 	 * @see #createRunnable(Object, Method)
 	 */
 	protected void processScheduled(Scheduled scheduled, Method method, Object bean) {
@@ -403,7 +395,7 @@ public class ScheduledAnnotationBeanPostProcessor
 
 			Set<ScheduledTask> tasks = new LinkedHashSet<>(4);
 
-			// Determine initial delay
+			// 确定初始延迟
 			long initialDelay = convertToMillis(scheduled.initialDelay(), scheduled.timeUnit());
 			String initialDelayString = scheduled.initialDelayString();
 			if (StringUtils.hasText(initialDelayString)) {
@@ -422,7 +414,7 @@ public class ScheduledAnnotationBeanPostProcessor
 				}
 			}
 
-			// Check cron expression
+			// 检查 cron 表达式
 			String cron = scheduled.cron();
 			if (StringUtils.hasText(cron)) {
 				String zone = scheduled.zone();
@@ -446,12 +438,12 @@ public class ScheduledAnnotationBeanPostProcessor
 				}
 			}
 
-			// At this point we don't need to differentiate between initial delay set or not anymore
+			// 此时不再需要区分是否设置了初始延迟
 			if (initialDelay < 0) {
 				initialDelay = 0;
 			}
 
-			// Check fixed delay
+			// 检查固定延迟
 			long fixedDelay = convertToMillis(scheduled.fixedDelay(), scheduled.timeUnit());
 			if (fixedDelay >= 0) {
 				Assert.isTrue(!processedSchedule, errorMessage);
@@ -478,7 +470,7 @@ public class ScheduledAnnotationBeanPostProcessor
 				}
 			}
 
-			// Check fixed rate
+			// 检查固定速率
 			long fixedRate = convertToMillis(scheduled.fixedRate(), scheduled.timeUnit());
 			if (fixedRate >= 0) {
 				Assert.isTrue(!processedSchedule, errorMessage);
@@ -504,10 +496,10 @@ public class ScheduledAnnotationBeanPostProcessor
 				}
 			}
 
-			// Check whether we had any attribute set
+			// 检查是否设置了任何属性
 			Assert.isTrue(processedSchedule, errorMessage);
 
-			// Finally register the scheduled tasks
+			// 最后注册已调度的任务
 			synchronized (this.scheduledTasks) {
 				Set<ScheduledTask> regTasks = this.scheduledTasks.computeIfAbsent(bean, key -> new LinkedHashSet<>(4));
 				regTasks.addAll(tasks);
@@ -520,11 +512,11 @@ public class ScheduledAnnotationBeanPostProcessor
 	}
 
 	/**
-	 * Create a {@link Runnable} for the given bean instance,
-	 * calling the specified scheduled method.
-	 * <p>The default implementation creates a {@link ScheduledMethodRunnable}.
-	 * @param target the target bean instance
-	 * @param method the scheduled method to call
+	 * 为给定的 Bean 实例创建 {@link Runnable}，
+	 * 调用指定的已调度方法。
+	 * <p>默认实现创建一个 {@link ScheduledMethodRunnable}。
+	 * @param target 目标 Bean 实例
+	 * @param method 要调用的已调度方法
 	 * @since 5.1
 	 * @see ScheduledMethodRunnable#ScheduledMethodRunnable(Object, Method)
 	 */
@@ -555,8 +547,8 @@ public class ScheduledAnnotationBeanPostProcessor
 
 
 	/**
-	 * Return all currently scheduled tasks, from {@link Scheduled} methods
-	 * as well as from programmatic {@link SchedulingConfigurer} interaction.
+	 * 返回所有当前已调度的任务，包括来自 {@link Scheduled} 方法
+	 * 以及来自编程式 {@link SchedulingConfigurer} 交互的任务。
 	 * @since 5.0.2
 	 */
 	@Override

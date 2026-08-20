@@ -34,20 +34,18 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link BeanNameGenerator} implementation for bean classes annotated with the
- * {@link org.springframework.stereotype.Component @Component} annotation or
- * with another annotation that is itself annotated with {@code @Component} as a
- * meta-annotation. For example, Spring's stereotype annotations (such as
- * {@link org.springframework.stereotype.Repository @Repository}) are
- * themselves annotated with {@code @Component}.
+ * 针对使用 {@link org.springframework.stereotype.Component @Component} 注解
+ * 标注的 Bean 类（或使用了以 {@code @Component} 作为元注解的其他注解标注的 Bean 类）
+ * 的 {@link BeanNameGenerator} 实现。
+ * 例如，Spring 的原型注解（如 {@link org.springframework.stereotype.Repository @Repository}）
+ * 本身就使用了 {@code @Component} 进行标注。
  *
- * <p>Also supports Java EE 6's {@link javax.annotation.ManagedBean} and
- * JSR-330's {@link javax.inject.Named} annotations, if available. Note that
- * Spring component annotations always override such standard annotations.
+ * <p>同时支持 Java EE 6 的 {@link javax.annotation.ManagedBean} 和
+ * JSR-330 的 {@link javax.inject.Named} 注解（如果可用的话）。
+ * 请注意，Spring 组件注解始终会覆盖此类标准注解。
  *
- * <p>If the annotation's value doesn't indicate a bean name, an appropriate
- * name will be built based on the short name of the class (with the first
- * letter lower-cased), unless the two first letters are uppercase. For example:
+ * <p>如果注解的 value 属性未指定 Bean 名称，则会基于类的短名称（首字母小写）生成合适的名称，
+ * 除非前两个字母均为大写。例如：
  *
  * <pre class="code">com.xyz.FooServiceImpl -&gt; fooServiceImpl</pre>
  * <pre class="code">com.xyz.URLFooServiceImpl -&gt; URLFooServiceImpl</pre>
@@ -65,8 +63,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 
 	/**
-	 * A convenient constant for a default {@code AnnotationBeanNameGenerator} instance,
-	 * as used for component scanning purposes.
+	 * 一个便捷的常量，表示默认的 {@code AnnotationBeanNameGenerator} 实例，
+	 * 用于组件扫描。
 	 *
 	 * @since 5.2
 	 */
@@ -83,20 +81,20 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 			//从注解中推断Bean名称
 			String beanName = determineBeanNameFromAnnotation((AnnotatedBeanDefinition) definition);
 			if (StringUtils.hasText(beanName)) {
-				// Explicit bean name found.
+				// 找到显式的 Bean 名称。
 				return beanName;
 			}
 		}
-		// Fallback: generate a unique default bean name.
+		// 回退：生成唯一的默认 Bean 名称。
 		//生成唯一的默认BeanName
 		return buildDefaultBeanName(definition, registry);
 	}
 
 	/**
-	 * Derive a bean name from one of the annotations on the class.
+	 * 从类上的某个注解中推导 Bean 名称。
 	 *
-	 * @param annotatedDef the annotation-aware bean definition
-	 * @return the bean name, or {@code null} if none is found
+	 * @param annotatedDef 支持注解的 Bean 定义
+	 * @return Bean 名称，如果未找到则返回 {@code null}
 	 */
 	@Nullable
 	protected String determineBeanNameFromAnnotation(AnnotatedBeanDefinition annotatedDef) {
@@ -132,13 +130,12 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	}
 
 	/**
-	 * Check whether the given annotation is a stereotype that is allowed
-	 * to suggest a component name through its annotation {@code value()}.
+	 * 检查给定的注解是否是允许通过其 {@code value()} 方法指定组件名称的原型注解。
 	 *
-	 * @param annotationType      the name of the annotation class to check
-	 * @param metaAnnotationTypes the names of meta-annotations on the given annotation
-	 * @param attributes          the map of attributes for the given annotation
-	 * @return whether the annotation qualifies as a stereotype with component name
+	 * @param annotationType      要检查的注解类的名称
+	 * @param metaAnnotationTypes 给定注解上的元注解名称
+	 * @param attributes          给定注解的属性映射
+	 * @return 该注解是否符合带组件名称的原型注解条件
 	 */
 	protected boolean isStereotypeWithNameValue(String annotationType,
 												Set<String> metaAnnotationTypes, @Nullable Map<String, Object> attributes) {
@@ -152,27 +149,26 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	}
 
 	/**
-	 * Derive a default bean name from the given bean definition.
-	 * <p>The default implementation delegates to {@link #buildDefaultBeanName(BeanDefinition)}.
+	 * 从给定的 Bean 定义中推导默认的 Bean 名称。
+	 * <p>默认实现委托给 {@link #buildDefaultBeanName(BeanDefinition)}。
 	 *
-	 * @param definition the bean definition to build a bean name for
-	 * @param registry   the registry that the given bean definition is being registered with
-	 * @return the default bean name (never {@code null})
+	 * @param definition 要为其构建 Bean 名称的 Bean 定义
+	 * @param registry   给定 Bean 定义正在注册到的注册表
+	 * @return 默认的 Bean 名称（永不为 {@code null}）
 	 */
 	protected String buildDefaultBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
 		return buildDefaultBeanName(definition);
 	}
 
 	/**
-	 * Derive a default bean name from the given bean definition.
-	 * <p>The default implementation simply builds a decapitalized version
-	 * of the short class name: e.g. "mypackage.MyJdbcDao" &rarr; "myJdbcDao".
-	 * <p>Note that inner classes will thus have names of the form
-	 * "outerClassName.InnerClassName", which because of the period in the
-	 * name may be an issue if you are autowiring by name.
+	 * 从给定的 Bean 定义中推导默认的 Bean 名称。
+	 * <p>默认实现简单地构建一个首字母小写的短类名版本：
+	 * 例如 "mypackage.MyJdbcDao" &rarr; "myJdbcDao"。
+	 * <p>请注意，内部类的名称格式将是 "outerClassName.InnerClassName"，
+	 * 由于名称中包含点号，如果按名称进行自动装配可能会出现问题。
 	 *
-	 * @param definition the bean definition to build a bean name for
-	 * @return the default bean name (never {@code null})
+	 * @param definition 要为其构建 Bean 名称的 Bean 定义
+	 * @return 默认的 Bean 名称（永不为 {@code null}）
 	 */
 	protected String buildDefaultBeanName(BeanDefinition definition) {
 		String beanClassName = definition.getBeanClassName();

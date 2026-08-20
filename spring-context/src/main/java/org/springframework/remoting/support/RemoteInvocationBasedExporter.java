@@ -19,11 +19,9 @@ package org.springframework.remoting.support;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Abstract base class for remote service exporters that are based
- * on deserialization of {@link RemoteInvocation} objects.
+ * 基于 {@link RemoteInvocation} 对象反序列化的远程服务导出器的抽象基类。
  *
- * <p>Provides a "remoteInvocationExecutor" property, with a
- * {@link DefaultRemoteInvocationExecutor} as default strategy.
+ * <p>提供 "remoteInvocationExecutor" 属性，默认使用 {@link DefaultRemoteInvocationExecutor} 作为策略。
  *
  * @author Juergen Hoeller
  * @since 1.1
@@ -36,17 +34,16 @@ public abstract class RemoteInvocationBasedExporter extends RemoteExporter {
 
 
 	/**
-	 * Set the RemoteInvocationExecutor to use for this exporter.
-	 * Default is a DefaultRemoteInvocationExecutor.
-	 * <p>A custom invocation executor can extract further context information
-	 * from the invocation, for example user credentials.
+	 * 设置用于此导出器的 RemoteInvocationExecutor。
+	 * 默认是 DefaultRemoteInvocationExecutor。
+	 * <p>自定义的调用执行器可以从调用中提取更多上下文信息，例如用户凭证。
 	 */
 	public void setRemoteInvocationExecutor(RemoteInvocationExecutor remoteInvocationExecutor) {
 		this.remoteInvocationExecutor = remoteInvocationExecutor;
 	}
 
 	/**
-	 * Return the RemoteInvocationExecutor used by this exporter.
+	 * 返回此导出器使用的 RemoteInvocationExecutor。
 	 */
 	public RemoteInvocationExecutor getRemoteInvocationExecutor() {
 		return this.remoteInvocationExecutor;
@@ -54,18 +51,17 @@ public abstract class RemoteInvocationBasedExporter extends RemoteExporter {
 
 
 	/**
-	 * Apply the given remote invocation to the given target object.
-	 * The default implementation delegates to the RemoteInvocationExecutor.
-	 * <p>Can be overridden in subclasses for custom invocation behavior,
-	 * possibly for applying additional invocation parameters from a
-	 * custom RemoteInvocation subclass. Note that it is preferable to use
-	 * a custom RemoteInvocationExecutor which is a reusable strategy.
-	 * @param invocation the remote invocation
-	 * @param targetObject the target object to apply the invocation to
-	 * @return the invocation result
-	 * @throws NoSuchMethodException if the method name could not be resolved
-	 * @throws IllegalAccessException if the method could not be accessed
-	 * @throws InvocationTargetException if the method invocation resulted in an exception
+	 * 将给定的远程调用应用到给定的目标对象。
+	 * 默认实现委托给 RemoteInvocationExecutor。
+	 * <p>可以在子类中重写以实现自定义调用行为，
+	 * 可能用于应用来自自定义 RemoteInvocation 子类的额外调用参数。请注意，
+	 * 更推荐使用自定义的 RemoteInvocationExecutor，这是一种可重用的策略。
+	 * @param invocation 远程调用
+	 * @param targetObject 要应用调用的目标对象
+	 * @return 调用结果
+	 * @throws NoSuchMethodException 如果无法解析方法名
+	 * @throws IllegalAccessException 如果无法访问该方法
+	 * @throws InvocationTargetException 如果方法调用导致异常
 	 * @see RemoteInvocationExecutor#invoke
 	 */
 	protected Object invoke(RemoteInvocation invocation, Object targetObject)
@@ -98,15 +94,13 @@ public abstract class RemoteInvocationBasedExporter extends RemoteExporter {
 	}
 
 	/**
-	 * Apply the given remote invocation to the given target object, wrapping
-	 * the invocation result in a serializable RemoteInvocationResult object.
-	 * The default implementation creates a plain RemoteInvocationResult.
-	 * <p>Can be overridden in subclasses for custom invocation behavior,
-	 * for example to return additional context information. Note that this
-	 * is not covered by the RemoteInvocationExecutor strategy!
-	 * @param invocation the remote invocation
-	 * @param targetObject the target object to apply the invocation to
-	 * @return the invocation result
+	 * 将给定的远程调用应用到给定的目标对象，并将调用结果包装在可序列化的 RemoteInvocationResult 对象中。
+	 * 默认实现创建一个普通的 RemoteInvocationResult。
+	 * <p>可以在子类中重写以实现自定义调用行为，
+	 * 例如返回额外的上下文信息。请注意，这不在 RemoteInvocationExecutor 策略的覆盖范围内！
+	 * @param invocation 远程调用
+	 * @param targetObject 要应用调用的目标对象
+	 * @return 调用结果
 	 * @see #invoke
 	 */
 	protected RemoteInvocationResult invokeAndCreateResult(RemoteInvocation invocation, Object targetObject) {

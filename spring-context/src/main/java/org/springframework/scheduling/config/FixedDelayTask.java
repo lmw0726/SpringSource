@@ -17,7 +17,7 @@
 package org.springframework.scheduling.config;
 
 /**
- * Specialization of {@link IntervalTask} for fixed-delay semantics.
+ * {@link IntervalTask} 的固定延迟语义特化。
  *
  * @author Juergen Hoeller
  * @since 5.0.2
@@ -27,10 +27,10 @@ package org.springframework.scheduling.config;
 public class FixedDelayTask extends IntervalTask {
 
 	/**
-	 * Create a new {@code FixedDelayTask}.
-	 * @param runnable the underlying task to execute
-	 * @param interval how often in milliseconds the task should be executed
-	 * @param initialDelay the initial delay before first execution of the task
+	 * 创建一个新的 {@code FixedDelayTask}。
+	 * @param runnable 要执行的底层任务
+	 * @param interval 任务执行的间隔时间（毫秒）
+	 * @param initialDelay 首次执行前的初始延迟时间（毫秒）
 	 */
 	public FixedDelayTask(Runnable runnable, long interval, long initialDelay) {
 		super(runnable, interval, initialDelay);

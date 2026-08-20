@@ -33,31 +33,27 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Provides supporting infrastructure for registering MBeans with an
- * {@link javax.management.MBeanServer}. The behavior when encountering
- * an existing MBean at a given {@link ObjectName} is fully configurable
- * allowing for flexible registration settings.
+ * 提供将 MBean 注册到 {@link javax.management.MBeanServer} 的支持基础设施。
+ * 当遇到给定 {@link ObjectName} 处已存在的 MBean 时，其行为是完全可配置的，
+ * 允许灵活的注册设置。
  *
- * <p>All registered MBeans are tracked and can be unregistered by calling
- * the #{@link #unregisterBeans()} method.
+ * <p>所有注册的 MBean 都会被跟踪，并且可以通过调用 #{@link #unregisterBeans()} 方法
+ * 来取消注册。
  *
- * <p>Sub-classes can receive notifications when an MBean is registered or
- * unregistered by overriding the {@link #onRegister(ObjectName)} and
- * {@link #onUnregister(ObjectName)} methods respectively.
+ * <p>子类可以在 MBean 被注册或取消注册时接收通知，方法是分别重写
+ * {@link #onRegister(ObjectName)} 和 {@link #onUnregister(ObjectName)} 方法。
  *
- * <p>By default, the registration process will fail if attempting to
- * register an MBean using a {@link javax.management.ObjectName} that is
- * already used.
+ * <p>默认情况下，如果尝试使用已存在的 {@link javax.management.ObjectName} 注册 MBean，
+ * 注册过程将失败。
  *
- * <p>By setting the {@link #setRegistrationPolicy(RegistrationPolicy) registrationPolicy}
- * property to {@link RegistrationPolicy#IGNORE_EXISTING} the registration process
- * will simply ignore existing MBeans leaving them registered. This is useful in settings
- * where multiple applications want to share a common MBean in a shared {@link MBeanServer}.
+ * <p>通过将 {@link #setRegistrationPolicy(RegistrationPolicy) registrationPolicy}
+ * 属性设置为 {@link RegistrationPolicy#IGNORE_EXISTING}，注册过程将简单地忽略
+ * 已存在的 MBean，使其保持注册状态。这在多个应用程序想要在共享的
+ * {@link MBeanServer} 中共享公共 MBean 的环境中很有用。
  *
- * <p>Setting {@link #setRegistrationPolicy(RegistrationPolicy) registrationPolicy} property
- * to {@link RegistrationPolicy#REPLACE_EXISTING} will cause existing MBeans to be replaced
- * during registration if necessary. This is useful in situations where you can't guarantee
- * the state of your {@link MBeanServer}.
+ * <p>将 {@link #setRegistrationPolicy(RegistrationPolicy) registrationPolicy} 属性
+ * 设置为 {@link RegistrationPolicy#REPLACE_EXISTING} 将导致在注册期间如有必要
+ * 替换已存在的 MBean。这在无法保证 {@link MBeanServer} 状态的情况下很有用。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -70,39 +66,38 @@ import org.springframework.util.Assert;
 public class MBeanRegistrationSupport {
 
 	/**
-	 * {@code Log} instance for this class.
-	 */
+ * 此类的 {@code Log} 实例。
+ */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * The {@code MBeanServer} instance being used to register beans.
+	 * 用于注册 bean 的 {@code MBeanServer} 实例。
 	 */
 	@Nullable
 	protected MBeanServer server;
 
 	/**
-	 * The beans that have been registered by this exporter.
+	 * 由此导出器注册的 bean。
 	 */
 	private final Set<ObjectName> registeredBeans = new LinkedHashSet<>();
 
 	/**
-	 * The policy used when registering an MBean and finding that it already exists.
-	 * By default an exception is raised.
+	 * 注册 MBean 时发现其已存在时使用的策略。
+	 * 默认情况下会抛出异常。
 	 */
 	private RegistrationPolicy registrationPolicy = RegistrationPolicy.FAIL_ON_EXISTING;
 
 
 	/**
-	 * Specify the {@code MBeanServer} instance with which all beans should
-	 * be registered. The {@code MBeanExporter} will attempt to locate an
-	 * existing {@code MBeanServer} if none is supplied.
+	 * 指定所有 bean 应注册到的 {@code MBeanServer} 实例。
+	 * 如果未提供，{@code MBeanExporter} 将尝试定位现有的 {@code MBeanServer}。
 	 */
 	public void setServer(@Nullable MBeanServer server) {
 		this.server = server;
 	}
 
 	/**
-	 * Return the {@code MBeanServer} that the beans will be registered with.
+	 * 返回 bean 将注册到的 {@code MBeanServer}。
 	 */
 	@Nullable
 	public final MBeanServer getServer() {
@@ -110,9 +105,8 @@ public class MBeanRegistrationSupport {
 	}
 
 	/**
-	 * The policy to use when attempting to register an MBean
-	 * under an {@link javax.management.ObjectName} that already exists.
-	 * @param registrationPolicy the policy to use
+	 * 尝试在已存在的 {@link javax.management.ObjectName} 下注册 MBean 时使用的策略。
+	 * @param registrationPolicy 要使用的策略
 	 * @since 3.2
 	 */
 	public void setRegistrationPolicy(RegistrationPolicy registrationPolicy) {
@@ -122,11 +116,11 @@ public class MBeanRegistrationSupport {
 
 
 	/**
-	 * Actually register the MBean with the server. The behavior when encountering
-	 * an existing MBean can be configured using {@link #setRegistrationPolicy}.
-	 * @param mbean the MBean instance
-	 * @param objectName the suggested ObjectName for the MBean
-	 * @throws JMException if the registration failed
+	 * 实际将 MBean 注册到服务器。遇到已存在的 MBean 时的行为
+	 * 可以通过 {@link #setRegistrationPolicy} 进行配置。
+	 * @param mbean MBean 实例
+	 * @param objectName 建议的 MBean 对象名称
+	 * @throws JMException 如果注册失败
 	 */
 	protected void doRegister(Object mbean, ObjectName objectName) throws JMException {
 		Assert.state(this.server != null, "No MBeanServer set");
@@ -163,7 +157,7 @@ public class MBeanRegistrationSupport {
 				}
 			}
 
-			// Track registration and notify listeners.
+			// 跟踪注册并通知监听器。
 			actualObjectName = (registeredBean != null ? registeredBean.getObjectName() : null);
 			if (actualObjectName == null) {
 				actualObjectName = objectName;
@@ -175,7 +169,7 @@ public class MBeanRegistrationSupport {
 	}
 
 	/**
-	 * Unregisters all beans that have been registered by an instance of this class.
+	 * 取消注册由此类实例注册的所有 bean。
 	 */
 	protected void unregisterBeans() {
 		Set<ObjectName> snapshot;
@@ -191,8 +185,8 @@ public class MBeanRegistrationSupport {
 	}
 
 	/**
-	 * Actually unregister the specified MBean from the server.
-	 * @param objectName the suggested ObjectName for the MBean
+	 * 实际从服务器取消注册指定的 MBean。
+	 * @param objectName 建议的 MBean 对象名称
 	 */
 	protected void doUnregister(ObjectName objectName) {
 		Assert.state(this.server != null, "No MBeanServer set");
@@ -201,7 +195,7 @@ public class MBeanRegistrationSupport {
 		synchronized (this.registeredBeans) {
 			if (this.registeredBeans.remove(objectName)) {
 				try {
-					// MBean might already have been unregistered by an external process
+					// MBean 可能已被外部进程取消注册
 					if (this.server.isRegistered(objectName)) {
 						this.server.unregisterMBean(objectName);
 						actuallyUnregistered = true;
@@ -227,7 +221,7 @@ public class MBeanRegistrationSupport {
 	}
 
 	/**
-	 * Return the {@link ObjectName ObjectNames} of all registered beans.
+	 * 返回所有已注册 bean 的 {@link ObjectName ObjectNames}。
 	 */
 	protected final ObjectName[] getRegisteredObjectNames() {
 		synchronized (this.registeredBeans) {
@@ -237,30 +231,30 @@ public class MBeanRegistrationSupport {
 
 
 	/**
-	 * Called when an MBean is registered under the given {@link ObjectName}. Allows
-	 * subclasses to perform additional processing when an MBean is registered.
-	 * <p>The default implementation delegates to {@link #onRegister(ObjectName)}.
-	 * @param objectName the actual {@link ObjectName} that the MBean was registered with
-	 * @param mbean the registered MBean instance
+	 * 当 MBean 在给定 {@link ObjectName} 下注册时调用。允许子类在 MBean 注册时
+	 * 执行额外的处理。
+	 * <p>默认实现委托给 {@link #onRegister(ObjectName)}。
+	 * @param objectName MBean 注册时使用的实际 {@link ObjectName}
+	 * @param mbean 已注册的 MBean 实例
 	 */
 	protected void onRegister(ObjectName objectName, Object mbean) {
 		onRegister(objectName);
 	}
 
 	/**
-	 * Called when an MBean is registered under the given {@link ObjectName}. Allows
-	 * subclasses to perform additional processing when an MBean is registered.
-	 * <p>The default implementation is empty. Can be overridden in subclasses.
-	 * @param objectName the actual {@link ObjectName} that the MBean was registered with
+	 * 当 MBean 在给定 {@link ObjectName} 下注册时调用。允许子类在 MBean 注册时
+	 * 执行额外的处理。
+	 * <p>默认实现为空。可在子类中重写。
+	 * @param objectName MBean 注册时使用的实际 {@link ObjectName}
 	 */
 	protected void onRegister(ObjectName objectName) {
 	}
 
 	/**
-	 * Called when an MBean is unregistered under the given {@link ObjectName}. Allows
-	 * subclasses to perform additional processing when an MBean is unregistered.
-	 * <p>The default implementation is empty. Can be overridden in subclasses.
-	 * @param objectName the {@link ObjectName} that the MBean was registered with
+	 * 当 MBean 在给定 {@link ObjectName} 下取消注册时调用。允许子类在 MBean 取消注册时
+	 * 执行额外的处理。
+	 * <p>默认实现为空。可在子类中重写。
+	 * @param objectName MBean 注册时使用的 {@link ObjectName}
 	 */
 	protected void onUnregister(ObjectName objectName) {
 	}

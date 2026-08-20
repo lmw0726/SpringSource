@@ -26,9 +26,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Helper class that allows for accessing a Spring
- * {@link org.springframework.context.MessageSource} as a {@link java.util.ResourceBundle}.
- * Used for example to expose a Spring MessageSource to JSTL web views.
+ * 辅助类，允许将 Spring
+ * {@link org.springframework.context.MessageSource} 作为 {@link java.util.ResourceBundle} 进行访问。
+ * 例如用于将 Spring MessageSource 暴露给 JSTL Web 视图。
  *
  * @author Juergen Hoeller
  * @since 27.02.2003
@@ -44,9 +44,9 @@ public class MessageSourceResourceBundle extends ResourceBundle {
 
 
 	/**
-	 * Create a new MessageSourceResourceBundle for the given MessageSource and Locale.
-	 * @param source the MessageSource to retrieve messages from
-	 * @param locale the Locale to retrieve messages for
+	 * 为给定的 MessageSource 和 Locale 创建新的 MessageSourceResourceBundle。
+	 * @param source 用于获取消息的 MessageSource
+	 * @param locale 用于获取消息的 Locale
 	 */
 	public MessageSourceResourceBundle(MessageSource source, Locale locale) {
 		Assert.notNull(source, "MessageSource must not be null");
@@ -55,10 +55,10 @@ public class MessageSourceResourceBundle extends ResourceBundle {
 	}
 
 	/**
-	 * Create a new MessageSourceResourceBundle for the given MessageSource and Locale.
-	 * @param source the MessageSource to retrieve messages from
-	 * @param locale the Locale to retrieve messages for
-	 * @param parent the parent ResourceBundle to delegate to if no local message found
+	 * 为给定的 MessageSource 和 Locale 创建新的 MessageSourceResourceBundle。
+	 * @param source 用于获取消息的 MessageSource
+	 * @param locale 用于获取消息的 Locale
+	 * @param parent 当未找到本地消息时委托的父 ResourceBundle
 	 */
 	public MessageSourceResourceBundle(MessageSource source, Locale locale, ResourceBundle parent) {
 		this(source, locale);
@@ -67,8 +67,8 @@ public class MessageSourceResourceBundle extends ResourceBundle {
 
 
 	/**
-	 * This implementation resolves the code in the MessageSource.
-	 * Returns {@code null} if the message could not be resolved.
+	 * 此实现在 MessageSource 中解析代码。
+	 * 如果无法解析消息则返回 {@code null}。
 	 */
 	@Override
 	@Nullable
@@ -82,10 +82,10 @@ public class MessageSourceResourceBundle extends ResourceBundle {
 	}
 
 	/**
-	 * This implementation checks whether the target MessageSource can resolve
-	 * a message for the given key, translating {@code NoSuchMessageException}
-	 * accordingly. In contrast to ResourceBundle's default implementation in
-	 * JDK 1.6, this does not rely on the capability to enumerate message keys.
+	 * 此实现检查目标 MessageSource 是否可以解析
+	 * 给定键的消息，并相应地转换 {@code NoSuchMessageException}。
+	 * 与 JDK 1.6 中 ResourceBundle 的默认实现不同，
+	 * 此实现不依赖于枚举消息键的能力。
 	 */
 	@Override
 	public boolean containsKey(String key) {
@@ -99,8 +99,8 @@ public class MessageSourceResourceBundle extends ResourceBundle {
 	}
 
 	/**
-	 * This implementation throws {@code UnsupportedOperationException},
-	 * as a MessageSource does not allow for enumerating the defined message codes.
+	 * 此实现抛出 {@code UnsupportedOperationException}，
+	 * 因为 MessageSource 不允许枚举已定义的消息代码。
 	 */
 	@Override
 	public Enumeration<String> getKeys() {
@@ -108,8 +108,8 @@ public class MessageSourceResourceBundle extends ResourceBundle {
 	}
 
 	/**
-	 * This implementation exposes the specified Locale for introspection
-	 * through the standard {@code ResourceBundle.getLocale()} method.
+	 * 此实现暴露指定的 Locale，以便通过
+	 * 标准 {@code ResourceBundle.getLocale()} 方法进行自省。
 	 */
 	@Override
 	public Locale getLocale() {

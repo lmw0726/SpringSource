@@ -33,7 +33,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Candidate components index loading mechanism for internal use within the framework.
+ * 候选组件索引加载机制，仅供框架内部使用。
  *
  * @author Stephane Nicoll
  * @since 5.0
@@ -41,19 +41,16 @@ import java.util.concurrent.ConcurrentMap;
 public final class CandidateComponentsIndexLoader {
 
 	/**
-	 * The location to look for components.
-	 * <p>Can be present in multiple JAR files.
+	 * 查找组件的位置。
+	 * <p>可以存在于多个 JAR 文件中。
 	 */
 	public static final String COMPONENTS_RESOURCE_LOCATION = "META-INF/spring.components";
 
 	/**
-	 * System property that instructs Spring to ignore the components index, i.e.
-	 * to always return {@code null} from {@link #loadIndex(ClassLoader)}.
-	 * <p>The default is "false", allowing for regular use of the index. Switching this
-	 * flag to {@code true} fulfills a corner case scenario when an index is partially
-	 * available for some libraries (or use cases) but couldn't be built for the whole
-	 * application. In this case, the application context fallbacks to a regular
-	 * classpath arrangement (i.e. as though no index were present at all).
+	 * 系统属性，用于指示 Spring 忽略组件索引，即始终从 {@link #loadIndex(ClassLoader)} 返回 {@code null}。
+	 * <p>默认值为 "false"，允许正常使用索引。将此标志切换为 {@code true} 可满足边界情况，
+	 * 即索引仅部分可用于某些库（或用例），但无法为整个应用程序构建索引。
+	 * 在这种情况下，应用程序上下文将回退到常规的类路径安排（即就好像根本没有索引一样）。
 	 */
 	public static final String IGNORE_INDEX = "spring.index.ignore";
 
@@ -71,14 +68,12 @@ public final class CandidateComponentsIndexLoader {
 
 
 	/**
-	 * Load and instantiate the {@link CandidateComponentsIndex} from
-	 * {@value #COMPONENTS_RESOURCE_LOCATION}, using the given class loader. If no
-	 * index is available, return {@code null}.
+	 * 使用给定的类加载器从 {@value #COMPONENTS_RESOURCE_LOCATION} 加载并实例化 {@link CandidateComponentsIndex}。
+	 * 如果没有可用的索引，则返回 {@code null}。
 	 *
-	 * @param classLoader the ClassLoader to use for loading (can be {@code null} to use the default)
-	 * @return the index to use or {@code null} if no index was found
-	 * @throws IllegalArgumentException if any module index cannot
-	 *                                  be loaded or if an error occurs while creating {@link CandidateComponentsIndex}
+	 * @param classLoader 用于加载的类加载器（可以为 {@code null} 以使用默认的类加载器）
+	 * @return 要使用的索引，如果未找到索引则返回 {@code null}
+	 * @throws IllegalArgumentException 如果无法加载任何模块索引或在创建 {@link CandidateComponentsIndex} 时发生错误
 	 */
 	@Nullable
 	public static CandidateComponentsIndex loadIndex(@Nullable ClassLoader classLoader) {

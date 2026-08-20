@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Parser for the @{@link ComponentScan} annotation.
+ * @{@link ComponentScan} 注解的解析器。
  *
  * @author Chris Beams
  * @author Juergen Hoeller

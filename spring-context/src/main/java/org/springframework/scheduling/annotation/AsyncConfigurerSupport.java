@@ -22,9 +22,8 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.lang.Nullable;
 
 /**
- * A convenience {@link AsyncConfigurer} that implements all methods
- * so that the defaults are used. Provides a backward compatible alternative
- * of implementing {@link AsyncConfigurer} directly.
+ * 一个便捷的 {@link AsyncConfigurer} 实现，所有方法均使用默认值。
+ * 提供了向后兼容的方式，无需直接实现 {@link AsyncConfigurer}。
  *
  * @author Stephane Nicoll
  * @since 4.1

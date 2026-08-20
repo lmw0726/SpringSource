@@ -1,5 +1,5 @@
 /**
- * Integration with Joda-Time for formatting Joda date and time types as well as standard JDK Date types.
+ * 与 Joda-Time 集成，用于格式化 Joda 日期和时间类型以及标准 JDK Date 类型。
  */
 @NonNullApi
 @NonNullFields

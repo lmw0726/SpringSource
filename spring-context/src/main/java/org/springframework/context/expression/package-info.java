@@ -1,5 +1,5 @@
 /**
- * Expression parsing support within a Spring application context.
+ * Spring 应用上下文中的表达式解析支持。
  */
 @NonNullApi
 @NonNullFields

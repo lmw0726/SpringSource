@@ -26,13 +26,12 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Class-level annotation that indicates to register instances of a class with a JMX server,
- * corresponding to the {@link org.springframework.jmx.export.metadata.ManagedResource} attribute.
+ * 类级别注解，用于指示将类的实例注册到 JMX 服务器，
+ * 对应于 {@link org.springframework.jmx.export.metadata.ManagedResource} 属性。
  *
- * <p><b>Note:</b> This annotation is marked as inherited, allowing for generic
- * management-aware base classes. In such a scenario, it is recommended to
- * <i>not</i> specify an object name value since this would lead to naming
- * collisions in case of multiple subclasses getting registered.
+ * <p><b>注意：</b>此注解被标记为可继承的，允许使用通用的管理感知基类。
+ * 在这种情况下，建议<i>不</i>指定 objectName 值，因为如果注册了多个子类，
+ * 这会导致命名冲突。
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -47,7 +46,7 @@ import org.springframework.core.annotation.AliasFor;
 public @interface ManagedResource {
 
 	/**
-	 * Alias for the {@link #objectName} attribute, for simple default usage.
+	 * {@link #objectName} 属性的别名，用于简单的默认使用方式。
 	 */
 	@AliasFor("objectName")
 	String value() default "";
