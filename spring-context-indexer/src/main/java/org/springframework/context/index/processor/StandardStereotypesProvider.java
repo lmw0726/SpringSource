@@ -24,8 +24,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 
 /**
- * A {@link StereotypesProvider} that extracts a stereotype for each
- * {@code javax.*} annotation <i>present</i> on a class or interface.
+ * 一个 {@link StereotypesProvider}，它从类或接口上存在的
+ * 每个 {@code javax.*} 注解中提取一个模板（stereotype）。
  *
  * @author Stephane Nicoll
  * @since 5.0

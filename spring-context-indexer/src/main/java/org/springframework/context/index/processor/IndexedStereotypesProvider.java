@@ -25,9 +25,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 
 /**
- * A {@link StereotypesProvider} implementation that extracts the stereotypes
- * flagged by the {@value #INDEXED_ANNOTATION} annotation. This implementation
- * honors stereotypes defined this way on meta-annotations.
+ * 一个 {@link StereotypesProvider} 实现，用于提取被 {@value #INDEXED_ANNOTATION} 注解标记的构面（stereotypes）。
+ * 此实现支持以这种方式在元注解（meta-annotations）上定义的构面。
  *
  * @author Stephane Nicoll
  * @since 5.0
@@ -96,7 +95,7 @@ class IndexedStereotypesProvider implements StereotypesProvider {
 		if (seen.contains(element)) {
 			return null;
 		}
-		// We need to visit all indexed annotations.
+		// 我们需要遍历所有被索引的注解。
 		if (!isIndexedAnnotation(annotation)) {
 			seen.add(element);
 		}

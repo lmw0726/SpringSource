@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Meta-data for candidate components.
+ * 候选组件的元数据。
  *
  * @author Stephane Nicoll
  * @since 5.0

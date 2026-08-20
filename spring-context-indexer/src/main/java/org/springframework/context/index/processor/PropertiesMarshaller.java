@@ -25,7 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Marshaller to write {@link CandidateComponentsMetadata} as properties.
+ * 用于将 {@link CandidateComponentsMetadata} 序列化为 properties 文件的 Marshaller。
  *
  * @author Stephane Nicoll
  * @author Vedran Pavic

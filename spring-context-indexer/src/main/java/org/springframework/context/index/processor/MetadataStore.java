@@ -25,7 +25,7 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
 /**
- * Store {@link CandidateComponentsMetadata} on the filesystem.
+ * 将 {@link CandidateComponentsMetadata} 存储在文件系统上。
  *
  * @author Stephane Nicoll
  * @since 5.0
@@ -47,7 +47,7 @@ class MetadataStore {
 			return readMetadata(getMetadataResource().openInputStream());
 		}
 		catch (IOException ex) {
-			// Failed to read metadata -> ignore.
+			// 读取元数据失败 -> 忽略。
 			return null;
 		}
 	}

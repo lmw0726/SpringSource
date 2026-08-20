@@ -27,7 +27,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 /**
- * Used by {@link CandidateComponentsIndexer} to collect {@link CandidateComponentsMetadata}.
+ * 由 {@link CandidateComponentsIndexer} 使用，用于收集 {@link CandidateComponentsMetadata}。
  *
  * @author Stephane Nicoll
  * @since 5.0
@@ -46,9 +46,9 @@ class MetadataCollector {
 
 
 	/**
-	 * Create a new {@code MetadataProcessor} instance.
-	 * @param processingEnvironment the processing environment of the build
-	 * @param previousMetadata any previous metadata or {@code null}
+	 * 创建一个新的 {@code MetadataProcessor} 实例。
+	 * @param processingEnvironment 构建的处理环境
+	 * @param previousMetadata 之前的元数据，或 {@code null}
 	 */
 	public MetadataCollector(ProcessingEnvironment processingEnvironment,
 			CandidateComponentsMetadata previousMetadata) {

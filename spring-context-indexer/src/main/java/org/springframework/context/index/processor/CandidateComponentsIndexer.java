@@ -36,8 +36,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
 /**
- * Annotation {@link Processor} that writes a {@link CandidateComponentsMetadata}
- * file for spring components.
+ * 注解处理器 {@link Processor}，用于为 Spring 组件写入 {@link CandidateComponentsMetadata} 文件。
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller

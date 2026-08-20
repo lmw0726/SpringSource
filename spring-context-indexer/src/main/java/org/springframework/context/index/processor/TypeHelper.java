@@ -16,10 +16,6 @@
 
 package org.springframework.context.index.processor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -28,9 +24,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Type utilities.
+ * 类型工具类。
  *
  * @author Stephane Nicoll
  * @since 5.0
@@ -81,26 +80,25 @@ class TypeHelper {
 	}
 
 	/**
-	 * Return the super class of the specified {@link Element} or null if this
-	 * {@code element} represents {@link Object}.
+	 * 返回指定{@link Element} 的父类，如果该
+	 * {@code element} 表示 {@link Object}，则返回 null。
 	 */
 	public Element getSuperClass(Element element) {
 		List<? extends TypeMirror> superTypes = this.types.directSupertypes(element.asType());
 		if (superTypes.isEmpty()) {
-			return null;  // reached java.lang.Object
+			return null;  // 已到达 java.lang.Object
 		}
 		return this.types.asElement(superTypes.get(0));
 	}
 
 	/**
-	 * Return the interfaces that are <strong>directly</strong> implemented by the
-	 * specified {@link Element} or an empty list if this {@code element} does not
-	 * implement any interface.
+	 * 返回指定 {@link Element} <strong>直接</strong>实现的接口列表，
+	 * 如果该 {@code element} 未实现任何接口，则返回空列表。
 	 */
 	public List<Element> getDirectInterfaces(Element element) {
 		List<? extends TypeMirror> superTypes = this.types.directSupertypes(element.asType());
 		List<Element> directInterfaces = new ArrayList<>();
-		if (superTypes.size() > 1) { // index 0 is the super class
+		if (superTypes.size() > 1) { // 索引 0 是父类
 			for (int i = 1; i < superTypes.size(); i++) {
 				Element e = this.types.asElement(superTypes.get(i));
 				if (e != null) {
@@ -116,7 +114,7 @@ class TypeHelper {
 			return this.env.getElementUtils().getAllAnnotationMirrors(e);
 		}
 		catch (Exception ex) {
-			// This may fail if one of the annotations is not available.
+			// 如果某个注解不可用，此处可能会失败。
 			return Collections.emptyList();
 		}
 	}

@@ -31,14 +31,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Specialization of {@link Properties} that sorts properties alphanumerically
- * based on their keys.
+ * {@link Properties} 的特化实现，根据键名按字母数字顺序对属性进行排序。
  *
- * <p>This can be useful when storing the {@link Properties} instance in a
- * properties file, since it allows such files to be generated in a repeatable
- * manner with consistent ordering of properties.
+ * <p>在将 {@link Properties} 实例存储到属性文件时，这非常有用，
+ * 因为它允许以可重复的方式生成此类文件，并保持属性的一致排序。
  *
- * <p>Comments in generated properties files can also be optionally omitted.
+ * <p>生成的属性文件中的注释也可以选择性地省略。
  *
  * @author Sam Brannen
  * @since 5.2
@@ -58,25 +56,19 @@ class SortedProperties extends Properties {
 
 
 	/**
-	 * Construct a new {@code SortedProperties} instance that honors the supplied
-	 * {@code omitComments} flag.
-	 * @param omitComments {@code true} if comments should be omitted when
-	 * storing properties in a file
+	 * 构造一个新的 {@code SortedProperties} 实例，并遵循提供的 {@code omitComments} 标志。
+	 * @param omitComments 当存储属性到文件时是否应省略注释，{@code true} 表示省略
 	 */
 	SortedProperties(boolean omitComments) {
 		this.omitComments = omitComments;
 	}
 
 	/**
-	 * Construct a new {@code SortedProperties} instance with properties populated
-	 * from the supplied {@link Properties} object and honoring the supplied
-	 * {@code omitComments} flag.
-	 * <p>Default properties from the supplied {@code Properties} object will
-	 * not be copied.
-	 * @param properties the {@code Properties} object from which to copy the
-	 * initial properties
-	 * @param omitComments {@code true} if comments should be omitted when
-	 * storing properties in a file
+	 * 构造一个新的 {@code SortedProperties} 实例，从提供的 {@link Properties} 对象填充属性，
+	 * 并遵循提供的 {@code omitComments} 标志。
+	 * <p>提供的 {@code Properties} 对象中的默认属性不会被复制。
+	 * @param properties 用于复制初始属性的 {@code Properties} 对象
+	 * @param omitComments 当存储属性到文件时是否应省略注释，{@code true} 表示省略
 	 */
 	SortedProperties(Properties properties, boolean omitComments) {
 		this(omitComments);
@@ -119,7 +111,7 @@ class SortedProperties extends Properties {
 	}
 
 	/**
-	 * Return a sorted enumeration of the keys in this {@link Properties} object.
+	 * 返回此 {@link Properties} 对象中键的排序枚举。
 	 * @see #keySet()
 	 */
 	@Override
@@ -128,10 +120,9 @@ class SortedProperties extends Properties {
 	}
 
 	/**
-	 * Return a sorted set of the keys in this {@link Properties} object.
-	 * <p>The keys will be converted to strings if necessary using
-	 * {@link String#valueOf(Object)} and sorted alphanumerically according to
-	 * the natural order of strings.
+	 * 返回此 {@link Properties} 对象中键的排序集合。
+	 * <p>如果需要，键将使用 {@link String#valueOf(Object)} 转换为字符串，
+	 * 并根据字符串的自然顺序按字母数字顺序排序。
 	 */
 	@Override
 	public Set<Object> keySet() {
@@ -141,10 +132,9 @@ class SortedProperties extends Properties {
 	}
 
 	/**
-	 * Return a sorted set of the entries in this {@link Properties} object.
-	 * <p>The entries will be sorted based on their keys, and the keys will be
-	 * converted to strings if necessary using {@link String#valueOf(Object)}
-	 * and compared alphanumerically according to the natural order of strings.
+	 * 返回此 {@link Properties} 对象中条目的排序集合。
+	 * <p>条目将根据其键进行排序，如果需要，键将使用 {@link String#valueOf(Object)} 转换为字符串，
+	 * 并根据字符串的自然顺序按字母数字顺序进行比较。
 	 */
 	@Override
 	public Set<Entry<Object, Object>> entrySet() {
